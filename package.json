@@ -1,0 +1,12 @@
+{
+  "name": "perennial",
+  "version": "0.0.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/phetsims/perennial.git"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1"
+  }
+}
