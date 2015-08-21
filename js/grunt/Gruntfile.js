@@ -8,6 +8,7 @@
 
 // grunt tasks
 var checkoutShas = require( '../../../perennial/js/grunt/checkoutShas' );
+var checkoutMasterAll = require( '../../../perennial/js/grunt/checkoutMasterAll' );
 
 module.exports = function( grunt ) {
   'use strict';
@@ -25,5 +26,11 @@ module.exports = function( grunt ) {
     '--repo : repository name where package.json should be read from',
     function() {
       checkoutShas( grunt, grunt.option( 'repo' ), true );
+    } );
+
+  grunt.registerTask( 'checkout-master-all',
+    'Check out master branch for all repos in git root',
+    function() {
+      checkoutMasterAll( grunt );
     } );
 };
