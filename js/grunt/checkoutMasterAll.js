@@ -27,11 +27,10 @@ module.exports = function( grunt ) {
     var filename = gitRoots[ i ];
     if ( grunt.file.isDir( '../' + filename ) && grunt.file.exists( '../' + filename + '/.git' ) ) {
       (function( filename ) {
-        child_process.exec( command, { cwd: '../' + filename }, function( error1, stdout1, stderr1 ) {
-          if ( error1 ) {
+        child_process.exec( command, { cwd: '../' + filename }, function( error ) {
+          if ( error ) {
             grunt.log.writeln( 'error in ' + command + ' for repo ' + filename );
           }
-          grunt.log.writeln( 'running ' + command + ' for ' + filename + '. stdout = ' + stdout1 + '. stderr = ' + stderr1 );
           finished();
         } );
       })( filename );
