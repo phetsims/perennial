@@ -28,7 +28,9 @@ module.exports = function( grunt ) {
     if ( grunt.file.isDir( '../' + filename ) && grunt.file.exists( '../' + filename + '/.git' ) ) {
       (function( filename ) {
         child_process.exec( command, { cwd: '../' + filename }, function( error1, stdout1, stderr1 ) {
-          assert( !error1, 'error in ' + command + ' for repo ' + filename );
+          if ( error1 ) {
+            grunt.log.writeln( 'error in ' + command + ' for repo ' + filename );
+          }
           grunt.log.writeln( 'running ' + command + ' for ' + filename + '. stdout = ' + stdout1 + '. stderr = ' + stderr1 );
           finished();
         } );
