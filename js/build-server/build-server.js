@@ -6,10 +6,12 @@
  * Starting and Stopping the Server
  * ================================
  *
- * All of the phet repos live on simian and figaro under /data/share/phet/phet-repos. The build server lives in chipper:
- * /data/share/phet/phet-repos/chipper. To start the build server, run this command on simian or figaro (without quotes):
+ * All of the phet repos live on simian and figaro under /data/share/phet/phet-repos. The build server lives in perennial:
+ * /data/share/phet/phet-repos/perennial/js/build-server. To manage the build server, run this command on simian or figaro:
  *
- * "cd /data/share/phet/phet-repos/chipper && nohup /usr/local/nodejs/bin/node js/build-server/build-server.js &"
+ * sudo /etc/init.d/build-server [start|stop|restart]
+ *
+ * Optionally add a --verbose flag for more debug information.
  *
  * Do not start the build server unless you have the necessary fields filled out in ~/.phet/build-local.json
  * (see assertions in getDeployConfig).
