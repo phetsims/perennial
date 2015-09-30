@@ -287,6 +287,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var simName = decodeURIComponent( req.query[ SIM_NAME_KEY ] );
   var version = decodeURIComponent( req.query[ VERSION_KEY ] );
 
+  winston.log( 'info', 'CHIPPER: ' + repos.chipper.sha );
+
   var productionServer = deployConfig.productionServerName;
   if ( req.query[ SERVER_NAME ] ) {
     productionServer = decodeURIComponent( req.query[ SERVER_NAME ] );
@@ -321,6 +323,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
       return;
     }
   }
+
+  winston.log( 'info', 'CHIPPER AFTER: ' + repos.chipper.sha );
 
   // validate simName
   if ( !simNameRegex.test( simName ) ) {
