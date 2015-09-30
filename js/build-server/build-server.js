@@ -54,7 +54,7 @@
  * The build server does the following steps when a deploy request is received:
  * - checks the authorization code, unauthorized codes will not trigger a build
  * - puts the build task on a queue so multiple builds don't occur simultaneously
- * - pull chipper and clone any missing repos
+ * - pull perennial and clone any missing repos
  * - npm install in the sim directory
  * - pull master for the sim and all dependencies
  * - grunt checkout-shas
@@ -99,7 +99,7 @@ var AUTHORIZATION_KEY = 'authorizationCode';
 var SERVER_NAME = 'serverName';
 var HTML_SIMS_DIRECTORY = '/data/web/htdocs/phetsims/sims/html/';
 var ENGLISH_LOCALE = 'en';
-var PERENNIAL = '../perennial';
+var PERENNIAL = '.';
 var UMASK = 436; // decimal version of the octal permissions mask 664
 
 // Handle command line input
@@ -627,28 +627,26 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         };
 
         // run every step of the build
-        exec( 'git pull', '.', function() { // pull chipper and perennial first
-          exec( 'git pull', PERENNIAL, function() {
-            exec( './chipper/bin/clone-missing-repos.sh', '..', function() { // clone missing repos in case any new repos exist that might be dependencies
-              pullMaster( function() {
-                exec( 'grunt checkout-shas --buildServer=true --repo=' + simName, PERENNIAL, function() {
-                  exec( 'git checkout ' + repos[ simName ].sha, simDir, function() { // checkout the sha for the current sim
-                    exec( 'npm install', simDir, function() {
-                      exec( 'grunt build-for-server --brand=phet --locales=' + locales, simDir, function() {
-                        mkVersionDir( function() {
-                          exec( 'cp build/* ' + HTML_SIMS_DIRECTORY + simName + '/' + version + '/', simDir, function() {
-                            writeHtaccess( function() {
-                              createTranslationsXML( simTitleCallback, function() {
-                                notifyServer( function() {
-                                  addToRosetta( simTitle, function() {
-                                    //spotScp( function() { TODO: do we need this? grunt deploy-production does a spot deploy already
-                                    exec( 'grunt checkout-master-all', PERENNIAL, function() {
-                                      exec( 'rm -rf ' + buildDir, '.', function() {
-                                        taskCallback();
-                                      } );
+        exec( 'git pull', PERENNIAL, function() {
+          exec( './chipper/bin/clone-missing-repos.sh', '..', function() { // clone missing repos in case any new repos exist that might be dependencies
+            pullMaster( function() {
+              exec( 'grunt checkout-shas --buildServer=true --repo=' + simName, PERENNIAL, function() {
+                exec( 'git checkout ' + repos[ simName ].sha, simDir, function() { // checkout the sha for the current sim
+                  exec( 'npm install', simDir, function() {
+                    exec( 'grunt build-for-server --brand=phet --locales=' + locales, simDir, function() {
+                      mkVersionDir( function() {
+                        exec( 'cp build/* ' + HTML_SIMS_DIRECTORY + simName + '/' + version + '/', simDir, function() {
+                          writeHtaccess( function() {
+                            createTranslationsXML( simTitleCallback, function() {
+                              notifyServer( function() {
+                                addToRosetta( simTitle, function() {
+                                  //spotScp( function() { TODO: do we need this? grunt deploy-production does a spot deploy already
+                                  exec( 'grunt checkout-master-all', PERENNIAL, function() {
+                                    exec( 'rm -rf ' + buildDir, '.', function() {
+                                      taskCallback();
                                     } );
-                                    //} );
                                   } );
+                                  //} );
                                 } );
                               } );
                             } );
