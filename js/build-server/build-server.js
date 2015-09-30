@@ -6,21 +6,30 @@
  * Starting and Stopping the Server
  * ================================
  *
- * All of the phet repos live on simian and figaro under /data/share/phet/phet-repos. The build server lives in perennial:
- * /data/share/phet/phet-repos/perennial/js/build-server. To manage the build server, run this command on simian or figaro:
+ * To start, stop, or restart the build server, run this command on simian or figaro:
  *
  * sudo /etc/init.d/build-server [start|stop|restart]
  *
- * Optionally add a --verbose flag for more debug information.
+ * Optionally add a --verbose flag for more debug information (with start or restart).
  *
- * Do not start the build server unless you have the necessary fields filled out in ~/.phet/build-local.json
- * (see assertions in getDeployConfig).
  *
- * To configure the build server to send an email on build failure, fill out the optional email related fields in getDeployConfig.
+ * Build Server Configuration
+ * ==========================
  *
- * Additionally, you will need an ssh key set up to copy files from the production server to spot. To do this, you'll need
- * to have an rsa key in ~/.ssh on the production server (run "ssh-keygen -t rsa" to generate a key if you don't already have one).
- * Also, you will need to add an entry for spot in ~/.ssh/authorized_keys like so:
+ * All of the phet repos live on simian and figaro under /data/share/phet/phet-repos. The build server lives in perennial:
+ * /data/share/phet/phet-repos/perennial/js/build-server.
+ *
+ * The build-server is run as user "phet-admin". It requires the certain fields filled out in phet-admin's HOME/.phet/build-local.json
+ * (see assertions in getBuildServerConfig.js). These fields are already filled out, but they may need to modified or updated.
+ *
+ * The build server is configured to send an email on build failure. The configuration for sending emails is also in
+ * phet-admin's HOME/.phet/build-local.json (these fields are described in getBuildServerConfig.js). To add other email
+ * recipients, you can add email addresses to the emailTo field in this file.
+ *
+ * Additionally, phet-admin needs an ssh key set up to copy files from the production server to spot. This should already be set up,
+ * but should you to do to set it up somewhere else, you'll need to have an rsa key in ~/.ssh on the production server and authorized
+ * (run "ssh-keygen -t rsa" to generate a key if you don't already have one).
+ * Also, you will need to add an entry for spot in ~/.ssh/config like so:
  *
  * Host spot
  *     HostName spot.colorado.edu
@@ -28,9 +37,7 @@
  *     Port 22
  *     IdentityFile ~/.ssh/id_rsa
  *
- * On spot, you'll need to add your public key from figaro to a file ~/.ssh/authorized_keys
- *
- * To stop the build server, look for its process id with "ps -elf | grep node" and kill the process.
+ * On spot, you'll need to add the public key from figaro to a file ~/.ssh/authorized_keys
  *
  *
  * Using the Build Server for Production Deploys
@@ -54,17 +61,22 @@
  * The build server does the following steps when a deploy request is received:
  * - checks the authorization code, unauthorized codes will not trigger a build
  * - puts the build task on a queue so multiple builds don't occur simultaneously
- * - pull perennial and clone any missing repos
- * - npm install in the sim directory
+ * - pull perennial and npm install
+ * - clone missing repos
  * - pull master for the sim and all dependencies
  * - grunt checkout-shas
- * - grunt build for selected locales
- * - grunt generate-thumbnails
+ * - checkout sha for the current sim
+ * - npm install in chipper and the sim directory
+ * - grunt build-for-server --brand=phet for selected locales (see chipper's Gruntfile for details)
  * - mkdir for the new sim version
  * - copy the build files to the correct location in the server doc root
- * - write necessary .htaccess files for indicating the latest directory and downloading the html files
+ * - write the .htaccess file for indicating the latest directory and downloading the html files
  * - write the XML file that tells the website which translations exist
  * - notify the website that a new simulation/translation is published and should appear
+ * - add the sim to rosetta's simInfoArray and commit and push (if the sim isn't already there)
+ * - checkout master for all repositories
+ *
+ * If any of these steps fails, the build aborts and grunt checkout-master-all is run so all repos are back on master
  *
  * @author Aaron Davis
  */
