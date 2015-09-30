@@ -82,7 +82,7 @@ var child_process = require( 'child_process' );
 var fs = require( 'fs.extra' );
 var async = require( 'async' );
 var email = require( 'emailjs/email' );
-var getDeployConfig = require( '../../../chipper/js/common/getDeployConfig' );
+var getDeployConfig = require( './getBuildServerConfig' );
 var deployConfig = getDeployConfig( fs );
 
 /* jshint -W079 */

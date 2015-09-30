@@ -16,6 +16,7 @@
     "lodash": "^3.10.1",
     "minimist": "^1.1.1",
     "request": "^2.55.0",
-    "winston": "^0.9.0"
+    "winston": "^0.9.0",
+    "passwd-user": "^1.2.1"
   }
 }
