@@ -16,7 +16,7 @@ var child_process = require( 'child_process' );
 module.exports = function( grunt, repositoryName, toMaster, buildServer ) {
   'use strict';
 
-  var dependencies = grunt.file.readJSON( ( buildServer ) ? '../chipper/js/build-server/tmp/dependencies.json' : '../' + repositoryName + '/dependencies.json' );
+  var dependencies = grunt.file.readJSON( ( buildServer ) ? '../perennial/js/build-server/tmp/dependencies.json' : '../' + repositoryName + '/dependencies.json' );
   var done = grunt.task.current.async();
   var numToCheckOut = 0;
   var numCheckedOut = 0;

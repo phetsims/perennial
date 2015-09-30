@@ -243,10 +243,10 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         }
         else {
           winston.log( 'error', 'error running command: ' + command + ' in ' + dir + '. build aborted.' );
-          //exec( 'grunt checkout-master-all', PERENNIAL, function() {
-          //  winston.log( 'info', 'checking out master for every repo in case build shas are still checked out' );
-          //  taskCallback( 'error running command ' + command + ': ' + err ); // build aborted, so take this build task off of the queue
-          //} );
+          exec( 'grunt checkout-master-all', PERENNIAL, function() {
+            winston.log( 'info', 'checking out master for every repo in case build shas are still checked out' );
+            taskCallback( 'error running command ' + command + ': ' + err ); // build aborted, so take this build task off of the queue
+          } );
         }
       }
     } );
@@ -287,8 +287,6 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var simName = decodeURIComponent( req.query[ SIM_NAME_KEY ] );
   var version = decodeURIComponent( req.query[ VERSION_KEY ] );
 
-  winston.log( 'info', 'CHIPPER: ' + repos.chipper.sha );
-
   var productionServer = deployConfig.productionServerName;
   if ( req.query[ SERVER_NAME ] ) {
     productionServer = decodeURIComponent( req.query[ SERVER_NAME ] );
@@ -323,8 +321,6 @@ var taskQueue = async.queue( function( task, taskCallback ) {
       return;
     }
   }
-
-  winston.log( 'info', 'CHIPPER AFTER: ' + repos.chipper.sha );
 
   // validate simName
   if ( !simNameRegex.test( simName ) ) {
