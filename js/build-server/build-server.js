@@ -654,13 +654,11 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                                 createTranslationsXML( simTitleCallback, function() {
                                   notifyServer( function() {
                                     addToRosetta( simTitle, function() {
-                                      //spotScp( function() { TODO: do we need this? grunt deploy-production does a spot deploy already
                                       exec( 'grunt checkout-master-all', PERENNIAL, function() {
                                         exec( 'rm -rf ' + buildDir, '.', function() {
                                           taskCallback();
                                         } );
                                       } );
-                                      //} );
                                     } );
                                   } );
                                 } );
