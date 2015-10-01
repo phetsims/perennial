@@ -743,7 +743,7 @@ function queueDeploy( req, res ) {
                              ' Version = ' + decodeURIComponent( version ) + ' Locales = ' + ( locales ? decodeURIComponent( locales ) : 'undefined' ) +
                              ' Shas = ' + shas;
           winston.log( 'error', errorMessage );
-          sendEmail( 'BUILD ERROR', errorMessage.replace( /\n/g, ' ' ) ); // for some reason emails get cut off at newlines
+          sendEmail( 'BUILD ERROR', errorMessage );
         }
         else {
           winston.log( 'info', 'build for ' + simName + ' finished successfully' );
