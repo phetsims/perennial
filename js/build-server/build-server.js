@@ -107,7 +107,7 @@ var REPOS_KEY = 'repos';
 var LOCALES_KEY = 'locales';
 var SIM_NAME_KEY = 'simName';
 var VERSION_KEY = 'version';
-var TASK_KEY = 'task';
+var OPTION_KEY = 'option';
 var AUTHORIZATION_KEY = 'authorizationCode';
 var SERVER_NAME = 'serverName';
 var HTML_SIMS_DIRECTORY = '/data/web/htdocs/phetsims/sims/html/';
@@ -299,7 +299,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var locales = ( req.query[ LOCALES_KEY ] ) ? decodeURIComponent( req.query[ LOCALES_KEY ] ) : '*';
   var simName = decodeURIComponent( req.query[ SIM_NAME_KEY ] );
   var version = decodeURIComponent( req.query[ VERSION_KEY ] );
-  var task = req.query[ TASK_KEY ] ? decodeURIComponent( req.query[ TASK_KEY ] ) : 'default';
+  var option = req.query[ OPTION_KEY ] ? decodeURIComponent( req.query[ OPTION_KEY ] ) : 'default';
 
   var productionServer = deployConfig.productionServerName;
   if ( req.query[ SERVER_NAME ] ) {
@@ -669,7 +669,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                       exec( 'npm install', simDir, function() {
                         exec( 'grunt build-for-server --brand=phet --locales=' + locales, simDir, function() {
 
-                          if ( task === 'rc' ) {
+                          if ( option === 'rc' ) {
                             spotScp( afterDeploy );
                           }
                           else {
