@@ -710,9 +710,18 @@ function queueDeploy( req, res ) {
       winston.log( 'info', 'queuing build for ' + simName + ' ' + version );
       taskQueue.push( { req: req, res: res }, function( err ) {
         if ( err ) {
+          var shas = decodeURIComponent( repos );
+
+          // try to format the JSON nicely for the email, but don't worry if it is invalid JSON
+          try {
+            shas = JSON.stringify( JSON.parse( shas ), null, 2 );
+          }
+          catch( e ) {
+            // invalid JSON
+          }
           var errorMessage = 'Build failed with error: ' + err + '. Sim = ' + decodeURIComponent( simName ) +
                              ' Version = ' + decodeURIComponent( version ) + ' Locales = ' + ( locales ? decodeURIComponent( locales ) : 'undefined' ) +
-                             ' Shas = ' + decodeURIComponent( repos );
+                             ' Shas = ' + shas;
           winston.log( 'error', errorMessage );
           sendEmail( 'BUILD ERROR', errorMessage.replace( /\n/g, ' ' ) ); // for some reason emails get cut off at newlines
         }
