@@ -39,6 +39,8 @@
  *
  * On spot, you'll need to add the public key from figaro to a file ~/.ssh/authorized_keys
  *
+ * build-server log files can be found at /data/share/phet/phet-repos/perennial/build-server.log
+ *
  *
  * Using the Build Server for Production Deploys
  * =============================================
@@ -50,9 +52,10 @@
  * - simName - the standardized name of the sim, lowercase with hyphens instead of spaces (i.e. area-builder)
  * - version - the version to be built. Production deploys will automatically strip everything after the major.minor.maintenance
  * - authorizationCode - a password to authorize legitimate requests
- * - serverName - server to deploy to, defaults to figaro.colorado.edu, but could be overriden for testing on simian.colorado.edu
+ * - option - optional parameter, can be set to "rc" to do an rc deploy instead of production
  *
- * Note: You will NOT want to assemble these request URLs manually, instead use grunt deploy-production for deploys.
+ * Note: You will NOT want to assemble these request URLs manually, instead use "grunt deploy-production" for production deploys and
+ * "grunt deploy-rc" for rc deploys.
  *
  *
  * What the Build Server Does
@@ -68,13 +71,18 @@
  * - checkout sha for the current sim
  * - npm install in chipper and the sim directory
  * - grunt build-for-server --brand=phet for selected locales (see chipper's Gruntfile for details)
- * - mkdir for the new sim version
- * - copy the build files to the correct location in the server doc root
- * - write the .htaccess file for indicating the latest directory and downloading the html files
- * - write the XML file that tells the website which translations exist
- * - notify the website that a new simulation/translation is published and should appear
- * - add the sim to rosetta's simInfoArray and commit and push (if the sim isn't already there)
- * - checkout master for all repositories
+ *
+ * - for rc deploys:
+ *    - deploy to spot, checkout master for all repositories, and finish
+ *
+ * - for production deploys:
+ *    - mkdir for the new sim version
+ *    - copy the build files to the correct location in the server doc root
+ *    - write the .htaccess file for indicating the latest directory and downloading the html files
+ *    - write the XML file that tells the website which translations exist
+ *    - notify the website that a new simulation/translation is published and should appear
+ *    - add the sim to rosetta's simInfoArray and commit and push (if the sim isn't already there)
+ *    - checkout master for all repositories
  *
  * If any of these steps fails, the build aborts and grunt checkout-master-all is run so all repos are back on master
  *
