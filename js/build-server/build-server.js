@@ -107,6 +107,7 @@ var REPOS_KEY = 'repos';
 var LOCALES_KEY = 'locales';
 var SIM_NAME_KEY = 'simName';
 var VERSION_KEY = 'version';
+var TASK_KEY = 'task';
 var AUTHORIZATION_KEY = 'authorizationCode';
 var SERVER_NAME = 'serverName';
 var HTML_SIMS_DIRECTORY = '/data/web/htdocs/phetsims/sims/html/';
@@ -298,6 +299,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var locales = ( req.query[ LOCALES_KEY ] ) ? decodeURIComponent( req.query[ LOCALES_KEY ] ) : '*';
   var simName = decodeURIComponent( req.query[ SIM_NAME_KEY ] );
   var version = decodeURIComponent( req.query[ VERSION_KEY ] );
+  var task = req.query[ TASK_KEY ] ? decodeURIComponent( req.query[ TASK_KEY ] ) : 'default';
 
   var productionServer = deployConfig.productionServerName;
   if ( req.query[ SERVER_NAME ] ) {
@@ -455,18 +457,26 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   /**
    * Copy files to spot. This function calls scp once for each file instead of using scp -r. The reason for this is that
    * scp -r will create a new directory called 'build' inside the sim version directory if the version directory already exists.
-   * Because this function is called for translations too, in many cases the directory will already exist.
    * @param callback
    */
-  //var spotScp = function( callback ) {
-  //  var buildDir = simDir + '/build';
-  //  var files = fs.readdirSync( buildDir );
-  //  var finished = _.after( files.length, callback );
-  //  for ( var i = 0; i < files.length; i++ ) {
-  //    var filename = files[ i ];
-  //    exec( 'scp ' + filename + ' ' + deployConfig.devUsername + '@' + deployConfig.devDeployServer + ':' + deployConfig.devDeployPath + simName + '/' + version, buildDir, finished );
-  //  }
-  //};
+  var spotScp = function( callback ) {
+    var userAtServer = deployConfig.devUsername + '@' + deployConfig.devDeployServer;
+    var simVersionDirectory = deployConfig.devDeployPath + simName + '/' + version;
+
+    // mkdir first in case it doesn't exist already
+    var mkdirCommand = 'ssh ' + userAtServer + ' \'mkdir -p ' + simVersionDirectory + '\'';
+    exec( mkdirCommand, buildDir, function() {
+
+      // copy the files
+      var buildDir = simDir + '/build';
+      var files = fs.readdirSync( buildDir );
+      var finished = _.after( files.length, callback );
+      for ( var i = 0; i < files.length; i++ ) {
+        var filename = files[ i ];
+        exec( 'scp ' + filename + ' ' + userAtServer + ':' + simVersionDirectory, buildDir, finished );
+      }
+    } );
+  };
 
   /**
    * Add an entry in for this sim in simInfoArray in rosetta, so it shows up as translatable.
@@ -618,6 +628,16 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     } );
   };
 
+  /**
+   * Clean up after deploy. Checkout master for every repo and remove tmp dir.
+   */
+  var afterDeploy = function() {
+    exec( 'grunt checkout-master-all', PERENNIAL, function() {
+      exec( 'rm -rf ' + buildDir, '.', function() {
+        taskCallback();
+      } );
+    } );
+  };
 
   /**
    * Write a dependencies.json file based on the the dependencies passed to the build server.
@@ -648,23 +668,23 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                     exec( 'npm install', '../chipper', function() { // npm install in chipper in case there are new dependencies there
                       exec( 'npm install', simDir, function() {
                         exec( 'grunt build-for-server --brand=phet --locales=' + locales, simDir, function() {
-                          mkVersionDir( function() {
-                            exec( 'cp build/* ' + HTML_SIMS_DIRECTORY + simName + '/' + version + '/', simDir, function() {
-                              writeHtaccess( function() {
-                                createTranslationsXML( simTitleCallback, function() {
-                                  notifyServer( function() {
-                                    addToRosetta( simTitle, function() {
-                                      exec( 'grunt checkout-master-all', PERENNIAL, function() {
-                                        exec( 'rm -rf ' + buildDir, '.', function() {
-                                          taskCallback();
-                                        } );
-                                      } );
+
+                          if ( task === 'rc' ) {
+                            spotScp( afterDeploy );
+                          }
+                          else {
+                            mkVersionDir( function() {
+                              exec( 'cp build/* ' + HTML_SIMS_DIRECTORY + simName + '/' + version + '/', simDir, function() {
+                                writeHtaccess( function() {
+                                  createTranslationsXML( simTitleCallback, function() {
+                                    notifyServer( function() {
+                                      addToRosetta( simTitle, afterDeploy );
                                     } );
                                   } );
                                 } );
                               } );
                             } );
-                          } );
+                          }
                         } );
                       } );
                     } );
