@@ -345,7 +345,16 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   // validate version and strip suffixes since just the numbers are used in the directory name on simian and figaro
   var versionMatch = version.match( /^(\d+\.\d+\.\d+)(?:-.*)?$/ );
   if ( versionMatch && versionMatch.length === 2 ) {
-    version = versionMatch[ 1 ];
+
+    // if deploying an rc version use the -rc.[number] suffix
+    if ( option === 'rc' ) {
+      version = versionMatch[ 0 ];
+    }
+
+    // otherwise strip any suffix
+    else {
+      version = versionMatch[ 1 ];
+    }
     winston.log( 'info', 'detecting version number: ' + version );
   }
   else {
