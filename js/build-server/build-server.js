@@ -479,7 +479,13 @@ var taskQueue = async.queue( function( task, taskCallback ) {
       // copy the files
       var buildDir = simDir + '/build';
       var files = fs.readdirSync( buildDir );
-      var finished = _.after( files.length, callback );
+
+      // after finishing copying the files, chmod to make sure we perserve group write on spot
+      var finished = _.after( files.length, function() {
+        var chmodCommand = 'ssh ' + userAtServer + ' \'chmod -R g+w ' + simVersionDirectory + '\'';
+        exec( chmodCommand, buildDir, callback );
+      } );
+
       for ( var i = 0; i < files.length; i++ ) {
         var filename = files[ i ];
         exec( 'scp ' + filename + ' ' + userAtServer + ':' + simVersionDirectory, buildDir, finished );
