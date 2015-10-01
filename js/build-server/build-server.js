@@ -573,7 +573,9 @@ var taskQueue = async.queue( function( task, taskCallback ) {
       if ( _.any( errors ) ) {
         abortBuild( 'at least one repository failed to pull master' );
       }
-      callback();
+      else {
+        callback();
+      }
     } );
 
     var errorCheckCallback = function( err ) {
