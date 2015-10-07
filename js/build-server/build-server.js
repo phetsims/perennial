@@ -89,8 +89,6 @@
  * @author Aaron Davis
  */
 
-// The following comment permits node-specific globals (such as process.cwd()) to pass jshint
-/* jslint node: true */
 'use strict';
 
 // modules
@@ -105,9 +103,7 @@ var email = require( 'emailjs/email' );
 var getDeployConfig = require( './getBuildServerConfig' );
 var deployConfig = getDeployConfig( fs );
 
-/* jshint -W079 */
-var _ = require( 'lodash' ); // allow _ to be redefined, contrary to jshintOptions.js
-/* jshint +W079 */
+var _ = require( 'lodash' );
 
 // constants
 var LISTEN_PORT = 16371;

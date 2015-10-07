@@ -7,9 +7,7 @@ var assert = require( 'assert' );
 var child_process = require( 'child_process' );
 
 // 3rd-party packages
-/* jshint -W079 */
-var _ = require( '../../../sherpa/lib/lodash-2.4.1.min' ); // allow _ to be redefined, contrary to jshintOptions.js
-/* jshint +W079 */
+var _ = require( '../../../sherpa/lib/lodash-2.4.1.min' );
 
 /**
  * @param grunt the grunt instance
