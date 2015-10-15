@@ -117,7 +117,6 @@ var SERVER_NAME = 'serverName';
 var HTML_SIMS_DIRECTORY = '/data/web/htdocs/phetsims/sims/html/';
 var ENGLISH_LOCALE = 'en';
 var PERENNIAL = '.';
-var UMASK = 436; // decimal version of the octal permissions mask 664
 
 // Handle command line input
 // First 2 args provide info about executables, ignore
@@ -446,7 +445,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 
     finalXML = finalXML.concat( '</simulations>\n' + '</project>' );
 
-    fs.writeFileSync( HTML_SIMS_DIRECTORY + simName + '/' + version + '/' + simName + '.xml', finalXML, { mode: UMASK } );
+    fs.writeFileSync( HTML_SIMS_DIRECTORY + simName + '/' + version + '/' + simName + '.xml', finalXML );
     winston.log( 'info', 'wrote XML file:\n' + finalXML );
     callback();
   };
@@ -603,7 +602,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var mkVersionDir = function( callback ) {
     var simDirPath = HTML_SIMS_DIRECTORY + simName + '/' + version + '/';
     try {
-      fs.mkdirpSync( simDirPath, UMASK );
+      fs.mkdirpSync( simDirPath );
       callback();
     }
     catch( e ) {
