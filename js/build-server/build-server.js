@@ -126,6 +126,8 @@ var parsedCommandLineOptions = parseArgs( commandLineArgs, {
   boolean: true
 } );
 
+console.log( process.env.HOME );
+
 var defaultOptions = {
   verbose: false,
 

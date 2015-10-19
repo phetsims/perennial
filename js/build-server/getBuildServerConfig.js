@@ -56,6 +56,10 @@ var passwdUser = require( 'passwd-user' );
      */
     if ( process.platform === 'linux' ) {
       BUILD_LOCAL_FILENAME = passwdUser.sync( process.getuid() ).homedir + '/.phet/build-local.json';
+
+      // set the home environment variable correctly, apparently it is used by npm install an will cause issues if set
+      // to the home directory of the user starting the build-server
+      process.env.HOME = '/home/phet-admin';
     }
     else {
       BUILD_LOCAL_FILENAME = process.env.HOME + '/.phet/build-local.json';
