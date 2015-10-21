@@ -126,8 +126,6 @@ var parsedCommandLineOptions = parseArgs( commandLineArgs, {
   boolean: true
 } );
 
-console.log( process.env.HOME );
-
 var defaultOptions = {
   verbose: false,
 
@@ -505,41 +503,43 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * @param callback
    */
   var addToRosetta = function( simTitle, callback ) {
-    var simInfoArray = '../rosetta/data/simInfoArray.json';
-    fs.readFile( simInfoArray, { encoding: 'utf8' }, function( err, simInfoArrayString ) {
-      var data = JSON.parse( simInfoArrayString );
-      if ( err ) {
-        winston.log( 'error', 'couldn\'t read simInfoArray ' + err );
-        abortBuild( 'couldn\'t read simInfoArray ' + err );
-      }
-      else {
-        var host = ( productionServer === 'simian.colorado.edu' ) ? 'phet-dev.colorado.edu' : 'phet.colorado.edu';
-        var testUrl = 'http://' + host + '/sims/html/' + simName + '/latest/' + simName + '_en.html';
-        var newSim = true;
-        for ( var i = 0; i < data.length; i++ ) {
-          var simInfoObject = data[ i ];
-          if ( simInfoObject.projectName && simInfoObject.projectName === simName ) {
-            simInfoObject.simTitle = simTitle;
-            simInfoObject.testUrl = testUrl;
-            newSim = false;
-          }
+
+    // start by pulling rosetta to make sure it is up to date and avoid merge conflicts
+    exec( 'git pull', '../rosetta', function() {
+      var simInfoArray = '../rosetta/data/simInfoArray.json';
+      fs.readFile( simInfoArray, { encoding: 'utf8' }, function( err, simInfoArrayString ) {
+        var data = JSON.parse( simInfoArrayString );
+        if ( err ) {
+          winston.log( 'error', 'couldn\'t read simInfoArray ' + err );
+          abortBuild( 'couldn\'t read simInfoArray ' + err );
         }
-        if ( newSim ) {
-          data.push( {
-            simTitle: simTitle,
-            projectName: simName,
-            testUrl: testUrl
-          } );
-        }
-        var contents = JSON.stringify( data, null, 2 );
-        fs.writeFile( simInfoArray, contents, function( err ) {
-          if ( err ) {
-            winston.log( 'error', 'couldn\'t write simInfoArray ' + err );
-            abortBuild( 'couldn\'t write simInfoArray ' + err );
+        else {
+          var host = ( productionServer === 'simian.colorado.edu' ) ? 'phet-dev.colorado.edu' : 'phet.colorado.edu';
+          var testUrl = 'http://' + host + '/sims/html/' + simName + '/latest/' + simName + '_en.html';
+          var newSim = true;
+          for ( var i = 0; i < data.length; i++ ) {
+            var simInfoObject = data[ i ];
+            if ( simInfoObject.projectName && simInfoObject.projectName === simName ) {
+              simInfoObject.simTitle = simTitle;
+              simInfoObject.testUrl = testUrl;
+              newSim = false;
+            }
           }
-          else {
-            if ( simInfoArrayString !== contents ) {
-              exec( 'git pull', '../rosetta', function() {
+          if ( newSim ) {
+            data.push( {
+              simTitle: simTitle,
+              projectName: simName,
+              testUrl: testUrl
+            } );
+          }
+          var contents = JSON.stringify( data, null, 2 );
+          fs.writeFile( simInfoArray, contents, function( err ) {
+            if ( err ) {
+              winston.log( 'error', 'couldn\'t write simInfoArray ' + err );
+              abortBuild( 'couldn\'t write simInfoArray ' + err );
+            }
+            else {
+              if ( simInfoArrayString !== contents ) {
                 exec( 'git commit -a -m "[automated commit] add ' + simTitle + ' to simInfoArray"', '../rosetta', function() {
                   execWithoutAbort( 'git push origin master', '../rosetta', function( err ) {
                     if ( err ) {
@@ -548,14 +548,14 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                     callback();
                   } );
                 } );
-              } );
+              }
+              else {
+                callback();
+              }
             }
-            else {
-              callback();
-            }
-          }
-        } );
-      }
+          } );
+        }
+      } );
     } );
   };
 
