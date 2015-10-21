@@ -41,6 +41,9 @@
  *
  * build-server log files can be found at /data/share/phet/phet-repos/perennial/build-server.log
  *
+ * build-server needs to be able to make commits to github to notify rosetta that a new sim is translatable. To do this,
+ * There must be valid git credentials in the .netrc file phet-admin's home directory.
+ *
  *
  * Using the Build Server for Production Deploys
  * =============================================
