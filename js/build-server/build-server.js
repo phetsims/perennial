@@ -105,6 +105,7 @@ var async = require( 'async' );
 var email = require( 'emailjs/email' );
 var getDeployConfig = require( './getBuildServerConfig' );
 var deployConfig = getDeployConfig( fs );
+var query = require( 'pg-query' );
 
 var _ = require( 'lodash' );
 
@@ -115,6 +116,7 @@ var LOCALES_KEY = 'locales';
 var SIM_NAME_KEY = 'simName';
 var VERSION_KEY = 'version';
 var OPTION_KEY = 'option';
+var USER_ID_KEY = 'userId';
 var AUTHORIZATION_KEY = 'authorizationCode';
 var SERVER_NAME = 'serverName';
 var HTML_SIMS_DIRECTORY = '/data/web/htdocs/phetsims/sims/html/';
@@ -182,6 +184,14 @@ if ( deployConfig.emailUsername && deployConfig.emailPassword && deployConfig.em
 else {
   winston.log( 'warn', 'failed to set up email server, missing one or more of the following fields in build-local.json:\n' +
                        'emailUsername, emailPassword, emailTo' );
+}
+
+// configure postgres connection
+if ( deployConfig.pgConnectionString ) {
+  query.connectionParameters = deployConfig.pgConnectionString;
+}
+else {
+  query.connectionParameters = 'postgresql://localhost/rosetta';
 }
 
 /**
@@ -306,6 +316,11 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var simName = decodeURIComponent( req.query[ SIM_NAME_KEY ] );
   var version = decodeURIComponent( req.query[ VERSION_KEY ] );
   var option = req.query[ OPTION_KEY ] ? decodeURIComponent( req.query[ OPTION_KEY ] ) : 'default';
+
+  var userId;
+  if ( req.query[ USER_ID_KEY ] ) {
+    userId = decodeURIComponent( req.query[ USER_ID_KEY ] );
+  }
 
   var productionServer = deployConfig.productionServerName;
   if ( req.query[ SERVER_NAME ] ) {
@@ -653,6 +668,25 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     } );
   };
 
+  var addTranslator = function( locale, callback ) {
+    var getLocalizedSimsQuery = 'SELECT localized_simulation.id, phet_user.id from localized_simulation, simulation, project, phet_user ' +
+                                'WHERE simulation.name = \'' + simName + '\' AND locale = \'' + locale + '\' AND phet_user.id = ' + userId + ' AND ' +
+                                'simulation = simulation.id AND simulation.project = project.id AND project.type = 2';
+    var addTranslatorQuery = 'INSERT INTO user_localized_simulation_mapping ' + getLocalizedSimsQuery;
+    winston.log( 'info', 'running SQL command: ' + addTranslatorQuery );
+    query( addTranslatorQuery, function( err, rows, result ) {
+      if ( err ) {
+        winston.log( 'error', 'adding to user_localized_simulation_mapping, translator probably already exists for this sim and locale' );
+        winston.log( 'error', err );
+      }
+      else {
+        winston.log( 'info', 'added translator to user_localized_simulation_mapping with user_id = ' + userId + ' locale = ' + locale + ' simName = ' + simName );
+        winston.log( 'info', JSON.stringify( result, null, 2 ) );
+      }
+      callback();
+    } );
+  };
+
   /**
    * Clean up after deploy. Checkout master for every repo and remove tmp dir.
    */
@@ -703,7 +737,16 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                                 writeHtaccess( function() {
                                   createTranslationsXML( simTitleCallback, function() {
                                     notifyServer( function() {
-                                      addToRosetta( simTitle, afterDeploy );
+                                      addToRosetta( simTitle, function() {
+
+                                        // if this build request comes from rosetta it will have a userId field and only one locale
+                                        if ( userId && locales.length === 1 ) {
+                                          addTranslator( locales[ 0 ] );
+                                        }
+                                        else {
+                                          afterDeploy();
+                                        }
+                                      } );
                                     } );
                                   } );
                                 } );

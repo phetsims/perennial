@@ -53,6 +53,7 @@ var assert = require( 'assert' );
 
     return {
       buildServerAuthorizationCode: buildLocalJSON.buildServerAuthorizationCode,
+      pgConnectionString: buildLocalJSON.pgConnectionString,
       devUsername: buildLocalJSON.devUsername,
       devDeployServer: buildLocalJSON.devDeployServer || 'spot.colorado.edu',
       devDeployPath: buildLocalJSON.devDeployPath || '/htdocs/physics/phet/dev/html/',
