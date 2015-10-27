@@ -320,6 +320,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var userId;
   if ( req.query[ USER_ID_KEY ] ) {
     userId = decodeURIComponent( req.query[ USER_ID_KEY ] );
+    winston.log( 'info', 'setting userId = ' + userId );
   }
 
   var productionServer = deployConfig.productionServerName;
@@ -741,7 +742,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 
                                         // if this build request comes from rosetta it will have a userId field and only one locale
                                         if ( userId && locales.length === 1 ) {
-                                          addTranslator( locales[ 0 ] );
+                                          addTranslator( locales[ 0 ], afterDeploy );
                                         }
                                         else {
                                           afterDeploy();
