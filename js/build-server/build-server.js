@@ -741,8 +741,9 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                                       addToRosetta( simTitle, function() {
 
                                         // if this build request comes from rosetta it will have a userId field and only one locale
-                                        if ( userId && locales.length === 1 ) {
-                                          addTranslator( locales[ 0 ], afterDeploy );
+                                        var localesArray = locales.split( ',' );
+                                        if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
+                                          addTranslator( localesArray[ 0 ], afterDeploy );
                                         }
                                         else {
                                           afterDeploy();
