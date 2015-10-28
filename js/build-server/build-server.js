@@ -533,7 +533,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
           abortBuild( 'couldn\'t read simInfoArray ' + err );
         }
         else {
-          var host = ( productionServer === 'simian.colorado.edu' ) ? 'phet-dev.colorado.edu' : 'phet.colorado.edu';
+          var host = 'phet.colorado.edu';
           var testUrl = 'http://' + host + '/sims/html/' + simName + '/latest/' + simName + '_en.html';
           var newSim = true;
           for ( var i = 0; i < data.length; i++ ) {
