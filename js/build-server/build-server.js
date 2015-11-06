@@ -322,36 +322,50 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   /**
    * Get all of the deployed locales from the latest version before publishing the next version,
    * so we know which locales to rebuild.
-   * @return {Array<string>}
+   * @param {string} locales
+   * @param {Function} callback
    */
-  var getDeployedLocales = function() {
-    var simDirectory = HTML_SIMS_DIRECTORY + simName;
-    if ( exists( simDirectory ) ) {
-      var files = fs.readdirSync( simDirectory );
-      var latest = files.sort()[ files.length - 1 ];
-      var translationsXMLFile = HTML_SIMS_DIRECTORY + simName + '/' + latest + '/' + simName + '.xml';
-      var xmlData = xml.parseFileSync( translationsXMLFile );
-      var simsArray = xmlData.project.simulations;
-      var localesArray = [];
-      for ( var i = 0; i < simsArray.length; i++ ) {
-        localesArray.push( simsArray.$.locale );
-      }
-      return localesArray;
-    }
-    else {
-      return [];
-    }
-  };
+  var getLocales = function( locales, callback ) {
+    var callbackLocales;
 
-  if ( !locales ) {
-    var deployedLocales = getDeployedLocales();
-    if ( deployedLocales.length ) {
-      locales = deployedLocales.join( ',' );
+    // from rosetta
+    if ( locales ) {
+      callbackLocales = locales;
     }
+
+    // from grunt deploy-production
     else {
-      locales = 'en';
+      var simDirectory = HTML_SIMS_DIRECTORY + simName;
+      if ( exists( simDirectory ) ) {
+        var files = fs.readdirSync( simDirectory );
+        var latest = files.sort()[ files.length - 1 ];
+        var translationsXMLFile = HTML_SIMS_DIRECTORY + simName + '/' + latest + '/' + simName + '.xml';
+        var xmlString = fs.readFileSync( translationsXMLFile );
+        parseString( xmlString, function( err, xmlData ) {
+          if ( err ) {
+            winston.log( 'error', 'parsing XML ' + err );
+          }
+          else {
+            winston.log( 'info', JSON.stringify( xmlData ) );
+            var simsArray = xmlData.project.simulations;
+            var localesArray = [];
+            for ( var i = 0; i < simsArray.length; i++ ) {
+              localesArray.push( simsArray.$.locale );
+            }
+            callbackLocales = localesArray.join( ',' );
+          }
+        } );
+      }
+
+      // first deploy, sim directory will not exist yet, just publish the english version
+      else {
+        callbackLocales = 'en';
+      }
     }
-  }
+    
+    winston.log( 'info', 'building locales=' + callbackLocales );
+    callback( callbackLocales );
+  };
 
   var userId;
   if ( req.query[ USER_ID_KEY ] ) {
@@ -763,34 +777,36 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                   exec( 'git checkout ' + repos[ simName ].sha, simDir, function() { // checkout the sha for the current sim
                     exec( 'npm install', '../chipper', function() { // npm install in chipper in case there are new dependencies there
                       exec( 'npm install', simDir, function() {
-                        exec( 'grunt build-for-server --brand=phet --locales=' + locales, simDir, function() {
+                        getLocales( locales, function( locales ) {
+                          exec( 'grunt build-for-server --brand=phet --locales=' + locales, simDir, function() {
 
-                          if ( option === 'rc' ) {
-                            spotScp( afterDeploy );
-                          }
-                          else {
-                            mkVersionDir( function() {
-                              exec( 'cp build/* ' + HTML_SIMS_DIRECTORY + simName + '/' + version + '/', simDir, function() {
-                                writeHtaccess( function() {
-                                  createTranslationsXML( simTitleCallback, function() {
-                                    notifyServer( function() {
-                                      addToRosetta( simTitle, function() {
+                            if ( option === 'rc' ) {
+                              spotScp( afterDeploy );
+                            }
+                            else {
+                              mkVersionDir( function() {
+                                exec( 'cp build/* ' + HTML_SIMS_DIRECTORY + simName + '/' + version + '/', simDir, function() {
+                                  writeHtaccess( function() {
+                                    createTranslationsXML( simTitleCallback, function() {
+                                      notifyServer( function() {
+                                        addToRosetta( simTitle, function() {
 
-                                        // if this build request comes from rosetta it will have a userId field and only one locale
-                                        var localesArray = locales.split( ',' );
-                                        if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
-                                          addTranslator( localesArray[ 0 ], afterDeploy );
-                                        }
-                                        else {
-                                          afterDeploy();
-                                        }
+                                          // if this build request comes from rosetta it will have a userId field and only one locale
+                                          var localesArray = locales.split( ',' );
+                                          if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
+                                            addTranslator( localesArray[ 0 ], afterDeploy );
+                                          }
+                                          else {
+                                            afterDeploy();
+                                          }
+                                        } );
                                       } );
                                     } );
                                   } );
                                 } );
                               } );
-                            } );
-                          }
+                            }
+                          } );
                         } );
                       } );
                     } );
