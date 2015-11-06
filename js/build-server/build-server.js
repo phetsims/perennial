@@ -107,7 +107,6 @@ var getDeployConfig = require( './getBuildServerConfig' );
 var deployConfig = getDeployConfig( fs );
 var query = require( 'pg-query' );
 var parseString = require( 'xml2js' ).parseString;
-var xml = require( "node-xml-lite" );
 
 var _ = require( 'lodash' );
 
