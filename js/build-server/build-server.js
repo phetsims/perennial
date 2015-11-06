@@ -107,7 +107,7 @@ var getDeployConfig = require( './getBuildServerConfig' );
 var deployConfig = getDeployConfig( fs );
 var query = require( 'pg-query' );
 var parseString = require( 'xml2js' ).parseString;
-var xml = require("node-xml-lite");
+var xml = require( "node-xml-lite" );
 
 var _ = require( 'lodash' );
 
@@ -314,7 +314,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   //-------------------------------------------------------------------------------------
 
   var repos = JSON.parse( decodeURIComponent( req.query[ REPOS_KEY ] ) );
-  var locales = ( req.query[ LOCALES_KEY ] ) ? decodeURIComponent( req.query[ LOCALES_KEY ] ) : '*';
+  var locales = ( req.query[ LOCALES_KEY ] ) ? decodeURIComponent( req.query[ LOCALES_KEY ] ) : null;
   var simName = decodeURIComponent( req.query[ SIM_NAME_KEY ] );
   var version = decodeURIComponent( req.query[ VERSION_KEY ] );
   var option = req.query[ OPTION_KEY ] ? decodeURIComponent( req.query[ OPTION_KEY ] ) : 'default';
@@ -322,39 +322,36 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   /**
    * Get all of the deployed locales from the latest version before publishing the next version,
    * so we know which locales to rebuild.
-   * @param callback
+   * @return {Array<string>}
    */
-  var getDeployedLocales = function( callback ) {
+  var getDeployedLocales = function() {
     var simDirectory = HTML_SIMS_DIRECTORY + simName;
     if ( exists( simDirectory ) ) {
       var files = fs.readdirSync();
       var latest = files.sort()[ files.length - 1 ];
       var translationsXMLFile = HTML_SIMS_DIRECTORY + simName + '/' + latest + '/' + simName + '.xml';
       var xmlData = xml.parseFileSync( translationsXMLFile );
-
-      console.log( JSON.stringify( xmlData, null, 2 ) );
-
-      //parseString( xmlString, function( err, result ) {
-      //  if ( err ) {
-      //    winston.log( 'error', 'can\'t parse XML data' );
-      //  }
-      //  else {
-      //    var simsArray = result.project.simulations;
-      //    var localesArray = [];
-      //    for ( var i = 0; i < simsArray.length; i++ ) {
-      //      localesArray.push( simsArray.$.locale );
-      //    }
-      //    locales = localesArray.join( ',' );
-      //    callback();
-      //  }
-      //} );
+      var simsArray = xmlData.project.simulations;
+      var localesArray = [];
+      for ( var i = 0; i < simsArray.length; i++ ) {
+        localesArray.push( simsArray.$.locale );
+      }
+      return localesArray;
     }
     else {
       return [];
     }
   };
 
-  getDeployedLocales();
+  if ( !locales ) {
+    var deployedLocales = getDeployedLocales();
+    if ( deployedLocales.length ) {
+      locales = deployedLocales.join( ',' );
+    }
+    else {
+      locales = 'en';
+    }
+  }
 
   var userId;
   if ( req.query[ USER_ID_KEY ] ) {
