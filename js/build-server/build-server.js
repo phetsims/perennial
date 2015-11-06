@@ -347,10 +347,10 @@ var taskQueue = async.queue( function( task, taskCallback ) {
           }
           else {
             winston.log( 'info', JSON.stringify( xmlData, null, 2 ) );
-            var simsArray = xmlData.project.simulations.simulation;
+            var simsArray = xmlData.project.simulations[ 0 ].simulation;
             var localesArray = [];
             for ( var i = 0; i < simsArray.length; i++ ) {
-              localesArray.push( simsArray.$.locale );
+              localesArray.push( simsArray[ i ].$.locale );
             }
             callbackLocales = localesArray.join( ',' );
           }
