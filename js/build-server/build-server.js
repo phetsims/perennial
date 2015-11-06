@@ -329,7 +329,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     var callbackLocales;
 
     // from rosetta
-    if ( locales ) {
+    if ( locales && locales !== '*' ) {
       callbackLocales = locales;
     }
 
