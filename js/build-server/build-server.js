@@ -106,6 +106,7 @@ var email = require( 'emailjs/email' );
 var getDeployConfig = require( './getBuildServerConfig' );
 var deployConfig = getDeployConfig( fs );
 var query = require( 'pg-query' );
+var parseString = require( 'xml2js' ).parseString;
 
 var _ = require( 'lodash' );
 
@@ -316,6 +317,22 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var simName = decodeURIComponent( req.query[ SIM_NAME_KEY ] );
   var version = decodeURIComponent( req.query[ VERSION_KEY ] );
   var option = req.query[ OPTION_KEY ] ? decodeURIComponent( req.query[ OPTION_KEY ] ) : 'default';
+
+  if ( locales === '*' ) {
+    var files = fs.readdirSync( HTML_SIMS_DIRECTORY + simName );
+    var latest = files.sort()[ files.length - 1 ];
+    var translationsXMLFile = HTML_SIMS_DIRECTORY + simName + '/' + latest + '/' + simName + '.xml';
+    var xmlString = fs.readFileSync( translationsXMLFile );
+
+    parseString( xmlString, function( err, result ) {
+      if ( err ) {
+        winston.log( 'error', 'can\'t parse XML data' );
+      }
+      else {
+        console.log( JSON.stringify( result, null, 2 ) );
+      }
+    } );
+  }
 
   var userId;
   if ( req.query[ USER_ID_KEY ] ) {

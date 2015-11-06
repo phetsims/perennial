@@ -20,6 +20,7 @@
     "pg-query": "^0.11.0",
     "request": "^2.55.0",
     "winston": "^0.9.0",
-    "passwd-user": "^1.2.1"
+    "passwd-user": "^1.2.1",
+    "xml2js": "^0.4.15"
   }
 }
