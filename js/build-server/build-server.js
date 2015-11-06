@@ -107,6 +107,7 @@ var getDeployConfig = require( './getBuildServerConfig' );
 var deployConfig = getDeployConfig( fs );
 var query = require( 'pg-query' );
 var parseString = require( 'xml2js' ).parseString;
+var xml = require("node-xml-lite");
 
 var _ = require( 'lodash' );
 
@@ -318,21 +319,42 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var version = decodeURIComponent( req.query[ VERSION_KEY ] );
   var option = req.query[ OPTION_KEY ] ? decodeURIComponent( req.query[ OPTION_KEY ] ) : 'default';
 
-  if ( locales === '*' ) {
-    var files = fs.readdirSync( HTML_SIMS_DIRECTORY + simName );
-    var latest = files.sort()[ files.length - 1 ];
-    var translationsXMLFile = HTML_SIMS_DIRECTORY + simName + '/' + latest + '/' + simName + '.xml';
-    var xmlString = fs.readFileSync( translationsXMLFile );
+  /**
+   * Get all of the deployed locales from the latest version before publishing the next version,
+   * so we know which locales to rebuild.
+   * @param callback
+   */
+  var getDeployedLocales = function( callback ) {
+    var simDirectory = HTML_SIMS_DIRECTORY + simName;
+    if ( exists( simDirectory ) ) {
+      var files = fs.readdirSync();
+      var latest = files.sort()[ files.length - 1 ];
+      var translationsXMLFile = HTML_SIMS_DIRECTORY + simName + '/' + latest + '/' + simName + '.xml';
+      var xmlData = xml.parseFileSync( translationsXMLFile );
 
-    parseString( xmlString, function( err, result ) {
-      if ( err ) {
-        winston.log( 'error', 'can\'t parse XML data' );
-      }
-      else {
-        console.log( JSON.stringify( result, null, 2 ) );
-      }
-    } );
-  }
+      console.log( JSON.stringify( xmlData, null, 2 ) );
+
+      //parseString( xmlString, function( err, result ) {
+      //  if ( err ) {
+      //    winston.log( 'error', 'can\'t parse XML data' );
+      //  }
+      //  else {
+      //    var simsArray = result.project.simulations;
+      //    var localesArray = [];
+      //    for ( var i = 0; i < simsArray.length; i++ ) {
+      //      localesArray.push( simsArray.$.locale );
+      //    }
+      //    locales = localesArray.join( ',' );
+      //    callback();
+      //  }
+      //} );
+    }
+    else {
+      return [];
+    }
+  };
+
+  getDeployedLocales();
 
   var userId;
   if ( req.query[ USER_ID_KEY ] ) {
