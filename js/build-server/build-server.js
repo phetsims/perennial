@@ -327,7 +327,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var getDeployedLocales = function() {
     var simDirectory = HTML_SIMS_DIRECTORY + simName;
     if ( exists( simDirectory ) ) {
-      var files = fs.readdirSync();
+      var files = fs.readdirSync( simDirectory );
       var latest = files.sort()[ files.length - 1 ];
       var translationsXMLFile = HTML_SIMS_DIRECTORY + simName + '/' + latest + '/' + simName + '.xml';
       var xmlData = xml.parseFileSync( translationsXMLFile );
