@@ -346,11 +346,11 @@ var taskQueue = async.queue( function( task, taskCallback ) {
             winston.log( 'error', 'parsing XML ' + err );
           }
           else {
-            winston.log( 'info', JSON.stringify( xmlData ) );
+            winston.log( 'info', JSON.stringify( xmlData, null, 2 ) );
             var simsArray = xmlData.project.simulations;
             var localesArray = [];
             for ( var i = 0; i < simsArray.length; i++ ) {
-              localesArray.push( simsArray.$.locale );
+              localesArray.push( simsArray.simulation.$.locale );
             }
             callbackLocales = localesArray.join( ',' );
           }
@@ -362,7 +362,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         callbackLocales = 'en';
       }
     }
-    
+
     winston.log( 'info', 'building locales=' + callbackLocales );
     callback( callbackLocales );
   };
