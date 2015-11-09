@@ -117,12 +117,16 @@ var LOCALES_KEY = 'locales';
 var SIM_NAME_KEY = 'simName';
 var VERSION_KEY = 'version';
 var OPTION_KEY = 'option';
+var EMAIL_KEY = 'email';
 var USER_ID_KEY = 'userId';
 var AUTHORIZATION_KEY = 'authorizationCode';
 var SERVER_NAME = 'serverName';
 var HTML_SIMS_DIRECTORY = '/data/web/htdocs/phetsims/sims/html/';
 var ENGLISH_LOCALE = 'en';
 var PERENNIAL = '.';
+
+// for storing an email address to send build failure emails to that is passed as a parameter on a per build basis
+var emailParameter = null;
 
 // Handle command line input
 // First 2 args provide info about executables, ignore
@@ -202,10 +206,14 @@ else {
  */
 function sendEmail( subject, text ) {
   if ( emailServer ) {
+    var emailTo = buildServerConfig.emailTo;
+    if ( emailParameter && /^(.+)@(.+){2,}\.(.+){2,}$/.test( emailParameter ) ) {
+      emailTo += ( ', ' + emailParameter );
+    }
     emailServer.send( {
       text: text,
       from: 'PhET Build Server <phethelp@colorado.edu>',
-      to: buildServerConfig.emailTo,
+      to: emailTo,
       subject: subject
     }, function( err, message ) {
       if ( err ) {
@@ -317,6 +325,9 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var simName = decodeURIComponent( req.query[ SIM_NAME_KEY ] );
   var version = decodeURIComponent( req.query[ VERSION_KEY ] );
   var option = req.query[ OPTION_KEY ] ? decodeURIComponent( req.query[ OPTION_KEY ] ) : 'default';
+
+  // this var may
+  emailParameter = req.query[ EMAIL_KEY ] ? decodeURIComponent( req.query[ EMAIL_KEY ] ) : null;
 
   var userId;
   if ( req.query[ USER_ID_KEY ] ) {
@@ -869,6 +880,9 @@ function queueDeploy( req, res ) {
         else {
           winston.log( 'info', 'build for ' + simName + ' finished successfully' );
         }
+
+        // reset email parameter to null after build finishes or errors, since this email address may be different on every build
+        emailParameter = null;
       } );
     }
   }
