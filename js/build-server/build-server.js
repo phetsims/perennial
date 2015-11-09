@@ -103,8 +103,8 @@ var child_process = require( 'child_process' );
 var fs = require( 'fs.extra' );
 var async = require( 'async' );
 var email = require( 'emailjs/email' );
-var getDeployConfig = require( './getBuildServerConfig' );
-var deployConfig = getDeployConfig( fs );
+var getBuildServerConfig = require( './getBuildServerConfig' );
+var buildServerConfig = getBuildServerConfig( fs );
 var query = require( 'pg-query' );
 var parseString = require( 'xml2js' ).parseString;
 
@@ -174,11 +174,11 @@ var verbose = options.verbose;
 
 // configure email server
 var emailServer;
-if ( deployConfig.emailUsername && deployConfig.emailPassword && deployConfig.emailTo ) {
+if ( buildServerConfig.emailUsername && buildServerConfig.emailPassword && buildServerConfig.emailTo ) {
   emailServer = email.server.connect( {
-    user: deployConfig.emailUsername,
-    password: deployConfig.emailPassword,
-    host: deployConfig.emailServer,
+    user: buildServerConfig.emailUsername,
+    password: buildServerConfig.emailPassword,
+    host: buildServerConfig.emailServer,
     tls: true
   } );
 }
@@ -188,8 +188,8 @@ else {
 }
 
 // configure postgres connection
-if ( deployConfig.pgConnectionString ) {
-  query.connectionParameters = deployConfig.pgConnectionString;
+if ( buildServerConfig.pgConnectionString ) {
+  query.connectionParameters = buildServerConfig.pgConnectionString;
 }
 else {
   query.connectionParameters = 'postgresql://localhost/rosetta';
@@ -205,7 +205,7 @@ function sendEmail( subject, text ) {
     emailServer.send( {
       text: text,
       from: 'PhET Build Server <phethelp@colorado.edu>',
-      to: deployConfig.emailTo,
+      to: buildServerConfig.emailTo,
       subject: subject
     }, function( err, message ) {
       if ( err ) {
@@ -372,7 +372,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     winston.log( 'info', 'setting userId = ' + userId );
   }
 
-  var productionServer = deployConfig.productionServerName;
+  var productionServer = buildServerConfig.productionServerName;
   if ( req.query[ SERVER_NAME ] ) {
     productionServer = decodeURIComponent( req.query[ SERVER_NAME ] );
   }
@@ -540,8 +540,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * @param callback
    */
   var spotScp = function( callback ) {
-    var userAtServer = deployConfig.devUsername + '@' + deployConfig.devDeployServer;
-    var simVersionDirectory = deployConfig.devDeployPath + simName + '/' + version;
+    var userAtServer = buildServerConfig.devUsername + '@' + buildServerConfig.devDeployServer;
+    var simVersionDirectory = buildServerConfig.devDeployPath + simName + '/' + version;
 
     // mkdir first in case it doesn't exist already
     var mkdirCommand = 'ssh ' + userAtServer + ' \'mkdir -p ' + simVersionDirectory + '\'';
@@ -842,7 +842,7 @@ function queueDeploy( req, res ) {
   var authorizationKey = req.query[ AUTHORIZATION_KEY ];
 
   if ( repos && simName && version && authorizationKey ) {
-    if ( authorizationKey !== deployConfig.buildServerAuthorizationCode ) {
+    if ( authorizationKey !== buildServerConfig.buildServerAuthorizationCode ) {
       var err = 'wrong authorization code';
       winston.log( 'error', err );
       res.send( err );
