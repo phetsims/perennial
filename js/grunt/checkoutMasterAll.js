@@ -3,7 +3,6 @@
 /**
  * This grunt task checks out master for all sims. Useful in some cases where different shas with conflicting dependencies are checked out.
  */
-var assert = require( 'assert' );
 var child_process = require( 'child_process' );
 var _ = require( 'lodash' );
 
