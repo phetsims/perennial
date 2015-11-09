@@ -318,54 +318,6 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var version = decodeURIComponent( req.query[ VERSION_KEY ] );
   var option = req.query[ OPTION_KEY ] ? decodeURIComponent( req.query[ OPTION_KEY ] ) : 'default';
 
-  /**
-   * Get all of the deployed locales from the latest version before publishing the next version,
-   * so we know which locales to rebuild.
-   * @param {string} locales
-   * @param {Function} callback
-   */
-  var getLocales = function( locales, callback ) {
-    var callbackLocales;
-
-    // from rosetta
-    if ( locales && locales !== '*' ) {
-      callbackLocales = locales;
-    }
-
-    // from grunt deploy-production
-    else {
-      var simDirectory = HTML_SIMS_DIRECTORY + simName;
-      if ( exists( simDirectory ) ) {
-        var files = fs.readdirSync( simDirectory );
-        var latest = files.sort()[ files.length - 1 ];
-        var translationsXMLFile = HTML_SIMS_DIRECTORY + simName + '/' + latest + '/' + simName + '.xml';
-        var xmlString = fs.readFileSync( translationsXMLFile );
-        parseString( xmlString, function( err, xmlData ) {
-          if ( err ) {
-            winston.log( 'error', 'parsing XML ' + err );
-          }
-          else {
-            winston.log( 'info', JSON.stringify( xmlData, null, 2 ) );
-            var simsArray = xmlData.project.simulations[ 0 ].simulation;
-            var localesArray = [];
-            for ( var i = 0; i < simsArray.length; i++ ) {
-              localesArray.push( simsArray[ i ].$.locale );
-            }
-            callbackLocales = localesArray.join( ',' );
-          }
-        } );
-      }
-
-      // first deploy, sim directory will not exist yet, just publish the english version
-      else {
-        callbackLocales = 'en';
-      }
-    }
-
-    winston.log( 'info', 'building locales=' + callbackLocales );
-    callback( callbackLocales );
-  };
-
   var userId;
   if ( req.query[ USER_ID_KEY ] ) {
     userId = decodeURIComponent( req.query[ USER_ID_KEY ] );
@@ -443,6 +395,54 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   //-------------------------------------------------------------------------------------
   // Define other helper functions used in build process
   //-------------------------------------------------------------------------------------
+
+  /**
+   * Get all of the deployed locales from the latest version before publishing the next version,
+   * so we know which locales to rebuild.
+   * @param {string} locales
+   * @param {Function} callback
+   */
+  var getLocales = function( locales, callback ) {
+    var callbackLocales;
+
+    // from rosetta
+    if ( locales && locales !== '*' ) {
+      callbackLocales = locales;
+    }
+
+    // from grunt deploy-production
+    else {
+      var simDirectory = HTML_SIMS_DIRECTORY + simName;
+      if ( exists( simDirectory ) ) {
+        var files = fs.readdirSync( simDirectory );
+        var latest = files.sort()[ files.length - 1 ];
+        var translationsXMLFile = HTML_SIMS_DIRECTORY + simName + '/' + latest + '/' + simName + '.xml';
+        var xmlString = fs.readFileSync( translationsXMLFile );
+        parseString( xmlString, function( err, xmlData ) {
+          if ( err ) {
+            winston.log( 'error', 'parsing XML ' + err );
+          }
+          else {
+            winston.log( 'info', JSON.stringify( xmlData, null, 2 ) );
+            var simsArray = xmlData.project.simulations[ 0 ].simulation;
+            var localesArray = [];
+            for ( var i = 0; i < simsArray.length; i++ ) {
+              localesArray.push( simsArray[ i ].$.locale );
+            }
+            callbackLocales = localesArray.join( ',' );
+          }
+        } );
+      }
+
+      // first deploy, sim directory will not exist yet, just publish the english version
+      else {
+        callbackLocales = 'en';
+      }
+    }
+
+    winston.log( 'info', 'building locales=' + callbackLocales );
+    callback( callbackLocales );
+  };
 
   /**
    * Create a [sim name].xml file in the live sim directory in htdocs. This file tells the website which
