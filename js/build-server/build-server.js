@@ -203,13 +203,26 @@ else {
  * Send an email. Used to notify developers if a build fails
  * @param subject
  * @param text
+ * @param emailParameterOnly - if true send the email only to the passed in email, not to the default list as well
  */
-function sendEmail( subject, text ) {
+function sendEmail( subject, text, emailParameterOnly ) {
   if ( emailServer ) {
     var emailTo = buildServerConfig.emailTo;
-    if ( emailParameter && /^(.+)@(.+){2,}\.(.+){2,}$/.test( emailParameter ) ) {
-      emailTo += ( ', ' + emailParameter );
+
+    if ( emailParameter ) {
+      if ( emailParameterOnly ) {
+        emailTo = emailParameter;
+      }
+      else {
+        emailTo += ( ', ' + emailParameter );
+      }
     }
+
+    // don't send an email if no email is given
+    if ( emailParameterOnly && !emailParameter ) {
+      return;
+    }
+
     emailServer.send( {
       text: text,
       from: 'PhET Build Server <phethelp@colorado.edu>',
@@ -861,6 +874,10 @@ function queueDeploy( req, res ) {
     else {
       winston.log( 'info', 'queuing build for ' + simName + ' ' + version );
       taskQueue.push( { req: req, res: res }, function( err ) {
+        var simInfoString = 'Sim = ' + decodeURIComponent( simName ) +
+                            ' Version = ' + decodeURIComponent( version ) +
+                            ' Locales = ' + ( locales ? decodeURIComponent( locales ) : 'undefined' );
+
         if ( err ) {
           var shas = decodeURIComponent( repos );
 
@@ -871,14 +888,13 @@ function queueDeploy( req, res ) {
           catch( e ) {
             // invalid JSON
           }
-          var errorMessage = 'Build failed with error: ' + err + '. Sim = ' + decodeURIComponent( simName ) +
-                             ' Version = ' + decodeURIComponent( version ) + ' Locales = ' + ( locales ? decodeURIComponent( locales ) : 'undefined' ) +
-                             ' Shas = ' + shas;
+          var errorMessage = 'Build failed with error: ' + err + '. ' + simInfoString + ' Shas = ' + shas;
           winston.log( 'error', errorMessage );
           sendEmail( 'BUILD ERROR', errorMessage );
         }
         else {
           winston.log( 'info', 'build for ' + simName + ' finished successfully' );
+          sendEmail( 'Build Succeeded', simInfoString, true );
         }
 
         // reset email parameter to null after build finishes or errors, since this email address may be different on every build
