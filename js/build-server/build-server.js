@@ -2,7 +2,7 @@
 
 /**
  * PhET build and deploy server. The server is designed to run on the same host as the production site (simian or figaro).
- *
+ *create
  * Starting and Stopping the Server
  * ================================
  *
@@ -124,6 +124,12 @@ var SERVER_NAME = 'serverName';
 var HTML_SIMS_DIRECTORY = '/data/web/htdocs/phetsims/sims/html/';
 var ENGLISH_LOCALE = 'en';
 var PERENNIAL = '.';
+
+// set this process up with the appropriate permissions, value is in octal
+process.umask( 0
+o0002
+)
+;
 
 // for storing an email address to send build failure emails to that is passed as a parameter on a per build basis
 var emailParameter = null;
