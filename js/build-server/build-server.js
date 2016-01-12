@@ -433,9 +433,9 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     if ( locales && locales !== '*' ) {
       callbackLocales = locales;
     }
-
-    // from grunt deploy-production
     else {
+
+      // from grunt deploy-production
       var simDirectory = HTML_SIMS_DIRECTORY + simName;
       if ( exists( simDirectory ) ) {
         var files = fs.readdirSync( simDirectory );
