@@ -259,9 +259,9 @@ function exists( file ) {
  * The main build/deploy logic is here.
  */
 var taskQueue = async.queue( function( task, taskCallback ) {
+
   var req = task.req;
   var res = task.res;
-
 
   //-----------------------------------------------------------------------------------------
   // Define helper functions exec, execWithoutAbort, and AbortBuild for use in this function
@@ -277,18 +277,20 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var exec = function( command, dir, callback ) {
     winston.log( 'info', 'running command: ' + command );
     child_process.exec( command, { cwd: dir }, function( err, stdout, stderr ) {
+
       if ( verbose ) {
         if ( stdout ) { winston.log( 'info', stdout ); }
         if ( stderr ) { winston.log( 'info', stderr ); }
       }
+
       if ( !err ) {
         winston.log( 'info', command + ' ran successfully in directory: ' + dir );
         if ( callback ) { callback(); }
       }
-
-      // checkout master for all repos if the build fails so they don't get left at random shas
       else {
         if ( command === 'grunt checkout-master-all' ) {
+
+          // checkout master for all repos if the build fails so they don't get left at random shas
           winston.log( 'error', 'error running grunt checkout-master-all in ' + dir + ', build aborted to avoid infinite loop.' );
           taskCallback( 'error running command ' + command + ': ' + err ); // build aborted, so take this build task off of the queue
         }
@@ -305,13 +307,16 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 
   var execWithoutAbort = function( command, dir, callback ) {
     child_process.exec( command, { cwd: dir }, function( err, stdout, stderr ) {
+
       if ( err ) {
         winston.log( 'warn', command + ' had error ' + err );
       }
+
       if ( verbose ) {
         if ( stdout ) { winston.log( 'info', stdout ); }
         if ( stderr ) { winston.log( 'info', stderr ); }
       }
+
       callback( err );
     } );
   };
@@ -393,13 +398,14 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var versionMatch = version.match( /^(\d+\.\d+\.\d+)(?:-.*)?$/ );
   if ( versionMatch && versionMatch.length === 2 ) {
 
-    // if deploying an rc version use the -rc.[number] suffix
     if ( option === 'rc' ) {
+
+      // if deploying an rc version use the -rc.[number] suffix
       version = versionMatch[ 0 ];
     }
-
-    // otherwise strip any suffix
     else {
+
+      // otherwise strip any suffix
       version = versionMatch[ 1 ];
     }
     winston.log( 'info', 'detecting version number: ' + version );
@@ -458,9 +464,9 @@ var taskQueue = async.queue( function( task, taskCallback ) {
           }
         } );
       }
-
-      // first deploy, sim directory will not exist yet, just publish the english version
       else {
+
+        // first deploy, sim directory will not exist yet, just publish the english version
         callbackLocales = 'en';
       }
     }
@@ -601,15 +607,19 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     exec( 'git pull', '../rosetta', function() {
       var simInfoArray = '../rosetta/data/simInfoArray.json';
       fs.readFile( simInfoArray, { encoding: 'utf8' }, function( err, simInfoArrayString ) {
+
         var data = JSON.parse( simInfoArrayString );
+
         if ( err ) {
           winston.log( 'error', 'couldn\'t read simInfoArray ' + err );
           abortBuild( 'couldn\'t read simInfoArray ' + err );
         }
         else {
+
           var host = 'phet.colorado.edu';
           var testUrl = 'http://' + host + '/sims/html/' + simName + '/latest/' + simName + '_en.html';
           var newSim = true;
+
           for ( var i = 0; i < data.length; i++ ) {
             var simInfoObject = data[ i ];
             if ( simInfoObject.projectName && simInfoObject.projectName === simName ) {
@@ -618,6 +628,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
               newSim = false;
             }
           }
+
           if ( newSim ) {
             data.push( {
               simTitle: simTitle,
@@ -625,7 +636,9 @@ var taskQueue = async.queue( function( task, taskCallback ) {
               testUrl: testUrl
             } );
           }
+
           var contents = JSON.stringify( data, null, 2 );
+
           fs.writeFile( simInfoArray, contents, function( err ) {
             if ( err ) {
               winston.log( 'error', 'couldn\'t write simInfoArray ' + err );
@@ -687,6 +700,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         execWithoutAbort( 'git pull', '../' + repoName, errorCheckCallback );
       }
     }
+
     execWithoutAbort( 'git pull', '../babel', errorCheckCallback );
   };
 
