@@ -126,10 +126,7 @@ var ENGLISH_LOCALE = 'en';
 var PERENNIAL = '.';
 
 // set this process up with the appropriate permissions, value is in octal
-process.umask( 0
-o0002
-)
-;
+process.umask( 0o0002 );
 
 // for storing an email address to send build failure emails to that is passed as a parameter on a per build basis
 var emailParameter = null;
