@@ -95,18 +95,19 @@
 'use strict';
 
 // modules
-var express = require( 'express' );
-var parseArgs = require( 'minimist' );
-var winston = require( 'winston' );
-var request = require( 'request' );
-var child_process = require( 'child_process' );
-var fs = require( 'fs.extra' );
 var async = require( 'async' );
-var email = require( 'emailjs/email' );
-var getBuildServerConfig = require( './getBuildServerConfig' );
 var buildServerConfig = getBuildServerConfig( fs );
-var query = require( 'pg-query' );
+var child_process = require( 'child_process' );
+var dateformat = require( 'dateformat' );
+var email = require( 'emailjs/email' );
+var express = require( 'express' );
+var fs = require( 'fs.extra' );
+var getBuildServerConfig = require( './getBuildServerConfig' );
+var parseArgs = require( 'minimist' );
 var parseString = require( 'xml2js' ).parseString;
+var query = require( 'pg-query' );
+var request = require( 'request' );
+var winston = require( 'winston' );
 
 var _ = require( 'lodash' );
 
@@ -175,7 +176,10 @@ var options = _.extend( defaultOptions, parsedCommandLineOptions );
 
 // add timestamps to log messages
 winston.remove( winston.transports.Console );
-winston.add( winston.transports.Console, { 'timestamp': true } );
+winston.add( winston.transports.Console, { 'timestamp': function(){
+  var now = new Date();
+  return dateformat( now, 'mmm dd yyyy HH:MM:ss Z' );
+} } );
 
 var verbose = options.verbose;
 
