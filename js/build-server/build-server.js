@@ -96,7 +96,6 @@
 
 // modules
 var async = require( 'async' );
-var buildServerConfig = getBuildServerConfig( fs );
 var child_process = require( 'child_process' );
 var dateformat = require( 'dateformat' );
 var email = require( 'emailjs/email' );
@@ -108,6 +107,7 @@ var parseString = require( 'xml2js' ).parseString;
 var query = require( 'pg-query' );
 var request = require( 'request' );
 var winston = require( 'winston' );
+var buildServerConfig = getBuildServerConfig( fs );
 
 var _ = require( 'lodash' );
 
