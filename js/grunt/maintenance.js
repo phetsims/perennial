@@ -595,19 +595,21 @@ module.exports = function( grunt, doneCallback ) {
             function updateDependenciesJSON() {
               grunt.log.debug( 'updating dependencies.json' );
               self.npmInstall( simName, function() {
-                self.execute( 'grunt', [], '../' + simName, function() {
-                  fs.readFile( '../' + simName + '/build/dependencies.json', 'utf8', function( fileError, fileData ) {
-                    self.assert( !fileError, 'DependenciesJSON file error: ' + fileError );
+                self.npmInstall( 'chipper', function() {
+                  self.execute( 'grunt', [], '../' + simName, function() {
+                    fs.readFile( '../' + simName + '/build/dependencies.json', 'utf8', function( fileError, fileData ) {
+                      self.assert( !fileError, 'DependenciesJSON file error: ' + fileError );
 
-                    fs.writeFile( '../' + simName + '/dependencies.json', fileData, function() {
-                      self.execute( 'git', [ 'add', 'dependencies.json' ], '../' + simName, function() {
-                        self.execute( 'git', [ 'commit', '-m', 'Bumping dependencies.json for ' + message ], '../' + simName, function() {
-                          self.gitPush( simName, branch, function() {
-                            self.gitCheckoutMaster( simName, function() {
-                              processNextSim();
+                      fs.writeFile( '../' + simName + '/dependencies.json', fileData, function() {
+                        self.execute( 'git', [ 'add', 'dependencies.json' ], '../' + simName, function() {
+                          self.execute( 'git', [ 'commit', '-m', 'Bumping dependencies.json for ' + message ], '../' + simName, function() {
+                            self.gitPush( simName, branch, function() {
+                              self.gitCheckoutMaster( simName, function() {
+                                processNextSim();
+                              } );
                             } );
-                          } );
-                        })
+                          })
+                        } );
                       } );
                     } );
                   } );
@@ -662,11 +664,13 @@ module.exports = function( grunt, doneCallback ) {
             self.execute( 'git', [ 'commit', '-m', 'Bumping version to ' + newVersionString + ' for ' + message ], '../' + simName, function() {
               self.gitPush( simName, branch, function() {
                 self.npmInstall( simName, function() {
-                  self.execute( 'grunt', [], '../' + simName, function() {
-                    // note, may need to enable ssh-agent? "exec ssh-agent bash"
-                    self.execute( 'grunt', [ 'deploy-rc' ], '../' + simName, function() {
-                      self.gitCheckoutMaster( simName, function() {
-                        self.success( 'Deployed ' + simName + ' ' + newVersionString );
+                  self.npmInstall( 'chipper', function() {
+                    self.execute( 'grunt', [], '../' + simName, function() {
+                      // note, may need to enable ssh-agent? "exec ssh-agent bash"
+                      self.execute( 'grunt', [ 'deploy-rc' ], '../' + simName, function() {
+                        self.gitCheckoutMaster( simName, function() {
+                          self.success( 'Deployed ' + simName + ' ' + newVersionString );
+                        } );
                       } );
                     } );
                   } );
