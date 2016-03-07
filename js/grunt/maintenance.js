@@ -5,7 +5,35 @@
  *
  * Almost every process that returns a non-zero exit code (i.e. not success) will halt the currently-running task.
  *
- * TODO: detailed documentation!
+ * The maintenance release process stores information between commands in perennial/.maintenance.json, as it needs
+ * to maintain some state. Its structure is described below:
+ * {
+ *   sims: {
+ *     // all sims included with the maintenance release (in maintenance-start) will be noted here
+ *     "acid-base-solutions": {
+ *       // branch and version information for the current production version
+ *       branch: {string}, // e.g. '1.2'
+ *       currentMajor: {number}, // e.g. 1
+ *       currentMinor: {number}, // e.g. 2
+ *       currentMaintenance: {number}, // e.g. 3
+ *       currentVersionString: {string} // e.g. '1.2.3'
+ *     },
+ *     // ... other sims
+ *   },
+ *   patches: {
+ *     // patch information, added by maintenance-patch-info
+ *     d712ace0fd0fa47ab617934aec8721228aefc0fc: {
+ *       simNames: [
+ *         'acid-base-solutions',
+ *         'arithmetic',
+ *         // ... other sims with the same SHA/SHAs combination
+ *       ]
+ *     },
+ *     // ... other SHA combinations
+ *   },
+ *   // records which SHA(s) are being patched in maintenance-patch-checkout
+ *   activeShaGroup: "68270b86c92ddd0af0cca1885cd750d9c857796c"
+ * }
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
@@ -291,7 +319,14 @@ module.exports = function( grunt, doneCallback ) {
       } );
     },
 
-    // callback(), reverse of gitCheckoutShas
+    /**
+     * Checks out master in the target repo AND any other repos listed in its current (non-master) dependencies.json.
+     * Additionally checks to make sure status is clean.
+     * @private
+     *
+     * @param {string} repo
+     * @param {Function} callback - callback() - called when completed successfully.
+     */
     gitCheckoutMaster: function( repo, callback ) {
       grunt.log.debug( 'gitCheckoutMaster ' + repo );
       var self = this;
@@ -318,6 +353,13 @@ module.exports = function( grunt, doneCallback ) {
       } );
     },
 
+    /**
+     * Checks out master in a specific repo, and makes sure its status is clean (working-copy changes will fail out).
+     * @private
+     *
+     * @param {string} repo
+     * @param {Function} callback - callback() called when complete with no errors
+     */
     gitClean: function( repo, callback ) {
       var self = this;
       // TODO: improve as needed
@@ -333,7 +375,13 @@ module.exports = function( grunt, doneCallback ) {
       } );
     },
 
-    // callback( sha )
+    /**
+     * Retrieves the current SHA for a repo, and passes it to the callback.
+     * @private
+     *
+     * @param {string} repo
+     * @param {Function} callback - callback( sha: {string} ) called when complete with no errors
+     */
     getCurrentSHA: function( repo, callback ) {
       var self = this;
       this.execute( 'git', [ 'rev-parse', 'HEAD' ], '../' + repo, function( sha ) {
@@ -344,12 +392,26 @@ module.exports = function( grunt, doneCallback ) {
       } );
     },
 
+    /**
+     * Runs "npm install" for a specific repo.
+     * @private
+     *
+     * @param {string} repo
+     * @param {Function} callback - callback() called when complete with no errors
+     */
     npmInstall: function( repo, callback ) {
       this.execute( 'npm', [ 'install' ], '../' + repo, function() {
         callback();
       } );
     },
 
+    /**
+     * Passes dependencies.json of the repo in object form to the callback.
+     * @private
+     *
+     * @param {string} repo
+     * @param {Function} callback - callback( dependencies: {Object} ) called when complete with no errors.
+     */
     getDependencies: function( repo, callback ) {
       var self = this;
       fs.readFile( '../' + repo + '/dependencies.json', 'utf8', function( fileError, fileData ) {
@@ -359,25 +421,44 @@ module.exports = function( grunt, doneCallback ) {
       } );
     },
 
+    /**
+     * Stores an object in perennial/.maintenance.json with information about the current maintenance release
+     * process.
+     * @private
+     *
+     * @param {Object} maintenanceObject
+     */
     set storageObject( maintenanceObject ) {
       return fs.writeFileSync( '.maintenance.json', JSON.stringify( maintenanceObject, null, 2 ) );
     },
 
+    /**
+     * Returns a previously-stored object (saved with storageObject's getter).
+     * @private
+     *
+     * @returns {Object}
+     */
     get storageObject() {
       return JSON.parse( fs.readFileSync( '.maintenance.json', 'utf8' ) );
     },
 
+    /**
+     * Starts the maintenance release process with a comma-separated list of sims.
+     * @public
+     *
+     * This will overwrite all information stored in perennial/.maintenance.json, and commands for previous
+     * maintenance releases should now not be used. See top-level documentation for details on the
+     * maintenance.json file.
+     *
+     * @param {string} simsString - Comma-separated list of sims, e.g. acid-base-solutions,arithmetic
+     */
     maintenanceStart: function( simsString ) {
       var self = this;
 
+      // Stub object that will be filled in later. The sims object will be filled in within this function
       var maintenanceObject = {
-        sims: {
-          // will be filled in
-        },
-
-        patches: {
-
-        }
+        sims: {},
+        patches: {}
       };
 
       var simNames = simsString.split( ',' );
@@ -386,6 +467,8 @@ module.exports = function( grunt, doneCallback ) {
       function requestNextVersion() {
         if ( versionSimNames.length ) {
           var simName = versionSimNames.shift();
+
+          // Grab the production version info from the website, and store it in .maintenance.json
           self.getLatestProductionVersion( simName, function( version ) {
             console.log( simName + '/' + version.string );
 
@@ -400,6 +483,7 @@ module.exports = function( grunt, doneCallback ) {
           } );
         }
         else {
+          // Write it to disk
           self.storageObject = maintenanceObject;
           self.success( '.maintenance.json written' );
         }
@@ -408,6 +492,14 @@ module.exports = function( grunt, doneCallback ) {
       requestNextVersion();
     },
 
+    /**
+     * Assuming maintenance-start has been run, this will analyze the current SHAs used for each simulation (for each
+     * repository noted in this command) and will find all unique SHA combinations. For each combination, it will print
+     * out a list of sims. All of this data will be stored in .maintenance.json
+     * @public
+     *
+     * @param {string} reposString - Comma-separated string of repository names that need to be patched
+     */
     maintenancePatchInfo: function( reposString ) {
       var self = this;
 
@@ -420,6 +512,7 @@ module.exports = function( grunt, doneCallback ) {
 
       var simNames = Object.keys( maintenanceObject.sims )
 
+      // First, load all dependencies.json files from all of the simulations (printing out relevant SHAs)
       var requestSimNames = simNames.slice();
       function requestNextDependencies() {
         if ( requestSimNames.length ) {
@@ -447,6 +540,7 @@ module.exports = function( grunt, doneCallback ) {
         }
       }
 
+      // Then combine sims into groups of "have same SHAs for all specified repositories", and print out
       function processDependencies() {
         var shaGroupMap = {};
 
@@ -456,6 +550,7 @@ module.exports = function( grunt, doneCallback ) {
             return dependencies[ repoName ].sha;
           } ).join( ',' );
 
+          // Create/update the simNames array
           if ( shaGroupMap[ shaGroupKey ] ) {
             shaGroupMap[ shaGroupKey ].simNames.push( simName );
           }
@@ -463,9 +558,6 @@ module.exports = function( grunt, doneCallback ) {
             shaGroupMap[ shaGroupKey ] = {
               simNames: [ simName ]
             };
-            // repoNames.forEach( function( repoName ) {
-            //   shaGroupMap[ shaGroupKey ][ repoName ] = dependencies[ repoName ].sha;
-            // } );
           }
         } );
 
@@ -479,8 +571,7 @@ module.exports = function( grunt, doneCallback ) {
           } );
 
           maintenanceObject.patches[ reposString ][ shaGroupKey ] = {
-            simNames: groupSimNames,
-            patched: false
+            simNames: groupSimNames
           };
         }
 
@@ -627,6 +718,29 @@ module.exports = function( grunt, doneCallback ) {
       processNextRepo();
     },
 
+    maintenanceDeployRCNoVersionBump: function( simName, message ) {
+      var self = this;
+
+      var maintenanceObject = this.storageObject;
+      var branch = maintenanceObject.sims[ simName ].branch;
+      this.assert( branch, 'Did not detect branch for ' + simName );
+
+      this.gitCheckoutShas( simName, branch, function() {
+        self.npmInstall( simName, function() {
+          self.npmInstall( 'chipper', function() {
+            self.execute( 'grunt', [], '../' + simName, function() {
+              // note, may need to enable ssh-agent? "exec ssh-agent bash"
+              self.execute( 'grunt', [ 'deploy-rc' ], '../' + simName, function() {
+                self.gitCheckoutMaster( simName, function() {
+                  self.success( 'Deployed ' + simName );
+                } );
+              } );
+            } );
+          } );
+        } );
+      } );
+    },
+
     maintenanceDeployRC: function( simName, message ) {
       var self = this;
 
@@ -676,7 +790,7 @@ module.exports = function( grunt, doneCallback ) {
                   } );
                 } );
               } );
-            })
+            } );
           } );
         } );
       } );

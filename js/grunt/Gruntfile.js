@@ -66,6 +66,14 @@ module.exports = function( grunt ) {
       maintenance( grunt, this.async() ).maintenancePatchApply( grunt.option( 'repos' ), grunt.option( 'message' ) );
     } );
 
+  grunt.registerTask( 'maintenance-deploy-rc-no-version-bump',
+    'TODO docs\n' +
+    '--sim : A sim name\n' +
+    '--message : Commit message for dependencies.json bumps',
+    function() {
+      maintenance( grunt, this.async() ).maintenanceDeployRCNoVersionBump( grunt.option( 'sim' ), grunt.option( 'message' ) );
+    } );
+
   grunt.registerTask( 'maintenance-deploy-rc',
     'TODO docs\n' +
     '--sim : A sim name\n' +
