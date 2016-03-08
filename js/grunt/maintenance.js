@@ -896,6 +896,64 @@ module.exports = function( grunt, doneCallback ) {
           } );
         } );
       } );
+    },
+
+    /**
+     * Updates the gh-pages branches of various repos with master, and builds dot/kite/scenery. Should make things
+     * available at phetsims.github.io, e.g. http://phetsims.github.io/scenery/
+     * @public
+     */
+    updateGithubPages: function() {
+      var self = this;
+      var repos = [
+        { name: 'assert' },
+        { name: 'phet-core' },
+        { name: 'chipper' },
+        { name: 'sherpa' },
+        { name: 'axon' },
+        { name: 'dot', build: true },
+        { name: 'kite', build: true },
+        { name: 'scenery', build: true }
+      ];
+
+      function next() {
+        if ( repos.length ) {
+          var repo = repos.shift();
+          var name = repo.name;
+          var cwd = '../' + name;
+
+          self.gitCheckout( name, 'gh-pages', function() {
+            self.gitPull( name, function() {
+              self.execute( 'git', [ 'merge', 'master' ], cwd, function() {
+                function afterOptionalBuild() {
+                  self.gitPush( name, 'gh-pages', function() {
+                    self.gitClean( name, function() {
+                      next();
+                    } );
+                  } );
+                }
+                if ( repo.build ) {
+                  self.npmInstall( name, function() {
+                    self.execute( 'grunt', [], cwd, function() {
+                      self.execute( 'git', [ 'add', 'build' ], cwd, function() {
+                        self.execute( 'git', [ 'commit', '-m', 'Updating Build' ], cwd, afterOptionalBuild, afterOptionalBuild );
+                      } );
+                    } );
+                  } );
+                }
+                else {
+                  afterOptionalBuild();
+                }
+              } );
+            } );
+          } );
+        }
+        else {
+          self.success( 'Updated gh-pages' );
+        }
+      }
+
+      next();
     }
   };
 };

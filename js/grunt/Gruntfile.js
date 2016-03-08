@@ -96,4 +96,10 @@ module.exports = function( grunt ) {
     function() {
       maintenance( grunt, this.async() ).maintenanceDeployProduction( grunt.option( 'sim' ), grunt.option( 'message' ) );
     } );
+
+  grunt.registerTask( 'update-gh-pages',
+    'Updates the gh-pages branches for various repos, including building of dot/kite/scenery',
+    function() {
+      maintenance( grunt, this.async() ).updateGithubPages();
+    } );
 };
