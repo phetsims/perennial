@@ -36,21 +36,24 @@ module.exports = function( grunt ) {
     } );
 
   grunt.registerTask( 'maintenance-start',
-    'TODO docs\n' +
+    'Starts the maintenance-release process.\n' +
+    'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
     '--sims : A comma-separated list of simulations that may be involved in this maintenance release process',
     function() {
       maintenance( grunt, this.async() ).maintenanceStart( grunt.option( 'sims' ) );
     } );
 
   grunt.registerTask( 'maintenance-patch-info',
-    'TODO docs\n' +
+    'Stores and prints out information about what SHAs of the repositories all of the simulations use.\n' +
+    'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
     '--repos : A comma-separated list of repo names that need a combined patch',
     function() {
       maintenance( grunt, this.async() ).maintenancePatchInfo( grunt.option( 'repos' ) );
     } );
 
   grunt.registerTask( 'maintenance-patch-checkout',
-    'TODO docs\n' +
+    'Checks out SHAs for modification and testing.\n' +
+    'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
     '--repos : A comma-separated list of repo names that need a combined patch\n' +
     '--shas : A comma-separated list of SHAs for the respective repos that need a combined patch\n' +
     '--sim : [optional] preferred sim to test with',
@@ -59,33 +62,37 @@ module.exports = function( grunt ) {
     } );
 
   grunt.registerTask( 'maintenance-patch-apply',
-    'TODO docs\n' +
+    'Applies committed changes to common repos\' sim-specific branches, and updates dependencies.json for affected\n' +
+    'sim repos\n' +
+    'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
     '--repos : A comma-separated list of repo names that need a combined patch\n' +
-    '--message : Commit message for dependencies.json bumps',
+    '--message : Additional part of message for the dependencies.json commit',
     function() {
       maintenance( grunt, this.async() ).maintenancePatchApply( grunt.option( 'repos' ), grunt.option( 'message' ) );
     } );
 
-  grunt.registerTask( 'maintenance-deploy-rc-no-version-bump',
-    'TODO docs\n' +
-    '--sim : A sim name\n' +
-    '--message : Commit message for dependencies.json bumps',
-    function() {
-      maintenance( grunt, this.async() ).maintenanceDeployRCNoVersionBump( grunt.option( 'sim' ), grunt.option( 'message' ) );
-    } );
-
   grunt.registerTask( 'maintenance-deploy-rc',
-    'TODO docs\n' +
-    '--sim : A sim name\n' +
-    '--message : Commit message for dependencies.json bumps',
+    'Deploys an RC (release candidate) for the simulation from the maintenance branch, bumping versions.\n' +
+    'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
+    '--sim : Sim name\n' +
+    '--message : Additional part of message for the version bump commit',
     function() {
       maintenance( grunt, this.async() ).maintenanceDeployRC( grunt.option( 'sim' ), grunt.option( 'message' ) );
     } );
 
+  grunt.registerTask( 'maintenance-deploy-rc-no-version-bump',
+    'Deploys an RC (release candidate) for the simulation from the maintenance branch without bumping versions.\n' +
+    'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
+    '--sim : Sim name',
+    function() {
+      maintenance( grunt, this.async() ).maintenanceDeployRCNoVersionBump( grunt.option( 'sim' ) );
+    } );
+
   grunt.registerTask( 'maintenance-deploy-production',
-    'TODO docs\n' +
-    '--sim : A sim name\n' +
-    '--message : Commit message for dependencies.json bumps',
+    'Deploys the simulation maintenance release to production, bumping the version number.\n' +
+    'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
+    '--sim : Sim name\n' +
+    '--message : Additional part of message for the version bump commit',
     function() {
       maintenance( grunt, this.async() ).maintenanceDeployProduction( grunt.option( 'sim' ), grunt.option( 'message' ) );
     } );

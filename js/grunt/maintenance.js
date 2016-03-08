@@ -584,6 +584,15 @@ module.exports = function( grunt, doneCallback ) {
       requestNextDependencies();
     },
 
+    /**
+     * Assuming maintenance-start and maintenance-patch-info have been run, this takes repos/shas from that output
+     * and checks out a simulation for testing that has the specific SHAs.
+     * @public
+     *
+     * @param {string} reposString - Comma-separated string of repository names that need to be patched
+     * @param {string} shasString - Comma-separated string of SHAs from maintenance-patch-info to be patched
+     * @param {string} [simName] - If provided, use this simulation instead of the first one in the list
+     */
     maintenancePatchCheckout: function( reposString, shasString, simName ) {
       var self = this;
 
@@ -602,6 +611,15 @@ module.exports = function( grunt, doneCallback ) {
       } );
     },
 
+    /**
+     * Assuming maintenance-patch-checkout has been run AND the user has created commits in all of the mentioned
+     * common repositories, this applies their patch to all of the related sim branches AND updates the
+     * dependencies.json of each of those sims' release branches to include the patches.
+     * @public
+     *
+     * @param {string} reposString - Comma-separated string of repository names that need to be patched
+     * @param {string} message - Additional info for the dependencies.json commit message
+     */
     maintenancePatchApply: function( reposString, message ) {
       var self = this;
 
@@ -632,6 +650,7 @@ module.exports = function( grunt, doneCallback ) {
         }
       }
 
+      // Patch each sim
       var processSimNames = simNames.slice();
       function processNextSim() {
         if ( processSimNames.length ) {
@@ -641,6 +660,8 @@ module.exports = function( grunt, doneCallback ) {
           console.log( 'patching ' + commonBranch );
 
           self.gitCheckoutShas( simName, branch, function() {
+
+            // Check out each patched common repo, and apply the patch to the sim-specific branch
             var repoIndex = 0;
             function nextCommonRepo() {
               if ( repoIndex < repoNames.length ) {
@@ -648,7 +669,8 @@ module.exports = function( grunt, doneCallback ) {
                 var sha = currentShas[ repoIndex ];
                 repoIndex++;
                 self.execute( 'git', [ 'checkout', commonBranch ], '../' + repoName, function() {
-                  // success checking out
+                  // success checking out, so we'll need to update the branch to point to our new commit (if it isn't
+                  // there already)
                   self.gitPull( repoName, function() {
                     self.getCurrentSHA( repoName, function( currentSHA ) {
                       if ( currentSHA === sha ) {
@@ -669,7 +691,8 @@ module.exports = function( grunt, doneCallback ) {
                     } );
                   } );
                 }, function() {
-                  // failure checking out
+                  // Failure checking out (which is fine), as we can create a new branch at the exact commit we need.
+                  // No merge necessary!
                   self.gitCheckout( repoName, sha, function() {
                     self.execute( 'git', [ 'checkout', '-b', commonBranch ], '../' + repoName, function() {
                       self.gitPush( repoName, commonBranch, function() {
@@ -680,9 +703,13 @@ module.exports = function( grunt, doneCallback ) {
                 } );
               }
               else {
+                // Done with all common repos for this sim, move on
                 updateDependenciesJSON();
               }
             }
+
+            // Updates dependencies.json for the sim's release branch by building the sim, copying the built
+            // dependencies.json to the top level, and committing/pushing.
             function updateDependenciesJSON() {
               grunt.log.debug( 'updating dependencies.json' );
               self.npmInstall( simName, function() {
@@ -718,7 +745,14 @@ module.exports = function( grunt, doneCallback ) {
       processNextRepo();
     },
 
-    maintenanceDeployRCNoVersionBump: function( simName, message ) {
+    /**
+     * WARNING! Read the documentation for this, as it's used to work around failed deployments.
+     * Deploys a maintenance release RC for the sim WITHOUT updating version numbers. Use ONLY for failed deployments.
+     * @public
+     *
+     * @param {string} simName
+     */
+    maintenanceDeployRCNoVersionBump: function( simName ) {
       var self = this;
 
       var maintenanceObject = this.storageObject;
@@ -741,6 +775,16 @@ module.exports = function( grunt, doneCallback ) {
       } );
     },
 
+    /**
+     * Deploys an RC for this simulation for the maintenance release. Bumps the version as necessary.
+     * @public
+     *
+     * NOTE: Recommended to execute "exec ssh-agent bash" and ensure SSH to spot will work without any user input.
+     *       This is untested with any SCP needing a password entered inline (that will probably fail).
+     *
+     * @param {string} simName
+     * @param {string} message - Additional information for the version-bump commit.
+     */
     maintenanceDeployRC: function( simName, message ) {
       var self = this;
 
@@ -751,6 +795,7 @@ module.exports = function( grunt, doneCallback ) {
       this.gitCheckoutShas( simName, branch, function() {
         self.getCheckedInVersion( simName, function( branchVersionInfo ) {
           var productionVersionInfo = maintenanceObject.sims[ simName ];
+          // Bumps in major/minor version indicate "double-check things, and if OK do it manually"
           self.assert( productionVersionInfo.currentMajor === branchVersionInfo.major, 'Major version mismatch' );
           self.assert( productionVersionInfo.currentMinor === branchVersionInfo.minor, 'Minor version mismatch' );
 
@@ -796,6 +841,16 @@ module.exports = function( grunt, doneCallback ) {
       } );
     },
 
+    /**
+     * Deploys a simulation to production with the patches, bumping the version number as necessary.
+     * @public
+     *
+     * NOTE: Recommended to execute "exec ssh-agent bash" and ensure SSH to spot will work without any user input.
+     *       This is untested with any SCP needing a password entered inline (that will probably fail).
+     *
+     * @param {string} simName
+     * @param {string} message - Additional information for the version-bump commit.
+     */
     maintenanceDeployProduction: function( simName, message ) {
       var self = this;
 
@@ -806,6 +861,7 @@ module.exports = function( grunt, doneCallback ) {
       this.gitCheckoutShas( simName, branch, function() {
         self.getCheckedInVersion( simName, function( branchVersionInfo ) {
           var productionVersionInfo = maintenanceObject.sims[ simName ];
+          // On any of these failures, do it manually (automated process too scary!)
           self.assert( productionVersionInfo.currentMajor === branchVersionInfo.major, 'Major version mismatch' );
           self.assert( productionVersionInfo.currentMinor === branchVersionInfo.minor, 'Minor version mismatch' );
           self.assert( branchVersionInfo.modifierType === 'rc' );
