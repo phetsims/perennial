@@ -277,7 +277,7 @@ module.exports = function( grunt, doneCallback ) {
      * @private
      *
      * @param {string} repo
-     * @param {string} target
+     * @param {string} target - branch or SHA
      * @param {Function} callback - callback( checkedOutRepos: Array.<string> ) - called when completed successfully.
      */
     gitCheckoutShas: function( repo, target, callback ) {
@@ -892,7 +892,7 @@ module.exports = function( grunt, doneCallback ) {
                   } );
                 } );
               } );
-            })
+            } );
           } );
         } );
       } );
