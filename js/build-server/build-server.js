@@ -768,24 +768,21 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   // define a helper function that will add the translator to the DB for translation credits
   var addTranslator = function( locale, callback ) {
 
+    // create the URL
     var addTranslatorURL = buildServerConfig.productionServerURL + '/services/add-html-translator?simName=' + simName +
                            '&locale=' + locale + '&userId=' + userId + '&authorizationCode=' +
                            buildServerConfig.databaseAuthorizationCode;
 
-    // log the URL but without the authorization code for slightly more security
-    winston.log( 'info', 'URL for adding translator (auth code omitted) = ' + addTranslatorURL );
+    // log the URL
+    winston.log( 'info', 'URL for adding translator to credits = ' + addTranslatorURL );
 
-    // tack on the authorization code
-    addTranslatorURL = addTranslatorURL + '&authorizationCode=' + buildServerConfig.databaseAuthorizationCode;
-
-    // make the request that should add the translator credits info to the DB
+    // send the request
     request( addTranslatorURL, function( error, response ) {
       if ( error ) {
         winston.log( 'error', 'error occurred when attempting to add translator credit info to DB: ' + error );
       }
       else {
         winston.log( 'info', 'request to add translator credit info returned code: ' + response.statusCode );
-        // TODO: What else should be done here?
       }
       callback();
     } );
