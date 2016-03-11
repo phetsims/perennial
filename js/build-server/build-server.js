@@ -176,10 +176,12 @@ var options = _.extend( defaultOptions, parsedCommandLineOptions );
 
 // add timestamps to log messages
 winston.remove( winston.transports.Console );
-winston.add( winston.transports.Console, { 'timestamp': function(){
-  var now = new Date();
-  return dateformat( now, 'mmm dd yyyy HH:MM:ss Z' );
-} } );
+winston.add( winston.transports.Console, {
+  'timestamp': function() {
+    var now = new Date();
+    return dateformat( now, 'mmm dd yyyy HH:MM:ss Z' );
+  }
+} );
 
 var verbose = options.verbose;
 
@@ -767,7 +769,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var addTranslator = function( locale, callback ) {
 
     var addTranslatorURL = buildServerConfig.productionServerURL + '/services/add-html-translator?simName=' + simName +
-                           '&locale=' + locale + '&userId=' + userId;
+                           '&locale=' + locale + '&userId=' + userId + '&authorizationCode=' +
+                           buildServerConfig.databaseAuthorizationCode;
 
     // log the URL but without the authorization code for slightly more security
     winston.log( 'info', 'URL for adding translator (auth code omitted) = ' + addTranslatorURL );
@@ -777,16 +780,11 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 
     // make the request that should add the translator credits info to the DB
     request( addTranslatorURL, function( error, response ) {
-      if ( error ){
-        winston( 'error', 'error occurred when attempting to add translator credit info to DB: ' + error );
+      if ( error ) {
+        winston.log( 'error', 'error occurred when attempting to add translator credit info to DB: ' + error );
       }
-      else{
-        if ( response && response.statusCode ){
-          winston( 'info', 'request to add translator credit info returned code: ' + response.statusCode );
-        }
-        else{
-          winston( 'info', 'when attempting to add translator credits, no error code received, but no response code either' );
-        }
+      else {
+        winston.log( 'info', 'request to add translator credit info returned code: ' + response.statusCode );
         // TODO: What else should be done here?
       }
       callback();

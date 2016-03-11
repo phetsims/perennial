@@ -53,16 +53,17 @@ var assert = require( 'assert' );
 
     return {
       buildServerAuthorizationCode: buildLocalJSON.buildServerAuthorizationCode,
-      pgConnectionString: buildLocalJSON.pgConnectionString,
-      devUsername: buildLocalJSON.devUsername,
-      devDeployServer: buildLocalJSON.devDeployServer || 'spot.colorado.edu',
+      databaseAuthorizationCode: buildLocalJSON.databaseAuthorizationCode,
       devDeployPath: buildLocalJSON.devDeployPath || '/htdocs/physics/phet/dev/html/',
-      productionServerName: buildLocalJSON.productionServerName || 'figaro.colorado.edu',
-      productionServerURL: buildLocalJSON.productionServerURL || 'https://phet.colorado.edu',
-      emailUsername: buildLocalJSON.emailUsername,
+      devDeployServer: buildLocalJSON.devDeployServer || 'spot.colorado.edu',
+      devUsername: buildLocalJSON.devUsername,
       emailPassword: buildLocalJSON.emailPassword,
       emailServer: buildLocalJSON.emailServer || 'smtp.colorado.edu',
-      emailTo: buildLocalJSON.emailTo
+      emailTo: buildLocalJSON.emailTo,
+      emailUsername: buildLocalJSON.emailUsername,
+      pgConnectionString: buildLocalJSON.pgConnectionString,
+      productionServerName: buildLocalJSON.productionServerName || 'figaro.colorado.edu',
+      productionServerURL: buildLocalJSON.productionServerURL || 'https://phet.colorado.edu'
     };
 
   }
