@@ -784,7 +784,6 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         winston( 'info', 'request to add translator credit info returned code: ' + response.statusCode );
         // TODO: What else should be done here?
       }
-      // don't pass the error through - it's not the end of the world if the credits aren't exactly correct TODO: right?
       callback();
     } );
   };
