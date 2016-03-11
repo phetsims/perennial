@@ -781,7 +781,12 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         winston( 'error', 'error occurred when attempting to add translator credit info to DB: ' + error );
       }
       else{
-        winston( 'info', 'request to add translator credit info returned code: ' + response.statusCode );
+        if ( response && response.statusCode ){
+          winston( 'info', 'request to add translator credit info returned code: ' + response.statusCode );
+        }
+        else{
+          winston( 'info', 'when attempting to add translator credits, no error code received, but no response code either' );
+        }
         // TODO: What else should be done here?
       }
       callback();
