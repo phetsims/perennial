@@ -262,8 +262,8 @@ function exists( file ) {
 }
 
 /**
- * taskQueue ensures that only one build/deploy process will be happening at the same time.
- * The main build/deploy logic is here.
+ * taskQueue ensures that only one build/deploy process will be happening at the same time.  The main build/deploy logic
+ * is here.
  */
 var taskQueue = async.queue( function( task, taskCallback ) {
 
@@ -271,7 +271,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var res = task.res;
 
   //-----------------------------------------------------------------------------------------
-  // Define helper functions exec, execWithoutAbort, and AbortBuild for use in this function
+  // Define helper functions for use in this function
   //-----------------------------------------------------------------------------------------
 
   /**
@@ -339,7 +339,6 @@ var taskQueue = async.queue( function( task, taskCallback ) {
       taskCallback( err ); // build aborted, so take this build task off of the queue
     } );
   };
-
 
   //-------------------------------------------------------------------------------------
   // Parse and validate query parameters
@@ -764,21 +763,28 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     } );
   };
 
+  // define a helper function that will add the translator to the DB for translation credits
   var addTranslator = function( locale, callback ) {
-    var getLocalizedSimsQuery = 'SELECT localized_simulation.id, phet_user.id from localized_simulation, simulation, project, phet_user ' +
-                                'WHERE simulation.name = \'' + simName + '\' AND locale = \'' + locale + '\' AND phet_user.id = ' + userId + ' AND ' +
-                                'simulation = simulation.id AND simulation.project = project.id AND project.type = 2';
-    var addTranslatorQuery = 'INSERT INTO user_localized_simulation_mapping ' + getLocalizedSimsQuery;
-    winston.log( 'info', 'running SQL command: ' + addTranslatorQuery );
-    query( addTranslatorQuery, function( err, rows, result ) {
-      if ( err ) {
-        winston.log( 'error', 'adding to user_localized_simulation_mapping, translator probably already exists for this sim and locale' );
-        winston.log( 'error', err );
+
+    var addTranslatorURL = buildServerConfig.productionServerURL + '/services/add-html-translator?simName=' + simName +
+                           '&locale=' + locale + '&userId=' + userId;
+
+    // log the URL but without the authorization code for slightly more security
+    winston.log( 'info', 'URL for adding translator (auth code omitted) = ' + addTranslatorURL );
+
+    // tack on the authorization code
+    addTranslatorURL = addTranslatorURL + '&authorizationCode=' + buildServerConfig.databaseAuthorizationCode;
+
+    // make the request that should add the translator credits info to the DB
+    request( addTranslatorURL, function( error, response ) {
+      if ( error ){
+        winston( 'error', 'error occurred when attempting to add translator credit info to DB: ' + error );
       }
-      else {
-        winston.log( 'info', 'added translator to user_localized_simulation_mapping with user_id = ' + userId + ' locale = ' + locale + ' simName = ' + simName );
-        winston.log( 'info', JSON.stringify( result, null, 2 ) );
+      else{
+        winston( 'info', 'request to add translator credit info returned code: ' + response.statusCode );
+        // TODO: What else should be done here?
       }
+      // don't pass the error through - it's not the end of the world if the credits aren't exactly correct TODO: right?
       callback();
     } );
   };
