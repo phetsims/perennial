@@ -232,19 +232,22 @@ function sendEmail( subject, text, emailParameterOnly ) {
       return;
     }
 
-    emailServer.send( {
-      text: text,
-      from: 'PhET Build Server <phethelp@colorado.edu>',
-      to: emailTo,
-      subject: subject
-    }, function( err, message ) {
-      if ( err ) {
-        winston.log( 'error', 'sending email ' + err );
+    emailServer.send(
+      {
+        text: text,
+        from: 'PhET Build Server <phethelp@colorado.edu>',
+        to: emailTo,
+        subject: subject
+      },
+      function( err, message ) {
+        if ( err ) {
+          winston.log( 'error', 'error when attempted to send email, err = ' + err );
+        }
+        else {
+          winston.log( 'info', 'sent email: ' + JSON.stringify( message ) );
+        }
       }
-      else {
-        winston.log( 'info', 'sent email ' + message.toString() );
-      }
-    } );
+    );
   }
 }
 
