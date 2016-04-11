@@ -244,7 +244,7 @@ function sendEmail( subject, text, emailParameterOnly ) {
           winston.log( 'error', 'error when attempted to send email, err = ' + err );
         }
         else {
-          winston.log( 'info', 'sent email: ' + JSON.stringify( message ) );
+          winston.log( 'info', 'sent email to: ' + message.to + ', subject: ' + message.subject + ', text: ' + message.text );
         }
       }
     );
