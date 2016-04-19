@@ -232,8 +232,7 @@ function sendEmail( subject, text, emailParameterOnly ) {
       return;
     }
 
-    emailServer.send(
-      {
+    emailServer.send( {
         text: text,
         from: 'PhET Build Server <phethelp@colorado.edu>',
         to: emailTo,
@@ -244,7 +243,8 @@ function sendEmail( subject, text, emailParameterOnly ) {
           winston.log( 'error', 'error when attempted to send email, err = ' + err );
         }
         else {
-          winston.log( 'info', 'sent email to: ' + message.to + ', subject: ' + message.subject + ', text: ' + message.text );
+          winston.log( 'info', 'sent email to: ' + message.header.to + ', subject: ' + message.header.subject +
+                               ', text: ' + message.text );
         }
       }
     );
