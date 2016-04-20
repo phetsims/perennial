@@ -6,9 +6,9 @@
  * Starting and Stopping the Server
  * ================================
  *
- * To start, stop, or restart the build server, run this command on simian or figaro:
+ * To start, stop, or restart the build server, run this command on phet-server:
  *
- * sudo /etc/init.d/build-server [start|stop|restart]
+ * sudo systemctl [start|stop|restart] build-server
  *
  * Optionally add a --verbose flag for more debug information (with start or restart).
  *
@@ -122,7 +122,7 @@ var EMAIL_KEY = 'email';
 var USER_ID_KEY = 'userId';
 var AUTHORIZATION_KEY = 'authorizationCode';
 var SERVER_NAME = 'serverName';
-var HTML_SIMS_DIRECTORY = '/data/web/htdocs/phetsims/sims/html/';
+var HTML_SIMS_DIRECTORY = '/data/web/static/phetsims/sims/html/';
 var ENGLISH_LOCALE = 'en';
 var PERENNIAL = '.';
 
@@ -627,8 +627,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         }
         else {
 
-          var host = 'phet.colorado.edu';
-          var testUrl = 'http://' + host + '/sims/html/' + simName + '/latest/' + simName + '_en.html';
+          var host = 'phet-new.colorado.edu';
+          var testUrl = 'https://' + host + '/sims/html/' + simName + '/latest/' + simName + '_en.html';
           var newSim = true;
 
           for ( var i = 0; i < data.length; i++ ) {
@@ -738,9 +738,18 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * @param callback
    */
   var notifyServer = function( callback ) {
-    var host = ( productionServer === 'simian.colorado.edu' ) ? 'phet-dev.colorado.edu' : 'phet.colorado.edu';
+    var host;
+    if ( productionServer === 'phet-server.int.colorado.edu' ) {
+      host = 'phet-new.colorado.edu';
+    }
+    else if ( productionServer === 'simian.colorado.edu' ) {
+      host = 'phet-dev.colorado.edu';
+    }
+    else {
+      host = 'phet.colorado.edu';
+    }
     var project = 'html/' + simName;
-    var url = 'http://' + host + '/services/synchronize-project?projectName=' + project;
+    var url = 'https://' + host + '/services/synchronize-project?projectName=' + project;
     request( url, function( error, response, body ) {
       var errorMessage;
 
