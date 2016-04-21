@@ -123,7 +123,7 @@ var EMAIL_KEY = 'email';
 var USER_ID_KEY = 'userId';
 var AUTHORIZATION_KEY = 'authorizationCode';
 var SERVER_NAME = 'serverName';
-var HTML_SIMS_DIRECTORY = '/data/web/htdocs/phetsims/sims/html/';
+var HTML_SIMS_DIRECTORY = buildServerConfig.htmlSimsDirectory;
 var ENGLISH_LOCALE = 'en';
 var PERENNIAL = '.';
 
