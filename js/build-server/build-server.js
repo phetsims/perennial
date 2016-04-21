@@ -628,8 +628,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         }
         else {
 
-          var host = 'phet.colorado.edu';
-          var testUrl = 'http://' + host + '/sims/html/' + simName + '/latest/' + simName + '_en.html';
+          var host = buildServerConfig.webHost;
+          var testUrl = 'https://' + host + '/sims/html/' + simName + '/latest/' + simName + '_en.html';
           var newSim = true;
 
           for ( var i = 0; i < data.length; i++ ) {
@@ -739,9 +739,9 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * @param callback
    */
   var notifyServer = function( callback ) {
-    var host = ( productionServer === 'simian.colorado.edu' ) ? 'phet-dev.colorado.edu' : 'phet.colorado.edu';
+    var host = buildServerConfig.webHost;
     var project = 'html/' + simName;
-    var url = 'http://' + host + '/services/synchronize-project?projectName=' + project;
+    var url = 'https://' + host + '/services/synchronize-project?projectName=' + project;
     request( url, function( error, response, body ) {
       var errorMessage;
 
