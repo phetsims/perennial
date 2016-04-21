@@ -6,12 +6,13 @@
  * Starting and Stopping the Server
  * ================================
  *
- * To start, stop, or restart the build server, run this command on simian or figaro:
+ * To start, stop, or restart the build server on figaro or simian, run this command:
  *
  * sudo /etc/init.d/build-server [start|stop|restart]
  *
- * Optionally add a --verbose flag for more debug information (with start or restart).
+ * To start, stop, or restart the build server on phet-server, run this command:
  *
+ * sudo systemctl [start|stop|restart] build-server
  *
  * Build Server Configuration
  * ==========================
@@ -141,7 +142,7 @@ var parsedCommandLineOptions = parseArgs( commandLineArgs, {
 } );
 
 var defaultOptions = {
-  verbose: false,
+  verbose: buildServerConfig.verbose === 'true', // can be overridden by a flag on the command line
 
   // options for supporting help
   help: false,
