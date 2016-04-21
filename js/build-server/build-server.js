@@ -122,7 +122,6 @@ var OPTION_KEY = 'option';
 var EMAIL_KEY = 'email';
 var USER_ID_KEY = 'userId';
 var AUTHORIZATION_KEY = 'authorizationCode';
-var SERVER_NAME = 'serverName';
 var HTML_SIMS_DIRECTORY = buildServerConfig.htmlSimsDirectory;
 var ENGLISH_LOCALE = 'en';
 var PERENNIAL = '.';
@@ -363,11 +362,6 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   if ( req.query[ USER_ID_KEY ] ) {
     userId = decodeURIComponent( req.query[ USER_ID_KEY ] );
     winston.log( 'info', 'setting userId = ' + userId );
-  }
-
-  var productionServer = buildServerConfig.productionServerName;
-  if ( req.query[ SERVER_NAME ] ) {
-    productionServer = decodeURIComponent( req.query[ SERVER_NAME ] );
   }
 
   var simNameRegex = /^[a-z-]+$/;
@@ -754,12 +748,12 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         var syncResponse = JSON.parse( body );
 
         if ( !syncResponse.success ) {
-          errorMessage = 'request to synchronize project ' + project + ' on ' + productionServer + ' failed with message: ' + syncResponse.error;
+          errorMessage = 'request to synchronize project ' + project + ' on ' + buildServerConfig.productionServerName + ' failed with message: ' + syncResponse.error;
           winston.log( 'error', errorMessage );
           sendEmail( 'SYNCHRONIZE FAILED', errorMessage );
         }
         else {
-          winston.log( 'info', 'request to synchronize project ' + project + ' on ' + productionServer + ' succeeded' );
+          winston.log( 'info', 'request to synchronize project ' + project + ' on ' + buildServerConfig.productionServerName + ' succeeded' );
         }
       }
       else {
