@@ -64,6 +64,7 @@ var assert = require( 'assert' );
       pgConnectionString: buildLocalJSON.pgConnectionString,
       productionServerName: buildLocalJSON.productionServerName || 'phet-server.int.colorado.edu',
       productionServerURL: buildLocalJSON.productionServerURL || 'https://phet.colorado.edu',
+      serverToken: buildLocalJSON.serverToken,
       verbose: buildLocalJSON.verbose === 'true' || false
     };
 

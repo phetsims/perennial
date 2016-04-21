@@ -740,7 +740,14 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var notifyServer = function( callback ) {
     var project = 'html/' + simName;
     var url = buildServerConfig.productionServerURL + '/services/synchronize-project?projectName=' + project;
-    request( url, function( error, response, body ) {
+    request( {
+      url: url,
+      auth: {
+        user: 'token',
+        pass: buildServerConfig.serverToken,
+        sendImmediately: true
+      }
+    }, function( error, response, body ) {
       var errorMessage;
 
       if ( !error && response.statusCode === 200 ) {
