@@ -2,7 +2,6 @@
 
 var assert = require( 'assert' );
 
-
 /**
  * Gets configuration information that is related to deploying sims.
  *
@@ -62,8 +61,9 @@ var assert = require( 'assert' );
       emailTo: buildLocalJSON.emailTo,
       emailUsername: buildLocalJSON.emailUsername,
       pgConnectionString: buildLocalJSON.pgConnectionString,
-      productionServerName: buildLocalJSON.productionServerName || 'figaro.colorado.edu',
-      productionServerURL: buildLocalJSON.productionServerURL || 'https://phet.colorado.edu'
+      productionServerName: buildLocalJSON.productionServerName || 'phet-server.int.colorado.edu',
+      productionServerURL: buildLocalJSON.productionServerURL || 'https://phet.colorado.edu',
+      verbose: buildLocalJSON.verbose === 'true' || false
     };
 
   }

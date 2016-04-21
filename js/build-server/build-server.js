@@ -142,7 +142,7 @@ var parsedCommandLineOptions = parseArgs( commandLineArgs, {
 } );
 
 var defaultOptions = {
-  verbose: buildServerConfig.verbose === 'true', // can be overridden by a flag on the command line
+  verbose: buildServerConfig.verbose, // can be overridden by a flag on the command line
 
   // options for supporting help
   help: false,
@@ -628,8 +628,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         }
         else {
 
-          var host = buildServerConfig.webHost;
-          var testUrl = 'https://' + host + '/sims/html/' + simName + '/latest/' + simName + '_en.html';
+          var testUrl = buildServerConfig.productionServerURL + '/sims/html/' + simName + '/latest/' + simName + '_en.html';
           var newSim = true;
 
           for ( var i = 0; i < data.length; i++ ) {
@@ -739,9 +738,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * @param callback
    */
   var notifyServer = function( callback ) {
-    var host = buildServerConfig.webHost;
     var project = 'html/' + simName;
-    var url = 'https://' + host + '/services/synchronize-project?projectName=' + project;
+    var url = buildServerConfig.productionServerURL + '/services/synchronize-project?projectName=' + project;
     request( url, function( error, response, body ) {
       var errorMessage;
 
