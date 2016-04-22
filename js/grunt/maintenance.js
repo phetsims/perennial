@@ -173,7 +173,7 @@ module.exports = function( grunt, doneCallback ) {
       var self = this;
 
       // TODO: hook up with the JSON API preferably? This is using the old metadata-based API
-      var url = 'http://phet.colorado.edu/services/metadata/simulation?simulation=' +
+      var url = 'https://phet.colorado.edu/services/metadata/simulation?simulation=' +
                 encodeURIComponent( simName ) + '&format=phet-master';
 
       this.requestXML( url, function( xmlResult ) {
