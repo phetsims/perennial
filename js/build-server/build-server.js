@@ -232,6 +232,7 @@ function sendEmail( subject, text, emailParameterOnly ) {
       return;
     }
 
+    winston.log( 'info', 'attempting to send email' );
     emailServer.send( {
         text: text,
         from: 'PhET Build Server <phethelp@colorado.edu>',
@@ -889,6 +890,13 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 }, 1 ); // 1 is the max number of tasks that can run concurrently
 
 function queueDeploy( req, res ) {
+
+  // log the original URL, which is useful for debugging
+  winston.log(
+    'info',
+    'deploy request received, original URL = ' + ( req.protocol + '://' + req.get( 'host' ) + req.originalUrl )
+  );
+
   var repos = req.query[ REPOS_KEY ];
   var simName = req.query[ SIM_NAME_KEY ];
   var version = req.query[ VERSION_KEY ];
