@@ -16,6 +16,7 @@
     "grunt": "~0.4.1",
     "grunt-eslint": "~17.2.0",
     "lodash": "^3.10.1",
+    "mimelib": "~0.2.19",
     "minimist": "^1.1.1",
     "pg": "^4.3.0",
     "pg-query": "^0.11.0",

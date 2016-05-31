@@ -103,16 +103,17 @@ var email = require( 'emailjs/email' );
 var express = require( 'express' );
 var fs = require( 'fs.extra' );
 var getBuildServerConfig = require( './getBuildServerConfig' );
+var mimelib = require( 'mimelib' );
 var parseArgs = require( 'minimist' );
 var parseString = require( 'xml2js' ).parseString;
 var query = require( 'pg-query' );
 var request = require( 'request' );
 var winston = require( 'winston' );
-var buildServerConfig = getBuildServerConfig( fs );
 
 var _ = require( 'lodash' );
 
 // constants
+var BUILD_SERVER_CONFIG = getBuildServerConfig( fs );
 var LISTEN_PORT = 16371;
 var REPOS_KEY = 'repos';
 var LOCALES_KEY = 'locales';
@@ -122,7 +123,7 @@ var OPTION_KEY = 'option';
 var EMAIL_KEY = 'email';
 var USER_ID_KEY = 'userId';
 var AUTHORIZATION_KEY = 'authorizationCode';
-var HTML_SIMS_DIRECTORY = buildServerConfig.htmlSimsDirectory;
+var HTML_SIMS_DIRECTORY = BUILD_SERVER_CONFIG.htmlSimsDirectory;
 var ENGLISH_LOCALE = 'en';
 var PERENNIAL = '.';
 
@@ -141,7 +142,7 @@ var parsedCommandLineOptions = parseArgs( commandLineArgs, {
 } );
 
 var defaultOptions = {
-  verbose: buildServerConfig.verbose, // can be overridden by a flag on the command line
+  verbose: BUILD_SERVER_CONFIG.verbose, // can be overridden by a flag on the command line
 
   // options for supporting help
   help: false,
@@ -187,11 +188,11 @@ var verbose = options.verbose;
 
 // configure email server
 var emailServer;
-if ( buildServerConfig.emailUsername && buildServerConfig.emailPassword && buildServerConfig.emailTo ) {
+if ( BUILD_SERVER_CONFIG.emailUsername && BUILD_SERVER_CONFIG.emailPassword && BUILD_SERVER_CONFIG.emailTo ) {
   emailServer = email.server.connect( {
-    user: buildServerConfig.emailUsername,
-    password: buildServerConfig.emailPassword,
-    host: buildServerConfig.emailServer,
+    user: BUILD_SERVER_CONFIG.emailUsername,
+    password: BUILD_SERVER_CONFIG.emailPassword,
+    host: BUILD_SERVER_CONFIG.emailServer,
     tls: true
   } );
 }
@@ -201,8 +202,8 @@ else {
 }
 
 // configure postgres connection
-if ( buildServerConfig.pgConnectionString ) {
-  query.connectionParameters = buildServerConfig.pgConnectionString;
+if ( BUILD_SERVER_CONFIG.pgConnectionString ) {
+  query.connectionParameters = BUILD_SERVER_CONFIG.pgConnectionString;
 }
 else {
   query.connectionParameters = 'postgresql://localhost/rosetta';
@@ -216,7 +217,7 @@ else {
  */
 function sendEmail( subject, text, emailParameterOnly ) {
   if ( emailServer ) {
-    var emailTo = buildServerConfig.emailTo;
+    var emailTo = BUILD_SERVER_CONFIG.emailTo;
 
     if ( emailParameter ) {
       if ( emailParameterOnly ) {
@@ -244,8 +245,9 @@ function sendEmail( subject, text, emailParameterOnly ) {
           winston.log( 'error', 'error when attempted to send email, err = ' + err );
         }
         else {
-          winston.log( 'info', 'sent email to: ' + message.header.to + ', subject: ' + message.header.subject +
-                               ', text: ' + message.text );
+          winston.log( 'info',                                                                  'sent email to: ' +                                              message.header.to                            +
+                               ', subject: ' + mimelib.decodeMimeWord( message.header.subject ) +
+                               ', text: '                                                       + message.text );
         }
       }
     );
@@ -578,8 +580,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * @param callback
    */
   var spotScp = function( callback ) {
-    var userAtServer = buildServerConfig.devUsername + '@' + buildServerConfig.devDeployServer;
-    var simVersionDirectory = buildServerConfig.devDeployPath + simName + '/' + version;
+    var userAtServer = BUILD_SERVER_CONFIG.devUsername + '@' + BUILD_SERVER_CONFIG.devDeployServer;
+    var simVersionDirectory = BUILD_SERVER_CONFIG.devDeployPath + simName + '/' + version;
 
     // mkdir first in case it doesn't exist already
     var mkdirCommand = 'ssh ' + userAtServer + ' \'mkdir -p ' + simVersionDirectory + '\'';
@@ -623,7 +625,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         }
         else {
 
-          var testUrl = buildServerConfig.productionServerURL + '/sims/html/' + simName + '/latest/' + simName + '_en.html';
+          var testUrl = BUILD_SERVER_CONFIG.productionServerURL + '/sims/html/' + simName + '/latest/' + simName + '_en.html';
           var newSim = true;
 
           for ( var i = 0; i < data.length; i++ ) {
@@ -734,12 +736,12 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    */
   var notifyServer = function( callback ) {
     var project = 'html/' + simName;
-    var url = buildServerConfig.productionServerURL + '/services/synchronize-project?projectName=' + project;
+    var url = BUILD_SERVER_CONFIG.productionServerURL + '/services/synchronize-project?projectName=' + project;
     request( {
       url: url,
       auth: {
         user: 'token',
-        pass: buildServerConfig.serverToken,
+        pass: BUILD_SERVER_CONFIG.serverToken,
         sendImmediately: true
       }
     }, function( error, response, body ) {
@@ -749,12 +751,12 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         var syncResponse = JSON.parse( body );
 
         if ( !syncResponse.success ) {
-          errorMessage = 'request to synchronize project ' + project + ' on ' + buildServerConfig.productionServerName + ' failed with message: ' + syncResponse.error;
+          errorMessage = 'request to synchronize project ' + project + ' on ' + BUILD_SERVER_CONFIG.productionServerName + ' failed with message: ' + syncResponse.error;
           winston.log( 'error', errorMessage );
           sendEmail( 'SYNCHRONIZE FAILED', errorMessage );
         }
         else {
-          winston.log( 'info', 'request to synchronize project ' + project + ' on ' + buildServerConfig.productionServerName + ' succeeded' );
+          winston.log( 'info', 'request to synchronize project ' + project + ' on ' + BUILD_SERVER_CONFIG.productionServerName + ' succeeded' );
         }
       }
       else {
@@ -773,9 +775,9 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var addTranslator = function( locale, callback ) {
 
     // create the URL
-    var addTranslatorURL = buildServerConfig.productionServerURL + '/services/add-html-translator?simName=' + simName +
+    var addTranslatorURL = BUILD_SERVER_CONFIG.productionServerURL + '/services/add-html-translator?simName=' + simName +
                            '&locale=' + locale + '&userId=' + userId + '&authorizationCode=' +
-                           buildServerConfig.databaseAuthorizationCode;
+                           BUILD_SERVER_CONFIG.databaseAuthorizationCode;
 
     // log the URL
     winston.log( 'info', 'URL for adding translator to credits = ' + addTranslatorURL );
@@ -904,7 +906,7 @@ function queueDeploy( req, res ) {
   var authorizationKey = req.query[ AUTHORIZATION_KEY ];
 
   if ( repos && simName && version && authorizationKey ) {
-    if ( authorizationKey !== buildServerConfig.buildServerAuthorizationCode ) {
+    if ( authorizationKey !== BUILD_SERVER_CONFIG.buildServerAuthorizationCode ) {
       var err = 'wrong authorization code';
       winston.log( 'error', err );
       res.send( err );
