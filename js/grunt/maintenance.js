@@ -38,11 +38,17 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
+// modules
 var child_process = require( 'child_process' );
 var xml2js = require( 'xml2js' );
 var request = require( 'request' );
 var fs = require( 'fs' );
 var _ = require( 'lodash' );
+
+// constants
+var IS_WIN = /^win/.test( process.platform );
+var GRUNT_CMD = IS_WIN ? 'grunt.cmd' : 'grunt'; // needs to be a slightly different command for Windows
+var NPM_CMD = IS_WIN ? 'npm.cmd' : 'npm'; // needs to be a slightly different command for Windows
 
 /**
  * @param {Object} grunt - For all of your grunting needs.
@@ -400,7 +406,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {Function} callback - callback() called when complete with no errors
      */
     npmInstall: function( repo, callback ) {
-      this.execute( 'npm', [ 'install' ], '../' + repo, function() {
+      this.execute( NPM_CMD, [ 'install' ], '../' + repo, function() {
         callback();
       } );
     },
@@ -464,6 +470,7 @@ module.exports = function( grunt, doneCallback ) {
       var simNames = simsString.split( ',' );
 
       var versionSimNames = simNames.slice();
+
       function requestNextVersion() {
         if ( versionSimNames.length ) {
           var simName = versionSimNames.shift();
@@ -514,6 +521,7 @@ module.exports = function( grunt, doneCallback ) {
 
       // First, load all dependencies.json files from all of the simulations (printing out relevant SHAs)
       var requestSimNames = simNames.slice();
+
       function requestNextDependencies() {
         if ( requestSimNames.length ) {
           var simName = requestSimNames.shift();
@@ -525,8 +533,8 @@ module.exports = function( grunt, doneCallback ) {
               self.getDependencies( simName, function( dependencies ) {
                 simDependenciesMap[ simName ] = dependencies;
                 console.log( simName + ' ' + repoNames.map( function( repoName ) {
-                  return dependencies[ repoName ].sha;
-                } ).join( ',' ) );
+                    return dependencies[ repoName ].sha;
+                  } ).join( ',' ) );
 
                 self.gitClean( simName, function() {
                   requestNextDependencies();
@@ -633,6 +641,7 @@ module.exports = function( grunt, doneCallback ) {
 
       // Grab current SHAs for the repos
       var processRepoNames = repoNames.slice();
+
       function processNextRepo() {
         if ( processRepoNames.length ) {
           var repoName = processRepoNames.shift();
@@ -652,6 +661,7 @@ module.exports = function( grunt, doneCallback ) {
 
       // Patch each sim
       var processSimNames = simNames.slice();
+
       function processNextSim() {
         if ( processSimNames.length ) {
           var simName = processSimNames.shift();
@@ -663,6 +673,7 @@ module.exports = function( grunt, doneCallback ) {
 
             // Check out each patched common repo, and apply the patch to the sim-specific branch
             var repoIndex = 0;
+
             function nextCommonRepo() {
               if ( repoIndex < repoNames.length ) {
                 var repoName = repoNames[ repoIndex ];
@@ -714,7 +725,7 @@ module.exports = function( grunt, doneCallback ) {
               grunt.log.debug( 'updating dependencies.json' );
               self.npmInstall( simName, function() {
                 self.npmInstall( 'chipper', function() {
-                  self.execute( 'grunt', [], '../' + simName, function() {
+                  self.execute( GRUNT_CMD, [], '../' + simName, function() {
                     fs.readFile( '../' + simName + '/build/dependencies.json', 'utf8', function( fileError, fileData ) {
                       self.assert( !fileError, 'DependenciesJSON file error: ' + fileError );
 
@@ -726,7 +737,7 @@ module.exports = function( grunt, doneCallback ) {
                                 processNextSim();
                               } );
                             } );
-                          })
+                          } )
                         } );
                       } );
                     } );
@@ -734,6 +745,7 @@ module.exports = function( grunt, doneCallback ) {
                 } );
               } );
             }
+
             nextCommonRepo();
           } );
         }
@@ -762,9 +774,9 @@ module.exports = function( grunt, doneCallback ) {
       this.gitCheckoutShas( simName, branch, function() {
         self.npmInstall( simName, function() {
           self.npmInstall( 'chipper', function() {
-            self.execute( 'grunt', [], '../' + simName, function() {
+            self.execute( GRUNT_CMD, [], '../' + simName, function() {
               // note, may need to enable ssh-agent? "exec ssh-agent bash"
-              self.execute( 'grunt', [ 'deploy-rc' ], '../' + simName, function() {
+              self.execute( GRUNT_CMD, [ 'deploy-rc' ], '../' + simName, function() {
                 self.gitCheckoutMaster( simName, function() {
                   self.success( 'Deployed ' + simName );
                 } );
@@ -824,9 +836,9 @@ module.exports = function( grunt, doneCallback ) {
               self.gitPush( simName, branch, function() {
                 self.npmInstall( simName, function() {
                   self.npmInstall( 'chipper', function() {
-                    self.execute( 'grunt', [], '../' + simName, function() {
+                    self.execute( GRUNT_CMD, [], '../' + simName, function() {
                       // note, may need to enable ssh-agent? "exec ssh-agent bash"
-                      self.execute( 'grunt', [ 'deploy-rc' ], '../' + simName, function() {
+                      self.execute( GRUNT_CMD, [ 'deploy-rc' ], '../' + simName, function() {
                         self.gitCheckoutMaster( simName, function() {
                           self.success( 'Deployed ' + simName + ' ' + newVersionString );
                         } );
@@ -880,11 +892,11 @@ module.exports = function( grunt, doneCallback ) {
             self.execute( 'git', [ 'commit', '-m', 'Bumping version to ' + newVersionString + ' for ' + message ], '../' + simName, function() {
               self.gitPush( simName, branch, function() {
                 self.npmInstall( simName, function() {
-                  self.execute( 'grunt', [], '../' + simName, function() {
+                  self.execute( GRUNT_CMD, [], '../' + simName, function() {
                     // extra args can safely be added, except for ph-scale
                     var extraArgs = ( simName.indexOf( 'ph-scale' ) === 0 ) ? [] : [ '--locales=*' ];
                     // note, may need to enable ssh-agent? "exec ssh-agent bash"
-                    self.execute( 'grunt', [ 'deploy-production' ].concat( extraArgs ), '../' + simName, function() {
+                    self.execute( GRUNT_CMD, [ 'deploy-production' ].concat( extraArgs ), '../' + simName, function() {
                       self.gitCheckoutMaster( simName, function() {
                         self.success( 'Deployed ' + simName + ' ' + newVersionString );
                       } );
@@ -932,9 +944,10 @@ module.exports = function( grunt, doneCallback ) {
                     } );
                   } );
                 }
+
                 if ( repo.build ) {
                   self.npmInstall( name, function() {
-                    self.execute( 'grunt', [], cwd, function() {
+                    self.execute( GRUNT_CMD, [], cwd, function() {
                       self.execute( 'git', [ 'add', 'build' ], cwd, function() {
                         self.execute( 'git', [ 'commit', '-m', 'Updating Build' ], cwd, afterOptionalBuild, afterOptionalBuild );
                       } );
