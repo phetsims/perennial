@@ -604,6 +604,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 
         // TODO: skip non-English version for now because of issues doing lots of transfers, see https://github.com/phetsims/perennial/issues/20
         if ( filename.indexOf( '.html' ) !== -1 && filename.indexOf( '_en' ) === -1 ){
+          finished();
           continue;
         }
 
