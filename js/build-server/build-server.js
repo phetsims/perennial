@@ -576,7 +576,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 
   /**
    * Copy files to spot. This function calls scp once for each file instead of using scp -r. The reason for this is that
-   * scp -r will create a new directory called 'build' inside the sim version directory if the version directory already exists.
+   * scp -r will create a new directory called 'build' inside the sim version directory if the version directory already
+   * exists.
    * @param callback
    */
   var spotScp = function( callback ) {
@@ -598,7 +599,14 @@ var taskQueue = async.queue( function( task, taskCallback ) {
       } );
 
       for ( var i = 0; i < files.length; i++ ) {
+
         var filename = files[ i ];
+
+        // TODO: skip non-English version for now because of issues doing lots of transfers, see https://github.com/phetsims/perennial/issues/20
+        if ( filename.indexOf( '.html' ) !== -1 && filename.indexOf( '_en' ) === -1 ){
+          continue;
+        }
+
         exec( 'scp ' + filename + ' ' + userAtServer + ':' + simVersionDirectory, buildDir, finished );
       }
     } );
