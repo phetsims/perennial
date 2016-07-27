@@ -853,15 +853,16 @@ var taskQueue = async.queue( function( task, taskCallback ) {
           simTitle = title;
         };
 
+        // TODO - jblanco - backout -dd flags
         // run every step of the build
         exec( 'git pull', PERENNIAL, function() {
-          exec( 'npm install', PERENNIAL, function() {
+          exec( 'npm install -dd', PERENNIAL, function() {
             exec( './chipper/bin/clone-missing-repos.sh', '..', function() { // clone missing repos in case any new repos exist that might be dependencies
               pullMaster( function() {
                 exec( 'grunt checkout-shas --buildServer=true --repo=' + simName, PERENNIAL, function() {
                   exec( 'git checkout ' + repos[ simName ].sha, simDir, function() { // checkout the sha for the current sim
-                    exec( 'npm install', '../chipper', function() { // npm install in chipper in case there are new dependencies there
-                      exec( 'npm install', simDir, function() {
+                    exec( 'npm install -dd', '../chipper', function() { // npm install in chipper in case there are new dependencies there
+                      exec( 'npm install -dd', simDir, function() {
                         getLocales( locales, function( locales ) {
                           exec( 'grunt build-for-server --brand=phet --locales=' + locales, simDir, function() {
 
