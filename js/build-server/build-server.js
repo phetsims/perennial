@@ -294,7 +294,14 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 
     // TODO - jblanco - remove
     child_process.exec( 'pwd', { cwd: dir }, function( err, stdout, stderr ) {
-      winston.log( 'info', '---- TEST PWD ------' + command ); // TODO: jblanco - remove
+      winston.log( 'info', '---- TEST PWD ------' ); // TODO: jblanco - remove
+      winston.log( 'info', 'stdout: ' + stdout ); // TODO: jblanco - remove
+      winston.log( 'info', 'stderr: ' + stderr ); // TODO: jblanco - remove
+      winston.log( 'info', 'err: ' + err ); // TODO: jblanco - remove
+    } );
+    // TODO - jblanco - remove
+    child_process.exec( 'touch marker.txt', { cwd: dir }, function( err, stdout, stderr ) {
+      winston.log( 'info', '---- TEST CREATING FILE ------' ); // TODO: jblanco - remove
       winston.log( 'info', 'stdout: ' + stdout ); // TODO: jblanco - remove
       winston.log( 'info', 'stderr: ' + stderr ); // TODO: jblanco - remove
       winston.log( 'info', 'err: ' + err ); // TODO: jblanco - remove
