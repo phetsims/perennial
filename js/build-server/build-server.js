@@ -293,6 +293,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     winston.log( 'info', 'running command: ' + command );
     child_process.exec( command, { cwd: dir }, function( err, stdout, stderr ) {
 
+      winston.log( 'info', 'command completed: ' + command ); // TODO: jblanco - remove
+      winston.log( 'info', 'stderr: ' + stderr ); // TODO: jblanco - remove
       if ( verbose ) {
         if ( stdout ) { winston.log( 'info', stdout ); }
         if ( stderr ) { winston.log( 'info', stderr ); }
