@@ -293,7 +293,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     winston.log( 'info', 'running command: ' + command );
 
     // TODO - jblanco - remove
-    child_process.exec( 'cat dependencies.json', { cwd: dir }, function( err, stdout, stderr ) {
+    child_process.exec( 'cat package.json', { cwd: dir }, function( err, stdout, stderr ) {
       winston.log( 'info', '---- TEST CAT ------' ); // TODO: jblanco - remove
       winston.log( 'info', 'stdout: ' + stdout ); // TODO: jblanco - remove
       winston.log( 'info', 'stderr: ' + stderr ); // TODO: jblanco - remove
