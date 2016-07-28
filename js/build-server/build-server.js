@@ -292,20 +292,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   var exec = function( command, dir, callback ) {
     winston.log( 'info', 'running command: ' + command );
 
-    // TODO - jblanco - remove
-    child_process.exec( 'echo $NODE_ENV', { cwd: dir }, function( err, stdout, stderr ) {
-      winston.log( 'info', '---- TEST echo $NODE_ENV ------' ); // TODO: jblanco - remove
-      winston.log( 'info', 'stdout: ' + stdout ); // TODO: jblanco - remove
-      winston.log( 'info', 'stderr: ' + stderr ); // TODO: jblanco - remove
-      winston.log( 'info', 'err: ' + err ); // TODO: jblanco - remove
-    } );
-
     child_process.exec( command, { cwd: dir }, function( err, stdout, stderr ) {
 
-      winston.log( 'info', 'command completed: ' + command ); // TODO: jblanco - remove
-      winston.log( 'info', 'stdout: ' + stdout ); // TODO: jblanco - remove
-      winston.log( 'info', 'stderr: ' + stderr ); // TODO: jblanco - remove
-      winston.log( 'info', 'err: ' + err ); // TODO: jblanco - remove
       if ( verbose ) {
         if ( stdout ) { winston.log( 'info', stdout ); }
         if ( stderr ) { winston.log( 'info', stderr ); }
