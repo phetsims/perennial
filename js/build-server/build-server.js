@@ -2,7 +2,7 @@
 
 /**
  * PhET build and deploy server. The server is designed to run on the same host as the production site (simian or figaro).
- *create
+ *
  * Starting and Stopping the Server
  * ================================
  *
