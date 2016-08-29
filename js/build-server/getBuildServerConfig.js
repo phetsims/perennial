@@ -15,7 +15,7 @@ var assert = require( 'assert' );
  * Optional:
  * {string} devDeployServer - name of the dev server, defaults to 'spot.colorado.edu'
  * {string} devDeployPath - path on dev server to deploy to, defaults to '/htdocs/physics/phet/dev/html/'
- * {string} productionServerName - production server name, defaults to 'figaro.colorado.edu', can be over-ridden to 'simian.colorado.edu' for example
+ * {string} productionServerName - production server name, defaults to 'phet-server.int.colorado.edu', can be over-ridden to dev server for testing
  * {string} productionServerURL - production server url, defaults to 'https://phet.colorado.edu', can be over-ridden to 'https://phet-dev.colorado.edu'
  *
  * Include these fields in build-local.json to enable sending emails from build-server on build failure.

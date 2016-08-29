@@ -6,19 +6,19 @@
  * Starting and Stopping the Server
  * ================================
  *
- * To start, stop, or restart the build server on figaro or simian, run this command:
- *
- * sudo /etc/init.d/build-server [start|stop|restart]
- *
  * To start, stop, or restart the build server on phet-server, run this command:
  *
  * sudo systemctl [start|stop|restart] build-server
  *
+ * To start, stop, or restart the build server on figaro or simian, run this command:
+ *
+ * sudo /etc/init.d/build-server [start|stop|restart]
+ *
  * Build Server Configuration
  * ==========================
  *
- * All of the phet repos live on simian and figaro under /data/share/phet/phet-repos. The build server lives in perennial:
- * /data/share/phet/phet-repos/perennial/js/build-server.
+ * All of the phet repos live on the production and dev servers under /data/share/phet/phet-repos. The build server
+ * lives in perennial: /data/share/phet/phet-repos/perennial/js/build-server.
  *
  * The build-server is run as user "phet-admin". It requires the certain fields filled out in phet-admin's HOME/.phet/build-local.json
  * (see assertions in getBuildServerConfig.js). These fields are already filled out, but they may need to modified or updated.
@@ -38,7 +38,7 @@
  *     Port 22
  *     IdentityFile ~/.ssh/id_rsa
  *
- * On spot, you'll need to add the public key from figaro to a file ~/.ssh/authorized_keys
+ * On spot, you'll need to add the public key from phet-server to a file ~/.ssh/authorized_keys
  *
  * build-server log files can be found at /data/share/phet/phet-repos/perennial/build-server.log
  *
@@ -404,7 +404,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     return;
   }
 
-  // validate version and strip suffixes since just the numbers are used in the directory name on simian and figaro
+  // validate version and strip suffixes since just the numbers are used in the directory name on dev and production servers
   var versionMatch = version.match( /^(\d+\.\d+\.\d+)(?:-.*)?$/ );
   if ( versionMatch && versionMatch.length === 2 ) {
 
