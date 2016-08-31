@@ -1,7 +1,7 @@
 // Copyright 2002-2015, University of Colorado Boulder
 
 /**
- * PhET build and deploy server. The server is designed to run on the same host as the production site (simian or figaro).
+ * PhET build and deploy server. The server is designed to run on the same host as the production site (phet-server.int.colorado.edu).
  *
  * Starting and Stopping the Server
  * ================================
