@@ -124,6 +124,7 @@ var EMAIL_KEY = 'email';
 var USER_ID_KEY = 'userId';
 var AUTHORIZATION_KEY = 'authorizationCode';
 var HTML_SIMS_DIRECTORY = BUILD_SERVER_CONFIG.htmlSimsDirectory;
+var PHETIO_SIMS_DIRECTORY = BUILD_SERVER_CONFIG.phetioSimsDirectory;
 var ENGLISH_LOCALE = 'en';
 var PERENNIAL = '.';
 
@@ -245,9 +246,9 @@ function sendEmail( subject, text, emailParameterOnly ) {
           winston.log( 'error', 'error when attempted to send email, err = ' + err );
         }
         else {
-          winston.log( 'info',                                                                  'sent email to: ' +                                              message.header.to                            +
+          winston.log( 'info', 'sent email to: ' + message.header.to +
                                ', subject: ' + mimelib.decodeMimeWord( message.header.subject ) +
-                               ', text: '                                                       + message.text );
+                               ', text: ' + message.text );
         }
       }
     );
@@ -563,7 +564,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * Write the .htaccess file to make "latest" point to the version being deployed and allow "download" links to work on Safari
    * @param callback
    */
-  var writeHtaccess = function( callback ) {
+  var writePhetHtaccess = function( callback ) {
     var contents = 'RewriteEngine on\n' +
                    'RewriteBase /sims/html/' + simName + '/\n' +
                    'RewriteRule latest(.*) ' + version + '$1\n' +
@@ -572,6 +573,15 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                    'RewriteRule ([^/]*)$ - [L,E=download:$1]\n' +
                    'Header onsuccess set Content-disposition "attachment; filename=%{download}e" env=download\n';
     fs.writeFileSync( HTML_SIMS_DIRECTORY + simName + '/.htaccess', contents );
+    callback();
+  };
+
+  var writePhetioHtaccess = function( callback ) {
+    var contents = 'AuthType Basic\n' +
+                   'AuthName "PhET-iO Password Protected Area"\n' +
+                   'AuthUserFile /etc/httpd/conf/phet-io_pw\n' +
+                   'Require valid-user\n';
+    fs.writeFileSync( PHETIO_SIMS_DIRECTORY + simName + '/' + version + '/protected/.htaccess', contents );
     callback();
   };
 
@@ -591,6 +601,9 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 
       // copy the files
       var buildDir = simDir + '/build';
+
+      //TODO: make sure this is recursive
+      //TODO: check and make sure the .htaccess files are copied with the phet-io sims
       var files = fs.readdirSync( buildDir );
 
       // after finishing copying the files, chmod to make sure we preserve group write on spot
@@ -604,7 +617,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         var filename = files[ i ];
 
         // TODO: skip non-English version for now because of issues doing lots of transfers, see https://github.com/phetsims/perennial/issues/20
-        if ( filename.indexOf( '.html' ) !== -1 && filename.indexOf( '_en' ) === -1 ){
+        if ( filename.indexOf( '.html' ) !== -1 && filename.indexOf( '_en' ) === -1 ) {
           finished();
           continue;
         }
@@ -724,12 +737,12 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 
   /**
    * execute mkdir for the sim version directory if it doesn't exist
+   * @param targetDirectory:String
    * @param callback
    */
-  var mkVersionDir = function( callback ) {
-    var simDirPath = HTML_SIMS_DIRECTORY + simName + '/' + version + '/';
+  var mkVersionDir = function( targetDirectory, callback ) {
     try {
-      fs.mkdirpSync( simDirPath );
+      fs.mkdirpSync( targetDirectory );
       callback();
     }
     catch( e ) {
@@ -833,7 +846,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         var simTitleCallback = function( title ) {
           simTitle = title;
         };
-        
+
         // run every step of the build
         exec( 'git pull', PERENNIAL, function() {
           exec( 'npm install', PERENNIAL, function() {
@@ -844,31 +857,39 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                     exec( 'npm install', '../chipper', function() { // npm install in chipper in case there are new dependencies there
                       exec( 'npm install', simDir, function() {
                         getLocales( locales, function( locales ) {
-                          exec( 'grunt build-for-server --brand=phet --locales=' + locales, simDir, function() {
+                          var brand = version.indexOf( 'phetio.' ) < 0 ? 'phet' : 'phet-io';
+                          exec( 'grunt build-for-server --brand=' + brand + ' --locales=' + locales, simDir, function() {
 
                             if ( option === 'rc' ) {
                               spotScp( afterDeploy );
                             }
                             else {
-                              mkVersionDir( function() {
-                                exec( 'cp build/* ' + HTML_SIMS_DIRECTORY + simName + '/' + version + '/', simDir, function() {
-                                  writeHtaccess( function() {
-                                    createTranslationsXML( simTitleCallback, function() {
-                                      notifyServer( function() {
-                                        addToRosetta( simTitle, function() {
+                              var targetDir = ( brand === 'phet' ) ? HTML_SIMS_DIRECTORY : PHETIO_SIMS_DIRECTORY;
+                              targetDir += simName + '/' + version + '/';
+                              mkVersionDir( targetDir, function() {
+                                exec( 'cp -r build/* ' + targetDir, simDir, function() {
+                                  if ( brand === 'phet' ) {
+                                    writePhetHtaccess( function() {
+                                      createTranslationsXML( simTitleCallback, function() {
+                                        notifyServer( function() {
+                                          addToRosetta( simTitle, function() {
 
-                                          // if this build request comes from rosetta it will have a userId field and only one locale
-                                          var localesArray = locales.split( ',' );
-                                          if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
-                                            addTranslator( localesArray[ 0 ], afterDeploy );
-                                          }
-                                          else {
-                                            afterDeploy();
-                                          }
+                                            // if this build request comes from rosetta it will have a userId field and only one locale
+                                            var localesArray = locales.split( ',' );
+                                            if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
+                                              addTranslator( localesArray[ 0 ], afterDeploy );
+                                            }
+                                            else {
+                                              afterDeploy();
+                                            }
+                                          } );
                                         } );
                                       } );
                                     } );
-                                  } );
+                                  }
+                                  else {
+                                    writePhetioHtaccess( afterDeploy );
+                                  }
                                 } );
                               } );
                             }
