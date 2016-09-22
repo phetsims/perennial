@@ -10,6 +10,8 @@
  *
  * sudo systemctl [start|stop|restart] build-server
  *
+ * To edit startup options, please see /usr/lib/systemd/system/build-server.service
+ *
  * To start, stop, or restart the build server on figaro or simian, run this command:
  *
  * sudo /etc/init.d/build-server [start|stop|restart]
@@ -40,7 +42,7 @@
  *
  * On spot, you'll need to add the public key from phet-server to a file ~/.ssh/authorized_keys
  *
- * build-server log files can be found at /data/share/phet/phet-repos/perennial/build-server.log
+ * build-server log files can be tailed by running /usr/lib/systemd/system/build-server.service
  *
  * build-server needs to be able to make commits to github to notify rosetta that a new sim is translatable. To do this,
  * There must be valid git credentials in the .netrc file phet-admin's home directory.
