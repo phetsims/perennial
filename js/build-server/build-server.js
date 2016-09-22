@@ -854,7 +854,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                       exec( 'npm install', simDir, function() {
                         getLocales( locales, function( locales ) {
                           var brand = version.indexOf( 'phetio.' ) < 0 ? 'phet' : 'phet-io';
-                          exec( 'grunt build-for-server --brand=' + brand + ' --locales=' + locales, simDir, function() {
+                          var brandLocales = ( brand === 'phet' ) ? locales : 'en';
+                          exec( 'grunt build-for-server --brand=' + brand + ' --locales=' + brandLocales, simDir, function() {
 
                             if ( option === 'rc' ) {
                               if ( brand === 'phet' ) {
