@@ -619,7 +619,9 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         exec( chmodCommand, buildDir, callback );
       } );
 
-      exec( 'scp -r * ' + userAtServer + ':' + simVersionDirectory, buildDir, finished );
+      exec( 'scp -r * ' + userAtServer + ':' + simVersionDirectory, buildDir, function() {
+        exec( 'scp .htaccess ' + userAtServer + ':' + simVersionDirectory, buildDir, finished );
+      } );
     } );
   };
 
