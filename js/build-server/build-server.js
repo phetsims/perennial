@@ -856,14 +856,13 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                           var brand = version.indexOf( 'phetio.' ) < 0 ? 'phet' : 'phet-io';
                           var brandLocales = ( brand === 'phet' ) ? locales : 'en';
                           exec( 'grunt build-for-server --brand=' + brand + ' --locales=' + brandLocales, simDir, function() {
-
                             if ( option === 'rc' ) {
                               if ( brand === 'phet' ) {
                                 spotScp( afterDeploy );
                               }
                               else if ( brand === 'phet-io' ) {
                                 writePhetioHtaccess(
-                                  'build/.htaccess',
+                                  simDir + '/build/.htaccess',
                                   '/htdocs/physics/phet-io/config/.htpasswd',
                                   function() { spotScp( afterDeploy ); }
                                 );
