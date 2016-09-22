@@ -576,16 +576,15 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     callback();
   };
 
-  var PHETIO_HTACCESS_CONTENTS = 'AuthType Basic\n' +
-                                 'AuthName "PhET-iO Password Protected Area"\n' +
-                                 'AuthUserFile /etc/httpd/conf/phet-io_pw\n' +
-                                 'Require valid-user\n';
-
   /**
    * Writes the htaccess file to password protect the exclusive content for phet-io sims
    * @param callback
    */
-  var writePhetioHtaccess = function( filepath, callback ) {
+  var writePhetioHtaccess = function( filepath, authFilepath, callback ) {
+    var contents = 'AuthType Basic\n' +
+                   'AuthName "PhET-iO Password Protected Area"\n' +
+                   'AuthUserFile ' + authFilepath + '\n' +
+                   'Require valid-user\n';
     fs.writeFileSync( filepath, contents );
     callback();
   };
@@ -860,9 +859,11 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                                 spotScp( afterDeploy );
                               }
                               else if ( brand === 'phet-io' ) {
-                                writePhetioHtaccess( 'build/.htaccess', function() {
-                                  spotScp( afterDeploy );
-                                })
+                                writePhetioHtaccess(
+                                  'build/.htaccess',
+                                  '/htdocs/physics/phet-io/config/.htpasswd',
+                                  function() { spotScp( afterDeploy ); }
+                                );
                               }
                             }
                             else {
@@ -871,7 +872,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                               mkVersionDir( targetDir, function() {
                                 exec( 'cp -r build/* ' + targetDir, simDir, function() {
                                   if ( brand === 'phet' ) {
-                                    writePhetHtaccess( PHETIO_SIMS_DIRECTORY + simName + '/' + version + '/protected/.htaccess', function() {
+                                    writePhetHtaccess( function() {
                                       createTranslationsXML( simTitleCallback, function() {
                                         notifyServer( function() {
                                           addToRosetta( simTitle, function() {
@@ -890,7 +891,11 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                                     } );
                                   }
                                   else {
-                                    writePhetioHtaccess( afterDeploy );
+                                    writePhetioHtaccess(
+                                      PHETIO_SIMS_DIRECTORY + simName + '/' + version + '/protected/.htaccess',
+                                      '/etc/httpd/conf/phet-io_pw',
+                                      afterDeploy
+                                    );
                                   }
                                 } );
                               } );
