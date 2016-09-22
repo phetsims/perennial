@@ -576,12 +576,17 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     callback();
   };
 
-  var writePhetioHtaccess = function( callback ) {
-    var contents = 'AuthType Basic\n' +
-                   'AuthName "PhET-iO Password Protected Area"\n' +
-                   'AuthUserFile /etc/httpd/conf/phet-io_pw\n' +
-                   'Require valid-user\n';
-    fs.writeFileSync( PHETIO_SIMS_DIRECTORY + simName + '/' + version + '/protected/.htaccess', contents );
+  var PHETIO_HTACCESS_CONTENTS = 'AuthType Basic\n' +
+                                 'AuthName "PhET-iO Password Protected Area"\n' +
+                                 'AuthUserFile /etc/httpd/conf/phet-io_pw\n' +
+                                 'Require valid-user\n';
+
+  /**
+   * Writes the htaccess file to password protect the exclusive content for phet-io sims
+   * @param callback
+   */
+  var writePhetioHtaccess = function( filepath, callback ) {
+    fs.writeFileSync( filepath, contents );
     callback();
   };
 
@@ -589,6 +594,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * Copy files to spot. This function calls scp once for each file instead of using scp -r. The reason for this is that
    * scp -r will create a new directory called 'build' inside the sim version directory if the version directory already
    * exists.
+   * @param brand:String
    * @param callback
    */
   var spotScp = function( callback ) {
@@ -612,18 +618,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         exec( chmodCommand, buildDir, callback );
       } );
 
-      for ( var i = 0; i < files.length; i++ ) {
-
-        var filename = files[ i ];
-
-        // TODO: skip non-English version for now because of issues doing lots of transfers, see https://github.com/phetsims/perennial/issues/20
-        if ( filename.indexOf( '.html' ) !== -1 && filename.indexOf( '_en' ) === -1 ) {
-          finished();
-          continue;
-        }
-
-        exec( 'scp ' + filename + ' ' + userAtServer + ':' + simVersionDirectory, buildDir, finished );
-      }
+      exec( 'scp -r * ' + userAtServer + ':' + simVersionDirectory, buildDir, finished );
     } );
   };
 
@@ -861,7 +856,14 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                           exec( 'grunt build-for-server --brand=' + brand + ' --locales=' + locales, simDir, function() {
 
                             if ( option === 'rc' ) {
-                              spotScp( afterDeploy );
+                              if ( brand === 'phet' ) {
+                                spotScp( afterDeploy );
+                              }
+                              else if ( brand === 'phet-io' ) {
+                                writePhetioHtaccess( 'build/.htaccess', function() {
+                                  spotScp( afterDeploy );
+                                })
+                              }
                             }
                             else {
                               var targetDir = ( brand === 'phet' ) ? HTML_SIMS_DIRECTORY : PHETIO_SIMS_DIRECTORY;
@@ -869,7 +871,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                               mkVersionDir( targetDir, function() {
                                 exec( 'cp -r build/* ' + targetDir, simDir, function() {
                                   if ( brand === 'phet' ) {
-                                    writePhetHtaccess( function() {
+                                    writePhetHtaccess( PHETIO_SIMS_DIRECTORY + simName + '/' + version + '/protected/.htaccess', function() {
                                       createTranslationsXML( simTitleCallback, function() {
                                         notifyServer( function() {
                                           addToRosetta( simTitle, function() {
