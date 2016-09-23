@@ -598,7 +598,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * @param brand:String
    * @param callback
    */
-  var spotScp = function( callback ) {
+  var spotScp = function( brand, callback ) {
     var userAtServer = BUILD_SERVER_CONFIG.devUsername + '@' + BUILD_SERVER_CONFIG.devDeployServer;
     var simVersionDirectory = BUILD_SERVER_CONFIG.devDeployPath + simName + '/' + version;
 
@@ -860,6 +860,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                               getLocales( locales, function( locales ) {
                                 var brand = version.indexOf( 'phetio.' ) < 0 ? 'phet' : 'phet-io';
                                 var brandLocales = ( brand === 'phet' ) ? locales : 'en';
+                                winston.log( 'info', 'building for brand: ' + brand + ' version: ' + version );
                                 exec( 'grunt build-for-server --brand=' + brand + ' --locales=' + brandLocales, simDir, function() {
                                   if ( option === 'rc' ) {
                                     if ( brand === 'phet' ) {
