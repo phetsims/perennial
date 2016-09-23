@@ -847,63 +847,69 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 
         // run every step of the build
         exec( 'git pull', PERENNIAL, function() {
-          exec( 'npm install', PERENNIAL, function() {
-            exec( './chipper/bin/clone-missing-repos.sh', '..', function() { // clone missing repos in case any new repos exist that might be dependencies
-              pullMaster( function() {
-                exec( 'grunt checkout-shas --buildServer=true --repo=' + simName, PERENNIAL, function() {
-                  exec( 'git checkout ' + repos[ simName ].sha, simDir, function() { // checkout the sha for the current sim
-                    exec( 'npm install', '../chipper', function() { // npm install in chipper in case there are new dependencies there
-                      exec( 'npm install', simDir, function() {
-                        getLocales( locales, function( locales ) {
-                          var brand = version.indexOf( 'phetio.' ) < 0 ? 'phet' : 'phet-io';
-                          var brandLocales = ( brand === 'phet' ) ? locales : 'en';
-                          exec( 'grunt build-for-server --brand=' + brand + ' --locales=' + brandLocales, simDir, function() {
-                            if ( option === 'rc' ) {
-                              if ( brand === 'phet' ) {
-                                spotScp( afterDeploy );
-                              }
-                              else if ( brand === 'phet-io' ) {
-                                writePhetioHtaccess(
-                                  simDir + '/build/.htaccess',
-                                  '/htdocs/physics/phet-io/config/.htpasswd',
-                                  function() { spotScp( afterDeploy ); }
-                                );
-                              }
-                            }
-                            else {
-                              var targetDir = ( brand === 'phet' ) ? HTML_SIMS_DIRECTORY : PHETIO_SIMS_DIRECTORY;
-                              targetDir += simName + '/' + version + '/';
-                              mkVersionDir( targetDir, function() {
-                                exec( 'cp -r build/* ' + targetDir, simDir, function() {
-                                  if ( brand === 'phet' ) {
-                                    writePhetHtaccess( function() {
-                                      createTranslationsXML( simTitleCallback, function() {
-                                        notifyServer( function() {
-                                          addToRosetta( simTitle, function() {
+          exec( 'npm prune', PERENNIAL, function() {
+            exec( 'npm install', PERENNIAL, function() {
+              exec( './chipper/bin/clone-missing-repos.sh', '..', function() { // clone missing repos in case any new repos exist that might be dependencies
+                pullMaster( function() {
+                  exec( 'grunt checkout-shas --buildServer=true --repo=' + simName, PERENNIAL, function() {
+                    exec( 'git checkout ' + repos[ simName ].sha, simDir, function() { // checkout the sha for the current sim
+                      exec( 'npm prune', '../chipper', function() {
+                        exec( 'npm install', '../chipper', function() { // npm install in chipper in case there are new dependencies there
+                          exec( 'npm prune', simDir, function() {
+                            exec( 'npm install', simDir, function() {
+                              getLocales( locales, function( locales ) {
+                                var brand = version.indexOf( 'phetio.' ) < 0 ? 'phet' : 'phet-io';
+                                var brandLocales = ( brand === 'phet' ) ? locales : 'en';
+                                exec( 'grunt build-for-server --brand=' + brand + ' --locales=' + brandLocales, simDir, function() {
+                                  if ( option === 'rc' ) {
+                                    if ( brand === 'phet' ) {
+                                      spotScp( afterDeploy );
+                                    }
+                                    else if ( brand === 'phet-io' ) {
+                                      writePhetioHtaccess(
+                                        simDir + '/build/.htaccess',
+                                        '/htdocs/physics/phet-io/config/.htpasswd',
+                                        function() { spotScp( afterDeploy ); }
+                                      );
+                                    }
+                                  }
+                                  else {
+                                    var targetDir = ( brand === 'phet' ) ? HTML_SIMS_DIRECTORY : PHETIO_SIMS_DIRECTORY;
+                                    targetDir += simName + '/' + version + '/';
+                                    mkVersionDir( targetDir, function() {
+                                      exec( 'cp -r build/* ' + targetDir, simDir, function() {
+                                        if ( brand === 'phet' ) {
+                                          writePhetHtaccess( function() {
+                                            createTranslationsXML( simTitleCallback, function() {
+                                              notifyServer( function() {
+                                                addToRosetta( simTitle, function() {
 
-                                            // if this build request comes from rosetta it will have a userId field and only one locale
-                                            var localesArray = locales.split( ',' );
-                                            if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
-                                              addTranslator( localesArray[ 0 ], afterDeploy );
-                                            }
-                                            else {
-                                              afterDeploy();
-                                            }
+                                                  // if this build request comes from rosetta it will have a userId field and only one locale
+                                                  var localesArray = locales.split( ',' );
+                                                  if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
+                                                    addTranslator( localesArray[ 0 ], afterDeploy );
+                                                  }
+                                                  else {
+                                                    afterDeploy();
+                                                  }
+                                                } );
+                                              } );
+                                            } );
                                           } );
-                                        } );
+                                        }
+                                        else {
+                                          writePhetioHtaccess(
+                                            PHETIO_SIMS_DIRECTORY + simName + '/' + version + '/protected/.htaccess',
+                                            '/etc/httpd/conf/phet-io_pw',
+                                            afterDeploy
+                                          );
+                                        }
                                       } );
                                     } );
                                   }
-                                  else {
-                                    writePhetioHtaccess(
-                                      PHETIO_SIMS_DIRECTORY + simName + '/' + version + '/protected/.htaccess',
-                                      '/etc/httpd/conf/phet-io_pw',
-                                      afterDeploy
-                                    );
-                                  }
                                 } );
                               } );
-                            }
+                            } );
                           } );
                         } );
                       } );
