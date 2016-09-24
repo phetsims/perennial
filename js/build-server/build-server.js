@@ -836,42 +836,47 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         
         // run every step of the build
         exec( 'git pull', PERENNIAL, function() {
-          exec( 'npm install', PERENNIAL, function() {
-            exec( './chipper/bin/clone-missing-repos.sh', '..', function() { // clone missing repos in case any new repos exist that might be dependencies
-              pullMaster( function() {
-                exec( 'grunt checkout-shas --buildServer=true --repo=' + simName, PERENNIAL, function() {
-                  exec( 'git checkout ' + repos[ simName ].sha, simDir, function() { // checkout the sha for the current sim
-                    exec( 'npm install', '../chipper', function() { // npm install in chipper in case there are new dependencies there
-                      exec( 'npm install', simDir, function() {
-                        getLocales( locales, function( locales ) {
-                          exec( 'grunt build-for-server --brand=phet --locales=' + locales, simDir, function() {
+          exec( 'npm prune', PERENNIAL, function() {
+            exec( 'npm install', PERENNIAL, function() {
+              exec( './chipper/bin/clone-missing-repos.sh', '..', function() { // clone missing repos in case any new repos exist that might be dependencies
+                pullMaster( function() {
+                  exec( 'grunt checkout-shas --buildServer=true --repo=' + simName, PERENNIAL, function() {
+                    exec( 'git checkout ' + repos[ simName ].sha, simDir, function() { // checkout the sha for the current sim
+                      exec( 'npm prune', '../chipper', function() {
+                        exec( 'npm install', '../chipper', function() { // npm install in chipper in case there are new dependencies there
+                          exec( 'npm prune', simDir, function() {
+                            exec( 'npm install', simDir, function() {
+                              getLocales( locales, function( locales ) {
+                                exec( 'grunt build-for-server --brand=phet --locales=' + locales, simDir, function() {
+                                  if ( option === 'rc' ) {
+                                    spotScp( afterDeploy );
+                                  }
+                                  else {
+                                    mkVersionDir( function() {
+                                      exec( 'cp build/* ' + HTML_SIMS_DIRECTORY + simName + '/' + version + '/', simDir, function() {
+                                        writeHtaccess( function() {
+                                          createTranslationsXML( simTitleCallback, function() {
+                                            notifyServer( function() {
+                                              addToRosetta( simTitle, function() {
 
-                            if ( option === 'rc' ) {
-                              spotScp( afterDeploy );
-                            }
-                            else {
-                              mkVersionDir( function() {
-                                exec( 'cp build/* ' + HTML_SIMS_DIRECTORY + simName + '/' + version + '/', simDir, function() {
-                                  writeHtaccess( function() {
-                                    createTranslationsXML( simTitleCallback, function() {
-                                      notifyServer( function() {
-                                        addToRosetta( simTitle, function() {
-
-                                          // if this build request comes from rosetta it will have a userId field and only one locale
-                                          var localesArray = locales.split( ',' );
-                                          if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
-                                            addTranslator( localesArray[ 0 ], afterDeploy );
-                                          }
-                                          else {
-                                            afterDeploy();
-                                          }
+                                                // if this build request comes from rosetta it will have a userId field and only one locale
+                                                var localesArray = locales.split( ',' );
+                                                if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
+                                                  addTranslator( localesArray[ 0 ], afterDeploy );
+                                                }
+                                                else {
+                                                  afterDeploy();
+                                                }
+                                              } );
+                                            } );
+                                          } );
                                         } );
                                       } );
                                     } );
-                                  } );
+                                  }
                                 } );
                               } );
-                            }
+                            } );
                           } );
                         } );
                       } );
@@ -883,7 +888,6 @@ var taskQueue = async.queue( function( task, taskCallback ) {
           } );
         } );
       }
-
     } );
   };
 
