@@ -407,6 +407,9 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     return;
   }
 
+  // Infer brand from version string
+  var brand = version.indexOf( 'phetio.' ) < 0 ? 'phet' : 'phet-io';
+
   // validate version and strip suffixes since just the numbers are used in the directory name on dev and production servers
   var versionMatch = version.match( /^(\d+\.\d+\.\d+)(?:-.*)?$/ );
   if ( versionMatch && versionMatch.length === 2 ) {
@@ -858,7 +861,6 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                           exec( 'npm prune', simDir, function() {
                             exec( 'npm install', simDir, function() {
                               getLocales( locales, function( locales ) {
-                                var brand = version.indexOf( 'phetio.' ) < 0 ? 'phet' : 'phet-io';
                                 var brandLocales = ( brand === 'phet' ) ? locales : 'en';
                                 winston.log( 'info', 'building for brand: ' + brand + ' version: ' + version );
                                 exec( 'grunt build-for-server --brand=' + brand + ' --locales=' + brandLocales, simDir, function() {
