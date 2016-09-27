@@ -409,7 +409,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 
   // Infer brand from version string
   var brand = version.indexOf( 'phetio.' ) < 0 ? 'phet' : 'phet-io';
-
+  var originalVersion = version;
   // validate version and strip suffixes since just the numbers are used in the directory name on dev and production servers
   var versionMatch = version.match( /^(\d+\.\d+\.\d+)(?:-.*)?$/ );
   if ( versionMatch && versionMatch.length === 2 ) {
@@ -877,8 +877,13 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                                     }
                                   }
                                   else {
-                                    var targetDir = ( brand === 'phet' ) ? HTML_SIMS_DIRECTORY : PHETIO_SIMS_DIRECTORY;
-                                    targetDir += simName + '/' + version + '/';
+                                    var targetDir;
+                                    if ( brand === 'phet' ) {
+                                      targetDir = HTML_SIMS_DIRECTORY + simName + '/' + version + '/';
+                                    }
+                                    else if ( brand === 'phet-io' ) {
+                                      targetDir = PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/';
+                                    }
                                     mkVersionDir( targetDir, function() {
                                       exec( 'cp -r build/* ' + targetDir, simDir, function() {
                                         if ( brand === 'phet' ) {
