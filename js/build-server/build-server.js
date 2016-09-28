@@ -407,9 +407,10 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     return;
   }
 
-  // Infer brand from version string
+  // Infer brand from version string and keep unstripped version for phet-io
   var brand = version.indexOf( 'phetio.' ) < 0 ? 'phet' : 'phet-io';
   var originalVersion = version;
+
   // validate version and strip suffixes since just the numbers are used in the directory name on dev and production servers
   var versionMatch = version.match( /^(\d+\.\d+\.\d+)(?:-.*)?$/ );
   if ( versionMatch && versionMatch.length === 2 ) {
@@ -611,9 +612,6 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 
       // copy the files
       var buildDir = simDir + '/build';
-
-      //TODO: make sure this is recursive
-      //TODO: check and make sure the .htaccess files are copied with the phet-io sims
       var files = fs.readdirSync( buildDir );
 
       // after finishing copying the files, chmod to make sure we preserve group write on spot
@@ -622,9 +620,14 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         exec( chmodCommand, buildDir, callback );
       } );
 
-      exec( 'scp -r * ' + userAtServer + ':' + simVersionDirectory, buildDir, function() {
-        exec( 'scp .htaccess ' + userAtServer + ':' + simVersionDirectory, buildDir, finished );
-      } );
+      if ( brand === 'phet' ) {
+        exec( 'scp -r * ' + userAtServer + ':' + simVersionDirectory, buildDir, finished );
+      }
+      else {
+        exec( 'scp -r * ' + userAtServer + ':' + simVersionDirectory, buildDir, function() {
+          exec( 'scp .htaccess ' + userAtServer + ':' + simVersionDirectory + '/protected/', buildDir, finished );
+        } );
+      }
     } );
   };
 
@@ -866,13 +869,13 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                                 exec( 'grunt build-for-server --brand=' + brand + ' --locales=' + brandLocales, simDir, function() {
                                   if ( option === 'rc' ) {
                                     if ( brand === 'phet' ) {
-                                      spotScp( afterDeploy );
+                                      spotScp( brand, afterDeploy );
                                     }
                                     else if ( brand === 'phet-io' ) {
                                       writePhetioHtaccess(
                                         simDir + '/build/.htaccess',
                                         '/htdocs/physics/phet-io/config/.htpasswd',
-                                        function() { spotScp( afterDeploy ); }
+                                        function() { spotScp( brand, afterDeploy ); }
                                       );
                                     }
                                   }
@@ -929,7 +932,6 @@ var taskQueue = async.queue( function( task, taskCallback ) {
           } );
         } );
       }
-
     } );
   };
 
