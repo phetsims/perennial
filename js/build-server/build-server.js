@@ -907,7 +907,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                                         }
                                         else {
                                           writePhetioHtaccess(
-                                            PHETIO_SIMS_DIRECTORY + simName + '/' + version + '/protected/.htaccess',
+                                            PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/protected/.htaccess',
                                             '/etc/httpd/conf/phet-io_pw',
                                             afterDeploy
                                           );
