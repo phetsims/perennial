@@ -70,12 +70,12 @@
  * The build server does the following steps when a deploy request is received:
  * - checks the authorization code, unauthorized codes will not trigger a build
  * - puts the build task on a queue so multiple builds don't occur simultaneously
- * - pull perennial and npm install
+ * - pull perennial and npm update
  * - clone missing repos
  * - pull master for the sim and all dependencies
  * - grunt checkout-shas
  * - checkout sha for the current sim
- * - npm install in chipper and the sim directory
+ * - npm update in chipper and the sim directory
  * - grunt build-for-server --brand=phet for selected locales (see chipper's Gruntfile for details)
  *
  * - for rc deploys:
@@ -854,15 +854,15 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         // run every step of the build
         exec( 'git pull', PERENNIAL, function() {
           exec( 'npm prune', PERENNIAL, function() {
-            exec( 'npm install', PERENNIAL, function() {
+            exec( 'npm update', PERENNIAL, function() {
               exec( './chipper/bin/clone-missing-repos.sh', '..', function() { // clone missing repos in case any new repos exist that might be dependencies
                 pullMaster( function() {
                   exec( 'grunt checkout-shas --buildServer=true --repo=' + simName, PERENNIAL, function() {
                     exec( 'git checkout ' + repos[ simName ].sha, simDir, function() { // checkout the sha for the current sim
                       exec( 'npm prune', '../chipper', function() {
-                        exec( 'npm install', '../chipper', function() { // npm install in chipper in case there are new dependencies there
+                        exec( 'npm update', '../chipper', function() { // npm update in chipper in case there are new dependencies there
                           exec( 'npm prune', simDir, function() {
-                            exec( 'npm install', simDir, function() {
+                            exec( 'npm update', simDir, function() {
                               getLocales( locales, function( locales ) {
                                 var brandLocales = ( brand === 'phet' ) ? locales : 'en';
                                 winston.log( 'info', 'building for brand: ' + brand + ' version: ' + version );
