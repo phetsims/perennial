@@ -615,10 +615,11 @@ var taskQueue = async.queue( function( task, taskCallback ) {
       var files = fs.readdirSync( buildDir );
 
       // after finishing copying the files, chmod to make sure we preserve group write on spot
-      var finished = _.after( files.length, function() {
+      // var finished = _.after( files.length, function() {
+      var finished = function() {
         var chmodCommand = 'ssh ' + userAtServer + ' \'chmod -R g+w ' + simVersionDirectory + '\'';
         exec( chmodCommand, buildDir, callback );
-      } );
+      };
 
       if ( brand === 'phet' ) {
         exec( 'scp -r * ' + userAtServer + ':' + simVersionDirectory, buildDir, finished );
@@ -872,11 +873,9 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                                       spotScp( brand, afterDeploy );
                                     }
                                     else if ( brand === 'phet-io' ) {
-                                      writePhetioHtaccess(
-                                        simDir + '/build/.htaccess',
-                                        '/htdocs/physics/phet-io/config/.htpasswd',
-                                        function() { spotScp( brand, afterDeploy ); }
-                                      );
+                                      writePhetioHtaccess( simDir + '/build/.htaccess', '/htdocs/physics/phet-io/config/.htpasswd', function() {
+                                        spotScp( brand, afterDeploy );
+                                      } );
                                     }
                                   }
                                   else {
