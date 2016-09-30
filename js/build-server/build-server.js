@@ -408,7 +408,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   }
 
   // Infer brand from version string and keep unstripped version for phet-io
-  var brand = version.indexOf( 'phetio.' ) < 0 ? 'phet' : 'phet-io';
+  var brand = version.indexOf( 'phetio' ) < 0 ? 'phet' : 'phet-io';
   var originalVersion = version;
 
   // validate version and strip suffixes since just the numbers are used in the directory name on dev and production servers
@@ -732,7 +732,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
       errors.push( err );
       finished();
     };
-    
+
     _.keys( reposCopy ).forEach( function( repoName ) {
       winston.log( 'info', 'pulling from ' + repoName );
       var repoDir = '../' + repoName;
