@@ -716,7 +716,10 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 
     var errors = [];
 
-    var finished = _.after( Object.keys( reposCopy ).length + 1, function() {
+    // Add babel to list of repos to pull
+    reposCopy.babel = true;
+
+    var finished = _.after( Object.keys( reposCopy ).length, function() {
       if ( _.any( errors ) ) {
         abortBuild( 'at least one repository failed to pull master' );
       }
@@ -729,15 +732,14 @@ var taskQueue = async.queue( function( task, taskCallback ) {
       errors.push( err );
       finished();
     };
-
-    for ( var repoName in reposCopy ) {
-      if ( reposCopy.hasOwnProperty( repoName ) ) {
-        winston.log( 'info', 'pulling from ' + repoName );
-        execWithoutAbort( 'git pull', '../' + repoName, errorCheckCallback );
-      }
-    }
-
-    execWithoutAbort( 'git pull', '../babel', errorCheckCallback );
+    
+    _.keys( reposCopy ).forEach( function( repoName ) {
+      winston.log( 'info', 'pulling from ' + repoName );
+      var repoDir = '../' + repoName;
+      exec( 'git checkout master', repoDir, function() {
+        execWithoutAbort( 'git pull', repoDir, errorCheckCallback );
+      } );
+    } );
   };
 
   /**
