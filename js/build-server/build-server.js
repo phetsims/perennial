@@ -621,8 +621,9 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         exec( chmodCommand, buildDir, callback );
       };
 
-      if ( brand === 'phet' ) {
-        exec( 'scp -r * ' + userAtServer + ':' + simVersionDirectory, buildDir, finished );
+      if ( brand !== 'phet-io' ) {
+        // only copy english version
+        exec( 'scp -r *_en*.html ' + userAtServer + ':' + simVersionDirectory, buildDir, finished );
       }
       else {
         exec( 'scp -r * ' + userAtServer + ':' + simVersionDirectory, buildDir, function() {
