@@ -399,14 +399,14 @@ module.exports = function( grunt, doneCallback ) {
     },
 
     /**
-     * Runs "npm install" for a specific repo.
+     * Runs "npm update" for a specific repo.
      * @private
      *
      * @param {string} repo
      * @param {Function} callback - callback() called when complete with no errors
      */
-    npmInstall: function( repo, callback ) {
-      this.execute( NPM_CMD, [ 'install' ], '../' + repo, function() {
+    npmUpdate: function( repo, callback ) {
+      this.execute( NPM_CMD, [ 'update' ], '../' + repo, function() {
         callback();
       } );
     },
@@ -723,8 +723,8 @@ module.exports = function( grunt, doneCallback ) {
             // dependencies.json to the top level, and committing/pushing.
             function updateDependenciesJSON() {
               grunt.log.debug( 'updating dependencies.json' );
-              self.npmInstall( simName, function() {
-                self.npmInstall( 'chipper', function() {
+              self.npmUpdate( simName, function() {
+                self.npmUpdate( 'chipper', function() {
                   self.execute( GRUNT_CMD, [], '../' + simName, function() {
                     fs.readFile( '../' + simName + '/build/dependencies.json', 'utf8', function( fileError, fileData ) {
                       self.assert( !fileError, 'DependenciesJSON file error: ' + fileError );
@@ -772,8 +772,8 @@ module.exports = function( grunt, doneCallback ) {
       this.assert( branch, 'Did not detect branch for ' + simName );
 
       this.gitCheckoutShas( simName, branch, function() {
-        self.npmInstall( simName, function() {
-          self.npmInstall( 'chipper', function() {
+        self.npmUpdate( simName, function() {
+          self.npmUpdate( 'chipper', function() {
             self.execute( GRUNT_CMD, [], '../' + simName, function() {
               // note, may need to enable ssh-agent? "exec ssh-agent bash"
               self.execute( GRUNT_CMD, [ 'deploy-rc' ], '../' + simName, function() {
@@ -834,8 +834,8 @@ module.exports = function( grunt, doneCallback ) {
           self.execute( 'git', [ 'add', 'package.json' ], '../' + simName, function() {
             self.execute( 'git', [ 'commit', '-m', 'Bumping version to ' + newVersionString + ' for ' + message ], '../' + simName, function() {
               self.gitPush( simName, branch, function() {
-                self.npmInstall( simName, function() {
-                  self.npmInstall( 'chipper', function() {
+                self.npmUpdate( simName, function() {
+                  self.itnpmUpdate( 'chipper', function() {
                     self.execute( GRUNT_CMD, [], '../' + simName, function() {
                       // note, may need to enable ssh-agent? "exec ssh-agent bash"
                       self.execute( GRUNT_CMD, [ 'deploy-rc' ], '../' + simName, function() {
@@ -891,7 +891,7 @@ module.exports = function( grunt, doneCallback ) {
           self.execute( 'git', [ 'add', 'package.json' ], '../' + simName, function() {
             self.execute( 'git', [ 'commit', '-m', 'Bumping version to ' + newVersionString + ' for ' + message ], '../' + simName, function() {
               self.gitPush( simName, branch, function() {
-                self.npmInstall( simName, function() {
+                self.npmUpdate( simName, function() {
                   self.execute( GRUNT_CMD, [], '../' + simName, function() {
                     // extra args can safely be added, except for ph-scale
                     var extraArgs = ( simName.indexOf( 'ph-scale' ) === 0 ) ? [] : [ '--locales=*' ];
@@ -946,7 +946,7 @@ module.exports = function( grunt, doneCallback ) {
                 }
 
                 if ( repo.build ) {
-                  self.npmInstall( name, function() {
+                  self.npmUpdate( name, function() {
                     self.execute( GRUNT_CMD, [], cwd, function() {
                       self.execute( 'git', [ 'add', 'build' ], cwd, function() {
                         self.execute( 'git', [ 'commit', '-m', 'Updating Build' ], cwd, afterOptionalBuild, afterOptionalBuild );
