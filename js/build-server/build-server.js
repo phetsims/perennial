@@ -596,9 +596,10 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   };
 
   /**
-   * Copy files to spot. This function calls scp once for each file instead of using scp -r. The reason for this is that
-   * scp -r will create a new directory called 'build' inside the sim version directory if the version directory already
-   * exists.
+   * Copy files to spot.
+   * If the brand is phet, it only copies the english sim file.
+   * If the brand is phet-io, it copies the entire sim directory including the .htaccess file.
+   *
    * @param brand:String
    * @param callback
    */
@@ -610,9 +611,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     var mkdirCommand = 'ssh ' + userAtServer + ' \'mkdir -p ' + simVersionDirectory + '\'';
     exec( mkdirCommand, buildDir, function() {
 
-      // copy the files
       var buildDir = simDir + '/build';
-      var files = fs.readdirSync( buildDir );
 
       // after finishing copying the files, chmod to make sure we preserve group write on spot
       // var finished = _.after( files.length, function() {
@@ -621,6 +620,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         exec( chmodCommand, buildDir, callback );
       };
 
+      // copy the files
       if ( brand !== 'phet-io' ) {
         // only copy english version
         exec( 'scp -r *_en*.html ' + userAtServer + ':' + simVersionDirectory, buildDir, finished );
