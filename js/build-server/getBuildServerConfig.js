@@ -61,6 +61,7 @@ var assert = require( 'assert' );
       emailTo: buildLocalJSON.emailTo,
       emailUsername: buildLocalJSON.emailUsername,
       htmlSimsDirectory: buildLocalJSON.htmlSimsDirectory,
+      phetioSimsDirectory: buildLocalJSON.phetioSimsDirectory,
       pgConnectionString: buildLocalJSON.pgConnectionString,
       productionServerName: buildLocalJSON.productionServerName || 'phet-server.int.colorado.edu',
       productionServerURL: buildLocalJSON.productionServerURL || 'https://phet.colorado.edu',

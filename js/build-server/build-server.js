@@ -10,6 +10,8 @@
  *
  * sudo systemctl [start|stop|restart] build-server
  *
+ * To edit startup options, please see /usr/lib/systemd/system/build-server.service
+ *
  * To start, stop, or restart the build server on figaro or simian, run this command:
  *
  * sudo /etc/init.d/build-server [start|stop|restart]
@@ -40,7 +42,7 @@
  *
  * On spot, you'll need to add the public key from phet-server to a file ~/.ssh/authorized_keys
  *
- * build-server log files can be found at /data/share/phet/phet-repos/perennial/build-server.log
+ * build-server log files can be tailed by running /usr/lib/systemd/system/build-server.service
  *
  * build-server needs to be able to make commits to github to notify rosetta that a new sim is translatable. To do this,
  * There must be valid git credentials in the .netrc file phet-admin's home directory.
@@ -124,6 +126,7 @@ var EMAIL_KEY = 'email';
 var USER_ID_KEY = 'userId';
 var AUTHORIZATION_KEY = 'authorizationCode';
 var HTML_SIMS_DIRECTORY = BUILD_SERVER_CONFIG.htmlSimsDirectory;
+var PHETIO_SIMS_DIRECTORY = BUILD_SERVER_CONFIG.phetioSimsDirectory;
 var ENGLISH_LOCALE = 'en';
 var PERENNIAL = '.';
 
@@ -245,9 +248,9 @@ function sendEmail( subject, text, emailParameterOnly ) {
           winston.log( 'error', 'error when attempted to send email, err = ' + err );
         }
         else {
-          winston.log( 'info',                                                                  'sent email to: ' +                                              message.header.to                            +
+          winston.log( 'info', 'sent email to: ' + message.header.to +
                                ', subject: ' + mimelib.decodeMimeWord( message.header.subject ) +
-                               ', text: '                                                       + message.text );
+                               ', text: ' + message.text );
         }
       }
     );
@@ -403,6 +406,10 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     abortBuild( 'invalid simName ' + simName );
     return;
   }
+
+  // Infer brand from version string and keep unstripped version for phet-io
+  var brand = version.indexOf( 'phetio' ) < 0 ? 'phet' : 'phet-io';
+  var originalVersion = version;
 
   // validate version and strip suffixes since just the numbers are used in the directory name on dev and production servers
   var versionMatch = version.match( /^(\d+\.\d+\.\d+)(?:-.*)?$/ );
@@ -563,7 +570,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * Write the .htaccess file to make "latest" point to the version being deployed and allow "download" links to work on Safari
    * @param callback
    */
-  var writeHtaccess = function( callback ) {
+  var writePhetHtaccess = function( callback ) {
     var contents = 'RewriteEngine on\n' +
                    'RewriteBase /sims/html/' + simName + '/\n' +
                    'RewriteRule latest(.*) ' + version + '$1\n' +
@@ -576,12 +583,27 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   };
 
   /**
-   * Copy files to spot. This function calls scp once for each file instead of using scp -r. The reason for this is that
-   * scp -r will create a new directory called 'build' inside the sim version directory if the version directory already
-   * exists.
+   * Writes the htaccess file to password protect the exclusive content for phet-io sims
    * @param callback
    */
-  var spotScp = function( callback ) {
+  var writePhetioHtaccess = function( filepath, authFilepath, callback ) {
+    var contents = 'AuthType Basic\n' +
+                   'AuthName "PhET-iO Password Protected Area"\n' +
+                   'AuthUserFile ' + authFilepath + '\n' +
+                   'Require valid-user\n';
+    fs.writeFileSync( filepath, contents );
+    callback();
+  };
+
+  /**
+   * Copy files to spot.
+   * If the brand is phet, it only copies the english sim file.
+   * If the brand is phet-io, it copies the entire sim directory including the .htaccess file.
+   *
+   * @param brand:String
+   * @param callback
+   */
+  var spotScp = function( brand, callback ) {
     var userAtServer = BUILD_SERVER_CONFIG.devUsername + '@' + BUILD_SERVER_CONFIG.devDeployServer;
     var simVersionDirectory = BUILD_SERVER_CONFIG.devDeployPath + simName + '/' + version;
 
@@ -589,27 +611,24 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     var mkdirCommand = 'ssh ' + userAtServer + ' \'mkdir -p ' + simVersionDirectory + '\'';
     exec( mkdirCommand, buildDir, function() {
 
-      // copy the files
       var buildDir = simDir + '/build';
-      var files = fs.readdirSync( buildDir );
 
       // after finishing copying the files, chmod to make sure we preserve group write on spot
-      var finished = _.after( files.length, function() {
+      // var finished = _.after( files.length, function() {
+      var finished = function() {
         var chmodCommand = 'ssh ' + userAtServer + ' \'chmod -R g+w ' + simVersionDirectory + '\'';
         exec( chmodCommand, buildDir, callback );
-      } );
+      };
 
-      for ( var i = 0; i < files.length; i++ ) {
-
-        var filename = files[ i ];
-
-        // TODO: skip non-English version for now because of issues doing lots of transfers, see https://github.com/phetsims/perennial/issues/20
-        if ( filename.indexOf( '.html' ) !== -1 && filename.indexOf( '_en' ) === -1 ){
-          finished();
-          continue;
-        }
-
-        exec( 'scp ' + filename + ' ' + userAtServer + ':' + simVersionDirectory, buildDir, finished );
+      // copy the files
+      if ( brand !== 'phet-io' ) {
+        // only copy english version
+        exec( 'scp -r *_en*.html ' + userAtServer + ':' + simVersionDirectory, buildDir, finished );
+      }
+      else {
+        exec( 'scp -r * ' + userAtServer + ':' + simVersionDirectory, buildDir, function() {
+          exec( 'scp .htaccess ' + userAtServer + ':' + simVersionDirectory + '/wrappers/', buildDir, finished );
+        } );
       }
     } );
   };
@@ -698,7 +717,10 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 
     var errors = [];
 
-    var finished = _.after( Object.keys( reposCopy ).length + 1, function() {
+    // Add babel to list of repos to pull
+    reposCopy.babel = true;
+
+    var finished = _.after( Object.keys( reposCopy ).length, function() {
       if ( _.any( errors ) ) {
         abortBuild( 'at least one repository failed to pull master' );
       }
@@ -712,24 +734,23 @@ var taskQueue = async.queue( function( task, taskCallback ) {
       finished();
     };
 
-    for ( var repoName in reposCopy ) {
-      if ( reposCopy.hasOwnProperty( repoName ) ) {
-        winston.log( 'info', 'pulling from ' + repoName );
-        execWithoutAbort( 'git pull', '../' + repoName, errorCheckCallback );
-      }
-    }
-
-    execWithoutAbort( 'git pull', '../babel', errorCheckCallback );
+    _.keys( reposCopy ).forEach( function( repoName ) {
+      winston.log( 'info', 'pulling from ' + repoName );
+      var repoDir = '../' + repoName;
+      exec( 'git checkout master', repoDir, function() {
+        execWithoutAbort( 'git pull', repoDir, errorCheckCallback );
+      } );
+    } );
   };
 
   /**
    * execute mkdir for the sim version directory if it doesn't exist
+   * @param targetDirectory:String
    * @param callback
    */
-  var mkVersionDir = function( callback ) {
-    var simDirPath = HTML_SIMS_DIRECTORY + simName + '/' + version + '/';
+  var mkVersionDir = function( targetDirectory, callback ) {
     try {
-      fs.mkdirpSync( simDirPath );
+      fs.mkdirpSync( targetDirectory );
       callback();
     }
     catch( e ) {
@@ -833,7 +854,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         var simTitleCallback = function( title ) {
           simTitle = title;
         };
-        
+
         // run every step of the build
         exec( 'git pull', PERENNIAL, function() {
           exec( 'npm prune', PERENNIAL, function() {
@@ -847,30 +868,55 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                           exec( 'npm prune', simDir, function() {
                             exec( 'npm update', simDir, function() {
                               getLocales( locales, function( locales ) {
-                                exec( 'grunt build-for-server --brand=phet --locales=' + locales, simDir, function() {
+                                var brandLocales = ( brand === 'phet' ) ? locales : 'en';
+                                winston.log( 'info', 'building for brand: ' + brand + ' version: ' + version );
+                                exec( 'grunt build-for-server --brand=' + brand + ' --locales=' + brandLocales, simDir, function() {
                                   if ( option === 'rc' ) {
-                                    spotScp( afterDeploy );
+                                    if ( brand === 'phet' ) {
+                                      spotScp( brand, afterDeploy );
+                                    }
+                                    else if ( brand === 'phet-io' ) {
+                                      writePhetioHtaccess( simDir + '/build/.htaccess', '/htdocs/physics/phet-io/config/.htpasswd', function() {
+                                        spotScp( brand, afterDeploy );
+                                      } );
+                                    }
                                   }
                                   else {
-                                    mkVersionDir( function() {
-                                      exec( 'cp build/* ' + HTML_SIMS_DIRECTORY + simName + '/' + version + '/', simDir, function() {
-                                        writeHtaccess( function() {
-                                          createTranslationsXML( simTitleCallback, function() {
-                                            notifyServer( function() {
-                                              addToRosetta( simTitle, function() {
+                                    var targetDir;
+                                    if ( brand === 'phet' ) {
+                                      targetDir = HTML_SIMS_DIRECTORY + simName + '/' + version + '/';
+                                    }
+                                    else if ( brand === 'phet-io' ) {
+                                      targetDir = PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/';
+                                    }
+                                    mkVersionDir( targetDir, function() {
+                                      exec( 'cp -r build/* ' + targetDir, simDir, function() {
+                                        if ( brand === 'phet' ) {
+                                          writePhetHtaccess( function() {
+                                            createTranslationsXML( simTitleCallback, function() {
+                                              notifyServer( function() {
+                                                addToRosetta( simTitle, function() {
 
-                                                // if this build request comes from rosetta it will have a userId field and only one locale
-                                                var localesArray = locales.split( ',' );
-                                                if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
-                                                  addTranslator( localesArray[ 0 ], afterDeploy );
-                                                }
-                                                else {
-                                                  afterDeploy();
-                                                }
+                                                  // if this build request comes from rosetta it will have a userId field and only one locale
+                                                  var localesArray = locales.split( ',' );
+                                                  if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
+                                                    addTranslator( localesArray[ 0 ], afterDeploy );
+                                                  }
+                                                  else {
+                                                    afterDeploy();
+                                                  }
+                                                } );
                                               } );
                                             } );
                                           } );
-                                        } );
+                                        }
+                                        else {
+                                          writePhetioHtaccess(
+                                            PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess',
+                                            '/etc/httpd/conf/phet-io_pw',
+                                            afterDeploy
+                                          );
+                                        }
                                       } );
                                     } );
                                   }
