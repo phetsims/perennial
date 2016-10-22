@@ -627,7 +627,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
       }
       else {
         exec( 'scp -r * ' + userAtServer + ':' + simVersionDirectory, buildDir, function() {
-          exec( 'scp .htaccess ' + userAtServer + ':' + simVersionDirectory + '/protected/', buildDir, finished );
+          exec( 'scp .htaccess ' + userAtServer + ':' + simVersionDirectory + '/wrappers/', buildDir, finished );
         } );
       }
     } );
@@ -912,7 +912,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                                         }
                                         else {
                                           writePhetioHtaccess(
-                                            PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/protected/.htaccess',
+                                            PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess',
                                             '/etc/httpd/conf/phet-io_pw',
                                             afterDeploy
                                           );
