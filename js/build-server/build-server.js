@@ -133,9 +133,6 @@ process.umask( parseInt( '0002', 8 ) );
 // for storing an email address to send build failure emails to that is passed as a parameter on a per build basis
 var emailParameter = null;
 
-// Used to flag website synchronize project call if it should include the locale
-var isTranslation = false;
-
 // Handle command line input
 // First 2 args provide info about executables, ignore
 var commandLineArgs = process.argv.slice( 2 );
@@ -428,9 +425,6 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     return;
   }
 
-  if ( option === 'rosetta' ) {
-    isTranslation = true;
-  }
   // define vars for build dir and sim dir
   var buildDir = './js/build-server/tmp';
   var simDir = '../' + simName;
@@ -752,14 +746,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    */
   var notifyServer = function( callback ) {
     var project = 'html/' + simName;
-    var url = BUILD_SERVER_CONFIG.productionServerURL + '/services/synchronize-project?projectName=' + project;
-    if ( isTranslation && locales.indexOf( ',' ) < 0 ) {
-      winston.log( 'Calling syncProj for locale: ' + locales );
-      url += '&locale=' + locales;
-    }
-    else if ( isTranslation ) {
-      winston.log( 'Detected call from rosetta, but locales qp was invalid: ' + locales );
-    }
+    var url = BUILD_SERVER_CONFIG.productionServerURL + '/services/synchronize-project?projectName=' + project + '&locales=' + locales;
+
     request( {
       url: url,
       auth: {
