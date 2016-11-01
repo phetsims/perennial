@@ -858,7 +858,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                                       exec( 'cp build/* ' + HTML_SIMS_DIRECTORY + simName + '/' + version + '/', simDir, function() {
                                         writeHtaccess( function() {
                                           createTranslationsXML( simTitleCallback, function() {
-                                            notifyServer( callbackLocales, function() {
+                                            notifyServer( locales, function() {
                                               addToRosetta( simTitle, function() {
 
                                                 // if this build request comes from rosetta it will have a userId field and only one locale
