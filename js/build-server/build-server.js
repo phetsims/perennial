@@ -742,9 +742,10 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   /**
    * Notify the website that a new sim or translation has been deployed. This will cause the project to
    * synchronize and the new translation will appear on the website.
+   * @param locales {String} comma separated list of locales
    * @param callback
    */
-  var notifyServer = function( callback ) {
+  var notifyServer = function( locales, callback ) {
     var project = 'html/' + simName;
     var url = BUILD_SERVER_CONFIG.productionServerURL + '/services/synchronize-project?projectName=' + project + '&locales=' + locales;
 
@@ -857,7 +858,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                                       exec( 'cp build/* ' + HTML_SIMS_DIRECTORY + simName + '/' + version + '/', simDir, function() {
                                         writeHtaccess( function() {
                                           createTranslationsXML( simTitleCallback, function() {
-                                            notifyServer( function() {
+                                            notifyServer( callbackLocales, function() {
                                               addToRosetta( simTitle, function() {
 
                                                 // if this build request comes from rosetta it will have a userId field and only one locale
