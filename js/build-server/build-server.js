@@ -112,7 +112,7 @@ var query = require( 'pg-query' );
 var request = require( 'request' );
 var winston = require( 'winston' );
 
-var _ = require( 'lodash' );
+var _ = require( 'lodash' ); // eslint-disable-line
 
 // constants
 var BUILD_SERVER_CONFIG = getBuildServerConfig( fs );

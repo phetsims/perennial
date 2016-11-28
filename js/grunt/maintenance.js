@@ -43,7 +43,7 @@ var child_process = require( 'child_process' );
 var xml2js = require( 'xml2js' );
 var request = require( 'request' );
 var fs = require( 'fs' );
-var _ = require( 'lodash' );
+var _ = require( 'lodash' ); // eslint-disable-line
 
 // constants
 var IS_WIN = /^win/.test( process.platform );
@@ -485,7 +485,7 @@ module.exports = function( grunt, doneCallback ) {
               currentMinor: version.minor,
               currentMaintenance: version.maintenance,
               currentVersionString: version.string
-            }
+            };
             requestNextVersion();
           } );
         }
@@ -517,7 +517,7 @@ module.exports = function( grunt, doneCallback ) {
 
       var simDependenciesMap = {}; // simName => dependencies object
 
-      var simNames = Object.keys( maintenanceObject.sims )
+      var simNames = Object.keys( maintenanceObject.sims );
 
       // First, load all dependencies.json files from all of the simulations (printing out relevant SHAs)
       var requestSimNames = simNames.slice();
@@ -604,8 +604,6 @@ module.exports = function( grunt, doneCallback ) {
     maintenancePatchCheckout: function( reposString, shasString, simName ) {
       var self = this;
 
-      var repoNames = reposString.split( ',' );
-      var shas = shasString.split( ',' );
       var maintenanceObject = this.storageObject;
       maintenanceObject.activeShaGroup = shasString;
       var patchInfo = maintenanceObject.patches[ reposString ][ shasString ];
@@ -636,7 +634,6 @@ module.exports = function( grunt, doneCallback ) {
       var shaGroup = maintenanceObject.activeShaGroup;
       var simNames = maintenanceObject.patches[ reposString ][ shaGroup ].simNames;
       this.assert( simNames, 'Could not find simulations matching the patch' );
-      var oldShas = shaGroup.split( ',' );
       var currentShas = [];
 
       // Grab current SHAs for the repos
@@ -737,7 +734,7 @@ module.exports = function( grunt, doneCallback ) {
                                 processNextSim();
                               } );
                             } );
-                          } )
+                          } );
                         } );
                       } );
                     } );

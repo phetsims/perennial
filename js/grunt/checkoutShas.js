@@ -33,7 +33,7 @@ module.exports = function( grunt, repositoryName, toMaster, buildServer ) {
 
         assert( typeof( dependencies[ property ].branch !== 'undefined' ) && typeof( dependencies[ property ].sha !== 'undefined' ) );
 
-        grunt.log.writeln( "Checking out dependency " + property + ': ' + dependencies[ property ].branch + '@' + dependencies[ property ].sha );
+        grunt.log.writeln( 'Checking out dependency ' + property + ': ' + dependencies[ property ].branch + '@' + dependencies[ property ].sha );
 
         //To execute something from a different directory:
         //cp.exec('foocommand', { cwd: 'path/to/dir/' }, callback);
