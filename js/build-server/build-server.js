@@ -95,7 +95,7 @@
  * @author Aaron Davis
  */
 
-'use strict';
+// 'use strict';
 
 // modules
 var async = require( 'async' );
@@ -107,7 +107,8 @@ var fs = require( 'fs.extra' );
 var getBuildServerConfig = require( './getBuildServerConfig' );
 var mimelib = require( 'mimelib' );
 var parseArgs = require( 'minimist' );
-var parseString = require( 'xml2js' ).parseString;
+var xml2js = require( 'xml2js' );
+var parseString = xml2js.parseString;
 var query = require( 'pg-query' );
 var request = require( 'request' );
 var winston = require( 'winston' );
@@ -156,7 +157,7 @@ for ( var key in parsedCommandLineOptions ) {
   if ( key !== '_' && parsedCommandLineOptions.hasOwnProperty( key ) && !defaultOptions.hasOwnProperty( key ) ) {
     console.error( 'Unrecognized option: ' + key );
     console.error( 'try --help for usage information.' );
-    return;
+    process.exit( 1 );
   }
 }
 
@@ -172,7 +173,7 @@ if ( parsedCommandLineOptions.hasOwnProperty( 'help' ) || parsedCommandLineOptio
     '  --verbose (output grunt logs in addition to build-server)\n' +
     '    type: bool  default: false\n'
   );
-  return;
+  process.exit( 1 );
 }
 
 // Merge the default and supplied options.
@@ -182,6 +183,8 @@ var options = _.extend( defaultOptions, parsedCommandLineOptions );
 winston.remove( winston.transports.Console );
 winston.add( winston.transports.Console, {
   'timestamp': function() {
+    'use strict';
+
     var now = new Date();
     return dateformat( now, 'mmm dd yyyy HH:MM:ss Z' );
   }
@@ -219,6 +222,8 @@ else {
  * @param emailParameterOnly - if true send the email only to the passed in email, not to the default list as well
  */
 function sendEmail( subject, text, emailParameterOnly ) {
+  'use strict';
+
   if ( emailServer ) {
     var emailTo = BUILD_SERVER_CONFIG.emailTo;
 
@@ -263,6 +268,8 @@ function sendEmail( subject, text, emailParameterOnly ) {
  * @returns {boolean} true if the file exists
  */
 function exists( file ) {
+  'use strict';
+
   try {
     fs.statSync( file );
     return true;
@@ -277,6 +284,7 @@ function exists( file ) {
  * is here.
  */
 var taskQueue = async.queue( function( task, taskCallback ) {
+  'use strict';
 
   var req = task.req;
   var res = task.res;
@@ -952,6 +960,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 }, 1 ); // 1 is the max number of tasks that can run concurrently
 
 function queueDeploy( req, res ) {
+  'use strict';
 
   // log the original URL, which is useful for debugging
   winston.log(
@@ -1017,6 +1026,8 @@ app.get( '/deploy-html-simulation', queueDeploy );
 
 // start the server
 app.listen( LISTEN_PORT, function() {
+  'use strict';
+
   winston.log( 'info', 'Listening on port ' + LISTEN_PORT );
   winston.log( 'info', 'Verbose mode: ' + verbose );
 } );

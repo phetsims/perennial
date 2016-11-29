@@ -31,7 +31,8 @@ var assert = require( 'assert' );
  * @author Aaron Davis
  */
 (function() {
-
+  'use strict';
+  
   /**
    * @param fs - the node fs API
    * @returns {Object} deploy configuration information, fields documented above
