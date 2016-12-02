@@ -95,7 +95,8 @@
  * @author Aaron Davis
  */
 
-// 'use strict';
+/* eslint-env node */
+'use strict';
 
 // modules
 var async = require( 'async' );
@@ -183,8 +184,6 @@ var options = _.extend( defaultOptions, parsedCommandLineOptions );
 winston.remove( winston.transports.Console );
 winston.add( winston.transports.Console, {
   'timestamp': function() {
-    'use strict';
-
     var now = new Date();
     return dateformat( now, 'mmm dd yyyy HH:MM:ss Z' );
   }
@@ -222,8 +221,6 @@ else {
  * @param emailParameterOnly - if true send the email only to the passed in email, not to the default list as well
  */
 function sendEmail( subject, text, emailParameterOnly ) {
-  'use strict';
-
   if ( emailServer ) {
     var emailTo = BUILD_SERVER_CONFIG.emailTo;
 
@@ -268,8 +265,6 @@ function sendEmail( subject, text, emailParameterOnly ) {
  * @returns {boolean} true if the file exists
  */
 function exists( file ) {
-  'use strict';
-
   try {
     fs.statSync( file );
     return true;
@@ -284,7 +279,6 @@ function exists( file ) {
  * is here.
  */
 var taskQueue = async.queue( function( task, taskCallback ) {
-  'use strict';
 
   var req = task.req;
   var res = task.res;
@@ -960,7 +954,6 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 }, 1 ); // 1 is the max number of tasks that can run concurrently
 
 function queueDeploy( req, res ) {
-  'use strict';
 
   // log the original URL, which is useful for debugging
   winston.log(
@@ -1026,8 +1019,6 @@ app.get( '/deploy-html-simulation', queueDeploy );
 
 // start the server
 app.listen( LISTEN_PORT, function() {
-  'use strict';
-
   winston.log( 'info', 'Listening on port ' + LISTEN_PORT );
   winston.log( 'info', 'Verbose mode: ' + verbose );
 } );
