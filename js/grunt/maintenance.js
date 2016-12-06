@@ -832,7 +832,7 @@ module.exports = function( grunt, doneCallback ) {
             self.execute( 'git', [ 'commit', '-m', 'Bumping version to ' + newVersionString + ' for ' + message ], '../' + simName, function() {
               self.gitPush( simName, branch, function() {
                 self.npmUpdate( simName, function() {
-                  self.itnpmUpdate( 'chipper', function() {
+                  self.npmUpdate( 'chipper', function() {
                     self.execute( GRUNT_CMD, [], '../' + simName, function() {
                       // note, may need to enable ssh-agent? "exec ssh-agent bash"
                       self.execute( GRUNT_CMD, [ 'deploy-rc' ], '../' + simName, function() {
