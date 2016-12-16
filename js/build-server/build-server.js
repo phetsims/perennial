@@ -622,14 +622,19 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         exec( chmodCommand, buildDir, callback );
       };
 
+      var scpTarget = userAtServer + ':' + simVersionDirectory;
+
       // copy the files
       if ( brand !== 'phet-io' ) {
-        // only copy english version
-        exec( 'scp -r *_en*.html ' + userAtServer + ':' + simVersionDirectory, buildDir, finished );
+        // only copy english html
+        exec( 'scp -r *_en*.html ' + scpTarget, buildDir, finished );
+
+        // find non-html files and copy them to the remote server
+        exec( 'find . -type f ! \( -iname \'*.html\' \) -exec scp {} ' + scpTarget + ' \;', buildDir, finished );
       }
       else {
-        exec( 'scp -r * ' + userAtServer + ':' + simVersionDirectory, buildDir, function() {
-          exec( 'scp .htaccess ' + userAtServer + ':' + simVersionDirectory + '/wrappers/', buildDir, finished );
+        exec( 'scp -r * ' + scpTarget, buildDir, function() {
+          exec( 'scp .htaccess ' + scpTarget + '/wrappers/', buildDir, finished );
         } );
       }
     } );
