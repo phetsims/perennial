@@ -104,13 +104,13 @@ var child_process = require( 'child_process' );
 var dateformat = require( 'dateformat' );
 var email = require( 'emailjs/email' );
 var express = require( 'express' );
-var fs = require( 'fs.extra' );
+var fs = require( 'fs.extra' ); // eslint-disable-line
 var getBuildServerConfig = require( './getBuildServerConfig' );
 var mimelib = require( 'mimelib' );
-var parseArgs = require( 'minimist' );
+var parseArgs = require( 'minimist' ); // eslint-disable-line
 var xml2js = require( 'xml2js' );
 var parseString = xml2js.parseString;
-var query = require( 'pg-query' );
+var query = require( 'pg-query' ); // eslint-disable-line
 var request = require( 'request' );
 var winston = require( 'winston' );
 
