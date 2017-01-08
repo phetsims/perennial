@@ -37,6 +37,9 @@
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
+/* eslint-env node */
+'use strict';
+
 
 // modules
 var child_process = require( 'child_process' );
@@ -56,7 +59,6 @@ var NPM_CMD = IS_WIN ? 'npm.cmd' : 'npm'; // needs to be a slightly different co
  *                                  call this.
  */
 module.exports = function( grunt, doneCallback ) {
-  'use strict';
 
   return {
     /**

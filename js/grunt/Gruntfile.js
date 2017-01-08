@@ -5,6 +5,9 @@
  * In particular, grunt checkout-shas and grunt checkout-master can be run from here
  * without worrying about an older version of chipper being checked out.
  */
+/* eslint-env node */
+'use strict';
+
 
 // grunt tasks
 var checkoutShas = require( '../../../perennial/js/grunt/checkoutShas' );
@@ -12,7 +15,6 @@ var checkoutMasterAll = require( '../../../perennial/js/grunt/checkoutMasterAll'
 var maintenance = require( '../../../perennial/js/grunt/maintenance' );
 
 module.exports = function( grunt ) {
-  'use strict';
 
   grunt.registerTask( 'checkout-shas',
     'Check out shas for a project, as specified in dependencies.json\n' +

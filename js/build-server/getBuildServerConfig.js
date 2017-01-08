@@ -1,5 +1,8 @@
 // Copyright 2002-2015, University of Colorado Boulder
 
+/* eslint-env node */
+'use strict';
+
 var assert = require( 'assert' );
 
 /**
@@ -30,47 +33,45 @@ var assert = require( 'assert' );
  * @author Chris Malley (PixelZoom, Inc.)
  * @author Aaron Davis
  */
-(function() {
-  'use strict';
-  
-  /**
-   * @param fs - the node fs API
-   * @returns {Object} deploy configuration information, fields documented above
-   *
-   * @private
-   */
-  function getDeployConfig( fs ) {
 
-    //------------------------------------------------------------------------------------
-    // read configuration file
-    var BUILD_LOCAL_FILENAME = process.env.HOME + '/.phet/build-local.json';
-    var buildLocalJSON = JSON.parse( fs.readFileSync( BUILD_LOCAL_FILENAME, { encoding: 'utf-8' } ) );
-    assert( buildLocalJSON.buildServerAuthorizationCode, 'buildServerAuthorizationCode missing from ' + BUILD_LOCAL_FILENAME );
-    assert( buildLocalJSON.devUsername, 'devUsername missing from ' + BUILD_LOCAL_FILENAME );
+/**
+ * @param fs - the node fs API
+ * @returns {Object} deploy configuration information, fields documented above
+ *
+ * @private
+ */
+function getDeployConfig( fs ) {
 
-    //------------------------------------------------------------------------------------
-    // Assemble the deployConfig
+  //------------------------------------------------------------------------------------
+  // read configuration file
+  var BUILD_LOCAL_FILENAME = process.env.HOME + '/.phet/build-local.json';
+  var buildLocalJSON = JSON.parse( fs.readFileSync( BUILD_LOCAL_FILENAME, { encoding: 'utf-8' } ) );
+  assert( buildLocalJSON.buildServerAuthorizationCode, 'buildServerAuthorizationCode missing from ' + BUILD_LOCAL_FILENAME );
+  assert( buildLocalJSON.devUsername, 'devUsername missing from ' + BUILD_LOCAL_FILENAME );
 
-    return {
-      buildServerAuthorizationCode: buildLocalJSON.buildServerAuthorizationCode,
-      databaseAuthorizationCode: buildLocalJSON.databaseAuthorizationCode,
-      devDeployPath: buildLocalJSON.devDeployPath || '/htdocs/physics/phet/dev/html/',
-      devDeployServer: buildLocalJSON.devDeployServer || 'spot.colorado.edu',
-      devUsername: buildLocalJSON.devUsername,
-      emailPassword: buildLocalJSON.emailPassword,
-      emailServer: buildLocalJSON.emailServer || 'smtp.colorado.edu',
-      emailTo: buildLocalJSON.emailTo,
-      emailUsername: buildLocalJSON.emailUsername,
-      htmlSimsDirectory: buildLocalJSON.htmlSimsDirectory,
-      phetioSimsDirectory: buildLocalJSON.phetioSimsDirectory,
-      pgConnectionString: buildLocalJSON.pgConnectionString,
-      productionServerName: buildLocalJSON.productionServerName || 'phet-server.int.colorado.edu',
-      productionServerURL: buildLocalJSON.productionServerURL || 'https://phet.colorado.edu',
-      serverToken: buildLocalJSON.serverToken,
-      verbose: buildLocalJSON.verbose === 'true' || false
-    };
+  //------------------------------------------------------------------------------------
+  // Assemble the deployConfig
 
-  }
+  return {
+    buildServerAuthorizationCode: buildLocalJSON.buildServerAuthorizationCode,
+    databaseAuthorizationCode: buildLocalJSON.databaseAuthorizationCode,
+    devDeployPath: buildLocalJSON.devDeployPath || '/htdocs/physics/phet/dev/html/',
+    devDeployServer: buildLocalJSON.devDeployServer || 'spot.colorado.edu',
+    devUsername: buildLocalJSON.devUsername,
+    emailPassword: buildLocalJSON.emailPassword,
+    emailServer: buildLocalJSON.emailServer || 'smtp.colorado.edu',
+    emailTo: buildLocalJSON.emailTo,
+    emailUsername: buildLocalJSON.emailUsername,
+    htmlSimsDirectory: buildLocalJSON.htmlSimsDirectory,
+    phetioSimsDirectory: buildLocalJSON.phetioSimsDirectory,
+    pgConnectionString: buildLocalJSON.pgConnectionString,
+    productionServerName: buildLocalJSON.productionServerName || 'phet-server.int.colorado.edu',
+    productionServerURL: buildLocalJSON.productionServerURL || 'https://phet.colorado.edu',
+    serverToken: buildLocalJSON.serverToken,
+    verbose: buildLocalJSON.verbose === 'true' || false
+  };
 
-  module.exports = getDeployConfig;
-})();
+}
+
+module.exports = getDeployConfig;
+

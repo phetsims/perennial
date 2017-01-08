@@ -4,6 +4,9 @@
 /**
  * This grunt task checks out the shas for a project, as specified in a dependencies.json file in its top level.
  */
+/* eslint-env node */
+'use strict';
+
 var assert = require( 'assert' );
 var child_process = require( 'child_process' );
 
@@ -14,7 +17,6 @@ var child_process = require( 'child_process' );
  * @param buildServer whether this build is initiated by the build server
  */
 module.exports = function( grunt, repositoryName, toMaster, buildServer ) {
-  'use strict';
 
   var dependencies = grunt.file.readJSON( ( buildServer ) ? '../perennial/js/build-server/tmp/dependencies.json' : '../' + repositoryName + '/dependencies.json' );
   var done = grunt.task.current.async();
