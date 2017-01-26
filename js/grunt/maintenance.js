@@ -408,8 +408,10 @@ module.exports = function( grunt, doneCallback ) {
      * @param {Function} callback - callback() called when complete with no errors
      */
     npmUpdate: function( repo, callback ) {
-      this.execute( NPM_CMD, [ 'update' ], '../' + repo, function() {
-        callback();
+      this.execute( NPM_CMD, [ 'prune' ], '../' + repo, function() {
+        this.execute( NPM_CMD, [ 'update' ], '../' + repo, function() {
+          callback();
+        } );
       } );
     },
 
