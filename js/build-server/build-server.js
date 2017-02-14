@@ -630,7 +630,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         exec( 'scp -r *_en*.html ' + scpTarget, buildDir, finished );
 
         // find non-html files and copy them to the remote server
-        exec( 'find . -type f ! \( -iname \'*.html\' \) -exec scp {} ' + scpTarget + ' \;', buildDir, finished );
+        exec( 'find . -type f ! \\\( -iname \\\'*.html\\\' \\\) -exec scp {} ' + scpTarget + ' \\\;', buildDir, finished );
       }
       else {
         exec( 'scp -r * ' + scpTarget, buildDir, function() {
