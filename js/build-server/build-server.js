@@ -110,7 +110,6 @@ var mimelib = require( 'mimelib' );
 var parseArgs = require( 'minimist' ); // eslint-disable-line
 var xml2js = require( 'xml2js' );
 var parseString = xml2js.parseString;
-var query = require( 'pg-query' ); // eslint-disable-line
 var request = require( 'request' );
 var winston = require( 'winston' );
 
@@ -204,14 +203,6 @@ if ( BUILD_SERVER_CONFIG.emailUsername && BUILD_SERVER_CONFIG.emailPassword && B
 else {
   winston.log( 'warn', 'failed to set up email server, missing one or more of the following fields in build-local.json:\n' +
                        'emailUsername, emailPassword, emailTo' );
-}
-
-// configure postgres connection
-if ( BUILD_SERVER_CONFIG.pgConnectionString ) {
-  query.connectionParameters = BUILD_SERVER_CONFIG.pgConnectionString;
-}
-else {
-  query.connectionParameters = 'postgresql://localhost/rosetta';
 }
 
 /**
