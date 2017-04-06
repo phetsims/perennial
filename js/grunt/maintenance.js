@@ -392,7 +392,7 @@ module.exports = function( grunt, doneCallback ) {
      */
     getCurrentSHA: function( repo, callback ) {
       var self = this;
-      this.execute( 'git', [ 'rev-parse', 'HEAD' ], '../' + repo, function( sha ) {
+      self.execute( 'git', [ 'rev-parse', 'HEAD' ], '../' + repo, function( sha ) {
         sha = sha.trim();
         self.assert( sha.length === 40, 'Response does not look like a SHA' );
 
@@ -408,8 +408,9 @@ module.exports = function( grunt, doneCallback ) {
      * @param {Function} callback - callback() called when complete with no errors
      */
     npmUpdate: function( repo, callback ) {
-      this.execute( NPM_CMD, [ 'prune' ], '../' + repo, function() {
-        this.execute( NPM_CMD, [ 'update' ], '../' + repo, function() {
+      var self = this;
+      self.execute( NPM_CMD, [ 'prune' ], '../' + repo, function() {
+        self.execute( NPM_CMD, [ 'update' ], '../' + repo, function() {
           callback();
         } );
       } );
