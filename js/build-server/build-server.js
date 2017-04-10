@@ -131,11 +131,11 @@ var PHETIO_SIMS_DIRECTORY = BUILD_SERVER_CONFIG.phetioSimsDirectory;
 var ENGLISH_LOCALE = 'en';
 var PERENNIAL = '.';
 
-// Find a helper function that will get a list of the PhET-style version directories at the given path.  The directories
-// must be named with three numbers separated by periods, e.g. 1.2.5.  The directories are sorted in numerical order,
-// which is different from the lexical ordering used by the Linux file system.  So, for example, valid output from this
-// method could be the array [ "1.1.8", "1.1.9", "1.1.10" ].  For more information on why this is necessary, see
-// https://github.com/phetsims/perennial/issues/28.
+// Define a helper function that will get a list of the PhET-style version directories at the given path.  The
+// directories must be named with three numbers separated by periods, e.g. 1.2.5.  The directories are sorted in
+// numerical order, which is different from the lexical ordering used by the Linux file system.  So, for example, valid
+// output from this method could be the array [ "1.1.8", "1.1.9", "1.1.10" ].  For more information on why this is
+// necessary, see https://github.com/phetsims/perennial/issues/28.
 function getSortedVersionDirectories( path ) {
 
   var versions;
