@@ -131,6 +131,56 @@ var PHETIO_SIMS_DIRECTORY = BUILD_SERVER_CONFIG.phetioSimsDirectory;
 var ENGLISH_LOCALE = 'en';
 var PERENNIAL = '.';
 
+// Find a helper function that will get a list of the PhET-style version directories at the given path.  The directories
+// must be named with three numbers separated by periods, e.g. 1.2.5.  The directories are sorted in numerical order,
+// which is different from the lexical ordering used by the Linux file system.  So, for example, valid output from this
+// method could be the array [ "1.1.8", "1.1.9", "1.1.10" ].  For more information on why this is necessary, see
+// https://github.com/phetsims/perennial/issues/28.
+function getSortedVersionDirectories( path ) {
+
+  var versions;
+
+  if ( fs.existsSync( path ) ) {
+    versions = fs.readdirSync( path );
+  }
+  else {
+    versions = [];
+  }
+
+  // filter out names that don't match the required format
+  versions = versions.filter( function( path ) {
+    var splitPath = path.split( '.' );
+    if ( splitPath.length !== 3 ) {
+      return false;
+    }
+    for ( var i = 0; i < 3; i++ ) {
+      if ( isNaN( splitPath[ i ] ) ) {
+        return false;
+      }
+    }
+    return true;
+  } );
+
+  // sort the names in numerical (not lexical) order
+  versions.sort( function( a, b ) {
+    var aTokenized = a.split( '.' );
+    var bTokenized = b.split( '.' );
+    var result = 0;
+    for ( var i = 0; i < aTokenized.length; i++ ) {
+      if ( parseInt( aTokenized[ i ], 10 ) < parseInt( bTokenized[ i ], 10 ) ) {
+        result = -1;
+        break;
+      }
+      else if ( parseInt( aTokenized[ i ], 10 ) > parseInt( bTokenized[ i ], 10 ) ) {
+        result = 1;
+        break;
+      }
+    }
+    return result;
+  } );
+  return versions;
+}
+
 // set this process up with the appropriate permissions, value is in octal
 process.umask( parseInt( '0002', 8 ) );
 
@@ -247,21 +297,6 @@ function sendEmail( subject, text, emailParameterOnly ) {
         }
       }
     );
-  }
-}
-
-/**
- * exists method that uses fs.statSync instead of the deprecated existsSync
- * @param file
- * @returns {boolean} true if the file exists
- */
-function exists( file ) {
-  try {
-    fs.statSync( file );
-    return true;
-  }
-  catch( e ) {
-    return false;
   }
 }
 
@@ -454,16 +489,18 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 
       // from grunt deploy-production
       var simDirectory = HTML_SIMS_DIRECTORY + simName;
-      if ( exists( simDirectory ) ) {
-        var files = fs.readdirSync( simDirectory );
-        var latest = files.sort()[ files.length - 1 ];
+      if ( fs.existsSync( simDirectory ) ) {
+        var versionDirectories = getSortedVersionDirectories( simDirectory );
+        var latest = versionDirectories[ versionDirectories.length - 1 ];
         var translationsXMLFile = HTML_SIMS_DIRECTORY + simName + '/' + latest + '/' + simName + '.xml';
+        winston.log( 'info', 'path to translations XML file = ' + translationsXMLFile );
         var xmlString = fs.readFileSync( translationsXMLFile );
         parseString( xmlString, function( err, xmlData ) {
           if ( err ) {
-            winston.log( 'error', 'parsing XML ' + err );
+            winston.log( 'error', 'error parsing XML, err = ' + err );
           }
           else {
+            winston.log( 'info', 'data extracted from translations XML file:' );
             winston.log( 'info', JSON.stringify( xmlData, null, 2 ) );
             var simsArray = xmlData.project.simulations[ 0 ].simulation;
             var localesArray = [];
@@ -544,7 +581,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 
       var simHTML = HTML_SIMS_DIRECTORY + simName + '/' + version + '/' + simName + '_' + stringFile.locale + '.html';
 
-      if ( exists( simHTML ) ) {
+      if ( fs.existsSync( simHTML ) ) {
         var localizedSimTitle = ( languageJSON[ simTitleKey ] ) ? languageJSON[ simTitleKey ].value : englishStrings[ simTitleKey ].value;
         finalXML = finalXML.concat( '<simulation name="' + simName + '" locale="' + stringFile.locale + '">\n' +
                                     '<title><![CDATA[' + localizedSimTitle + ']]></title>\n' +
