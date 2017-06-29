@@ -894,13 +894,15 @@ module.exports = function( grunt, doneCallback ) {
             self.execute( 'git', [ 'commit', '-m', 'Bumping version to ' + newVersionString + ' for ' + message ], '../' + simName, function() {
               self.gitPush( simName, branch, function() {
                 self.npmUpdate( simName, function() {
-                  self.execute( GRUNT_CMD, [], '../' + simName, function() {
-                    // extra args can safely be added, except for ph-scale
-                    var extraArgs = ( simName.indexOf( 'ph-scale' ) === 0 ) ? [] : [ '--locales=*' ];
-                    // note, may need to enable ssh-agent? "exec ssh-agent bash"
-                    self.execute( GRUNT_CMD, [ 'deploy-production' ].concat( extraArgs ), '../' + simName, function() {
-                      self.gitCheckoutMaster( simName, function() {
-                        self.success( 'Deployed ' + simName + ' ' + newVersionString );
+                  self.npmUpdate( 'chipper', function() {
+                    self.execute( GRUNT_CMD, [], '../' + simName, function() {
+                      // extra args can safely be added, except for ph-scale
+                      var extraArgs = ( simName.indexOf( 'ph-scale' ) === 0 ) ? [] : [ '--locales=*' ];
+                      // note, may need to enable ssh-agent? "exec ssh-agent bash"
+                      self.execute( GRUNT_CMD, [ 'deploy-production' ].concat( extraArgs ), '../' + simName, function() {
+                        self.gitCheckoutMaster( simName, function() {
+                          self.success( 'Deployed ' + simName + ' ' + newVersionString );
+                        } );
                       } );
                     } );
                   } );
