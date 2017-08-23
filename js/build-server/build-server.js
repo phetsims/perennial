@@ -342,7 +342,10 @@ var taskQueue = async.queue( function( task, taskCallback ) {
           taskCallback( 'error running command ' + command + ': ' + err ); // build aborted, so take this build task off of the queue
         }
         else {
-          winston.log( 'error', 'error running command: ' + command + ' in ' + dir + ', err: ' + err + ', build aborted.' );
+          winston.log(
+            'error',
+            'error running command: ' + command + ' in ' + dir + ', err: ' + err + ', stdout: ' + stdout + ', build aborted.'
+          );
           exec( 'grunt checkout-master-all', PERENNIAL, function() {
             winston.log( 'info', 'checking out master for every repo in case build shas are still checked out' );
             taskCallback( 'error running command ' + command + ': ' + err ); // build aborted, so take this build task off of the queue
