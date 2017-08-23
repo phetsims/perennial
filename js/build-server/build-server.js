@@ -356,7 +356,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     child_process.exec( command, { cwd: dir }, function( err, stdout, stderr ) {
 
       if ( err ) {
-        winston.log( 'warn', command + ' had error ' + err );
+        winston.log( 'warn', 'command \'' + command + '\' in dir \'' + dir + '\' had error ' + err );
       }
 
       if ( verbose ) {
