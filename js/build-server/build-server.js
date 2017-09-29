@@ -616,15 +616,26 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   };
 
   /**
-   * Writes the htaccess file to password protect the exclusive content for phet-io sims
+   *  Write the .htaccess file to make "latest" point to the version being deployed and allow "download" links to work on Safari
+   * Write the htaccess file to password protect the exclusive content for phet-io sims
    * @param callback
    */
   var writePhetioHtaccess = function( filepath, authFilepath, callback ) {
-    var contents = 'AuthType Basic\n' +
+    var latestRedirectContents = 'RewriteEngine on\n' +
+                   'RewriteBase /sims/' + simName + '/\n' +
+                   'RewriteRule latest(.*) ' + version + '$1\n' +
+                   'Header set Access-Control-Allow-Origin "*"\n\n' +
+                   'RewriteCond %{QUERY_STRING} =download\n' +
+                   'RewriteRule ([^/]*)$ - [L,E=download:$1]\n' +
+                   'Header onsuccess set Content-disposition "attachment; filename=%{download}e" env=download\n';
+    fs.writeFileSync( PHETIO_SIMS_DIRECTORY + simName + '/.htaccess', latestRedirectContents );
+
+    var passwordProtectWrapperContents = 'AuthType Basic\n' +
                    'AuthName "PhET-iO Password Protected Area"\n' +
                    'AuthUserFile ' + authFilepath + '\n' +
                    'Require valid-user\n';
-    fs.writeFileSync( filepath, contents );
+    fs.writeFileSync( filepath, passwordProtectWrapperContents );
+
     callback();
   };
 
