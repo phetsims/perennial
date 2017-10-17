@@ -131,11 +131,16 @@ var PHETIO_SIMS_DIRECTORY = BUILD_SERVER_CONFIG.phetioSimsDirectory;
 var ENGLISH_LOCALE = 'en';
 var PERENNIAL = '.';
 
-// Define a helper function that will get a list of the PhET-style version directories at the given path.  The
-// directories must be named with three numbers separated by periods, e.g. 1.2.5.  The directories are sorted in
-// numerical order, which is different from the lexical ordering used by the Linux file system.  So, for example, valid
-// output from this method could be the array [ "1.1.8", "1.1.9", "1.1.10" ].  For more information on why this is
-// necessary, see https://github.com/phetsims/perennial/issues/28.
+/**
+ * Define a helper function that will get a list of the PhET-style version directories at the given path.  The
+ * directories must be named with three numbers separated by periods, e.g. 1.2.5.  The directories are sorted in
+ * numerical order, which is different from the lexical ordering used by the Linux file system.  So, for example, valid
+ * output from this method could be the array [ "1.1.8", "1.1.9", "1.1.10" ].  For more information on why this is
+ * necessary, see https://github.com/phetsims/perennial/issues/28.
+ *
+ * @param path - Filename of the directory.  It's ok if the path does not exist.
+ * @returns {Array} - returns a sorted array of version directories.  Returns an empty array if none exist or if the path does not exist.
+ */
 function getSortedVersionDirectories( path ) {
 
   var versions;
@@ -492,8 +497,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 
       // from grunt deploy-production
       var simDirectory = HTML_SIMS_DIRECTORY + simName;
-      if ( fs.existsSync( simDirectory ) ) {
-        var versionDirectories = getSortedVersionDirectories( simDirectory );
+      var versionDirectories = getSortedVersionDirectories( simDirectory );
+      if ( versionDirectories.length > 0 ) {
         var latest = versionDirectories[ versionDirectories.length - 1 ];
         var translationsXMLFile = HTML_SIMS_DIRECTORY + simName + '/' + latest + '/' + simName + '.xml';
         winston.log( 'info', 'path to translations XML file = ' + translationsXMLFile );
