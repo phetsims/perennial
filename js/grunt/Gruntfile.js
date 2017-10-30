@@ -10,6 +10,7 @@
 
 
 // grunt tasks
+var assert = require( 'assert' );
 var checkoutShas = require( '../../../perennial/js/grunt/checkoutShas' );
 var checkoutMasterAll = require( '../../../perennial/js/grunt/checkoutMasterAll' );
 var maintenance = require( '../../../perennial/js/grunt/maintenance' );
@@ -20,6 +21,7 @@ module.exports = function( grunt ) {
     'Check out shas for a project, as specified in dependencies.json\n' +
     '--repo : repository name where package.json should be read from',
     function() {
+      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       var buildServer = grunt.option( 'buildServer' ) ? true : false;
       checkoutShas( grunt, grunt.option( 'repo' ), false, buildServer );
     } );
@@ -28,6 +30,7 @@ module.exports = function( grunt ) {
     'Check out master branch for all dependencies, as specified in dependencies.json\n' +
     '--repo : repository name where package.json should be read from',
     function() {
+      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       checkoutShas( grunt, grunt.option( 'repo' ), true );
     } );
 
