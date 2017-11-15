@@ -190,7 +190,7 @@ function getSortedVersionDirectories( path ) {
 process.umask( parseInt( '0002', 8 ) );
 
 // for storing an email address to send build failure emails to that is passed as a parameter on a per build basis
-var emailParameter = null;
+let emailParameter = null;
 
 // Handle command line input
 // First 2 args provide info about executables, ignore
@@ -306,13 +306,37 @@ function sendEmail( subject, text, emailParameterOnly ) {
 }
 
 /**
- * taskQueue ensures that only one build/deploy process will be happening at the same time.  The main build/deploy logic
- * is here.
+ * taskQueue ensures that only one build/deploy process will be happening at the same time.  The main build/deploy logic is here.
+ *
+ * @param {Object} task
+ * @property {JSON} task.repos
+ * @property {String} task.locales
+ * @property {String} task.simName
+ * @property {String} task.version
+ * @property {String} task.option - deployment type (dev/rc/production)
+ * @property {String} task.email
+ * @property {String} task.id
  */
 var taskQueue = async.queue( function( task, taskCallback ) {
 
-  var req = task.req;
-  var res = task.res;
+  //-------------------------------------------------------------------------------------
+  // Parse and validate parameters
+  //-------------------------------------------------------------------------------------
+
+  const repos = JSON.parse( decodeURIComponent( task.repos ) );
+  const locales = task.locales ? decodeURIComponent( task.locales ) : null;
+  const simName = decodeURIComponent( task.simName );
+  const version = decodeURIComponent( task.version );
+  const option = task.option ? decodeURIComponent( task.option ) : 'default';
+
+  // this may have been declared already?
+  emailParameter = task.email ? decodeURIComponent( task.email ) : null;
+
+  const userId = ( task.id ) ? decodeURIComponent( task.id ) : undefined;
+  if ( userId ) {
+    winston.log( 'info', 'setting userId = ' + userId );
+  }
+
 
   //-----------------------------------------------------------------------------------------
   // Define helper functions for use in this function
@@ -387,25 +411,6 @@ var taskQueue = async.queue( function( task, taskCallback ) {
       taskCallback( err ); // build aborted, so take this build task off of the queue
     } );
   };
-
-  //-------------------------------------------------------------------------------------
-  // Parse and validate query parameters
-  //-------------------------------------------------------------------------------------
-
-  var repos = JSON.parse( decodeURIComponent( req.query[ REPOS_KEY ] ) );
-  var locales = ( req.query[ LOCALES_KEY ] ) ? decodeURIComponent( req.query[ LOCALES_KEY ] ) : null;
-  var simName = decodeURIComponent( req.query[ SIM_NAME_KEY ] );
-  var version = decodeURIComponent( req.query[ VERSION_KEY ] );
-  var option = req.query[ OPTION_KEY ] ? decodeURIComponent( req.query[ OPTION_KEY ] ) : 'default';
-
-  // this var may
-  emailParameter = req.query[ EMAIL_KEY ] ? decodeURIComponent( req.query[ EMAIL_KEY ] ) : null;
-
-  var userId;
-  if ( req.query[ USER_ID_KEY ] ) {
-    userId = decodeURIComponent( req.query[ USER_ID_KEY ] );
-    winston.log( 'info', 'setting userId = ' + userId );
-  }
 
   var simNameRegex = /^[a-z-]+$/;
 
@@ -994,19 +999,38 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 
 }, 1 ); // 1 is the max number of tasks that can run concurrently
 
-function queueDeploy( req, res ) {
-
-  // log the original URL, which is useful for debugging
-  winston.log(
-    'info',
-    'deploy request received, original URL = ' + ( req.protocol + '://' + req.get( 'host' ) + req.originalUrl )
-  );
-
+function getQueueDeploy( req, res ) {
   var repos = req.query[ REPOS_KEY ];
   var simName = req.query[ SIM_NAME_KEY ];
   var version = req.query[ VERSION_KEY ];
   var locales = req.query[ LOCALES_KEY ];
+  var option = req.query[ OPTION_KEY ];
+  var email = req.query[ EMAIL_KEY ];
   var authorizationKey = req.query[ AUTHORIZATION_KEY ];
+  var id = req.query[ USER_ID_KEY ];
+
+  queueDeploy( repos, simName, version, locales, option, email, id, authorizationKey );
+}
+
+function postQueueDeploy( req, res ) {
+  var repos = req.body[ REPOS_KEY ];
+  var simName = req.body[ SIM_NAME_KEY ];
+  var version = req.body[ VERSION_KEY ];
+  var locales = req.body[ LOCALES_KEY ];
+  var option = req.body[ OPTION_KEY ];
+  var email = req.body[ EMAIL_KEY ];
+  var email = req.body[ USER_ID_KEY ];
+  var authorizationKey = req.body[ AUTHORIZATION_KEY ];
+
+  queueDeploy( repos, simName, version, locales, option, email, id, authorizationKey );
+}
+
+function queueDeploy( repos, simName, version, locales, option, email, id, authorizationKey ) {
+  // log the original URL, which is useful for debugging
+  winston.log(
+    'info',
+    'deploy request received, original URL = ' + ( req.protocol + '://' + req.get( 'host' ) + req.originalUrl )
+  );  
 
   if ( repos && simName && version && authorizationKey ) {
     if ( authorizationKey !== BUILD_SERVER_CONFIG.buildServerAuthorizationCode ) {
@@ -1016,7 +1040,7 @@ function queueDeploy( req, res ) {
     }
     else {
       winston.log( 'info', 'queuing build for ' + simName + ' ' + version );
-      taskQueue.push( { req: req, res: res }, function( err ) {
+      taskQueue.push( { repos, simName, version, locales, option, email, id }, function( err ) {
         var simInfoString = 'Sim = ' + decodeURIComponent( simName ) +
                             ' Version = ' + decodeURIComponent( version ) +
                             ' Locales = ' + ( locales ? decodeURIComponent( locales ) : 'undefined' );
@@ -1055,8 +1079,15 @@ function queueDeploy( req, res ) {
 // Create the ExpressJS app
 var app = express();
 
+// to support JSON-encoded bodies
+app.use( express.json() );       
+// TODO:: when upgrading to express 4, use this instead:
+// var bodyParser = require('body-parser')
+// app.use( bodyParser.json() ); 
+
 // add the route to build and deploy
-app.get( '/deploy-html-simulation', queueDeploy );
+app.get( '/deploy-html-simulation', getQueueDeploy );
+app.post( '/deploy-html-simulation', postQueueDeploy );
 
 // start the server
 app.listen( LISTEN_PORT, function() {
