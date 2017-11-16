@@ -318,6 +318,7 @@ function sendEmail( subject, text, emailParameterOnly ) {
  * @property {String} task.option - deployment type (dev/rc/production)
  * @property {String} task.email - used for sending notifications about success/failure
  * @property {String} task.id - rosetta user id for adding translators to the website
+ * @property {String} task.res - express response object
  */
 var taskQueue = async.queue( function( task, taskCallback ) {
 
@@ -330,6 +331,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   const simName = decodeURIComponent( task.simName );
   let version = decodeURIComponent( task.version );
   const option = task.option ? decodeURIComponent( task.option ) : 'default';
+  const res = task.res;
 
   // this may have been declared already?
   emailParameter = task.email ? decodeURIComponent( task.email ) : null;
@@ -1049,7 +1051,7 @@ function queueDeploy( repos, simName, version, locales, option, email, id, autho
     }
     else {
       winston.log( 'info', 'queuing build for ' + simName + ' ' + version );
-      taskQueue.push( { repos, simName, version, locales, option, email, id }, function( err ) {
+      taskQueue.push( { repos, simName, version, locales, option, email, id, res }, function( err ) {
         var simInfoString = 'Sim = ' + decodeURIComponent( simName ) +
                             ' Version = ' + decodeURIComponent( version ) +
                             ' Locales = ' + ( locales ? decodeURIComponent( locales ) : 'undefined' );
