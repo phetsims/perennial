@@ -1028,10 +1028,16 @@ function postQueueDeploy( req, res ) {
 }
 
 function queueDeploy( repos, simName, version, locales, option, email, id, authorizationKey, req, res ) {
-  // log the original URL, which is useful for debugging
+  // log the request, which is useful for debugging
+  let requestBodyString = '';
+  for ( var key in req.body ) {
+    if ( req.body.hasOwnProperty( key ) ) {
+      requestBodyString += key + ':' + req.body[ key ] + '\n';
+    }
+  }
   winston.log(
     'info',
-    'deploy request received, original URL = ' + ( req.protocol + '://' + req.get( 'host' ) + req.originalUrl )
+    'deploy request received, original URL = ' + ( req.protocol + '://' + req.get( 'host' ) + req.originalUrl ) + '\n' + requestBodyString
   );  
 
   if ( repos && simName && version && authorizationKey ) {
