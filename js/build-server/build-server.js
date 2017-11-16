@@ -1,4 +1,4 @@
-// Copyright 2002-2015, University of Colorado Boulder
+// Copyright 2002-2017, University of Colorado Boulder
 
 /**
  * PhET build and deploy server. The server is designed to run on the same host as the production site (phet-server.int.colorado.edu).
@@ -51,14 +51,16 @@
  * Using the Build Server for Production Deploys
  * =============================================
  *
- * The build server starts a build process upon receiving and https request to /deploy-html-simulation. It takes as input
- * the following query parameters:
+ * The build server starts a build process upon receiving an https POST request to /deploy-html-simulation. 
+ * It takes as input a JSON object with the following properties:
  * - repos - a json object with dependency repos and shas, in the form of dependencies.json files
  * - locales - a comma-separated list of locales to build [optional, defaults to all locales in babel]
  * - simName - the standardized name of the sim, lowercase with hyphens instead of spaces (i.e. area-builder)
  * - version - the version to be built. Production deploys will automatically strip everything after the major.minor.maintenance
  * - authorizationCode - a password to authorize legitimate requests
  * - option - optional parameter, can be set to "rc" to do an rc deploy instead of production
+ * - email - optional parameter, used to send success/failure notifications
+ * - id - optional parameter for production/rc deploys, required for translation deploys from rosetta to add the user's credit to the website.
  *
  * Note: You will NOT want to assemble these request URLs manually, instead use "grunt deploy-production" for production deploys and
  * "grunt deploy-rc" for rc deploys.
@@ -310,12 +312,12 @@ function sendEmail( subject, text, emailParameterOnly ) {
  *
  * @param {Object} task
  * @property {JSON} task.repos
- * @property {String} task.locales
- * @property {String} task.simName
- * @property {String} task.version
+ * @property {String} task.locales - comma separated list of locale codes
+ * @property {String} task.simName - lower case simulation name used for creating files/directories
+ * @property {String} task.version - sim version identifier string
  * @property {String} task.option - deployment type (dev/rc/production)
- * @property {String} task.email
- * @property {String} task.id
+ * @property {String} task.email - used for sending notifications about success/failure
+ * @property {String} task.id - rosetta user id for adding translators to the website
  */
 var taskQueue = async.queue( function( task, taskCallback ) {
 
@@ -326,7 +328,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   const repos = JSON.parse( decodeURIComponent( task.repos ) );
   const locales = task.locales ? decodeURIComponent( task.locales ) : null;
   const simName = decodeURIComponent( task.simName );
-  const version = decodeURIComponent( task.version );
+  let version = decodeURIComponent( task.version );
   const option = task.option ? decodeURIComponent( task.option ) : 'default';
 
   // this may have been declared already?
@@ -1000,32 +1002,32 @@ var taskQueue = async.queue( function( task, taskCallback ) {
 }, 1 ); // 1 is the max number of tasks that can run concurrently
 
 function getQueueDeploy( req, res ) {
-  var repos = req.query[ REPOS_KEY ];
-  var simName = req.query[ SIM_NAME_KEY ];
-  var version = req.query[ VERSION_KEY ];
-  var locales = req.query[ LOCALES_KEY ];
-  var option = req.query[ OPTION_KEY ];
-  var email = req.query[ EMAIL_KEY ];
-  var authorizationKey = req.query[ AUTHORIZATION_KEY ];
-  var id = req.query[ USER_ID_KEY ];
+  const repos = req.query[ REPOS_KEY ];
+  const simName = req.query[ SIM_NAME_KEY ];
+  const version = req.query[ VERSION_KEY ];
+  const locales = req.query[ LOCALES_KEY ];
+  const option = req.query[ OPTION_KEY ];
+  const email = req.query[ EMAIL_KEY ];
+  const id = req.query[ USER_ID_KEY ];
+  const authorizationKey = req.query[ AUTHORIZATION_KEY ];
 
-  queueDeploy( repos, simName, version, locales, option, email, id, authorizationKey );
+  queueDeploy( repos, simName, version, locales, option, email, id, authorizationKey, req, res );
 }
 
 function postQueueDeploy( req, res ) {
-  var repos = req.body[ REPOS_KEY ];
-  var simName = req.body[ SIM_NAME_KEY ];
-  var version = req.body[ VERSION_KEY ];
-  var locales = req.body[ LOCALES_KEY ];
-  var option = req.body[ OPTION_KEY ];
-  var email = req.body[ EMAIL_KEY ];
-  var email = req.body[ USER_ID_KEY ];
-  var authorizationKey = req.body[ AUTHORIZATION_KEY ];
+  const repos = req.body[ REPOS_KEY ];
+  const simName = req.body[ SIM_NAME_KEY ];
+  const version = req.body[ VERSION_KEY ];
+  const locales = req.body[ LOCALES_KEY ];
+  const option = req.body[ OPTION_KEY ];
+  const email = req.body[ EMAIL_KEY ];
+  const id = req.body[ USER_ID_KEY ];
+  const authorizationKey = req.body[ AUTHORIZATION_KEY ];
 
-  queueDeploy( repos, simName, version, locales, option, email, id, authorizationKey );
+  queueDeploy( repos, simName, version, locales, option, email, id, authorizationKey, req, res );
 }
 
-function queueDeploy( repos, simName, version, locales, option, email, id, authorizationKey ) {
+function queueDeploy( repos, simName, version, locales, option, email, id, authorizationKey, req, res ) {
   // log the original URL, which is useful for debugging
   winston.log(
     'info',
