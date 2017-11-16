@@ -1015,6 +1015,8 @@ function getQueueDeploy( req, res ) {
 }
 
 function postQueueDeploy( req, res ) {
+  console.log( req );
+  console.log( req.body );
   const repos = req.body[ REPOS_KEY ];
   const simName = req.body[ SIM_NAME_KEY ];
   const version = req.body[ VERSION_KEY ];
