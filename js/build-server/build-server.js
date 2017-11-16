@@ -1090,10 +1090,8 @@ function queueDeploy( repos, simName, version, locales, option, email, id, autho
 var app = express();
 
 // to support JSON-encoded bodies
-app.use( express.json() );       
-// TODO:: when upgrading to express 4, use this instead:
-// var bodyParser = require('body-parser')
-// app.use( bodyParser.json() ); 
+var bodyParser = require('body-parser');
+app.use( bodyParser.json() );
 
 // add the route to build and deploy
 app.get( '/deploy-html-simulation', getQueueDeploy );
