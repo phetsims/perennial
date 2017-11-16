@@ -8,4 +8,6 @@ node_modules/
 *.sublime-project
 *.sublime-workspace
 .eslintcache
+build-server.log
+js/build-server/tmp*
 .maintenance.json
