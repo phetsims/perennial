@@ -51,7 +51,7 @@
  * Using the Build Server for Production Deploys
  * =============================================
  *
- * The build server starts a build process upon receiving an https POST request to /deploy-html-simulation. 
+ * The build server starts a build process upon receiving an https POST request to /deploy-html-simulation.
  * It takes as input a JSON object with the following properties:
  * - repos - a json object with dependency repos and shas, in the form of dependencies.json files
  * - locales - a comma-separated list of locales to build [optional, defaults to all locales in babel]
@@ -1015,8 +1015,7 @@ function getQueueDeploy( req, res ) {
 }
 
 function postQueueDeploy( req, res ) {
-  console.log( req );
-  console.log( req.body );
+  winston.log( 'info', JSON.stringify( req.body ) );
   const repos = req.body[ REPOS_KEY ];
   const simName = req.body[ SIM_NAME_KEY ];
   const version = req.body[ VERSION_KEY ];
@@ -1040,7 +1039,7 @@ function queueDeploy( repos, simName, version, locales, option, email, id, autho
   winston.log(
     'info',
     'deploy request received, original URL = ' + ( req.protocol + '://' + req.get( 'host' ) + req.originalUrl ) + '\n' + requestBodyString
-  );  
+  );
 
   if ( repos && simName && version && authorizationKey ) {
     if ( authorizationKey !== BUILD_SERVER_CONFIG.buildServerAuthorizationCode ) {
@@ -1090,7 +1089,7 @@ function queueDeploy( repos, simName, version, locales, option, email, id, autho
 var app = express();
 
 // to support JSON-encoded bodies
-var bodyParser = require('body-parser');
+var bodyParser = require( 'body-parser' );
 app.use( bodyParser.json() );
 
 // add the route to build and deploy
