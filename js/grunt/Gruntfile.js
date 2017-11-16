@@ -14,6 +14,7 @@ var assert = require( 'assert' );
 var checkoutShas = require( '../../../perennial/js/grunt/checkoutShas' );
 var checkoutMasterAll = require( '../../../perennial/js/grunt/checkoutMasterAll' );
 var maintenance = require( '../../../perennial/js/grunt/maintenance' );
+var shaCheck = require( '../../../perennial/js/grunt/shaCheck' );
 
 module.exports = function( grunt ) {
 
@@ -38,6 +39,14 @@ module.exports = function( grunt ) {
     'Check out master branch for all repos in git root',
     function() {
       checkoutMasterAll( grunt );
+    } );
+
+  grunt.registerTask( 'sha-check',
+    'Checks which simulations\' latest release version includes the given common-code SHA in its git tree.\n' +
+    '--repo : repository to check for the SHA\n' +
+    '--sha : git SHA',
+    function() {
+      shaCheck( grunt, this.async() ).check( grunt.option( 'repo' ), grunt.option( 'sha' ) );
     } );
 
   grunt.registerTask( 'maintenance-start',
