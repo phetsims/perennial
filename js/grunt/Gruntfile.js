@@ -11,28 +11,76 @@
 
 // grunt tasks
 var assert = require( 'assert' );
-var checkoutShas = require( '../../../perennial/js/grunt/checkoutShas' );
+var checkoutDependencies = require( '../common/checkoutDependencies' );
+var checkoutMaster = require( '../common/checkoutMaster' );
 var checkoutMasterAll = require( '../../../perennial/js/grunt/checkoutMasterAll' );
+var checkoutRelease = require( '../common/checkoutRelease' );
+var checkoutTarget = require( '../common/checkoutTarget' );
 var maintenance = require( '../../../perennial/js/grunt/maintenance' );
 var shaCheck = require( '../../../perennial/js/grunt/shaCheck' );
+var simMetadata = require( '../common/simMetadata' );
 
 module.exports = function( grunt ) {
 
   grunt.registerTask( 'checkout-shas',
     'Check out shas for a project, as specified in dependencies.json\n' +
-    '--repo : repository name where package.json should be read from',
+    '--repo : repository name where package.json should be read from\n' +
+    '--skipNpmUpdate : If provided, will prevent the usual npm update\n' +
+    '--buildServer : If provided, it will read dependencies from the build-server temporary location (and will skip npm update)',
     function() {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+
       var buildServer = grunt.option( 'buildServer' ) ? true : false;
-      checkoutShas( grunt, grunt.option( 'repo' ), false, buildServer );
+
+      var repo = grunt.option( 'repo' );
+      var dependencies = grunt.file.readJSON( buildServer ? '../perennial/js/build-server/tmp/dependencies.json' : '../' + repo + '/dependencies.json' );
+      var includeNpmUpdate = !grunt.option( 'skipNpmUpdate' ) && !buildServer;
+
+      var done = grunt.task.current.async();
+      checkoutDependencies( repo, dependencies, includeNpmUpdate, function() {
+        done();
+      } );
+    } );
+
+  grunt.registerTask( 'checkout-target',
+    'Check out a specific branch/SHA for a simulation and all of its declared dependencies\n' +
+    '--repo : repository name where package.json should be read from\n' +
+    '--target : the branch/SHA to check out\n' +
+    '--skipNpmUpdate : If provided, will prevent the usual npm update',
+    function() {
+      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+      assert( grunt.option( 'target' ), 'Requires specifying a branch/SHA with --target={{BRANCH}}' );
+
+      var done = grunt.task.current.async();
+      checkoutTarget( grunt.option( 'repo' ), grunt.option( 'target' ), !grunt.option( 'skipNpmUpdate' ), function() {
+        done();
+      } );
+    } );
+
+  grunt.registerTask( 'checkout-release',
+    'Check out the latest release branch for a simulation and all of its declared dependencies\n' +
+    '--repo : repository name where package.json should be read from\n' +
+    '--skipNpmUpdate : If provided, will prevent the usual npm update',
+    function() {
+      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+
+      var done = grunt.task.current.async();
+      checkoutRelease( grunt.option( 'repo' ), !grunt.option( 'skipNpmUpdate' ), function() {
+        done();
+      } );
     } );
 
   grunt.registerTask( 'checkout-master',
     'Check out master branch for all dependencies, as specified in dependencies.json\n' +
-    '--repo : repository name where package.json should be read from',
+    '--repo : repository name where package.json should be read from\n' +
+    '--skipNpmUpdate : If provided, will prevent the usual npm update',
     function() {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
-      checkoutShas( grunt, grunt.option( 'repo' ), true );
+
+      var done = grunt.task.current.async();
+      checkoutMaster( grunt.option( 'repo' ), !grunt.option( 'skipNpmUpdate' ), function() {
+        done();
+      } );
     } );
 
   grunt.registerTask( 'checkout-master-all',
@@ -115,5 +163,18 @@ module.exports = function( grunt ) {
     'Updates the gh-pages branches for various repos, including building of dot/kite/scenery',
     function() {
       maintenance( grunt, this.async() ).updateGithubPages();
+    } );
+
+  grunt.registerTask( 'sim-list',
+    'Prints out a list of live production HTML sims to stderr (can be filtered from other stdout output)',
+    function() {
+      var done = grunt.task.current.async();
+      simMetadata( {
+        summary: true,
+        type: 'html'
+      }, function( data ) {
+        console.error( data.projects.map( project => project.name.slice( project.name.indexOf( '/' ) + 1 ) ).join( '\n' ) );
+        done();
+      } );
     } );
 };
