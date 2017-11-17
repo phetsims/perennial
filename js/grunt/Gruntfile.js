@@ -16,6 +16,7 @@ var checkoutMaster = require( '../common/checkoutMaster' );
 var checkoutMasterAll = require( './checkoutMasterAll' );
 var checkoutRelease = require( '../common/checkoutRelease' );
 var checkoutTarget = require( '../common/checkoutTarget' );
+var gitCherryPick = require( '../common/gitCherryPick' );
 var maintenance = require( './maintenance' );
 var npmUpdate = require( '../common/npmUpdate' );
 var shaCheck = require( './shaCheck' );
@@ -191,5 +192,42 @@ module.exports = function( grunt ) {
           done();
         } );
       } );
+    } );
+
+  grunt.registerTask( 'cherry-pick',
+    'Runs cherry-pick on a list of SHAs until one works. Reports success or failure\n' +
+    '--repo : The repository to cherry-pick on\n' +
+    '--shas : Comma-separated list of SHAs to try',
+    function() {
+      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+      assert( grunt.option( 'shas' ), 'Requires specifying a comma-separated list of SHAs with --shas={{SHAS}}' );
+
+      var repo = grunt.option( 'repo' );
+      var shas = grunt.option( 'shas' ).split( ',' );
+
+      var done = grunt.task.current.async();
+
+      function loop() {
+        if ( shas.length ) {
+          var sha = shas.shift();
+          gitCherryPick( repo, sha, function( success ) {
+            if ( success ) {
+              grunt.log.ok( 'Cherry-pick with ' + sha + ' was successful' );
+              done();
+            }
+            else {
+              loop();
+            }
+          }, function( code, stdout ) {
+            grunt.log.error( 'abort failed with code ' + code + ':\n' + stdout );
+            done();
+          } );
+        }
+        else {
+          grunt.log.error( 'No SHAs were able to be cherry-picked without conflicts' );
+          done();
+        }
+      }
+      loop();
     } );
 };
