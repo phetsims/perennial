@@ -13,11 +13,12 @@
 var assert = require( 'assert' );
 var checkoutDependencies = require( '../common/checkoutDependencies' );
 var checkoutMaster = require( '../common/checkoutMaster' );
-var checkoutMasterAll = require( '../../../perennial/js/grunt/checkoutMasterAll' );
+var checkoutMasterAll = require( './checkoutMasterAll' );
 var checkoutRelease = require( '../common/checkoutRelease' );
 var checkoutTarget = require( '../common/checkoutTarget' );
-var maintenance = require( '../../../perennial/js/grunt/maintenance' );
-var shaCheck = require( '../../../perennial/js/grunt/shaCheck' );
+var maintenance = require( './maintenance' );
+var npmUpdate = require( '../common/npmUpdate' );
+var shaCheck = require( './shaCheck' );
 var simMetadata = require( '../common/simMetadata' );
 
 module.exports = function( grunt ) {
@@ -175,6 +176,20 @@ module.exports = function( grunt ) {
       }, function( data ) {
         console.error( data.projects.map( project => project.name.slice( project.name.indexOf( '/' ) + 1 ) ).join( '\n' ) );
         done();
+      } );
+    } );
+
+  grunt.registerTask( 'npm-update',
+    'Runs npm update/prune for both chipper and the given repository\n' +
+    '--repo : The repository to update',
+    function() {
+      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+
+      var done = grunt.task.current.async();
+      npmUpdate( grunt.option( 'repo' ), function() {
+        npmUpdate( 'chipper', function() {
+          done();
+        } );
       } );
     } );
 };
