@@ -21,6 +21,7 @@ var maintenance = require( './maintenance' );
 var npmUpdate = require( '../common/npmUpdate' );
 var shaCheck = require( './shaCheck' );
 var simMetadata = require( '../common/simMetadata' );
+var winston = require( 'winston' );
 
 module.exports = function( grunt ) {
 
@@ -170,6 +171,7 @@ module.exports = function( grunt ) {
   grunt.registerTask( 'sim-list',
     'Prints out a list of live production HTML sims to stderr (can be filtered from other stdout output)',
     function() {
+      winston.default.transports.console.level = 'error';
       var done = grunt.task.current.async();
       simMetadata( {
         summary: true,

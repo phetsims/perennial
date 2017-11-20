@@ -46,7 +46,7 @@ module.exports = function( cmd, args, cwd, callback, errorCallback ) {
         errorCallback( code, stdoutData );
       }
       else {
-        throw new Error( 'failed to execute ' + cmd + ' with error code ' + code );
+        throw new Error( 'failed to execute ' + cmd + '(' + args.join( ' ' ) + ') with error code ' + code );
       }
     }
     else {
