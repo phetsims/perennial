@@ -16,6 +16,7 @@ var checkoutMaster = require( '../common/checkoutMaster' );
 var checkoutMasterAll = require( './checkoutMasterAll' );
 var checkoutRelease = require( '../common/checkoutRelease' );
 var checkoutTarget = require( '../common/checkoutTarget' );
+var execute = require( '../common/execute' );
 var gitCherryPick = require( '../common/gitCherryPick' );
 var maintenance = require( './maintenance' );
 var npmUpdate = require( '../common/npmUpdate' );
@@ -193,6 +194,27 @@ module.exports = function( grunt ) {
         npmUpdate( 'chipper', function() {
           done();
         } );
+      } );
+    } );
+
+  grunt.registerTask( 'create-release',
+    'Creates a new release branch for a given simulation\n' +
+    '--repo : The repository to add the release branch to\n' +
+    '--branch : The branch name, which should be {{MAJOR}}.{{MINOR}}, e.g. 1.0',
+    function() {
+      var repo = grunt.option( 'repo' );
+      var branch = grunt.option( 'branch' );
+      assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+      assert( branch, 'Requires specifying a branch with --branch={{BRANCH}}' );
+      assert( branch.split( '.' ).length === 2, 'Branch should be {{MAJOR}}.{{MINOR}}' );
+      var major = parseInt( branch.split( '.' )[ 0 ], 10 );
+      var minor = parseInt( branch.split( '.' )[ 1 ], 10 );
+      assert( major > 0, 'Major version for a branch should be greater than zero' );
+      assert( minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
+
+      var done = grunt.task.current.async();
+      execute( 'git', [ 'checkout', '-b', branch ], '../' + repo, function() {
+        done();
       } );
     } );
 
