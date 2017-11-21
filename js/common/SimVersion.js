@@ -23,6 +23,7 @@
   function SimVersion( major, minor, maintenance, brand, options ) {
 
     // Can't depend on lodash to be available easily
+    options = options || {};
     options.buildTimestamp = options.buildTimestamp === undefined ? null : options.buildTimestamp;
     options.testType = options.testType === undefined ? null : options.testType;
     options.testNumber = options.testNumber === undefined ? null : options.testNumber;
@@ -127,29 +128,43 @@
     }
   };
 
-  // /**
-  //  * Parses a sim version from a string form.
-  //  * @public
-  //  *
-  //  * @param {string} versionString - e.g. '1.0.0', '1.0.1-dev.3', etc.
-  //  * @param {string} [buildTimestamp] - Optional build timestamp, like '2015-06-12 16:05:03 UTC' (phet.chipper.buildTimestamp)
-  //  * @returns {SimVersion}
-  //  */
-  // SimVersion.parse = function( versionString, buildTimestamp ) {
-  //   var matches = versionString.match( /(\d+)\.(\d+)\.(\d+)(-([^\.]+))?/ );
+  /**
+   * Parses a sim version from a string form.
+   * @public
+   *
+   * @param {string} versionString - e.g. '1.0.0', '1.0.1-dev.3', etc.
+   * @param {string} [buildTimestamp] - Optional build timestamp, like '2015-06-12 16:05:03 UTC' (phet.chipper.buildTimestamp)
+   * @returns {SimVersion}
+   */
+  SimVersion.parse = function( versionString, buildTimestamp ) {
+    var matches = versionString.match( /(\d+)\.(\d+)\.(\d+)(-(([^\.-]+)\.(\d+)))?(-([^.-]+))?/ );
 
-  //   if ( !matches ) {
-  //     throw new Error( 'could not parse version: ' + versionString );
-  //   }
+    if ( !matches ) {
+      throw new Error( 'could not parse version: ' + versionString );
+    }
 
-  //   return new SimVersion( {
-  //     major: parseInt( matches[ 1 ], 10 ),
-  //     minor: parseInt( matches[ 2 ], 10 ),
-  //     maintenance: parseInt( matches[ 3 ], 10 ),
-  //     suffix: matches[ 5 ],
-  //     buildTimestamp: buildTimestamp
-  //   } );
-  // };
+    var major = parseInt( matches[ 1 ], 10 );
+    var minor = parseInt( matches[ 2 ], 10 );
+    var maintenance = parseInt( matches[ 3 ], 10 );
+    var testType = matches[ 6 ];
+    var testNumber = matches[ 7 ] === undefined ? matches[ 7 ] : parseInt( matches[ 7 ], 10 );
+    var brand = matches[ 9 ];
+    if ( brand === undefined ) {
+      brand = 'phet';
+    }
+    else if ( brand === 'phetio' ) {
+      brand = 'phet-io';
+    }
+    else {
+      brand = brand.replace( /([A-Z])/g, '-$1' ).toLowerCase();
+    }
+
+    return new SimVersion( major, minor, maintenance, brand, {
+      testType: testType,
+      testNumber: testNumber,
+      buildTimestamp: buildTimestamp
+    } );
+  };
 
   // browser require.js-compatible definition
   if ( typeof define !== 'undefined' ) {

@@ -17,11 +17,15 @@ var checkoutMasterAll = require( './checkoutMasterAll' );
 var checkoutRelease = require( '../common/checkoutRelease' );
 var checkoutTarget = require( '../common/checkoutTarget' );
 var execute = require( '../common/execute' );
+var gitCheckout = require( '../common/gitCheckout' );
 var gitCherryPick = require( '../common/gitCherryPick' );
+var gitPush = require( '../common/gitPush' );
 var maintenance = require( './maintenance' );
 var npmUpdate = require( '../common/npmUpdate' );
+var setRepoVersion = require( '../common/setRepoVersion' );
 var shaCheck = require( './shaCheck' );
 var simMetadata = require( '../common/simMetadata' );
+var SimVersion = require( '../common/SimVersion' );
 var winston = require( 'winston' );
 
 module.exports = function( grunt ) {
@@ -214,7 +218,25 @@ module.exports = function( grunt ) {
 
       var done = grunt.task.current.async();
       execute( 'git', [ 'checkout', '-b', branch ], '../' + repo, function() {
-        done();
+        setRepoVersion( repo, new SimVersion( major, minor, 0, 'phet', {
+          testType: 'rc',
+          testNumber: 1
+        } ), function() {
+          gitPush( repo, branch, function() {
+            gitCheckout( repo, 'master', function() {
+              setRepoVersion( repo, new SimVersion( major, minor + 1, 0, 'phet', {
+                testType: 'dev',
+                testNumber: 0
+              } ), function() {
+                gitPush( repo, 'master', function() {
+                  gitCheckout( repo, branch, function() {
+                    done();
+                  } );
+                } );
+              } );
+            } );
+          } );
+        } );
       } );
     } );
 

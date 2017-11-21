@@ -9,7 +9,8 @@
 'use strict';
 
 // modules
-// var execute = require( './execute' );
+var fs = require( 'fs' );
+var SimVersion = require( './SimVersion' );
 var winston = require( 'winston' );
 
 /**
@@ -17,13 +18,24 @@ var winston = require( 'winston' );
  * @public
  *
  * @param {string} repo - The repository name
- * @param {string} target - The SHA/branch/whatnot to check out
- * @param {Function} callback - callback( stdout: {string} ), called when done, and with the entire stdout output.
- * @param {Function} [errorCallback] - errorCallback( code: {number}, stdout: {string} ), called when errors with the
- *                                     exit code of the process.
+ * @param {Function} callback - callback( version: {SimVersion} )
+ * @param {Function} [errorCallback] - errorCallback( message: {string} )
  */
-module.exports = function( repo, target, callback, errorCallback ) {
-  winston.info( 'git checkout ' + target + ' on ' + repo );
+module.exports = function( repo, callback, errorCallback ) {
+  winston.debug( 'Reading version from package.json for ' + repo );
 
-  //TODO
+  fs.readFile( '../' + repo + '/package.json', 'utf8', function( err, data ) {
+    if ( err ) {
+      winston.error( 'Error occurred reading version from package.json: ' + err );
+      if ( errorCallback ) {
+        errorCallback( err );
+        return;
+      }
+      else {
+        throw err;
+      }
+    }
+
+    callback( SimVersion.parse( JSON.parse( data ).version ) );
+  } );
 };
