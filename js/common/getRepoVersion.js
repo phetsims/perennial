@@ -9,7 +9,7 @@
 'use strict';
 
 // modules
-var fs = require( 'fs' );
+var loadJSON = require( './loadJSON' );
 var SimVersion = require( './SimVersion' );
 var winston = require( 'winston' );
 
@@ -18,24 +18,11 @@ var winston = require( 'winston' );
  * @public
  *
  * @param {string} repo - The repository name
- * @param {Function} callback - callback( version: {SimVersion} )
- * @param {Function} [errorCallback] - errorCallback( message: {string} )
+ * @returns {Promise} - Resolves to version: {SimVersion}
  */
-module.exports = function( repo, callback, errorCallback ) {
+module.exports = async function( repo ) {
   winston.debug( 'Reading version from package.json for ' + repo );
 
-  fs.readFile( '../' + repo + '/package.json', 'utf8', function( err, data ) {
-    if ( err ) {
-      winston.error( 'Error occurred reading version from package.json: ' + err );
-      if ( errorCallback ) {
-        errorCallback( err );
-        return;
-      }
-      else {
-        throw err;
-      }
-    }
-
-    callback( SimVersion.parse( JSON.parse( data ).version ) );
-  } );
+  var packageObject = await loadJSON( '../' + repo + '/package.json' );
+  return SimVersion.parse( packageObject.version );
 };

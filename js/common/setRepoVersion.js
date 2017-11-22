@@ -9,11 +9,12 @@
 'use strict';
 
 // modules
-var fs = require( 'fs' );
 var gitAdd = require( './gitAdd' );
 var gitCommit = require( './gitCommit' );
 var gitIsClean = require( './gitIsClean' );
+var loadJSON = require( './loadJSON' );
 var winston = require( 'winston' );
+var writeJSON = require( './writeJSON' );
 
 /**
  * Sets the version for a current checked-in repo, creating a commit with the change
@@ -21,60 +22,22 @@ var winston = require( 'winston' );
  *
  * @param {string} repo - The repository name
  * @param {SimVersion} version
- * @param {Function} callback - callback()
- * @param {Function} [errorCallback] - errorCallback( message: {string} )
+ * @returns {Promise}
  */
-module.exports = function( repo, version, callback, errorCallback ) {
+module.exports = async function( repo, version ) {
   winston.info( 'Setting version from package.json for ' + repo + ' to ' + version.toString() );
 
   var packageFile = '../' + repo + '/package.json';
 
-  gitIsClean( repo, function( isClean ) {
-    if ( !isClean ) {
-      winston.error( 'Unclean status in ' + repo + ', cannot increment version' );
-      if ( errorCallback ) {
-        errorCallback( 'Unclean status in ' + repo + ', cannot increment version' );
-        return;
-      }
-      else {
-        throw new Error( 'Unclean status in ' + repo + ', cannot increment version' );
-      }
-    }
+  var isClean = await gitIsClean( repo );
+  if ( !isClean ) {
+    throw new Error( 'Unclean status in ' + repo + ', cannot increment version' );
+  }
 
-    fs.readFile( packageFile, 'utf8', function( err, data ) {
-      if ( err ) {
-        winston.error( 'Error occurred reading package.json: ' + err );
-        if ( errorCallback ) {
-          errorCallback( err );
-          return;
-        }
-        else {
-          throw err;
-        }
-      }
+  var packageObject = await loadJSON( packageFile );
+  packageObject.version = version.toString();
 
-      var packageObject = JSON.parse( data );
-      packageObject.version = version.toString();
-
-      fs.writeFile( packageFile, JSON.stringify( packageObject, null, 2 ), function( err ) {
-        if ( err ) {
-          winston.error( 'Error occurred writing to package.json: ' + err );
-          if ( errorCallback ) {
-            errorCallback( err );
-            return;
-          }
-          else {
-            throw err;
-          }
-        }
-        else {
-          gitAdd( repo, 'package.json', function() {
-            gitCommit( repo, 'Bumping version to ' + version.toString(), function() {
-              callback();
-            }, errorCallback );
-          }, errorCallback );
-        }
-      } );
-    } );
-  }, errorCallback );
+  await writeJSON( packageFile, packageObject );
+  await gitAdd( repo, 'package.json' );
+  await gitCommit( repo, 'Bumping version to ' + version.toString() );
 };

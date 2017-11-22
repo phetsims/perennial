@@ -18,12 +18,10 @@ var winston = require( 'winston' );
  *
  * @param {string} repo - The repository name
  * @param {string} remoteBranch - The branch that is getting pushed to, e.g. 'master' or '1.0'
- * @param {Function} callback - callback( stdout: {string} ), called when done, and with the entire stdout output.
- * @param {Function} [errorCallback] - errorCallback( code: {number}, stdout: {string} ), called when errors with the
- *                                     exit code of the process.
+ * @returns {Promise} - See execute for details
  */
-module.exports = function( repo, remoteBranch, callback, errorCallback ) {
+module.exports = function( repo, remoteBranch ) {
   winston.info( 'git push on ' + repo + ' to ' + remoteBranch );
 
-  execute( 'git', [ 'push', '-u', 'origin', remoteBranch ], '../' + repo, callback, errorCallback );
+  return execute( 'git', [ 'push', '-u', 'origin', remoteBranch ], '../' + repo );
 };

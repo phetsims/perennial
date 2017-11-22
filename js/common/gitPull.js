@@ -17,12 +17,10 @@ var winston = require( 'winston' );
  * @public
  *
  * @param {string} repo - The repository name
- * @param {Function} callback - callback( stdout: {string} ), called when done, and with the entire stdout output.
- * @param {Function} [errorCallback] - errorCallback( code: {number}, stdout: {string} ), called when errors with the
- *                                     exit code of the process.
+ * @returns {Promise} - See execute for details
  */
-module.exports = function( repo, callback, errorCallback ) {
+module.exports = function( repo ) {
   winston.info( 'git pull on ' + repo );
 
-  execute( 'git', [ 'pull' ], '../' + repo, callback, errorCallback );
+  return execute( 'git', [ 'pull' ], '../' + repo );
 };

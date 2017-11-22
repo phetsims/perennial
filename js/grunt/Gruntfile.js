@@ -16,19 +16,23 @@ var checkoutMaster = require( '../common/checkoutMaster' );
 var checkoutMasterAll = require( './checkoutMasterAll' );
 var checkoutRelease = require( '../common/checkoutRelease' );
 var checkoutTarget = require( '../common/checkoutTarget' );
-var execute = require( '../common/execute' );
-var gitCheckout = require( '../common/gitCheckout' );
-var gitCherryPick = require( '../common/gitCherryPick' );
-var gitPush = require( '../common/gitPush' );
+var cherryPick = require( './cherryPick' );
+var createRelease = require( './createRelease' );
 var maintenance = require( './maintenance' );
 var npmUpdate = require( '../common/npmUpdate' );
-var setRepoVersion = require( '../common/setRepoVersion' );
 var shaCheck = require( './shaCheck' );
 var simMetadata = require( '../common/simMetadata' );
-var SimVersion = require( '../common/SimVersion' );
 var winston = require( 'winston' );
 
 module.exports = function( grunt ) {
+
+  function error( done ) {
+    return function( reason ) {
+      grunt.log.error( reason );
+      done();
+      throw new Error( reason );
+    };
+  }
 
   grunt.registerTask( 'checkout-shas',
     'Check out shas for a project, as specified in dependencies.json\n' +
@@ -45,9 +49,7 @@ module.exports = function( grunt ) {
       var includeNpmUpdate = !grunt.option( 'skipNpmUpdate' ) && !buildServer;
 
       var done = grunt.task.current.async();
-      checkoutDependencies( repo, dependencies, includeNpmUpdate, function() {
-        done();
-      } );
+      checkoutDependencies( repo, dependencies, includeNpmUpdate ).then( done ).catch( error( done ) );
     } );
 
   grunt.registerTask( 'checkout-target',
@@ -60,9 +62,7 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'target' ), 'Requires specifying a branch/SHA with --target={{BRANCH}}' );
 
       var done = grunt.task.current.async();
-      checkoutTarget( grunt.option( 'repo' ), grunt.option( 'target' ), !grunt.option( 'skipNpmUpdate' ), function() {
-        done();
-      } );
+      checkoutTarget( grunt.option( 'repo' ), grunt.option( 'target' ), !grunt.option( 'skipNpmUpdate' ) ).then( done ).catch( error( done ) );
     } );
 
   grunt.registerTask( 'checkout-release',
@@ -73,9 +73,7 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
       var done = grunt.task.current.async();
-      checkoutRelease( grunt.option( 'repo' ), !grunt.option( 'skipNpmUpdate' ), function() {
-        done();
-      } );
+      checkoutRelease( grunt.option( 'repo' ), !grunt.option( 'skipNpmUpdate' ) ).then( done ).catch( error( done ) );
     } );
 
   grunt.registerTask( 'checkout-master',
@@ -86,9 +84,7 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
       var done = grunt.task.current.async();
-      checkoutMaster( grunt.option( 'repo' ), !grunt.option( 'skipNpmUpdate' ), function() {
-        done();
-      } );
+      checkoutMaster( grunt.option( 'repo' ), !grunt.option( 'skipNpmUpdate' ) ).then( done ).catch( error( done ) );
     } );
 
   grunt.registerTask( 'checkout-master-all',
@@ -181,10 +177,9 @@ module.exports = function( grunt ) {
       simMetadata( {
         summary: true,
         type: 'html'
-      }, function( data ) {
+      } ).then( data => {
         console.error( data.projects.map( project => project.name.slice( project.name.indexOf( '/' ) + 1 ) ).join( '\n' ) );
-        done();
-      } );
+      } ).then( done ).catch( error( done ) );
     } );
 
   grunt.registerTask( 'npm-update',
@@ -194,11 +189,7 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
       var done = grunt.task.current.async();
-      npmUpdate( grunt.option( 'repo' ), function() {
-        npmUpdate( 'chipper', function() {
-          done();
-        } );
-      } );
+      npmUpdate( grunt.option( 'repo' ) ).then( () => npmUpdate( 'chipper' ) ).then( done ).catch( error( done ) );
     } );
 
   grunt.registerTask( 'create-release',
@@ -211,33 +202,9 @@ module.exports = function( grunt ) {
       assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( branch, 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( branch.split( '.' ).length === 2, 'Branch should be {{MAJOR}}.{{MINOR}}' );
-      var major = parseInt( branch.split( '.' )[ 0 ], 10 );
-      var minor = parseInt( branch.split( '.' )[ 1 ], 10 );
-      assert( major > 0, 'Major version for a branch should be greater than zero' );
-      assert( minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
 
       var done = grunt.task.current.async();
-      execute( 'git', [ 'checkout', '-b', branch ], '../' + repo, function() {
-        setRepoVersion( repo, new SimVersion( major, minor, 0, 'phet', {
-          testType: 'rc',
-          testNumber: 1
-        } ), function() {
-          gitPush( repo, branch, function() {
-            gitCheckout( repo, 'master', function() {
-              setRepoVersion( repo, new SimVersion( major, minor + 1, 0, 'phet', {
-                testType: 'dev',
-                testNumber: 0
-              } ), function() {
-                gitPush( repo, 'master', function() {
-                  gitCheckout( repo, branch, function() {
-                    done();
-                  } );
-                } );
-              } );
-            } );
-          } );
-        } );
-      } );
+      createRelease( repo, branch ).then( done ).catch( error( done ) );
     } );
 
   grunt.registerTask( 'cherry-pick',
@@ -252,28 +219,6 @@ module.exports = function( grunt ) {
       var shas = grunt.option( 'shas' ).split( ',' );
 
       var done = grunt.task.current.async();
-
-      function loop() {
-        if ( shas.length ) {
-          var sha = shas.shift();
-          gitCherryPick( repo, sha, function( success ) {
-            if ( success ) {
-              grunt.log.ok( 'Cherry-pick with ' + sha + ' was successful' );
-              done();
-            }
-            else {
-              loop();
-            }
-          }, function( code, stdout ) {
-            grunt.log.error( 'abort failed with code ' + code + ':\n' + stdout );
-            done();
-          } );
-        }
-        else {
-          grunt.log.error( 'No SHAs were able to be cherry-picked without conflicts' );
-          done();
-        }
-      }
-      loop();
+      cherryPick( grunt, repo, shas ).then( done ).catch( error( done ) );
     } );
 };

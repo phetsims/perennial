@@ -21,11 +21,9 @@ var _ = require( 'lodash' ); // eslint-disable-line
  * @param {string} repo - The repository name
  * @param {Object} dependencies - In the format of dependencies.json
  * @param {boolean} includeNpmUpdate - Whether npm update should be included (for the repo and chipper)
- * @param {Function} callback - callback( checkedOutRepos: {Array.<string>} ), called when done
- * @param {Function} [errorCallback] - errorCallback( code: {number}, stdout: {string} ), called when errors with the
- *                                     exit code of the process.
+ * @returns {Promise} - Resolves with checkedOutRepos: {Array.<string>}
  */
-module.exports = function( repo, dependencies, includeNpmUpdate, callback, errorCallback ) {
+module.exports = async function( repo, dependencies, includeNpmUpdate ) {
   winston.info( 'checking out dependencies for ' + repo );
 
   // track checked-out repositories, as it's helpful for future processes
@@ -36,34 +34,22 @@ module.exports = function( repo, dependencies, includeNpmUpdate, callback, error
     return key !== 'comment' && key !== repo;
   } );
 
-  // async loop until done
-  function checkoutNext() {
-    if ( repoNames.length ) {
-      var dependencyRepoName = repoNames.shift();
+  for ( var i = 0; i < repoNames.length; i++ ) {
+    var dependencyRepoName = repoNames[ i ];
 
-      checkedOutRepoNames.push( dependencyRepoName );
-      var sha = dependencies[ dependencyRepoName ].sha;
-      if ( !sha ) {
-        throw new Error( 'Missing sha for ' + dependencyRepoName + ' in ' + repo );
-      }
+    checkedOutRepoNames.push( dependencyRepoName );
+    var sha = dependencies[ dependencyRepoName ].sha;
+    if ( !sha ) {
+      throw new Error( 'Missing sha for ' + dependencyRepoName + ' in ' + repo );
+    }
 
-      gitCheckout( dependencyRepoName, sha, function() {
-        checkoutNext();
-      } );
-    }
-    else {
-      if ( includeNpmUpdate ) {
-        npmUpdate( repo, function() {
-          npmUpdate( 'chipper', function() {
-            callback( checkedOutRepoNames );
-          }, errorCallback );
-        }, errorCallback );
-      }
-      else {
-        callback( checkedOutRepoNames );
-      }
-    }
+    await gitCheckout( dependencyRepoName, sha );
   }
 
-  checkoutNext();
+  if ( includeNpmUpdate ) {
+    await npmUpdate( repo );
+    await npmUpdate( 'chipper' );
+  }
+
+  return checkedOutRepoNames;
 };

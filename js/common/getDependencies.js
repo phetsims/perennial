@@ -9,7 +9,7 @@
 'use strict';
 
 // modules
-var fs = require( 'fs' );
+var loadJSON = require( './loadJSON' );
 var winston = require( 'winston' );
 
 /**
@@ -23,13 +23,5 @@ var winston = require( 'winston' );
 module.exports = function( repo, callback, errorCallback ) {
   winston.info( 'getting dependencies.json for ' + repo );
 
-  fs.readFile( '../' + repo + '/dependencies.json', 'utf8', function( fileError, fileData ) {
-    if ( fileError ) {
-      winston.error( 'failed dependencies.json read for ' + repo );
-      errorCallback( fileError );
-    }
-    else {
-      callback( JSON.parse( fileData ) );
-    }
-  } );
+  return loadJSON( '../' + repo + '/dependencies.json' );
 };

@@ -19,26 +19,17 @@ var winston = require( 'winston' );
  * @param {string} repo - The repository name
  * @param {string} possibleAncestor
  * @param {string} possibleDescendant
- * @param {Function} callback - callback( isAnAncestor: {boolean} ), called when done
- * @param {Function} [errorCallback] - callback( stdout, exitCode )
+ * @returns {Promise} - Resolves with {boolean} (whether it is an ancestor or not)
  */
-module.exports = function( repo, possibleAncestor, possibleDescendant, callback, errorCallback ) {
+module.exports = function( repo, possibleAncestor, possibleDescendant ) {
   winston.info( 'git check (in ' + repo + ') for whether ' + possibleAncestor + ' is an ancestor of ' + possibleDescendant );
 
-  execute( 'git', [ 'merge-base', '--is-ancestor', possibleAncestor, possibleDescendant ], '../' + repo, function() {
-    callback( true );
-  }, function ( exitCode, stdout ) {
-    if ( exitCode === 1 ) {
-      callback( false );
+  return execute( 'git', [ 'merge-base', '--is-ancestor', possibleAncestor, possibleDescendant ], '../' + repo ).then( stdout => Promise.resolve( true ), mergeError => {
+    if ( mergeError.code === 1 ) {
+      return Promise.resolve( false );
     }
     else {
-      winston.error( 'Unexpected exit code from merge-base: ' + exitCode );
-      if ( errorCallback ) {
-        errorCallback( exitCode, stdout );
-      }
-      else {
-        throw new Error( 'Unexpected exit code from merge-base: ' + exitCode );
-      }
+      return Promise.reject( mergeError );
     }
   } );
 };

@@ -18,14 +18,11 @@ var winston = require( 'winston' );
  * @public
  *
  * @param {string} repo - The repository name
- * @param {Function} callback - callback( stdout: {string} ), called when done, and with the entire stdout output.
- * @param {Function} [errorCallback] - errorCallback( code: {number}, stdout: {string} ), called when errors with the
- *                                     exit code of the process.
+ * @returns {Promise}
  */
-module.exports = function( repo, callback, errorCallback ) {
+module.exports = async function( repo ) {
   winston.info( 'npm update on ' + repo );
 
-  execute( npmCommand, [ 'prune' ], '../' + repo, function() {
-    execute( npmCommand, [ 'update' ], '../' + repo, callback, errorCallback );
-  }, errorCallback );
+  await execute( npmCommand, [ 'prune' ], '../' + repo );
+  await execute( npmCommand, [ 'update' ], '../' + repo );
 };

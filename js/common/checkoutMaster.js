@@ -1,7 +1,7 @@
 // Copyright 2017, University of Colorado Boulder
 
 /**
- * TODO doc
+ * Checks out master for a repository and all of its dependencies.
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
@@ -15,49 +15,32 @@ var npmUpdate = require( './npmUpdate' );
 var winston = require( 'winston' );
 
 /**
- * TODO: doc
+ * Checks out master for a repository and all of its dependencies.
  * @public
  *
  * @param {string} repo - The repository name
  * @param {boolean} includeNpmUpdate - Whether npm updates should be done to repositories.
- * @param {Function} callback - callback(), called when done
- * @param {Function} [errorCallback] - errorCallback( code: {number}, stdout: {string} ), called when errors with the
- *                                     exit code of the process.
+ * @returns {Promise}
  */
-module.exports = function( repo, includeNpmUpdate, callback, errorCallback ) {
+module.exports = async function( repo, includeNpmUpdate ) {
   winston.info( 'checking out master for ' + repo );
 
-  getDependencies( repo, function( dependencies ) {
-    // Ignore the repo we just checked out, and the comment
-    var repoNames = Object.keys( dependencies ).filter( function( key ) {
-      return key !== 'comment' && key !== repo;
-    } );
+  var dependencies = await getDependencies( repo );
 
-    // async loop until done
-    function checkoutNext() {
-      if ( repoNames.length ) {
-        var dependencyRepoName = repoNames.shift();
+  // Ignore the repo we just checked out, and the comment
+  var repoNames = Object.keys( dependencies ).filter( function( key ) {
+    return key !== 'comment' && key !== repo;
+  } );
 
-        gitCheckout( dependencyRepoName, 'master', function() {
-          checkoutNext();
-        } );
-      }
-      else {
-        gitCheckout( repo, 'master', function() {
-          if ( includeNpmUpdate ) {
-            npmUpdate( repo, function() {
-              npmUpdate( 'chipper', function() {
-                callback();
-              }, errorCallback );
-            }, errorCallback );
-          }
-          else {
-            callback();
-          }
-        }, errorCallback );
-      }
-    }
+  // TODO: can we use each here safely?
+  for ( var i = 0; i < repoNames.length; i++ ) {
+    await gitCheckout( repoNames[ i ], 'master' );
+  }
 
-    checkoutNext();
-  }, errorCallback );
+  await gitCheckout( repo, 'master' );
+
+  if ( includeNpmUpdate ) {
+    await npmUpdate( repo );
+    await npmUpdate( 'chipper' );
+  }
 };

@@ -17,13 +17,10 @@ var winston = require( 'winston' );
  * @public
  *
  * @param {string} repo - The repository name
- * @param {Function} callback - callback( isClean: {boolean} )
- * @param {Function} [errorCallback] - errorCallback( code: {number}, stdout: {string} )
+ * @returns {Promise} - Resolves {boolean} - Whether it is clean or not
  */
-module.exports = function( repo, callback, errorCallback ) {
+module.exports = function( repo ) {
   winston.debug( 'git status check on ' + repo );
 
-  execute( 'git', [ 'status', '--porcelain' ], '../' + repo, function( stdout ) {
-    callback( stdout.length === 0 );
-  }, errorCallback );
+  return execute( 'git', [ 'status', '--porcelain' ], '../' + repo ).then( stdout => Promise.resolve( stdout.length === 0 ) );
 };

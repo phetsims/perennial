@@ -1,7 +1,7 @@
 // Copyright 2017, University of Colorado Boulder
 
 /**
- * TODO doc
+ * Checks out a SHA/branch for a repository, and also checks out all of its dependencies.
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
@@ -17,24 +17,19 @@ var winston = require( 'winston' );
 var _ = require( 'lodash' ); // eslint-disable-line
 
 /**
- * TODO: doc
+ * Checks out a SHA/branch for a repository, and also checks out all of its dependencies.
  * @public
  *
  * @param {string} repo - The repository name
  * @param {string} target - branch or SHA
  * @param {boolean} includeNpmUpdate
- * @param {Function} callback - callback( checkedOutRepos: {Array.<string>} ), called when done
- * @param {Function} [errorCallback] - errorCallback( code: {number}, stdout: {string} ), called when errors with the
- *                                     exit code of the process.
+ * @returns {Promise} - Resolves with checkedOutRepos: {Array.<string>}
  */
-module.exports = function( repo, target, includeNpmUpdate, callback, errorCallback ) {
+module.exports = async function( repo, target, includeNpmUpdate ) {
   winston.info( 'checking out shas for ' + repo + ' ' + target );
 
-  gitCheckout( repo, target, function() {
-    gitPull( repo, function() {
-      getDependencies( repo, function( dependencies ) {
-        checkoutDependencies( repo, dependencies, includeNpmUpdate, callback, errorCallback );
-      }, errorCallback );
-    }, errorCallback );
-  }, errorCallback );
+  await gitCheckout( repo, target );
+  await gitPull( repo ); // Does this work for a SHA?
+  var dependencies = await getDependencies( repo );
+  return await checkoutDependencies( repo, dependencies, includeNpmUpdate );
 };

@@ -16,41 +16,36 @@ var winston = require( 'winston' );
  * Executes a command, with specific arguments and in a specific directory (cwd).
  * @public
  *
- * If the command fails (exit code non-zero), the error override callback will be called (if available), otherwise
- * we default to the hard-error "halt everything" approach for safety.
+ * Resolves with the stdout: {string}
+ * Rejects with { code: {number}, stdout: {string} } -- Happens if the exit code is non-zero.
  *
  * @param {string} cmd - The process to execute. Should be on the current path.
  * @param {Array.<string>} args - Array of arguments. No need to extra-quote things.
  * @param {string} cwd - The working directory where the process should be run from
- * @param {Function} callback - callback( stdout: {string} ), called when done, and with the entire stdout output.
- * @param {Function} [errorCallback] - errorCallback( code: {number}, stdout: {string} ), called when errors with the
- *                                     exit code of the process.
+ * @returns {Promise}
  */
-module.exports = function( cmd, args, cwd, callback, errorCallback ) {
-  var process = child_process.spawn( cmd, args, {
-    cwd: cwd
-  } );
-  winston.debug( 'running ' + cmd + ' ' + args.join( ' ' ) + ' from ' + cwd );
+module.exports = function( cmd, args, cwd ) {
+  return new Promise( ( resolve, reject ) => {
+    var process = child_process.spawn( cmd, args, {
+      cwd: cwd
+    } );
+    winston.debug( 'running ' + cmd + ' ' + args.join( ' ' ) + ' from ' + cwd );
 
-  var stdoutData = ''; // to be appended to
+    var stdout = ''; // to be appended to
 
-  process.stderr.on( 'data', data => winston.debug( 'stderr: ' + data ) );
-  process.stdout.on( 'data', function( data ) {
-    stdoutData += data;
-    winston.debug( 'stdout: ' + data );
-  } );
+    process.stderr.on( 'data', data => winston.debug( 'stderr: ' + data ) );
+    process.stdout.on( 'data', data => {
+      stdout += data;
+      winston.debug( 'stdout: ' + data );
+    } );
 
-  process.on( 'close', function( code ) {
-    if ( code !== 0 ) {
-      if ( errorCallback ) {
-        errorCallback( code, stdoutData );
+    process.on( 'close', function( code ) {
+      if ( code !== 0 ) {
+        reject( { code, stdout } );
       }
       else {
-        throw new Error( 'failed to execute ' + cmd + '(' + args.join( ' ' ) + ') with error code ' + code );
+        resolve( stdout );
       }
-    }
-    else {
-      callback( stdoutData );
-    }
+    } );
   } );
 };

@@ -18,12 +18,10 @@ var winston = require( 'winston' );
  *
  * @param {string} repo - The repository name
  * @param {string} file - The file to be added
- * @param {Function} callback - callback( stdout: {string} ), called when done, and with the entire stdout output.
- * @param {Function} [errorCallback] - errorCallback( code: {number}, stdout: {string} ), called when errors with the
- *                                     exit code of the process.
+ * @returns {Promise} - See execute for details
  */
-module.exports = function( repo, file, callback, errorCallback ) {
+module.exports = function( repo, file ) {
   winston.info( 'git add ' + file + ' on ' + repo );
 
-  execute( 'git', [ 'add', file ], '../' + repo, callback, errorCallback );
+  return execute( 'git', [ 'add', file ], '../' + repo );
 };

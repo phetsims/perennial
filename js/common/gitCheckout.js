@@ -9,6 +9,7 @@
 'use strict';
 
 // modules
+var assert = require( 'assert' );
 var execute = require( './execute' );
 var winston = require( 'winston' );
 
@@ -18,12 +19,13 @@ var winston = require( 'winston' );
  *
  * @param {string} repo - The repository name
  * @param {string} target - The SHA/branch/whatnot to check out
- * @param {Function} callback - callback( stdout: {string} ), called when done, and with the entire stdout output.
- * @param {Function} [errorCallback] - errorCallback( code: {number}, stdout: {string} ), called when errors with the
- *                                     exit code of the process.
+ * @returns {Promise} - See execute for details
  */
-module.exports = function( repo, target, callback, errorCallback ) {
+module.exports = function( repo, target ) {
+  assert( typeof repo === 'string' );
+  assert( typeof target === 'string' );
+
   winston.info( 'git checkout ' + target + ' on ' + repo );
 
-  execute( 'git', [ 'checkout', target ], '../' + repo, callback, errorCallback );
+  return execute( 'git', [ 'checkout', target ], '../' + repo );
 };
