@@ -27,17 +27,15 @@ module.exports = async function( repo, includeNpmUpdate ) {
 
   var dependencies = await getDependencies( repo );
 
-  // Ignore the repo we just checked out, and the comment
+  // Ignore the comment
   var repoNames = Object.keys( dependencies ).filter( function( key ) {
-    return key !== 'comment' && key !== repo;
+    return key !== 'comment';
   } );
 
   // TODO: can we use each here safely?
   for ( var i = 0; i < repoNames.length; i++ ) {
     await gitCheckout( repoNames[ i ], 'master' );
   }
-
-  await gitCheckout( repo, 'master' );
 
   if ( includeNpmUpdate ) {
     await npmUpdate( repo );
