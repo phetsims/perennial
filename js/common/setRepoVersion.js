@@ -9,12 +9,12 @@
 'use strict';
 
 // modules
-var gitAdd = require( './gitAdd' );
-var gitCommit = require( './gitCommit' );
-var gitIsClean = require( './gitIsClean' );
-var loadJSON = require( './loadJSON' );
-var winston = require( 'winston' );
-var writeJSON = require( './writeJSON' );
+const gitAdd = require( './gitAdd' );
+const gitCommit = require( './gitCommit' );
+const gitIsClean = require( './gitIsClean' );
+const loadJSON = require( './loadJSON' );
+const winston = require( 'winston' );
+const writeJSON = require( './writeJSON' );
 
 /**
  * Sets the version for a current checked-in repo, creating a commit with the change
@@ -27,14 +27,14 @@ var writeJSON = require( './writeJSON' );
 module.exports = async function( repo, version ) {
   winston.info( 'Setting version from package.json for ' + repo + ' to ' + version.toString() );
 
-  var packageFile = '../' + repo + '/package.json';
+  const packageFile = '../' + repo + '/package.json';
 
-  var isClean = await gitIsClean( repo );
+  const isClean = await gitIsClean( repo );
   if ( !isClean ) {
     throw new Error( 'Unclean status in ' + repo + ', cannot increment version' );
   }
 
-  var packageObject = await loadJSON( packageFile );
+  const packageObject = await loadJSON( packageFile );
   packageObject.version = version.toString();
 
   await writeJSON( packageFile, packageObject );

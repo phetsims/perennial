@@ -10,19 +10,19 @@
 
 
 // grunt tasks
-var assert = require( 'assert' );
-var checkoutDependencies = require( '../common/checkoutDependencies' );
-var checkoutMaster = require( '../common/checkoutMaster' );
-var checkoutMasterAll = require( './checkoutMasterAll' );
-var checkoutRelease = require( '../common/checkoutRelease' );
-var checkoutTarget = require( '../common/checkoutTarget' );
-var cherryPick = require( './cherryPick' );
-var createRelease = require( './createRelease' );
-var maintenance = require( './maintenance' );
-var npmUpdate = require( '../common/npmUpdate' );
-var shaCheck = require( './shaCheck' );
-var simMetadata = require( '../common/simMetadata' );
-var winston = require( 'winston' );
+const assert = require( 'assert' );
+const checkoutDependencies = require( '../common/checkoutDependencies' );
+const checkoutMaster = require( '../common/checkoutMaster' );
+const checkoutMasterAll = require( './checkoutMasterAll' );
+const checkoutRelease = require( '../common/checkoutRelease' );
+const checkoutTarget = require( '../common/checkoutTarget' );
+const cherryPick = require( './cherryPick' );
+const createRelease = require( './createRelease' );
+const maintenance = require( './maintenance' );
+const npmUpdate = require( '../common/npmUpdate' );
+const shaCheck = require( './shaCheck' );
+const simMetadata = require( '../common/simMetadata' );
+const winston = require( 'winston' );
 
 module.exports = function( grunt ) {
 
@@ -42,13 +42,13 @@ module.exports = function( grunt ) {
     function() {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
-      var buildServer = grunt.option( 'buildServer' ) ? true : false;
+      const buildServer = grunt.option( 'buildServer' ) ? true : false;
 
-      var repo = grunt.option( 'repo' );
-      var dependencies = grunt.file.readJSON( buildServer ? '../perennial/js/build-server/tmp/dependencies.json' : '../' + repo + '/dependencies.json' );
-      var includeNpmUpdate = !grunt.option( 'skipNpmUpdate' ) && !buildServer;
+      const repo = grunt.option( 'repo' );
+      const dependencies = grunt.file.readJSON( buildServer ? '../perennial/js/build-server/tmp/dependencies.json' : '../' + repo + '/dependencies.json' );
+      const includeNpmUpdate = !grunt.option( 'skipNpmUpdate' ) && !buildServer;
 
-      var done = grunt.task.current.async();
+      const done = grunt.task.current.async();
       checkoutDependencies( repo, dependencies, includeNpmUpdate ).then( done ).catch( error( done ) );
     } );
 
@@ -61,7 +61,7 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'target' ), 'Requires specifying a branch/SHA with --target={{BRANCH}}' );
 
-      var done = grunt.task.current.async();
+      const done = grunt.task.current.async();
       checkoutTarget( grunt.option( 'repo' ), grunt.option( 'target' ), !grunt.option( 'skipNpmUpdate' ) ).then( done ).catch( error( done ) );
     } );
 
@@ -72,7 +72,7 @@ module.exports = function( grunt ) {
     function() {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
-      var done = grunt.task.current.async();
+      const done = grunt.task.current.async();
       checkoutRelease( grunt.option( 'repo' ), !grunt.option( 'skipNpmUpdate' ) ).then( done ).catch( error( done ) );
     } );
 
@@ -83,7 +83,7 @@ module.exports = function( grunt ) {
     function() {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
-      var done = grunt.task.current.async();
+      const done = grunt.task.current.async();
       checkoutMaster( grunt.option( 'repo' ), !grunt.option( 'skipNpmUpdate' ) ).then( done ).catch( error( done ) );
     } );
 
@@ -173,7 +173,7 @@ module.exports = function( grunt ) {
     'Prints out a list of live production HTML sims to stderr (can be filtered from other stdout output)',
     function() {
       winston.default.transports.console.level = 'error';
-      var done = grunt.task.current.async();
+      const done = grunt.task.current.async();
       simMetadata( {
         summary: true,
         type: 'html'
@@ -188,7 +188,7 @@ module.exports = function( grunt ) {
     function() {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
-      var done = grunt.task.current.async();
+      const done = grunt.task.current.async();
       npmUpdate( grunt.option( 'repo' ) ).then( () => npmUpdate( 'chipper' ) ).then( done ).catch( error( done ) );
     } );
 
@@ -197,13 +197,13 @@ module.exports = function( grunt ) {
     '--repo : The repository to add the release branch to\n' +
     '--branch : The branch name, which should be {{MAJOR}}.{{MINOR}}, e.g. 1.0',
     function() {
-      var repo = grunt.option( 'repo' );
-      var branch = grunt.option( 'branch' );
+      const repo = grunt.option( 'repo' );
+      const branch = grunt.option( 'branch' );
       assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( branch, 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( branch.split( '.' ).length === 2, 'Branch should be {{MAJOR}}.{{MINOR}}' );
 
-      var done = grunt.task.current.async();
+      const done = grunt.task.current.async();
       createRelease( repo, branch ).then( done ).catch( error( done ) );
     } );
 
@@ -215,10 +215,10 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'shas' ), 'Requires specifying a comma-separated list of SHAs with --shas={{SHAS}}' );
 
-      var repo = grunt.option( 'repo' );
-      var shas = grunt.option( 'shas' ).split( ',' );
+      const repo = grunt.option( 'repo' );
+      const shas = grunt.option( 'shas' ).split( ',' );
 
-      var done = grunt.task.current.async();
+      const done = grunt.task.current.async();
       cherryPick( grunt, repo, shas ).then( done ).catch( error( done ) );
     } );
 };

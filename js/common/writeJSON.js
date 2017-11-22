@@ -9,8 +9,8 @@
 'use strict';
 
 // modules
-var fs = require( 'fs' );
-var winston = require( 'winston' );
+const fs = require( 'fs' );
+const winston = require( 'winston' );
 
 /**
  * Write JSON to a file
@@ -24,7 +24,7 @@ module.exports = function( file, content ) {
   return new Promise( ( resolve, reject ) => {
     winston.debug( 'Writing JSON to ' + file );
 
-    fs.writeFile( file, JSON.stringify( content, null, 2 ), function( err ) {
+    fs.writeFile( file, JSON.stringify( content, null, 2 ), err => {
       if ( err ) {
         reject( 'Could not write to file: ' + file + ' due to: ' + err );
       }

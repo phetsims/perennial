@@ -9,8 +9,8 @@
 'use strict';
 
 // modules
-var execute = require( './execute' );
-var winston = require( 'winston' );
+const execute = require( './execute' );
+const winston = require( 'winston' );
 
 /**
  * Whether a git commit is an ancestor of another

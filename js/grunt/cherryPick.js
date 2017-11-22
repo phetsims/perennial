@@ -9,7 +9,7 @@
 'use strict';
 
 // modules
-var gitCherryPick = require( '../common/gitCherryPick' );
+const gitCherryPick = require( '../common/gitCherryPick' );
 
 /**
  * For `grunt cherry-pick`, see Gruntfile for details
@@ -21,7 +21,7 @@ var gitCherryPick = require( '../common/gitCherryPick' );
  */
 module.exports = async function( grunt, repo, shas ) {
   for ( var i = 0; i < shas.length; i++ ) {
-    var sha = shas[ i ];
+    const sha = shas[ i ];
 
     var success;
     try {

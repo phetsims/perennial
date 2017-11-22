@@ -7,8 +7,8 @@
 /* eslint-env node */
 'use strict';
 
-var assert = require( 'assert' );
-var child_process = require( 'child_process' );
+const assert = require( 'assert' );
+const child_process = require( 'child_process' );
 
 /**
  * @param grunt the grunt instance
@@ -18,8 +18,8 @@ var child_process = require( 'child_process' );
  */
 module.exports = function( grunt, repositoryName, toMaster, buildServer ) {
 
-  var dependencies = grunt.file.readJSON( ( buildServer ) ? '../perennial/js/build-server/tmp/dependencies.json' : '../' + repositoryName + '/dependencies.json' );
-  var done = grunt.task.current.async();
+  const dependencies = grunt.file.readJSON( ( buildServer ) ? '../perennial/js/build-server/tmp/dependencies.json' : '../' + repositoryName + '/dependencies.json' );
+  const done = grunt.task.current.async();
   var numToCheckOut = 0;
   var numCheckedOut = 0;
   for ( var property in dependencies ) {

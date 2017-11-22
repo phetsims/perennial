@@ -9,12 +9,12 @@
 'use strict';
 
 // modules
-var assert = require( 'assert' );
-var execute = require( '../common/execute' );
-var gitCheckout = require( '../common/gitCheckout' );
-var gitPush = require( '../common/gitPush' );
-var setRepoVersion = require( '../common/setRepoVersion' );
-var SimVersion = require( '../common/SimVersion' );
+const assert = require( 'assert' );
+const execute = require( '../common/execute' );
+const gitCheckout = require( '../common/gitCheckout' );
+const gitPush = require( '../common/gitPush' );
+const setRepoVersion = require( '../common/setRepoVersion' );
+const SimVersion = require( '../common/SimVersion' );
 
 /**
  * For `grunt create-release`, see Gruntfile for details
@@ -25,8 +25,8 @@ var SimVersion = require( '../common/SimVersion' );
  * @returns {Promise}
  */
 module.exports = async function( repo, branch ) {
-  var major = parseInt( branch.split( '.' )[ 0 ], 10 );
-  var minor = parseInt( branch.split( '.' )[ 1 ], 10 );
+  const major = parseInt( branch.split( '.' )[ 0 ], 10 );
+  const minor = parseInt( branch.split( '.' )[ 1 ], 10 );
   assert( major > 0, 'Major version for a branch should be greater than zero' );
   assert( minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
 

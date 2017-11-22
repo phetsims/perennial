@@ -9,9 +9,9 @@
 'use strict';
 
 // modules
-var request = require( 'request' );
-var winston = require( 'winston' );
-var _ = require( 'lodash' ); // eslint-disable-line
+const request = require( 'request' );
+const winston = require( 'winston' );
+const _ = require( 'lodash' ); // eslint-disable-line
 
 /**
  * Returns metadata from the production website.
@@ -45,7 +45,7 @@ module.exports = function( options ) {
 
     winston.info( 'getting metadata request with ' + metadataURL );
 
-    request( metadataURL, function( requestError, requestResponse, requestBody ) {
+    request( metadataURL, ( requestError, requestResponse, requestBody ) => {
       if ( requestError || requestResponse.statusCode !== 200 ) {
         reject( {
           error: requestError,

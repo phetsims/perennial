@@ -10,11 +10,11 @@
 'use strict';
 
 // modules
-var getDependencies = require( '../common/getDependencies' );
-var gitCheckout = require( '../common/gitCheckout' );
-var gitIsAncestor = require( '../common/gitIsAncestor' );
-var simMetadata = require( '../common/simMetadata' );
-var _ = require( 'lodash' ); // eslint-disable-line
+const getDependencies = require( '../common/getDependencies' );
+const gitCheckout = require( '../common/gitCheckout' );
+const gitIsAncestor = require( '../common/gitIsAncestor' );
+const simMetadata = require( '../common/simMetadata' );
+const _ = require( 'lodash' ); // eslint-disable-line
 
 /**
  * @param {Object} grunt - For all of your grunting needs.
@@ -30,19 +30,19 @@ module.exports = function( grunt, doneCallback ) {
      * @param {string} repo
      * @param {string} sha
      */
-    check: function( repo, sha ) {
+    check( repo, sha ) {
       simMetadata( {
         summary: true
       }, function( data ) {
-        var sims = data.projects.map( function( simData ) {
+        const sims = data.projects.map( function( simData ) {
           return {
             name: simData.name.slice( simData.name.indexOf( '/' ) + 1 ),
             branch: simData.version.major + '.' + simData.version.minor
           };
         } );
 
-        var includedSims = [];
-        var excludedSims = [];
+        const includedSims = [];
+        const excludedSims = [];
 
         function nextSim() {
           if ( sims.length ) {

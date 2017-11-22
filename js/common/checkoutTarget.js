@@ -9,12 +9,12 @@
 'use strict';
 
 // modules
-var checkoutDependencies = require( './checkoutDependencies' );
-var getDependencies = require( './getDependencies' );
-var gitCheckout = require( './gitCheckout' );
-var gitPull = require( './gitPull' );
-var winston = require( 'winston' );
-var _ = require( 'lodash' ); // eslint-disable-line
+const checkoutDependencies = require( './checkoutDependencies' );
+const getDependencies = require( './getDependencies' );
+const gitCheckout = require( './gitCheckout' );
+const gitPull = require( './gitPull' );
+const winston = require( 'winston' );
+const _ = require( 'lodash' ); // eslint-disable-line
 
 /**
  * Checks out a SHA/branch for a repository, and also checks out all of its dependencies.
@@ -30,6 +30,6 @@ module.exports = async function( repo, target, includeNpmUpdate ) {
 
   await gitCheckout( repo, target );
   await gitPull( repo ); // Does this work for a SHA?
-  var dependencies = await getDependencies( repo );
+  const dependencies = await getDependencies( repo );
   return await checkoutDependencies( repo, dependencies, includeNpmUpdate );
 };

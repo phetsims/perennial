@@ -9,8 +9,8 @@
 'use strict';
 
 // modules
-var child_process = require( 'child_process' );
-var winston = require( 'winston' );
+const child_process = require( 'child_process' );
+const winston = require( 'winston' );
 
 /**
  * Executes a command, with specific arguments and in a specific directory (cwd).
@@ -26,7 +26,7 @@ var winston = require( 'winston' );
  */
 module.exports = function( cmd, args, cwd ) {
   return new Promise( ( resolve, reject ) => {
-    var process = child_process.spawn( cmd, args, {
+    const process = child_process.spawn( cmd, args, {
       cwd: cwd
     } );
     winston.debug( 'running ' + cmd + ' ' + args.join( ' ' ) + ' from ' + cwd );
@@ -39,7 +39,7 @@ module.exports = function( cmd, args, cwd ) {
       winston.debug( 'stdout: ' + data );
     } );
 
-    process.on( 'close', function( code ) {
+    process.on( 'close', code => {
       if ( code !== 0 ) {
         reject( { code, stdout } );
       }

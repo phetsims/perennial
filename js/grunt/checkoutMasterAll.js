@@ -6,31 +6,29 @@
 /* eslint-env node */
 'use strict';
 
-var child_process = require( 'child_process' );
-var _ = require( 'lodash' ); // eslint-disable-line
+const child_process = require( 'child_process' );
+const _ = require( 'lodash' ); // eslint-disable-line
 
 /**
  * @param grunt the grunt instance
  */
 module.exports = function( grunt ) {
 
-  var command = 'git checkout master';
-  var done = grunt.task.current.async();
+  const command = 'git checkout master';
+  const done = grunt.task.current.async();
 
-  var gitRoots = grunt.file.expand( { cwd: '..' }, '*' );
-  var finished = _.after( gitRoots.length, done );
+  const gitRoots = grunt.file.expand( { cwd: '..' }, '*' );
+  const finished = _.after( gitRoots.length, done );
 
   for ( var i = 0; i < gitRoots.length; i++ ) {
-    var filename = gitRoots[ i ];
+    const filename = gitRoots[ i ]; // Don't change to var without rewrapping usages in the closure
     if ( filename !== 'babel' && grunt.file.isDir( '../' + filename ) && grunt.file.exists( '../' + filename + '/.git' ) ) {
-      (function( filename ) {
-        child_process.exec( command, { cwd: '../' + filename }, function( error ) {
-          if ( error ) {
-            grunt.log.writeln( 'error in ' + command + ' for repo ' + filename );
-          }
-          finished();
-        } );
-      })( filename );
+      child_process.exec( command, { cwd: '../' + filename }, function( error ) {
+        if ( error ) {
+          grunt.log.writeln( 'error in ' + command + ' for repo ' + filename );
+        }
+        finished();
+      } );
     }
     else {
       finished();

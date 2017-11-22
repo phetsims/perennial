@@ -9,8 +9,8 @@
 'use strict';
 
 // modules
-var fs = require( 'fs' );
-var winston = require( 'winston' );
+const fs = require( 'fs' );
+const winston = require( 'winston' );
 
 /**
  * Load JSON from a file, resulting in the parsed result.
@@ -23,7 +23,7 @@ module.exports = function( file ) {
   return new Promise( ( resolve, reject ) => {
     winston.debug( 'Loading JSON from ' + file );
 
-    fs.readFile( file, 'utf8', function( err, data ) {
+    fs.readFile( file, 'utf8', ( err, data ) => {
       if ( err ) {
         winston.error( 'Error occurred reading version from json at ' + file + ': ' + err );
         reject( err );

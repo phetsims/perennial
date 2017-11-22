@@ -9,10 +9,10 @@
 'use strict';
 
 // modules
-var assert = require( 'assert' );
-var checkoutTarget = require( './checkoutTarget' );
-var simMetadata = require( './simMetadata' );
-var winston = require( 'winston' );
+const assert = require( 'assert' );
+const checkoutTarget = require( './checkoutTarget' );
+const simMetadata = require( './simMetadata' );
+const winston = require( 'winston' );
 
 /**
  * Checks out the latest release branch (and dependencies) for a repository.
@@ -25,14 +25,14 @@ var winston = require( 'winston' );
 module.exports = async function( repo, includeNpmUpdate, callback, errorCallback ) {
   winston.info( 'checking out release for ' + repo );
 
-  var data = await simMetadata( {
+  const data = await simMetadata( {
     summary: true,
     simulation: repo
   } );
 
   assert( data.projects.length === 1, 'Metadata request should only return 1 simulation result' );
 
-  var branch = data.projects[ 0 ].version.major + '.' + data.projects[ 0 ].version.minor;
+  const branch = data.projects[ 0 ].version.major + '.' + data.projects[ 0 ].version.minor;
 
   return await checkoutTarget( repo, branch, includeNpmUpdate, callback, errorCallback );
 };

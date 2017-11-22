@@ -9,8 +9,8 @@
 'use strict';
 
 // modules
-var loadJSON = require( './loadJSON' );
-var winston = require( 'winston' );
+const loadJSON = require( './loadJSON' );
+const winston = require( 'winston' );
 
 /**
  * Executes git checkout

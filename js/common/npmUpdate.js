@@ -9,9 +9,9 @@
 'use strict';
 
 // modules
-var execute = require( './execute' );
-var npmCommand = require( './npmCommand' );
-var winston = require( 'winston' );
+const execute = require( './execute' );
+const npmCommand = require( './npmCommand' );
+const winston = require( 'winston' );
 
 /**
  * Executes an effective "npm update" (with pruning because it's required).

@@ -79,7 +79,7 @@
      *
      * @param {SimVersion} version
      */
-    compareNumber: function( version ) {
+    compareNumber( version ) {
       if ( this.major < version.major ) { return -1; }
       if ( this.major > version.major ) { return 1; }
       if ( this.minor < version.minor ) { return -1; }
@@ -105,7 +105,7 @@
      *
      * @returns {string}
      */
-    toString: function() {
+    toString() {
       var str = this.major + '.' + this.minor + '.' + this.maintenance;
       if ( typeof this.testType === 'string' ) {
         str += '-' + this.testType + '.' + this.testNumber;
@@ -137,17 +137,17 @@
    * @returns {SimVersion}
    */
   SimVersion.parse = function( versionString, buildTimestamp ) {
-    var matches = versionString.match( /(\d+)\.(\d+)\.(\d+)(-(([^\.-]+)\.(\d+)))?(-([^.-]+))?/ );
+    const matches = versionString.match( /(\d+)\.(\d+)\.(\d+)(-(([^\.-]+)\.(\d+)))?(-([^.-]+))?/ );
 
     if ( !matches ) {
       throw new Error( 'could not parse version: ' + versionString );
     }
 
-    var major = parseInt( matches[ 1 ], 10 );
-    var minor = parseInt( matches[ 2 ], 10 );
-    var maintenance = parseInt( matches[ 3 ], 10 );
-    var testType = matches[ 6 ];
-    var testNumber = matches[ 7 ] === undefined ? matches[ 7 ] : parseInt( matches[ 7 ], 10 );
+    const major = parseInt( matches[ 1 ], 10 );
+    const minor = parseInt( matches[ 2 ], 10 );
+    const maintenance = parseInt( matches[ 3 ], 10 );
+    const testType = matches[ 6 ];
+    const testNumber = matches[ 7 ] === undefined ? matches[ 7 ] : parseInt( matches[ 7 ], 10 );
     var brand = matches[ 9 ];
     if ( brand === undefined ) {
       brand = 'phet';
@@ -159,11 +159,7 @@
       brand = brand.replace( /([A-Z])/g, '-$1' ).toLowerCase();
     }
 
-    return new SimVersion( major, minor, maintenance, brand, {
-      testType: testType,
-      testNumber: testNumber,
-      buildTimestamp: buildTimestamp
-    } );
+    return new SimVersion( major, minor, maintenance, brand, { testType, testNumber, buildTimestamp } );
   };
 
   // browser require.js-compatible definition

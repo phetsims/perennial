@@ -9,10 +9,10 @@
 'use strict';
 
 // modules
-var gitCheckout = require( './gitCheckout' );
-var npmUpdate = require( './npmUpdate' );
-var winston = require( 'winston' );
-var _ = require( 'lodash' ); // eslint-disable-line
+const gitCheckout = require( './gitCheckout' );
+const npmUpdate = require( './npmUpdate' );
+const winston = require( 'winston' );
+const _ = require( 'lodash' ); // eslint-disable-line
 
 /**
  * Checks out the given dependencies (for a given repository) without modifying the given repository.
@@ -27,12 +27,10 @@ module.exports = async function( repo, dependencies, includeNpmUpdate ) {
   winston.info( 'checking out dependencies for ' + repo );
 
   // track checked-out repositories, as it's helpful for future processes
-  var checkedOutRepoNames = [ repo ];
+  const checkedOutRepoNames = [ repo ];
 
   // Ignore the repo we just checked out, and the comment
-  var repoNames = Object.keys( dependencies ).filter( function( key ) {
-    return key !== 'comment' && key !== repo;
-  } );
+  const repoNames = Object.keys( dependencies ).filter( key => key !== 'comment' && key !== repo );
 
   for ( var i = 0; i < repoNames.length; i++ ) {
     var dependencyRepoName = repoNames[ i ];

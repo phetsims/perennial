@@ -42,16 +42,15 @@
 
 
 // modules
-var child_process = require( 'child_process' );
-var xml2js = require( 'xml2js' );
-var request = require( 'request' );
-var fs = require( 'fs' );
-var _ = require( 'lodash' ); // eslint-disable-line
+const child_process = require( 'child_process' );
+const xml2js = require( 'xml2js' );
+const request = require( 'request' );
+const fs = require( 'fs' );
+const _ = require( 'lodash' ); // eslint-disable-line
 
-// constants
-var IS_WIN = /^win/.test( process.platform );
-var GRUNT_CMD = IS_WIN ? 'grunt.cmd' : 'grunt'; // needs to be a slightly different command for Windows
-var NPM_CMD = IS_WIN ? 'npm.cmd' : 'npm'; // needs to be a slightly different command for Windows
+const IS_WIN = /^win/.test( process.platform );
+const GRUNT_CMD = IS_WIN ? 'grunt.cmd' : 'grunt'; // needs to be a slightly different command for Windows
+const NPM_CMD = IS_WIN ? 'npm.cmd' : 'npm'; // needs to be a slightly different command for Windows
 
 /**
  * @param {Object} grunt - For all of your grunting needs.
@@ -67,7 +66,7 @@ module.exports = function( grunt, doneCallback ) {
      *
      * @param {string} message
      */
-    success: function( message ) {
+    success( message ) {
       grunt.log.ok( message );
       doneCallback();
     },
@@ -79,7 +78,7 @@ module.exports = function( grunt, doneCallback ) {
      *
      * @param {string} message
      */
-    error: function( message ) {
+    error( message ) {
       grunt.log.error( message + '\n' + new Error().stack );
       doneCallback();
       throw new Error( message );
@@ -92,7 +91,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {*} value - Checks if its negation is truthy
      * @param {string} message
      */
-    assert: function( value, message ) {
+    assert( value, message ) {
       if ( !value ) {
         this.error( 'Assertion failed: ' + message );
       }
@@ -113,7 +112,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {Function} [errorOverrideCallback] - errorOverrideCallback( code: {number} ), called when errors with the
      *                                             exit code of the process.
      */
-    execute: function( cmd, args, cwd, callback, errorOverrideCallback ) {
+    execute( cmd, args, cwd, callback, errorOverrideCallback ) {
       var self = this;
 
       var process = child_process.spawn( cmd, args, {
@@ -153,7 +152,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {string} url
      * @param {Function} callback - callback( xmlResult: Object ), see xml2js for more details
      */
-    requestXML: function( url, callback ) {
+    requestXML( url, callback ) {
       var self = this;
       grunt.log.debug( 'requesting ' + url );
       request( url, function( requestError, requestResponse, requestBody ) {
@@ -177,7 +176,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {string} simName - E.g. acid-base-solutions
      * @param {Function} callback - callback( versionInfo ).
      */
-    getLatestProductionVersion: function( simName, callback ) {
+    getLatestProductionVersion( simName, callback ) {
       var self = this;
 
       // TODO: hook up with the JSON API preferably? This is using the old metadata-based API
@@ -229,7 +228,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {string} simName
      * @param {Function} callback - callback( versionInfo ) - See above specification.
      */
-    getCheckedInVersion: function( simName, callback ) {
+    getCheckedInVersion( simName, callback ) {
       var packageObject = JSON.parse( fs.readFileSync( '../' + simName + '/package.json', 'utf8' ) );
       var currentVersionString = packageObject.version;
       var match = currentVersionString.match( /(\d+)\.(\d+)\.(\d+)(-(rc|dev)\.(\d+))?/ );
@@ -251,7 +250,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {string} target
      * @param {Function} callback - callback() executed when complete
      */
-    gitCheckout: function( repo, target, callback ) {
+    gitCheckout( repo, target, callback ) {
       this.execute( 'git', [ 'checkout', target ], '../' + repo, callback );
     },
 
@@ -262,7 +261,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {string} repo
      * @param {Function} callback - callback() executed when complete
      */
-    gitPull: function( repo, callback ) {
+    gitPull( repo, callback ) {
       this.execute( 'git', [ 'pull' ], '../' + repo, callback );
     },
 
@@ -274,7 +273,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {string} remoteBranch - The branch that is getting pushed to, e.g. 'master' or '1.0'
      * @param {Function} callback - callback() executed when complete
      */
-    gitPush: function( repo, remoteBranch, callback ) {
+    gitPush( repo, remoteBranch, callback ) {
       this.assert( remoteBranch, 'Ensure we have a remote branch to push to' );
       this.execute( 'git', [ 'push', '-u', 'origin', remoteBranch ], '../' + repo, callback );
     },
@@ -288,7 +287,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {string} target - branch or SHA
      * @param {Function} callback - callback( checkedOutRepos: Array.<string> ) - called when completed successfully.
      */
-    gitCheckoutShas: function( repo, target, callback ) {
+    gitCheckoutShas( repo, target, callback ) {
       grunt.log.debug( 'gitCheckoutShas ' + repo + ' ' + target );
       var self = this;
 
@@ -335,7 +334,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {string} repo
      * @param {Function} callback - callback() - called when completed successfully.
      */
-    gitCheckoutMaster: function( repo, callback ) {
+    gitCheckoutMaster( repo, callback ) {
       grunt.log.debug( 'gitCheckoutMaster ' + repo );
       var self = this;
       this.getDependencies( repo, function( dependencies ) {
@@ -368,7 +367,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {string} repo
      * @param {Function} callback - callback() called when complete with no errors
      */
-    gitClean: function( repo, callback ) {
+    gitClean( repo, callback ) {
       var self = this;
       // TODO: improve as needed
       this.gitCheckout( repo, 'master', function() {
@@ -390,7 +389,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {string} repo
      * @param {Function} callback - callback( sha: {string} ) called when complete with no errors
      */
-    getCurrentSHA: function( repo, callback ) {
+    getCurrentSHA( repo, callback ) {
       var self = this;
       self.execute( 'git', [ 'rev-parse', 'HEAD' ], '../' + repo, function( sha ) {
         sha = sha.trim();
@@ -407,7 +406,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {string} repo
      * @param {Function} callback - callback() called when complete with no errors
      */
-    npmUpdate: function( repo, callback ) {
+    npmUpdate( repo, callback ) {
       var self = this;
       self.execute( NPM_CMD, [ 'prune' ], '../' + repo, function() {
         self.execute( NPM_CMD, [ 'update' ], '../' + repo, function() {
@@ -423,7 +422,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {string} repo
      * @param {Function} callback - callback( dependencies: {Object} ) called when complete with no errors.
      */
-    getDependencies: function( repo, callback ) {
+    getDependencies( repo, callback ) {
       var self = this;
       fs.readFile( '../' + repo + '/dependencies.json', 'utf8', function( fileError, fileData ) {
         self.assert( !fileError, 'Error opening ' + repo + ' dependencies.json: ' + fileError );
@@ -463,7 +462,7 @@ module.exports = function( grunt, doneCallback ) {
      *
      * @param {string} simsString - Comma-separated list of sims, e.g. acid-base-solutions,arithmetic
      */
-    maintenanceStart: function( simsString ) {
+    maintenanceStart( simsString ) {
       var self = this;
 
       // Stub object that will be filled in later. The sims object will be filled in within this function
@@ -512,7 +511,7 @@ module.exports = function( grunt, doneCallback ) {
      *
      * @param {string} reposString - Comma-separated string of repository names that need to be patched
      */
-    maintenancePatchInfo: function( reposString ) {
+    maintenancePatchInfo( reposString ) {
       var self = this;
 
       var repoNames = reposString.split( ',' );
@@ -606,7 +605,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {string} shasString - Comma-separated string of SHAs from maintenance-patch-info to be patched
      * @param {string} [simName] - If provided, use this simulation instead of the first one in the list
      */
-    maintenancePatchCheckout: function( reposString, shasString, simName ) {
+    maintenancePatchCheckout( reposString, shasString, simName ) {
       var self = this;
 
       var maintenanceObject = this.storageObject;
@@ -631,7 +630,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {string} reposString - Comma-separated string of repository names that need to be patched
      * @param {string} message - Additional info for the dependencies.json commit message
      */
-    maintenancePatchApply: function( reposString, message ) {
+    maintenancePatchApply( reposString, message ) {
       var self = this;
 
       var repoNames = reposString.split( ',' );
@@ -766,7 +765,7 @@ module.exports = function( grunt, doneCallback ) {
      *
      * @param {string} simName
      */
-    maintenanceDeployRCNoVersionBump: function( simName ) {
+    maintenanceDeployRCNoVersionBump( simName ) {
       var self = this;
 
       var maintenanceObject = this.storageObject;
@@ -799,7 +798,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {string} simName
      * @param {string} message - Additional information for the version-bump commit.
      */
-    maintenanceDeployRC: function( simName, message ) {
+    maintenanceDeployRC( simName, message ) {
       var self = this;
 
       var maintenanceObject = this.storageObject;
@@ -865,7 +864,7 @@ module.exports = function( grunt, doneCallback ) {
      * @param {string} simName
      * @param {string} message - Additional information for the version-bump commit.
      */
-    maintenanceDeployProduction: function( simName, message ) {
+    maintenanceDeployProduction( simName, message ) {
       var self = this;
 
       var maintenanceObject = this.storageObject;
@@ -919,7 +918,7 @@ module.exports = function( grunt, doneCallback ) {
      * available at phetsims.github.io, e.g. http://phetsims.github.io/scenery/
      * @public
      */
-    updateGithubPages: function() {
+    updateGithubPages() {
       var self = this;
       var repos = [
         { name: 'assert' },

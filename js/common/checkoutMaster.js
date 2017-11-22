@@ -9,10 +9,10 @@
 'use strict';
 
 // modules
-var getDependencies = require( './getDependencies' );
-var gitCheckout = require( './gitCheckout' );
-var npmUpdate = require( './npmUpdate' );
-var winston = require( 'winston' );
+const getDependencies = require( './getDependencies' );
+const gitCheckout = require( './gitCheckout' );
+const npmUpdate = require( './npmUpdate' );
+const winston = require( 'winston' );
 
 /**
  * Checks out master for a repository and all of its dependencies.
@@ -25,12 +25,10 @@ var winston = require( 'winston' );
 module.exports = async function( repo, includeNpmUpdate ) {
   winston.info( 'checking out master for ' + repo );
 
-  var dependencies = await getDependencies( repo );
+  const dependencies = await getDependencies( repo );
 
   // Ignore the comment
-  var repoNames = Object.keys( dependencies ).filter( function( key ) {
-    return key !== 'comment';
-  } );
+  const repoNames = Object.keys( dependencies ).filter( key => key !== 'comment' );
 
   // TODO: can we use each here safely?
   for ( var i = 0; i < repoNames.length; i++ ) {

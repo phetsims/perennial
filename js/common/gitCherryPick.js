@@ -9,8 +9,8 @@
 'use strict';
 
 // modules
-var execute = require( './execute' );
-var winston = require( 'winston' );
+const execute = require( './execute' );
+const winston = require( 'winston' );
 
 /**
  * Executes git cherry-pick (but if it fails, it will back out of the cherry-pick)
