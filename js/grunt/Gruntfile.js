@@ -18,6 +18,7 @@ const checkoutRelease = require( '../common/checkoutRelease' );
 const checkoutTarget = require( '../common/checkoutTarget' );
 const cherryPick = require( './cherryPick' );
 const createRelease = require( './createRelease' );
+const dev = require( './dev' );
 const execute = require( '../common/execute' );
 const gruntCommand = require( '../common/gruntCommand' );
 const maintenance = require( './maintenance' );
@@ -236,4 +237,19 @@ module.exports = function( grunt ) {
 
     done();
   } );
+
+  grunt.registerTask( 'dev',
+    'Deploys a dev version of the simulation',
+    async function() {
+      // winston.default.transports.console.level = 'debug';
+
+      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+      assert( grunt.option( 'brand' ), 'Requires specifying a brand with --brand={{BRAND}}' );
+
+      const done = grunt.task.current.async();
+
+      await dev( grunt, grunt.option( 'repo' ), grunt.option( 'brand' ) );
+
+      done();
+    } );
 };
