@@ -12,12 +12,15 @@
 const _ = require( 'lodash' ); // eslint-disable-line
 const build = require( '../common/build' );
 const buildLocal = require( '../common/buildLocal' );
+const copyFile = require( '../common/copyFile' );
 const devDirectoryExists = require( '../common/devDirectoryExists' );
 const devScp = require( '../common/devScp' );
 const devSsh = require( '../common/devSsh' );
 const getBranch = require( '../common/getBranch' );
 const getRepoVersion = require( '../common/getRepoVersion' );
 const gitIsClean = require( '../common/gitIsClean' );
+const gitAdd = require( '../common/gitAdd' );
+const gitCommit = require( '../common/gitCommit' );
 const gitPush = require( '../common/gitPush' );
 const prompt = require( '../common/prompt' );
 const setRepoVersion = require( '../common/setRepoVersion' );
@@ -79,10 +82,25 @@ module.exports = async function( grunt, repo, brand ) {
     await devSsh( `chmod -R g+w "${simPath}"` );
   }
 
-  // Create (and fix permissions for) the version-specific directory
+  // Create the version-specific directory
   await devSsh( `mkdir -p "${versionPath}"` );
-  await devSsh( `chmod g+w "${versionPath}"` );
 
   // Copy the build contents into the version-specific directory
   await devScp( `../${repo}/build/*`, `${versionPath}/` );
+
+  // If there is a protected directory and we are copying to spot, include the .htaccess file
+  // This is for PhET-iO simulations, to protected the password protected wrappers, see
+  // https://github.com/phetsims/phet-io/issues/641
+  if ( brand === 'phet-io' && buildLocal.devDeployServer === 'spot.colorado.edu' ) {
+    await devScp( '../phet-io/templates/spot/.htaccess', `${versionPath}/wrappers/.htaccess` );
+  }
+
+  // Permissions fixes so others can write over it later
+  await devSsh( `chmod g+w "${versionPath}"` );
+
+  // Move over dependencies.json and commit/push
+  await copyFile( `../${repo}/build/dependencies.json`, `../${repo}/dependencies.json` );
+  await gitAdd( repo, 'dependencies.json' );
+  await gitCommit( repo, `updated dependencies.json for version ${versionString}` );
+  await gitPush( repo, 'master' );
 };
