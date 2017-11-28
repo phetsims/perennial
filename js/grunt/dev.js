@@ -66,7 +66,7 @@ module.exports = async function( grunt, repo, brand ) {
 
   const confirmation = await prompt( `Deploy ${versionString} to ${buildLocal.devDeployServer} [Y/n]?` );
   if ( confirmation === 'n' ) {
-    throw new Error( 'Aborted dev deploy' );
+    grunt.fail.fatal( 'Aborted dev deploy' );
   }
 
   await setRepoVersion( repo, version );
