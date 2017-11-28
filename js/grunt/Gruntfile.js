@@ -18,6 +18,8 @@ const checkoutRelease = require( '../common/checkoutRelease' );
 const checkoutTarget = require( '../common/checkoutTarget' );
 const cherryPick = require( './cherryPick' );
 const createRelease = require( './createRelease' );
+const execute = require( '../common/execute' );
+const gruntCommand = require( '../common/gruntCommand' );
 const maintenance = require( './maintenance' );
 const npmUpdate = require( '../common/npmUpdate' );
 const shaCheck = require( './shaCheck' );
@@ -221,4 +223,17 @@ module.exports = function( grunt ) {
       const done = grunt.task.current.async();
       cherryPick( grunt, repo, shas ).then( done ).catch( error( done ) );
     } );
+
+  grunt.registerTask( 'lint', 'Lints this repository only', async function() {
+    const done = grunt.task.current.async();
+
+    try {
+      grunt.log.writeln( await execute( gruntCommand, [ 'lint', '--repo=perennial' ], '../chipper' ) );
+    }
+    catch ( e ) {
+      grunt.log.error( e.stdout );
+    }
+
+    done();
+  } );
 };
