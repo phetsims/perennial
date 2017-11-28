@@ -21,8 +21,8 @@ const winston = require( 'winston' );
  * @returns {Promise}
  */
 module.exports = async function( repo ) {
-  winston.info( 'npm update on ' + repo );
+  winston.info( `npm update on ${repo}` );
 
-  await execute( npmCommand, [ 'prune' ], '../' + repo );
-  await execute( npmCommand, [ 'update' ], '../' + repo );
+  await execute( npmCommand, [ 'prune' ], `../${repo}` );
+  await execute( npmCommand, [ 'update' ], `../${repo}` );
 };

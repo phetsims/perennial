@@ -21,7 +21,7 @@ const winston = require( 'winston' );
  * @returns {Promise} - See execute for details
  */
 module.exports = function( repo, file ) {
-  winston.info( 'git add ' + file + ' on ' + repo );
+  winston.info( `git add ${file} on ${repo}` );
 
-  return execute( 'git', [ 'add', file ], '../' + repo );
+  return execute( 'git', [ 'add', file ], '../${repo}' );
 };

@@ -21,8 +21,8 @@ const winston = require( 'winston' );
  * @returns {Promise} - Resolves to version: {SimVersion}
  */
 module.exports = async function( repo ) {
-  winston.debug( 'Reading version from package.json for ' + repo );
+  winston.debug( `Reading version from package.json for ${repo}` );
 
-  const packageObject = await loadJSON( '../' + repo + '/package.json' );
+  const packageObject = await loadJSON( `../${repo}/package.json` );
   return SimVersion.parse( packageObject.version );
 };

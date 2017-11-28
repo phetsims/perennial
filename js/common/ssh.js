@@ -22,10 +22,10 @@ const winston = require( 'winston' );
  * @returns {Promise}
  */
 module.exports = function( username, host, cmd ) {
-  winston.info( 'running ' + cmd + ' remotely on ' + host );
+  winston.info( `running ${cmd} remotely on ${host}` );
 
   return execute( 'ssh', [
-    username + '@' + host,
+    `${username}@${host}`,
     cmd
   ], '.' );
 };

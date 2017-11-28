@@ -21,7 +21,7 @@ const winston = require( 'winston' );
  * @param {Function} [errorCallback] - errorCallback( {*} error )
  */
 module.exports = function( repo, callback, errorCallback ) {
-  winston.info( 'getting dependencies.json for ' + repo );
+  winston.info( `getting dependencies.json for ${repo}` );
 
-  return loadJSON( '../' + repo + '/dependencies.json' );
+  return loadJSON( `../${repo}/dependencies.json` );
 };

@@ -20,7 +20,7 @@ const winston = require( 'winston' );
  * @returns {Promise} - Resolves {boolean} - Whether it is clean or not
  */
 module.exports = function( repo ) {
-  winston.debug( 'git status check on ' + repo );
+  winston.debug( `git status check on ${repo}` );
 
-  return execute( 'git', [ 'status', '--porcelain' ], '../' + repo ).then( stdout => Promise.resolve( stdout.length === 0 ) );
+  return execute( 'git', [ 'status', '--porcelain' ], `../${repo}` ).then( stdout => Promise.resolve( stdout.length === 0 ) );
 };

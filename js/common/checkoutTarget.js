@@ -9,12 +9,12 @@
 'use strict';
 
 // modules
+const _ = require( 'lodash' ); // eslint-disable-line
 const checkoutDependencies = require( './checkoutDependencies' );
 const getDependencies = require( './getDependencies' );
 const gitCheckout = require( './gitCheckout' );
 const gitPull = require( './gitPull' );
 const winston = require( 'winston' );
-const _ = require( 'lodash' ); // eslint-disable-line
 
 /**
  * Checks out a SHA/branch for a repository, and also checks out all of its dependencies.
@@ -26,7 +26,7 @@ const _ = require( 'lodash' ); // eslint-disable-line
  * @returns {Promise} - Resolves with checkedOutRepos: {Array.<string>}
  */
 module.exports = async function( repo, target, includeNpmUpdate ) {
-  winston.info( 'checking out shas for ' + repo + ' ' + target );
+  winston.info( `checking out shas for ${repo} ${target}` );
 
   await gitCheckout( repo, target );
   await gitPull( repo ); // Does this work for a SHA?

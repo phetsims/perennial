@@ -21,11 +21,11 @@ const winston = require( 'winston' );
  */
 module.exports = function( file ) {
   return new Promise( ( resolve, reject ) => {
-    winston.debug( 'Loading JSON from ' + file );
+    winston.debug( `Loading JSON from ${file}` );
 
     fs.readFile( file, 'utf8', ( err, data ) => {
       if ( err ) {
-        winston.error( 'Error occurred reading version from json at ' + file + ': ' + err );
+        winston.error( `Error occurred reading version from json at ${file}: ${err}` );
         reject( err );
       }
       else {

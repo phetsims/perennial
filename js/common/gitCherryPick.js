@@ -21,13 +21,13 @@ const winston = require( 'winston' );
  * @returns {Promise} - Resolves to whether the cherry-pick worked or not. If aborting fails, will reject.
  */
 module.exports = function( repo, target ) {
-  winston.info( 'git cherry-pick ' + target + ' on ' + repo );
+  winston.info( `git cherry-pick ${target} on ${repo}` );
 
-  return execute( 'git', [ 'cherry-pick', target ], '../' + repo ).then( stdout => Promise.resolve( true ), cherryPickError => {
-    winston.info( 'git cherry-pick failed (aborting): ' + target + ' on ' + repo );
+  return execute( 'git', [ 'cherry-pick', target ], `../${repo}` ).then( stdout => Promise.resolve( true ), cherryPickError => {
+    winston.info( `git cherry-pick failed (aborting): ${target} on ${repo}` );
 
-    return execute( 'git', [ 'cherry-pick', '--abort' ], '../' + repo ).then( stdout => Promise.resolve( false ), abortError => {
-      winston.error( 'git cherry-pick --abort failed: ' + target + ' on ' + repo );
+    return execute( 'git', [ 'cherry-pick', '--abort' ], `../${repo}` ).then( stdout => Promise.resolve( false ), abortError => {
+      winston.error( `git cherry-pick --abort failed: ${target} on ${repo}` );
       return Promise.reject( abortError );
     } );
   } );

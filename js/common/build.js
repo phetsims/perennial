@@ -49,8 +49,8 @@ module.exports = async function( repo, options ) {
     if ( twitterCard ) {
       args.push( 'generate-twitter-card' );
     }
-    args.push( '--brand=' + brand );
-    args.push( '--locales=' + locales );
+    args.push( `--brand=${brand}` );
+    args.push( `--locales=${locales}` );
     if ( !uglify ) {
       args.push( '--uglify=false' );
     }
@@ -65,8 +65,8 @@ module.exports = async function( repo, options ) {
     }
   }
   else {
-    throw new Error( 'unsupported chipper version: ' + chipperVersion );
+    throw new Error( `unsupported chipper version: ${chipperVersion}` );
   }
 
-  return execute( gruntCommand, args, '../' + repo );
+  return execute( gruntCommand, args, `../${repo}` );
 };

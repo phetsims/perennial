@@ -22,9 +22,9 @@ const winston = require( 'winston' );
  * @returns {Promise} - Resolves with {boolean} (whether it is an ancestor or not)
  */
 module.exports = function( repo, possibleAncestor, possibleDescendant ) {
-  winston.info( 'git check (in ' + repo + ') for whether ' + possibleAncestor + ' is an ancestor of ' + possibleDescendant );
+  winston.info( `git check (in ${repo}) for whether ${possibleAncestor} is an ancestor of ${possibleDescendant}` );
 
-  return execute( 'git', [ 'merge-base', '--is-ancestor', possibleAncestor, possibleDescendant ], '../' + repo ).then( stdout => Promise.resolve( true ), mergeError => {
+  return execute( 'git', [ 'merge-base', '--is-ancestor', possibleAncestor, possibleDescendant ], `../${repo}` ).then( stdout => Promise.resolve( true ), mergeError => {
     if ( mergeError.code === 1 ) {
       return Promise.resolve( false );
     }

@@ -22,11 +22,11 @@ const winston = require( 'winston' );
  */
 module.exports = function( file, content ) {
   return new Promise( ( resolve, reject ) => {
-    winston.debug( 'Writing JSON to ' + file );
+    winston.debug( `Writing JSON to ${file}` );
 
     fs.writeFile( file, JSON.stringify( content, null, 2 ), err => {
       if ( err ) {
-        reject( 'Could not write to file: ' + file + ' due to: ' + err );
+        reject( `Could not write to file: ${file} due to: ${err}` );
       }
       else {
         resolve();

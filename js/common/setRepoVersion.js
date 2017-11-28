@@ -25,13 +25,13 @@ const writeJSON = require( './writeJSON' );
  * @returns {Promise}
  */
 module.exports = async function( repo, version ) {
-  winston.info( 'Setting version from package.json for ' + repo + ' to ' + version.toString() );
+  winston.info( `Setting version from package.json for ${repo} to ${version.toString()}` );
 
-  const packageFile = '../' + repo + '/package.json';
+  const packageFile = `../${repo}/package.json`;
 
   const isClean = await gitIsClean( repo );
   if ( !isClean ) {
-    throw new Error( 'Unclean status in ' + repo + ', cannot increment version' );
+    throw new Error( `Unclean status in ${repo}, cannot increment version` );
   }
 
   const packageObject = await loadJSON( packageFile );
@@ -39,5 +39,5 @@ module.exports = async function( repo, version ) {
 
   await writeJSON( packageFile, packageObject );
   await gitAdd( repo, 'package.json' );
-  await gitCommit( repo, 'Bumping version to ' + version.toString() );
+  await gitCommit( repo, `Bumping version to ${version.toString()}` );
 };

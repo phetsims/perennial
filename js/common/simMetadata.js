@@ -34,16 +34,16 @@ module.exports = function( options ) {
       metadataURL += '&summary';
     }
     if ( options.type ) {
-      metadataURL += '&type=' + options.type;
+      metadataURL += `&type=${options.type}`;
     }
     if ( options.locale ) {
-      metadataURL += '&locale=' + options.locale;
+      metadataURL += `&locale=${options.locale}`;
     }
     if ( options.simulation ) {
-      metadataURL += '&simulation=' + options.simulation;
+      metadataURL += `&simulation=${options.simulation}`;
     }
 
-    winston.info( 'getting metadata request with ' + metadataURL );
+    winston.info( `getting metadata request with ${metadataURL}` );
 
     request( metadataURL, ( requestError, requestResponse, requestBody ) => {
       if ( requestError || requestResponse.statusCode !== 200 ) {

@@ -25,7 +25,7 @@ module.exports = function( repo, target ) {
   assert( typeof repo === 'string' );
   assert( typeof target === 'string' );
 
-  winston.info( 'git checkout ' + target + ' on ' + repo );
+  winston.info( `git checkout ${target} on ${repo}` );
 
-  return execute( 'git', [ 'checkout', target ], '../' + repo );
+  return execute( 'git', [ 'checkout', target ], `../${repo}` );
 };

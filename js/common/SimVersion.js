@@ -106,9 +106,9 @@
      * @returns {string}
      */
     toString() {
-      var str = this.major + '.' + this.minor + '.' + this.maintenance;
+      var str = `${this.major}.${this.minor}.${this.maintenance}`;
       if ( typeof this.testType === 'string' ) {
-        str += '-' + this.testType + '.' + this.testNumber;
+        str += `-${this.testType}.${this.testNumber}`;
       }
       if ( this.brand !== 'phet' ) {
         var brandString;
@@ -122,7 +122,7 @@
             return ( index > 0 ? bit[ 0 ].toUpperCase() : bit[ 0 ] ) + bit.slice( 1 );
           } ).join( '' );
         }
-        str += '-' + brandString;
+        str += `-${brandString}`;
       }
       return str;
     }

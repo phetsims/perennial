@@ -23,7 +23,7 @@ const winston = require( 'winston' );
  * @returns {Promise}
  */
 module.exports = async function( repo, includeNpmUpdate ) {
-  winston.info( 'checking out master for ' + repo );
+  winston.info( `checking out master for ${repo}` );
 
   const dependencies = await getDependencies( repo );
 

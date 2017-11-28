@@ -21,7 +21,7 @@ const winston = require( 'winston' );
  * @returns {Promise} - See execute for details
  */
 module.exports = function( repo, remoteBranch ) {
-  winston.info( 'git push on ' + repo + ' to ' + remoteBranch );
+  winston.info( `git push on ${repo} to ${remoteBranch}` );
 
-  return execute( 'git', [ 'push', '-u', 'origin', remoteBranch ], '../' + repo );
+  return execute( 'git', [ 'push', '-u', 'origin', remoteBranch ], `../${repo}` );
 };

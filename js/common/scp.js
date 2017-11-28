@@ -23,13 +23,11 @@ const winston = require( 'winston' );
  * @returns {Promise}
  */
 module.exports = function( username, host, localFile, remoteFile ) {
-  winston.info( 'transferring ' + localFile + ' remotely to ' + remoteFile + ' on ' + host );
-
-  // 'scp -r ' + ChipperConstants.BUILD_DIR + '/* ' + deployConfig.devUsername + '@' + server + ':' + versionPath
+  winston.info( `transferring ${localFile} remotely to ${remoteFile} on ${host}` );
 
   return execute( 'scp', [
     '-r',
     localFile,
-    username + '@' + host + ':' + remoteFile
+    `${username}@${host}:${remoteFile}`
   ], '.' );
 };
