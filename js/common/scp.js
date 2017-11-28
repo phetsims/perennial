@@ -1,0 +1,35 @@
+// Copyright 2017, University of Colorado Boulder
+
+/**
+ * Transfers a file (or directory recursively) to a remote server.
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+/* eslint-env node */
+'use strict';
+
+// modules
+const execute = require( './execute' );
+const winston = require( 'winston' );
+
+/**
+ * Transfers a file (or directory recursively) to a remote server.
+ * @public
+ *
+ * @param {string} username
+ * @param {string} host
+ * @param {string} localFile - A file, directory or glob pattern. Basically the first part of the SCP command
+ * @param {string} remoteFile - A file or directory. Basically the second part of the SCP command (minus the host/username)
+ * @returns {Promise}
+ */
+module.exports = function( username, host, localFile, remoteFile ) {
+  winston.info( 'transferring ' + localFile + ' remotely to ' + remoteFile + ' on ' + host );
+
+  // 'scp -r ' + ChipperConstants.BUILD_DIR + '/* ' + deployConfig.devUsername + '@' + server + ':' + versionPath
+
+  return execute( 'scp', [
+    '-r',
+    localFile,
+    username + '@' + host + ':' + remoteFile
+  ], '.' );
+};
