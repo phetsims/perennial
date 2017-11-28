@@ -17,7 +17,9 @@ const devScp = require( '../common/devScp' );
 const devSsh = require( '../common/devSsh' );
 const getBranch = require( '../common/getBranch' );
 const getRepoVersion = require( '../common/getRepoVersion' );
+const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
+const prompt = require( '../common/prompt' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 
 /**
@@ -40,6 +42,11 @@ module.exports = async function( grunt, repo, brand ) {
     grunt.fail.fatal( 'The current version identifier is not a dev version, aborting.' );
   }
 
+  const isClean = await gitIsClean( repo );
+  if ( !isClean ) {
+    throw new Error( `Unclean status in ${repo}, cannot deploy` );
+  }
+
   // Bump the version
   version.testNumber++;
   const versionString = version.toString();
@@ -52,6 +59,11 @@ module.exports = async function( grunt, repo, brand ) {
 
   if ( versionPathExists ) {
     grunt.fail.fatal( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
+  }
+
+  const confirmation = await prompt( `Deploy ${versionString} to ${buildLocal.devDeployServer} [Y/n]?` );
+  if ( confirmation === 'n' ) {
+    throw new Error( 'Aborted dev deploy' );
   }
 
   await setRepoVersion( repo, version );

@@ -248,7 +248,11 @@ module.exports = function( grunt ) {
 
       const done = grunt.task.current.async();
 
-      await dev( grunt, grunt.option( 'repo' ), grunt.option( 'brand' ) );
+      try {
+        await dev( grunt, grunt.option( 'repo' ), grunt.option( 'brand' ) );
+      } catch ( e ) {
+        grunt.fail.fatal( e + '\n' + e.stack );
+      }
 
       done();
     } );
