@@ -29,7 +29,7 @@ module.exports = async function( repo, version, dependencies, options ) {
     const {
       locales = '*',
       rc = false
-    } = options;
+    } = options || {};
 
     winston.info( `sending build request for ${repo} ${version.toFullString()} with dependencies: ${JSON.stringify( dependencies )}` );
 

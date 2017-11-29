@@ -56,7 +56,7 @@ module.exports = async function( grunt, repo, branch, brand ) {
   if ( !( await hasRemoteBranch( repo, branch ) ) ) {
     const createBranchConfirmation = await prompt( `Release branch ${branch} does not exist. Create it? [Y/n]?` );
     if ( createBranchConfirmation === 'n' ) {
-      grunt.fail.fatal( 'Aborted rc deploy due to non-existing branch' );
+      grunt.fail.fatal( 'Aborted rc deployment due to non-existing branch' );
     }
 
     await createRelease( grunt, repo, branch );
@@ -67,7 +67,7 @@ module.exports = async function( grunt, repo, branch, brand ) {
   const previousVersion = getRepoVersion( repo );
 
   if ( previousVersion.testType !== 'rc' && previousVersion.testType !== null ) {
-    grunt.fail.fatal( 'Aobrted rc deploy since the version number cannot be incremented safely' );
+    grunt.fail.fatal( 'Aborted rc deployment since the version number cannot be incremented safely' );
   }
 
   const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, brand, {
@@ -91,7 +91,7 @@ module.exports = async function( grunt, repo, branch, brand ) {
 
   const initialConfirmation = await prompt( `Deploy ${fullVersionString} to ${buildLocal.devDeployServer} [Y/n]?` );
   if ( initialConfirmation === 'n' ) {
-    grunt.fail.fatal( 'Aborted rc deploy' );
+    grunt.fail.fatal( 'Aborted rc deployment' );
   }
 
   await setRepoVersion( repo, version );
@@ -114,7 +114,7 @@ module.exports = async function( grunt, repo, branch, brand ) {
 
     // Abort checkout
     await checkoutMaster( repo );
-    grunt.fail.fatal( 'Aborted rc deploy (aborted version change too).' );
+    grunt.fail.fatal( 'Aborted rc deployment (aborted version change too).' );
   }
 
   // Move over dependencies.json and commit/push

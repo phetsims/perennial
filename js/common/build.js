@@ -31,7 +31,7 @@ module.exports = async function( repo, options ) {
     lint = true,
     thumbnails = false,
     twitterCard = false
-  } = options;
+  } = options || {};
 
   winston.info( `building ${repo}` );
 

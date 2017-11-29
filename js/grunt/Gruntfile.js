@@ -23,6 +23,7 @@ const execute = require( '../common/execute' );
 const gruntCommand = require( '../common/gruntCommand' );
 const maintenance = require( './maintenance' );
 const npmUpdate = require( '../common/npmUpdate' );
+const rc = require( './rc' );
 const shaCheck = require( './shaCheck' );
 const simMetadata = require( '../common/simMetadata' );
 const winston = require( 'winston' );
@@ -250,6 +251,26 @@ module.exports = function( grunt ) {
 
       try {
         await dev( grunt, grunt.option( 'repo' ), grunt.option( 'brand' ) );
+      } catch ( e ) {
+        grunt.fail.fatal( e + '\n' + e.stack );
+      }
+
+      done();
+    } );
+
+  grunt.registerTask( 'rc',
+    'Deploys an rc version of the simulation',
+    async function() {
+      // winston.default.transports.console.level = 'debug';
+
+      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+      assert( grunt.option( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
+      assert( grunt.option( 'brand' ), 'Requires specifying a brand with --brand={{BRAND}}' );
+
+      const done = grunt.task.current.async();
+
+      try {
+        await rc( grunt, grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brand' ) );
       } catch ( e ) {
         grunt.fail.fatal( e + '\n' + e.stack );
       }
