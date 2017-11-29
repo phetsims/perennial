@@ -64,6 +64,9 @@ module.exports = async function( repo, options ) {
     if ( allHTML ) {
       args.push( '--allHTML' );
     }
+    if ( debugHTML ) {
+      args.push( '--debugHTML' );
+    }
   }
   else {
     throw new Error( `unsupported chipper version: ${chipperVersion}` );
