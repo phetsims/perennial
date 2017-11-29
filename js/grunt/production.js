@@ -161,6 +161,7 @@ module.exports = async function( grunt, repo, branch, brand ) {
     grunt.log.writeln( 'After testing, let the simulation lead know it has been deployed, so they can edit metadata on the website' );
 
     // Update the README on master
+    grunt.log.writeln( 'Updating README' );
     await execute( gruntCommand, [ 'published-README' ], `../${repo}` );
   }
 
@@ -178,6 +179,7 @@ module.exports = async function( grunt, repo, branch, brand ) {
   }
 
   // Update the third-party-licenses report
+  grunt.log.writeln( 'Running third-party report (do not ctrl-C it)' );
   await execute( gruntCommand, [ 'report-third-party' ], '../chipper' );
   await gitAdd( 'sherpa', 'third-party-licenses.md' );
   await gitCommit( 'sherpa', `Updating third-party-licenses for deploy of ${repo} ${fullVersionString}` );
