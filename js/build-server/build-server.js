@@ -6,14 +6,16 @@
  * Starting and Stopping the Server
  * ================================
  *
- * To start, stop, or restart the build server on phet-server, run this command:
- *
+ * To start, stop, or restart the build server on phet-server.int.colorado.edu (production) or phet-server.int.colorado.edu (test), run this command:
  * sudo systemctl [start|stop|restart] build-server
+ *
+ * To view the logs, run the following command.  A -f flag will tail the log.  Pressing Shift+F will scroll to the end (navigation is less-like).
+ * sudo journalctl -u build-server
  *
  * To edit startup options, please see /usr/lib/systemd/system/build-server.service
  *
+ * !!!DEPRECATED!!! - figaro has been decommisioned and simian is nearing end of life.
  * To start, stop, or restart the build server on figaro or simian, run this command:
- *
  * sudo /etc/init.d/build-server [start|stop|restart]
  *
  * Build Server Configuration
