@@ -22,6 +22,7 @@ const gitIsClean = require( '../common/gitIsClean' );
 const gitAdd = require( '../common/gitAdd' );
 const gitCommit = require( '../common/gitCommit' );
 const gitPush = require( '../common/gitPush' );
+const npmUpdate = require( '../common/npmUpdate' );
 const prompt = require( '../common/prompt' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 
@@ -71,6 +72,10 @@ module.exports = async function( grunt, repo, brand ) {
 
   await setRepoVersion( repo, version );
   await gitPush( repo, 'master' );
+
+  // Make sure our correct npm dependencies are set
+  await npmUpdate( repo );
+  await npmUpdate( 'chipper' );
 
   grunt.log.writeln( await build( repo, {
     brand
