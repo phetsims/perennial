@@ -28,6 +28,12 @@ module.exports = {
     assert( buildLocalObject.devUsername );
     return buildLocalObject.devUsername;
   },
+  get buildServerAuthorizationCode() {
+    assert( buildLocalObject.buildServerAuthorizationCode );
+    return buildLocalObject.buildServerAuthorizationCode;
+  },
   devDeployServer: buildLocalObject.devDeployServer || 'spot.colorado.edu',
   devDeployPath: buildLocalObject.devDeployPath || '/htdocs/physics/phet/dev/html/',
+  buildServerNotifyEmail: buildLocalObject.buildServerNotifyEmail || null,
+  productionServerURL: buildLocalObject.productionServerURL || 'https://phet.colorado.edu'
 };
