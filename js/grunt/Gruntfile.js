@@ -207,7 +207,7 @@ module.exports = function( grunt ) {
       assert( branch.split( '.' ).length === 2, 'Branch should be {{MAJOR}}.{{MINOR}}' );
 
       const done = grunt.task.current.async();
-      createRelease( repo, branch ).then( done ).catch( error( done ) );
+      createRelease( grunt, repo, branch ).then( done ).catch( error( done ) );
     } );
 
   grunt.registerTask( 'cherry-pick',

@@ -9,6 +9,8 @@
 /* eslint-env browser, node */
 'use strict';
 
+const brandToSuffix = require( './brandToSuffix' );
+
 (function() {
 
   /**
@@ -23,6 +25,7 @@
   function SimVersion( major, minor, maintenance, brand, options ) {
 
     // Can't depend on lodash to be available easily
+    // TODO: improve options pattern
     options = options || {};
     options.buildTimestamp = options.buildTimestamp === undefined ? null : options.buildTimestamp;
     options.testType = options.testType === undefined ? null : options.testType;
@@ -43,6 +46,7 @@
     if ( typeof options.testType === 'string' && typeof options.testNumber !== 'number' ) {
       throw new Error( 'if testType is provided, testNumber should be a number' );
     }
+    // TODO: handle one-offs?
 
     // @public {number}
     this.major = major;
@@ -110,21 +114,17 @@
       if ( typeof this.testType === 'string' ) {
         str += `-${this.testType}.${this.testNumber}`;
       }
-      if ( this.brand !== 'phet' ) {
-        var brandString;
-        // Decided not to camel-case phet-io
-        if ( this.brand === 'phet-io' ) {
-          brandString = 'phetio';
-        }
-        // otherwise camel-case
-        else {
-          brandString = this.brand.split( '-' ).map( function( bit, index ) {
-            return ( index > 0 ? bit[ 0 ].toUpperCase() : bit[ 0 ] ) + bit.slice( 1 );
-          } ).join( '' );
-        }
-        str += `-${brandString}`;
-      }
       return str;
+    },
+
+    /**
+     * Returns the string form of the version, including all extra bits of information (brand, etc.)
+     * @public
+     *
+     * @returns {string}
+     */
+    toFullString() {
+      return this.toString() + brandToSuffix( this.brand );
     }
   };
 
