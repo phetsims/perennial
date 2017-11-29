@@ -10,6 +10,7 @@
 
 // modules
 const _ = require( 'lodash' ); // eslint-disable-line
+const assert = require( 'assert' );
 const brandToSuffix = require( '../common/brandToSuffix' );
 const build = require( '../common/build' );
 const buildLocal = require( '../common/buildLocal' );

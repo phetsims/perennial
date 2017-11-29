@@ -10,6 +10,7 @@
 
 // modules
 const _ = require( 'lodash' ); // eslint-disable-line
+const assert = require( 'assert' );
 const build = require( '../common/build' );
 const buildServerRequest = require( '../common/buildServerRequest' );
 const checkoutMaster = require( '../common/checkoutMaster' );
