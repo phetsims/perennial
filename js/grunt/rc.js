@@ -65,10 +65,10 @@ module.exports = async function( grunt, repo, branch, brand ) {
 
   await checkoutTarget( repo, branch, true ); // include npm update
 
-  const previousVersion = getRepoVersion( repo );
+  const previousVersion = await getRepoVersion( repo );
 
   if ( previousVersion.testType !== 'rc' && previousVersion.testType !== null ) {
-    grunt.fail.fatal( 'Aborted rc deployment since the version number cannot be incremented safely' );
+    grunt.fail.fatal( `Aborted rc deployment since the version number cannot be incremented safely (testType:${previousVersion.testType})` );
   }
 
   const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, brand, {

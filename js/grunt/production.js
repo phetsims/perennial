@@ -65,7 +65,7 @@ module.exports = async function( grunt, repo, branch, brand ) {
 
   await checkoutTarget( repo, branch, true ); // include npm update
 
-  const previousVersion = getRepoVersion( repo );
+  const previousVersion = await getRepoVersion( repo );
   var version;
   var versionChanged;
 
