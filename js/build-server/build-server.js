@@ -1093,7 +1093,7 @@ function queueDeploy( repos, simName, version, locales, option, email, id, autho
 var app = express();
 
 // to support JSON-encoded bodies
-var bodyParser = require( 'body-parser' );
+var bodyParser = require( 'body-parser' ); // eslint-disable-line require-statement-match
 app.use( bodyParser.json() );
 
 // add the route to build and deploy
