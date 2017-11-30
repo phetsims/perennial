@@ -18,6 +18,7 @@ const checkoutRelease = require( '../common/checkoutRelease' );
 const checkoutTarget = require( '../common/checkoutTarget' );
 const cherryPick = require( './cherryPick' );
 const createRelease = require( './createRelease' );
+const createSim = require( './createSim' );
 const dev = require( './dev' );
 const execute = require( '../common/execute' );
 const gruntCommand = require( '../common/gruntCommand' );
@@ -290,6 +291,7 @@ module.exports = function( grunt ) {
 
       const done = grunt.task.current.async();
 
+      // TODO: consider wrapping most of these with this type of function, separated out somewhere
       try {
         await production( grunt, grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brand' ) );
       } catch ( e ) {
@@ -298,4 +300,31 @@ module.exports = function( grunt ) {
 
       done();
     } );
+
+  grunt.registerTask( 'create-sim',
+    'Creates a sim based on the simula-rasa template.\n' +
+    '--repo="string" : the repository repo\n' +
+    '--author="string" : the author name\n' +
+    '--title="string" : (optional) the simulation title\n' +
+    '--clean=true : (optional) deletes the repository directory if it exists',
+    async function() {
+      const repo = grunt.option( 'repo' );
+      const author = grunt.option( 'author' );
+      const title = grunt.option( 'title' );
+      const clean = grunt.option( 'clean' );
+
+      assert( grunt.option( 'repo' ), 'Requires specifying a repository name with --repo={{REPO}}' );
+      assert( grunt.option( 'author' ), 'Requires specifying a author with --author={{AUTHOR}}' );
+
+      const done = grunt.task.current.async();
+
+      try {
+        await createSim( grunt, repo, author, { title, clean } );
+      } catch ( e ) {
+        grunt.fail.fatal( e + '\n' + e.stack );
+      }
+
+      done();
+    } );
+
 };
