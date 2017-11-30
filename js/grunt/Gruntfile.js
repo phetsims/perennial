@@ -22,12 +22,14 @@ const createSim = require( './createSim' );
 const dev = require( './dev' );
 const execute = require( '../common/execute' );
 const gruntCommand = require( '../common/gruntCommand' );
+const insertRequireStatement = require( './insertRequireStatement' );
 const maintenance = require( './maintenance' );
 const npmUpdate = require( '../common/npmUpdate' );
 const production = require( './production' );
 const rc = require( './rc' );
 const shaCheck = require( './shaCheck' );
 const simMetadata = require( '../common/simMetadata' );
+const sortRequireStatements = require( './sortRequireStatements' );
 const winston = require( 'winston' );
 
 module.exports = function( grunt ) {
@@ -327,4 +329,30 @@ module.exports = function( grunt ) {
       done();
     } );
 
+  grunt.registerTask( 'sort-require-statements', 'Sort the require statements for a single file (if --file={{FILE}} is provided), or does so for all JS files in a repo (if --repo={{REPO}} is specified)', function() {
+    const file = grunt.option( 'file' );
+    const repo = grunt.option( 'repo' );
+
+    assert( !( file && repo ), 'Only one of --file and --repo should be specified' );
+    assert( file || repo, 'At least one of --file and --repo should be specified, see documentation' );
+
+    if ( file ) {
+      sortRequireStatements( grunt, file );
+    }
+    else {
+      grunt.file.recurse( `../${repo}/js`, absfile => sortRequireStatements( grunt, absfile ) );
+    }
+  } );
+
+  grunt.registerTask( 'insert-require-statement', 'Insert a require statement into the specified file.\n' +
+                                                  '--file absolute path of the file that will receive the require statement\n' +
+                                                  '--name to be required', function() {
+    const file = grunt.option( 'file' );
+    const name = grunt.option( 'name' );
+
+    assert( grunt.option( 'file' ), 'Requires specifying a file to update with --file={{FILE}}' );
+    assert( grunt.option( 'name' ), 'Requires specifying an (import) name with --name={{NAME}}' );
+
+    insertRequireStatement( grunt, file, name );
+  } );
 };
