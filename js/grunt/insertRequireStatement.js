@@ -23,7 +23,7 @@ module.exports = function( grunt, file, name ) {
   assert && assert( file, 'file should be defined' );
   assert && assert( name, 'name should be defined' );
 
-  var activeSims = fs.readFileSync( '../chipper/data/active-repos' ).toString();
+  var activeSims = fs.readFileSync( '../perennial/data/active-repos' ).toString();
   activeSims = activeSims.split( /\r?\n/ );
   activeSims.length = activeSims.length - 1;
 
