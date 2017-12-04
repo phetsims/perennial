@@ -355,4 +355,8 @@ module.exports = function( grunt ) {
 
     insertRequireStatement( grunt, file, name );
   } );
+
+  grunt.registerTask( 'lint-everything', 'lint all js files that are required to build this repository', function() {
+    require( '../../../chipper/js/grunt/lint' )( grunt, grunt.file.read( 'data/active-repos' ).trim().split( /\r?\n/ ) );
+  } );
 };

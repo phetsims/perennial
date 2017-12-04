@@ -34,5 +34,5 @@ module.exports = async function( repo, includeNpmUpdate ) {
 
   const branch = data.projects[ 0 ].version.major + '.' + data.projects[ 0 ].version.minor;
 
-  return await checkoutTarget( repo, branch, includeNpmUpdate, callback, errorCallback );
+  return await checkoutTarget( repo, branch, includeNpmUpdate );
 };
