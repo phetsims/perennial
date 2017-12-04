@@ -22,7 +22,7 @@ const winston = require( 'winston' );
  * @param {boolean} includeNpmUpdate
  * @returns {Promise} - Resolves with checkedOutRepos: {Array.<string>}
  */
-module.exports = async function( repo, includeNpmUpdate, callback, errorCallback ) {
+module.exports = async function( repo, includeNpmUpdate ) {
   winston.info( `checking out release for ${repo}` );
 
   const data = await simMetadata( {
