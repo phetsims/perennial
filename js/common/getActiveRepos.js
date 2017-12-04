@@ -17,7 +17,7 @@ const fs = require( 'fs' );
  *
  * @returns {Array.<string>}
  */
-module.exports = function( repo ) {
+module.exports = function() {
   const contents = fs.readFileSync( '../perennial/data/active-repos', 'utf8' ).trim();
 
   // Trim will remove any spaces and carriage returns if they are present.

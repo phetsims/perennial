@@ -21,6 +21,7 @@ const createRelease = require( './createRelease' );
 const createSim = require( './createSim' );
 const dev = require( './dev' );
 const execute = require( '../common/execute' );
+const generateData = require( './generateData' );
 const gruntCommand = require( '../common/gruntCommand' );
 const insertRequireStatement = require( './insertRequireStatement' );
 const maintenance = require( './maintenance' );
@@ -357,6 +358,11 @@ module.exports = function( grunt ) {
   } );
 
   grunt.registerTask( 'lint-everything', 'lint all js files that are required to build this repository', function() {
+    // Don't always require this, as we may have an older chipper checked out
     require( '../../../chipper/js/grunt/lint' )( grunt, grunt.file.read( 'data/active-repos' ).trim().split( /\r?\n/ ) );
+  } );
+
+  grunt.registerTask( 'generate-data', 'generates most files under perennial/data/', function() {
+    generateData( grunt );
   } );
 };
