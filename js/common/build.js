@@ -72,5 +72,12 @@ module.exports = async function( repo, options ) {
     throw new Error( `unsupported chipper version: ${chipperVersion}` );
   }
 
-  return execute( gruntCommand, args, `../${repo}` );
+  const result = await execute( gruntCommand, args, `../${repo}` );
+
+  // Examine output to see if getDependencies (in chipper) notices any missing phet-io things. Fail out if so. Detects that specific error message.
+  if ( result.includes( 'WARNING404' ) ) {
+    throw new Error( 'phet-io dependencies missing' );
+  }
+
+  return result;
 };
