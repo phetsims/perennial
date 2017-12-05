@@ -9,6 +9,7 @@
 'use strict';
 
 // modules
+const assert = require( 'assert' );
 const fs = require( 'fs' );
 const getActiveRepos = require( '../common/getActiveRepos' );
 const os = require( 'os' );
@@ -22,6 +23,9 @@ module.exports = function( grunt ) {
 
   function writeList( name, packageFilter ) {
     const repos = activeRepos.filter( repo => {
+      // Make sure that if someone doesn't have all repositories checked out that this will FAIL. Otherwise bad things.
+      assert( grunt.file.exists( `../${repo}` ) );
+      
       var packageObject;
       try {
         packageObject = JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) );

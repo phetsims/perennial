@@ -53,6 +53,10 @@ module.exports = async function( grunt, repo, brands ) {
     throw new Error( `Unclean status in ${repo}, cannot deploy` );
   }
 
+  // Ensure we don't try to request an unsupported brand
+  const supportedBrands = grunt.file.readJSON( `../${repo}/package.json` ).phet.supportedBrands;
+  brands.forEach( brand => assert( supportedBrands.includes( brand ), `Brand ${brand} not included in ${repo}'s supported brands: ${supportedBrands.join( ',' )}` ) );
+
   // Bump the version
   // TODO: look into removing the brand from SimVersion (not needed)
   const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, 'phet', {
