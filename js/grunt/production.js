@@ -15,7 +15,6 @@ const build = require( '../common/build' );
 const buildServerRequest = require( '../common/buildServerRequest' );
 const checkoutMaster = require( '../common/checkoutMaster' );
 const checkoutTarget = require( '../common/checkoutTarget' );
-const copyFile = require( '../common/copyFile' );
 const execute = require( '../common/execute' );
 const getDependencies = require( '../common/getDependencies' );
 const getRepoVersion = require( '../common/getRepoVersion' );
@@ -29,6 +28,7 @@ const npmUpdate = require( '../common/npmUpdate' );
 const prompt = require( '../common/prompt' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 const SimVersion = require( '../common/SimVersion' );
+const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
 
 /**
  * Deploys a production version after incrementing the test version number.
@@ -39,11 +39,9 @@ const SimVersion = require( '../common/SimVersion' );
  * @param {Object} grunt
  * @param {string} repo
  * @param {string} branch
- * @param {string} brand
+ * @param {Array.<string>} brands
  */
-module.exports = async function( grunt, repo, branch, brand ) {
-  // TODO: does this happen for multiple brands?
-
+module.exports = async function( grunt, repo, branch, brands ) {
   const major = parseInt( branch.split( '.' )[ 0 ], 10 );
   const minor = parseInt( branch.split( '.' )[ 1 ], 10 );
   assert( major > 0, 'Major version for a branch should be greater than zero' );
@@ -79,7 +77,8 @@ module.exports = async function( grunt, repo, branch, brand ) {
     versionChanged = false;
   }
   else if ( previousVersion.testType === 'rc' ) {
-    version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, brand );
+    // TODO: SimVersion not including brand (presumably)
+    version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, 'phet' );
     versionChanged = true;
   }
   else {
@@ -118,7 +117,7 @@ module.exports = async function( grunt, repo, branch, brand ) {
 
   // No special options required here, as we send the main request to the build server
   grunt.log.writeln( await build( repo, {
-    brand
+    brands
   } ) );
 
   const postBuildConfirmation = await prompt( `Please test the built version of ${repo}.\nIs it ready to deploy [Y/n]?` );
@@ -135,11 +134,7 @@ module.exports = async function( grunt, repo, branch, brand ) {
   }
 
   // Move over dependencies.json and commit/push
-  // TODO: don't do this twice if we want to deploy both brands
-  await copyFile( `../${repo}/build/dependencies.json`, `../${repo}/dependencies.json` );
-  await gitAdd( repo, 'dependencies.json' );
-  await gitCommit( repo, `updated dependencies.json for version ${versionString}` );
-  await gitPush( repo, branch );
+  await updateDependenciesJSON( repo, brands, versionString, branch );
 
   // Send the build request
   await buildServerRequest( repo, version, await getDependencies( repo ) );
@@ -147,17 +142,17 @@ module.exports = async function( grunt, repo, branch, brand ) {
   // Move back to master
   await checkoutMaster( repo );
 
-  if ( brand === 'phet' ) {
+  if ( brands.includes( 'phet' ) ) {
     grunt.log.writeln( `Deployed: https://phet.colorado.edu/sims/html/${repo}/latest/${repo}_en.html` );
   }
-  if ( brand === 'phet-io' ) {
+  if ( brands.includes( 'phet-io' ) ) {
     // TODO: this should include the brand in the path, but double-check
     grunt.log.writeln( `Deployed: https://phet-io.colorado.edu/sims/${repo}/${versionString}` );
   }
 
   grunt.log.writeln( 'Please test!' );
 
-  if ( isFirstVersion && brand === 'phet' ) {
+  if ( isFirstVersion && brands.includes( 'phet' ) ) {
     grunt.log.writeln( 'After testing, let the simulation lead know it has been deployed, so they can edit metadata on the website' );
 
     // Update the README on master
@@ -166,7 +161,7 @@ module.exports = async function( grunt, repo, branch, brand ) {
   }
 
   // phet-io nags from the checklist
-  if ( brand === 'phet-io' ) {
+  if ( brands.includes( 'phet-io' ) ) {
     grunt.log.writeln( 'If this is a version that will be used with students, then make sure to remove the password protection.' );
     grunt.log.writeln( 'See https://github.com/phetsims/phet-io/blob/master/doc/phet-io-security.md for details.' );
     grunt.log.writeln( '' );

@@ -11,19 +11,15 @@
 // modules
 const _ = require( 'lodash' ); // eslint-disable-line
 const assert = require( 'assert' );
-const brandToSuffix = require( '../common/brandToSuffix' );
 const build = require( '../common/build' );
 const buildLocal = require( '../common/buildLocal' );
 const buildServerRequest = require( '../common/buildServerRequest' );
 const checkoutMaster = require( '../common/checkoutMaster' );
 const checkoutTarget = require( '../common/checkoutTarget' );
-const copyFile = require( '../common/copyFile' );
 const createRelease = require( './createRelease' );
 const devDirectoryExists = require( '../common/devDirectoryExists' );
 const getDependencies = require( '../common/getDependencies' );
 const getRepoVersion = require( '../common/getRepoVersion' );
-const gitAdd = require( '../common/gitAdd' );
-const gitCommit = require( '../common/gitCommit' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
@@ -31,6 +27,7 @@ const npmUpdate = require( '../common/npmUpdate' );
 const prompt = require( '../common/prompt' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 const SimVersion = require( '../common/SimVersion' );
+const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
 
 /**
  * Deploys an rc version after incrementing the test version number.
@@ -39,9 +36,9 @@ const SimVersion = require( '../common/SimVersion' );
  * @param {Object} grunt
  * @param {string} repo
  * @param {string} branch
- * @param {string} brand
+ * @param {Array.<string>} brands
  */
-module.exports = async function( grunt, repo, branch, brand ) {
+module.exports = async function( grunt, repo, branch, brands ) {
   // TODO: does this happen for multiple brands?
 
   const major = parseInt( branch.split( '.' )[ 0 ], 10 );
@@ -71,18 +68,16 @@ module.exports = async function( grunt, repo, branch, brand ) {
     grunt.fail.fatal( `Aborted rc deployment since the version number cannot be incremented safely (testType:${previousVersion.testType})` );
   }
 
-  const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, brand, {
+  // TODO: SimVersion brand removal
+  const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, 'phet', {
     testType: 'rc',
     testNumber: previousVersion.testNumber ? previousVersion.testNumber + 1 : 1
   } );
 
   // TODO: reduce this code duplication with dev.js
-  const brandSuffix = brandToSuffix( brand );
   const versionString = version.toString();
-  const fullVersionString = version.toFullString();
-
   const simPath = buildLocal.devDeployPath + repo;
-  const versionPath = simPath + '/' + fullVersionString;
+  const versionPath = simPath + '/' + versionString;
 
   const versionPathExists = await devDirectoryExists( versionPath );
 
@@ -90,7 +85,7 @@ module.exports = async function( grunt, repo, branch, brand ) {
     grunt.fail.fatal( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
   }
 
-  const initialConfirmation = await prompt( `Deploy ${fullVersionString} to ${buildLocal.devDeployServer} [Y/n]?` );
+  const initialConfirmation = await prompt( `Deploy ${versionString} to ${buildLocal.devDeployServer} [Y/n]?` );
   if ( initialConfirmation === 'n' ) {
     grunt.fail.fatal( 'Aborted rc deployment' );
   }
@@ -104,7 +99,7 @@ module.exports = async function( grunt, repo, branch, brand ) {
 
   // No special options required here, as we send the main request to the build server
   grunt.log.writeln( await build( repo, {
-    brand
+    brands
   } ) );
 
   const postBuildConfirmation = await prompt( `Please test the built version of ${repo}.\nIs it ready to deploy [Y/n]?` );
@@ -119,11 +114,7 @@ module.exports = async function( grunt, repo, branch, brand ) {
   }
 
   // Move over dependencies.json and commit/push
-  // TODO: don't do this twice if we want to deploy both brands
-  await copyFile( `../${repo}/build/dependencies.json`, `../${repo}/dependencies.json` );
-  await gitAdd( repo, 'dependencies.json' );
-  await gitCommit( repo, `updated dependencies.json for version ${versionString}` );
-  await gitPush( repo, branch );
+  await updateDependenciesJSON( repo, brands, versionString, branch );
 
   // Send the build request
   await buildServerRequest( repo, version, await getDependencies( repo ), {
@@ -133,13 +124,13 @@ module.exports = async function( grunt, repo, branch, brand ) {
   // Move back to master
   await checkoutMaster( repo );
 
-  const versionURL = `https://www.colorado.edu/physics/phet/dev/html/${repo}/${fullVersionString}`;
+  const versionURL = `https://www.colorado.edu/physics/phet/dev/html/${repo}/${versionString}`;
 
-  if ( brand === 'phet' ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/${repo}_en-${brandSuffix}.html` );
+  if ( brands.includes( 'phet' ) ) {
+    grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_en-phet.html` );
   }
-  if ( brand === 'phet-io' ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/wrappers/index` );
+  if ( brands.includes( 'phet-io' ) ) {
+    grunt.log.writeln( `Deployed: ${versionURL}/phetio/wrappers/index` );
   }
 
   grunt.log.writeln( 'Please test!' );

@@ -11,23 +11,20 @@
 // modules
 const _ = require( 'lodash' ); // eslint-disable-line
 const assert = require( 'assert' );
-const brandToSuffix = require( '../common/brandToSuffix' );
 const build = require( '../common/build' );
 const buildLocal = require( '../common/buildLocal' );
-const copyFile = require( '../common/copyFile' );
 const devDirectoryExists = require( '../common/devDirectoryExists' );
 const devScp = require( '../common/devScp' );
 const devSsh = require( '../common/devSsh' );
 const getBranch = require( '../common/getBranch' );
 const getRepoVersion = require( '../common/getRepoVersion' );
 const gitIsClean = require( '../common/gitIsClean' );
-const gitAdd = require( '../common/gitAdd' );
-const gitCommit = require( '../common/gitCommit' );
 const gitPush = require( '../common/gitPush' );
 const npmUpdate = require( '../common/npmUpdate' );
 const prompt = require( '../common/prompt' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 const SimVersion = require( '../common/SimVersion' );
+const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
 
 /**
  * Deploys a dev version after incrementing the test version number.
@@ -67,7 +64,6 @@ module.exports = async function( grunt, repo, brands ) {
   } );
 
   const versionString = version.toString();
-
   const simPath = buildLocal.devDeployPath + repo;
   const versionPath = simPath + '/' + versionString;
 
@@ -119,10 +115,7 @@ module.exports = async function( grunt, repo, brands ) {
   await devSsh( `chmod g+w "${versionPath}"` );
 
   // Move over dependencies.json and commit/push
-  await copyFile( `../${repo}/build/${brandToSuffix( brands[ 0 ] )}/dependencies.json`, `../${repo}/dependencies.json` );
-  await gitAdd( repo, 'dependencies.json' );
-  await gitCommit( repo, `updated dependencies.json for version ${versionString}` );
-  await gitPush( repo, 'master' );
+  await updateDependenciesJSON( repo, brands, versionString, 'master' );
 
   const versionURL = `https://www.colorado.edu/physics/phet/dev/html/${repo}/${versionString}`;
 
