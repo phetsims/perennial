@@ -32,6 +32,7 @@ module.exports = {
     assert( buildLocalObject.buildServerAuthorizationCode );
     return buildLocalObject.buildServerAuthorizationCode;
   },
+  // Wrappers are now deployed to the dev location (for convenience)
   devDeployServer: buildLocalObject.devDeployServer || 'spot.colorado.edu',
   devDeployPath: buildLocalObject.devDeployPath || '/htdocs/physics/phet/dev/html/',
   buildServerNotifyEmail: buildLocalObject.buildServerNotifyEmail || null,

@@ -32,6 +32,7 @@ const shaCheck = require( './shaCheck' );
 const simMetadata = require( '../common/simMetadata' );
 const sortRequireStatements = require( './sortRequireStatements' );
 const winston = require( 'winston' );
+const wrapper = require( './wrapper' );
 
 module.exports = function( grunt ) {
 
@@ -243,6 +244,24 @@ module.exports = function( grunt ) {
 
     done();
   } );
+
+  grunt.registerTask( 'wrapper',
+    'Deploys a phet-io wrapper',
+    async function() {
+      // winston.default.transports.console.level = 'debug';
+
+      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+
+      const done = grunt.task.current.async();
+
+      try {
+        await wrapper( grunt, grunt.option( 'repo' ) );
+      } catch ( e ) {
+        grunt.fail.fatal( e + '\n' + e.stack );
+      }
+
+      done();
+    } );
 
   grunt.registerTask( 'dev',
     'Deploys a dev version of the simulation',
