@@ -269,14 +269,15 @@ module.exports = function( grunt ) {
       // winston.default.transports.console.level = 'debug';
 
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
-      assert( grunt.option( 'brand' ), 'Requires specifying a brand with --brand={{BRAND}}' );
+      assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
       const done = grunt.task.current.async();
 
       try {
-        await dev( grunt, grunt.option( 'repo' ), grunt.option( 'brand' ) );
+        await dev( grunt, grunt.option( 'repo' ), grunt.option( 'brands' ).split( ',' ) );
       } catch ( e ) {
-        grunt.fail.fatal( e + '\n' + e.stack );
+        // TODO: is the stringify version better?
+        grunt.fail.fatal( JSON.stringify( e ) + '\n' + e.stack );
       }
 
       done();

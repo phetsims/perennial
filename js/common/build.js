@@ -23,7 +23,7 @@ const winston = require( 'winston' );
  */
 module.exports = async function( repo, options ) {
   const {
-    brand = 'phet',
+    brands = [ 'phet' ],
     locales = 'en',
     allHTML = false,
     debugHTML = true, // Desired in almost all perennial builds, so set to true here
@@ -40,7 +40,7 @@ module.exports = async function( repo, options ) {
   const args = [];
 
   // Currently has the same flag versions
-  if ( chipperVersion === '0.0.0' || chipperVersion === '2.0.0' ) {
+  if ( chipperVersion === '2.0.0' ) {
     args.push( 'lint-all' );
     args.push( 'clean' );
     args.push( 'build' );
@@ -50,7 +50,7 @@ module.exports = async function( repo, options ) {
     if ( twitterCard ) {
       args.push( 'generate-twitter-card' );
     }
-    args.push( `--brand=${brand}` );
+    args.push( `--brands=${brands.join( ',' )}` );
     args.push( `--locales=${locales}` );
     if ( !uglify ) {
       args.push( '--uglify=false' );

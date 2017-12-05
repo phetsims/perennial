@@ -17,9 +17,9 @@
  */
 module.exports = function( brand ) {
   if ( brand === 'phet-io' ) {
-    return '-phetio';
+    return 'phetio';
   }
-  return '-' + brand.split( '-' ).map( function( bit, index ) {
+  return brand.split( '-' ).map( function( bit, index ) {
     return ( index > 0 ? bit[ 0 ].toUpperCase() : bit[ 0 ] ) + bit.slice( 1 );
   } ).join( '' );
 };

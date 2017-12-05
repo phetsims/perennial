@@ -124,7 +124,7 @@ const brandToSuffix = require( './brandToSuffix' );
      * @returns {string}
      */
     toFullString() {
-      return this.toString() + brandToSuffix( this.brand );
+      return this.toString() + '-' + brandToSuffix( this.brand );
     }
   };
 

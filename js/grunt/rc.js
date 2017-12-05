@@ -136,7 +136,7 @@ module.exports = async function( grunt, repo, branch, brand ) {
   const versionURL = `https://www.colorado.edu/physics/phet/dev/html/${repo}/${fullVersionString}`;
 
   if ( brand === 'phet' ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/${repo}_en${brandSuffix}.html` );
+    grunt.log.writeln( `Deployed: ${versionURL}/${repo}_en-${brandSuffix}.html` );
   }
   if ( brand === 'phet-io' ) {
     grunt.log.writeln( `Deployed: ${versionURL}/wrappers/index` );

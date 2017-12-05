@@ -34,9 +34,9 @@ const SimVersion = require( '../common/SimVersion' );
  *
  * @param {Object} grunt
  * @param {string} repo
- * @param {string} brand
+ * @param {Array.<string>} brands
  */
-module.exports = async function( grunt, repo, brand ) {
+module.exports = async function( grunt, repo, brands ) {
   const currentBranch = await getBranch( repo );
   if ( currentBranch !== 'master' ) {
     grunt.fail.fatal( 'Dev deployments are only supported from the master branch, not: ' + ( currentBranch ? currentBranch : '(detached head)' ) );
@@ -54,18 +54,17 @@ module.exports = async function( grunt, repo, brand ) {
   }
 
   // Bump the version
-  const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, brand, {
+  // TODO: look into removing the brand from SimVersion (not needed)
+  const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, 'phet', {
     testType: 'dev',
     testNumber: previousVersion.testNumber + 1
     // TODO: handle one-off things
   } );
 
-  const brandSuffix = brandToSuffix( brand );
   const versionString = version.toString();
-  const fullVersionString = version.toFullString();
 
   const simPath = buildLocal.devDeployPath + repo;
-  const versionPath = simPath + '/' + fullVersionString;
+  const versionPath = simPath + '/' + versionString;
 
   const simPathExists = await devDirectoryExists( simPath );
   const versionPathExists = await devDirectoryExists( versionPath );
@@ -74,7 +73,7 @@ module.exports = async function( grunt, repo, brand ) {
     grunt.fail.fatal( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
   }
 
-  const confirmation = await prompt( `Deploy ${fullVersionString} to ${buildLocal.devDeployServer} [Y/n]?` );
+  const confirmation = await prompt( `Deploy ${versionString} to ${buildLocal.devDeployServer} [Y/n]?` );
   if ( confirmation === 'n' ) {
     grunt.fail.fatal( 'Aborted dev deploy' );
   }
@@ -87,7 +86,9 @@ module.exports = async function( grunt, repo, brand ) {
   await npmUpdate( 'chipper' );
 
   grunt.log.writeln( await build( repo, {
-    brand
+    brands,
+    allHTML: true,
+    debugHTML: true
   } ) );
 
   // Create (and fix permissions for) the main simulation directory, if it didn't already exist
@@ -105,26 +106,25 @@ module.exports = async function( grunt, repo, brand ) {
   // If there is a protected directory and we are copying to spot, include the .htaccess file
   // This is for PhET-iO simulations, to protected the password protected wrappers, see
   // https://github.com/phetsims/phet-io/issues/641
-  if ( brand === 'phet-io' && buildLocal.devDeployServer === 'spot.colorado.edu' ) {
-    await devScp( '../phet-io/templates/spot/.htaccess', `${versionPath}/wrappers/.htaccess` );
+  if ( brands.includes( 'phet-io' ) && buildLocal.devDeployServer === 'spot.colorado.edu' ) {
+    await devScp( '../phet-io/templates/spot/.htaccess', `${versionPath}/phetio/wrappers/.htaccess` );
   }
 
   // Permissions fixes so others can write over it later
   await devSsh( `chmod g+w "${versionPath}"` );
 
   // Move over dependencies.json and commit/push
-  // TODO: don't do this twice if we want to deploy both brands
-  await copyFile( `../${repo}/build/dependencies.json`, `../${repo}/dependencies.json` );
+  await copyFile( `../${repo}/build/${brandToSuffix( brands[ 0 ] )}/dependencies.json`, `../${repo}/dependencies.json` );
   await gitAdd( repo, 'dependencies.json' );
   await gitCommit( repo, `updated dependencies.json for version ${versionString}` );
   await gitPush( repo, 'master' );
 
-  const versionURL = `https://www.colorado.edu/physics/phet/dev/html/${repo}/${fullVersionString}`;
+  const versionURL = `https://www.colorado.edu/physics/phet/dev/html/${repo}/${versionString}`;
 
-  if ( brand === 'phet' ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/${repo}_en${brandSuffix}.html` );
+  if ( brands.includes( 'phet' ) ) {
+    grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_en-phet.html` );
   }
-  if ( brand === 'phet-io' ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/wrappers/index` );
+  if ( brands.includes( 'phet-io' ) ) {
+    grunt.log.writeln( `Deployed: ${versionURL}/phetio/wrappers/index` );
   }
 };
