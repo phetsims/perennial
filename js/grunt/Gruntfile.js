@@ -100,7 +100,7 @@ module.exports = function( grunt ) {
   grunt.registerTask( 'checkout-master-all',
     'Check out master branch for all repos in git root',
     function() {
-      checkoutMasterAll( grunt );
+      checkoutMasterAll();
     } );
 
   grunt.registerTask( 'sha-check',
@@ -108,7 +108,7 @@ module.exports = function( grunt ) {
     '--repo : repository to check for the SHA\n' +
     '--sha : git SHA',
     function() {
-      shaCheck( grunt, this.async() ).check( grunt.option( 'repo' ), grunt.option( 'sha' ) );
+      shaCheck( this.async() ).check( grunt.option( 'repo' ), grunt.option( 'sha' ) );
     } );
 
   grunt.registerTask( 'maintenance-start',
@@ -116,7 +116,7 @@ module.exports = function( grunt ) {
     'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
     '--sims : A comma-separated list of simulations that may be involved in this maintenance release process',
     function() {
-      maintenance( grunt, this.async() ).maintenanceStart( grunt.option( 'sims' ) );
+      maintenance( this.async() ).maintenanceStart( grunt.option( 'sims' ) );
     } );
 
   grunt.registerTask( 'maintenance-patch-info',
@@ -124,7 +124,7 @@ module.exports = function( grunt ) {
     'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
     '--repos : A comma-separated list of repo names that need a combined patch',
     function() {
-      maintenance( grunt, this.async() ).maintenancePatchInfo( grunt.option( 'repos' ) );
+      maintenance( this.async() ).maintenancePatchInfo( grunt.option( 'repos' ) );
     } );
 
   grunt.registerTask( 'maintenance-patch-checkout',
@@ -134,7 +134,7 @@ module.exports = function( grunt ) {
     '--shas : A comma-separated list of SHAs for the respective repos that need a combined patch\n' +
     '--sim : [optional] preferred sim to test with',
     function() {
-      maintenance( grunt, this.async() ).maintenancePatchCheckout( grunt.option( 'repos' ), grunt.option( 'shas' ), grunt.option( 'sim' ) );
+      maintenance( this.async() ).maintenancePatchCheckout( grunt.option( 'repos' ), grunt.option( 'shas' ), grunt.option( 'sim' ) );
     } );
 
   grunt.registerTask( 'maintenance-patch-apply',
@@ -144,7 +144,7 @@ module.exports = function( grunt ) {
     '--repos : A comma-separated list of repo names that need a combined patch\n' +
     '--message : Additional part of message for the dependencies.json commit',
     function() {
-      maintenance( grunt, this.async() ).maintenancePatchApply( grunt.option( 'repos' ), grunt.option( 'message' ) );
+      maintenance( this.async() ).maintenancePatchApply( grunt.option( 'repos' ), grunt.option( 'message' ) );
     } );
 
   grunt.registerTask( 'maintenance-deploy-rc',
@@ -153,7 +153,7 @@ module.exports = function( grunt ) {
     '--sim : Sim name\n' +
     '--message : Additional part of message for the version bump commit',
     function() {
-      maintenance( grunt, this.async() ).maintenanceDeployRC( grunt.option( 'sim' ), grunt.option( 'message' ) );
+      maintenance( this.async() ).maintenanceDeployRC( grunt.option( 'sim' ), grunt.option( 'message' ) );
     } );
 
   grunt.registerTask( 'maintenance-deploy-rc-no-version-bump',
@@ -161,7 +161,7 @@ module.exports = function( grunt ) {
     'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
     '--sim : Sim name',
     function() {
-      maintenance( grunt, this.async() ).maintenanceDeployRCNoVersionBump( grunt.option( 'sim' ) );
+      maintenance( this.async() ).maintenanceDeployRCNoVersionBump( grunt.option( 'sim' ) );
     } );
 
   grunt.registerTask( 'maintenance-deploy-production',
@@ -170,13 +170,13 @@ module.exports = function( grunt ) {
     '--sim : Sim name\n' +
     '--message : Additional part of message for the version bump commit',
     function() {
-      maintenance( grunt, this.async() ).maintenanceDeployProduction( grunt.option( 'sim' ), grunt.option( 'message' ) );
+      maintenance( this.async() ).maintenanceDeployProduction( grunt.option( 'sim' ), grunt.option( 'message' ) );
     } );
 
   grunt.registerTask( 'update-gh-pages',
     'Updates the gh-pages branches for various repos, including building of dot/kite/scenery',
     function() {
-      maintenance( grunt, this.async() ).updateGithubPages();
+      maintenance( this.async() ).updateGithubPages();
     } );
 
   grunt.registerTask( 'sim-list',
@@ -214,7 +214,7 @@ module.exports = function( grunt ) {
       assert( branch.split( '.' ).length === 2, 'Branch should be {{MAJOR}}.{{MINOR}}' );
 
       const done = grunt.task.current.async();
-      createRelease( grunt, repo, branch ).then( done ).catch( error( done ) );
+      createRelease( repo, branch ).then( done ).catch( error( done ) );
     } );
 
   grunt.registerTask( 'cherry-pick',
@@ -229,7 +229,7 @@ module.exports = function( grunt ) {
       const shas = grunt.option( 'shas' ).split( ',' );
 
       const done = grunt.task.current.async();
-      cherryPick( grunt, repo, shas ).then( done ).catch( error( done ) );
+      cherryPick( repo, shas ).then( done ).catch( error( done ) );
     } );
 
   grunt.registerTask( 'lint', 'Lints this repository only', async function() {
@@ -255,7 +255,7 @@ module.exports = function( grunt ) {
       const done = grunt.task.current.async();
 
       try {
-        await wrapper( grunt, grunt.option( 'repo' ) );
+        await wrapper( grunt.option( 'repo' ) );
       } catch ( e ) {
         grunt.fail.fatal( e + '\n' + e.stack );
       }
@@ -274,7 +274,7 @@ module.exports = function( grunt ) {
       const done = grunt.task.current.async();
 
       try {
-        await dev( grunt, grunt.option( 'repo' ), grunt.option( 'brands' ).split( ',' ) );
+        await dev( grunt.option( 'repo' ), grunt.option( 'brands' ).split( ',' ) );
       } catch ( e ) {
         // TODO: is the stringify version better?
         grunt.fail.fatal( JSON.stringify( e ) + '\n' + e.stack );
@@ -295,7 +295,7 @@ module.exports = function( grunt ) {
       const done = grunt.task.current.async();
 
       try {
-        await rc( grunt, grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brand' ) );
+        await rc( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brand' ) );
       } catch ( e ) {
         grunt.fail.fatal( e + '\n' + e.stack );
       }
@@ -316,7 +316,7 @@ module.exports = function( grunt ) {
 
       // TODO: consider wrapping most of these with this type of function, separated out somewhere
       try {
-        await production( grunt, grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brand' ) );
+        await production( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brand' ) );
       } catch ( e ) {
         grunt.fail.fatal( e + '\n' + e.stack );
       }
@@ -342,7 +342,7 @@ module.exports = function( grunt ) {
       const done = grunt.task.current.async();
 
       try {
-        await createSim( grunt, repo, author, { title, clean } );
+        await createSim( repo, author, { title, clean } );
       } catch ( e ) {
         grunt.fail.fatal( e + '\n' + e.stack );
       }
@@ -358,10 +358,10 @@ module.exports = function( grunt ) {
     assert( file || repo, 'At least one of --file and --repo should be specified, see documentation' );
 
     if ( file ) {
-      sortRequireStatements( grunt, file );
+      sortRequireStatements( file );
     }
     else {
-      grunt.file.recurse( `../${repo}/js`, absfile => sortRequireStatements( grunt, absfile ) );
+      grunt.file.recurse( `../${repo}/js`, absfile => sortRequireStatements( absfile ) );
     }
   } );
 
@@ -374,7 +374,7 @@ module.exports = function( grunt ) {
     assert( grunt.option( 'file' ), 'Requires specifying a file to update with --file={{FILE}}' );
     assert( grunt.option( 'name' ), 'Requires specifying an (import) name with --name={{NAME}}' );
 
-    insertRequireStatement( grunt, file, name );
+    insertRequireStatement( file, name );
   } );
 
   grunt.registerTask( 'lint-everything', 'lint all js files that are required to build this repository', function() {

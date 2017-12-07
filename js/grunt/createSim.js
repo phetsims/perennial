@@ -22,16 +22,16 @@
 
 const assert = require( 'assert' );
 const execute = require( '../common/execute' );
+const grunt = require( 'grunt' );
 const gruntCommand = require( '../common/gruntCommand' );
 const npmUpdate = require( '../common/npmUpdate' );
 
 /**
- * @param {Object} grunt
  * @param {string} repo
  * @param {string} author
  * @param {Object} options
  */
-module.exports = async function( grunt, repo, author, options ) {
+module.exports = async function( repo, author, options ) {
   const {
     title = toTitle( repo ),
     clean = false

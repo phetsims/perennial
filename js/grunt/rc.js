@@ -22,6 +22,7 @@ const getDependencies = require( '../common/getDependencies' );
 const getRepoVersion = require( '../common/getRepoVersion' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
+const grunt = require( 'grunt' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
 const prompt = require( '../common/prompt' );
@@ -33,12 +34,11 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  * Deploys an rc version after incrementing the test version number.
  * @public
  *
- * @param {Object} grunt
  * @param {string} repo
  * @param {string} branch
  * @param {Array.<string>} brands
  */
-module.exports = async function( grunt, repo, branch, brands ) {
+module.exports = async function( repo, branch, brands ) {
   // TODO: does this happen for multiple brands?
 
   const major = parseInt( branch.split( '.' )[ 0 ], 10 );
@@ -57,7 +57,7 @@ module.exports = async function( grunt, repo, branch, brands ) {
       grunt.fail.fatal( 'Aborted rc deployment due to non-existing branch' );
     }
 
-    await createRelease( grunt, repo, branch );
+    await createRelease( repo, branch );
   }
 
   await checkoutTarget( repo, branch, true ); // include npm update

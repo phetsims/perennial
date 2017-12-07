@@ -8,15 +8,15 @@
 
 // 3rd-party packages
 const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
+const grunt = require( 'grunt' );
 
 // constants
 var KEY = ' = require( '; // the substring that is searched to find require statements
 
 /**
- * @param {Object} grunt
  * @param {string} file
  */
-module.exports = function( grunt, file ) {
+module.exports = function( file ) {
   'use strict';
   
   // only address js files

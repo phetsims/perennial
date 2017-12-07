@@ -6,13 +6,14 @@
 /* eslint-env node */
 'use strict';
 
-const child_process = require( 'child_process' );
 const _ = require( 'lodash' ); // eslint-disable-line
+const child_process = require( 'child_process' );
+const grunt = require( 'grunt' );
 
 /**
- * @param grunt the grunt instance
+ * TODO: doc
  */
-module.exports = function( grunt ) {
+module.exports = function() {
 
   const command = 'git checkout master';
   const done = grunt.task.current.async();

@@ -20,6 +20,7 @@ const gitCheckout = require( '../common/gitCheckout' );
 const gitCommit = require( '../common/gitCommit' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
+const grunt = require( 'grunt' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
 const setRepoVersion = require( '../common/setRepoVersion' );
@@ -29,12 +30,11 @@ const SimVersion = require( '../common/SimVersion' );
  * For `grunt create-release`, see Gruntfile for details
  * @public
  *
- * @param {Object} grunt
  * @param {string} repo - The repository name
  * @param {string} branch - The branch to create (should be {{MAJOR}}.{{MINOR}})
  * @returns {Promise}
  */
-module.exports = async function( grunt, repo, branch ) {
+module.exports = async function( repo, branch ) {
   const major = parseInt( branch.split( '.' )[ 0 ], 10 );
   const minor = parseInt( branch.split( '.' )[ 1 ], 10 );
   assert( major > 0, 'Major version for a branch should be greater than zero' );

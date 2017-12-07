@@ -20,6 +20,7 @@ const getBranch = require( '../common/getBranch' );
 const getRepoVersion = require( '../common/getRepoVersion' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
+const grunt = require( 'grunt' );
 const npmUpdate = require( '../common/npmUpdate' );
 const prompt = require( '../common/prompt' );
 const setRepoVersion = require( '../common/setRepoVersion' );
@@ -30,11 +31,10 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  * Deploys a dev version after incrementing the test version number.
  * @public
  *
- * @param {Object} grunt
  * @param {string} repo
  * @param {Array.<string>} brands
  */
-module.exports = async function( grunt, repo, brands ) {
+module.exports = async function( repo, brands ) {
   const currentBranch = await getBranch( repo );
   if ( currentBranch !== 'master' ) {
     grunt.fail.fatal( 'Dev deployments are only supported from the master branch, not: ' + ( currentBranch ? currentBranch : '(detached head)' ) );

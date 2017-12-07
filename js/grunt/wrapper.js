@@ -22,6 +22,7 @@ const gitIsClean = require( '../common/gitIsClean' );
 const gitAdd = require( '../common/gitAdd' );
 const gitCommit = require( '../common/gitCommit' );
 const gitPush = require( '../common/gitPush' );
+const grunt = require( 'grunt' );
 const gruntCommand = require( '../common/gruntCommand' );
 const npmUpdate = require( '../common/npmUpdate' );
 const prompt = require( '../common/prompt' );
@@ -34,10 +35,9 @@ const SimVersion = require( '../common/SimVersion' );
  *
  * TODO: deduplicate code (where possible) with dev.js
  *
- * @param {Object} grunt
  * @param {string} repo
  */
-module.exports = async function( grunt, repo ) {
+module.exports = async function( repo ) {
   const currentBranch = await getBranch( repo );
   if ( currentBranch !== 'master' ) {
     grunt.fail.fatal( 'Dev deployments are only supported from the master branch, not: ' + ( currentBranch ? currentBranch : '(detached head)' ) );

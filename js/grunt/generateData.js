@@ -12,13 +12,14 @@
 const assert = require( 'assert' );
 const fs = require( 'fs' );
 const getActiveRepos = require( '../common/getActiveRepos' );
+const grunt = require( 'grunt' );
 const os = require( 'os' );
 
 /**
  * Generates the lists under perennial/data/.
  * @public
  */
-module.exports = function( grunt ) {
+module.exports = function() {
   const activeRepos = getActiveRepos();
 
   function writeList( name, packageFilter ) {

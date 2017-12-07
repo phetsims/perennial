@@ -10,18 +10,17 @@
 'use strict';
 
 // modules
+const _ = require( 'lodash' ); // eslint-disable-line
 const getDependencies = require( '../common/getDependencies' );
 const gitCheckout = require( '../common/gitCheckout' );
 const gitIsAncestor = require( '../common/gitIsAncestor' );
 const simMetadata = require( '../common/simMetadata' );
-const _ = require( 'lodash' ); // eslint-disable-line
 
 /**
- * @param {Object} grunt - For all of your grunting needs.
  * @param {Function} doneCallback - Called with no arguments when the task is done. Our error/success functions will
  *                                  call this.
  */
-module.exports = function( grunt, doneCallback ) {
+module.exports = function( doneCallback ) {
   return {
     /**
      * Will print out information about with simulations include the given SHA, and which ones don't.

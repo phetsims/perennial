@@ -22,6 +22,7 @@ const gitAdd = require( '../common/gitAdd' );
 const gitCommit = require( '../common/gitCommit' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
+const grunt = require( 'grunt' );
 const gruntCommand = require( '../common/gruntCommand' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
@@ -36,12 +37,11 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  *
  * TODO: remove a lot of the duplication with rc deployments! (rc.js)
  *
- * @param {Object} grunt
  * @param {string} repo
  * @param {string} branch
  * @param {Array.<string>} brands
  */
-module.exports = async function( grunt, repo, branch, brands ) {
+module.exports = async function( repo, branch, brands ) {
   const major = parseInt( branch.split( '.' )[ 0 ], 10 );
   const minor = parseInt( branch.split( '.' )[ 1 ], 10 );
   assert( major > 0, 'Major version for a branch should be greater than zero' );

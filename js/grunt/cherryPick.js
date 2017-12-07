@@ -10,6 +10,7 @@
 
 // modules
 const gitCherryPick = require( '../common/gitCherryPick' );
+const grunt = require( 'grunt' );
 
 /**
  * For `grunt cherry-pick`, see Gruntfile for details
@@ -19,7 +20,7 @@ const gitCherryPick = require( '../common/gitCherryPick' );
  * @param {Array.<string>} shas
  * @returns {Promise}
  */
-module.exports = async function( grunt, repo, shas ) {
+module.exports = async function( repo, shas ) {
   for ( var i = 0; i < shas.length; i++ ) {
     const sha = shas[ i ];
 

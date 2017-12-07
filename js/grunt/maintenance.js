@@ -42,22 +42,22 @@
 
 
 // modules
-const child_process = require( 'child_process' );
-const xml2js = require( 'xml2js' );
-const request = require( 'request' );
-const fs = require( 'fs' );
 const _ = require( 'lodash' ); // eslint-disable-line
+const child_process = require( 'child_process' );
+const fs = require( 'fs' );
+const grunt = require( 'grunt' );
+const request = require( 'request' );
+const xml2js = require( 'xml2js' );
 
 const IS_WIN = /^win/.test( process.platform );
 const GRUNT_CMD = IS_WIN ? 'grunt.cmd' : 'grunt'; // needs to be a slightly different command for Windows
 const NPM_CMD = IS_WIN ? 'npm.cmd' : 'npm'; // needs to be a slightly different command for Windows
 
 /**
- * @param {Object} grunt - For all of your grunting needs.
  * @param {Function} doneCallback - Called with no arguments when the task is done. Our error/success functions will
  *                                  call this.
  */
-module.exports = function( grunt, doneCallback ) {
+module.exports = function( doneCallback ) {
 
   return {
     /**

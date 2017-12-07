@@ -9,14 +9,15 @@
 
 const assert = require( 'assert' );
 const child_process = require( 'child_process' );
+const grunt = require( 'grunt' );
 
 /**
- * @param grunt the grunt instance
+ * TODO: fix type docs?
  * @param repositoryName name field from package.json
  * @param toMaster whether master should be used, or dependencies.json shas should be used
  * @param buildServer whether this build is initiated by the build server
  */
-module.exports = function( grunt, repositoryName, toMaster, buildServer ) {
+module.exports = function( repositoryName, toMaster, buildServer ) {
 
   const dependencies = grunt.file.readJSON( ( buildServer ) ? '../perennial/js/build-server/tmp/dependencies.json' : '../' + repositoryName + '/dependencies.json' );
   const done = grunt.task.current.async();
