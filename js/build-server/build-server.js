@@ -103,37 +103,37 @@
 'use strict';
 
 // modules
-var async = require( 'async' );
-var child_process = require( 'child_process' );
-var dateformat = require( 'dateformat' );
-var email = require( 'emailjs/email' );
-var express = require( 'express' );
-var fs = require( 'fs.extra' ); // eslint-disable-line
-var getBuildServerConfig = require( './getBuildServerConfig' );
-var mimelib = require( 'mimelib' );
-var parseArgs = require( 'minimist' ); // eslint-disable-line
-var xml2js = require( 'xml2js' );
-var parseString = xml2js.parseString;
-var request = require( 'request' );
-var winston = require( 'winston' );
+const async = require( 'async' );
+const child_process = require( 'child_process' );
+const dateformat = require( 'dateformat' );
+const email = require( 'emailjs/email' );
+const express = require( 'express' );
+const fs = require( 'fs.extra' ); // eslint-disable-line
+const getBuildServerConfig = require( './getBuildServerConfig' );
+const mimelib = require( 'mimelib' );
+const parseArgs = require( 'minimist' ); // eslint-disable-line
+const xml2js = require( 'xml2js' );
+const parseString = xml2js.parseString;
+const request = require( 'request' );
+const winston = require( 'winston' );
 
-var _ = require( 'lodash' ); // eslint-disable-line
+const _ = require( 'lodash' ); // eslint-disable-line
 
 // constants
-var BUILD_SERVER_CONFIG = getBuildServerConfig( fs );
-var LISTEN_PORT = 16371;
-var REPOS_KEY = 'repos';
-var LOCALES_KEY = 'locales';
-var SIM_NAME_KEY = 'simName';
-var VERSION_KEY = 'version';
-var OPTION_KEY = 'option';
-var EMAIL_KEY = 'email';
-var USER_ID_KEY = 'userId';
-var AUTHORIZATION_KEY = 'authorizationCode';
-var HTML_SIMS_DIRECTORY = BUILD_SERVER_CONFIG.htmlSimsDirectory;
-var PHETIO_SIMS_DIRECTORY = BUILD_SERVER_CONFIG.phetioSimsDirectory;
-var ENGLISH_LOCALE = 'en';
-var PERENNIAL = '.';
+const BUILD_SERVER_CONFIG = getBuildServerConfig( fs );
+const LISTEN_PORT = 16371;
+const REPOS_KEY = 'repos';
+const LOCALES_KEY = 'locales';
+const SIM_NAME_KEY = 'simName';
+const VERSION_KEY = 'version';
+const OPTION_KEY = 'option';
+const EMAIL_KEY = 'email';
+const USER_ID_KEY = 'userId';
+const AUTHORIZATION_KEY = 'authorizationCode';
+const HTML_SIMS_DIRECTORY = BUILD_SERVER_CONFIG.htmlSimsDirectory;
+const PHETIO_SIMS_DIRECTORY = BUILD_SERVER_CONFIG.phetioSimsDirectory;
+const ENGLISH_LOCALE = 'en';
+const PERENNIAL = '.';
 
 /**
  * Define a helper function that will get a list of the PhET-style version directories at the given path.  The
@@ -147,7 +147,7 @@ var PERENNIAL = '.';
  */
 function getSortedVersionDirectories( path ) {
 
-  var versions;
+  let versions;
 
   if ( fs.existsSync( path ) ) {
     versions = fs.readdirSync( path );
@@ -158,11 +158,11 @@ function getSortedVersionDirectories( path ) {
 
   // filter out names that don't match the required format
   versions = versions.filter( function( path ) {
-    var splitPath = path.split( '.' );
+    const splitPath = path.split( '.' );
     if ( splitPath.length !== 3 ) {
       return false;
     }
-    for ( var i = 0; i < 3; i++ ) {
+    for ( let i = 0; i < 3; i++ ) {
       if ( isNaN( splitPath[ i ] ) ) {
         return false;
       }
@@ -172,10 +172,10 @@ function getSortedVersionDirectories( path ) {
 
   // sort the names in numerical (not lexical) order
   versions.sort( function( a, b ) {
-    var aTokenized = a.split( '.' );
-    var bTokenized = b.split( '.' );
-    var result = 0;
-    for ( var i = 0; i < aTokenized.length; i++ ) {
+    const aTokenized = a.split( '.' );
+    const bTokenized = b.split( '.' );
+    let result = 0;
+    for ( let i = 0; i < aTokenized.length; i++ ) {
       if ( parseInt( aTokenized[ i ], 10 ) < parseInt( bTokenized[ i ], 10 ) ) {
         result = -1;
         break;
@@ -198,13 +198,11 @@ let emailParameter = null;
 
 // Handle command line input
 // First 2 args provide info about executables, ignore
-var commandLineArgs = process.argv.slice( 2 );
-
-var parsedCommandLineOptions = parseArgs( commandLineArgs, {
+const parsedCommandLineOptions = parseArgs( process.argv.slice( 2 ), {
   boolean: true
 } );
 
-var defaultOptions = {
+const defaultOptions = {
   verbose: BUILD_SERVER_CONFIG.verbose, // can be overridden by a flag on the command line
 
   // options for supporting help
@@ -212,7 +210,7 @@ var defaultOptions = {
   h: false
 };
 
-for ( var key in parsedCommandLineOptions ) {
+for ( let key in parsedCommandLineOptions ) {
   if ( key !== '_' && parsedCommandLineOptions.hasOwnProperty( key ) && !defaultOptions.hasOwnProperty( key ) ) {
     console.error( 'Unrecognized option: ' + key );
     console.error( 'try --help for usage information.' );
@@ -236,21 +234,19 @@ if ( parsedCommandLineOptions.hasOwnProperty( 'help' ) || parsedCommandLineOptio
 }
 
 // Merge the default and supplied options.
-var options = _.extend( defaultOptions, parsedCommandLineOptions );
+const options = _.extend( defaultOptions, parsedCommandLineOptions );
+const verbose = options.verbose;
 
 // add timestamps to log messages
 winston.remove( winston.transports.Console );
 winston.add( winston.transports.Console, {
   'timestamp': function() {
-    var now = new Date();
-    return dateformat( now, 'mmm dd yyyy HH:MM:ss Z' );
+    return dateformat( new Date(), 'mmm dd yyyy HH:MM:ss Z' );
   }
 } );
 
-var verbose = options.verbose;
-
 // configure email server
-var emailServer;
+let emailServer;
 if ( BUILD_SERVER_CONFIG.emailUsername && BUILD_SERVER_CONFIG.emailPassword && BUILD_SERVER_CONFIG.emailTo ) {
   emailServer = email.server.connect( {
     user: BUILD_SERVER_CONFIG.emailUsername,
@@ -272,7 +268,7 @@ else {
  */
 function sendEmail( subject, text, emailParameterOnly ) {
   if ( emailServer ) {
-    var emailTo = BUILD_SERVER_CONFIG.emailTo;
+    let emailTo = BUILD_SERVER_CONFIG.emailTo;
 
     if ( emailParameter ) {
       if ( emailParameterOnly ) {
@@ -322,7 +318,7 @@ function sendEmail( subject, text, emailParameterOnly ) {
  * @property {String} task.id - rosetta user id for adding translators to the website
  * @property {String} task.res - express response object
  */
-var taskQueue = async.queue( function( task, taskCallback ) {
+const taskQueue = async.queue( function( task, taskCallback ) {
 
   //-------------------------------------------------------------------------------------
   // Parse and validate parameters
@@ -355,7 +351,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * @param dir the directory to execute the command from
    * @param callback the function that executes upon completion
    */
-  var exec = function( command, dir, callback ) {
+  const exec = function( command, dir, callback ) {
     winston.log( 'info', 'running command: ' + command );
 
     child_process.exec( command, { cwd: dir }, function( err, stdout, stderr ) {
@@ -390,7 +386,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     } );
   };
 
-  var execWithoutAbort = function( command, dir, callback ) {
+  const execWithoutAbort = function( command, dir, callback ) {
     child_process.exec( command, { cwd: dir }, function( err, stdout, stderr ) {
 
       if ( err ) {
@@ -410,7 +406,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * checkout master everywhere and abort build with err
    * @param err
    */
-  var abortBuild = function( err ) {
+  const abortBuild = function( err ) {
     winston.log( 'error', 'BUILD ABORTED! ' + err );
     exec( 'grunt checkout-master-all', PERENNIAL, function() {
       winston.log( 'info', 'build aborted: checking out master for every repo in case build shas are still checked out' );
@@ -418,33 +414,35 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     } );
   };
 
-  var simNameRegex = /^[a-z-]+$/;
+  const simNameRegex = /^[a-z-]+$/;
 
   // make sure the repos passed in validates
-  for ( var key in repos ) {
+  for ( let key in repos ) {
+    if ( repos.hasOwnProperty( key ) ) {
 
-    // make sure all keys in repos object are valid sim names
-    if ( !simNameRegex.test( key ) ) {
-      abortBuild( 'invalid simName in repos: ' + simName );
-      return;
-    }
-
-    var value = repos[ key ];
-    if ( key === 'comment' ) {
-      if ( typeof value !== 'string' ) {
-        abortBuild( 'invalid comment in repos: should be a string' );
+      // make sure all keys in repos object are valid sim names
+      if ( !simNameRegex.test( key ) ) {
+        abortBuild( 'invalid simName in repos: ' + simName );
         return;
       }
-    }
-    else if ( value instanceof Object && value.hasOwnProperty( 'sha' ) ) {
-      if ( !/^[a-f0-9]{40}$/.test( value.sha ) ) {
-        abortBuild( 'invalid sha in repos. key: ' + key + ' value: ' + value + ' sha: ' + value.sha );
+
+      const value = repos[ key ];
+      if ( key === 'comment' ) {
+        if ( typeof value !== 'string' ) {
+          abortBuild( 'invalid comment in repos: should be a string' );
+          return;
+        }
+      }
+      else if ( value instanceof Object && value.hasOwnProperty( 'sha' ) ) {
+        if ( !/^[a-f0-9]{40}$/.test( value.sha ) ) {
+          abortBuild( 'invalid sha in repos. key: ' + key + ' value: ' + value + ' sha: ' + value.sha );
+          return;
+        }
+      }
+      else {
+        abortBuild( 'invalid item in repos. key: ' + key + ' value: ' + value );
         return;
       }
-    }
-    else {
-      abortBuild( 'invalid item in repos. key: ' + key + ' value: ' + value );
-      return;
     }
   }
 
@@ -455,11 +453,11 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   }
 
   // Infer brand from version string and keep unstripped version for phet-io
-  var brand = version.indexOf( 'phetio' ) < 0 ? 'phet' : 'phet-io';
-  var originalVersion = version;
+  const brand = version.indexOf( 'phetio' ) < 0 ? 'phet' : 'phet-io';
+  const originalVersion = version;
 
   // validate version and strip suffixes since just the numbers are used in the directory name on dev and production servers
-  var versionMatch = version.match( /^(\d+\.\d+\.\d+)(?:-.*)?$/ );
+  const versionMatch = version.match( /^(\d+\.\d+\.\d+)(?:-.*)?$/ );
   if ( versionMatch && versionMatch.length === 2 ) {
 
     if ( option === 'rc' ) {
@@ -480,8 +478,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   }
 
   // define vars for build dir and sim dir
-  var buildDir = './js/build-server/tmp';
-  var simDir = '../' + simName;
+  const buildDir = './js/build-server/tmp';
+  const simDir = '../' + simName;
 
   winston.log( 'info', 'building sim ' + simName );
 
@@ -496,8 +494,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * @param {string} locales
    * @param {Function} callback
    */
-  var getLocales = function( locales, callback ) {
-    var callbackLocales;
+  const getLocales = function( locales, callback ) {
+    let callbackLocales;
 
     if ( locales && locales !== '*' ) {
 
@@ -507,13 +505,13 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     else {
 
       // from grunt deploy-production
-      var simDirectory = HTML_SIMS_DIRECTORY + simName;
-      var versionDirectories = getSortedVersionDirectories( simDirectory );
+      const simDirectory = HTML_SIMS_DIRECTORY + simName;
+      const versionDirectories = getSortedVersionDirectories( simDirectory );
       if ( versionDirectories.length > 0 ) {
-        var latest = versionDirectories[ versionDirectories.length - 1 ];
-        var translationsXMLFile = HTML_SIMS_DIRECTORY + simName + '/' + latest + '/' + simName + '.xml';
+        const latest = versionDirectories[ versionDirectories.length - 1 ];
+        const translationsXMLFile = HTML_SIMS_DIRECTORY + simName + '/' + latest + '/' + simName + '.xml';
         winston.log( 'info', 'path to translations XML file = ' + translationsXMLFile );
-        var xmlString = fs.readFileSync( translationsXMLFile );
+        const xmlString = fs.readFileSync( translationsXMLFile );
         parseString( xmlString, function( err, xmlData ) {
           if ( err ) {
             winston.log( 'error', 'error parsing XML, err = ' + err );
@@ -521,9 +519,9 @@ var taskQueue = async.queue( function( task, taskCallback ) {
           else {
             winston.log( 'info', 'data extracted from translations XML file:' );
             winston.log( 'info', JSON.stringify( xmlData, null, 2 ) );
-            var simsArray = xmlData.project.simulations[ 0 ].simulation;
-            var localesArray = [];
-            for ( var i = 0; i < simsArray.length; i++ ) {
+            const simsArray = xmlData.project.simulations[ 0 ].simulation;
+            const localesArray = [];
+            for ( let i = 0; i < simsArray.length; i++ ) {
               localesArray.push( simsArray[ i ].$.locale );
             }
             callbackLocales = localesArray.join( ',' );
@@ -531,7 +529,6 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         } );
       }
       else {
-
         // first deploy, sim directory will not exist yet, just publish the english version
         callbackLocales = 'en';
       }
@@ -547,20 +544,20 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * @param simTitleCallback
    * @param callback
    */
-  var createTranslationsXML = function( simTitleCallback, callback ) {
+  const createTranslationsXML = function( simTitleCallback, callback ) {
 
-    var rootdir = '../babel/' + simName;
-    var englishStringsFile = simName + '-strings_en.json';
-    var stringFiles = [ { name: englishStringsFile, locale: ENGLISH_LOCALE } ];
+    const rootdir = '../babel/' + simName;
+    const englishStringsFile = simName + '-strings_en.json';
+    const stringFiles = [ { name: englishStringsFile, locale: ENGLISH_LOCALE } ];
 
     // pull all the string filenames and locales from babel and store in stringFiles array
     try {
-      var files = fs.readdirSync( rootdir );
-      for ( var i = 0; i < files.length; i++ ) {
-        var filename = files[ i ];
-        var firstUnderscoreIndex = filename.indexOf( '_' );
-        var periodIndex = filename.indexOf( '.' );
-        var locale = filename.substring( firstUnderscoreIndex + 1, periodIndex );
+      const files = fs.readdirSync( rootdir );
+      for ( let i = 0; i < files.length; i++ ) {
+        const filename = files[ i ];
+        const firstUnderscoreIndex = filename.indexOf( '_' );
+        const periodIndex = filename.indexOf( '.' );
+        const locale = filename.substring( firstUnderscoreIndex + 1, periodIndex );
         stringFiles.push( { name: filename, locale: locale } );
       }
     }
@@ -569,7 +566,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     }
 
     // try opening the english strings file so we can read the english strings
-    var englishStrings;
+    let englishStrings;
     try {
       englishStrings = JSON.parse( fs.readFileSync( '../' + simName + '/' + englishStringsFile, { encoding: 'utf-8' } ) );
     }
@@ -578,7 +575,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
       return;
     }
 
-    var simTitleKey = simName + '.title'; // all sims must have a key of this form
+    const simTitleKey = simName + '.title'; // all sims must have a key of this form
 
     if ( englishStrings[ simTitleKey ] ) {
       simTitleCallback( englishStrings[ simTitleKey ].value );
@@ -589,19 +586,19 @@ var taskQueue = async.queue( function( task, taskCallback ) {
     }
 
     // create xml, making a simulation tag for each language
-    var finalXML = '<?xml version="1.0" encoding="utf-8" ?>\n' +
+    let finalXML = '<?xml version="1.0" encoding="utf-8" ?>\n' +
                    '<project name="' + simName + '">\n' +
                    '<simulations>\n';
 
-    for ( var j = 0; j < stringFiles.length; j++ ) {
-      var stringFile = stringFiles[ j ];
-      var languageJSON = ( stringFile.locale === ENGLISH_LOCALE ) ? englishStrings :
+    for ( let j = 0; j < stringFiles.length; j++ ) {
+      const stringFile = stringFiles[ j ];
+      const languageJSON = ( stringFile.locale === ENGLISH_LOCALE ) ? englishStrings :
                          JSON.parse( fs.readFileSync( '../babel' + '/' + simName + '/' + stringFile.name, { encoding: 'utf-8' } ) );
 
-      var simHTML = HTML_SIMS_DIRECTORY + simName + '/' + version + '/' + simName + '_' + stringFile.locale + '.html';
+      const simHTML = HTML_SIMS_DIRECTORY + simName + '/' + version + '/' + simName + '_' + stringFile.locale + '.html';
 
       if ( fs.existsSync( simHTML ) ) {
-        var localizedSimTitle = ( languageJSON[ simTitleKey ] ) ? languageJSON[ simTitleKey ].value : englishStrings[ simTitleKey ].value;
+        const localizedSimTitle = ( languageJSON[ simTitleKey ] ) ? languageJSON[ simTitleKey ].value : englishStrings[ simTitleKey ].value;
         finalXML = finalXML.concat( '<simulation name="' + simName + '" locale="' + stringFile.locale + '">\n' +
                                     '<title><![CDATA[' + localizedSimTitle + ']]></title>\n' +
                                     '</simulation>\n' );
@@ -619,8 +616,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * Write the .htaccess file to make "latest" point to the version being deployed and allow "download" links to work on Safari
    * @param callback
    */
-  var writePhetHtaccess = function( callback ) {
-    var contents = 'RewriteEngine on\n' +
+  const writePhetHtaccess = function( callback ) {
+    const contents = 'RewriteEngine on\n' +
                    'RewriteBase /sims/html/' + simName + '/\n' +
                    'RewriteRule latest(.*) ' + version + '$1\n' +
                    'Header set Access-Control-Allow-Origin "*"\n\n' +
@@ -635,8 +632,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * Writes the htaccess file to password protect the exclusive content for phet-io sims
    * @param callback
    */
-  var writePhetioHtaccess = function( filepath, authFilepath, callback ) {
-    var contents = 'AuthType Basic\n' +
+  const writePhetioHtaccess = function( filepath, authFilepath, callback ) {
+    const contents = 'AuthType Basic\n' +
                    'AuthName "PhET-iO Password Protected Area"\n' +
                    'AuthUserFile ' + authFilepath + '\n' +
                    'Require valid-user\n';
@@ -652,31 +649,31 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * @param brand:String
    * @param callback
    */
-  var spotScp = function( brand, callback ) {
-    var userAtServer = BUILD_SERVER_CONFIG.devUsername + '@' + BUILD_SERVER_CONFIG.devDeployServer;
-    var simVersionDirectory = BUILD_SERVER_CONFIG.devDeployPath + simName + '/' + version;
+  const spotScp = function( brand, callback ) {
+    const userAtServer = BUILD_SERVER_CONFIG.devUsername + '@' + BUILD_SERVER_CONFIG.devDeployServer;
+    const simVersionDirectory = BUILD_SERVER_CONFIG.devDeployPath + simName + '/' + version;
 
     // mkdir first in case it doesn't exist already
-    var mkdirCommand = 'ssh ' + userAtServer + ' \'mkdir -p ' + simVersionDirectory + '\'';
+    const mkdirCommand = 'ssh ' + userAtServer + ' \'mkdir -p ' + simVersionDirectory + '\'';
     exec( mkdirCommand, buildDir, function() {
 
-      var buildDir = simDir + '/build';
+      const buildDir = simDir + '/build';
 
       // after finishing copying the files, chmod to make sure we preserve group write on spot
-      // var finished = _.after( files.length, function() {
-      var finished = function() {
-        var chmodCommand = 'ssh ' + userAtServer + ' \'chmod -R g+w ' + simVersionDirectory + '\'';
+      // const finished = _.after( files.length, function() {
+      const finished = function() {
+        const chmodCommand = 'ssh ' + userAtServer + ' \'chmod -R g+w ' + simVersionDirectory + '\'';
         exec( chmodCommand, buildDir, callback );
       };
 
-      var scpTarget = userAtServer + ':' + simVersionDirectory;
+      const scpTarget = userAtServer + ':' + simVersionDirectory;
 
       // copy the files
       if ( brand !== 'phet-io' ) {
         // only copy english html
         exec( 'scp -r *_en*.html ' + scpTarget, buildDir, function() {
           // find non-html files and copy them to the remote server
-          exec( 'find . -type f ! \\\( -iname \'*.html\' \\\) -exec scp {} ' + scpTarget + ' \\\;', buildDir, finished );
+          exec( 'find . -type f ! -iname \'*.html\' -exec scp {} ' + scpTarget + ' ;', buildDir, finished );
         } );
       }
       else {
@@ -693,14 +690,14 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * @param simTitle
    * @param callback
    */
-  var addToRosetta = function( simTitle, callback ) {
+  const addToRosetta = function( simTitle, callback ) {
 
     // start by pulling rosetta to make sure it is up to date and avoid merge conflicts
     exec( 'git pull', '../rosetta', function() {
-      var simInfoArray = '../rosetta/data/simInfoArray.json';
+      const simInfoArray = '../rosetta/data/simInfoArray.json';
       fs.readFile( simInfoArray, { encoding: 'utf8' }, function( err, simInfoArrayString ) {
 
-        var data = JSON.parse( simInfoArrayString );
+        const data = JSON.parse( simInfoArrayString );
 
         if ( err ) {
           winston.log( 'error', 'couldn\'t read simInfoArray ' + err );
@@ -708,11 +705,11 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         }
         else {
 
-          var testUrl = BUILD_SERVER_CONFIG.productionServerURL + '/sims/html/' + simName + '/latest/' + simName + '_en.html';
-          var newSim = true;
+          const testUrl = BUILD_SERVER_CONFIG.productionServerURL + '/sims/html/' + simName + '/latest/' + simName + '_en.html';
+          let newSim = true;
 
-          for ( var i = 0; i < data.length; i++ ) {
-            var simInfoObject = data[ i ];
+          for ( let i = 0; i < data.length; i++ ) {
+            const simInfoObject = data[ i ];
             if ( simInfoObject.projectName && simInfoObject.projectName === simName ) {
               simInfoObject.simTitle = simTitle;
               simInfoObject.testUrl = testUrl;
@@ -728,7 +725,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
             } );
           }
 
-          var contents = JSON.stringify( data, null, 2 );
+          const contents = JSON.stringify( data, null, 2 );
 
           fs.writeFile( simInfoArray, contents, function( err ) {
             if ( err ) {
@@ -760,21 +757,21 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * pull master for every repo in dependencies.json (plus babel) to make sure everything is up to date
    * @param callback
    */
-  var pullMaster = function( callback ) {
+  const pullMaster = function( callback ) {
 
     // so we don't have to modify the repos object
-    var reposCopy = _.clone( repos );
+    const reposCopy = _.clone( repos );
 
     if ( 'comment' in reposCopy ) {
       delete reposCopy.comment;
     }
 
-    var errors = [];
+    const errors = [];
 
     // Add babel to list of repos to pull
     reposCopy.babel = true;
 
-    var finished = _.after( Object.keys( reposCopy ).length, function() {
+    const finished = _.after( Object.keys( reposCopy ).length, function() {
       if ( _.any( errors ) ) {
         abortBuild( 'at least one repository failed to pull master' );
       }
@@ -783,14 +780,14 @@ var taskQueue = async.queue( function( task, taskCallback ) {
       }
     } );
 
-    var errorCheckCallback = function( err ) {
+    const errorCheckCallback = function( err ) {
       errors.push( err );
       finished();
     };
 
     _.keys( reposCopy ).forEach( function( repoName ) {
       winston.log( 'info', 'pulling from ' + repoName );
-      var repoDir = '../' + repoName;
+      const repoDir = '../' + repoName;
       exec( 'git checkout master', repoDir, function() {
         execWithoutAbort( 'git pull', repoDir, errorCheckCallback );
       } );
@@ -802,7 +799,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * @param targetDirectory:String
    * @param callback
    */
-  var mkVersionDir = function( targetDirectory, callback ) {
+  const mkVersionDir = function( targetDirectory, callback ) {
     try {
       fs.mkdirpSync( targetDirectory );
       callback();
@@ -819,9 +816,9 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * synchronize and the new translation will appear on the website.
    * @param callback
    */
-  var notifyServer = function( callback ) {
-    var project = 'html/' + simName;
-    var url = BUILD_SERVER_CONFIG.productionServerURL + '/services/synchronize-project?projectName=' + project;
+  const notifyServer = function( callback ) {
+    const project = 'html/' + simName;
+    const url = BUILD_SERVER_CONFIG.productionServerURL + '/services/synchronize-project?projectName=' + project;
     request( {
       url: url,
       auth: {
@@ -830,10 +827,10 @@ var taskQueue = async.queue( function( task, taskCallback ) {
         sendImmediately: true
       }
     }, function( error, response, body ) {
-      var errorMessage;
+      let errorMessage;
 
       if ( !error && response.statusCode === 200 ) {
-        var syncResponse = JSON.parse( body );
+        const syncResponse = JSON.parse( body );
 
         if ( !syncResponse.success ) {
           errorMessage = 'request to synchronize project ' + project + ' on ' + BUILD_SERVER_CONFIG.productionServerName + ' failed with message: ' + syncResponse.error;
@@ -857,10 +854,10 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   };
 
   // define a helper function that will add the translator to the DB for translation credits
-  var addTranslator = function( locale, callback ) {
+  const addTranslator = function( locale, callback ) {
 
     // create the URL
-    var addTranslatorURL = BUILD_SERVER_CONFIG.productionServerURL + '/services/add-html-translator?simName=' + simName +
+    const addTranslatorURL = BUILD_SERVER_CONFIG.productionServerURL + '/services/add-html-translator?simName=' + simName +
                            '&locale=' + locale + '&userId=' + userId + '&authorizationCode=' +
                            BUILD_SERVER_CONFIG.databaseAuthorizationCode;
 
@@ -882,7 +879,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
   /**
    * Clean up after deploy. Checkout master for every repo and remove tmp dir.
    */
-  var afterDeploy = function() {
+  const afterDeploy = function() {
     exec( 'grunt checkout-master-all', PERENNIAL, function() {
       exec( 'rm -rf ' + buildDir, '.', function() {
         taskCallback();
@@ -895,7 +892,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
    * The reason to write this to a file instead of using the in memory values, is so the "grunt checkout-shas"
    * task works without much modification.
    */
-  var writeDependenciesFile = function() {
+  const writeDependenciesFile = function() {
     fs.writeFile( buildDir + '/dependencies.json', JSON.stringify( repos ), function( err ) {
       if ( err ) {
         winston.log( 'error', err );
@@ -904,8 +901,8 @@ var taskQueue = async.queue( function( task, taskCallback ) {
       else {
         winston.log( 'info', 'wrote file ' + buildDir + '/dependencies.json' );
 
-        var simTitle; // initialized via simTitleCallback in createTranslationsXML() for use in addToRosetta()
-        var simTitleCallback = function( title ) {
+        let simTitle; // initialized via simTitleCallback in createTranslationsXML() for use in addToRosetta()
+        const simTitleCallback = function( title ) {
           simTitle = title;
         };
 
@@ -922,7 +919,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                           exec( 'npm prune', simDir, function() {
                             exec( 'npm update', simDir, function() {
                               getLocales( locales, function( locales ) {
-                                var brandLocales = ( brand === 'phet' ) ? locales : 'en';
+                                const brandLocales = ( brand === 'phet' ) ? locales : 'en';
                                 winston.log( 'info', 'building for brand: ' + brand + ' version: ' + version );
                                 exec( 'grunt build-for-server --brand=' + brand + ' --locales=' + brandLocales, simDir, function() {
                                   if ( option === 'rc' ) {
@@ -936,7 +933,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                                     }
                                   }
                                   else {
-                                    var targetDir;
+                                    let targetDir;
                                     if ( brand === 'phet' ) {
                                       targetDir = HTML_SIMS_DIRECTORY + simName + '/' + version + '/';
                                     }
@@ -952,7 +949,7 @@ var taskQueue = async.queue( function( task, taskCallback ) {
                                                 addToRosetta( simTitle, function() {
 
                                                   // if this build request comes from rosetta it will have a userId field and only one locale
-                                                  var localesArray = locales.split( ',' );
+                                                  const localesArray = locales.split( ',' );
                                                   if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
                                                     addTranslator( localesArray[ 0 ], afterDeploy );
                                                   }
@@ -1035,7 +1032,7 @@ function postQueueDeploy( req, res ) {
 function queueDeploy( repos, simName, version, locales, option, email, id, authorizationKey, req, res ) {
   // log the request, which is useful for debugging
   let requestBodyString = '';
-  for ( var key in req.body ) {
+  for ( let key in req.body ) {
     if ( req.body.hasOwnProperty( key ) ) {
       requestBodyString += key + ':' + req.body[ key ] + '\n';
     }
@@ -1047,19 +1044,19 @@ function queueDeploy( repos, simName, version, locales, option, email, id, autho
 
   if ( repos && simName && version && authorizationKey ) {
     if ( authorizationKey !== BUILD_SERVER_CONFIG.buildServerAuthorizationCode ) {
-      var err = 'wrong authorization code';
+      const err = 'wrong authorization code';
       winston.log( 'error', err );
       res.send( err );
     }
     else {
       winston.log( 'info', 'queuing build for ' + simName + ' ' + version );
       taskQueue.push( { repos, simName, version, locales, option, email, id, res }, function( err ) {
-        var simInfoString = 'Sim = ' + decodeURIComponent( simName ) +
+        const simInfoString = 'Sim = ' + decodeURIComponent( simName ) +
                             ' Version = ' + decodeURIComponent( version ) +
                             ' Locales = ' + ( locales ? decodeURIComponent( locales ) : 'undefined' );
 
         if ( err ) {
-          var shas = decodeURIComponent( repos );
+          let shas = decodeURIComponent( repos );
 
           // try to format the JSON nicely for the email, but don't worry if it is invalid JSON
           try {
@@ -1068,7 +1065,7 @@ function queueDeploy( repos, simName, version, locales, option, email, id, autho
           catch( e ) {
             // invalid JSON
           }
-          var errorMessage = 'Build failed with error: ' + err + '. ' + simInfoString + ' Shas = ' + shas;
+          const errorMessage = 'Build failed with error: ' + err + '. ' + simInfoString + ' Shas = ' + shas;
           winston.log( 'error', errorMessage );
           sendEmail( 'BUILD ERROR', errorMessage );
         }
@@ -1083,17 +1080,17 @@ function queueDeploy( repos, simName, version, locales, option, email, id, autho
     }
   }
   else {
-    var errorString = 'missing one or more required query parameters: repos, simName, version, authorizationKey';
+    const errorString = 'missing one or more required query parameters: repos, simName, version, authorizationKey';
     winston.log( 'error', errorString );
     res.send( errorString );
   }
 }
 
 // Create the ExpressJS app
-var app = express();
+const app = express();
 
 // to support JSON-encoded bodies
-var bodyParser = require( 'body-parser' ); // eslint-disable-line require-statement-match
+const bodyParser = require( 'body-parser' ); // eslint-disable-line require-statement-match
 app.use( bodyParser.json() );
 
 // add the route to build and deploy
