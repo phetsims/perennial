@@ -108,7 +108,7 @@ module.exports = async function( repo, brands ) {
   // This is for PhET-iO simulations, to protected the password protected wrappers, see
   // https://github.com/phetsims/phet-io/issues/641
   if ( brands.includes( 'phet-io' ) && buildLocal.devDeployServer === 'spot.colorado.edu' ) {
-    await devScp( '../phet-io/templates/spot/.htaccess', `${versionPath}/phetio/wrappers/.htaccess` );
+    await devScp( '../phet-io/templates/spot/.htaccess', `${versionPath}/phet-io/wrappers/.htaccess` );
   }
 
   // Permissions fixes so others can write over it later
@@ -123,6 +123,6 @@ module.exports = async function( repo, brands ) {
     grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_en-phet.html` );
   }
   if ( brands.includes( 'phet-io' ) ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/phetio/wrappers/index` );
+    grunt.log.writeln( `Deployed: ${versionURL}/phet-io/wrappers/index` );
   }
 };

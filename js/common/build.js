@@ -9,6 +9,7 @@
 'use strict';
 
 // modules
+const assert = require( 'assert' );
 const execute = require( '../common/execute' );
 const fs = require( 'fs' );
 const gruntCommand = require( '../common/gruntCommand' );
@@ -40,8 +41,11 @@ module.exports = async function( repo, options ) {
   const args = [];
 
   // Currently has the same flag versions
-  if ( chipperVersion === '2.0.0' ) {
-    args.push( 'lint-all' );
+  if ( chipperVersion === '0.0.0' ) {
+    assert( brands.length === 1, 'Chiper 0.0.0 cannot build multiple brands at a time' );
+    if ( lint ) {
+      args.push( 'lint-all' );
+    }
     args.push( 'clean' );
     args.push( 'build' );
     if ( thumbnails ) {
@@ -50,7 +54,7 @@ module.exports = async function( repo, options ) {
     if ( twitterCard ) {
       args.push( 'generate-twitter-card' );
     }
-    args.push( `--brands=${brands.join( ',' )}` );
+    args.push( `--brand=${brands[ 0 ]}}` );
     args.push( `--locales=${locales}` );
     if ( !uglify ) {
       args.push( '--uglify=false' );
@@ -58,8 +62,26 @@ module.exports = async function( repo, options ) {
     if ( !mangle ) {
       args.push( '--mangle=false' );
     }
-    if ( !lint ) {
-      args.push( '--lint=false' );
+    if ( allHTML ) {
+      args.push( '--allHTML' );
+    }
+    if ( debugHTML ) {
+      args.push( '--debugHTML' );
+    }
+  }
+  else if ( chipperVersion === '2.0.0' ) {
+    if ( lint ) {
+      args.push( 'lint-all' );
+    }
+    args.push( 'clean' );
+    args.push( 'build' );
+    args.push( `--brands=${brands.join( ',' )}` );
+    args.push( `--locales=${locales}` );
+    if ( !uglify ) {
+      args.push( '--uglify=false' );
+    }
+    if ( !mangle ) {
+      args.push( '--mangle=false' );
     }
     if ( allHTML ) {
       args.push( '--allHTML' );
