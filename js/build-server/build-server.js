@@ -62,7 +62,7 @@
  * - authorizationCode - a password to authorize legitimate requests
  * - option - optional parameter, can be set to "rc" to do an rc deploy instead of production
  * - email - optional parameter, used to send success/failure notifications
- * - id - optional parameter for production/rc deploys, required for translation deploys from rosetta to add the user's credit to the website.
+ * - translatorId - optional parameter for production/rc deploys, required for translation deploys from rosetta to add the user's credit to the website.
  *
  * Note: You will NOT want to assemble these request URLs manually, instead use "grunt deploy-production" for production deploys and
  * "grunt deploy-rc" for rc deploys.
@@ -123,13 +123,20 @@ const _ = require( 'lodash' ); // eslint-disable-line
 const BUILD_SERVER_CONFIG = getBuildServerConfig( fs );
 const LISTEN_PORT = 16371;
 const REPOS_KEY = 'repos';
+const DEPENDENCIES_KEY = 'dependencies';
 const LOCALES_KEY = 'locales';
+const API_KEY = 'api';
 const SIM_NAME_KEY = 'simName';
 const VERSION_KEY = 'version';
 const OPTION_KEY = 'option';
 const EMAIL_KEY = 'email';
 const USER_ID_KEY = 'userId';
+const TRANSLATOR_ID_KEY = 'translatorId';
 const AUTHORIZATION_KEY = 'authorizationCode';
+const SERVERS_KEY = 'servers';
+const BRANDS_KEY = 'brands';
+const PRODUCTION_SERVER = 'production';
+const DEV_SERVER = 'dev';
 const HTML_SIMS_DIRECTORY = BUILD_SERVER_CONFIG.htmlSimsDirectory;
 const PHETIO_SIMS_DIRECTORY = BUILD_SERVER_CONFIG.phetioSimsDirectory;
 const ENGLISH_LOCALE = 'en';
@@ -315,7 +322,7 @@ function sendEmail( subject, text, emailParameterOnly ) {
  * @property {String} task.version - sim version identifier string
  * @property {String} task.option - deployment type (dev/rc/production)
  * @property {String} task.email - used for sending notifications about success/failure
- * @property {String} task.id - rosetta user id for adding translators to the website
+ * @property {String} task.translatorId - rosetta user id for adding translators to the website
  * @property {String} task.res - express response object
  */
 const taskQueue = async.queue( function( task, taskCallback ) {
@@ -328,13 +335,12 @@ const taskQueue = async.queue( function( task, taskCallback ) {
   const locales = task.locales ? decodeURIComponent( task.locales ) : null;
   const simName = decodeURIComponent( task.simName );
   let version = decodeURIComponent( task.version );
-  const option = task.option ? decodeURIComponent( task.option ) : 'default';
   const res = task.res;
 
   // this may have been declared already?
   emailParameter = task.email ? decodeURIComponent( task.email ) : null;
 
-  const userId = ( task.id ) ? decodeURIComponent( task.id ) : undefined;
+  const userId = ( task.translatorId ) ? decodeURIComponent( task.translatorId ) : undefined;
   if ( userId ) {
     winston.log( 'info', 'setting userId = ' + userId );
   }
@@ -453,7 +459,6 @@ const taskQueue = async.queue( function( task, taskCallback ) {
   }
 
   // Infer brand from version string and keep unstripped version for phet-io
-  const brand = version.indexOf( 'phetio' ) < 0 ? 'phet' : 'phet-io';
   const originalVersion = version;
 
   // validate version and strip suffixes since just the numbers are used in the directory name on dev and production servers
@@ -1002,45 +1007,64 @@ const taskQueue = async.queue( function( task, taskCallback ) {
 
 }, 1 ); // 1 is the max number of tasks that can run concurrently
 
-function getQueueDeploy( req, res ) {
-  const repos = req.query[ REPOS_KEY ];
-  const simName = req.query[ SIM_NAME_KEY ];
-  const version = req.query[ VERSION_KEY ];
-  const locales = req.query[ LOCALES_KEY ];
-  const option = req.query[ OPTION_KEY ];
-  const email = req.query[ EMAIL_KEY ];
-  const id = req.query[ USER_ID_KEY ];
-  const authorizationKey = req.query[ AUTHORIZATION_KEY ];
-
-  queueDeploy( repos, simName, version, locales, option, email, id, authorizationKey, req, res );
-}
-
-function postQueueDeploy( req, res ) {
-  winston.log( 'info', JSON.stringify( req.body ) );
-  const repos = req.body[ REPOS_KEY ];
-  const simName = req.body[ SIM_NAME_KEY ];
-  const version = req.body[ VERSION_KEY ];
-  const locales = req.body[ LOCALES_KEY ];
-  const option = req.body[ OPTION_KEY ];
-  const email = req.body[ EMAIL_KEY ];
-  const id = req.body[ USER_ID_KEY ];
-  const authorizationKey = req.body[ AUTHORIZATION_KEY ];
-
-  queueDeploy( repos, simName, version, locales, option, email, id, authorizationKey, req, res );
-}
-
-function queueDeploy( repos, simName, version, locales, option, email, id, authorizationKey, req, res ) {
+function logRequest( req, type ) {
   // log the request, which is useful for debugging
   let requestBodyString = '';
-  for ( let key in req.body ) {
-    if ( req.body.hasOwnProperty( key ) ) {
-      requestBodyString += key + ':' + req.body[ key ] + '\n';
+  for ( let key in req[ type ] ) {
+    if ( req[ type ].hasOwnProperty( key ) ) {
+      requestBodyString += key + ':' + req[ type ][ key ] + '\n';
     }
   }
   winston.log(
     'info',
     'deploy request received, original URL = ' + ( req.protocol + '://' + req.get( 'host' ) + req.originalUrl ) + '\n' + requestBodyString
   );
+}
+
+function getQueueDeploy( req, res ) {
+  logRequest( req, 'query' );
+  queueDeployApiVersion1( req, res, 'query' );
+}
+
+function queueDeployApiVersion1( req, res, key ) {
+  const repos = req[ key ][ REPOS_KEY ];
+  const simName = req[ key ][ SIM_NAME_KEY ];
+  const version = req[ key ][ VERSION_KEY ];
+  const brands = version.indexOf( 'phetio' ) < 0 ? [ 'phet' ] : [ 'phet-io' ];
+  const locales = req[ key ][ LOCALES_KEY ];
+  const option = req[ key ][ OPTION_KEY ] ? decodeURIComponent( req[ key ][ OPTION_KEY ] ) : 'default';
+  const servers = ( option === 'rc' ) ? [ PRODUCTION_SERVER ] : [ DEV_SERVER ];
+  const email = req[ key ][ EMAIL_KEY ];
+  const translatorId = req[ key ][ USER_ID_KEY ];
+  const authorizationKey = req[ key ][ AUTHORIZATION_KEY ];
+
+  queueDeploy( repos, simName, version, locales, servers, brands, email, translatorId, authorizationKey, req, res );
+}
+
+function postQueueDeploy( req, res ) {
+  logRequest( req, 'body' );
+
+  const api = req.body[ API_KEY ]; // Used in the future
+  if ( api && api.startsWith( '2.' ) ) {
+    const repos = req.body[ DEPENDENCIES_KEY ].repos;
+    const simName = req.body[ SIM_NAME_KEY ];
+    const version = req.body[ VERSION_KEY ];
+    const locales = req.body[ LOCALES_KEY ];
+    const servers = req.body[ SERVERS_KEY ];
+    const brands = req.body[ BRANDS_KEY ];
+    const authorizationKey = req.body[ AUTHORIZATION_KEY ];
+    const translatorId = req.body[ TRANSLATOR_ID_KEY ];
+    const email = req.body[ EMAIL_KEY ];
+
+    queueDeploy( repos, simName, version, locales, servers, brands, email, translatorId, authorizationKey, req, res );
+  }
+  else {
+    queueDeployApiVersion1( req, res, 'body' );
+  }
+}
+
+function queueDeploy( repos, simName, version, locales, brands, servers, email, translatorId, authorizationKey, req, res ) {
+
 
   if ( repos && simName && version && authorizationKey ) {
     if ( authorizationKey !== BUILD_SERVER_CONFIG.buildServerAuthorizationCode ) {
@@ -1050,7 +1074,7 @@ function queueDeploy( repos, simName, version, locales, option, email, id, autho
     }
     else {
       winston.log( 'info', 'queuing build for ' + simName + ' ' + version );
-      taskQueue.push( { repos, simName, version, locales, option, email, id, res }, function( err ) {
+      taskQueue.push( { repos, simName, version, locales, servers, brands, email, translatorId, res }, function( err ) {
         const simInfoString = 'Sim = ' + decodeURIComponent( simName ) +
                             ' Version = ' + decodeURIComponent( version ) +
                             ' Locales = ' + ( locales ? decodeURIComponent( locales ) : 'undefined' );
