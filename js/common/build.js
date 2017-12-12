@@ -70,11 +70,6 @@ module.exports = async function( repo, options ) {
     }
   }
   else if ( chipperVersion === '2.0.0' ) {
-    if ( lint ) {
-      args.push( 'lint-all' );
-    }
-    args.push( 'clean' );
-    args.push( 'build' );
     args.push( `--brands=${brands.join( ',' )}` );
     args.push( `--locales=${locales}` );
     if ( !uglify ) {
@@ -82,6 +77,9 @@ module.exports = async function( repo, options ) {
     }
     if ( !mangle ) {
       args.push( '--mangle=false' );
+    }
+    if ( !lint ) {
+      args.push( '--lint=false' );
     }
     if ( allHTML ) {
       args.push( '--allHTML' );
