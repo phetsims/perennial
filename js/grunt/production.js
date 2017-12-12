@@ -28,6 +28,7 @@ const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
 const prompt = require( '../common/prompt' );
 const setRepoVersion = require( '../common/setRepoVersion' );
+const simMetadata = require( '../common/simMetadata' );
 const SimVersion = require( '../common/SimVersion' );
 const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
 
@@ -84,7 +85,10 @@ module.exports = async function( repo, branch, brands ) {
     grunt.fail.fatal( 'Aborted production deployment since the version number cannot be incremented safely' );
   }
 
-  const isFirstVersion = version.major === 1 && version.minor === 0 && version.maintenance === 0;
+  const isFirstVersion = !( await simMetadata( {
+    summary: true,
+    simulation: repo
+  } ).projects );
 
   // Initial deployment nags
   if ( isFirstVersion ) {
