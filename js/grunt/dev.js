@@ -120,7 +120,7 @@ module.exports = async function( repo, brands ) {
   const versionURL = `https://www.colorado.edu/physics/phet/dev/html/${repo}/${versionString}`;
 
   if ( brands.includes( 'phet' ) ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_en-phet.html` );
+    grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_en_phet.html` );
   }
   if ( brands.includes( 'phet-io' ) ) {
     grunt.log.writeln( `Deployed: ${versionURL}/phet-io/wrappers/index` );
