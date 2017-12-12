@@ -96,12 +96,10 @@ module.exports = async function( repo, branch, brands ) {
 
   // TODO: reduce this code duplication with dev.js
   const versionString = version.toString();
-  const fullVersionString = version.toString();
-  // TODO: unhandle fullVersionString stuff
 
   // caps-lock should hopefully shout this at people. do we have a text-to-speech synthesizer we can shout out of their speakers?
   // SECOND THOUGHT: this would be horrible during automated maintenance releases.
-  const initialConfirmation = await prompt( `DEPLOY ${fullVersionString} to PRODUCTION [Y/n]?` );
+  const initialConfirmation = await prompt( `DEPLOY ${versionString} to PRODUCTION [Y/n]?` );
   if ( initialConfirmation === 'n' ) {
     grunt.fail.fatal( 'Aborted production deployment' );
   }
@@ -137,7 +135,11 @@ module.exports = async function( repo, branch, brands ) {
   await updateDependenciesJSON( repo, brands, versionString, branch );
 
   // Send the build request
-  await buildServerRequest( repo, version, await getDependencies( repo ) );
+  await buildServerRequest( repo, version, await getDependencies( repo ), {
+    locales: '*',
+    brands,
+    servers: [ 'dev', 'production' ]
+  } );
 
   // Move back to master
   await checkoutMaster( repo );
@@ -177,6 +179,6 @@ module.exports = async function( repo, branch, brands ) {
   grunt.log.writeln( 'Running third-party report (do not ctrl-C it)' );
   await execute( gruntCommand, [ 'report-third-party' ], '../chipper' );
   await gitAdd( 'sherpa', 'third-party-licenses.md' );
-  await gitCommit( 'sherpa', `Updating third-party-licenses for deploy of ${repo} ${fullVersionString}` );
+  await gitCommit( 'sherpa', `Updating third-party-licenses for deploy of ${repo} ${versionString}` );
   await gitPush( 'sherpa', 'master' );
 };

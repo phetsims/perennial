@@ -9,6 +9,7 @@
 'use strict';
 
 // modules
+const assert = require( 'assert' );
 const buildLocal = require( '../common/buildLocal' );
 const request = require( 'request' );
 const winston = require( 'winston' );
@@ -28,21 +29,24 @@ module.exports = async function( repo, version, dependencies, options ) {
 
     const {
       locales = '*',
-      rc = false
+      brands = [ 'phet', 'phet-io' ],
+      servers = [ 'dev' ] // {Array.<string>}, currently 'dev' and 'production' are supported
     } = options || {};
 
     winston.info( `sending build request for ${repo} ${version.toString()} with dependencies: ${JSON.stringify( dependencies )}` );
 
+    servers.forEach( server => assert( [ 'dev', 'production' ].includes( server ), `Unknown server: ${server}` ) );
+
     const requestObject = {
-      repos: JSON.stringify( dependencies ),
-      locales,
+      api: '2.0',
+      dependencies: JSON.stringify( dependencies ),
       simName: repo,
       version: version.toString(),
+      locales,
+      servers,
+      brands,
       authorizationCode: buildLocal.buildServerAuthorizationCode
     };
-    if ( rc ) {
-      requestObject.option = 'rc';
-    }
     if ( buildLocal.buildServerNotifyEmail ) {
       requestObject.email = buildLocal.buildServerNotifyEmail;
     }

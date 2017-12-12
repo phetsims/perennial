@@ -115,7 +115,9 @@ module.exports = async function( repo, branch, brands ) {
 
   // Send the build request
   await buildServerRequest( repo, version, await getDependencies( repo ), {
-    rc: true
+    locales: [ 'en' ],
+    brands,
+    servers: [ 'dev' ]
   } );
 
   // Move back to master
@@ -124,10 +126,10 @@ module.exports = async function( repo, branch, brands ) {
   const versionURL = `https://www.colorado.edu/physics/phet/dev/html/${repo}/${versionString}`;
 
   if ( brands.includes( 'phet' ) ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_en-phet.html` );
+    grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_en_phet.html` );
   }
   if ( brands.includes( 'phet-io' ) ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/phetio/wrappers/index` );
+    grunt.log.writeln( `Deployed: ${versionURL}/phet-io/wrappers/index` );
   }
 
   grunt.log.writeln( 'Please test!' );
