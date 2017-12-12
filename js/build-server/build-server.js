@@ -3,100 +3,8 @@
 /**
  * PhET build and deploy server. The server is designed to run on the same host as the production site (phet-server.int.colorado.edu).
  *
- * Starting and Stopping the Server
- * ================================
- *
- * To start, stop, or restart the build server on phet-server.int.colorado.edu (production) or phet-server.int.colorado.edu (test), run this command:
- * sudo systemctl [start|stop|restart] build-server
- *
- * To view the logs, run the following command.  A -f flag will tail the log.  Pressing Shift+F will scroll to the end (navigation is less-like).
- * sudo journalctl -u build-server
- *
- * To edit startup options, please see /usr/lib/systemd/system/build-server.service
- *
- * !!!DEPRECATED!!! - figaro has been decommisioned and simian is nearing end of life.
- * To start, stop, or restart the build server on figaro or simian, run this command:
- * sudo /etc/init.d/build-server [start|stop|restart]
- *
- * Build Server Configuration
- * ==========================
- *
- * All of the phet repos live on the production and dev servers under /data/share/phet/phet-repos. The build server
- * lives in perennial: /data/share/phet/phet-repos/perennial/js/build-server.
- *
- * The build-server is run as user "phet-admin". It requires the certain fields filled out in phet-admin's HOME/.phet/build-local.json
- * (see assertions in getBuildServerConfig.js). These fields are already filled out, but they may need to modified or updated.
- *
- * The build server is configured to send an email on build failure. The configuration for sending emails is also in
- * phet-admin's HOME/.phet/build-local.json (these fields are described in getBuildServerConfig.js). To add other email
- * recipients, you can add email addresses to the emailTo field in this file.
- *
- * Additionally, phet-admin needs an ssh key set up to copy files from the production server to spot. This should already be set up,
- * but should you to do to set it up somewhere else, you'll need to have an rsa key in ~/.ssh on the production server and authorized
- * (run "ssh-keygen -t rsa" to generate a key if you don't already have one).
- * Also, you will need to add an entry for spot in ~/.ssh/config like so:
- *
- * Host spot
- *     HostName spot.colorado.edu
- *     User [identikey]
- *     Port 22
- *     IdentityFile ~/.ssh/id_rsa
- *
- * On spot, you'll need to add the public key from phet-server to a file ~/.ssh/authorized_keys
- *
- * build-server log files can be tailed by running /usr/lib/systemd/system/build-server.service
- *
- * build-server needs to be able to make commits to github to notify rosetta that a new sim is translatable. To do this,
- * There must be valid git credentials in the .netrc file phet-admin's home directory.
- *
- *
- * Using the Build Server for Production Deploys
- * =============================================
- *
- * The build server starts a build process upon receiving an https POST request to /deploy-html-simulation.
- * It takes as input a JSON object with the following properties:
- * - repos - a json object with dependency repos and shas, in the form of dependencies.json files
- * - locales - a comma-separated list of locales to build [optional, defaults to all locales in babel]
- * - simName - the standardized name of the sim, lowercase with hyphens instead of spaces (i.e. area-builder)
- * - version - the version to be built. Production deploys will automatically strip everything after the major.minor.maintenance
- * - authorizationCode - a password to authorize legitimate requests
- * - option - optional parameter, can be set to "rc" to do an rc deploy instead of production
- * - email - optional parameter, used to send success/failure notifications
- * - translatorId - optional parameter for production/rc deploys, required for translation deploys from rosetta to add the user's credit to the website.
- *
- * Note: You will NOT want to assemble these request URLs manually, instead use "grunt deploy-production" for production deploys and
- * "grunt deploy-rc" for rc deploys.
- *
- *
- * What the Build Server Does
- * ==========================
- *
- * The build server does the following steps when a deploy request is received:
- * - checks the authorization code, unauthorized codes will not trigger a build
- * - puts the build task on a queue so multiple builds don't occur simultaneously
- * - pull perennial and npm update
- * - clone missing repos
- * - pull master for the sim and all dependencies
- * - grunt checkout-shas
- * - checkout sha for the current sim
- * - npm update in chipper and the sim directory
- * - grunt build-for-server --brand=phet for selected locales (see chipper's Gruntfile for details)
- *
- * - for rc deploys:
- *    - deploy to spot, checkout master for all repositories, and finish
- *
- * - for production deploys:
- *    - mkdir for the new sim version
- *    - copy the build files to the correct location in the server doc root
- *    - write the .htaccess file for indicating the latest directory and downloading the html files
- *    - write the XML file that tells the website which translations exist
- *    - notify the website that a new simulation/translation is published and should appear
- *    - add the sim to rosetta's simInfoArray and commit and push (if the sim isn't already there)
- *    - checkout master for all repositories
- *
- * If any of these steps fails, the build aborts and grunt checkout-master-all is run so all repos are back on master
- *
  * @author Aaron Davis
+ * @author Matt Pennington
  */
 
 /* eslint-env node */
@@ -104,113 +12,34 @@
 
 // modules
 const async = require( 'async' );
-const child_process = require( 'child_process' );
+const constants = require( './constants' );
+const createTranslationsXML = require( './createTranslationsXML' );
 const dateformat = require( 'dateformat' );
-const email = require( 'emailjs/email' );
 const express = require( 'express' );
+const execute = require( '../common/execute' );
 const fs = require( 'fs.extra' ); // eslint-disable-line
-const getBuildServerConfig = require( './getBuildServerConfig' );
-const mimelib = require( 'mimelib' );
+const getSortedVersionDirectories = require( './getSortedVersionDirectories' );
 const parseArgs = require( 'minimist' ); // eslint-disable-line
-const xml2js = require( 'xml2js' );
 const parseString = xml2js.parseString;
 const request = require( 'request' );
+const sendEmail = require( './sendEmail' );
 const winston = require( 'winston' );
-
+const xml2js = require( 'xml2js' );
 const _ = require( 'lodash' ); // eslint-disable-line
-
-// constants
-const BUILD_SERVER_CONFIG = getBuildServerConfig( fs );
-const LISTEN_PORT = 16371;
-const REPOS_KEY = 'repos';
-const DEPENDENCIES_KEY = 'dependencies';
-const LOCALES_KEY = 'locales';
-const API_KEY = 'api';
-const SIM_NAME_KEY = 'simName';
-const VERSION_KEY = 'version';
-const OPTION_KEY = 'option';
-const EMAIL_KEY = 'email';
-const USER_ID_KEY = 'userId';
-const TRANSLATOR_ID_KEY = 'translatorId';
-const AUTHORIZATION_KEY = 'authorizationCode';
-const SERVERS_KEY = 'servers';
-const BRANDS_KEY = 'brands';
-const PRODUCTION_SERVER = 'production';
-const DEV_SERVER = 'dev';
-const HTML_SIMS_DIRECTORY = BUILD_SERVER_CONFIG.htmlSimsDirectory;
-const PHETIO_SIMS_DIRECTORY = BUILD_SERVER_CONFIG.phetioSimsDirectory;
-const ENGLISH_LOCALE = 'en';
-const PERENNIAL = '.';
-
-/**
- * Define a helper function that will get a list of the PhET-style version directories at the given path.  The
- * directories must be named with three numbers separated by periods, e.g. 1.2.5.  The directories are sorted in
- * numerical order, which is different from the lexical ordering used by the Linux file system.  So, for example, valid
- * output from this method could be the array [ "1.1.8", "1.1.9", "1.1.10" ].  For more information on why this is
- * necessary, see https://github.com/phetsims/perennial/issues/28.
- *
- * @param path - Filename of the directory.  It's ok if the path does not exist.
- * @returns {Array} - returns a sorted array of version directories.  Returns an empty array if none exist or if the path does not exist.
- */
-function getSortedVersionDirectories( path ) {
-
-  let versions;
-
-  if ( fs.existsSync( path ) ) {
-    versions = fs.readdirSync( path );
-  }
-  else {
-    versions = [];
-  }
-
-  // filter out names that don't match the required format
-  versions = versions.filter( function( path ) {
-    const splitPath = path.split( '.' );
-    if ( splitPath.length !== 3 ) {
-      return false;
-    }
-    for ( let i = 0; i < 3; i++ ) {
-      if ( isNaN( splitPath[ i ] ) ) {
-        return false;
-      }
-    }
-    return true;
-  } );
-
-  // sort the names in numerical (not lexical) order
-  versions.sort( function( a, b ) {
-    const aTokenized = a.split( '.' );
-    const bTokenized = b.split( '.' );
-    let result = 0;
-    for ( let i = 0; i < aTokenized.length; i++ ) {
-      if ( parseInt( aTokenized[ i ], 10 ) < parseInt( bTokenized[ i ], 10 ) ) {
-        result = -1;
-        break;
-      }
-      else if ( parseInt( aTokenized[ i ], 10 ) > parseInt( bTokenized[ i ], 10 ) ) {
-        result = 1;
-        break;
-      }
-    }
-    return result;
-  } );
-  return versions;
-}
 
 // set this process up with the appropriate permissions, value is in octal
 process.umask( parseInt( '0002', 8 ) );
 
-// for storing an email address to send build failure emails to that is passed as a parameter on a per build basis
-let emailParameter = null;
-
-// Handle command line input
-// First 2 args provide info about executables, ignore
+/**
+ * Handle command line input
+ * First 2 args provide info about executables, ignore
+  */
 const parsedCommandLineOptions = parseArgs( process.argv.slice( 2 ), {
   boolean: true
 } );
 
 const defaultOptions = {
-  verbose: BUILD_SERVER_CONFIG.verbose, // can be overridden by a flag on the command line
+  verbose: constants.BUILD_SERVER_CONFIG.verbose, // can be overridden by a flag on the command line
 
   // options for supporting help
   help: false,
@@ -252,65 +81,6 @@ winston.add( winston.transports.Console, {
   }
 } );
 
-// configure email server
-let emailServer;
-if ( BUILD_SERVER_CONFIG.emailUsername && BUILD_SERVER_CONFIG.emailPassword && BUILD_SERVER_CONFIG.emailTo ) {
-  emailServer = email.server.connect( {
-    user: BUILD_SERVER_CONFIG.emailUsername,
-    password: BUILD_SERVER_CONFIG.emailPassword,
-    host: BUILD_SERVER_CONFIG.emailServer,
-    tls: true
-  } );
-}
-else {
-  winston.log( 'warn', 'failed to set up email server, missing one or more of the following fields in build-local.json:\n' +
-                       'emailUsername, emailPassword, emailTo' );
-}
-
-/**
- * Send an email. Used to notify developers if a build fails
- * @param subject
- * @param text
- * @param emailParameterOnly - if true send the email only to the passed in email, not to the default list as well
- */
-function sendEmail( subject, text, emailParameterOnly ) {
-  if ( emailServer ) {
-    let emailTo = BUILD_SERVER_CONFIG.emailTo;
-
-    if ( emailParameter ) {
-      if ( emailParameterOnly ) {
-        emailTo = emailParameter;
-      }
-      else {
-        emailTo += ( ', ' + emailParameter );
-      }
-    }
-
-    // don't send an email if no email is given
-    if ( emailParameterOnly && !emailParameter ) {
-      return;
-    }
-
-    winston.log( 'info', 'attempting to send email' );
-    emailServer.send( {
-        text: text,
-        from: 'PhET Build Server <phethelp@colorado.edu>',
-        to: emailTo,
-        subject: subject
-      },
-      function( err, message ) {
-        if ( err ) {
-          winston.log( 'error', 'error when attempted to send email, err = ' + err );
-        }
-        else {
-          winston.log( 'info', 'sent email to: ' + message.header.to +
-                               ', subject: ' + mimelib.decodeMimeWord( message.header.subject ) +
-                               ', text: ' + message.text );
-        }
-      }
-    );
-  }
-}
 
 /**
  * taskQueue ensures that only one build/deploy process will be happening at the same time.  The main build/deploy logic is here.
@@ -338,7 +108,7 @@ const taskQueue = async.queue( function( task, taskCallback ) {
   const res = task.res;
 
   // this may have been declared already?
-  emailParameter = task.email ? decodeURIComponent( task.email ) : null;
+  const email = task.email ? decodeURIComponent( task.email ) : null;
 
   const userId = ( task.translatorId ) ? decodeURIComponent( task.translatorId ) : undefined;
   if ( userId ) {
@@ -383,7 +153,7 @@ const taskQueue = async.queue( function( task, taskCallback ) {
             'error',
             'error running command: ' + command + ' in ' + dir + ', err: ' + err + ', stdout: ' + stdout + ', build aborted.'
           );
-          exec( 'grunt checkout-master-all', PERENNIAL, function() {
+          exec( 'grunt checkout-master-all', constants.PERENNIAL, function() {
             winston.log( 'info', 'checking out master for every repo in case build shas are still checked out' );
             taskCallback( 'error running command ' + command + ': ' + err ); // build aborted, so take this build task off of the queue
           } );
@@ -414,7 +184,7 @@ const taskQueue = async.queue( function( task, taskCallback ) {
    */
   const abortBuild = function( err ) {
     winston.log( 'error', 'BUILD ABORTED! ' + err );
-    exec( 'grunt checkout-master-all', PERENNIAL, function() {
+    exec( 'grunt checkout-master-all', constants.PERENNIAL, function() {
       winston.log( 'info', 'build aborted: checking out master for every repo in case build shas are still checked out' );
       taskCallback( err ); // build aborted, so take this build task off of the queue
     } );
@@ -510,11 +280,11 @@ const taskQueue = async.queue( function( task, taskCallback ) {
     else {
 
       // from grunt deploy-production
-      const simDirectory = HTML_SIMS_DIRECTORY + simName;
+      const simDirectory = constants.HTML_SIMS_DIRECTORY + simName;
       const versionDirectories = getSortedVersionDirectories( simDirectory );
       if ( versionDirectories.length > 0 ) {
         const latest = versionDirectories[ versionDirectories.length - 1 ];
-        const translationsXMLFile = HTML_SIMS_DIRECTORY + simName + '/' + latest + '/' + simName + '.xml';
+        const translationsXMLFile = constants.HTML_SIMS_DIRECTORY + simName + '/' + latest + '/' + simName + '.xml';
         winston.log( 'info', 'path to translations XML file = ' + translationsXMLFile );
         const xmlString = fs.readFileSync( translationsXMLFile );
         parseString( xmlString, function( err, xmlData ) {
@@ -544,119 +314,44 @@ const taskQueue = async.queue( function( task, taskCallback ) {
   };
 
   /**
-   * Create a [sim name].xml file in the live sim directory in htdocs. This file tells the website which
-   * translations exist for a given sim. It is used by the "synchronize" method in Project.java in the website code.
-   * @param simTitleCallback
-   * @param callback
-   */
-  const createTranslationsXML = function( simTitleCallback, callback ) {
-
-    const rootdir = '../babel/' + simName;
-    const englishStringsFile = simName + '-strings_en.json';
-    const stringFiles = [ { name: englishStringsFile, locale: ENGLISH_LOCALE } ];
-
-    // pull all the string filenames and locales from babel and store in stringFiles array
-    try {
-      const files = fs.readdirSync( rootdir );
-      for ( let i = 0; i < files.length; i++ ) {
-        const filename = files[ i ];
-        const firstUnderscoreIndex = filename.indexOf( '_' );
-        const periodIndex = filename.indexOf( '.' );
-        const locale = filename.substring( firstUnderscoreIndex + 1, periodIndex );
-        stringFiles.push( { name: filename, locale: locale } );
-      }
-    }
-    catch( e ) {
-      winston.log( 'warn', 'no directory for the given sim exists in babel' );
-    }
-
-    // try opening the english strings file so we can read the english strings
-    let englishStrings;
-    try {
-      englishStrings = JSON.parse( fs.readFileSync( '../' + simName + '/' + englishStringsFile, { encoding: 'utf-8' } ) );
-    }
-    catch( e ) {
-      abortBuild( 'English strings file not found' );
-      return;
-    }
-
-    const simTitleKey = simName + '.title'; // all sims must have a key of this form
-
-    if ( englishStrings[ simTitleKey ] ) {
-      simTitleCallback( englishStrings[ simTitleKey ].value );
-    }
-    else {
-      abortBuild( 'no key for sim title' );
-      return;
-    }
-
-    // create xml, making a simulation tag for each language
-    let finalXML = '<?xml version="1.0" encoding="utf-8" ?>\n' +
-                   '<project name="' + simName + '">\n' +
-                   '<simulations>\n';
-
-    for ( let j = 0; j < stringFiles.length; j++ ) {
-      const stringFile = stringFiles[ j ];
-      const languageJSON = ( stringFile.locale === ENGLISH_LOCALE ) ? englishStrings :
-                         JSON.parse( fs.readFileSync( '../babel' + '/' + simName + '/' + stringFile.name, { encoding: 'utf-8' } ) );
-
-      const simHTML = HTML_SIMS_DIRECTORY + simName + '/' + version + '/' + simName + '_' + stringFile.locale + '.html';
-
-      if ( fs.existsSync( simHTML ) ) {
-        const localizedSimTitle = ( languageJSON[ simTitleKey ] ) ? languageJSON[ simTitleKey ].value : englishStrings[ simTitleKey ].value;
-        finalXML = finalXML.concat( '<simulation name="' + simName + '" locale="' + stringFile.locale + '">\n' +
-                                    '<title><![CDATA[' + localizedSimTitle + ']]></title>\n' +
-                                    '</simulation>\n' );
-      }
-    }
-
-    finalXML = finalXML.concat( '</simulations>\n' + '</project>' );
-
-    fs.writeFileSync( HTML_SIMS_DIRECTORY + simName + '/' + version + '/' + simName + '.xml', finalXML );
-    winston.log( 'info', 'wrote XML file:\n' + finalXML );
-    callback();
-  };
-
-  /**
    * Write the .htaccess file to make "latest" point to the version being deployed and allow "download" links to work on Safari
    * @param callback
    */
   const writePhetHtaccess = function( callback ) {
     const contents = 'RewriteEngine on\n' +
-                   'RewriteBase /sims/html/' + simName + '/\n' +
-                   'RewriteRule latest(.*) ' + version + '$1\n' +
-                   'Header set Access-Control-Allow-Origin "*"\n\n' +
-                   'RewriteCond %{QUERY_STRING} =download\n' +
-                   'RewriteRule ([^/]*)$ - [L,E=download:$1]\n' +
-                   'Header onsuccess set Content-disposition "attachment; filename=%{download}e" env=download\n';
-    fs.writeFileSync( HTML_SIMS_DIRECTORY + simName + '/.htaccess', contents );
+                     'RewriteBase /sims/html/' + simName + '/\n' +
+                     'RewriteRule latest(.*) ' + version + '$1\n' +
+                     'Header set Access-Control-Allow-Origin "*"\n\n' +
+                     'RewriteCond %{QUERY_STRING} =download\n' +
+                     'RewriteRule ([^/]*)$ - [L,E=download:$1]\n' +
+                     'Header onsuccess set Content-disposition "attachment; filename=%{download}e" env=download\n';
+    fs.writeFileSync( constants.HTML_SIMS_DIRECTORY + simName + '/.htaccess', contents );
     callback();
   };
 
   /**
    * Writes the htaccess file to password protect the exclusive content for phet-io sims
+   * @param filepath - location to write the .htaccess file
+   * @param authFilepath - location of AuthUserFile on the dev server
    * @param callback
    */
   const writePhetioHtaccess = function( filepath, authFilepath, callback ) {
     const contents = 'AuthType Basic\n' +
-                   'AuthName "PhET-iO Password Protected Area"\n' +
-                   'AuthUserFile ' + authFilepath + '\n' +
-                   'Require valid-user\n';
+                     'AuthName "PhET-iO Password Protected Area"\n' +
+                     'AuthUserFile ' + authFilepath + '\n' +
+                     'Require valid-user\n';
     fs.writeFileSync( filepath, contents );
     callback();
   };
 
   /**
-   * Copy files to spot.
-   * If the brand is phet, it only copies the english sim file.
-   * If the brand is phet-io, it copies the entire sim directory including the .htaccess file.
+   * Copy files to dev server, typically spot.colorado.edu.
    *
-   * @param brand:String
    * @param callback
    */
-  const spotScp = function( brand, callback ) {
-    const userAtServer = BUILD_SERVER_CONFIG.devUsername + '@' + BUILD_SERVER_CONFIG.devDeployServer;
-    const simVersionDirectory = BUILD_SERVER_CONFIG.devDeployPath + simName + '/' + version;
+  const spotScp = function( callback ) {
+    const userAtServer = constants.BUILD_SERVER_CONFIG.devUsername + '@' + constants.BUILD_SERVER_CONFIG.devDeployServer;
+    const simVersionDirectory = constants.BUILD_SERVER_CONFIG.devDeployPath + simName + '/' + version;
 
     // mkdir first in case it doesn't exist already
     const mkdirCommand = 'ssh ' + userAtServer + ' \'mkdir -p ' + simVersionDirectory + '\'';
@@ -674,6 +369,7 @@ const taskQueue = async.queue( function( task, taskCallback ) {
       const scpTarget = userAtServer + ':' + simVersionDirectory;
 
       // copy the files
+      // todo: copy entire build directory but without translations
       if ( brand !== 'phet-io' ) {
         // only copy english html
         exec( 'scp -r *_en*.html ' + scpTarget, buildDir, function() {
@@ -710,7 +406,7 @@ const taskQueue = async.queue( function( task, taskCallback ) {
         }
         else {
 
-          const testUrl = BUILD_SERVER_CONFIG.productionServerURL + '/sims/html/' + simName + '/latest/' + simName + '_en.html';
+          const testUrl = constants.BUILD_SERVER_CONFIG.productionServerURL + '/sims/html/' + simName + '/latest/' + simName + '_en.html';
           let newSim = true;
 
           for ( let i = 0; i < data.length; i++ ) {
@@ -742,7 +438,7 @@ const taskQueue = async.queue( function( task, taskCallback ) {
                 exec( 'git commit -a -m "[automated commit] add ' + simTitle + ' to simInfoArray"', '../rosetta', function() {
                   execWithoutAbort( 'git push origin master', '../rosetta', function( err ) {
                     if ( err ) {
-                      sendEmail( 'ROSETTA PUSH FAILED', err );
+                      sendEmail( 'ROSETTA PUSH FAILED', err, email );
                     }
                     callback();
                   } );
@@ -823,12 +519,12 @@ const taskQueue = async.queue( function( task, taskCallback ) {
    */
   const notifyServer = function( callback ) {
     const project = 'html/' + simName;
-    const url = BUILD_SERVER_CONFIG.productionServerURL + '/services/synchronize-project?projectName=' + project;
+    const url = constants.BUILD_SERVER_CONFIG.productionServerURL + '/services/synchronize-project?projectName=' + project;
     request( {
       url: url,
       auth: {
         user: 'token',
-        pass: BUILD_SERVER_CONFIG.serverToken,
+        pass: constants.BUILD_SERVER_CONFIG.serverToken,
         sendImmediately: true
       }
     }, function( error, response, body ) {
@@ -838,18 +534,18 @@ const taskQueue = async.queue( function( task, taskCallback ) {
         const syncResponse = JSON.parse( body );
 
         if ( !syncResponse.success ) {
-          errorMessage = 'request to synchronize project ' + project + ' on ' + BUILD_SERVER_CONFIG.productionServerName + ' failed with message: ' + syncResponse.error;
+          errorMessage = 'request to synchronize project ' + project + ' on ' + constants.BUILD_SERVER_CONFIG.productionServerName + ' failed with message: ' + syncResponse.error;
           winston.log( 'error', errorMessage );
-          sendEmail( 'SYNCHRONIZE FAILED', errorMessage );
+          sendEmail( 'SYNCHRONIZE FAILED', errorMessage, email );
         }
         else {
-          winston.log( 'info', 'request to synchronize project ' + project + ' on ' + BUILD_SERVER_CONFIG.productionServerName + ' succeeded' );
+          winston.log( 'info', 'request to synchronize project ' + project + ' on ' + constants.BUILD_SERVER_CONFIG.productionServerName + ' succeeded' );
         }
       }
       else {
         errorMessage = 'request to synchronize project errored or returned a non 200 status code';
         winston.log( 'error', errorMessage );
-        sendEmail( 'SYNCHRONIZE FAILED', errorMessage );
+        sendEmail( 'SYNCHRONIZE FAILED', errorMessage, email );
       }
 
       if ( callback ) {
@@ -862,9 +558,9 @@ const taskQueue = async.queue( function( task, taskCallback ) {
   const addTranslator = function( locale, callback ) {
 
     // create the URL
-    const addTranslatorURL = BUILD_SERVER_CONFIG.productionServerURL + '/services/add-html-translator?simName=' + simName +
-                           '&locale=' + locale + '&userId=' + userId + '&authorizationCode=' +
-                           BUILD_SERVER_CONFIG.databaseAuthorizationCode;
+    const addTranslatorURL = constants.BUILD_SERVER_CONFIG.productionServerURL + '/services/add-html-translator?simName=' + simName +
+                             '&locale=' + locale + '&userId=' + userId + '&authorizationCode=' +
+                             constants.BUILD_SERVER_CONFIG.databaseAuthorizationCode;
 
     // log the URL
     winston.log( 'info', 'URL for adding translator to credits = ' + addTranslatorURL );
@@ -885,7 +581,7 @@ const taskQueue = async.queue( function( task, taskCallback ) {
    * Clean up after deploy. Checkout master for every repo and remove tmp dir.
    */
   const afterDeploy = function() {
-    exec( 'grunt checkout-master-all', PERENNIAL, function() {
+    exec( 'grunt checkout-master-all', constants.PERENNIAL, function() {
       exec( 'rm -rf ' + buildDir, '.', function() {
         taskCallback();
       } );
@@ -912,12 +608,12 @@ const taskQueue = async.queue( function( task, taskCallback ) {
         };
 
         // run every step of the build
-        exec( 'git pull', PERENNIAL, function() {
-          exec( 'npm prune', PERENNIAL, function() {
-            exec( 'npm update', PERENNIAL, function() {
+        exec( 'git pull', constants.PERENNIAL, function() {
+          exec( 'npm prune', constants.PERENNIAL, function() {
+            exec( 'npm update', constants.PERENNIAL, function() {
               exec( './chipper/bin/clone-missing-repos.sh', '..', function() { // clone missing repos in case any new repos exist that might be dependencies
                 pullMaster( function() {
-                  exec( 'grunt checkout-shas --buildServer=true --repo=' + simName, PERENNIAL, function() {
+                  exec( 'grunt checkout-shas --buildServer=true --repo=' + simName, constants.PERENNIAL, function() {
                     exec( 'git checkout ' + repos[ simName ].sha, simDir, function() { // checkout the sha for the current sim
                       exec( 'npm prune', '../chipper', function() {
                         exec( 'npm update', '../chipper', function() { // npm update in chipper in case there are new dependencies there
@@ -927,29 +623,29 @@ const taskQueue = async.queue( function( task, taskCallback ) {
                                 const brandLocales = ( brand === 'phet' ) ? locales : 'en';
                                 winston.log( 'info', 'building for brand: ' + brand + ' version: ' + version );
                                 exec( 'grunt build-for-server --allHTML --brand=' + brand + ' --locales=' + brandLocales, simDir, function() {
-                                  if ( option === 'rc' ) {
-                                    if ( brand === 'phet' ) {
-                                      spotScp( brand, afterDeploy );
+                                  if ( task.servers.indexOf( constants.DEV_SERVER ) >= 0 ) {
+                                    if ( task.brands.indexOf( constants.PHET_BRAND ) ) {
+                                      spotScp( afterDeploy );
                                     }
-                                    else if ( brand === 'phet-io' ) {
+                                    else if ( task.brands.indexOf( constants.PHET_IO_BRAND ) ) {
                                       writePhetioHtaccess( simDir + '/build/.htaccess', '/htdocs/physics/phet-io/config/.htpasswd', function() {
-                                        spotScp( brand, afterDeploy );
+                                        spotScp( afterDeploy );
                                       } );
                                     }
                                   }
                                   else {
                                     let targetDir;
                                     if ( brand === 'phet' ) {
-                                      targetDir = HTML_SIMS_DIRECTORY + simName + '/' + version + '/';
+                                      targetDir = constants.HTML_SIMS_DIRECTORY + simName + '/' + version + '/';
                                     }
                                     else if ( brand === 'phet-io' ) {
-                                      targetDir = PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/';
+                                      targetDir = constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/';
                                     }
                                     mkVersionDir( targetDir, function() {
                                       exec( 'cp -r build/* ' + targetDir, simDir, function() {
                                         if ( brand === 'phet' ) {
                                           writePhetHtaccess( function() {
-                                            createTranslationsXML( simTitleCallback, function() {
+                                            createTranslationsXML( simTitleCallback, simName, winston, function() {
                                               notifyServer( function() {
                                                 addToRosetta( simTitle, function() {
 
@@ -968,7 +664,7 @@ const taskQueue = async.queue( function( task, taskCallback ) {
                                         }
                                         else {
                                           writePhetioHtaccess(
-                                            PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess',
+                                            constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess',
                                             '/etc/httpd/conf/phet-io_pw',
                                             afterDeploy
                                           );
@@ -1027,47 +723,46 @@ function getQueueDeploy( req, res ) {
 }
 
 function queueDeployApiVersion1( req, res, key ) {
-  const repos = req[ key ][ REPOS_KEY ];
-  const simName = req[ key ][ SIM_NAME_KEY ];
-  const version = req[ key ][ VERSION_KEY ];
-  const brands = version.indexOf( 'phetio' ) < 0 ? [ 'phet' ] : [ 'phet-io' ];
-  const locales = req[ key ][ LOCALES_KEY ];
-  const option = req[ key ][ OPTION_KEY ] ? decodeURIComponent( req[ key ][ OPTION_KEY ] ) : 'default';
-  const servers = ( option === 'rc' ) ? [ PRODUCTION_SERVER ] : [ DEV_SERVER ];
-  const email = req[ key ][ EMAIL_KEY ];
-  const translatorId = req[ key ][ USER_ID_KEY ];
-  const authorizationKey = req[ key ][ AUTHORIZATION_KEY ];
+  const repos = decodeURIComponent( req[ key ][ constants.REPOS_KEY ] );
+  const simName = decodeURIComponent( req[ key ][ constants.SIM_NAME_KEY ] );
+  const version = decodeURIComponent( req[ key ][ constants.VERSION_KEY ] );
+  const locales = decodeURIComponent( req[ key ][ constants.LOCALES_KEY ] );
+  const option = req[ key ][ constants.OPTION_KEY ] ? decodeURIComponent( req[ key ][ constants.OPTION_KEY ] ) : 'default';
+  const email = req[ key ][ constants.EMAIL_KEY ] ? decodeURIComponent( req[ key ][ constants.EMAIL_KEY ] ) : null;
+  const translatorId = decodeURIComponent( req[ key ][ constants.USER_ID_KEY ] );
+  const authorizationKey = decodeURIComponent( req[ key ][ constants.AUTHORIZATION_KEY ] );
 
-  queueDeploy( repos, simName, version, locales, servers, brands, email, translatorId, authorizationKey, req, res );
+  const servers = ( option === 'rc' ) ? [ constants.PRODUCTION_SERVER ] : [ constants.DEV_SERVER ];
+  const brands = version.indexOf( 'phetio' ) < 0 ? [ constants.PHET_BRAND ] : [ constants.PHET_IO_BRAND ];
+
+  queueDeploy( '1.0', repos, simName, version, locales, servers, brands, email, translatorId, authorizationKey, req, res );
 }
 
 function postQueueDeploy( req, res ) {
   logRequest( req, 'body' );
 
-  const api = req.body[ API_KEY ]; // Used in the future
+  const api = decodeURIComponent( req.body[ constants.API_KEY ] ); // Used in the future
   if ( api && api.startsWith( '2.' ) ) {
-    const repos = req.body[ DEPENDENCIES_KEY ].repos;
-    const simName = req.body[ SIM_NAME_KEY ];
-    const version = req.body[ VERSION_KEY ];
-    const locales = req.body[ LOCALES_KEY ];
-    const servers = req.body[ SERVERS_KEY ];
-    const brands = req.body[ BRANDS_KEY ];
-    const authorizationKey = req.body[ AUTHORIZATION_KEY ];
-    const translatorId = req.body[ TRANSLATOR_ID_KEY ];
-    const email = req.body[ EMAIL_KEY ];
+    const repos = JSON.parse( decodeURIComponent( req.body[ constants.DEPENDENCIES_KEY ].repos ) );
+    const simName = decodeURIComponent( req.body[ constants.SIM_NAME_KEY ] );
+    const version = decodeURIComponent( req.body[ constants.VERSION_KEY ] );
+    const locales = decodeURIComponent( req.body[ constants.LOCALES_KEY ] );
+    const servers = JSON.parse( decodeURIComponent( req.body[ constants.SERVERS_KEY ] ) );
+    const brands = JSON.parse( decodeURIComponent( req.body[ constants.BRANDS_KEY ] ) );
+    const authorizationKey = decodeURIComponent( req.body[ constants.AUTHORIZATION_KEY ] );
+    const translatorId = decodeURIComponent( req.body[ constants.TRANSLATOR_ID_KEY ] );
+    const email = decodeURIComponent( req.body[ constants.EMAIL_KEY ] );
 
-    queueDeploy( repos, simName, version, locales, servers, brands, email, translatorId, authorizationKey, req, res );
+    queueDeploy( api, repos, simName, version, locales, servers, brands, email, translatorId, authorizationKey, req, res );
   }
   else {
     queueDeployApiVersion1( req, res, 'body' );
   }
 }
 
-function queueDeploy( repos, simName, version, locales, brands, servers, email, translatorId, authorizationKey, req, res ) {
-
-
+function queueDeploy( api, repos, simName, version, locales, brands, servers, email, translatorId, authorizationKey, req, res ) {
   if ( repos && simName && version && authorizationKey ) {
-    if ( authorizationKey !== BUILD_SERVER_CONFIG.buildServerAuthorizationCode ) {
+    if ( authorizationKey !== constants.BUILD_SERVER_CONFIG.buildServerAuthorizationCode ) {
       const err = 'wrong authorization code';
       winston.log( 'error', err );
       res.send( err );
@@ -1076,8 +771,8 @@ function queueDeploy( repos, simName, version, locales, brands, servers, email, 
       winston.log( 'info', 'queuing build for ' + simName + ' ' + version );
       taskQueue.push( { repos, simName, version, locales, servers, brands, email, translatorId, res }, function( err ) {
         const simInfoString = 'Sim = ' + decodeURIComponent( simName ) +
-                            ' Version = ' + decodeURIComponent( version ) +
-                            ' Locales = ' + ( locales ? decodeURIComponent( locales ) : 'undefined' );
+                              ' Version = ' + decodeURIComponent( version ) +
+                              ' Locales = ' + ( locales ? decodeURIComponent( locales ) : 'undefined' );
 
         if ( err ) {
           let shas = decodeURIComponent( repos );
@@ -1091,15 +786,15 @@ function queueDeploy( repos, simName, version, locales, brands, servers, email, 
           }
           const errorMessage = 'Build failed with error: ' + err + '. ' + simInfoString + ' Shas = ' + shas;
           winston.log( 'error', errorMessage );
-          sendEmail( 'BUILD ERROR', errorMessage );
+          sendEmail( 'BUILD ERROR', errorMessage, email );
         }
         else {
           winston.log( 'info', 'build for ' + simName + ' finished successfully' );
-          sendEmail( 'Build Succeeded', simInfoString, true );
+          sendEmail( 'Build Succeeded', simInfoString, email, true );
         }
 
         // reset email parameter to null after build finishes or errors, since this email address may be different on every build
-        emailParameter = null;
+        email = null;
       } );
     }
   }
@@ -1122,7 +817,7 @@ app.get( '/deploy-html-simulation', getQueueDeploy );
 app.post( '/deploy-html-simulation', postQueueDeploy );
 
 // start the server
-app.listen( LISTEN_PORT, function() {
-  winston.log( 'info', 'Listening on port ' + LISTEN_PORT );
+app.listen( constants.LISTEN_PORT, function() {
+  winston.log( 'info', 'Listening on port ' + constants.LISTEN_PORT );
   winston.log( 'info', 'Verbose mode: ' + verbose );
 } );
