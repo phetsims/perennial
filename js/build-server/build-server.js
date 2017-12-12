@@ -921,7 +921,7 @@ const taskQueue = async.queue( function( task, taskCallback ) {
                               getLocales( locales, function( locales ) {
                                 const brandLocales = ( brand === 'phet' ) ? locales : 'en';
                                 winston.log( 'info', 'building for brand: ' + brand + ' version: ' + version );
-                                exec( 'grunt build-for-server --brand=' + brand + ' --locales=' + brandLocales, simDir, function() {
+                                exec( 'grunt build-for-server --allHTML --brand=' + brand + ' --locales=' + brandLocales, simDir, function() {
                                   if ( option === 'rc' ) {
                                     if ( brand === 'phet' ) {
                                       spotScp( brand, afterDeploy );
