@@ -9,8 +9,6 @@
 /* eslint-env browser, node */
 'use strict';
 
-const brandToSuffix = require( './brandToSuffix' );
-
 (function() {
 
   /**
@@ -19,10 +17,9 @@ const brandToSuffix = require( './brandToSuffix' );
    * @param {number} major - The major part of the version (the 3 in 3.1.2)
    * @param {number} minor - The minor part of the version (the 1 in 3.1.2)
    * @param {number} maintenance - The maintenance part of the version (the 2 in 3.1.2)
-   * @param {string} brand - The brand name identifier, e.g. 'phet', 'phet-io'
    * @param {Object} options
    */
-  function SimVersion( major, minor, maintenance, brand, options ) {
+  function SimVersion( major, minor, maintenance, options ) {
 
     // Can't depend on lodash to be available easily
     // TODO: improve options pattern
@@ -39,9 +36,6 @@ const brandToSuffix = require( './brandToSuffix' );
     }
     if ( typeof maintenance !== 'number' || maintenance < 0 || maintenance % 1 !== 0 ) {
       throw new Error( 'maintenance version should be a non-negative integer' );
-    }
-    if ( typeof brand !== 'string' ) {
-      throw new Error( 'brand required' );
     }
     if ( typeof options.testType === 'string' && typeof options.testNumber !== 'number' ) {
       throw new Error( 'if testType is provided, testNumber should be a number' );
@@ -62,9 +56,6 @@ const brandToSuffix = require( './brandToSuffix' );
 
     // @public {number|null}
     this.testNumber = options.testNumber;
-
-    // @public {string}
-    this.brand = brand;
 
     // @public {string|null} - If provided, like '2015-06-12 16:05:03 UTC' (phet.chipper.buildTimestamp)
     this.buildTimestamp = options.buildTimestamp;
@@ -115,16 +106,6 @@ const brandToSuffix = require( './brandToSuffix' );
         str += `-${this.testType}.${this.testNumber}`;
       }
       return str;
-    },
-
-    /**
-     * Returns the string form of the version, including all extra bits of information (brand, etc.)
-     * @public
-     *
-     * @returns {string}
-     */
-    toFullString() {
-      return this.toString() + '-' + brandToSuffix( this.brand );
     }
   };
 
@@ -148,18 +129,9 @@ const brandToSuffix = require( './brandToSuffix' );
     const maintenance = parseInt( matches[ 3 ], 10 );
     const testType = matches[ 6 ];
     const testNumber = matches[ 7 ] === undefined ? matches[ 7 ] : parseInt( matches[ 7 ], 10 );
-    var brand = matches[ 9 ];
-    if ( brand === undefined ) {
-      brand = 'phet';
-    }
-    else if ( brand === 'phetio' ) {
-      brand = 'phet-io';
-    }
-    else {
-      brand = brand.replace( /([A-Z])/g, '-$1' ).toLowerCase();
-    }
+    // const brand = matches[ 9 ];
 
-    return new SimVersion( major, minor, maintenance, brand, { testType, testNumber, buildTimestamp } );
+    return new SimVersion( major, minor, maintenance, { testType, testNumber, buildTimestamp } );
   };
 
   // browser require.js-compatible definition

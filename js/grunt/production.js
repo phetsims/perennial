@@ -68,7 +68,7 @@ module.exports = async function( repo, branch, brands ) {
   var versionChanged;
 
   if ( previousVersion.testType === null ) {
-    const redeployConfirmation = await prompt( `It appears that the last deployment was a production deployment (${previousVersion.toFullString()}).\nWould you like to redeploy (i.e. did the last production deploy fail for some reason?) [Y/n]?` );
+    const redeployConfirmation = await prompt( `It appears that the last deployment was a production deployment (${previousVersion.toString()}).\nWould you like to redeploy (i.e. did the last production deploy fail for some reason?) [Y/n]?` );
     if ( redeployConfirmation === 'n' ) {
       grunt.fail.fatal( 'Aborted production deployment' );
     }
@@ -77,8 +77,7 @@ module.exports = async function( repo, branch, brands ) {
     versionChanged = false;
   }
   else if ( previousVersion.testType === 'rc' ) {
-    // TODO: SimVersion not including brand (presumably)
-    version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, 'phet' );
+    version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance );
     versionChanged = true;
   }
   else {
@@ -97,7 +96,8 @@ module.exports = async function( repo, branch, brands ) {
 
   // TODO: reduce this code duplication with dev.js
   const versionString = version.toString();
-  const fullVersionString = version.toFullString();
+  const fullVersionString = version.toString();
+  // TODO: unhandle fullVersionString stuff
 
   // caps-lock should hopefully shout this at people. do we have a text-to-speech synthesizer we can shout out of their speakers?
   // SECOND THOUGHT: this would be horrible during automated maintenance releases.

@@ -31,13 +31,13 @@ module.exports = async function( repo, version, dependencies, options ) {
       rc = false
     } = options || {};
 
-    winston.info( `sending build request for ${repo} ${version.toFullString()} with dependencies: ${JSON.stringify( dependencies )}` );
+    winston.info( `sending build request for ${repo} ${version.toString()} with dependencies: ${JSON.stringify( dependencies )}` );
 
     const requestObject = {
       repos: JSON.stringify( dependencies ),
       locales,
       simName: repo,
-      version: version.toFullString(),
+      version: version.toString(),
       authorizationCode: buildLocal.buildServerAuthorizationCode
     };
     if ( rc ) {

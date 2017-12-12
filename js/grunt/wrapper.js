@@ -55,7 +55,7 @@ module.exports = async function( repo ) {
   }
 
   // Bump the version
-  const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, 'phet-io', {
+  const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, {
     testType: 'dev',
     testNumber: previousVersion.testNumber + 1
     // TODO: handle one-off things

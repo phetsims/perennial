@@ -56,8 +56,7 @@ module.exports = async function( repo, brands ) {
   brands.forEach( brand => assert( supportedBrands.includes( brand ), `Brand ${brand} not included in ${repo}'s supported brands: ${supportedBrands.join( ',' )}` ) );
 
   // Bump the version
-  // TODO: look into removing the brand from SimVersion (not needed)
-  const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, 'phet', {
+  const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, {
     testType: 'dev',
     testNumber: previousVersion.testNumber + 1
     // TODO: handle one-off things

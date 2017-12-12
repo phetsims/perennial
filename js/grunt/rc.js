@@ -39,8 +39,6 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  * @param {Array.<string>} brands
  */
 module.exports = async function( repo, branch, brands ) {
-  // TODO: does this happen for multiple brands?
-
   const major = parseInt( branch.split( '.' )[ 0 ], 10 );
   const minor = parseInt( branch.split( '.' )[ 1 ], 10 );
   assert( major > 0, 'Major version for a branch should be greater than zero' );
@@ -68,8 +66,7 @@ module.exports = async function( repo, branch, brands ) {
     grunt.fail.fatal( `Aborted rc deployment since the version number cannot be incremented safely (testType:${previousVersion.testType})` );
   }
 
-  // TODO: SimVersion brand removal
-  const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, 'phet', {
+  const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, {
     testType: 'rc',
     testNumber: previousVersion.testNumber ? previousVersion.testNumber + 1 : 1
   } );
