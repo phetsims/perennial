@@ -69,7 +69,7 @@ async function getLocales( locales, simName ) {
 
   winston.log( 'info', 'building locales=' + callbackLocales );
 
-  return Promise.resolve( callbackLocales );
+  return callbackLocales;
 }
 
 module.exports = getLocales;

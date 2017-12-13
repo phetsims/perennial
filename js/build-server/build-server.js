@@ -150,9 +150,17 @@ function postQueueDeploy( req, res ) {
  * @param {express.Response} res
  */
 function queueDeploy( repos, simName, version, locales, brands, servers, email, translatorId, authorizationKey, req, res ) {
+
   if ( repos && simName && version && authorizationKey ) {
+    const productionBrands = [ constants.PHET_BRAND, constants.PHET_IO_BRAND ];
+
     if ( authorizationKey !== constants.BUILD_SERVER_CONFIG.buildServerAuthorizationCode ) {
       const err = 'wrong authorization code';
+      winston.log( 'error', err );
+      res.send( err );
+    }
+    else if ( servers.indexOf( constants.PRODUCTION_SERVER ) >= 0 && brands.some( brand => { return !productionBrands.includes( brand ); } ) ) {
+      const err = 'Cannot complete production deploys for brands outside of phet and phet-io';
       winston.log( 'error', err );
       res.send( err );
     }
