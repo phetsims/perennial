@@ -14,16 +14,16 @@ const grunt = require( 'grunt' );
 var KEY = ' = require( '; // the substring that is searched to find require statements
 
 /**
- * @param {string} file
+ * @param {string} path
  */
-module.exports = function( file ) {
+module.exports = function( path ) {
   'use strict';
-  
+
   // only address js files
-  if ( file.indexOf( '.js' ) ) {
+  if ( path.indexOf( '.js' ) ) {
 
     // read the file as text
-    var text = grunt.file.read( file ).toString();
+    var text = grunt.file.read( path ).toString();
 
     // split by line
     var lines = text.split( /\r?\n/ );
@@ -69,7 +69,7 @@ module.exports = function( file ) {
       }
     }
 
-    grunt.file.write( file, result.join( '\n' ) );
-    grunt.log.writeln( 'sorted ' + count + ' require statements in ' + file );
+    grunt.file.write( path, result.join( '\n' ) );
+    grunt.log.writeln( 'sorted ' + count + ' require statements in ' + path );
   }
 };
