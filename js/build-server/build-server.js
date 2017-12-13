@@ -88,7 +88,13 @@ function getQueueDeploy( req, res ) {
   queueDeployApiVersion1( req, res, 'query' );
 }
 
-// Handle chipper 1.0 requests
+/**
+ * Handle chipper 1.0 requests
+ *
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {String} key - one of 'query' or 'body', used to differentiate query parameters or POST data.
+ */
 function queueDeployApiVersion1( req, res, key ) {
   const repos = decodeURIComponent( req[ key ][ constants.REPOS_KEY ] );
   const simName = decodeURIComponent( req[ key ][ constants.SIM_NAME_KEY ] );
@@ -108,7 +114,8 @@ function queueDeployApiVersion1( req, res, key ) {
 function postQueueDeploy( req, res ) {
   logRequest( req, 'body', winston );
 
-  const api = decodeURIComponent( req.body[ constants.API_KEY ] ); // Used in the future
+  const api = decodeURIComponent( req.body[ constants.API_KEY ] );
+
   if ( api && api.startsWith( '2.' ) ) {
     const repos = JSON.parse( decodeURIComponent( req.body[ constants.DEPENDENCIES_KEY ].repos ) );
     const simName = decodeURIComponent( req.body[ constants.SIM_NAME_KEY ] );
@@ -127,7 +134,22 @@ function postQueueDeploy( req, res ) {
   }
 }
 
-function queueDeploy( api, repos, simName, version, locales, brands, servers, email, translatorId, authorizationKey, req, res ) {
+/**
+ * Adds the request to the processing queue and handles email notifications about success or failures
+ *
+ * @param {Object} repos
+ * @param {String} simName
+ * @param {String} version
+ * @param {Array.<String>} locales
+ * @param {Array.<String>} brands
+ * @param {Array.<String>} servers
+ * @param {String} email
+ * @param {String} translatorId
+ * @param {String} authorizationKey
+ * @param {express.Request} req
+ * @param {express.Response} res
+ */
+function queueDeploy( repos, simName, version, locales, brands, servers, email, translatorId, authorizationKey, req, res ) {
   if ( repos && simName && version && authorizationKey ) {
     if ( authorizationKey !== constants.BUILD_SERVER_CONFIG.buildServerAuthorizationCode ) {
       const err = 'wrong authorization code';
