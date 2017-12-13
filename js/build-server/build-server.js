@@ -117,7 +117,7 @@ function postQueueDeploy( req, res ) {
   const api = decodeURIComponent( req.body[ constants.API_KEY ] );
 
   if ( api && api.startsWith( '2.' ) ) {
-    const repos = JSON.parse( decodeURIComponent( req.body[ constants.DEPENDENCIES_KEY ].repos ) );
+    const repos = JSON.parse( decodeURIComponent( req.body[ constants.DEPENDENCIES_KEY ] ) ).repos;
     const simName = decodeURIComponent( req.body[ constants.SIM_NAME_KEY ] );
     const version = decodeURIComponent( req.body[ constants.VERSION_KEY ] );
     const locales = decodeURIComponent( req.body[ constants.LOCALES_KEY ] ) || null;
