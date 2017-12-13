@@ -100,6 +100,7 @@ module.exports = async function( task, taskCallback ) {
   // make sure the repos passed in validates
   for ( let key in repos ) {
     if ( repos.hasOwnProperty( key ) ) {
+      winston.log( 'debug', 'Validating repo: ' + key );
 
       // make sure all keys in repos object are valid sim names
       if ( !simNameRegex.test( key ) ) {
