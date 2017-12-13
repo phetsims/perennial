@@ -26,7 +26,7 @@ module.exports = async function( repo, options ) {
   const {
     brands = [ 'phet' ],
     locales = 'en',
-    allHTML = false,
+    allHTML = true,
     debugHTML = true, // Desired in almost all perennial builds, so set to true here
     uglify = true,
     mangle = true,

@@ -10,7 +10,6 @@
 
 // modules
 const _ = require( 'lodash' ); // eslint-disable-line
-const assert = require( 'assert' );
 const build = require( '../common/build' );
 const buildLocal = require( '../common/buildLocal' );
 const buildServerRequest = require( '../common/buildServerRequest' );
@@ -39,10 +38,7 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  * @param {Array.<string>} brands
  */
 module.exports = async function( repo, branch, brands ) {
-  const major = parseInt( branch.split( '.' )[ 0 ], 10 );
-  const minor = parseInt( branch.split( '.' )[ 1 ], 10 );
-  assert( major > 0, 'Major version for a branch should be greater than zero' );
-  assert( minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
+  SimVersion.ensureReleaseBranch( branch );
 
   const isClean = await gitIsClean( repo );
   if ( !isClean ) {
@@ -71,7 +67,6 @@ module.exports = async function( repo, branch, brands ) {
     testNumber: previousVersion.testNumber ? previousVersion.testNumber + 1 : 1
   } );
 
-  // TODO: reduce this code duplication with dev.js
   const versionString = version.toString();
   const simPath = buildLocal.devDeployPath + repo;
   const versionPath = simPath + '/' + versionString;

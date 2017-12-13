@@ -10,7 +10,6 @@
 
 // modules
 const _ = require( 'lodash' ); // eslint-disable-line
-const assert = require( 'assert' );
 const build = require( '../common/build' );
 const buildServerRequest = require( '../common/buildServerRequest' );
 const checkoutMaster = require( '../common/checkoutMaster' );
@@ -36,17 +35,12 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  * Deploys a production version after incrementing the test version number.
  * @public
  *
- * TODO: remove a lot of the duplication with rc deployments! (rc.js)
- *
  * @param {string} repo
  * @param {string} branch
  * @param {Array.<string>} brands
  */
 module.exports = async function( repo, branch, brands ) {
-  const major = parseInt( branch.split( '.' )[ 0 ], 10 );
-  const minor = parseInt( branch.split( '.' )[ 1 ], 10 );
-  assert( major > 0, 'Major version for a branch should be greater than zero' );
-  assert( minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
+  SimVersion.ensureReleaseBranch( branch );
 
   const isClean = await gitIsClean( repo );
   if ( !isClean ) {
@@ -98,7 +92,6 @@ module.exports = async function( repo, branch, brands ) {
     }
   }
 
-  // TODO: reduce this code duplication with dev.js
   const versionString = version.toString();
 
   // caps-lock should hopefully shout this at people. do we have a text-to-speech synthesizer we can shout out of their speakers?
@@ -152,7 +145,6 @@ module.exports = async function( repo, branch, brands ) {
     grunt.log.writeln( `Deployed: https://phet.colorado.edu/sims/html/${repo}/latest/${repo}_en.html` );
   }
   if ( brands.includes( 'phet-io' ) ) {
-    // TODO: this should include the brand in the path, but double-check
     grunt.log.writeln( `Deployed: https://phet-io.colorado.edu/sims/${repo}/${versionString}` );
   }
 

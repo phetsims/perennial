@@ -59,7 +59,6 @@ module.exports = async function( repo, brands ) {
   const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, {
     testType: 'dev',
     testNumber: previousVersion.testNumber + 1
-    // TODO: handle one-off things
   } );
 
   const versionString = version.toString();

@@ -28,7 +28,6 @@ module.exports = function( sourceFilename, destinationFilename ) {
     const writeStream = fs.createWriteStream( destinationFilename );
     readStream.pipe( writeStream );
     readStream.on( 'end', () => resolve() );
-    // TODO: do we need to close the readStream on an error? Can we just assume things will fail out and close the process?
     readStream.on( 'error', err => reject( err ) );
     writeStream.on( 'error', err => reject( err ) );
   } );
