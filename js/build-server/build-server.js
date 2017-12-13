@@ -673,7 +673,7 @@ const taskQueue = async.queue( function( task, taskCallback ) {
         // only copy english html
         exec( 'scp -r *_en*.html ' + scpTarget, buildDir, function() {
           // find non-html files and copy them to the remote server
-          exec( 'find . -type f ! -iname \'*.html\' -exec scp {} ' + scpTarget + ' ;', buildDir, finished );
+          exec( 'find . -type f ! -iname \'*.html\' -exec scp {} ' + scpTarget + ' \\;', buildDir, finished );
         } );
       }
       else {
