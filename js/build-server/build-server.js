@@ -117,7 +117,7 @@ function postQueueDeploy( req, res ) {
   const api = decodeURIComponent( req.body[ constants.API_KEY ] );
 
   if ( api && api.startsWith( '2.' ) ) {
-    const repos = req.body[ constants.DEPENDENCIES_KEY ].repos;
+    const repos = req.body[ constants.DEPENDENCIES_KEY ];
     const simName = req.body[ constants.SIM_NAME_KEY ];
     const version = req.body[ constants.VERSION_KEY ];
     const locales = req.body[ constants.LOCALES_KEY ] || null;
@@ -196,7 +196,7 @@ function queueDeploy( repos, simName, version, locales, brands, servers, email, 
     }
   }
   else {
-    const errorString = 'missing one or more required query parameters: repos, simName, version, authorizationKey';
+    const errorString = 'missing one or more required query parameters: dependencies, simName, version, authorizationCode';
     winston.log( 'error', errorString );
     res.send( errorString );
   }

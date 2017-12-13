@@ -8,7 +8,7 @@ module.exports = function logRequest( req, type, winston ) {
   let requestBodyString = '';
   for ( let key in req[ type ] ) {
     if ( req[ type ].hasOwnProperty( key ) ) {
-      requestBodyString += key + ':' + req[ type ][ key ] + '\n';
+      requestBodyString += key + ':' + JSON.stringify( req[ type ][ key ] ) + '\n';
     }
   }
   winston.log(
