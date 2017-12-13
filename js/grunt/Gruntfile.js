@@ -290,12 +290,12 @@ module.exports = function( grunt ) {
 
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
-      assert( grunt.option( 'brand' ), 'Requires specifying a brand with --brand={{BRAND}}' );
+      assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
       const done = grunt.task.current.async();
 
       try {
-        await rc( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brand' ) );
+        await rc( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ) );
       } catch ( e ) {
         grunt.fail.fatal( e + '\n' + e.stack );
       }
@@ -310,13 +310,13 @@ module.exports = function( grunt ) {
 
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
-      assert( grunt.option( 'brand' ), 'Requires specifying a brand with --brand={{BRAND}}' );
+      assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
       const done = grunt.task.current.async();
 
       // TODO: consider wrapping most of these with this type of function, separated out somewhere
       try {
-        await production( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brand' ) );
+        await production( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ) );
       } catch ( e ) {
         grunt.fail.fatal( e + '\n' + e.stack );
       }
