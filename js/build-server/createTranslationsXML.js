@@ -5,16 +5,15 @@
 
 const constants = require( './constants' );
 const fs = require( 'fs.extra' ); // eslint-disable-line
+const winston = require( 'winston' );
 
 /**
  * Create a [sim name].xml file in the live sim directory in htdocs. This file tells the website which
  * translations exist for a given sim. It is used by the "synchronize" method in Project.java in the website code.
- * @param simTitleCallback
  * @param simName
- * @param callback
+ * @param version
  */
-module.exports = async function( simTitleCallback, simName, version, winston ) {
-
+module.exports = async function( simName, version ) {
   const rootdir = '../babel/' + simName;
   const englishStringsFile = simName + '-strings_en.json';
   const stringFiles = [ { name: englishStringsFile, locale: constants.ENGLISH_LOCALE } ];
