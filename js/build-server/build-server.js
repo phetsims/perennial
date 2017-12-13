@@ -102,13 +102,13 @@ function queueDeployApiVersion1( req, res, key ) {
   const locales = decodeURIComponent( req[ key ][ constants.LOCALES_KEY ] ) || null;
   const option = decodeURIComponent( req[ key ][ constants.OPTION_KEY ] ) || 'default';
   const email = decodeURIComponent( req[ key ][ constants.EMAIL_KEY ] ) || null;
-  const translatorId = decodeURIComponent( req[ key ][ constants.USER_ID_KEY ] ) || undefined;
+  const translatorId = decodeURIComponent( req[ key ][ constants.USER_ID_KEY ] ) || null;
   const authorizationKey = decodeURIComponent( req[ key ][ constants.AUTHORIZATION_KEY ] );
 
   const servers = ( option === 'rc' ) ? [ constants.PRODUCTION_SERVER ] : [ constants.DEV_SERVER ];
   const brands = version.indexOf( 'phetio' ) < 0 ? [ constants.PHET_BRAND ] : [ constants.PHET_IO_BRAND ];
 
-  queueDeploy( '1.0', repos, simName, version, locales, servers, brands, email, translatorId, authorizationKey, req, res );
+  queueDeploy( repos, simName, version, locales, servers, brands, email, translatorId, authorizationKey, req, res );
 }
 
 function postQueueDeploy( req, res ) {
@@ -117,17 +117,17 @@ function postQueueDeploy( req, res ) {
   const api = decodeURIComponent( req.body[ constants.API_KEY ] );
 
   if ( api && api.startsWith( '2.' ) ) {
-    const repos = JSON.parse( decodeURIComponent( req.body[ constants.DEPENDENCIES_KEY ] ) ).repos;
-    const simName = decodeURIComponent( req.body[ constants.SIM_NAME_KEY ] );
-    const version = decodeURIComponent( req.body[ constants.VERSION_KEY ] );
-    const locales = decodeURIComponent( req.body[ constants.LOCALES_KEY ] ) || null;
-    const servers = JSON.parse( decodeURIComponent( req.body[ constants.SERVERS_KEY ] ) );
-    const brands = JSON.parse( decodeURIComponent( req.body[ constants.BRANDS_KEY ] ) );
-    const authorizationKey = decodeURIComponent( req.body[ constants.AUTHORIZATION_KEY ] );
-    const translatorId = decodeURIComponent( req.body[ constants.TRANSLATOR_ID_KEY ] ) || undefined;
-    const email = decodeURIComponent( req.body[ constants.EMAIL_KEY ] ) || null;
+    const repos = req.body[ constants.DEPENDENCIES_KEY ].repos;
+    const simName = req.body[ constants.SIM_NAME_KEY ];
+    const version = req.body[ constants.VERSION_KEY ];
+    const locales = req.body[ constants.LOCALES_KEY ] || null;
+    const servers = req.body[ constants.SERVERS_KEY ];
+    const brands = req.body[ constants.BRANDS_KEY ];
+    const authorizationKey = req.body[ constants.AUTHORIZATION_KEY ];
+    const translatorId = req.body[ constants.TRANSLATOR_ID_KEY ] || null;
+    const email = req.body[ constants.EMAIL_KEY ] || null;
 
-    queueDeploy( api, repos, simName, version, locales, servers, brands, email, translatorId, authorizationKey, req, res );
+    queueDeploy( repos, simName, version, locales, servers, brands, email, translatorId, authorizationKey, req, res );
   }
   else {
     queueDeployApiVersion1( req, res, 'body' );
