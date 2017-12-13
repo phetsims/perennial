@@ -75,7 +75,7 @@ module.exports = async function( repo, branch ) {
   await build( repo, {
     brand: 'phet'
   } );
-  await copyFile( `../${repo}/build/dependencies.json`, `../${repo}/dependencies.json` );
+  await copyFile( `../${repo}/build/phet/dependencies.json`, `../${repo}/dependencies.json` );
   await gitAdd( repo, 'dependencies.json' );
   await gitCommit( repo, `updated dependencies.json for version ${newVersion.toString()}` );
   await gitPush( repo, branch );
