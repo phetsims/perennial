@@ -4,7 +4,7 @@
 'use strict';
 
 const fs = require( 'fs.extra' ); // eslint-disable-line
-const winston = require( 'winston' );
+// const winston = require( 'winston' );
 
 const addToRosetta = require( './addToRosetta' );
 const addTranslator = require( './addTranslator' );
@@ -33,6 +33,7 @@ const execute = require( '../common/execute' );
  * @property {String} task.email - used for sending notifications about success/failure
  * @property {String} task.translatorId - rosetta user id for adding translators to the website
  * @property {String} task.res - express response object
+ * @property {winston} task.winston - logger
  *
  * @param {Function} taskCallback - called when build is finished or aborted
  */
@@ -50,6 +51,7 @@ module.exports = async function( task, taskCallback ) {
   const email = task.email;
   const brands = task.brands;
   const servers = task.servers;
+  const winston = task.winston
 
   const userId = task.translatorId;
   if ( userId ) {
