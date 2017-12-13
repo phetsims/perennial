@@ -6,6 +6,7 @@
 const constants = require( './constants' );
 const execute = require( '../common/execute' );
 const fs = require( 'fs.extra' ); // eslint-disable-line
+const gitCheckout = require( '../common/gitCheckout' );
 const gitPull = require( '../common/gitPull' );
 const sendEmail = require( './sendEmail' );
 
@@ -67,7 +68,7 @@ module.exports = async function addToRosetta( simTitle, simName, email ) {
     return Promise.reject( 'couldn\'t write simInfoArray ' + err );
   }
 
-  if ( simInfoArrayString !== contents ) {
+  if ( simInfoArrayString !== contents && constants.BUILD_SERVER_CONFIG.productionServerURL.indexOf( '//phet.colorado.edu' ) >= 0 ) {
     try {
       await execute( 'git commit -a -m "[automated commit] add ' + simTitle + ' to simInfoArray"', [], '../rosetta' );
       await execute( 'git push origin master', [], '../rosetta' );
