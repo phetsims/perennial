@@ -295,7 +295,7 @@ module.exports = function( grunt ) {
       const done = grunt.task.current.async();
 
       try {
-        await rc( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ) );
+        await rc( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ) );
       } catch ( e ) {
         grunt.fail.fatal( e + '\n' + e.stack );
       }
@@ -316,7 +316,7 @@ module.exports = function( grunt ) {
 
       // TODO: consider wrapping most of these with this type of function, separated out somewhere
       try {
-        await production( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ) );
+        await production( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ) );
       } catch ( e ) {
         grunt.fail.fatal( e + '\n' + e.stack );
       }
