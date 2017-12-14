@@ -3,13 +3,15 @@
 /* eslint-env node */
 'use strict';
 
-const child_process = require( './child_process' );
+const child_process = require( 'child_process' );
 const constants = require( './constants' );
 const devScp = require( '../common/devScp' );
 const devSsh = require( '../common/devSsh' );
 const execute = require( '../common/execute' );
 
-function scpAll() {
+const userAtServer = constants.BUILD_SERVER_CONFIG.devUsername + '@' + constants.BUILD_SERVER_CONFIG.devDeployServer;
+
+function scpAll( buildDir, simVersionDirectory ) {
   child_process.execSync( 'scp -r ' + buildDir + '/* ' + userAtServer + simVersionDirectory );
 }
 
@@ -25,7 +27,6 @@ function scpAll() {
  * @return Promise
  */
 module.exports = async function( simDir, simName, version, brands, api ) {
-  const userAtServer = constants.BUILD_SERVER_CONFIG.devUsername + '@' + constants.BUILD_SERVER_CONFIG.devDeployServer;
   const simVersionDirectory = constants.BUILD_SERVER_CONFIG.devDeployPath + simName + '/' + version;
 
   // mkdir first in case it doesn't exist already
@@ -34,7 +35,7 @@ module.exports = async function( simDir, simName, version, brands, api ) {
 
   // copy the files
   if ( api !== '1.0' ) {
-    scpAll();
+    scpAll( buildDir, simVersionDirectory );
     if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
       await devScp( buildDir + '/.htaccess', simVersionDirectory + '/phet-io/wrappers/' );
     }
@@ -47,12 +48,12 @@ module.exports = async function( simDir, simName, version, brands, api ) {
     }
 
     if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
-      scpAll();
+      scpAll( buildDir, simVersionDirectory );
       await devScp( buildDir + '/.htaccess', simVersionDirectory + '/wrappers/' );
     }
 
     if ( brands.indexOf( brands.indexOf( constants.PHET_BRAND ) < 0 && brands.indexOf( constants.PHET_IO_BRAND ) < 0 ) ) {
-      scpAll();
+      scpAll( buildDir, simVersionDirectory );
     }
   }
 
