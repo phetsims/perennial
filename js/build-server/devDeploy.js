@@ -32,8 +32,8 @@ module.exports = async function( simDir, simName, version, brands ) {
   // TODO: update files/directories copied for requirements in https://github.com/phetsims/chipper/issues/560
   if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
     // copy english and all html and all non-html files
-    await devScp( buildDir + '/*_en*.html ', scpTarget );
-    await devScp( buildDir + '/*_all*.html ', scpTarget );
+    await devScp( buildDir + '/*_en-phet.html ', scpTarget );
+    await devScp( buildDir + '/*_all-phet.html ', scpTarget );
     await execute( 'find', [ '.', '-type', 'f', '!', '-iname', '\'*.html\'', '-exec', 'scp', '{}', scpTarget, '\\;' ], buildDir );
   }
 
