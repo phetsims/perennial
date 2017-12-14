@@ -226,7 +226,7 @@ module.exports = async function( task, taskCallback ) {
   const brandLocales = ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) ? locales : 'en';
   winston.log( 'info', 'building for brands: ' + brands + ' version: ' + version );
 
-  await execWithAbort( 'grunt', [ 'build-for-server', '--allHTML', '--brands=', brands.join( ',' ), '--locales=', brandLocales ], simDir );
+  await execWithAbort( 'grunt', [ 'build-for-server', '--allHTML', '--brands=' + brands.join( ',' ), '--locales=' + brandLocales ], simDir );
 
   if ( servers.indexOf( constants.DEV_SERVER ) >= 0 ) {
     if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
