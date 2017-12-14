@@ -8,6 +8,10 @@ const devScp = require( '../common/devScp' );
 const devSsh = require( '../common/devSsh' );
 const execute = require( '../common/execute' );
 
+function scpAll() {
+  child_process.execSync( 'scp -r ' + buildDir + '/* ' + userAtServer + simVersionDirectory );
+}
+
 /**
  * Copy files to dev server, typically spot.colorado.edu.
  *
@@ -29,11 +33,7 @@ module.exports = async function( simDir, simName, version, brands, api ) {
 
   // copy the files
   if ( api !== '1.0' ) {
-    // TODO: filter out translations?
-    await execute( 'ls', [ '-la', buildDir ], '.' );
-    await execute( 'ls', [ '-la', buildDir + '/*' ], '.' );
-    await execute( 'pwd', [], buildDir );
-    await devScp( buildDir + '/*', simVersionDirectory );
+    scpAll();
     if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
       await devScp( buildDir + '/.htaccess', simVersionDirectory + '/phet-io/wrappers/' );
     }
@@ -46,12 +46,12 @@ module.exports = async function( simDir, simName, version, brands, api ) {
     }
 
     if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
-      await devScp( buildDir + '/*', simVersionDirectory );
+      scpAll();
       await devScp( buildDir + '/.htaccess', simVersionDirectory + '/wrappers/' );
     }
 
     if ( brands.indexOf( brands.indexOf( constants.PHET_BRAND ) < 0 && brands.indexOf( constants.PHET_IO_BRAND ) < 0 ) ) {
-      await devScp( buildDir + '/*', simVersionDirectory );
+      scpAll();
     }
   }
 
