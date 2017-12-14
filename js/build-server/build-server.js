@@ -118,7 +118,7 @@ function postQueueDeploy( req, res ) {
     const translatorId = req.body[ constants.TRANSLATOR_ID_KEY ] || null;
     const email = req.body[ constants.EMAIL_KEY ] || null;
 
-    queueDeploy( api, repos, simName, version, locales, servers, brands, email, translatorId, authorizationKey, req, res );
+    queueDeploy( api, repos, simName, version, locales, brands, servers, email, translatorId, authorizationKey, req, res );
   }
   else {
     queueDeployApiVersion1( req, res, 'body' );
