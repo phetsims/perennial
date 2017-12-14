@@ -4,6 +4,7 @@
 'use strict';
 
 const execute = require( '../common/execute' );
+const gitPull = require( '../common/gitPull' );
 const winston = require( 'winston' );
 const _ = require( 'lodash' ); // eslint-disable-line
 
@@ -35,7 +36,7 @@ module.exports = async function pullMaster( repos ) {
     }
 
     try {
-      await execute( 'git pull', [], repoDir );
+      await gitPull( repoName );
     }
     catch( error ) {
       errors.push( error );
