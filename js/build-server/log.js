@@ -3,6 +3,10 @@
 /* eslint-env node */
 'use strict';
 
+/**
+ * Source: https://stackoverflow.com/a/17737613/2496827
+ */
+
 const dateformat = require( 'dateformat' );
 const winston = require( 'winston' );
 const Loggly = require( 'winston-loggly' ).Loggly; // eslint-disable-line
