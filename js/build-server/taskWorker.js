@@ -25,6 +25,7 @@ const execute = require( '../common/execute' );
  *
  * @param {Object} task
  * @property {JSON} task.repos
+ * @property {String} task.api
  * @property {String} task.locales - comma separated list of locale codes
  * @property {String} task.simName - lower case simulation name used for creating files/directories
  * @property {String} task.version - sim version identifier string
@@ -43,6 +44,7 @@ module.exports = async function( task, taskCallback ) {
   // Parse and validate parameters
   //-------------------------------------------------------------------------------------
 
+  const api = task.api;
   const repos = task.repos;
   const locales = task.locales;
   const simName = task.simName;
@@ -132,24 +134,27 @@ module.exports = async function( task, taskCallback ) {
 
   // Infer brand from version string and keep unstripped version for phet-io
   const originalVersion = version;
+  if ( api === '1.0') {
+    // validate version and strip suffixes since just the numbers are used in the directory name on dev and production servers
+    const versionMatch = version.match( /^(\d+\.\d+\.\d+)(?:-.*)?$/ );
+    if ( versionMatch && versionMatch.length === 2 ) {
 
-  // validate version and strip suffixes since just the numbers are used in the directory name on dev and production servers
-  const versionMatch = version.match( /^(\d+\.\d+\.\d+)(?:-.*)?$/ );
-  if ( versionMatch && versionMatch.length === 2 ) {
-
-    // TODO: make sure we are handling this correctly for https://github.com/phetsims/chipper/issues/560
-    if ( option === 'rc' ) {
-      // if deploying an rc version use the -rc.[number] suffix
-      version = versionMatch[ 0 ];
+      if ( servers.includes( 'dev' ) ) {
+        // if deploying an rc version use the -rc.[number] suffix
+        version = versionMatch[ 0 ];
+      }
+      else {
+        // otherwise strip any suffix
+        version = versionMatch[ 1 ];
+      }
+      winston.log( 'info', 'detecting version number: ' + version );
     }
     else {
-      // otherwise strip any suffix
-      version = versionMatch[ 1 ];
+      return abortBuild( 'invalid version number: ' + version );
     }
-    winston.log( 'info', 'detecting version number: ' + version );
   }
   else {
-    return abortBuild( 'invalid version number: ' + version );
+    // TODO: handle version validation for https://github.com/phetsims/chipper/issues/560
   }
 
   // define vars for build dir and sim dir

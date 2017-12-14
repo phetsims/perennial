@@ -74,11 +74,6 @@ const verbose = options.verbose;
 
 const taskQueue = async.queue( taskWorker, 1 ); // 1 is the max number of tasks that can run concurrently
 
-function getQueueDeploy( req, res ) {
-  logRequest( req, 'query', winston );
-  queueDeployApiVersion1( req, res, 'query' );
-}
-
 /**
  * Handle chipper 1.0 requests
  *
@@ -99,7 +94,12 @@ function queueDeployApiVersion1( req, res, key ) {
   const servers = ( option === 'rc' ) ? [ constants.PRODUCTION_SERVER ] : [ constants.DEV_SERVER ];
   const brands = version.indexOf( 'phetio' ) < 0 ? [ constants.PHET_BRAND ] : [ constants.PHET_IO_BRAND ];
 
-  queueDeploy( repos, simName, version, locales, servers, brands, email, translatorId, authorizationKey, req, res );
+  queueDeploy( '1.0', repos, simName, version, locales, servers, brands, email, translatorId, authorizationKey, req, res );
+}
+
+function getQueueDeploy( req, res ) {
+  logRequest( req, 'query', winston );
+  queueDeployApiVersion1( req, res, 'query' );
 }
 
 function postQueueDeploy( req, res ) {
@@ -118,7 +118,7 @@ function postQueueDeploy( req, res ) {
     const translatorId = req.body[ constants.TRANSLATOR_ID_KEY ] || null;
     const email = req.body[ constants.EMAIL_KEY ] || null;
 
-    queueDeploy( repos, simName, version, locales, servers, brands, email, translatorId, authorizationKey, req, res );
+    queueDeploy( api, repos, simName, version, locales, servers, brands, email, translatorId, authorizationKey, req, res );
   }
   else {
     queueDeployApiVersion1( req, res, 'body' );
@@ -140,7 +140,7 @@ function postQueueDeploy( req, res ) {
  * @param {express.Request} req
  * @param {express.Response} res
  */
-function queueDeploy( repos, simName, version, locales, brands, servers, email, translatorId, authorizationKey, req, res ) {
+function queueDeploy( api, repos, simName, version, locales, brands, servers, email, translatorId, authorizationKey, req, res ) {
 
   if ( repos && simName && version && authorizationKey ) {
     const productionBrands = [ constants.PHET_BRAND, constants.PHET_IO_BRAND ];
@@ -157,7 +157,7 @@ function queueDeploy( repos, simName, version, locales, brands, servers, email, 
     }
     else {
       winston.log( 'info', 'queuing build for ' + simName + ' ' + version );
-      taskQueue.push( { repos, simName, version, locales, servers, brands, email, translatorId, res }, function( err ) {
+      taskQueue.push( { api, repos, simName, version, locales, servers, brands, email, translatorId, res }, function( err ) {
         const simInfoString = 'Sim = ' + simName +
                               ' Version = ' + version +
                               ' Locales = ' + locales;
