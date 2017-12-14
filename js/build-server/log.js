@@ -10,6 +10,7 @@
 const dateformat = require( 'dateformat' );
 const winston = require( 'winston' );
 const Loggly = require( 'winston-loggly' ).Loggly; // eslint-disable-line
+
 const loggly_options = { subdomain: 'build-server', inputToken: 'none' }
 
 winston.add( Loggly, loggly_options );
