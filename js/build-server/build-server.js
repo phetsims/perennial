@@ -108,12 +108,12 @@ function postQueueDeploy( req, res ) {
   const api = decodeURIComponent( req.body[ constants.API_KEY ] );
 
   if ( api && api.startsWith( '2.' ) ) {
-    const repos = req.body[ constants.DEPENDENCIES_KEY ];
+    const repos = JSON.parse( req.body[ constants.DEPENDENCIES_KEY ] );
     const simName = req.body[ constants.SIM_NAME_KEY ];
     const version = req.body[ constants.VERSION_KEY ];
     const locales = req.body[ constants.LOCALES_KEY ] || null;
-    const servers = req.body[ constants.SERVERS_KEY ];
-    const brands = req.body[ constants.BRANDS_KEY ];
+    const servers = JSON.parse( req.body[ constants.SERVERS_KEY ] );
+    const brands = JSON.parse( req.body[ constants.BRANDS_KEY ] );
     const authorizationKey = req.body[ constants.AUTHORIZATION_KEY ];
     const translatorId = req.body[ constants.TRANSLATOR_ID_KEY ] || null;
     const email = req.body[ constants.EMAIL_KEY ] || null;
