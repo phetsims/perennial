@@ -44,6 +44,7 @@ module.exports = async function( task, taskCallback ) {
   // Parse and validate parameters
   //-------------------------------------------------------------------------------------
 
+  // TODO: change to ES6 destructuring
   const api = task.api;
   const repos = task.repos;
   const locales = task.locales;
@@ -180,6 +181,18 @@ module.exports = async function( task, taskCallback ) {
 
   try {
     fs.mkdirSync( buildDir );
+  }
+  catch ( err ) {
+    try {
+      await execute( 'rm -rf', [ buildDir ], '.' );
+      fs.mkdirSync( buildDir );
+    }
+    catch ( err ) {
+      return abortBuild( err );
+    }
+  }
+
+  try {
     fs.writeFileSync( buildDir + '/dependencies.json', JSON.stringify( repos ) );
   }
   catch( err ) {
