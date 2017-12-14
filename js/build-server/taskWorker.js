@@ -4,7 +4,7 @@
 'use strict';
 
 const fs = require( 'fs.extra' ); // eslint-disable-line
-// const winston = global.winston;
+const winston = global.winston;
 
 const addToRosetta = require( './addToRosetta' );
 const addTranslator = require( './addTranslator' );
@@ -51,7 +51,6 @@ module.exports = async function( task, taskCallback ) {
   const email = task.email;
   const brands = task.brands;
   const servers = task.servers;
-  const winston = task.winston
 
   const userId = task.translatorId;
   if ( userId ) {
