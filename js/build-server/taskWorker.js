@@ -71,7 +71,7 @@ module.exports = async function( task, taskCallback ) {
    * @param command the command to be executed
    * @param dir the directory to execute the command from
    */
-  const execWithAbort = async function( command, dir ) {
+  const execWithAbort = async function( command, args, dir ) {
     winston.log( 'info', 'running command: ' + command );
     try {
       await execute( command, [], dir );
@@ -199,17 +199,17 @@ module.exports = async function( task, taskCallback ) {
   }
   winston.log( 'info', 'wrote file ' + buildDir + '/dependencies.json' );
 
-  await execWithAbort( 'git pull', constants.PERENNIAL );
-  await execWithAbort( 'npm prune', constants.PERENNIAL );
-  await execWithAbort( 'npm update', constants.PERENNIAL );
-  await execWithAbort( './chipper/bin/clone-missing-repos.sh', '..' );
+  await execWithAbort( 'git', [ 'pull' ], constants.PERENNIAL );
+  await execWithAbort( 'npm', [ 'prune' ], constants.PERENNIAL );
+  await execWithAbort( 'npm', [ 'update' ], constants.PERENNIAL );
+  await execWithAbort( './chipper/bin/clone-missing-repos.sh', [], '..' );
   try {
     await pullMaster( repos );
   }
   catch( e ) {
     return abortBuild( e );
   }
-  await execWithAbort( 'grunt checkout-shas --buildServer=true --repo=' + simName, constants.PERENNIAL );
+  await execWithAbort( 'grunt', [ 'checkout-shas --buildServer=true --repo=' + simName ], constants.PERENNIAL );
   await execWithAbort( 'git checkout ' + repos[ simName ].sha, simDir );
   await execWithAbort( 'npm prune', '../chipper' );
   await execWithAbort( 'npm update', '../chipper' );
