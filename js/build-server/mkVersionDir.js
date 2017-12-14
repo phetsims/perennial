@@ -4,7 +4,7 @@
 'use strict';
 
 const fs = require( 'fs.extra' ); // eslint-disable-line
-const winston = global.winston;
+const winston = require( 'winston' );
 
 /**
  * execute mkdir for the sim version directory if it doesn't exist

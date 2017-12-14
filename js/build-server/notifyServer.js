@@ -6,7 +6,7 @@
 const constants = require( './constants' );
 const request = require( 'request' );
 const sendEmail = require( './sendEmail' );
-const winston = global.winston;
+const winston = require( 'winston' );
 
 /**
  * Notify the website that a new sim or translation has been deployed. This will cause the project to

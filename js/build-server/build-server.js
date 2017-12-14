@@ -16,10 +16,9 @@ const constants = require( './constants' );
 
 // modules
 const async = require( 'async' );
-const dateformat = require( 'dateformat' );
 const express = require( 'express' );
+const winston = require( './log.js' ); // eslint-disable-line
 const parseArgs = require( 'minimist' ); // eslint-disable-line
-const winston = require( 'winston' );
 const _ = require( 'lodash' ); // eslint-disable-line
 
 // functions
@@ -72,16 +71,6 @@ if ( parsedCommandLineOptions.hasOwnProperty( 'help' ) || parsedCommandLineOptio
 // Merge the default and supplied options.
 const options = _.extend( defaultOptions, parsedCommandLineOptions );
 const verbose = options.verbose;
-
-// add timestamps to log messages
-winston.remove( winston.transports.Console );
-winston.add( winston.transports.Console, {
-  'timestamp': function() {
-    return dateformat( new Date(), 'mmm dd yyyy HH:MM:ss Z' );
-  }
-} );
-
-global.winston = winston;
 
 const taskQueue = async.queue( taskWorker, 1 ); // 1 is the max number of tasks that can run concurrently
 

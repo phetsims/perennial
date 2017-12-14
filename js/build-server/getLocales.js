@@ -7,7 +7,7 @@ const constants = require( './constants' );
 const fs = require( 'fs.extra' ); // eslint-disable-line
 const getSortedVersionDirectories = require( './getSortedVersionDirectories' );
 const parseString = require( 'xml2js' ).parseString; // eslint-disable-line
-const winston = global.winston;
+const winston = require( 'winston' );
 
 async function getJsonFromXML( xmlString ) {
   return new Promise( ( resolve, reject ) => {

@@ -4,7 +4,7 @@
 'use strict';
 
 const execute = require( '../common/execute' );
-const winston = global.winston;
+const winston = require( 'winston' );
 const _ = require( 'lodash' ); // eslint-disable-line
 
 /**
