@@ -98,8 +98,10 @@ module.exports = async function( task, taskCallback ) {
 
   const simNameRegex = /^[a-z-]+$/;
 
+  winston.log( 'info', 'repos: ' + JSON.stringify( repos ) );
   // make sure the repos passed in validates
-  for ( let key in repos ) {
+  for ( let i in repos ) {
+    const key = repos[ i ];
     if ( repos.hasOwnProperty( key ) ) {
       winston.log( 'info', 'Validating repo: ' + key );
 
