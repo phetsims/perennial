@@ -7,6 +7,7 @@
  * Source: https://stackoverflow.com/a/17737613/2496827
  */
 
+const constants = require('./constants' );
 const dateformat = require( 'dateformat' );
 const winston = require( 'winston' );
 const Loggly = require( 'winston-loggly' ).Loggly; // eslint-disable-line
@@ -20,7 +21,8 @@ winston.remove( winston.transports.Console );
 winston.add( winston.transports.Console, {
   'timestamp': function() {
     return dateformat( new Date(), 'mmm dd yyyy HH:MM:ss Z' );
-  }
+  },
+  'level': constants.BUILD_SERVER_CONFIG.verbose ? 'debug' : 'info'
 } );
 
 module.exports = winston;

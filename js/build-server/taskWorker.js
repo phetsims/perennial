@@ -96,7 +96,6 @@ module.exports = async function( task, taskCallback ) {
     winston.log( 'info', 'build aborted: checking out master for every repo in case build shas are still checked out' );
     await execute( 'grunt checkout-master-all', [], constants.PERENNIAL );
     taskCallback( err );
-    return Promise.reject( err );
   };
 
   const simNameRegex = /^[a-z-]+$/;
@@ -184,7 +183,7 @@ module.exports = async function( task, taskCallback ) {
   }
   catch ( err ) {
     try {
-      await execute( 'rm -rf', [ buildDir ], '.' );
+      await execute( 'rm -rf ' + buildDir, [], '.' );
       fs.mkdirSync( buildDir );
     }
     catch ( err ) {
