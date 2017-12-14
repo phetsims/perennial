@@ -210,7 +210,7 @@ module.exports = async function( task, taskCallback ) {
   catch( e ) {
     return abortBuild( e );
   }
-  await execWithAbort( 'grunt', [ 'checkout-shas', '--buildServer=true', '--repo=', simName ], constants.PERENNIAL );
+  await execWithAbort( 'grunt', [ 'checkout-shas', '--buildServer=true', '--repo=' + simName ], constants.PERENNIAL );
   await execWithAbort( 'git', [ 'checkout', repos[ simName ].sha ], simDir );
   await execWithAbort( 'npm', [ 'prune' ], '../chipper' );
   await execWithAbort( 'npm', [ 'update' ], '../chipper' );
