@@ -3,6 +3,7 @@
 /* eslint-env node */
 'use strict';
 
+const child_process = require( './child_process' );
 const constants = require( './constants' );
 const devScp = require( '../common/devScp' );
 const devSsh = require( '../common/devSsh' );
