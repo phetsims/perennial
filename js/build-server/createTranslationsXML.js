@@ -5,7 +5,7 @@
 
 const constants = require( './constants' );
 const fs = require( 'fs.extra' ); // eslint-disable-line
-const winston = require( 'winston' );
+const winston = global.winston;
 
 /**
  * Create a [sim name].xml file in the live sim directory in htdocs. This file tells the website which

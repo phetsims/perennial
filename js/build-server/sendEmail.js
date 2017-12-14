@@ -6,7 +6,7 @@
 const constants = require( './constants' );
 const email = require( 'emailjs/email' );
 const mimelib = require( 'mimelib' );
-const winston = require( 'winston' );
+const winston = global.winston;
 
 // configure email server
 let emailServer;

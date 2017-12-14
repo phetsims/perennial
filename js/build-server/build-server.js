@@ -81,6 +81,8 @@ winston.add( winston.transports.Console, {
   }
 } );
 
+global.winston = winston;
+
 const taskQueue = async.queue( taskWorker, 1 ); // 1 is the max number of tasks that can run concurrently
 
 function getQueueDeploy( req, res ) {

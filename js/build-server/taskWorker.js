@@ -4,7 +4,7 @@
 'use strict';
 
 const fs = require( 'fs.extra' ); // eslint-disable-line
-// const winston = require( 'winston' );
+// const winston = global.winston;
 
 const addToRosetta = require( './addToRosetta' );
 const addTranslator = require( './addTranslator' );

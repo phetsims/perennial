@@ -5,7 +5,7 @@
 
 const constants = require( './constants' );
 const request = require( 'request' );
-const winston = require( 'winston' );
+const winston = global.winston;
 
 /**
  * define a helper function that will add the translator to the DB for translation credits
