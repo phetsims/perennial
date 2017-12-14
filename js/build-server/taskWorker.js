@@ -203,7 +203,7 @@ module.exports = async function( task, taskCallback ) {
   await execWithAbort( 'git', [ 'pull' ], constants.PERENNIAL );
   await execWithAbort( 'npm', [ 'prune' ], constants.PERENNIAL );
   await execWithAbort( 'npm', [ 'update' ], constants.PERENNIAL );
-  await execWithAbort( 'clone-missing-repos.sh', [], constants.PERENNIAL + '/bin/' );
+  await execWithAbort( './perennial/bin/clone-missing-repos.sh', [], '..' );
   try {
     await pullMaster( repos );
   }
