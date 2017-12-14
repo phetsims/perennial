@@ -9,7 +9,7 @@
 /* eslint-env browser, node */
 'use strict';
 
-const brandToSuffix = require( './brandToSuffix' );
+const assert = require( 'assert' );
 
 (function() {
 
@@ -19,34 +19,29 @@ const brandToSuffix = require( './brandToSuffix' );
    * @param {number} major - The major part of the version (the 3 in 3.1.2)
    * @param {number} minor - The minor part of the version (the 1 in 3.1.2)
    * @param {number} maintenance - The maintenance part of the version (the 2 in 3.1.2)
-   * @param {string} brand - The brand name identifier, e.g. 'phet', 'phet-io'
    * @param {Object} options
    */
-  function SimVersion( major, minor, maintenance, brand, options ) {
+  function SimVersion( major, minor, maintenance, options ) {
 
-    // Can't depend on lodash to be available easily
-    // TODO: improve options pattern
-    options = options || {};
-    options.buildTimestamp = options.buildTimestamp === undefined ? null : options.buildTimestamp;
-    options.testType = options.testType === undefined ? null : options.testType;
-    options.testNumber = options.testNumber === undefined ? null : options.testNumber;
+    const {
+      // {string|null} - If provided, indicates the time at which the sim file was built
+      buildTimestamp = null,
 
-    if ( typeof major !== 'number' || major < 0 || major % 1 !== 0 ) {
-      throw new Error( 'major version should be a non-negative integer' );
-    }
-    if ( typeof minor !== 'number' || minor < 0 || minor % 1 !== 0 ) {
-      throw new Error( 'minor version should be a non-negative integer' );
-    }
-    if ( typeof maintenance !== 'number' || maintenance < 0 || maintenance % 1 !== 0 ) {
-      throw new Error( 'maintenance version should be a non-negative integer' );
-    }
-    if ( typeof brand !== 'string' ) {
-      throw new Error( 'brand required' );
-    }
-    if ( typeof options.testType === 'string' && typeof options.testNumber !== 'number' ) {
-      throw new Error( 'if testType is provided, testNumber should be a number' );
-    }
-    // TODO: handle one-offs?
+      // {string|null} - The test name, e.g. the 'rc' in rc.1
+      testType = null,
+
+      // {number|null} - The test number, e.g. the 1 in rc.1
+      testNumber = null,
+
+      // {string|null} - The name of the one-off, if provided
+      oneOff = null
+    } = options || {};
+
+    assert( typeof major === 'number' && major >= 0 && major % 1 === 0, 'major version should be a non-negative integer' );
+    assert( typeof minor === 'number' && minor >= 0 && minor % 1 === 0, 'minor version should be a non-negative integer' );
+    assert( typeof maintenance === 'number' && maintenance >= 0 && maintenance % 1 === 0, 'maintenance version should be a non-negative integer' );
+    assert( typeof testType !== 'string' || typeof testNumber === 'number', 'if testType is provided, testNumber should be a number' );
+    assert( oneOff === null || typeof oneOff === 'string', 'oneOff should be a string' );
 
     // @public {number}
     this.major = major;
@@ -58,16 +53,16 @@ const brandToSuffix = require( './brandToSuffix' );
     this.maintenance = maintenance;
 
     // @public {string|null}
-    this.testType = options.testType;
+    this.testType = testType;
 
     // @public {number|null}
-    this.testNumber = options.testNumber;
-
-    // @public {string}
-    this.brand = brand;
+    this.testNumber = testNumber;
 
     // @public {string|null} - If provided, like '2015-06-12 16:05:03 UTC' (phet.chipper.buildTimestamp)
-    this.buildTimestamp = options.buildTimestamp;
+    this.buildTimestamp = buildTimestamp;
+
+    // @public {string|null}
+    this.oneOff = oneOff;
   }
 
   // Can't rely on inherit existing
@@ -114,17 +109,10 @@ const brandToSuffix = require( './brandToSuffix' );
       if ( typeof this.testType === 'string' ) {
         str += `-${this.testType}.${this.testNumber}`;
       }
+      if ( typeof this.oneOff === 'string' ) {
+        str += `-${this.oneOff}`;
+      }
       return str;
-    },
-
-    /**
-     * Returns the string form of the version, including all extra bits of information (brand, etc.)
-     * @public
-     *
-     * @returns {string}
-     */
-    toFullString() {
-      return this.toString() + '-' + brandToSuffix( this.brand );
     }
   };
 
@@ -148,18 +136,38 @@ const brandToSuffix = require( './brandToSuffix' );
     const maintenance = parseInt( matches[ 3 ], 10 );
     const testType = matches[ 6 ];
     const testNumber = matches[ 7 ] === undefined ? matches[ 7 ] : parseInt( matches[ 7 ], 10 );
-    var brand = matches[ 9 ];
-    if ( brand === undefined ) {
-      brand = 'phet';
-    }
-    else if ( brand === 'phetio' ) {
-      brand = 'phet-io';
-    }
-    else {
-      brand = brand.replace( /([A-Z])/g, '-$1' ).toLowerCase();
-    }
+    const oneOff = matches[ 9 ] || null;
 
-    return new SimVersion( major, minor, maintenance, brand, { testType, testNumber, buildTimestamp } );
+    return new SimVersion( major, minor, maintenance, { testType, testNumber, buildTimestamp, oneOff } );
+  };
+
+  /**
+   * Parses a branch in the form {{MAJOR}}.{{MINOR}} and returns a corresponding version. Uses 0 for the maintenance version (unknown).
+   * @public
+   *
+   * @param {string} branch - e.g. '1.0'
+   * @returns {SimVersion}
+   */
+  SimVersion.fromBranch = function( branch ) {
+    const bits = branch.split( '.' );
+    assert( bits.length === 2, `Bad branch, should be {{MAJOR}}.{{MINOR}}, had: ${branch}` );
+
+    const major = parseInt( branch.split( '.' )[ 0 ], 10 );
+    const minor = parseInt( branch.split( '.' )[ 1 ], 10 );
+
+    return new SimVersion( major, minor, 0 );
+  };
+
+  /**
+   * Ensures that a branch name is ok to be a release branch.
+   * @public
+   *
+   * @param {string} branch - e.g. '1.0'
+   */
+  SimVersion.ensureReleaseBranch = function( branch ) {
+    const version = SimVersion.fromBranch( branch );
+    assert( version.major > 0, 'Major version for a branch should be greater than zero' );
+    assert( version.minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
   };
 
   // browser require.js-compatible definition

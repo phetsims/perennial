@@ -87,6 +87,6 @@ module.exports = function( file, name ) {
     grunt.log.writeln( 'inserted a require statements in ' + file );
 
     // Make sure it ends up in the right place
-    sortRequireStatements( grunt, file );
+    sortRequireStatements( file );
   }
 };

@@ -11,7 +11,8 @@ const child_process = require( 'child_process' );
 const grunt = require( 'grunt' );
 
 /**
- * TODO: doc
+ * Checks out master for all repositories in the git root directory.
+ * @public
  */
 module.exports = function() {
 

@@ -30,9 +30,8 @@ module.exports = async function( repo, includeNpmUpdate ) {
   // Ignore the comment
   const repoNames = Object.keys( dependencies ).filter( key => key !== 'comment' );
 
-  // TODO: can we use each here safely?
-  for ( var i = 0; i < repoNames.length; i++ ) {
-    await gitCheckout( repoNames[ i ], 'master' );
+  for ( let repoName in repoNames ) {
+    await gitCheckout( repoName, 'master' );
   }
 
   if ( includeNpmUpdate ) {

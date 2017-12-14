@@ -10,7 +10,6 @@
 
 // modules
 const _ = require( 'lodash' ); // eslint-disable-line
-const assert = require( 'assert' );
 const build = require( '../common/build' );
 const buildServerRequest = require( '../common/buildServerRequest' );
 const checkoutMaster = require( '../common/checkoutMaster' );
@@ -28,6 +27,7 @@ const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
 const prompt = require( '../common/prompt' );
 const setRepoVersion = require( '../common/setRepoVersion' );
+const simMetadata = require( '../common/simMetadata' );
 const SimVersion = require( '../common/SimVersion' );
 const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
 
@@ -35,17 +35,12 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  * Deploys a production version after incrementing the test version number.
  * @public
  *
- * TODO: remove a lot of the duplication with rc deployments! (rc.js)
- *
  * @param {string} repo
  * @param {string} branch
  * @param {Array.<string>} brands
  */
 module.exports = async function( repo, branch, brands ) {
-  const major = parseInt( branch.split( '.' )[ 0 ], 10 );
-  const minor = parseInt( branch.split( '.' )[ 1 ], 10 );
-  assert( major > 0, 'Major version for a branch should be greater than zero' );
-  assert( minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
+  SimVersion.ensureReleaseBranch( branch );
 
   const isClean = await gitIsClean( repo );
   if ( !isClean ) {
@@ -68,7 +63,7 @@ module.exports = async function( repo, branch, brands ) {
   var versionChanged;
 
   if ( previousVersion.testType === null ) {
-    const redeployConfirmation = await prompt( `It appears that the last deployment was a production deployment (${previousVersion.toFullString()}).\nWould you like to redeploy (i.e. did the last production deploy fail for some reason?) [Y/n]?` );
+    const redeployConfirmation = await prompt( `It appears that the last deployment was a production deployment (${previousVersion.toString()}).\nWould you like to redeploy (i.e. did the last production deploy fail for some reason?) [Y/n]?` );
     if ( redeployConfirmation === 'n' ) {
       grunt.fail.fatal( 'Aborted production deployment' );
     }
@@ -77,15 +72,17 @@ module.exports = async function( repo, branch, brands ) {
     versionChanged = false;
   }
   else if ( previousVersion.testType === 'rc' ) {
-    // TODO: SimVersion not including brand (presumably)
-    version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, 'phet' );
+    version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance );
     versionChanged = true;
   }
   else {
     grunt.fail.fatal( 'Aborted production deployment since the version number cannot be incremented safely' );
   }
 
-  const isFirstVersion = version.major === 1 && version.minor === 0 && version.maintenance === 0;
+  const isFirstVersion = !( await simMetadata( {
+    summary: true,
+    simulation: repo
+  } ).projects );
 
   // Initial deployment nags
   if ( isFirstVersion ) {
@@ -95,13 +92,11 @@ module.exports = async function( repo, branch, brands ) {
     }
   }
 
-  // TODO: reduce this code duplication with dev.js
   const versionString = version.toString();
-  const fullVersionString = version.toFullString();
 
   // caps-lock should hopefully shout this at people. do we have a text-to-speech synthesizer we can shout out of their speakers?
   // SECOND THOUGHT: this would be horrible during automated maintenance releases.
-  const initialConfirmation = await prompt( `DEPLOY ${fullVersionString} to PRODUCTION [Y/n]?` );
+  const initialConfirmation = await prompt( `DEPLOY ${versionString} to PRODUCTION [Y/n]?` );
   if ( initialConfirmation === 'n' ) {
     grunt.fail.fatal( 'Aborted production deployment' );
   }
@@ -137,7 +132,11 @@ module.exports = async function( repo, branch, brands ) {
   await updateDependenciesJSON( repo, brands, versionString, branch );
 
   // Send the build request
-  await buildServerRequest( repo, version, await getDependencies( repo ) );
+  await buildServerRequest( repo, version, await getDependencies( repo ), {
+    locales: '*',
+    brands,
+    servers: [ 'dev', 'production' ]
+  } );
 
   // Move back to master
   await checkoutMaster( repo );
@@ -146,7 +145,6 @@ module.exports = async function( repo, branch, brands ) {
     grunt.log.writeln( `Deployed: https://phet.colorado.edu/sims/html/${repo}/latest/${repo}_en.html` );
   }
   if ( brands.includes( 'phet-io' ) ) {
-    // TODO: this should include the brand in the path, but double-check
     grunt.log.writeln( `Deployed: https://phet-io.colorado.edu/sims/${repo}/${versionString}` );
   }
 
@@ -177,6 +175,6 @@ module.exports = async function( repo, branch, brands ) {
   grunt.log.writeln( 'Running third-party report (do not ctrl-C it)' );
   await execute( gruntCommand, [ 'report-third-party' ], '../chipper' );
   await gitAdd( 'sherpa', 'third-party-licenses.md' );
-  await gitCommit( 'sherpa', `Updating third-party-licenses for deploy of ${repo} ${fullVersionString}` );
+  await gitCommit( 'sherpa', `Updating third-party-licenses for deploy of ${repo} ${versionString}` );
   await gitPush( 'sherpa', 'master' );
 };

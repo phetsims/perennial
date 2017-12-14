@@ -1,6 +1,5 @@
 // Copyright 2002-2015, University of Colorado Boulder
 
-//TODO: should the parent project (the sim itself) also be checked out, ignored, or moved into its specified branch?  Right now it is ignored (i.e. left as it was when the task was started)
 /**
  * This grunt task checks out the shas for a project, as specified in a dependencies.json file in its top level.
  */
@@ -12,10 +11,12 @@ const child_process = require( 'child_process' );
 const grunt = require( 'grunt' );
 
 /**
- * TODO: fix type docs?
- * @param repositoryName name field from package.json
- * @param toMaster whether master should be used, or dependencies.json shas should be used
- * @param buildServer whether this build is initiated by the build server
+ * NOTE: This is somewhat vestigial, kept to ensure some build-server behavior for now.
+ * TODO: remove this when possible
+ *
+ * @param {string} repositoryName name field from package.json
+ * @param {boolean} toMaster whether master should be used, or dependencies.json shas should be used
+ * @param {boolean} buildServer whether this build is initiated by the build server
  */
 module.exports = function( repositoryName, toMaster, buildServer ) {
 
@@ -29,30 +30,26 @@ module.exports = function( repositoryName, toMaster, buildServer ) {
     }
   }
 
-  for ( property in dependencies ) {
+  for ( let property of dependencies ) {
     if ( property !== 'comment' && property !== repositoryName && dependencies.hasOwnProperty( property ) ) {
+      assert( typeof( dependencies[ property ].branch !== 'undefined' ) && typeof( dependencies[ property ].sha !== 'undefined' ) );
 
-      (function( property ) {
+      grunt.log.writeln( 'Checking out dependency ' + property + ': ' + dependencies[ property ].branch + '@' + dependencies[ property ].sha );
 
-        assert( typeof( dependencies[ property ].branch !== 'undefined' ) && typeof( dependencies[ property ].sha !== 'undefined' ) );
-
-        grunt.log.writeln( 'Checking out dependency ' + property + ': ' + dependencies[ property ].branch + '@' + dependencies[ property ].sha );
-
-        //To execute something from a different directory:
-        //cp.exec('foocommand', { cwd: 'path/to/dir/' }, callback);
-        //http://stackoverflow.com/questions/14026967/calling-child-process-exec-in-node-as-though-it-was-executed-in-a-specific-folde
-        var command = 'git checkout ' + ( toMaster ? 'master' : dependencies[ property ].sha );
-        child_process.exec( command, { cwd: '../' + property }, function( error1, stdout1, stderr1 ) {
-          assert( !error1, 'error in ' + command + ' for repo ' + property );
-          grunt.log.writeln( 'Finished checkout.' );
-          grunt.log.writeln( stdout1 );
-          grunt.log.writeln( stderr1 );
-          numCheckedOut = numCheckedOut + 1;
-          if ( numToCheckOut === numCheckedOut ) {
-            done();
-          }
-        } );
-      })( property );
+      //To execute something from a different directory:
+      //cp.exec('foocommand', { cwd: 'path/to/dir/' }, callback);
+      //http://stackoverflow.com/questions/14026967/calling-child-process-exec-in-node-as-though-it-was-executed-in-a-specific-folde
+      var command = 'git checkout ' + ( toMaster ? 'master' : dependencies[ property ].sha );
+      child_process.exec( command, { cwd: '../' + property }, function( error1, stdout1, stderr1 ) {
+        assert( !error1, 'error in ' + command + ' for repo ' + property );
+        grunt.log.writeln( 'Finished checkout.' );
+        grunt.log.writeln( stdout1 );
+        grunt.log.writeln( stderr1 );
+        numCheckedOut = numCheckedOut + 1;
+        if ( numToCheckOut === numCheckedOut ) {
+          done();
+        }
+      } );
     }
   }
 };

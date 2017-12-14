@@ -10,7 +10,6 @@
 
 // modules
 const _ = require( 'lodash' ); // eslint-disable-line
-const assert = require( 'assert' );
 const build = require( '../common/build' );
 const buildLocal = require( '../common/buildLocal' );
 const buildServerRequest = require( '../common/buildServerRequest' );
@@ -39,12 +38,7 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  * @param {Array.<string>} brands
  */
 module.exports = async function( repo, branch, brands ) {
-  // TODO: does this happen for multiple brands?
-
-  const major = parseInt( branch.split( '.' )[ 0 ], 10 );
-  const minor = parseInt( branch.split( '.' )[ 1 ], 10 );
-  assert( major > 0, 'Major version for a branch should be greater than zero' );
-  assert( minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
+  SimVersion.ensureReleaseBranch( branch );
 
   const isClean = await gitIsClean( repo );
   if ( !isClean ) {
@@ -68,13 +62,11 @@ module.exports = async function( repo, branch, brands ) {
     grunt.fail.fatal( `Aborted rc deployment since the version number cannot be incremented safely (testType:${previousVersion.testType})` );
   }
 
-  // TODO: SimVersion brand removal
-  const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, 'phet', {
+  const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, {
     testType: 'rc',
     testNumber: previousVersion.testNumber ? previousVersion.testNumber + 1 : 1
   } );
 
-  // TODO: reduce this code duplication with dev.js
   const versionString = version.toString();
   const simPath = buildLocal.devDeployPath + repo;
   const versionPath = simPath + '/' + versionString;
@@ -118,7 +110,9 @@ module.exports = async function( repo, branch, brands ) {
 
   // Send the build request
   await buildServerRequest( repo, version, await getDependencies( repo ), {
-    rc: true
+    locales: [ 'en' ],
+    brands,
+    servers: [ 'dev' ]
   } );
 
   // Move back to master
@@ -127,10 +121,10 @@ module.exports = async function( repo, branch, brands ) {
   const versionURL = `https://www.colorado.edu/physics/phet/dev/html/${repo}/${versionString}`;
 
   if ( brands.includes( 'phet' ) ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_en-phet.html` );
+    grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_en_phet.html` );
   }
   if ( brands.includes( 'phet-io' ) ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/phetio/wrappers/index` );
+    grunt.log.writeln( `Deployed: ${versionURL}/phet-io/wrappers/index` );
   }
 
   grunt.log.writeln( 'Please test!' );

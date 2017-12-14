@@ -56,11 +56,9 @@ module.exports = async function( repo, brands ) {
   brands.forEach( brand => assert( supportedBrands.includes( brand ), `Brand ${brand} not included in ${repo}'s supported brands: ${supportedBrands.join( ',' )}` ) );
 
   // Bump the version
-  // TODO: look into removing the brand from SimVersion (not needed)
-  const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, 'phet', {
+  const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, {
     testType: 'dev',
     testNumber: previousVersion.testNumber + 1
-    // TODO: handle one-off things
   } );
 
   const versionString = version.toString();
@@ -108,7 +106,7 @@ module.exports = async function( repo, brands ) {
   // This is for PhET-iO simulations, to protected the password protected wrappers, see
   // https://github.com/phetsims/phet-io/issues/641
   if ( brands.includes( 'phet-io' ) && buildLocal.devDeployServer === 'spot.colorado.edu' ) {
-    await devScp( '../phet-io/templates/spot/.htaccess', `${versionPath}/phetio/wrappers/.htaccess` );
+    await devScp( '../phet-io/templates/spot/.htaccess', `${versionPath}/phet-io/wrappers/.htaccess` );
   }
 
   // Permissions fixes so others can write over it later
@@ -120,9 +118,9 @@ module.exports = async function( repo, brands ) {
   const versionURL = `https://www.colorado.edu/physics/phet/dev/html/${repo}/${versionString}`;
 
   if ( brands.includes( 'phet' ) ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_en-phet.html` );
+    grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_en_phet.html` );
   }
   if ( brands.includes( 'phet-io' ) ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/phetio/wrappers/index` );
+    grunt.log.writeln( `Deployed: ${versionURL}/phet-io/wrappers/index` );
   }
 };
