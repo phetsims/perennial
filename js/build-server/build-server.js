@@ -128,6 +128,7 @@ function postQueueDeploy( req, res ) {
 /**
  * Adds the request to the processing queue and handles email notifications about success or failures
  *
+ * @param {String} api
  * @param {Object} repos
  * @param {String} simName
  * @param {String} version

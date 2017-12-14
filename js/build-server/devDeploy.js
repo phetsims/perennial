@@ -15,10 +15,11 @@ const execute = require( '../common/execute' );
  * @param simName
  * @param version
  * @param brands
+ * @param api
  *
  * @return Promise
  */
-module.exports = async function( simDir, simName, version, brands ) {
+module.exports = async function( simDir, simName, version, brands, api ) {
   const userAtServer = constants.BUILD_SERVER_CONFIG.devUsername + '@' + constants.BUILD_SERVER_CONFIG.devDeployServer;
   const simVersionDirectory = constants.BUILD_SERVER_CONFIG.devDeployPath + simName + '/' + version;
 
@@ -29,21 +30,28 @@ module.exports = async function( simDir, simName, version, brands ) {
   const scpTarget = userAtServer + ':' + simVersionDirectory;
 
   // copy the files
-  // TODO: update files/directories copied for requirements in https://github.com/phetsims/chipper/issues/560
-  if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
-    // copy english and all html and all non-html files
-    await devScp( buildDir + '/phet/' + simName + '_en-phet.html ', scpTarget );
-    await devScp( buildDir + '/phet/' + simName + '_all-phet.html ', scpTarget );
-    await execute( 'find', [ './phet', '-type', 'f', '!', '-iname', '\'*.html\'', '-exec', 'scp', '{}', scpTarget, '\\;' ], buildDir );
+  if ( api !== '1.0' ) {
+    // TODO: filter out translations?
+    await devScp( buildDir + '/*', scpTarget );
+    if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
+      await devScp( buildDir + '/.htaccess', scpTarget + '/phet-io/wrappers/' );
+    }
   }
+  else {
+    if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
+      // copy english and all html and all non-html files
+      await devScp( buildDir + '/' + simName + '_en.html ', scpTarget );
+      await execute( 'find', [ '.', '-type', 'f', '!', '-iname', '\'*.html\'', '-exec', 'scp', '{}', scpTarget, '\\;' ], buildDir );
+    }
 
-  if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
-    await devScp( buildDir + '/*', buildDir );
-    await devScp( buildDir + '/.htaccess', scpTarget + '/wrappers/' );
-  }
+    if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
+      await devScp( buildDir + '/*', scpTarget );
+      await devScp( buildDir + '/.htaccess', scpTarget + '/wrappers/' );
+    }
 
-  if ( brands.indexOf( brands.indexOf( constants.PHET_BRAND ) < 0 && brands.indexOf( constants.PHET_IO_BRAND ) < 0 ) ) {
-    await devScp( buildDir + '/*', buildDir );
+    if ( brands.indexOf( brands.indexOf( constants.PHET_BRAND ) < 0 && brands.indexOf( constants.PHET_IO_BRAND ) < 0 ) ) {
+      await devScp( buildDir + '/*', scpTarget );
+    }
   }
 
   await devSsh( 'chmod -R g+w ' + simVersionDirectory );
