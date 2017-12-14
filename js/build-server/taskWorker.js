@@ -174,8 +174,8 @@ module.exports = async function( task, taskCallback ) {
    * Clean up after deploy. Checkout master for every repo and remove tmp dir.
    */
   const afterDeploy = async function() {
-    await execWithAbort( 'grunt checkout-master-all', constants.PERENNIAL );
-    await execWithAbort( 'rm -rf ' + buildDir, '.' );
+    await execWithAbort( 'grunt', [ 'checkout-master-all' ], constants.PERENNIAL );
+    await execWithAbort( 'rm', [ '-rf ', buildDir ], '.' );
     taskCallback();
   };
 
@@ -210,12 +210,12 @@ module.exports = async function( task, taskCallback ) {
   catch( e ) {
     return abortBuild( e );
   }
-  await execWithAbort( 'grunt', [ 'checkout-shas --buildServer=true --repo=' + simName ], constants.PERENNIAL );
-  await execWithAbort( 'git checkout ' + repos[ simName ].sha, simDir );
-  await execWithAbort( 'npm prune', '../chipper' );
-  await execWithAbort( 'npm update', '../chipper' );
-  await execWithAbort( 'npm prune', simDir );
-  await execWithAbort( 'npm update', simDir );
+  await execWithAbort( 'grunt', [ 'checkout-shas', '--buildServer=true', '--repo=', simName ], constants.PERENNIAL );
+  await execWithAbort( 'git', [ 'checkout', repos[ simName ].sha ], simDir );
+  await execWithAbort( 'npm', [ 'prune' ], '../chipper' );
+  await execWithAbort( 'npm', [ 'update' ], '../chipper' );
+  await execWithAbort( 'npm', [ 'prune' ], simDir );
+  await execWithAbort( 'npm', [ 'update' ], simDir );
   try {
     await getLocales( locales, simName );
   }
@@ -226,7 +226,7 @@ module.exports = async function( task, taskCallback ) {
   const brandLocales = ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) ? locales : 'en';
   winston.log( 'info', 'building for brands: ' + brands + ' version: ' + version );
 
-  await execWithAbort( 'grunt build-for-server --allHTML --brands=' + brands.join( ',' ) + ' --locales=' + brandLocales, simDir );
+  await execWithAbort( 'grunt', [ 'build-for-server', '--allHTML', '--brands=', brands.join( ',' ), '--locales=', brandLocales ], simDir );
 
   if ( servers.indexOf( constants.DEV_SERVER ) >= 0 ) {
     if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
@@ -249,7 +249,7 @@ module.exports = async function( task, taskCallback ) {
     }
     await mkVersionDir( targetDir );
     // TODO: rewrite names if phet brand
-    await execWithAbort( 'cp -r build/* ' + targetDir, simDir );
+    await execWithAbort( 'cp', [ '-r', 'build/*', targetDir ], simDir );
     if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
       await writePhetHtaccess( simName, version );
       let simTitle = await createTranslationsXML( simName, winston );

@@ -70,8 +70,8 @@ module.exports = async function addToRosetta( simTitle, simName, email ) {
 
   if ( simInfoArrayString !== contents && constants.BUILD_SERVER_CONFIG.productionServerURL.indexOf( '//phet.colorado.edu' ) >= 0 ) {
     try {
-      await execute( 'git commit -a -m "[automated commit] add ' + simTitle + ' to simInfoArray"', [], '../rosetta' );
-      await execute( 'git push origin master', [], '../rosetta' );
+      await execute( 'git', [ 'commit', '-a', '-m', '[automated commit] add ' + simTitle + ' to simInfoArray' ], '../rosetta' );
+      await execute( 'git', [ 'push', 'origin', 'master' ], '../rosetta' );
     }
     catch( err ) {
       sendEmail( 'ROSETTA PUSH FAILED', err, email );
