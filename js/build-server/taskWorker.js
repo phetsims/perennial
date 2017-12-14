@@ -134,7 +134,7 @@ module.exports = async function( task, taskCallback ) {
 
   // Infer brand from version string and keep unstripped version for phet-io
   const originalVersion = version;
-  if ( api === '1.0') {
+  if ( api === '1.0' ) {
     // validate version and strip suffixes since just the numbers are used in the directory name on dev and production servers
     const versionMatch = version.match( /^(\d+\.\d+\.\d+)(?:-.*)?$/ );
     if ( versionMatch && versionMatch.length === 2 ) {
@@ -181,14 +181,14 @@ module.exports = async function( task, taskCallback ) {
   try {
     fs.mkdirSync( buildDir );
   }
-  catch ( err ) {
+  catch( err ) {
     try {
-      const ls = await execute( 'ls -la', [], '.' );
+      const ls = await execute( 'ls', [ '-la' ], '.' );
       winston.debug( ls );
-      await execute( 'rm -rf ' + buildDir, [], '.' );
+      await execute( 'rm', [ '-rf', buildDir ], '.' );
       fs.mkdirSync( buildDir );
     }
-    catch ( err ) {
+    catch( err ) {
       return abortBuild( err );
     }
   }
