@@ -68,13 +68,14 @@ module.exports = async function( task, taskCallback ) {
   /**
    * Execute a step of the build process. The build aborts if any step fails.
    *
-   * @param command the command to be executed
-   * @param dir the directory to execute the command from
+   * @param {String} command - the command to be executed
+   * @param {Array.<String>} args - ordered list of args to append
+   * @param {String} dir - the directory to execute the command from
    */
   const execWithAbort = async function( command, args, dir ) {
     winston.log( 'info', 'running command: ' + command );
     try {
-      await execute( command, [], dir );
+      await execute( command, args, dir );
     }
     catch( err ) {
       if ( command === 'grunt checkout-master-all' ) {
@@ -89,12 +90,12 @@ module.exports = async function( task, taskCallback ) {
 
   /**
    * checkout master everywhere and abort build with err
-   * @param err
+   * @param {String|Error} err - error logged and sent via email
    */
   const abortBuild = async function( err ) {
     winston.log( 'error', 'BUILD ABORTED! ' + err );
     winston.log( 'info', 'build aborted: checking out master for every repo in case build shas are still checked out' );
-    await execute( 'grunt checkout-master-all', [], constants.PERENNIAL );
+    await execute( 'grunt', [ 'checkout-master-all' ], constants.PERENNIAL );
     taskCallback( err );
   };
 

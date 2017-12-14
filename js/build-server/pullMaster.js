@@ -29,7 +29,7 @@ module.exports = async function pullMaster( repos ) {
     const repoDir = '../' + repoName;
 
     try {
-      await execute( 'git checkout master', [], repoDir );
+      await execute( 'git', [ 'checkout master' ], repoDir );
     }
     catch( error ) {
       return Promise.reject( 'git checkout master failed in ' + repoName );
