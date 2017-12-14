@@ -112,8 +112,8 @@ function postQueueDeploy( req, res ) {
     const simName = req.body[ constants.SIM_NAME_KEY ];
     const version = req.body[ constants.VERSION_KEY ];
     const locales = req.body[ constants.LOCALES_KEY ] || null;
-    const servers = JSON.parse( req.body[ constants.SERVERS_KEY ] );
-    const brands = JSON.parse( req.body[ constants.BRANDS_KEY ] );
+    const servers = req.body[ constants.SERVERS_KEY ];
+    const brands = req.body[ constants.BRANDS_KEY ];
     const authorizationKey = req.body[ constants.AUTHORIZATION_KEY ];
     const translatorId = req.body[ constants.TRANSLATOR_ID_KEY ] || null;
     const email = req.body[ constants.EMAIL_KEY ] || null;
