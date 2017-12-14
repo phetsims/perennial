@@ -183,8 +183,6 @@ module.exports = async function( task, taskCallback ) {
   }
   catch( err ) {
     try {
-      const ls = await execute( 'ls', [ '-la' ], '.' );
-      winston.debug( ls );
       await execute( 'rm', [ '-rf', buildDir ], '.' );
       fs.mkdirSync( buildDir );
     }

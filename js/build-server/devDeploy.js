@@ -34,7 +34,7 @@ module.exports = async function( simDir, simName, version, brands ) {
     // copy english and all html and all non-html files
     await devScp( buildDir + '/*_en*.html ', scpTarget );
     await devScp( buildDir + '/*_all*.html ', scpTarget );
-    await execute( 'find . -type f ! -iname \'*.html\' -exec scp {} ' + scpTarget + ' \\;', [], buildDir );
+    await execute( 'find', [ '. -type f ! -iname \'*.html\' -exec scp {}', scpTarget, '\\;' ], buildDir );
   }
 
   if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
