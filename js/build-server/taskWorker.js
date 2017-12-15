@@ -3,6 +3,7 @@
 /* eslint-env node */
 'use strict';
 
+const child_process = require( 'child_process' );
 const fs = require( 'fs.extra' ); // eslint-disable-line
 const winston = require( 'winston' );
 
@@ -237,30 +238,52 @@ module.exports = async function( task, taskCallback ) {
 
   if ( servers.indexOf( constants.PRODUCTION_SERVER ) >= 0 ) {
     let targetDir;
-    // TODO: loop over brands
-    if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
-      targetDir = constants.HTML_SIMS_DIRECTORY + simName + '/' + version + '/';
-    }
-    else if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
-      targetDir = constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/';
-    }
-    await mkVersionDir( targetDir );
-    // TODO: rewrite names if phet brand
-    await execWithAbort( 'cp', [ '-r', 'build/*', targetDir ], simDir );
-    if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
-      await writePhetHtaccess( simName, version );
-      let simTitle = await createTranslationsXML( simName, winston );
-      await notifyServer( simName, email );
-      await addToRosetta( simTitle, simName, email );
+    // Loop over all brands
+    for ( let i in brands ) {
+      if ( brands.hasOwnProperty( i ) ) {
+        const brand = brands[ i ];
 
-      // if this build request comes from rosetta it will have a userId field and only one locale
-      const localesArray = locales.split( ',' );
-      if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
-        await addTranslator( localesArray[ 0 ], afterDeploy );
+        // Pre-copy steps
+        if ( brand === constants.PHET_BRAND ) {
+          targetDir = constants.HTML_SIMS_DIRECTORY + simName + '/' + version + '/';
+
+          // Remove _phet from all filenames in the phet directory
+          const files = fs.readdirSync( simDir + '/build/phet' );
+          for ( let i in files ) {
+            if ( files.hasOwnProperty( i ) ) {
+              const filename = files[ i ];
+              if ( filename.indexOf( '_phet' ) >= 0 ) {
+                const newFilename = filename.replace( '_phet', '' );
+                await execWithAbort( 'mv', [ filename, newFilename ], simDir + '/build/phet' );
+              }
+            }
+          }
+        }
+        else if ( brand === constants.PHET_IO_BRAND ) {
+          targetDir = constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/';
+        }
+
+        // Copy steps
+        await mkVersionDir( targetDir );
+        child_process.execSync( 'cp -r build/' + brand + '/* ' + targetDir, simDir );
+
+        // Post-copy steps
+        if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
+          await writePhetHtaccess( simName, version );
+          let simTitle = await createTranslationsXML( simName, winston );
+          await notifyServer( simName, email );
+          await addToRosetta( simTitle, simName, email );
+
+          // if this build request comes from rosetta it will have a userId field and only one locale
+          const localesArray = locales.split( ',' );
+          if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
+            await addTranslator( localesArray[ 0 ], afterDeploy );
+          }
+        }
+        else {
+          await writePhetioHtaccess( constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess', '/etc/httpd/conf/phet-io_pw' );
+        }
       }
-    }
-    else {
-      await writePhetioHtaccess( constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess', '/etc/httpd/conf/phet-io_pw' );
     }
   }
 
