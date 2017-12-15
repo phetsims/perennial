@@ -36,6 +36,10 @@ const wrapper = require( './wrapper' );
 
 module.exports = function( grunt ) {
 
+  if ( grunt.option( 'debug' ) ) {
+    winston.default.transports.console.level = 'debug';
+  }
+
   function error( done ) {
     return function( reason ) {
       grunt.log.error( reason );
@@ -260,8 +264,6 @@ module.exports = function( grunt ) {
   grunt.registerTask( 'wrapper',
     'Deploys a phet-io wrapper',
     async function() {
-      // winston.default.transports.console.level = 'debug';
-
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
       const done = grunt.task.current.async();
@@ -278,8 +280,6 @@ module.exports = function( grunt ) {
   grunt.registerTask( 'dev',
     'Deploys a dev version of the simulation',
     async function() {
-      // winston.default.transports.console.level = 'debug';
-
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
@@ -298,8 +298,6 @@ module.exports = function( grunt ) {
   grunt.registerTask( 'rc',
     'Deploys an rc version of the simulation',
     function() {
-      // winston.default.transports.console.level = 'debug';
-
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
@@ -310,8 +308,6 @@ module.exports = function( grunt ) {
   grunt.registerTask( 'production',
     'Deploys a production version of the simulation',
     async function() {
-      // winston.default.transports.console.level = 'debug';
-
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
