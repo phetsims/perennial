@@ -41,6 +41,7 @@ module.exports = function( cmd, args, cwd ) {
 
     process.on( 'close', code => {
       if ( code !== 0 ) {
+        // TODO: does this need to be an error?
         reject( { code, stdout } );
       }
       else {
