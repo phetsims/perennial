@@ -12,6 +12,7 @@
 const child_process = require( 'child_process' );
 const winston = require( 'winston' );
 
+
 /**
  * Executes a command, with specific arguments and in a specific directory (cwd).
  * @public
@@ -25,6 +26,26 @@ const winston = require( 'winston' );
  * @returns {Promise}
  */
 module.exports = function( cmd, args, cwd ) {
+  class ExecuteError extends Error {
+    /**
+     * @param {string} cmd
+     * @param {Array.<string>} args
+     * @param {string} cwd
+     * @param {string} stdout
+     * @param {number} code - exit code
+     */
+    constructor( cmd, args, cwd, stdout, code ) {
+      super( `${cmd} ${args.join( ' ')} in ${cwd} failed with exit code ${code} and stdout:\n${stdout}` );
+
+      // @public
+      this.cmd = cmd;
+      this.args = args;
+      this.cwd = cwd;
+      this.stdout = stdout;
+      this.code = code;
+    }
+  }
+  
   return new Promise( ( resolve, reject ) => {
     const process = child_process.spawn( cmd, args, {
       cwd: cwd
@@ -41,8 +62,7 @@ module.exports = function( cmd, args, cwd ) {
 
     process.on( 'close', code => {
       if ( code !== 0 ) {
-        // TODO: does this need to be an error?
-        reject( { code, stdout } );
+        reject( new ExecuteError( cmd, args, cwd, stdout, code ) );
       }
       else {
         resolve( stdout );

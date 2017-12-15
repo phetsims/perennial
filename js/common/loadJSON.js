@@ -26,7 +26,7 @@ module.exports = function( file ) {
     fs.readFile( file, 'utf8', ( err, data ) => {
       if ( err ) {
         winston.error( `Error occurred reading version from json at ${file}: ${err}` );
-        reject( err );
+        reject( new Error( err ) );
       }
       else {
         resolve( JSON.parse( data ) );

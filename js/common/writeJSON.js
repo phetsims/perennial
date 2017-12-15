@@ -26,7 +26,7 @@ module.exports = function( file, content ) {
 
     fs.writeFile( file, JSON.stringify( content, null, 2 ), err => {
       if ( err ) {
-        reject( `Could not write to file: ${file} due to: ${err}` );
+        reject( new Error( `Could not write to file: ${file} due to: ${err}` ) );
       }
       else {
         resolve();

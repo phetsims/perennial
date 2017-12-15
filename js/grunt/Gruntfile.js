@@ -54,7 +54,15 @@ module.exports = function( grunt ) {
     try {
       await promise;
     } catch ( e ) {
-      grunt.fail.fatal( JSON.stringify( e, null, 2 ) + '\n' + e.stack );
+      if ( e.stack ) {
+        grunt.fail.fatal( `Perennial task failed:\n${e.stack}\nFull Error details:\n${JSON.stringify( e, null, 2 )}` );
+      }
+      else if ( typeof e === 'string' ) {
+        grunt.fail.fatal( `Perennial task failed: ${e}` );
+      }
+      else {
+        grunt.fail.fatal( `Perennial task failed with unknown error: ${JSON.stringify( e, null, 2 )}` );
+      }
     }
 
     done();
@@ -279,20 +287,11 @@ module.exports = function( grunt ) {
 
   grunt.registerTask( 'dev',
     'Deploys a dev version of the simulation',
-    async function() {
+    function() {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
-      const done = grunt.task.current.async();
-
-      try {
-        await dev( grunt.option( 'repo' ), grunt.option( 'brands' ).split( ',' ) );
-      } catch ( e ) {
-        // TODO: is the stringify version better?
-        grunt.fail.fatal( JSON.stringify( e ) + '\n' + e.stack );
-      }
-
-      done();
+      wrap( dev( grunt.option( 'repo' ), grunt.option( 'brands' ).split( ',' ) ) );
     } );
 
   grunt.registerTask( 'rc',
@@ -307,7 +306,7 @@ module.exports = function( grunt ) {
 
   grunt.registerTask( 'production',
     'Deploys a production version of the simulation',
-    async function() {
+    function() {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
@@ -321,7 +320,7 @@ module.exports = function( grunt ) {
     '--author="string" : the author name\n' +
     '--title="string" : (optional) the simulation title\n' +
     '--clean=true : (optional) deletes the repository directory if it exists',
-    async function() {
+    function() {
       const repo = grunt.option( 'repo' );
       const author = grunt.option( 'author' );
       const title = grunt.option( 'title' );
@@ -330,15 +329,7 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository name with --repo={{REPO}}' );
       assert( grunt.option( 'author' ), 'Requires specifying a author with --author={{AUTHOR}}' );
 
-      const done = grunt.task.current.async();
-
-      try {
-        await createSim( repo, author, { title, clean } );
-      } catch ( e ) {
-        grunt.fail.fatal( e + '\n' + e.stack );
-      }
-
-      done();
+      wrap( createSim( repo, author, { title, clean } ) );
     } );
 
   grunt.registerTask( 'sort-require-statements', 'Sort the require statements for a single file (if --file={{FILE}} is provided), or does so for all JS files in a repo (if --repo={{REPO}} is specified)', function() {

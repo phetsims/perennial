@@ -28,7 +28,7 @@ module.exports = function( sourceFilename, destinationFilename ) {
     const writeStream = fs.createWriteStream( destinationFilename );
     readStream.pipe( writeStream );
     readStream.on( 'end', () => resolve() );
-    readStream.on( 'error', err => reject( err ) );
-    writeStream.on( 'error', err => reject( err ) );
+    readStream.on( 'error', err => reject( new Error( err ) ) );
+    writeStream.on( 'error', err => reject( new Error( err ) ) );
   } );
 };

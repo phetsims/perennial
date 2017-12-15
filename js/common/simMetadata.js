@@ -47,10 +47,7 @@ module.exports = function( options ) {
 
     request( metadataURL, ( requestError, requestResponse, requestBody ) => {
       if ( requestError || requestResponse.statusCode !== 200 ) {
-        reject( {
-          error: requestError,
-          code: requestResponse.statusCode
-        } );
+        reject( new Error( `metadata request failed with ${requestResponse.statusCode}: ${requestError}` ) );
       }
       else {
         resolve( JSON.parse( requestBody ) );
