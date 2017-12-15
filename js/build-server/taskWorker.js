@@ -229,13 +229,10 @@ module.exports = async function( task, taskCallback ) {
   await execWithAbort( 'grunt', [ 'build-for-server', '--allHTML', '--brands=' + brands.join( ',' ), '--locales=' + brandLocales ], simDir );
 
   if ( servers.indexOf( constants.DEV_SERVER ) >= 0 ) {
-    if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
-      await devDeploy( simDir, simName, version, brands, api );
-    }
-    else if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
+    if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
       await writePhetioHtaccess( simDir + '/build/.htaccess', '/htdocs/physics/phet-io/config/.htpasswd' );
-      await devDeploy( simDir, simName, version, brands, api );
     }
+    await devDeploy( simDir, simName, version, brands, api );
   }
 
   if ( servers.indexOf( constants.PRODUCTION_SERVER ) >= 0 ) {
