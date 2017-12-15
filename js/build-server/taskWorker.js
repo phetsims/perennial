@@ -265,7 +265,7 @@ module.exports = async function( task, taskCallback ) {
 
         // Copy steps
         await mkVersionDir( targetDir );
-        child_process.execSync( 'cp -r build/' + brand + '/* ' + targetDir, simDir );
+        child_process.execSync( 'cp -r ' + simDir + '/build/' + brand + '/* ' + targetDir );
 
         // Post-copy steps
         if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
