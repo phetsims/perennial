@@ -56,76 +56,83 @@ module.exports = async function( repo, branch, brands ) {
 
   await checkoutTarget( repo, branch, true ); // include npm update
 
-  const previousVersion = await getRepoVersion( repo );
+  try {
+    const previousVersion = await getRepoVersion( repo );
 
-  if ( previousVersion.testType !== 'rc' && previousVersion.testType !== null ) {
-    grunt.fail.fatal( `Aborted rc deployment since the version number cannot be incremented safely (testType:${previousVersion.testType})` );
-  }
+    if ( previousVersion.testType !== 'rc' && previousVersion.testType !== null ) {
+      grunt.fail.fatal( `Aborted rc deployment since the version number cannot be incremented safely (testType:${previousVersion.testType})` );
+    }
 
-  const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance + ( previousVersion.testType === null ? 1 : 0 ), {
-    testType: 'rc',
-    testNumber: previousVersion.testNumber ? previousVersion.testNumber + 1 : 1
-  } );
+    const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance + ( previousVersion.testType === null ? 1 : 0 ), {
+      testType: 'rc',
+      testNumber: previousVersion.testNumber ? previousVersion.testNumber + 1 : 1
+    } );
 
-  const versionString = version.toString();
-  const simPath = buildLocal.devDeployPath + repo;
-  const versionPath = simPath + '/' + versionString;
+    const versionString = version.toString();
+    const simPath = buildLocal.devDeployPath + repo;
+    const versionPath = simPath + '/' + versionString;
 
-  const versionPathExists = await devDirectoryExists( versionPath );
+    const versionPathExists = await devDirectoryExists( versionPath );
 
-  if ( versionPathExists ) {
-    grunt.fail.fatal( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
-  }
+    if ( versionPathExists ) {
+      grunt.fail.fatal( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
+    }
 
-  const initialConfirmation = await prompt( `Deploy ${versionString} to ${buildLocal.devDeployServer} [Y/n]?` );
-  if ( initialConfirmation === 'n' ) {
-    grunt.fail.fatal( 'Aborted rc deployment' );
-  }
+    const initialConfirmation = await prompt( `Deploy ${versionString} to ${buildLocal.devDeployServer} [Y/n]?` );
+    if ( initialConfirmation === 'n' ) {
+      grunt.fail.fatal( 'Aborted rc deployment' );
+    }
 
-  await setRepoVersion( repo, version );
-  await gitPush( repo, branch );
-
-  // Make sure our correct npm dependencies are set
-  await npmUpdate( repo );
-  await npmUpdate( 'chipper' );
-
-  // No special options required here, as we send the main request to the build server
-  grunt.log.writeln( await build( repo, {
-    brands
-  } ) );
-
-  const postBuildConfirmation = await prompt( `Please test the built version of ${repo}.\nIs it ready to deploy [Y/n]?` );
-  if ( postBuildConfirmation === 'n' ) {
-    // Abort version update
-    await setRepoVersion( repo, previousVersion );
+    await setRepoVersion( repo, version );
     await gitPush( repo, branch );
 
-    // Abort checkout
+    // Make sure our correct npm dependencies are set
+    await npmUpdate( repo );
+    await npmUpdate( 'chipper' );
+
+    // No special options required here, as we send the main request to the build server
+    grunt.log.writeln( await build( repo, {
+      brands
+    } ) );
+
+    const postBuildConfirmation = await prompt( `Please test the built version of ${repo}.\nIs it ready to deploy [Y/n]?` );
+    if ( postBuildConfirmation === 'n' ) {
+      // Abort version update
+      await setRepoVersion( repo, previousVersion );
+      await gitPush( repo, branch );
+
+      // Abort checkout
+      await checkoutMaster( repo, true );
+      grunt.fail.fatal( 'Aborted rc deployment (aborted version change too).' );
+    }
+
+    // Move over dependencies.json and commit/push
+    await updateDependenciesJSON( repo, brands, versionString, branch );
+
+    // Send the build request
+    await buildServerRequest( repo, version, await getDependencies( repo ), {
+      locales: [ 'en' ],
+      brands,
+      servers: [ 'dev' ]
+    } );
+    
+    // Move back to master
     await checkoutMaster( repo, true );
-    grunt.fail.fatal( 'Aborted rc deployment (aborted version change too).' );
+
+    const versionURL = `https://www.colorado.edu/physics/phet/dev/html/${repo}/${versionString}`;
+
+    if ( brands.includes( 'phet' ) ) {
+      grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_en_phet.html` );
+    }
+    if ( brands.includes( 'phet-io' ) ) {
+      grunt.log.writeln( `Deployed: ${versionURL}/phet-io/wrappers/index` );
+    }
+
+    grunt.log.writeln( 'Please test!' );
   }
-
-  // Move over dependencies.json and commit/push
-  await updateDependenciesJSON( repo, brands, versionString, branch );
-
-  // Send the build request
-  await buildServerRequest( repo, version, await getDependencies( repo ), {
-    locales: [ 'en' ],
-    brands,
-    servers: [ 'dev' ]
-  } );
-
-  // Move back to master
-  await checkoutMaster( repo, true );
-
-  const versionURL = `https://www.colorado.edu/physics/phet/dev/html/${repo}/${versionString}`;
-
-  if ( brands.includes( 'phet' ) ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_en_phet.html` );
+  catch ( e ) {
+    grunt.log.warn( 'Detected failure during deploy, reverting to master' );
+    await checkoutMaster( repo, true );
+    throw e;
   }
-  if ( brands.includes( 'phet-io' ) ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/phet-io/wrappers/index` );
-  }
-
-  grunt.log.writeln( 'Please test!' );
 };
