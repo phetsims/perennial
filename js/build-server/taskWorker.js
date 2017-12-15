@@ -175,7 +175,7 @@ module.exports = async function( task, taskCallback ) {
    */
   const afterDeploy = async function() {
     await execWithAbort( 'grunt', [ 'checkout-master-all' ], constants.PERENNIAL );
-    await execWithAbort( 'rm', [ '-rf ', buildDir ], '.' );
+    await execWithAbort( 'rm', [ '-rf', buildDir ], '.' );
     taskCallback();
   };
 
