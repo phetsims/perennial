@@ -124,7 +124,7 @@ module.exports = async function( repo, branch, brands ) {
     }
 
     // Abort checkout
-    await checkoutMaster( repo );
+    await checkoutMaster( repo, true );
     grunt.fail.fatal( 'Aborted production deployment (aborted version change too).' );
   }
 
@@ -139,7 +139,7 @@ module.exports = async function( repo, branch, brands ) {
   } );
 
   // Move back to master
-  await checkoutMaster( repo );
+  await checkoutMaster( repo, true );
 
   if ( brands.includes( 'phet' ) ) {
     grunt.log.writeln( `Deployed: https://phet.colorado.edu/sims/html/${repo}/latest/${repo}_en.html` );

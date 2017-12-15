@@ -30,7 +30,7 @@ module.exports = async function( repo, includeNpmUpdate ) {
   // Ignore the comment
   const repoNames = Object.keys( dependencies ).filter( key => key !== 'comment' );
 
-  for ( let repoName in repoNames ) {
+  for ( let repoName of repoNames ) {
     await gitCheckout( repoName, 'master' );
   }
 
