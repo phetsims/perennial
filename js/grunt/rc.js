@@ -62,7 +62,7 @@ module.exports = async function( repo, branch, brands ) {
     grunt.fail.fatal( `Aborted rc deployment since the version number cannot be incremented safely (testType:${previousVersion.testType})` );
   }
 
-  const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, {
+  const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance + ( previousVersion.testType === null ? 1 : 0 ), {
     testType: 'rc',
     testNumber: previousVersion.testNumber ? previousVersion.testNumber + 1 : 1
   } );
