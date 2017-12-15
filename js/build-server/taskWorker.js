@@ -270,7 +270,7 @@ module.exports = async function( task, taskCallback ) {
         // Post-copy steps
         if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
           await writePhetHtaccess( simName, version );
-          let simTitle = await createTranslationsXML( simName, winston );
+          let simTitle = await createTranslationsXML( simName, version );
           await notifyServer( simName, email );
           await addToRosetta( simTitle, simName, email );
 
