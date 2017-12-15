@@ -163,7 +163,7 @@ module.exports = async function( repo, branch, brands ) {
         await gitPush( repo, 'master' );
       }
       catch ( e ) {
-        grunt.log.info( 'Production README is already up-to-date' );
+        grunt.log.writeln( 'Production README is already up-to-date' );
       }
     }
 
