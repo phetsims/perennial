@@ -158,8 +158,13 @@ module.exports = async function( repo, branch, brands ) {
       grunt.log.writeln( 'Updating README' );
       await execute( gruntCommand, [ 'published-README' ], `../${repo}` );
       await gitAdd( repo, 'README.md' );
-      await gitCommit( repo, `Generated published README.md as part of a production deploy for ${versionString}` );
-      await gitPush( repo, 'master' );
+      try {
+        await gitCommit( repo, `Generated published README.md as part of a production deploy for ${versionString}` );
+        await gitPush( repo, 'master' );
+      }
+      catch ( e ) {
+        grunt.log.info( 'Production README is already up-to-date' );
+      }
     }
 
     // phet-io nags from the checklist

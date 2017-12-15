@@ -44,6 +44,18 @@ module.exports = function( grunt ) {
     };
   }
 
+  async function wrap( promise ) {
+    const done = grunt.task.current.async();
+
+    try {
+      await promise;
+    } catch ( e ) {
+      grunt.fail.fatal( JSON.stringify( e, null, 2 ) + '\n' + e.stack );
+    }
+
+    done();
+  }
+
   grunt.registerTask( 'checkout-shas',
     'Check out shas for a project, as specified in dependencies.json\n' +
     '--repo : repository name where package.json should be read from\n' +
@@ -285,22 +297,14 @@ module.exports = function( grunt ) {
 
   grunt.registerTask( 'rc',
     'Deploys an rc version of the simulation',
-    async function() {
+    function() {
       // winston.default.transports.console.level = 'debug';
 
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
-      const done = grunt.task.current.async();
-
-      try {
-        await rc( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ) );
-      } catch ( e ) {
-        grunt.fail.fatal( e + '\n' + e.stack );
-      }
-
-      done();
+      wrap( rc( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ) ) );
     } );
 
   grunt.registerTask( 'production',
@@ -312,16 +316,7 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
-      const done = grunt.task.current.async();
-
-      // TODO: consider wrapping most of these with this type of function, separated out somewhere
-      try {
-        await production( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ) );
-      } catch ( e ) {
-        grunt.fail.fatal( e + '\n' + e.stack );
-      }
-
-      done();
+      wrap( production( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ) ) );
     } );
 
   grunt.registerTask( 'create-sim',
