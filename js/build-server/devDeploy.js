@@ -12,7 +12,7 @@ const execute = require( '../common/execute' );
 const userAtServer = constants.BUILD_SERVER_CONFIG.devUsername + '@' + constants.BUILD_SERVER_CONFIG.devDeployServer;
 
 function scpAll( buildDir, simVersionDirectory ) {
-  child_process.execSync( 'scp -r ' + buildDir + '/* ' + userAtServer + simVersionDirectory );
+  child_process.execSync( 'scp -r ' + buildDir + '/* ' + userAtServer + ':' + simVersionDirectory );
 }
 
 /**
