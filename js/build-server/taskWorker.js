@@ -286,7 +286,6 @@ module.exports = async function( task, taskCallback ) {
       }
     }
   }
-
-  res.send( 'build process initiated, check logs for details' );
+  
   return afterDeploy();
 };

@@ -185,6 +185,8 @@ function queueDeploy( api, repos, simName, version, locales, brands, servers, em
         // reset email parameter to null after build finishes or errors, since this email address may be different on every build
         email = null;
       } );
+
+      res.send( 'build process initiated, check logs for details' );
     }
   }
   else {
