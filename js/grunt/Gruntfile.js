@@ -74,7 +74,7 @@ module.exports = function( grunt ) {
    * @param {async function} asyncTaskFunction
    */
   function wrapTask( asyncTaskFunction ) {
-    return function() {
+    return () => {
       wrap( asyncTaskFunction() );
     };
   }
@@ -84,7 +84,7 @@ module.exports = function( grunt ) {
     '--repo : repository name where package.json should be read from\n' +
     '--skipNpmUpdate : If provided, will prevent the usual npm update\n' +
     '--buildServer : If provided, it will read dependencies from the build-server temporary location (and will skip npm update)',
-    wrapTask( async function() {
+    wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
       const buildServer = grunt.option( 'buildServer' ) ? true : false;
@@ -101,7 +101,7 @@ module.exports = function( grunt ) {
     '--repo : repository name where package.json should be read from\n' +
     '--target : the branch/SHA to check out\n' +
     '--skipNpmUpdate : If provided, will prevent the usual npm update',
-    wrapTask( async function() {
+    wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'target' ), 'Requires specifying a branch/SHA with --target={{BRANCH}}' );
 
@@ -112,7 +112,7 @@ module.exports = function( grunt ) {
     'Check out the latest release branch for a simulation and all of its declared dependencies\n' +
     '--repo : repository name where package.json should be read from\n' +
     '--skipNpmUpdate : If provided, will prevent the usual npm update',
-    wrapTask( async function() {
+    wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
       await checkoutRelease( grunt.option( 'repo' ), !grunt.option( 'skipNpmUpdate' ) );
@@ -122,7 +122,7 @@ module.exports = function( grunt ) {
     'Check out master branch for all dependencies, as specified in dependencies.json\n' +
     '--repo : repository name where package.json should be read from\n' +
     '--skipNpmUpdate : If provided, will prevent the usual npm update',
-    wrapTask( async function() {
+    wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
       await checkoutMaster( grunt.option( 'repo' ), !grunt.option( 'skipNpmUpdate' ) );
@@ -130,7 +130,7 @@ module.exports = function( grunt ) {
 
   grunt.registerTask( 'checkout-master-all',
     'Check out master branch for all repos in git root',
-    wrapTask( async function() {
+    wrapTask( async () => {
       checkoutMasterAll();
     } ) );
 
@@ -138,7 +138,7 @@ module.exports = function( grunt ) {
     'Checks which simulations\' latest release version includes the given common-code SHA in its git tree.\n' +
     '--repo : repository to check for the SHA\n' +
     '--sha : git SHA',
-    wrapTask( async function() {
+    wrapTask( async () => {
       shaCheck( this.async() ).check( grunt.option( 'repo' ), grunt.option( 'sha' ) );
     } ) );
 
@@ -146,7 +146,7 @@ module.exports = function( grunt ) {
     'Starts the maintenance-release process.\n' +
     'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
     '--sims : A comma-separated list of simulations that may be involved in this maintenance release process',
-    wrapTask( async function() {
+    wrapTask( async () => {
       maintenance( this.async() ).maintenanceStart( grunt.option( 'sims' ) );
     } ) );
 
@@ -154,7 +154,7 @@ module.exports = function( grunt ) {
     'Stores and prints out information about what SHAs of the repositories all of the simulations use.\n' +
     'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
     '--repos : A comma-separated list of repo names that need a combined patch',
-    wrapTask( async function() {
+    wrapTask( async () => {
       maintenance( this.async() ).maintenancePatchInfo( grunt.option( 'repos' ) );
     } ) );
 
@@ -164,7 +164,7 @@ module.exports = function( grunt ) {
     '--repos : A comma-separated list of repo names that need a combined patch\n' +
     '--shas : A comma-separated list of SHAs for the respective repos that need a combined patch\n' +
     '--sim : [optional] preferred sim to test with',
-    wrapTask( async function() {
+    wrapTask( async () => {
       maintenance( this.async() ).maintenancePatchCheckout( grunt.option( 'repos' ), grunt.option( 'shas' ), grunt.option( 'sim' ) );
     } ) );
 
@@ -174,7 +174,7 @@ module.exports = function( grunt ) {
     'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
     '--repos : A comma-separated list of repo names that need a combined patch\n' +
     '--message : Additional part of message for the dependencies.json commit',
-    wrapTask( async function() {
+    wrapTask( async () => {
       maintenance( this.async() ).maintenancePatchApply( grunt.option( 'repos' ), grunt.option( 'message' ) );
     } ) );
 
@@ -183,7 +183,7 @@ module.exports = function( grunt ) {
     'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
     '--sim : Sim name\n' +
     '--message : Additional part of message for the version bump commit',
-    wrapTask( async function() {
+    wrapTask( async () => {
       maintenance( this.async() ).maintenanceDeployRC( grunt.option( 'sim' ), grunt.option( 'message' ) );
     } ) );
 
@@ -191,7 +191,7 @@ module.exports = function( grunt ) {
     'Deploys an RC (release candidate) for the simulation from the maintenance branch without bumping versions.\n' +
     'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
     '--sim : Sim name',
-    wrapTask( async function() {
+    wrapTask( async () => {
       maintenance( this.async() ).maintenanceDeployRCNoVersionBump( grunt.option( 'sim' ) );
     } ) );
 
@@ -200,19 +200,19 @@ module.exports = function( grunt ) {
     'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
     '--sim : Sim name\n' +
     '--message : Additional part of message for the version bump commit',
-    wrapTask( async function() {
+    wrapTask( async () => {
       maintenance( this.async() ).maintenanceDeployProduction( grunt.option( 'sim' ), grunt.option( 'message' ) );
     } ) );
 
   grunt.registerTask( 'update-gh-pages',
     'Updates the gh-pages branches for various repos, including building of dot/kite/scenery',
-    wrapTask( async function() {
+    wrapTask( async () => {
       maintenance( this.async() ).updateGithubPages();
     } ) );
 
   grunt.registerTask( 'sim-list',
     'Prints out a list of live production HTML sims to stderr (can be filtered from other stdout output)',
-    wrapTask( async function() {
+    wrapTask( async () => {
       winston.default.transports.console.level = 'error';
       const data = await simMetadata( {
         summary: true,
@@ -224,7 +224,7 @@ module.exports = function( grunt ) {
   grunt.registerTask( 'npm-update',
     'Runs npm update/prune for both chipper and the given repository\n' +
     '--repo : The repository to update',
-    wrapTask( async function() {
+    wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
       await npmUpdate( grunt.option( 'repo' ) ).then( () => npmUpdate( 'chipper' ) );
@@ -234,7 +234,7 @@ module.exports = function( grunt ) {
     'Creates a new release branch for a given simulation\n' +
     '--repo : The repository to add the release branch to\n' +
     '--branch : The branch name, which should be {{MAJOR}}.{{MINOR}}, e.g. 1.0',
-    wrapTask( async function() {
+    wrapTask( async () => {
       const repo = grunt.option( 'repo' );
       const branch = grunt.option( 'branch' );
       assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
@@ -248,7 +248,7 @@ module.exports = function( grunt ) {
     'Runs cherry-pick on a list of SHAs until one works. Reports success or failure\n' +
     '--repo : The repository to cherry-pick on\n' +
     '--shas : Comma-separated list of SHAs to try',
-    wrapTask( async function() {
+    wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'shas' ), 'Requires specifying a comma-separated list of SHAs with --shas={{SHAS}}' );
 
@@ -258,13 +258,13 @@ module.exports = function( grunt ) {
       await cherryPick( repo, shas );
     } ) );
 
-  grunt.registerTask( 'lint', 'Lints this repository only', wrapTask( async function() {
+  grunt.registerTask( 'lint', 'Lints this repository only', wrapTask( async () => {
     grunt.log.writeln( await execute( gruntCommand, [ 'lint', '--repo=perennial' ], '../chipper' ) );
   } ) );
 
   grunt.registerTask( 'wrapper',
     'Deploys a phet-io wrapper',
-    wrapTask( async function() {
+    wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
       await wrapper( grunt.option( 'repo' ) );
@@ -272,7 +272,7 @@ module.exports = function( grunt ) {
 
   grunt.registerTask( 'dev',
     'Deploys a dev version of the simulation',
-    wrapTask( async function() {
+    wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
@@ -281,7 +281,7 @@ module.exports = function( grunt ) {
 
   grunt.registerTask( 'rc',
     'Deploys an rc version of the simulation',
-    wrapTask( async function() {
+    wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
@@ -291,7 +291,7 @@ module.exports = function( grunt ) {
 
   grunt.registerTask( 'production',
     'Deploys a production version of the simulation',
-    wrapTask( async function() {
+    wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
@@ -305,7 +305,7 @@ module.exports = function( grunt ) {
     '--author="string" : the author name\n' +
     '--title="string" : (optional) the simulation title\n' +
     '--clean=true : (optional) deletes the repository directory if it exists',
-    wrapTask( async function() {
+    wrapTask( async () => {
       const repo = grunt.option( 'repo' );
       const author = grunt.option( 'author' );
       const title = grunt.option( 'title' );
@@ -317,7 +317,7 @@ module.exports = function( grunt ) {
       await createSim( repo, author, { title, clean } );
     } ) );
 
-  grunt.registerTask( 'sort-require-statements', 'Sort the require statements for a single file (if --file={{FILE}} is provided), or does so for all JS files in a repo (if --repo={{REPO}} is specified)', wrapTask( async function() {
+  grunt.registerTask( 'sort-require-statements', 'Sort the require statements for a single file (if --file={{FILE}} is provided), or does so for all JS files in a repo (if --repo={{REPO}} is specified)', wrapTask( async () => {
     const file = grunt.option( 'file' );
     const repo = grunt.option( 'repo' );
 
@@ -334,7 +334,7 @@ module.exports = function( grunt ) {
 
   grunt.registerTask( 'insert-require-statement', 'Insert a require statement into the specified file.\n' +
                                                   '--file absolute path of the file that will receive the require statement\n' +
-                                                  '--name to be required', wrapTask( async function() {
+                                                  '--name to be required', wrapTask( async () => {
     const file = grunt.option( 'file' );
     const name = grunt.option( 'name' );
 
@@ -344,12 +344,12 @@ module.exports = function( grunt ) {
     insertRequireStatement( file, name );
   } ) );
 
-  grunt.registerTask( 'lint-everything', 'lint all js files that are required to build this repository', wrapTask( async function() {
+  grunt.registerTask( 'lint-everything', 'lint all js files that are required to build this repository', wrapTask( async () => {
     // Don't always require this, as we may have an older chipper checked out
     require( '../../../chipper/js/grunt/lint' )( grunt.file.read( 'data/active-repos' ).trim().split( /\r?\n/ ) );
   } ) );
 
-  grunt.registerTask( 'generate-data', 'generates most files under perennial/data/', wrapTask( async function() {
+  grunt.registerTask( 'generate-data', 'generates most files under perennial/data/', wrapTask( async () => {
     generateData( grunt );
   } ) );
 };
