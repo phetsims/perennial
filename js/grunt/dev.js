@@ -33,6 +33,7 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  *
  * @param {string} repo
  * @param {Array.<string>} brands
+ * @returns {Promise}
  */
 module.exports = async function( repo, brands ) {
   const currentBranch = await getBranch( repo );

@@ -16,6 +16,7 @@
     "lodash": "^3.10.1",
     "mimelib": "~0.2.19",
     "minimist": "^1.1.1",
+    "mocha": "~4.0.1",
     "request": "^2.55.0",
     "winston": "^0.9.0",
     "xml2js": "^0.4.15"
