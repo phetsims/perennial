@@ -22,7 +22,7 @@ if [ $# -gt 1 ]; then
 fi
 
 # default logfile
-LOGFILE=${HOME}/.phet/print-shas.log
+LOGFILE=${HOME}/.phet/print-shas.out
 
 # get log file from command line or use default
 if [ $# = 1 ]; then
