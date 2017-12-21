@@ -10,8 +10,8 @@
 #
 #====================================================================================================
 
-CHIPPER_BIN=`dirname "${BASH_SOURCE[0]}"`
-WORKING_DIR=${CHIPPER_BIN}/../..
+PERENNIAL_BIN=`dirname "${BASH_SOURCE[0]}"`
+WORKING_DIR=${PERENNIAL_BIN}/../..
 cd ${WORKING_DIR}
 
 # ANSI escape sequences to move to the right (in the same line) or to apply or reset colors
