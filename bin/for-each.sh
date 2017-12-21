@@ -1,12 +1,16 @@
 #!/bin/bash
 #====================================================================================================
 #
-# Visits each repository listed in a file and applies the same command to each.  If the specified file cannot be found
-# it will check for a matching file in perennial/bin/data.
+# Visits each repository listed in a file and applies the same command to each.
+# If the specified file cannot be found, it will check for a matching file in perennial/bin/data.
 #
-# For example, to print the working directory of all active repos:
+# Examples:
 #
+# // print the working directory of all active repos:
 # for-each.sh active-repos pwd
+#
+# // checkout master for all repos:
+# for-each.sh active-repos git checkout master
 #
 # Author: Sam Reid
 # Author: Chris Malley
