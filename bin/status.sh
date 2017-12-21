@@ -15,7 +15,7 @@ WORKING_DIR=${PERENNIAL_BIN}/../..
 cd ${WORKING_DIR}
 
 # ANSI escape sequences to move to the right (in the same line) or to apply or reset colors
-MOVE_RIGHT="\033[36G"
+MOVE_RIGHT="\033[42G"
 RED="\033[31m"
 GREEN="\033[32m"
 RESET="\033[0m"
