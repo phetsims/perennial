@@ -31,11 +31,8 @@ done
 
 # log the current shas in your working copy, which can be restored using restore-shas.sh
 HOME_PHET=${HOME}/.phet/
-if [ ! -d ${HOME_PHET} ]; then
-  mkdir ${HOME_PHET}
-fi
+mkdir -p ${HOME_PHET}
 ${PERENNIAL_BIN}/print-shas.sh > ${HOME_PHET}/print-shas.log
-exit 1
 
 # pull each repository
 for repo in `cat perennial/data/active-repos | xargs | tr -d '\r'`
