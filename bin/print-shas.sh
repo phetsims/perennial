@@ -18,7 +18,7 @@ do
     cd $repo > /dev/null
 
     # format is "{{repo}} {{sha}}"
-    echo -n "$repo `git rev-parse HEAD`"
+    echo "$repo `git rev-parse HEAD`"
     cd .. > /dev/null
   fi
 done
