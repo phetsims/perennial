@@ -19,7 +19,5 @@ do
     echo -n $repo ": "
     git rev-parse HEAD
     cd ..
-  else
-    echo ">>>>>>>>>>>>>>>>>>>>>>>> Missing repo: $sim"
   fi
 done
