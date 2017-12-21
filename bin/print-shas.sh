@@ -16,8 +16,9 @@ do
   # if it's a Git repository...
   if [ -d $repo/.git ]; then
     cd $repo > /dev/null
-    echo -n $repo ": "
-    git rev-parse HEAD
-    cd ..
+
+    # format is "{{repo}} {{sha}}"
+    echo -n "$repo `git rev-parse HEAD`"
+    cd .. > /dev/null
   fi
 done
