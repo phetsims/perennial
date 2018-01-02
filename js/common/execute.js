@@ -32,9 +32,10 @@ module.exports = function( cmd, args, cwd ) {
      * @param {Array.<string>} args
      * @param {string} cwd
      * @param {string} stdout
+     * @param {string} stderr
      * @param {number} code - exit code
      */
-    constructor( cmd, args, cwd, stdout, code ) {
+    constructor( cmd, args, cwd, stdout, stderr, code ) {
       super( `${cmd} ${args.join( ' ')} in ${cwd} failed with exit code ${code} and stdout:\n${stdout}` );
 
       // @public
@@ -42,6 +43,7 @@ module.exports = function( cmd, args, cwd ) {
       this.args = args;
       this.cwd = cwd;
       this.stdout = stdout;
+      this.stderr = stderr;
       this.code = code;
     }
   }
@@ -53,8 +55,12 @@ module.exports = function( cmd, args, cwd ) {
     winston.debug( `running ${cmd} ${args.join( ' ' )} from ${cwd}` );
 
     var stdout = ''; // to be appended to
+    var stderr = '';
 
-    process.stderr.on( 'data', data => winston.debug( 'stderr: ' + data ) );
+    process.stderr.on( 'data', data => {
+      stderr += data;
+      winston.debug( 'stderr: ' + data );
+    } );
     process.stdout.on( 'data', data => {
       stdout += data;
       winston.debug( 'stdout: ' + data );
@@ -62,7 +68,7 @@ module.exports = function( cmd, args, cwd ) {
 
     process.on( 'close', code => {
       if ( code !== 0 ) {
-        reject( new ExecuteError( cmd, args, cwd, stdout, code ) );
+        reject( new ExecuteError( cmd, args, cwd, stdout, stderr, code ) );
       }
       else {
         resolve( stdout );
