@@ -11,6 +11,7 @@
 // modules
 const _ = require( 'lodash' ); // eslint-disable-line
 const assert = require( 'assert' );
+const booleanPrompt = require( '../common/booleanPrompt' );
 const build = require( '../common/build' );
 const buildLocal = require( '../common/buildLocal' );
 const devDirectoryExists = require( '../common/devDirectoryExists' );
@@ -22,7 +23,6 @@ const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
 const grunt = require( 'grunt' );
 const npmUpdate = require( '../common/npmUpdate' );
-const prompt = require( '../common/prompt' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 const SimVersion = require( '../common/SimVersion' );
 const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
@@ -33,9 +33,10 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  *
  * @param {string} repo
  * @param {Array.<string>} brands
+ * @param {boolean} noninteractive
  * @returns {Promise}
  */
-module.exports = async function( repo, brands ) {
+module.exports = async function( repo, brands, noninteractive ) {
   const currentBranch = await getBranch( repo );
   if ( currentBranch !== 'master' ) {
     grunt.fail.fatal( 'Dev deployments are only supported from the master branch, not: ' + ( currentBranch ? currentBranch : '(detached head)' ) );
@@ -73,8 +74,7 @@ module.exports = async function( repo, brands ) {
     grunt.fail.fatal( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
   }
 
-  const confirmation = await prompt( `Deploy ${versionString} to ${buildLocal.devDeployServer} [Y/n]?` );
-  if ( confirmation === 'n' ) {
+  if ( !await booleanPrompt( `Deploy ${versionString} to ${buildLocal.devDeployServer}`, noninteractive ) ) {
     grunt.fail.fatal( 'Aborted dev deploy' );
   }
 

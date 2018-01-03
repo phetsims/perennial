@@ -40,6 +40,9 @@ module.exports = function( grunt ) {
     winston.default.transports.console.level = 'debug';
   }
 
+  // If true, will skip most prompts, but will fail out on things that should not be done in an automated manner.
+  const noninteractive = !!grunt.option( 'noninteractive' );
+
   /**
    * Wraps a promise's completion with grunt's asynchronous handling, with added helpful failure messages (including stack traces, regardless of whether --stack was provided).
    * @public
@@ -263,40 +266,53 @@ module.exports = function( grunt ) {
   } ) );
 
   grunt.registerTask( 'wrapper',
-    'Deploys a phet-io wrapper',
+    'Deploys a phet-io wrapper\n' +
+    '--repo : The name of the wrapper repository to deploy\n' +
+    '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out',
     wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
-      await wrapper( grunt.option( 'repo' ) );
+      await wrapper( grunt.option( 'repo' ), noninteractive );
     } ) );
 
   grunt.registerTask( 'dev',
-    'Deploys a dev version of the simulation',
+    'Deploys a dev version of the simulation\n' +
+    '--repo : The name of the repository to deploy\n' +
+    '--brands : A comma-separated list of brand names to deploy\n' +
+    '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out',
     wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
-      await dev( grunt.option( 'repo' ), grunt.option( 'brands' ).split( ',' ) );
+      await dev( grunt.option( 'repo' ), grunt.option( 'brands' ).split( ',' ), noninteractive );
     } ) );
 
   grunt.registerTask( 'rc',
-    'Deploys an rc version of the simulation',
+    'Deploys an rc version of the simulation\n' +
+    '--repo : The name of the wrapper repository to deploy\n' +
+    '--branch : The release branch name (e.g. "1.7") that should be used for deployment\n' +
+    '--brands : A comma-separated list of brand names to deploy\n' +
+    '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out',
     wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
-      await rc( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ) );
+      await rc( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ), noninteractive );
     } ) );
 
   grunt.registerTask( 'production',
-    'Deploys a production version of the simulation',
+    'Deploys a production version of the simulation\n' +
+    '--repo : The name of the wrapper repository to deploy\n' +
+    '--branch : The release branch name (e.g. "1.7") that should be used for deployment\n' +
+    '--brands : A comma-separated list of brand names to deploy\n' +
+    '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out',
     wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
-      await production( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ) );
+      await production( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ), noninteractive );
     } ) );
 
   grunt.registerTask( 'create-sim',

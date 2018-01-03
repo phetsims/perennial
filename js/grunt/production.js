@@ -10,6 +10,7 @@
 
 // modules
 const _ = require( 'lodash' ); // eslint-disable-line
+const booleanPrompt = require( '../common/booleanPrompt' );
 const build = require( '../common/build' );
 const buildServerRequest = require( '../common/buildServerRequest' );
 const checkoutMaster = require( '../common/checkoutMaster' );
@@ -25,7 +26,6 @@ const grunt = require( 'grunt' );
 const gruntCommand = require( '../common/gruntCommand' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
-const prompt = require( '../common/prompt' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 const simMetadata = require( '../common/simMetadata' );
 const SimVersion = require( '../common/SimVersion' );
@@ -38,9 +38,10 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  * @param {string} repo
  * @param {string} branch
  * @param {Array.<string>} brands
+ * @param {boolean} noninteractive
  * @returns {Promise}
  */
-module.exports = async function( repo, branch, brands ) {
+module.exports = async function( repo, branch, brands, noninteractive ) {
   SimVersion.ensureReleaseBranch( branch );
 
   const isClean = await gitIsClean( repo );
@@ -52,8 +53,7 @@ module.exports = async function( repo, branch, brands ) {
     grunt.fail.fatal( `Cannot find release branch ${branch} for ${repo}` );
   }
 
-  const creditsConfirmation = await prompt( 'Are QA credits up-to-date [Y/n]?' );
-  if ( creditsConfirmation === 'n' ) {
+  if ( !await booleanPrompt( 'Are QA credits up-to-date', noninteractive ) ) {
     grunt.fail.fatal( 'Aborted production deployment' );
   }
 
@@ -65,8 +65,7 @@ module.exports = async function( repo, branch, brands ) {
     var versionChanged;
 
     if ( previousVersion.testType === null ) {
-      const redeployConfirmation = await prompt( `It appears that the last deployment was a production deployment (${previousVersion.toString()}).\nWould you like to redeploy (i.e. did the last production deploy fail for some reason?) [Y/n]?` );
-      if ( redeployConfirmation === 'n' ) {
+      if ( noninteractive || !await booleanPrompt( `It appears that the last deployment was a production deployment (${previousVersion.toString()}).\nWould you like to redeploy (i.e. did the last production deploy fail for some reason?)`, false ) ) {
         grunt.fail.fatal( 'Aborted production deployment' );
       }
 
@@ -88,8 +87,7 @@ module.exports = async function( repo, branch, brands ) {
 
     // Initial deployment nags
     if ( isFirstVersion ) {
-      const checklistConfirmation = await prompt( 'Is the master checklist complete (e.g. are screenshots added to assets, etc.) [Y/n]?' );
-      if ( checklistConfirmation === 'n' ) {
+      if ( !await booleanPrompt( 'Is the master checklist complete (e.g. are screenshots added to assets, etc.)', noninteractive ) ) {
         grunt.fail.fatal( 'Aborted production deployment' );
       }
     }
@@ -98,8 +96,7 @@ module.exports = async function( repo, branch, brands ) {
 
     // caps-lock should hopefully shout this at people. do we have a text-to-speech synthesizer we can shout out of their speakers?
     // SECOND THOUGHT: this would be horrible during automated maintenance releases.
-    const initialConfirmation = await prompt( `DEPLOY ${versionString} to PRODUCTION [Y/n]?` );
-    if ( initialConfirmation === 'n' ) {
+    if ( !await booleanPrompt( `DEPLOY ${versionString} to PRODUCTION`, noninteractive ) ) {
       grunt.fail.fatal( 'Aborted production deployment' );
     }
 
@@ -117,8 +114,7 @@ module.exports = async function( repo, branch, brands ) {
       brands
     } ) );
 
-    const postBuildConfirmation = await prompt( `Please test the built version of ${repo}.\nIs it ready to deploy [Y/n]?` );
-    if ( postBuildConfirmation === 'n' ) {
+    if ( !await booleanPrompt( `Please test the built version of ${repo}.\nIs it ready to deploy`, noninteractive ) ) {
       // Abort version update
       if ( versionChanged ) {
         await setRepoVersion( repo, previousVersion );

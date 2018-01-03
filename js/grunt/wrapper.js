@@ -10,6 +10,7 @@
 
 // modules
 const _ = require( 'lodash' ); // eslint-disable-line
+const booleanPrompt = require( '../common/booleanPrompt' );
 const buildLocal = require( '../common/buildLocal' );
 const copyFile = require( '../common/copyFile' );
 const devDirectoryExists = require( '../common/devDirectoryExists' );
@@ -25,7 +26,6 @@ const gitPush = require( '../common/gitPush' );
 const grunt = require( 'grunt' );
 const gruntCommand = require( '../common/gruntCommand' );
 const npmUpdate = require( '../common/npmUpdate' );
-const prompt = require( '../common/prompt' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 const SimVersion = require( '../common/SimVersion' );
 
@@ -36,8 +36,10 @@ const SimVersion = require( '../common/SimVersion' );
  * TODO: deduplicate code (where possible) with dev.js
  *
  * @param {string} repo
+ * @param {boolean} noninteractive
+ * @returns {Promise}
  */
-module.exports = async function( repo ) {
+module.exports = async function( repo, noninteractive ) {
   const currentBranch = await getBranch( repo );
   if ( currentBranch !== 'master' ) {
     grunt.fail.fatal( 'Dev deployments are only supported from the master branch, not: ' + ( currentBranch ? currentBranch : '(detached head)' ) );
@@ -73,8 +75,7 @@ module.exports = async function( repo ) {
     grunt.fail.fatal( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
   }
 
-  const confirmation = await prompt( `Deploy ${versionString} to ${buildLocal.devDeployServer} [Y/n]?` );
-  if ( confirmation === 'n' ) {
+  if ( !await booleanPrompt( `Deploy ${versionString} to ${buildLocal.devDeployServer}`, noninteractive ) ) {
     grunt.fail.fatal( 'Aborted wrapper deploy' );
   }
 
