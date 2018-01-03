@@ -247,14 +247,16 @@ module.exports = async function( task, taskCallback ) {
         if ( brand === constants.PHET_BRAND ) {
           targetDir = constants.HTML_SIMS_DIRECTORY + simName + '/' + version + '/';
 
-          // Remove _phet from all filenames in the phet directory
-          const files = fs.readdirSync( simDir + '/build/phet' );
-          for ( let i in files ) {
-            if ( files.hasOwnProperty( i ) ) {
-              const filename = files[ i ];
-              if ( filename.indexOf( '_phet' ) >= 0 ) {
-                const newFilename = filename.replace( '_phet', '' );
-                await execWithAbort( 'mv', [ filename, newFilename ], simDir + '/build/phet' );
+          if ( api !== '1.0' ) {
+            // Remove _phet from all filenames in the phet directory
+            const files = fs.readdirSync( simDir + '/build/phet' );
+            for ( let i in files ) {
+              if ( files.hasOwnProperty( i ) ) {
+                const filename = files[ i ];
+                if ( filename.indexOf( '_phet' ) >= 0 ) {
+                  const newFilename = filename.replace( '_phet', '' );
+                  await execWithAbort( 'mv', [ filename, newFilename ], simDir + '/build/phet' );
+                }
               }
             }
           }
@@ -265,7 +267,14 @@ module.exports = async function( task, taskCallback ) {
 
         // Copy steps
         await mkVersionDir( targetDir );
-        child_process.execSync( 'cp -r ' + simDir + '/build/' + brand + '/* ' + targetDir );
+        let copyCommand = 'cp -r ' + simDir + '/build/';
+        if ( api === '1.0' ) {
+          copyCommand += '/* ';
+        }
+        else {
+          copyCommand += + brand + '/* ';
+        }
+        child_process.execSync( copyCommand + targetDir );
 
         // Post-copy steps
         if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
@@ -280,7 +289,7 @@ module.exports = async function( task, taskCallback ) {
             await addTranslator( localesArray[ 0 ], afterDeploy );
           }
         }
-        else {
+        else if ( brand === constants.PHET_IO_BRAND ) {
           await writePhetioHtaccess( constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess', '/etc/httpd/conf/phet-io_pw' );
         }
       }

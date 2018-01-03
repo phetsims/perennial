@@ -37,9 +37,9 @@ Also, you will need to add an entry for spot in `~/.ssh/config` like so:
 ```
 Host spot
     HostName spot.colorado.edu
-        User [identikey]
-            Port 22
-                IdentityFile ~/.ssh/id_rsa
+    User [identikey]
+    Port 22
+    IdentityFile ~/.ssh/id_rsa
 ```
 On spot, you'll need to add the public key from phet-server to a file ~/.ssh/authorized_keys
 
