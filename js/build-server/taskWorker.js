@@ -272,7 +272,7 @@ module.exports = async function( task, taskCallback ) {
           copyCommand += '/* ';
         }
         else {
-          copyCommand += + brand + '/* ';
+          copyCommand += brand + '/* ';
         }
         child_process.execSync( copyCommand + targetDir );
 
