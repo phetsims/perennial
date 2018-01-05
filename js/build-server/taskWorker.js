@@ -284,7 +284,7 @@ module.exports = async function( task, taskCallback ) {
           await addToRosetta( simTitle, simName, email );
 
           // if this build request comes from rosetta it will have a userId field and only one locale
-          const localesArray = locales.split( ',' );
+          const localesArray = api === "1.0" ? localesArray.split( ',' ) : locales;
           if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
             await addTranslator( localesArray[ 0 ], afterDeploy );
           }
