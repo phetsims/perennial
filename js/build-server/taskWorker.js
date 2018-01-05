@@ -36,11 +36,8 @@ const execute = require( '../common/execute' );
  * @property {String} task.translatorId - rosetta user id for adding translators to the website
  * @property {String} task.res - express response object
  * @property {winston} task.winston - logger
- *
- * @param {Function} taskCallback - called when build is finished or aborted
  */
-module.exports = async function( task, taskCallback ) {
-
+async function taskWorker( task ) {
   //-------------------------------------------------------------------------------------
   // Parse and validate parameters
   //-------------------------------------------------------------------------------------
@@ -51,7 +48,6 @@ module.exports = async function( task, taskCallback ) {
   const locales = task.locales;
   const simName = task.simName;
   let version = task.version;
-  const res = task.res;
   const email = task.email;
   const brands = task.brands;
   const servers = task.servers;
@@ -80,8 +76,7 @@ module.exports = async function( task, taskCallback ) {
     }
     catch( err ) {
       if ( command === 'grunt checkout-master-all' ) {
-        taskCallback( 'error running command ' + command + ': ' + err.stdout );
-        Promise.reject( 'Build aborted' );
+        Promise.reject( 'Build aborted, error running command ' + command + ': ' + err.stdout );
       }
       else {
         return abortBuild( err );
@@ -97,7 +92,7 @@ module.exports = async function( task, taskCallback ) {
     winston.log( 'error', 'BUILD ABORTED! ' + err );
     winston.log( 'info', 'build aborted: checking out master for every repo in case build shas are still checked out' );
     await execute( 'grunt', [ 'checkout-master-all' ], constants.PERENNIAL );
-    taskCallback( err );
+    Promise.reject( 'Build aborted,' + err );
   };
 
   const simNameRegex = /^[a-z-]+$/;
@@ -177,7 +172,7 @@ module.exports = async function( task, taskCallback ) {
   const afterDeploy = async function() {
     await execWithAbort( 'grunt', [ 'checkout-master-all' ], constants.PERENNIAL );
     await execWithAbort( 'rm', [ '-rf', buildDir ], '.' );
-    taskCallback();
+    Promise.resolve();
   };
 
   try {
@@ -274,7 +269,12 @@ module.exports = async function( task, taskCallback ) {
         else {
           copyCommand += brand + '/* ';
         }
-        child_process.execSync( copyCommand + targetDir );
+        try {
+          child_process.exec( copyCommand + targetDir );
+        }
+        catch( e ) {
+          throw e;
+        }
 
         // Post-copy steps
         if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
@@ -297,4 +297,14 @@ module.exports = async function( task, taskCallback ) {
   }
 
   return afterDeploy();
+}
+
+module.exports = function( task, taskCallback ) {
+  const ret = taskWorker( task );
+  ret.then( () => {
+      taskCallback();
+    }
+  ).catch( ( reason ) => {
+    taskCallback( reason );
+  } );
 };
