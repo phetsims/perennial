@@ -10,19 +10,19 @@
 
 const execute = require( '../js/common/execute' );
 const gruntCommand = require( '../js/common/gruntCommand' );
+const qunit = require( 'qunit' );
 
-describe( 'Perennial grunt tasks', () => {
-  it( 'Checkout target', async () => {
-    await execute( gruntCommand, [ 'checkout-target', '--repo=chains', '--target=1.9' ], '.' );
-    await execute( gruntCommand, [ 'checkout-master', '--repo=chains' ], '.' );
-  } ).timeout( 120000 );
+qunit.module( 'Perennial grunt tasks' );
 
-  it( 'NPM update', async () => {
-    await execute( gruntCommand, [ 'npm-update', '--repo=chains' ], '.' );
-  } ).timeout( 120000 );
+qunit.test( 'Checkout target', async ( assert ) => {
+  assert.timeout( 120000 );
+  await execute( gruntCommand, [ 'checkout-target', '--repo=chains', '--target=1.9' ], '.' );
+  await execute( gruntCommand, [ 'checkout-master', '--repo=chains' ], '.' );
+  assert.expect( 0 );
+} );
 
-  // TODO: uninteractive version of this
-  // it( 'Chains dev deploy', async () => {
-  //   await execute( gruntCommand, [ 'dev', '--repo=chains', '--brands=phet,phet-io' ], '.' );
-  // } ).timeout( 360000 );
+qunit.test( 'NPM update', async ( assert ) => {
+  assert.timeout( 120000 );
+  await execute( gruntCommand, [ 'npm-update', '--repo=chains' ], '.' );
+  assert.expect( 0 );
 } );
