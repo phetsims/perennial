@@ -18,7 +18,7 @@ const winston = require( 'winston' );
  *
  * @param {string} repo - The repository name
  * @param {string} target - The SHA/branch/whatnot to check out
- * @returns {Promise} - Resolves to whether the cherry-pick worked or not. If aborting fails, will reject.
+ * @returns {Promise.<boolean>} - Resolves to whether the cherry-pick worked or not. If aborting fails, will reject.
  */
 module.exports = function( repo, target ) {
   winston.info( `git cherry-pick ${target} on ${repo}` );

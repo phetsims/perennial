@@ -20,7 +20,8 @@ const winston = require( 'winston' );
  * @param {string} host
  * @param {string} localFile - A file, directory or glob pattern. Basically the first part of the SCP command
  * @param {string} remoteFile - A file or directory. Basically the second part of the SCP command (minus the host/username)
- * @returns {Promise}
+ * @returns {Promise.<string>} - Stdout
+ * @rejects {ExecuteError}
  */
 module.exports = async function( username, host, localFile, remoteFile ) {
   winston.info( `transferring ${localFile} remotely to ${remoteFile} on ${host} from ${await execute( 'pwd', [], '.' )}` );

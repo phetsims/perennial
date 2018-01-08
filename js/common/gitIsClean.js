@@ -17,7 +17,8 @@ const winston = require( 'winston' );
  * @public
  *
  * @param {string} repo - The repository name
- * @returns {Promise} - Resolves {boolean} - Whether it is clean or not
+ * @returns {Promise.<boolean>} - Whether it is clean or not
+ * @rejects {ExecuteError}
  */
 module.exports = function( repo ) {
   winston.debug( `git status check on ${repo}` );

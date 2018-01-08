@@ -18,7 +18,7 @@ const _ = require( 'lodash' ); // eslint-disable-line
  * @public
  *
  * @param {string} options - The repository name
- * @returns {Promise} - Resolves with metadata: {Object}
+ * @returns {Promise.<Object>} - Resolves with metadata object
  */
 module.exports = function( options ) {
   return new Promise( ( resolve, reject ) => {

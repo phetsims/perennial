@@ -18,7 +18,8 @@ const scp = require( './scp' );
  *
  * @param {string} localFile - A file, directory or glob pattern. Basically the first part of the SCP command
  * @param {string} remoteFile - A file or directory. Basically the second part of the SCP command (minus the host/username)
- * @returns {Promise}
+ * @returns {Promise.<string>} - Stdout
+ * @rejects {ExecuteError}
  */
 module.exports = function( localFile, remoteFile ) {
   return scp( buildLocal.devUsername, buildLocal.devDeployServer, localFile, remoteFile );

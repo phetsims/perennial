@@ -17,7 +17,8 @@ const ssh = require( './ssh' );
  * @public
  *
  * @param {string} cmd
- * @returns {Promise}
+ * @returns {Promise.<string>} - Stdout
+ * @rejects {ExecuteError}
  */
 module.exports = function( cmd ) {
   return ssh( buildLocal.devUsername, buildLocal.devDeployServer, cmd );

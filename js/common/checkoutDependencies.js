@@ -21,7 +21,7 @@ const winston = require( 'winston' );
  * @param {string} repo - The repository name
  * @param {Object} dependencies - In the format of dependencies.json
  * @param {boolean} includeNpmUpdate - Whether npm update should be included (for the repo and chipper)
- * @returns {Promise} - Resolves with checkedOutRepos: {Array.<string>}
+ * @returns {Promise.<Array.<string>>} - Resolves with checkedOutRepos
  */
 module.exports = async function( repo, dependencies, includeNpmUpdate ) {
   winston.info( `checking out dependencies for ${repo}` );

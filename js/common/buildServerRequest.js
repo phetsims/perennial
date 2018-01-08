@@ -22,7 +22,7 @@ const winston = require( 'winston' );
  * @param {SimVersion} version
  * @param {Object} dependencies - Dependencies object, use getDependencies?
  * @param {Object} [options]
- * @returns {Promise}
+ * @returns {Promise} - No resolved value
  */
 module.exports = async function( repo, version, dependencies, options ) {
   return new Promise( ( resolve, reject ) => {

@@ -19,7 +19,8 @@ const winston = require( 'winston' );
  * @param {string} repo - The repository name
  * @param {string} possibleAncestor
  * @param {string} possibleDescendant
- * @returns {Promise} - Resolves with {boolean} (whether it is an ancestor or not)
+ * @returns {Promise.<boolean>} - Whether it is an ancestor or not
+ * @rejects {ExecuteError}
  */
 module.exports = function( repo, possibleAncestor, possibleDescendant ) {
   winston.info( `git check (in ${repo}) for whether ${possibleAncestor} is an ancestor of ${possibleDescendant}` );

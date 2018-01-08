@@ -18,7 +18,8 @@ const winston = require( 'winston' );
  *
  * @param {string} repo - The repository name
  * @param {string} remoteBranch - The branch that is getting pushed to, e.g. 'master' or '1.0'
- * @returns {Promise} - See execute for details
+ * @returns {Promise.<string>} - Stdout
+ * @rejects {ExecuteError}
  */
 module.exports = function( repo, remoteBranch ) {
   winston.info( `git push on ${repo} to ${remoteBranch}` );
