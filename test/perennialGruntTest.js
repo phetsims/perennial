@@ -26,3 +26,12 @@ qunit.test( 'NPM update', async ( assert ) => {
   await execute( gruntCommand, [ 'npm-update', '--repo=chains' ], '.' );
   assert.expect( 0 );
 } );
+
+qunit.test( 'Bumper dev phet,phet-io', async ( assert ) => {
+  assert.timeout( 600000 );
+  // TODO: Remove these once it goes to master
+  await execute( 'git', [ 'checkout', '2.0'], '../chipper' );
+  await execute( 'git', [ 'checkout', 'chipper2.0'], '../phet-io-wrappers' );
+  await execute( gruntCommand, [ 'dev', '--repo=bumper', '--brands=phet,phet-io', '--noninteractive' ], '.' );
+  assert.expect( 0 );
+} );
