@@ -44,7 +44,7 @@ module.exports = function() {
   writeList( 'accessibility', phet => phet.accessible );
   writeList( 'active-runnables', phet => phet.runnable );
   writeList( 'active-sims', phet => phet.simulation );
-  writeList( 'phet-io', phet => phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) );
+  writeList( 'phet-io', phet => phet.runnable && phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) );
   writeList( 'testable-runnables', phet => phet.runnable && phet.automatedTestEnabled !== false );
-  writeList( 'testable-phet-io', phet => phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) && phet.automatedTestEnabled !== false );
+  writeList( 'testable-phet-io', phet => phet.runnable && phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) && phet.automatedTestEnabled !== false );
 };
