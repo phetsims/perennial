@@ -57,7 +57,7 @@ module.exports = async function( repo, version, dependencies, options ) {
       if ( error ) {
         reject( new Error( `Build request failed with error ${error}.` ) );
       }
-      else if ( response.statusCode !== 200 ) {
+      else if ( response.statusCode !== 200 && response.statusCode !== 202 ) {
         reject( new Error( `Build request failed with status code ${response.statusCode}.` ) );
       }
       else {
