@@ -3,6 +3,11 @@
 /**
  * Generates the lists under perennial/data/, and if there were changes, will commit and push.
  *
+ * Ideally, run from bayes.colorado.edu under the phet-admin user from /data/share/phet/generate-data:
+ * # pm2 start grunt -- generate-data
+ *
+ * See https://github.com/phetsims/perennial/issues/66
+ *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 /* eslint-env node */
