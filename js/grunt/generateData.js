@@ -31,12 +31,12 @@ module.exports = async function() {
   if ( await getBranch( 'perennial' ) !== 'master' || !await gitIsClean( 'perennial' ) ) {
     grunt.fail.fatal( 'Data will only be generated if perennial is on master with no working-copy changes.' );
   }
-  
+
   // Make sure we get an up-to-date list of repos
   await gitPull( 'perennial' );
 
   // Make sure to clone anything we are missing
-  await execute( 'perennial/bin/clone-missing-repos.sh', [], '..' );
+  await execute( 'bash', [ 'perennial/bin/clone-missing-repos.sh' ], '..' );
 
   const activeRepos = getActiveRepos();
 
