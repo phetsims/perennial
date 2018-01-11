@@ -365,7 +365,7 @@ module.exports = function( grunt ) {
     require( '../../../chipper/js/grunt/lint' )( grunt.file.read( 'data/active-repos' ).trim().split( /\r?\n/ ) );
   } ) );
 
-  grunt.registerTask( 'generate-data', 'generates most files under perennial/data/', wrapTask( async () => {
+  grunt.registerTask( 'generate-data', 'Generates the lists under perennial/data/, and if there were changes, will commit and push.', wrapTask( async () => {
     await generateData( grunt );
   } ) );
 };

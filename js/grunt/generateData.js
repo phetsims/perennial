@@ -1,7 +1,7 @@
 // Copyright 2017, University of Colorado Boulder
 
 /**
- * Generates the lists under perennial/data/.
+ * Generates the lists under perennial/data/, and if there were changes, will commit and push.
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
@@ -23,7 +23,7 @@ const os = require( 'os' );
 const winston = require( 'winston' );
 
 /**
- * Generates the lists under perennial/data/.
+ * Generates the lists under perennial/data/, and if there were changes, will commit and push.
  * @public
  */
 module.exports = async function() {
@@ -75,5 +75,8 @@ module.exports = async function() {
     winston.info( 'Changes to data files detected, will push' );
     await gitCommit( 'perennial', 'Automated update of perennial data files' );
     await gitPush( 'perennial', 'master' );
+  }
+  else {
+    winston.info( 'No changes detected' );
   }
 };
