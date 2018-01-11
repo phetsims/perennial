@@ -51,8 +51,8 @@ module.exports = async function( repo, branch ) {
   }
 
   const oldVersion = await getRepoVersion( repo );
-  assert( major === oldVersion.major, `Generally a new release branch should have the same major version as master. branch: ${major}, master: ${oldVersion.major}` );
-  assert( minor === oldVersion.minor, `Generally a new release branch should have the same minor version as master. branch: ${minor}, master: ${oldVersion.minor}` );
+  // assert( major === oldVersion.major, `Generally a new release branch should have the same major version as master. branch: ${major}, master: ${oldVersion.major}` );
+  // assert( minor === oldVersion.minor, `Generally a new release branch should have the same minor version as master. branch: ${minor}, master: ${oldVersion.minor}` );
 
   const newVersion = new SimVersion( major, minor, 0, {
     testType: 'rc',
