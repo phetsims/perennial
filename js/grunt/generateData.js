@@ -70,7 +70,7 @@ module.exports = async function() {
   await gitAdd( 'perennial', 'data/testable-runnables' );
   await gitAdd( 'perennial', 'data/testable-phet-io' );
 
-  const hasChanges = await gitIsClean( 'perennial' );
+  const hasChanges = !await gitIsClean( 'perennial' );
   if ( hasChanges ) {
     winston.info( 'Changes to data files detected, will push' );
     await gitCommit( 'perennial', 'Automated update of perennial data files' );
