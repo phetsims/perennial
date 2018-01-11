@@ -10,6 +10,7 @@
 
 // modules
 const assert = require( 'assert' );
+const execute = require( '../common/execute' );
 const fs = require( 'fs' );
 const getActiveRepos = require( '../common/getActiveRepos' );
 const getBranch = require( '../common/getBranch' );
@@ -30,6 +31,12 @@ module.exports = async function() {
   if ( await getBranch( 'perennial' ) !== 'master' || !await gitIsClean( 'perennial' ) ) {
     grunt.fail.fatal( 'Data will only be generated if perennial is on master with no working-copy changes.' );
   }
+  
+  // Make sure we get an up-to-date list of repos
+  await gitPull( 'perennial' );
+
+  // Make sure to clone anything we are missing
+  await execute( 'perennial/bin/clone-missing-repos.sh', [], '..' );
 
   const activeRepos = getActiveRepos();
 
