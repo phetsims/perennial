@@ -14,7 +14,7 @@ const build = require( '../common/build' );
 const copyFile = require( '../common/copyFile' );
 const execute = require( '../common/execute' );
 const getBranch = require( '../common/getBranch' );
-const getRepoVersion = require( '../common/getRepoVersion' );
+// const getRepoVersion = require( '../common/getRepoVersion' );
 const gitAdd = require( '../common/gitAdd' );
 const gitCheckout = require( '../common/gitCheckout' );
 const gitCommit = require( '../common/gitCommit' );
@@ -50,7 +50,7 @@ module.exports = async function( repo, branch ) {
     grunt.fail.fatal( 'Branch already exists, aborting' );
   }
 
-  const oldVersion = await getRepoVersion( repo );
+  // const oldVersion = await getRepoVersion( repo );
   // assert( major === oldVersion.major, `Generally a new release branch should have the same major version as master. branch: ${major}, master: ${oldVersion.major}` );
   // assert( minor === oldVersion.minor, `Generally a new release branch should have the same minor version as master. branch: ${minor}, master: ${oldVersion.minor}` );
 

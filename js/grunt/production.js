@@ -19,6 +19,7 @@ const execute = require( '../common/execute' );
 const getDependencies = require( '../common/getDependencies' );
 const getRepoVersion = require( '../common/getRepoVersion' );
 const gitAdd = require( '../common/gitAdd' );
+const gitCheckout = require( '../common/gitCheckout' );
 const gitCommit = require( '../common/gitCommit' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
@@ -183,7 +184,9 @@ module.exports = async function( repo, branch, brands, noninteractive ) {
 
     // Update the third-party-licenses report
     grunt.log.writeln( 'Running third-party report (do not ctrl-C it)' );
+    await gitCheckout( 'chipper', '2.0' ); // TODO: MERGE: Remove this, we want to use master
     await execute( gruntCommand, [ 'report-third-party' ], '../chipper' );
+    await gitCheckout( 'chipper', 'master' ); // TODO: MERGE: Remove this, we want to use master
     await gitAdd( 'sherpa', 'third-party-licenses.md' );
     try {
       await gitCommit( 'sherpa', `Updating third-party-licenses for deploy of ${repo} ${versionString}` );
