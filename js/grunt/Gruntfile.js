@@ -366,6 +366,6 @@ module.exports = function( grunt ) {
   } ) );
 
   grunt.registerTask( 'generate-data', 'generates most files under perennial/data/', wrapTask( async () => {
-    generateData( grunt );
+    await generateData( grunt );
   } ) );
 };
