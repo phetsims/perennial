@@ -361,8 +361,11 @@ module.exports = function( grunt ) {
   } ) );
 
   grunt.registerTask( 'lint-everything', 'lint all js files that are required to build this repository', wrapTask( async () => {
+    // --disable-eslint-cache disables the cache, useful for developing rules
+    var cache = !grunt.option( 'disable-eslint-cache' );
+
     // Don't always require this, as we may have an older chipper checked out
-    require( '../../../chipper/js/grunt/lint' )( grunt.file.read( 'data/active-repos' ).trim().split( /\r?\n/ ) );
+    require( '../../../chipper/js/grunt/lint' )( grunt.file.read( 'data/active-repos' ).trim().split( /\r?\n/ ), cache );
   } ) );
 
   grunt.registerTask( 'generate-data', '[NOTE: Runs automatically on bayes] Generates the lists under perennial/data/, and if there were changes, will commit and push.', wrapTask( async () => {
