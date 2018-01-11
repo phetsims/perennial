@@ -79,7 +79,7 @@ qunit.test( 'Major bump, RC/Production', async( assert ) => {
   // TODO: Remove these once it goes to master
   await execute( 'git', [ 'checkout', '2.0'], '../chipper' );
   await execute( 'git', [ 'checkout', 'chipper2.0'], '../phet-io-wrappers' );
-  const branch = getLikelyNextBranch( 'bumper', true, false );
+  const branch = await getLikelyNextBranch( 'bumper', true, false );
 
   // We can't create the branch interactively (for maintenance releases), so we do so here
   await execute( gruntCommand, [ 'create-release', '--repo=bumper', `--branch=${branch}` ], '.' );
