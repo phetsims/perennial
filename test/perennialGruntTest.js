@@ -84,12 +84,16 @@ qunit.test( 'Major bump, RC/Production', async( assert ) => {
   // We can't create the branch interactively (for maintenance releases), so we do so here
   await execute( gruntCommand, [ 'create-release', '--repo=bumper', `--branch=${branch}` ], '.' );
 
-  // should be rc.1 and maintenance:0
+  // should be rc.1 and maintenance:0 (phet,phet-io)
   await execute( gruntCommand, [ 'rc', '--repo=bumper', '--brands=phet,phet-io', `--branch=${branch}`, '--noninteractive' ], '.' );
   await execute( gruntCommand, [ 'production', '--repo=bumper', '--brands=phet,phet-io', `--branch=${branch}`, '--noninteractive' ], '.' );
 
-  // same thing, but maintenance:1
-  await execute( gruntCommand, [ 'rc', '--repo=bumper', '--brands=phet,phet-io', `--branch=${branch}`, '--noninteractive' ], '.' );
-  await execute( gruntCommand, [ 'production', '--repo=bumper', '--brands=phet,phet-io', `--branch=${branch}`, '--noninteractive' ], '.' );
+  // same thing, but maintenance:1 (phet brand only)
+  await execute( gruntCommand, [ 'rc', '--repo=bumper', '--brands=phet', `--branch=${branch}`, '--noninteractive' ], '.' );
+  await execute( gruntCommand, [ 'production', '--repo=bumper', '--brands=phet', `--branch=${branch}`, '--noninteractive' ], '.' );
+
+  // same thing, but maintenance:1 (phet-io brand only)
+  await execute( gruntCommand, [ 'rc', '--repo=bumper', '--brands=phet-io', `--branch=${branch}`, '--noninteractive' ], '.' );
+  await execute( gruntCommand, [ 'production', '--repo=bumper', '--brands=phet-io', `--branch=${branch}`, '--noninteractive' ], '.' );
   assert.expect( 0 );
 } );

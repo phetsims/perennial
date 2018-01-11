@@ -9,7 +9,6 @@
 'use strict';
 
 // modules
-const brandToSuffix = require( './brandToSuffix' );
 const copyFile = require( './copyFile' );
 const gitAdd = require( './gitAdd' );
 const gitCommit = require( './gitCommit' );
@@ -29,7 +28,7 @@ const winston = require( 'winston' );
 module.exports = async function( repo, brands, versionString, branch ) {
   winston.info( `updating top-level dependencies.json for ${repo} ${versionString}` );
 
-  await copyFile( `../${repo}/build/${brandToSuffix( brands[ 0 ] )}/dependencies.json`, `../${repo}/dependencies.json` );
+  await copyFile( `../${repo}/build/${brands[ 0 ]}/dependencies.json`, `../${repo}/dependencies.json` );
   await gitAdd( repo, 'dependencies.json' );
   await gitCommit( repo, `updated dependencies.json for version ${versionString}` );
   await gitPush( repo, branch );
