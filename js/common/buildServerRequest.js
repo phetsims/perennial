@@ -58,10 +58,10 @@ module.exports = async function( repo, version, dependencies, options ) {
 
     request.post( { url: url, json: requestObject }, function( error, response, body ) {
       if ( error ) {
-        reject( `Build request failed with error ${error}.` );
+        reject( new Error( `Build request failed with error ${error}.` ) );
       }
       else if ( response.statusCode !== 200 ) {
-        reject( `Build request failed with status code ${response.statusCode}.` );
+        reject( new Error( `Build request failed with status code ${response.statusCode}.` ) );
       }
       else {
         winston.info( 'Build request sent successfully' );

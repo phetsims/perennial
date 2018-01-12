@@ -33,6 +33,7 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  *
  * @param {string} repo
  * @param {Array.<string>} brands
+ * @returns {Promise}
  */
 module.exports = async function( repo, brands ) {
   const currentBranch = await getBranch( repo );
@@ -100,7 +101,9 @@ module.exports = async function( repo, brands ) {
   await devSsh( `mkdir -p "${versionPath}"` );
 
   // Copy the build contents into the version-specific directory
-  await devScp( `../${repo}/build/*`, `${versionPath}/` );
+  for ( let brand of brands ) {
+    await devScp( `../${repo}/build/${brand}`, `${versionPath}/` );
+  }
 
   // If there is a protected directory and we are copying to spot, include the .htaccess file
   // This is for PhET-iO simulations, to protected the password protected wrappers, see

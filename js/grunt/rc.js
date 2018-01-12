@@ -36,6 +36,7 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  * @param {string} repo
  * @param {string} branch
  * @param {Array.<string>} brands
+ * @returns {Promise}
  */
 module.exports = async function( repo, branch, brands ) {
   SimVersion.ensureReleaseBranch( branch );

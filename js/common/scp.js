@@ -22,10 +22,10 @@ const winston = require( 'winston' );
  * @param {string} remoteFile - A file or directory. Basically the second part of the SCP command (minus the host/username)
  * @returns {Promise}
  */
-module.exports = function( username, host, localFile, remoteFile ) {
-  winston.info( `transferring ${localFile} remotely to ${remoteFile} on ${host}` );
+module.exports = async function( username, host, localFile, remoteFile ) {
+  winston.info( `transferring ${localFile} remotely to ${remoteFile} on ${host} from ${await execute( 'pwd', [], '.' )}` );
 
-  return execute( 'scp', [
+  return await execute( 'scp', [
     '-r',
     localFile,
     `${username}@${host}:${remoteFile}`

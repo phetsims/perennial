@@ -12,8 +12,8 @@ PULL_COMMAND="git pull --rebase"
 PARALLEL="false"
 
 # cd to the directory where your git repositories live
-CHIPPER_BIN=`dirname "${BASH_SOURCE[0]}"`
-WORKING_DIR=${CHIPPER_BIN}/../..
+PERENNIAL_BIN=`dirname "${BASH_SOURCE[0]}"`
+WORKING_DIR=${PERENNIAL_BIN}/../..
 cd ${WORKING_DIR}
 
 # parse command line options
@@ -28,6 +28,11 @@ while getopts ":p" opt; do
       ;;
   esac
 done
+
+# log the current shas in your working copy, which can be restored using restore-shas.sh
+HOME_PHET=${HOME}/.phet/
+mkdir -p ${HOME_PHET}
+${PERENNIAL_BIN}/print-shas.sh > ${HOME_PHET}/print-shas.out
 
 # pull each repository
 for repo in `cat perennial/data/active-repos | xargs | tr -d '\r'`
