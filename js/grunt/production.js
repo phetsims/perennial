@@ -185,8 +185,10 @@ module.exports = async function( repo, branch, brands, noninteractive ) {
     // Update the third-party-licenses report
     grunt.log.writeln( 'Running third-party report (do not ctrl-C it)' );
     await gitCheckout( 'chipper', '2.0' ); // TODO: MERGE: Remove this, we want to use master
+    await npmUpdate( 'chipper' );
     await execute( gruntCommand, [ 'report-third-party' ], '../chipper' );
     await gitCheckout( 'chipper', 'master' ); // TODO: MERGE: Remove this, we want to use master
+    await npmUpdate( 'chipper' );
     await gitAdd( 'sherpa', 'third-party-licenses.md' );
     try {
       await gitCommit( 'sherpa', `Updating third-party-licenses for deploy of ${repo} ${versionString}` );
