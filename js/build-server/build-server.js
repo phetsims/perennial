@@ -149,11 +149,13 @@ function queueDeploy( api, repos, simName, version, locales, brands, servers, em
     if ( authorizationKey !== constants.BUILD_SERVER_CONFIG.buildServerAuthorizationCode ) {
       const err = 'wrong authorization code';
       winston.log( 'error', err );
+      res.status( 401 );
       res.send( err );
     }
     else if ( servers.indexOf( constants.PRODUCTION_SERVER ) >= 0 && brands.some( brand => { return !productionBrands.includes( brand ); } ) ) {
       const err = 'Cannot complete production deploys for brands outside of phet and phet-io';
       winston.log( 'error', err );
+      res.status( 400 );
       res.send( err );
     }
     else {
@@ -186,12 +188,14 @@ function queueDeploy( api, repos, simName, version, locales, brands, servers, em
         email = null;
       } );
 
+      res.status( 202 );
       res.send( 'build process initiated, check logs for details' );
     }
   }
   else {
     const errorString = 'missing one or more required query parameters: dependencies, simName, version, authorizationCode';
     winston.log( 'error', errorString );
+    res.status( 400 );
     res.send( errorString );
   }
 }
