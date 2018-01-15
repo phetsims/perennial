@@ -212,11 +212,14 @@ async function taskWorker( task ) {
   await execWithAbort( 'npm', [ 'update' ], '../chipper' );
   await execWithAbort( 'npm', [ 'prune' ], simDir );
   await execWithAbort( 'npm', [ 'update' ], simDir );
-  try {
-    await getLocales( locales, simName );
-  }
-  catch( e ) {
-    return abortBuild( e );
+
+  if ( api === '1.0' ) {
+    try {
+      locales = await getLocales( locales, simName );
+    }
+    catch( e ) {
+      return abortBuild( e );
+    }
   }
 
   const brandLocales = ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) ? locales : 'en';
@@ -287,7 +290,7 @@ async function taskWorker( task ) {
           await addToRosetta( simTitle, simName, email );
 
           // if this build request comes from rosetta it will have a userId field and only one locale
-          const localesArray = chipperVersion !== '2.0.0' ? localesArray.split( ',' ) : locales;
+          const localesArray = chipperVersion !== '2.0.0' ? locales.split( ',' ) : locales;
           if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
             await addTranslator( localesArray[ 0 ], afterDeploy );
           }
