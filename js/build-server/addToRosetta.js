@@ -9,6 +9,7 @@ const fs = require( 'fs.extra' ); // eslint-disable-line
 const gitCheckout = require( '../common/gitCheckout' );
 const gitPull = require( '../common/gitPull' );
 const sendEmail = require( './sendEmail' );
+const writeFile = require( './writeFile' );
 
 /**
  * Add an entry in for this sim in simInfoArray in rosetta, so it shows up as translatable.
@@ -62,7 +63,7 @@ module.exports = async function addToRosetta( simTitle, simName, email ) {
   const contents = JSON.stringify( data, null, 2 );
 
   try {
-    fs.writeFileSync( simInfoArray, contents );
+    writeFile( simInfoArray, contents );
   }
   catch( err ) {
     return Promise.reject( 'couldn\'t write simInfoArray ' + err );

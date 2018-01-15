@@ -6,6 +6,7 @@
 const constants = require( './constants' );
 const fs = require( 'fs.extra' ); // eslint-disable-line
 const winston = require( 'winston' );
+const writeFile = require( './writeFile' );
 
 /**
  * Create a [sim name].xml file in the live sim directory in htdocs. This file tells the website which
@@ -73,7 +74,7 @@ module.exports = async function( simName, version ) {
 
   finalXML = finalXML.concat( '</simulations>\n' + '</project>' );
 
-  fs.writeFileSync( constants.HTML_SIMS_DIRECTORY + simName + '/' + version + '/' + simName + '.xml', finalXML );
+  writeFile( constants.HTML_SIMS_DIRECTORY + simName + '/' + version + '/' + simName + '.xml', finalXML );
   winston.log( 'info', 'wrote XML file:\n' + finalXML );
   return Promise.resolve( simTitle );
 };

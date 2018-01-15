@@ -4,7 +4,7 @@
 'use strict';
 
 const constants = require( './constants' );
-const fs = require( 'fs.extra' ); // eslint-disable-line
+const writeFile = require( './writeFile' );
 
 /**
  * Write the .htaccess file to make "latest" point to the version being deployed and allow "download" links to work on Safari
@@ -19,5 +19,5 @@ module.exports = function writePhetHtaccess ( simName, version ) {
                    'RewriteCond %{QUERY_STRING} =download\n' +
                    'RewriteRule ([^/]*)$ - [L,E=download:$1]\n' +
                    'Header onsuccess set Content-disposition "attachment; filename=%{download}e" env=download\n';
-  fs.writeFileSync( constants.HTML_SIMS_DIRECTORY + simName + '/.htaccess', contents );
+  writeFile( constants.HTML_SIMS_DIRECTORY + simName + '/.htaccess', contents );
 };

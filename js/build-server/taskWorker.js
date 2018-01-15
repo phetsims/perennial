@@ -16,6 +16,7 @@ const getLocales = require( './getLocales' );
 const mkVersionDir = require( './mkVersionDir' );
 const notifyServer = require( './notifyServer' );
 const pullMaster = require( './pullMaster' );
+const writeFile = require( './writeFile' );
 const writePhetHtaccess = require( './writePhetHtaccess' );
 const writePhetioHtaccess = require( './writePhetioHtaccess' );
 
@@ -189,7 +190,7 @@ async function taskWorker( task ) {
   }
 
   try {
-    fs.writeFileSync( buildDir + '/dependencies.json', JSON.stringify( repos ) );
+    writeFile( buildDir + '/dependencies.json', JSON.stringify( repos ) );
   }
   catch( err ) {
     return abortBuild( err );
@@ -279,7 +280,8 @@ async function taskWorker( task ) {
           child_process.exec( copyCommand + targetDir );
         }
         catch( e ) {
-          throw e;
+          winston.error( 'Failed to complete copy command' );
+          Promise.reject( e );
         }
 
         // Post-copy steps
