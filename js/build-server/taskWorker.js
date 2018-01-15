@@ -231,7 +231,7 @@ async function taskWorker( task ) {
     if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
       await writePhetioHtaccess( simDir + '/build/.htaccess', '/htdocs/physics/phet-io/config/.htpasswd' );
     }
-    await devDeploy( simDir, simName, chipperVersion, brands, api );
+    await devDeploy( simDir, simName, version, chipperVersion, brands );
   }
 
   if ( servers.indexOf( constants.PRODUCTION_SERVER ) >= 0 ) {
@@ -245,7 +245,7 @@ async function taskWorker( task ) {
         if ( brand === constants.PHET_BRAND ) {
           targetDir = constants.HTML_SIMS_DIRECTORY + simName + '/' + version + '/';
 
-          if ( api !== '1.0' ) {
+          if ( chipperVersion !== '2.0.0' ) {
             // Remove _phet from all filenames in the phet directory
             const files = fs.readdirSync( simDir + '/build/phet' );
             for ( let i in files ) {

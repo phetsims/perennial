@@ -26,7 +26,7 @@ function scpAll( buildDir, simVersionDirectory ) {
  *
  * @return Promise
  */
-module.exports = async function( simDir, simName, chipperVersion, brands, api ) {
+module.exports = async function( simDir, simName, version, chipperVersion, brands ) {
   const simVersionDirectory = constants.BUILD_SERVER_CONFIG.devDeployPath + simName + '/' + version;
 
   // mkdir first in case it doesn't exist already
