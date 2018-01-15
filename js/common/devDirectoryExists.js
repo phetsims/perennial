@@ -16,7 +16,7 @@ const devSsh = require( './devSsh' );
  * @public
  *
  * @param {string} directory
- * @returns {Promise} - Resolves to a boolean of whether the directory exists
+ * @returns {Promise.<boolean>} - Whether the directory exists
  */
 module.exports = function( directory ) {
   return devSsh( `[[ -d "${directory}" ]] && echo exists || echo not` ).then( stdout => {

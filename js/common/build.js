@@ -21,6 +21,7 @@ const winston = require( 'winston' );
  *
  * @param {string} repo
  * @param {Object} [options]
+ * @returns {Promise.<string>} - The stdout of the build
  */
 module.exports = async function( repo, options ) {
   const {

@@ -10,6 +10,7 @@
 
 // modules
 const _ = require( 'lodash' ); // eslint-disable-line
+const booleanPrompt = require( '../common/booleanPrompt' );
 const build = require( '../common/build' );
 const buildLocal = require( '../common/buildLocal' );
 const buildServerRequest = require( '../common/buildServerRequest' );
@@ -24,7 +25,6 @@ const gitPush = require( '../common/gitPush' );
 const grunt = require( 'grunt' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
-const prompt = require( '../common/prompt' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 const SimVersion = require( '../common/SimVersion' );
 const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
@@ -36,9 +36,10 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  * @param {string} repo
  * @param {string} branch
  * @param {Array.<string>} brands
+ * @param {boolean} noninteractive
  * @returns {Promise}
  */
-module.exports = async function( repo, branch, brands ) {
+module.exports = async function( repo, branch, brands, noninteractive ) {
   SimVersion.ensureReleaseBranch( branch );
 
   const isClean = await gitIsClean( repo );
@@ -47,8 +48,7 @@ module.exports = async function( repo, branch, brands ) {
   }
 
   if ( !( await hasRemoteBranch( repo, branch ) ) ) {
-    const createBranchConfirmation = await prompt( `Release branch ${branch} does not exist. Create it? [Y/n]?` );
-    if ( createBranchConfirmation === 'n' ) {
+    if ( noninteractive || !await booleanPrompt( `Release branch ${branch} does not exist. Create it?`, false ) ) {
       grunt.fail.fatal( 'Aborted rc deployment due to non-existing branch' );
     }
 
@@ -79,8 +79,7 @@ module.exports = async function( repo, branch, brands ) {
       grunt.fail.fatal( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
     }
 
-    const initialConfirmation = await prompt( `Deploy ${versionString} to ${buildLocal.devDeployServer} [Y/n]?` );
-    if ( initialConfirmation === 'n' ) {
+    if ( !await booleanPrompt( `Deploy ${versionString} to ${buildLocal.devDeployServer}`, noninteractive ) ) {
       grunt.fail.fatal( 'Aborted rc deployment' );
     }
 
@@ -96,8 +95,7 @@ module.exports = async function( repo, branch, brands ) {
       brands
     } ) );
 
-    const postBuildConfirmation = await prompt( `Please test the built version of ${repo}.\nIs it ready to deploy [Y/n]?` );
-    if ( postBuildConfirmation === 'n' ) {
+    if ( !await booleanPrompt( `Please test the built version of ${repo}.\nIs it ready to deploy`, noninteractive ) ) {
       // Abort version update
       await setRepoVersion( repo, previousVersion );
       await gitPush( repo, branch );

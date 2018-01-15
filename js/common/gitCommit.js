@@ -18,7 +18,8 @@ const winston = require( 'winston' );
  *
  * @param {string} repo - The repository name
  * @param {string} message - The message to include in the commit
- * @returns {Promise} - See execute for details
+ * @returns {Promise.<string>} - Stdout
+ * @rejects {ExecuteError}
  */
 module.exports = function( repo, message ) {
   winston.info( `git commit on ${repo} with message:\n${message}` );

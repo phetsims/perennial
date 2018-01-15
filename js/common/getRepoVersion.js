@@ -18,7 +18,7 @@ const winston = require( 'winston' );
  * @public
  *
  * @param {string} repo - The repository name
- * @returns {Promise} - Resolves to version: {SimVersion}
+ * @returns {Promise.<SimVersion>}
  */
 module.exports = async function( repo ) {
   winston.debug( `Reading version from package.json for ${repo}` );

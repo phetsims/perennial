@@ -18,7 +18,8 @@ const winston = require( 'winston' );
  *
  * @param {string} repo - The repository name
  * @param {string} file - The file to be added
- * @returns {Promise} - See execute for details
+ * @returns {Promise.<string>} - Stdout
+ * @rejects {ExecuteError}
  */
 module.exports = function( repo, file ) {
   winston.info( `git add ${file} on ${repo}` );

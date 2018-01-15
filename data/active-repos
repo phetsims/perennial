@@ -1,7 +1,10 @@
 acid-base-solutions
 aqua
 area-builder
+area-model-algebra
 area-model-common
+area-model-counting
+area-model-decimals
 area-model-multiplication
 arithmetic
 assert
@@ -18,6 +21,7 @@ blast
 brand
 build-a-molecule
 build-an-atom
+bumper
 calculus-grapher
 capacitor-lab-basics
 chains

@@ -20,7 +20,7 @@ const winston = require( 'winston' );
  *
  * @param {string} repo - The repository name
  * @param {boolean} includeNpmUpdate
- * @returns {Promise} - Resolves with checkedOutRepos: {Array.<string>}
+ * @returns {Promise.<Array.<string>>} - Resolves with checkedOutRepos
  */
 module.exports = async function( repo, includeNpmUpdate ) {
   winston.info( `checking out release for ${repo}` );

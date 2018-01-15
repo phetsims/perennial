@@ -20,7 +20,7 @@ const RESET = '\u001B[0m';
  * @public
  *
  * @param {string} prompt - The string to be shown to the user
- * @returns {Promise} - Resolves with the string entered by the user.
+ * @returns {Promise.<string>} - Resolves with the string entered by the user.
  */
 module.exports = function( prompt ) {
   return new Promise( ( resolve, reject ) => {

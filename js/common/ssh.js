@@ -19,7 +19,8 @@ const winston = require( 'winston' );
  * @param {string} username
  * @param {string} host
  * @param {string} cmd - The process to execute.
- * @returns {Promise}
+ * @returns {Promise.<string>} - Stdout
+ * @rejects {ExecuteError}
  */
 module.exports = function( username, host, cmd ) {
   winston.info( `running ${cmd} remotely on ${host}` );

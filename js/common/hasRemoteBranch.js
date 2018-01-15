@@ -18,7 +18,7 @@ const winston = require( 'winston' );
  *
  * @param {string} repo - The repository name
  * @param {string} branch - The potential branch
- * @returns {Promise} - Resolves with a {boolean} of whether there was the branch on the remote server
+ * @returns {Promise.<boolean>} - Whether there was the branch on the remote server
  */
 module.exports = async function( repo, branch ) {
   winston.debug( `checking for remote branch ${branch} for ${repo}` );

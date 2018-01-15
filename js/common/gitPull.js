@@ -17,7 +17,8 @@ const winston = require( 'winston' );
  * @public
  *
  * @param {string} repo - The repository name
- * @returns {Promise} - See execute for details
+ * @returns {Promise.<string>} - Stdout
+ * @rejects {ExecuteError}
  */
 module.exports = function( repo ) {
   winston.info( `git pull on ${repo}` );
