@@ -224,8 +224,8 @@ async function taskWorker( task ) {
 
   await execWithAbort( 'grunt', [ '--allHTML', '--debugHTML', '--brands=' + brands.join( ',' ), '--locales=' + brandLocales ], simDir );
 
-  const chipperPackage = JSON.parse( fs.readFileSync( '../chipper/package.json' ) );
-  const chipperVersion = chipperPackage.version;
+  const chipperVersion = JSON.parse( fs.readFileSync( '../chipper/package.json' ) ).version;
+  winston.debug( 'Chipper version detected: ' + chipperVersion );
 
   if ( servers.indexOf( constants.DEV_SERVER ) >= 0 ) {
     if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
