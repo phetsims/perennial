@@ -15,5 +15,18 @@ module.exports = function writePhetioHtaccess( filepath, authFilepath ) {
                    'AuthName "PhET-iO Password Protected Area"\n' +
                    'AuthUserFile ' + authFilepath + '\n' +
                    'Require valid-user\n';
-  fs.writeFileSync( filepath, contents );
+  let count = 0;
+  const writeInterval = setInterval( () => {
+    try {
+      fs.writeFileSync( filepath, contents );
+    }
+    catch ( e ) {
+      winston.error( e );
+      winston.info( 'Error writing phetio htaccess, will try again a few times' );
+    }
+    if ( count >= 10 ) {
+      clearInterval( writeInterval );
+    }
+    count += 1;
+  }, 500)
 };
