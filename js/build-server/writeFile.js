@@ -9,6 +9,7 @@ const ATTEMPTS = 3;
 const INTERVAL = 500;
 
 module.exports = async function ( filepath, contents ) {
+  let count = 0;
   const writeInterval = setInterval( () => {
     try {
       fs.writeFileSync( filepath, contents );

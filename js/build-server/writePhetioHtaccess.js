@@ -15,6 +15,5 @@ module.exports = function writePhetioHtaccess( filepath, authFilepath ) {
                    'AuthName "PhET-iO Password Protected Area"\n' +
                    'AuthUserFile ' + authFilepath + '\n' +
                    'Require valid-user\n';
-  let count = 0
   writeFile( filepath, contents );
 };
