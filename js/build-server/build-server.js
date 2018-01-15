@@ -175,7 +175,7 @@ function queueDeploy( api, repos, simName, version, locales, brands, servers, em
           catch( e ) {
             // invalid JSON
           }
-          const errorMessage = 'Build failed with error: ' + err + '. ' + simInfoString + ' Shas = ' + shas;
+          const errorMessage = 'Build failure: ' + err + '. ' + simInfoString + ' Shas = ' + JSON.stringify( shas );
           winston.log( 'error', errorMessage );
           sendEmail( 'BUILD ERROR', errorMessage, email );
         }
