@@ -224,11 +224,14 @@ async function taskWorker( task ) {
 
   await execWithAbort( 'grunt', [ '--allHTML', '--debugHTML', '--brands=' + brands.join( ',' ), '--locales=' + brandLocales ], simDir );
 
+  const chipperPackage = JSON.parse( fs.readFileSync( '../chipper/package.json' ) );
+  const chipperVersion = chipperPackage.version;
+
   if ( servers.indexOf( constants.DEV_SERVER ) >= 0 ) {
     if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
       await writePhetioHtaccess( simDir + '/build/.htaccess', '/htdocs/physics/phet-io/config/.htpasswd' );
     }
-    await devDeploy( simDir, simName, version, brands, api );
+    await devDeploy( simDir, simName, chipperVersion, brands, api );
   }
 
   if ( servers.indexOf( constants.PRODUCTION_SERVER ) >= 0 ) {
@@ -263,7 +266,7 @@ async function taskWorker( task ) {
         // Copy steps
         await mkVersionDir( targetDir );
         let copyCommand = 'cp -r ' + simDir + '/build/';
-        if ( api === '1.0' ) {
+        if ( chipperVersion === '2.0.0' ) {
           copyCommand += '/* ';
         }
         else {
@@ -284,7 +287,7 @@ async function taskWorker( task ) {
           await addToRosetta( simTitle, simName, email );
 
           // if this build request comes from rosetta it will have a userId field and only one locale
-          const localesArray = api === "1.0" ? localesArray.split( ',' ) : locales;
+          const localesArray = chipperVersion === '2.0.0' ? localesArray.split( ',' ) : locales;
           if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
             await addTranslator( localesArray[ 0 ], afterDeploy );
           }

@@ -26,7 +26,7 @@ function scpAll( buildDir, simVersionDirectory ) {
  *
  * @return Promise
  */
-module.exports = async function( simDir, simName, version, brands, api ) {
+module.exports = async function( simDir, simName, chipperVersion, brands, api ) {
   const simVersionDirectory = constants.BUILD_SERVER_CONFIG.devDeployPath + simName + '/' + version;
 
   // mkdir first in case it doesn't exist already
@@ -34,7 +34,7 @@ module.exports = async function( simDir, simName, version, brands, api ) {
   const buildDir = simDir + '/build';
 
   // copy the files
-  if ( api !== '1.0' ) {
+  if ( chipperVersion === '2.0.0' ) {
     scpAll( buildDir, simVersionDirectory );
     if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
       await devScp( buildDir + '/.htaccess', simVersionDirectory + '/phet-io/wrappers/' );
