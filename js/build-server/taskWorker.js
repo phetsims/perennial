@@ -245,7 +245,7 @@ async function taskWorker( task ) {
         if ( brand === constants.PHET_BRAND ) {
           targetDir = constants.HTML_SIMS_DIRECTORY + simName + '/' + version + '/';
 
-          if ( chipperVersion !== '2.0.0' ) {
+          if ( chipperVersion === '2.0.0' ) {
             // Remove _phet from all filenames in the phet directory
             const files = fs.readdirSync( simDir + '/build/phet' );
             for ( let i in files ) {
@@ -266,7 +266,7 @@ async function taskWorker( task ) {
         // Copy steps
         await mkVersionDir( targetDir );
         let copyCommand = 'cp -r ' + simDir + '/build/';
-        if ( chipperVersion === '2.0.0' ) {
+        if ( chipperVersion !== '2.0.0' ) {
           copyCommand += '/* ';
         }
         else {
@@ -287,7 +287,7 @@ async function taskWorker( task ) {
           await addToRosetta( simTitle, simName, email );
 
           // if this build request comes from rosetta it will have a userId field and only one locale
-          const localesArray = chipperVersion === '2.0.0' ? localesArray.split( ',' ) : locales;
+          const localesArray = chipperVersion !== '2.0.0' ? localesArray.split( ',' ) : locales;
           if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
             await addTranslator( localesArray[ 0 ], afterDeploy );
           }
