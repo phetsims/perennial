@@ -49,36 +49,24 @@ qunit.test( 'NPM update', async ( assert ) => {
 
 qunit.test( 'Bumper dev phet,phet-io', async ( assert ) => {
   assert.timeout( 600000 );
-  // TODO: Remove these once it goes to master
-  await execute( 'git', [ 'checkout', '2.0'], '../chipper' );
-  await execute( 'git', [ 'checkout', 'chipper2.0'], '../phet-io-wrappers' );
   await execute( gruntCommand, [ 'dev', '--repo=bumper', '--brands=phet,phet-io', '--noninteractive' ], '.' );
   assert.expect( 0 );
 } );
 
 qunit.test( 'Bumper dev phet', async ( assert ) => {
   assert.timeout( 600000 );
-  // TODO: Remove these once it goes to master
-  await execute( 'git', [ 'checkout', '2.0'], '../chipper' );
-  await execute( 'git', [ 'checkout', 'chipper2.0'], '../phet-io-wrappers' );
   await execute( gruntCommand, [ 'dev', '--repo=bumper', '--brands=phet', '--noninteractive' ], '.' );
   assert.expect( 0 );
 } );
 
 qunit.test( 'Bumper dev phet-io', async ( assert ) => {
   assert.timeout( 600000 );
-  // TODO: Remove these once it goes to master
-  await execute( 'git', [ 'checkout', '2.0'], '../chipper' );
-  await execute( 'git', [ 'checkout', 'chipper2.0'], '../phet-io-wrappers' );
   await execute( gruntCommand, [ 'dev', '--repo=bumper', '--brands=phet-io', '--noninteractive' ], '.' );
   assert.expect( 0 );
 } );
 
 qunit.test( 'Major bump, RC/Production', async( assert ) => {
   assert.timeout( 3000000 );
-  // TODO: Remove these once it goes to master
-  await execute( 'git', [ 'checkout', '2.0'], '../chipper' );
-  await execute( 'git', [ 'checkout', 'chipper2.0'], '../phet-io-wrappers' );
   const branch = await getLikelyNextBranch( 'bumper', true, false );
 
   // We can't create the branch interactively (for maintenance releases), so we do so here
