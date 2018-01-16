@@ -96,7 +96,7 @@ function queueDeployApiVersion1( req, res, key ) {
   const servers = ( option === 'rc' ) ? [ constants.DEV_SERVER ] : [ constants.PRODUCTION_SERVER ];
   const brands = version.indexOf( 'phetio' ) < 0 ? [ constants.PHET_BRAND ] : [ constants.PHET_IO_BRAND ];
 
-  queueDeploy( '1.0', repos, simName, version, locales, servers, brands, email, translatorId, authorizationKey, req, res );
+  queueDeploy( '1.0', repos, simName, version, locales, brands, servers, email, translatorId, authorizationKey, req, res );
 }
 
 function getQueueDeploy( req, res ) {

@@ -233,7 +233,10 @@ async function taskWorker( task ) {
   const chipperVersion = JSON.parse( fs.readFileSync( '../chipper/package.json' ) ).version;
   winston.debug( 'Chipper version detected: ' + chipperVersion );
 
+  winston.debug( 'deploying to servers: ' + JSON.stringify( servers ) );
+
   if ( servers.indexOf( constants.DEV_SERVER ) >= 0 ) {
+    winston.info( 'deploying to dev' );
     if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
       await writePhetioHtaccess( simDir + '/build/.htaccess', '/htdocs/physics/phet-io/config/.htpasswd' );
     }
@@ -241,6 +244,7 @@ async function taskWorker( task ) {
   }
 
   if ( servers.indexOf( constants.PRODUCTION_SERVER ) >= 0 ) {
+    winston.info( 'deploying to production' );
     let targetDir;
     // Loop over all brands
     for ( let i in brands ) {
