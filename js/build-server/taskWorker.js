@@ -46,7 +46,7 @@ async function taskWorker( task ) {
   // TODO: change to ES6 destructuring
   const api = task.api;
   const repos = task.repos;
-  const locales = task.locales;
+  let locales = task.locales;
   const simName = task.simName;
   let version = task.version;
   const email = task.email;
