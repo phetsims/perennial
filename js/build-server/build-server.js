@@ -188,7 +188,7 @@ function queueDeploy( api, repos, simName, version, locales, brands, servers, em
         email = null;
       } );
 
-      res.status( 202 );
+      res.status( api === '1.0' ? 200 : 202 );
       res.send( 'build process initiated, check logs for details' );
     }
   }
