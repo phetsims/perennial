@@ -82,7 +82,7 @@ const taskQueue = async.queue( taskWorker, 1 ); // 1 is the max number of tasks 
  * @param {String} key - one of 'query' or 'body', used to differentiate query parameters or POST data.
  */
 function queueDeployApiVersion1( req, res, key ) {
-  const repos = decodeURIComponent( req[ key ][ constants.REPOS_KEY ] );
+  const repos = JSON.parse( decodeURIComponent( req[ key ][ constants.REPOS_KEY ] ) );
   const simName = decodeURIComponent( req[ key ][ constants.SIM_NAME_KEY ] );
   const version = decodeURIComponent( req[ key ][ constants.VERSION_KEY ] );
   const locales = decodeURIComponent( req[ key ][ constants.LOCALES_KEY ] ) || null;

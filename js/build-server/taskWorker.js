@@ -98,6 +98,8 @@ async function taskWorker( task ) {
 
   const simNameRegex = /^[a-z-]+$/;
 
+  winston.debug( JSON.stringify( repos ) );
+
   // make sure the repos passed in validates
   for ( let key in repos ) {
     if ( repos.hasOwnProperty( key ) ) {
