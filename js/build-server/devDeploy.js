@@ -44,7 +44,7 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
     if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
       // copy english and all html and all non-html files
       await devScp( buildDir + '/' + simName + '_en.html', simVersionDirectory );
-      await execute( 'find', [ '.', '-type', 'f', '!', '-iname', '\'*.html\'', '-exec', 'scp', '{}', simVersionDirectory, '\\;' ], buildDir );
+      child_process.execSync( 'find . -type f ! -iname \'*.html\' -exec scp {}' + simVersionDirectory + '\\;', { cwd: buildDir } );
     }
 
     if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
