@@ -12,7 +12,7 @@
 const fs = require( 'fs.extra' ); // eslint-disable-line
 const getBuildServerConfig = require( './getBuildServerConfig' );
 
-const BUILD_SERVER_CONFIG = getBuildServerConfig( fs )
+const BUILD_SERVER_CONFIG = getBuildServerConfig( fs );
 
 module.exports = {
   BUILD_SERVER_CONFIG,

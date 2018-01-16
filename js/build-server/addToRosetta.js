@@ -6,7 +6,6 @@
 const constants = require( './constants' );
 const execute = require( '../common/execute' );
 const fs = require( 'fs.extra' ); // eslint-disable-line
-const gitCheckout = require( '../common/gitCheckout' );
 const gitPull = require( '../common/gitPull' );
 const sendEmail = require( './sendEmail' );
 const writeFile = require( './writeFile' );

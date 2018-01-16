@@ -67,4 +67,4 @@ module.exports = function sendEmail( subject, text, emailParameter, emailParamet
       }
     );
   }
-}
+};

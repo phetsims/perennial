@@ -7,7 +7,6 @@ const child_process = require( 'child_process' );
 const constants = require( './constants' );
 const devScp = require( '../common/devScp' );
 const devSsh = require( '../common/devSsh' );
-const execute = require( '../common/execute' );
 
 const userAtServer = constants.BUILD_SERVER_CONFIG.devUsername + '@' + constants.BUILD_SERVER_CONFIG.devDeployServer;
 
