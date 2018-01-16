@@ -19,7 +19,6 @@ const execute = require( '../common/execute' );
 const getDependencies = require( '../common/getDependencies' );
 const getRepoVersion = require( '../common/getRepoVersion' );
 const gitAdd = require( '../common/gitAdd' );
-const gitCheckout = require( '../common/gitCheckout' );
 const gitCommit = require( '../common/gitCommit' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
