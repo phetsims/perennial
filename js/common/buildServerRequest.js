@@ -53,6 +53,9 @@ module.exports = async function( repo, version, dependencies, options ) {
 
     const url = `${buildLocal.productionServerURL}/deploy-html-simulation`;
 
+    winston.info( url );
+    winston.info( JSON.stringify( requestObject ) );
+
     request.post( { url: url, json: requestObject }, function( error, response, body ) {
       if ( error ) {
         reject( new Error( `Build request failed with error ${error}.` ) );

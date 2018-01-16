@@ -68,7 +68,7 @@ function getDeployConfig( fs ) {
     productionServerName: buildLocalJSON.productionServerName || 'phet-server.int.colorado.edu',
     productionServerURL: buildLocalJSON.productionServerURL || 'https://phet.colorado.edu',
     serverToken: buildLocalJSON.serverToken,
-    verbose: buildLocalJSON.verbose === 'true' || false
+    verbose: buildLocalJSON.verbose || buildLocalJSON.verbose === 'true'
   };
 
 }
