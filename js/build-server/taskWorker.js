@@ -77,7 +77,7 @@ async function taskWorker( task ) {
     }
     catch( err ) {
       if ( command === 'grunt checkout-master-all' ) {
-        Promise.reject( 'Build aborted, error running command ' + command + ': ' + err.stdout );
+        return Promise.reject( 'Build aborted, error running command ' + command + ': ' + err.stdout );
       }
       else {
         return abortBuild( err );
@@ -93,7 +93,7 @@ async function taskWorker( task ) {
     winston.log( 'error', 'BUILD ABORTED! ' + err );
     winston.log( 'info', 'build aborted: checking out master for every repo in case build shas are still checked out' );
     await execute( 'grunt', [ 'checkout-master-all' ], constants.PERENNIAL );
-    Promise.reject( 'Build aborted,' + err );
+    return Promise.reject( 'Build aborted,' + err );
   };
 
   const simNameRegex = /^[a-z-]+$/;
@@ -287,7 +287,7 @@ async function taskWorker( task ) {
         }
         catch( e ) {
           winston.error( 'Failed to complete copy command' );
-          Promise.reject( e );
+          return Promise.reject( e );
         }
 
         // Post-copy steps
