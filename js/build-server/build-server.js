@@ -91,7 +91,9 @@ function queueDeployApiVersion1( req, res, key ) {
   const translatorId = decodeURIComponent( req[ key ][ constants.USER_ID_KEY ] ) || null;
   const authorizationKey = decodeURIComponent( req[ key ][ constants.AUTHORIZATION_KEY ] );
 
-  const servers = ( option === 'rc' ) ? [ constants.PRODUCTION_SERVER ] : [ constants.DEV_SERVER ];
+  // For RC deploys, only send to spot.  For production deploys, the local build will send to spot so the build-server
+  // only sends to the production server (phet-server).
+  const servers = ( option === 'rc' ) ? [ constants.DEV_SERVER ] : [ constants.PRODUCTION_SERVER ];
   const brands = version.indexOf( 'phetio' ) < 0 ? [ constants.PHET_BRAND ] : [ constants.PHET_IO_BRAND ];
 
   queueDeploy( '1.0', repos, simName, version, locales, servers, brands, email, translatorId, authorizationKey, req, res );
