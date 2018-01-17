@@ -60,7 +60,6 @@ module.exports = async function( repo, noninteractive ) {
   const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, {
     testType: 'dev',
     testNumber: previousVersion.testNumber + 1
-    // TODO: handle one-off things
   } );
 
   const versionString = version.toString();
@@ -104,7 +103,6 @@ module.exports = async function( repo, noninteractive ) {
   await devSsh( `chmod g+w "${versionPath}"` );
 
   // Move over dependencies.json and commit/push
-  // TODO: don't do this twice if we want to deploy both brands
   await copyFile( `../${repo}/build/dependencies.json`, `../${repo}/dependencies.json` );
   await gitAdd( repo, 'dependencies.json' );
   await gitCommit( repo, `updated dependencies.json for version ${versionString}` );
