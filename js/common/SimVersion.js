@@ -27,21 +27,17 @@ const assert = require( 'assert' );
       // {string|null} - If provided, indicates the time at which the sim file was built
       buildTimestamp = null,
 
-      // {string|null} - The test name, e.g. the 'rc' in rc.1
+      // {string|null} - The test name, e.g. the 'rc' in rc.1. Also can be the one-off version name, if provided.
       testType = null,
 
       // {number|null} - The test number, e.g. the 1 in rc.1
-      testNumber = null,
-
-      // {string|null} - The name of the one-off, if provided
-      oneOff = null
+      testNumber = null
     } = options || {};
 
     assert( typeof major === 'number' && major >= 0 && major % 1 === 0, 'major version should be a non-negative integer' );
     assert( typeof minor === 'number' && minor >= 0 && minor % 1 === 0, 'minor version should be a non-negative integer' );
     assert( typeof maintenance === 'number' && maintenance >= 0 && maintenance % 1 === 0, 'maintenance version should be a non-negative integer' );
     assert( typeof testType !== 'string' || typeof testNumber === 'number', 'if testType is provided, testNumber should be a number' );
-    assert( oneOff === null || typeof oneOff === 'string', 'oneOff should be a string' );
 
     // @public {number}
     this.major = major;
@@ -60,9 +56,6 @@ const assert = require( 'assert' );
 
     // @public {string|null} - If provided, like '2015-06-12 16:05:03 UTC' (phet.chipper.buildTimestamp)
     this.buildTimestamp = buildTimestamp;
-
-    // @public {string|null}
-    this.oneOff = oneOff;
   }
 
   // Can't rely on inherit existing
@@ -109,9 +102,6 @@ const assert = require( 'assert' );
       if ( typeof this.testType === 'string' ) {
         str += `-${this.testType}.${this.testNumber}`;
       }
-      if ( typeof this.oneOff === 'string' ) {
-        str += `-${this.oneOff}`;
-      }
       return str;
     }
   };
@@ -136,9 +126,8 @@ const assert = require( 'assert' );
     const maintenance = parseInt( matches[ 3 ], 10 );
     const testType = matches[ 6 ];
     const testNumber = matches[ 7 ] === undefined ? matches[ 7 ] : parseInt( matches[ 7 ], 10 );
-    const oneOff = matches[ 9 ] || null;
 
-    return new SimVersion( major, minor, maintenance, { testType, testNumber, buildTimestamp, oneOff } );
+    return new SimVersion( major, minor, maintenance, { testType, testNumber, buildTimestamp } );
   };
 
   /**
