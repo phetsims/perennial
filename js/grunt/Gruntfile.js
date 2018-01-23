@@ -17,6 +17,7 @@ const checkoutMasterAll = require( './checkoutMasterAll' );
 const checkoutRelease = require( '../common/checkoutRelease' );
 const checkoutTarget = require( '../common/checkoutTarget' );
 const cherryPick = require( './cherryPick' );
+const createOneOff = require( './createOneOff' );
 const createRelease = require( './createRelease' );
 const createSim = require( './createSim' );
 const dev = require( './dev' );
@@ -247,6 +248,20 @@ module.exports = function( grunt ) {
       await createRelease( repo, branch );
     } ) );
 
+  grunt.registerTask( 'create-one-off',
+    'Creates a new release branch for a given simulation\n' +
+    '--repo : The repository to add the release branch to\n' +
+    '--branch : The branch/one-off name, which should be anything without dahes or periods',
+    wrapTask( async () => {
+      const repo = grunt.option( 'repo' );
+      const branch = grunt.option( 'branch' );
+      assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+      assert( branch, 'Requires specifying a branch with --branch={{BRANCH}}' );
+      assert( !branch.includes( '-' ) && !branch.includes( '.' ), 'Branch should not contain dashes or periods' );
+
+      await createOneOff( repo, branch );
+    } ) );
+
   grunt.registerTask( 'cherry-pick',
     'Runs cherry-pick on a list of SHAs until one works. Reports success or failure\n' +
     '--repo : The repository to cherry-pick on\n' +
@@ -284,7 +299,21 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
-      await dev( grunt.option( 'repo' ), grunt.option( 'brands' ).split( ',' ), noninteractive );
+      await dev( grunt.option( 'repo' ), grunt.option( 'brands' ).split( ',' ), noninteractive, 'master' );
+    } ) );
+
+  grunt.registerTask( 'one-off',
+    'Deploys a dev version of the simulation\n' +
+    '--repo : The name of the repository to deploy\n' +
+    '--branch : The name of the one-off branch (the name of the one-off)\n' +
+    '--brands : A comma-separated list of brand names to deploy\n' +
+    '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out',
+    wrapTask( async () => {
+      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+      assert( grunt.option( 'branch' ), 'Requires specifying a branch (one-off name) with --branch={{BRANCH}}' );
+      assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
+
+      await dev( grunt.option( 'repo' ), grunt.option( 'brands' ).split( ',' ), noninteractive, grunt.option( 'branch' ) );
     } ) );
 
   grunt.registerTask( 'rc',

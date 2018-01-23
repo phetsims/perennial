@@ -34,17 +34,21 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  * @param {string} repo
  * @param {Array.<string>} brands
  * @param {boolean} noninteractive
+ * @param {string} - 'master' for normal dev deploys, otherwise is the name of a one-off branch
  * @returns {Promise}
  */
-module.exports = async function( repo, brands, noninteractive ) {
+module.exports = async function( repo, brands, noninteractive, branch ) {
+  const isOneOff = branch !== 'master';
+  const testType = isOneOff ? branch : 'dev';
+
   const currentBranch = await getBranch( repo );
-  if ( currentBranch !== 'master' ) {
-    grunt.fail.fatal( 'Dev deployments are only supported from the master branch, not: ' + ( currentBranch ? currentBranch : '(detached head)' ) );
+  if ( currentBranch !== branch ) {
+    grunt.fail.fatal( `${testType} deployment should be on the branch ${branch}, not: ` + ( currentBranch ? currentBranch : '(detached head)' ) );
   }
 
   const previousVersion = await getRepoVersion( repo );
 
-  if ( previousVersion.testType !== 'dev' ) {
+  if ( previousVersion.testType !== testType ) {
     grunt.fail.fatal( 'The current version identifier is not a dev version, aborting.' );
   }
 
@@ -59,7 +63,7 @@ module.exports = async function( repo, brands, noninteractive ) {
 
   // Bump the version
   const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, {
-    testType: 'dev',
+    testType: testType,
     testNumber: previousVersion.testNumber + 1
   } );
 
@@ -75,11 +79,11 @@ module.exports = async function( repo, brands, noninteractive ) {
   }
 
   if ( !await booleanPrompt( `Deploy ${versionString} to ${buildLocal.devDeployServer}`, noninteractive ) ) {
-    grunt.fail.fatal( 'Aborted dev deploy' );
+    grunt.fail.fatal( `Aborted ${testType} deploy` );
   }
 
   await setRepoVersion( repo, version );
-  await gitPush( repo, 'master' );
+  await gitPush( repo, branch );
 
   // Make sure our correct npm dependencies are set
   await npmUpdate( repo );
@@ -116,7 +120,7 @@ module.exports = async function( repo, brands, noninteractive ) {
   await devSsh( `chmod g+w "${versionPath}"` );
 
   // Move over dependencies.json and commit/push
-  await updateDependenciesJSON( repo, brands, versionString, 'master' );
+  await updateDependenciesJSON( repo, brands, versionString, branch );
 
   const versionURL = `https://www.colorado.edu/physics/phet/dev/html/${repo}/${versionString}`;
 

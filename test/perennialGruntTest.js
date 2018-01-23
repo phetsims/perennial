@@ -47,6 +47,17 @@ qunit.test( 'NPM update', async ( assert ) => {
   assert.expect( 0 );
 } );
 
+qunit.test( 'Bumper one-off (random)', async ( assert ) => {
+  assert.timeout( 3000000 );
+  const branch = 'oneoff' + Math.random().toString( 36 ).substring( 2 );
+
+  // Create a random one-off branch
+  await execute( gruntCommand, [ 'create-one-off', '--repo=bumper', `--branch=${branch}` ], '.' );
+
+  await execute( gruntCommand, [ 'one-off', '--repo=bumper', `--branch=${branch}`, '--brands=phet,phet-io', '--noninteractive' ], '.' );
+  assert.expect( 0 );
+} );
+
 qunit.test( 'Bumper dev phet,phet-io', async ( assert ) => {
   assert.timeout( 600000 );
   await execute( gruntCommand, [ 'dev', '--repo=bumper', '--brands=phet,phet-io', '--noninteractive' ], '.' );
