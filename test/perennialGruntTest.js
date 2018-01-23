@@ -55,6 +55,8 @@ qunit.test( 'Bumper one-off (random)', async ( assert ) => {
   await execute( gruntCommand, [ 'create-one-off', '--repo=bumper', `--branch=${branch}` ], '.' );
 
   await execute( gruntCommand, [ 'one-off', '--repo=bumper', `--branch=${branch}`, '--brands=phet,phet-io', '--noninteractive' ], '.' );
+
+  await execute( gruntCommand, [ 'checkout-master', '--repo=bumper' ], '.' );
   assert.expect( 0 );
 } );
 
