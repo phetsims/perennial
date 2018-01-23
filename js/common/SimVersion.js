@@ -4,6 +4,35 @@
  * Handles serializing and deserializing versions for simulations.
  *
  * See https://github.com/phetsims/chipper/issues/560
+ *
+ * The canonical description of our general versions:
+ *
+ * Each version string has the form: {{MAJOR}}.{{MINOR}}.{{MAINTENANCE}}[-{{TEST_TYPE}}.{{TEST_NUMBER}}] where:
+ *
+ * MAJOR: Sequential integer, starts at 1, and is generally incremented when there are significant changes to a simulation.
+ * MINOR: Sequential integer, starts at 0, and is generally incremented when there are smaller changes to a simulation.
+ *   Resets to 0 whenever the major number is incremented.
+ * MAINTENANCE: Sequential integer, starts at 0, and is incremented whenever we build with the same major/minor (but with different SHAs).
+ *   Resets to 0 whenever the minor number is incremented.
+ * TEST_TYPE (when present): Indicates that this is a non-production build when present. Typically will take the values:
+ *   'dev' - A normal dev deployment, which goes to spot (www.colorado.edu/physics/phet/dev/html/)
+ *   'rc' -  A release-candidate deployment (off of a release branch). Also goes to spot only.
+ *   anything else - A one-off deployment name, which is the same name as the branch it was deployed from.
+ * TEST_NUMBER (when present): Indicates the version of the test/one-off type (gets incremented for every deployment).
+ *   starts at 0 in package.json, but since it is incremented on every deploy, the first version published will be 1.
+ *
+ * It used to be (pre-chipper-2.0) that sometimes a shortened form of the (non-'phet') brand would be added to the end
+ * (e.g. '1.3.0-dev.1-phetio' or '1.3.0-dev.1-adaptedfromphet'), or as a direct prefix for the TEST_TYPE (e.g.
+ * 1.1.0-phetiodev.1 or 1.1.0-phetio). We have since moved to a deployment model where there are
+ * subdirectories for each brand, so this is no longer part of the version. Since this was not used for any production sim
+ * builds that we need statistics from, it is excluded in SimVersion.js or its description.
+ *
+ * Examples:
+ *
+ * 1.5.0 - Production simulation version (no test type). Major = 1, minor = 5, maintenance = 0
+ * 1.5.0.rc.1 - Example of a release-candidate build version that would be published before '1.5.0' for testing.
+ * 1.5.0.dev.1 - Example of a dev build that would be from master.
+ * 1.5.0.sonification.1 - Example of a one-off build (which would be from the branch 'sonification')
  */
 
 /* eslint-env browser, node */
