@@ -147,7 +147,7 @@ module.exports = async function( repo, branch, brands, noninteractive ) {
       grunt.log.writeln( `Deployed: https://phet.colorado.edu/sims/html/${repo}/latest/${repo}_en.html` );
     }
     if ( brands.includes( 'phet-io' ) ) {
-      grunt.log.writeln( `Deployed: https://phet-io.colorado.edu/sims/${repo}/${versionString}` );
+      grunt.log.writeln( `Deployed: https://phet-io.colorado.edu/sims/${repo}/${versionString}/wrappers/index` );
     }
 
     grunt.log.writeln( 'Please test!' );
