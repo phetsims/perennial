@@ -41,7 +41,7 @@ shift $(($OPTIND-1))
 
 # date required
 if [ -z "$1" ]; then
-  echo "Usage: checkout-date.sh -m comma,separated,repo,list date"
+  echo "Usage: `basename $0` -m comma,separated,repo,list date"
   exit 1
 fi
 
