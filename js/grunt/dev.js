@@ -22,6 +22,7 @@ const getRepoVersion = require( '../common/getRepoVersion' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
 const grunt = require( 'grunt' );
+const lintAllRunnable = require( '../common/lintAllRunnable' );
 const npmUpdate = require( '../common/npmUpdate' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 const SimVersion = require( '../common/SimVersion' );
@@ -60,6 +61,10 @@ module.exports = async function( repo, brands, noninteractive, branch ) {
   // Ensure we don't try to request an unsupported brand
   const supportedBrands = grunt.file.readJSON( `../${repo}/package.json` ).phet.supportedBrands;
   brands.forEach( brand => assert( supportedBrands.includes( brand ), `Brand ${brand} not included in ${repo}'s supported brands: ${supportedBrands.join( ',' )}` ) );
+
+  // Ensure that the repository and its dependencies pass lint before continuing.
+  // See https://github.com/phetsims/perennial/issues/76
+  await lintAllRunnable( repo );
 
   // Bump the version
   const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, {
