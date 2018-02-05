@@ -100,7 +100,7 @@ module.exports = async function( repo, branch, brands, noninteractive ) {
 
     // caps-lock should hopefully shout this at people. do we have a text-to-speech synthesizer we can shout out of their speakers?
     // SECOND THOUGHT: this would be horrible during automated maintenance releases.
-    if ( !await booleanPrompt( `DEPLOY ${versionString} to PRODUCTION`, noninteractive ) ) {
+    if ( !await booleanPrompt( `DEPLOY ${repo} ${versionString} (brands: ${brands.join( ',' )}) to PRODUCTION`, noninteractive ) ) {
       grunt.fail.fatal( 'Aborted production deployment' );
     }
 
@@ -147,7 +147,7 @@ module.exports = async function( repo, branch, brands, noninteractive ) {
       grunt.log.writeln( `Deployed: https://phet.colorado.edu/sims/html/${repo}/latest/${repo}_en.html` );
     }
     if ( brands.includes( 'phet-io' ) ) {
-      grunt.log.writeln( `Deployed: https://phet-io.colorado.edu/sims/${repo}/${versionString}/wrappers/index` );
+      grunt.log.writeln( `Deployed: https://phet-io.colorado.edu/sims/${repo}/${versionString}/wrappers/index/` );
     }
 
     grunt.log.writeln( 'Please test!' );
