@@ -10,8 +10,8 @@
 
 // modules
 const assert = require( 'assert' );
+const ChipperVersion = require( '../common/ChipperVersion' );
 const execute = require( '../common/execute' );
-const fs = require( 'fs' );
 const gruntCommand = require( '../common/gruntCommand' );
 const winston = require( 'winston' );
 
@@ -38,11 +38,11 @@ module.exports = async function( repo, options ) {
 
   winston.info( `building ${repo}` );
 
-  const chipperVersion = JSON.parse( fs.readFileSync( '../chipper/package.json', 'utf8' ) ).version;
+  const chipperVersion = ChipperVersion.getFromRepository();
   const args = [];
 
-  // Currently has the same flag versions
-  if ( chipperVersion === '0.0.0' ) {
+  // Chipper "1.0" (it was called such) had version 0.0.0 in its package.json
+  if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ) {
     assert( brands.length === 1, 'chipper 0.0.0 cannot build multiple brands at a time' );
     if ( lint ) {
       args.push( 'lint-all' );
@@ -70,7 +70,8 @@ module.exports = async function( repo, options ) {
       args.push( '--debugHTML' );
     }
   }
-  else if ( chipperVersion === '2.0.0' ) {
+  // Chipper 2.0
+  else if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
     args.push( `--brands=${brands.join( ',' )}` );
     args.push( `--locales=${locales}` );
     if ( !uglify ) {
@@ -90,7 +91,7 @@ module.exports = async function( repo, options ) {
     }
   }
   else {
-    throw new Error( `unsupported chipper version: ${chipperVersion}` );
+    throw new Error( `unsupported chipper version: ${chipperVersion.toString()}` );
   }
 
   const result = await execute( gruntCommand, args, `../${repo}` );

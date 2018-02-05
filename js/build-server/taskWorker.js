@@ -9,6 +9,7 @@ const winston = require( 'winston' );
 
 const addToRosetta = require( './addToRosetta' );
 const addTranslator = require( './addTranslator' );
+const ChipperVersion = require( '../common/ChipperVersion' );
 const constants = require( './constants' );
 const createTranslationsXML = require( './createTranslationsXML' );
 const devDeploy = require( './devDeploy' );
@@ -230,8 +231,8 @@ async function taskWorker( task ) {
 
   await execWithAbort( 'grunt', [ '--allHTML', '--debugHTML', '--brands=' + brands.join( ',' ), '--locales=' + brandLocales ], simDir );
 
-  const chipperVersion = JSON.parse( fs.readFileSync( '../chipper/package.json' ) ).version;
-  winston.debug( 'Chipper version detected: ' + chipperVersion );
+  const chipperVersion = ChipperVersion.getFromRepository();
+  winston.debug( 'Chipper version detected: ' + chipperVersion.toString() );
 
   winston.debug( 'deploying to servers: ' + JSON.stringify( servers ) );
 
@@ -255,7 +256,7 @@ async function taskWorker( task ) {
         if ( brand === constants.PHET_BRAND ) {
           targetDir = constants.HTML_SIMS_DIRECTORY + simName + '/' + version + '/';
 
-          if ( chipperVersion === '2.0.0' ) {
+          if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
             // Remove _phet from all filenames in the phet directory
             const files = fs.readdirSync( simDir + '/build/phet' );
             for ( let i in files ) {
@@ -276,7 +277,7 @@ async function taskWorker( task ) {
         // Copy steps
         await mkVersionDir( targetDir );
         let copyCommand = 'cp -r ' + simDir + '/build/';
-        if ( chipperVersion !== '2.0.0' ) {
+        if ( chipperVersion.major < 2 ) {
           copyCommand += '/* ';
         }
         else {

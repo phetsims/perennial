@@ -33,7 +33,7 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
   const buildDir = simDir + '/build';
 
   // copy the files
-  if ( chipperVersion === '2.0.0' ) {
+  if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
     scpAll( buildDir, simVersionDirectory );
     if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
       await devScp( buildDir + '/.htaccess', simVersionDirectory + '/phet-io/wrappers/' );
