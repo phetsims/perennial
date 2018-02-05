@@ -275,15 +275,23 @@ async function taskWorker( task ) {
 
         // Copy steps
         await mkVersionDir( targetDir );
-        let copyCommand = 'cp -r ' + simDir + '/build/';
-        if ( chipperVersion !== '2.0.0' ) {
-          copyCommand += '/* ';
-        }
-        else {
-          copyCommand += brand + '/* ';
-        }
+
+        const copyR = ( source, target ) => {
+          return new Promise( ( resolve, reject ) => {
+            fs.copyRecursive( source, target, ( err ) => {
+              if ( err ) {
+                return reject( err );
+              }
+              else {
+                return resolve();
+              }
+            } );
+          } );
+        };
+
+        const copySource = simDir + '/build' + ( chipperVersion === '2.0.0' ? ( '/' + brand ) : '');
         try {
-          child_process.exec( copyCommand + targetDir );
+          await copyR( copySource, targetDir );
         }
         catch( e ) {
           winston.error( 'Failed to complete copy command' );
@@ -304,7 +312,13 @@ async function taskWorker( task ) {
           }
         }
         else if ( brand === constants.PHET_IO_BRAND ) {
-          await writePhetioHtaccess( constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess', '/etc/httpd/conf/phet-io_pw' );
+          await writePhetioHtaccess(
+            constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess',
+            '/etc/httpd/conf/phet-io_pw',
+            constants.PHETIO_SIMS_DIRECTORY + simName + '/.htaccess',
+            simName,
+            version
+          );
         }
       }
     }

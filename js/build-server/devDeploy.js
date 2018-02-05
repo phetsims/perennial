@@ -7,6 +7,7 @@ const child_process = require( 'child_process' );
 const constants = require( './constants' );
 const devScp = require( '../common/devScp' );
 const devSsh = require( '../common/devSsh' );
+const fs = require( 'fs' );
 
 const userAtServer = constants.BUILD_SERVER_CONFIG.devUsername + '@' + constants.BUILD_SERVER_CONFIG.devDeployServer;
 
@@ -44,6 +45,11 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
       // copy english and all html and all non-html files
       await devScp( buildDir + '/' + simName + '_en.html', simVersionDirectory );
       child_process.execSync( 'find . -type f ! -iname \'*.html\' -exec scp {} ' + simVersionDirectory + ' \\;', { cwd: buildDir } );
+      fs.readdirSync( buildDir ).forEach( ( filename ) => {
+        if ( !filename.includes( '.html' ) ) {
+          devScp( buildDir + filename, simVersionDirectory );
+        }
+      } );
     }
 
     if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
