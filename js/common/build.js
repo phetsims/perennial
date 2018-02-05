@@ -43,7 +43,7 @@ module.exports = async function( repo, options ) {
 
   // Currently has the same flag versions
   if ( chipperVersion === '0.0.0' ) {
-    assert( brands.length === 1, 'Chiper 0.0.0 cannot build multiple brands at a time' );
+    assert( brands.length === 1, 'chipper 0.0.0 cannot build multiple brands at a time' );
     if ( lint ) {
       args.push( 'lint-all' );
     }
