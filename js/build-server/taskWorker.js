@@ -285,11 +285,14 @@ async function taskWorker( task ) {
         // Copy steps
         await mkVersionDir( targetDir );
         let copyCommand = 'cp -r ' + simDir + '/build/';
-        if ( chipperVersion.major < 2 ) {
+        if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
+          copyCommand += brand + '/* ';
+        }
+        else if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ){
           copyCommand += '/* ';
         }
         else {
-          copyCommand += brand + '/* ';
+          return Promise.reject( 'Unsupported chipper version' );
         }
         try {
           child_process.exec( copyCommand + targetDir );
