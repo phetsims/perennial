@@ -16,14 +16,14 @@ if [ $# != 1 ]; then
   echo "usage: checkout-branch.sh branchName"
   exit 1
 fi
-BRANCH=$1
+branch=$1
 
 # visit all directories that are Git repositories
 for dir in */; do
    if [ -d ${dir}/.git ]
    then
      cd $dir &> /dev/null
-     git ls-remote --exit-code . origin/${BRANCH} &> /dev/null
+     git ls-remote --exit-code . origin/${branch} &> /dev/null
      if [ $? != 0 ]; then
        echo "WARNING: $dir has no such branch"
      else
