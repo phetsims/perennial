@@ -9,9 +9,9 @@
 #
 #====================================================================================================
 
-PERENNIAL_BIN=`dirname "${BASH_SOURCE[0]}"`
-ROOT_DIR=${PERENNIAL_BIN}/../..
-cd ${ROOT_DIR}
+binDir=`dirname "${BASH_SOURCE[0]}"`
+workingDir=${binDir}/../..
+cd ${workingDir}
 
 sourceFiles=`find . -name "*.js" -print | grep -v node_modules | grep -v sherpa | grep -v "scenery/snapshots"`
 
