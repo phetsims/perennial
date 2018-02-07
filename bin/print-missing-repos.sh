@@ -5,24 +5,23 @@
 # Requires perennial repo to be checked out at the top-level of your working copy,
 # and all other repos to be siblings of perennial.
 #
-# Author: Chris Malley (PixelZoom, Inc.), Jonathan Olson <jonathan.olson@colorado.edu>
+# Author: Chris Malley (PixelZoom, Inc.)
+# Author: Jonathan Olson <jonathan.olson@colorado.edu>
 #
 #=======================================================================================
 
-PERENNIAL_BIN=`dirname "${BASH_SOURCE[0]}"`
-WORKING_DIR=${PERENNIAL_BIN}/../..
-cd ${WORKING_DIR}
+binDir=`dirname "${BASH_SOURCE[0]}"`
+workingDir=${binDir}/../..
+cd ${workingDir}
 
-# This used to be the simple line, but Git bash on windows doesn't include comm, or the way of piping in results.
-# comm -23 <(sort -u ./perennial/data/active-repos) <(/bin/ls -1 .)
+# Lists of repo names and files at the top-level of the working copy
+activeRepos=`cat ./perennial/data/active-repos | tr -d '\015'`
+workingFiles=`ls -1 .`
 
-# Lists of repo names and possible repo names (directories)
-ACTIVE_REPOS=`cat ./perennial/data/active-repos | tr -d '\015'`
-DIRECTORIES=`ls -1 .`
-
-# A list of repo names that is either in active-repos OR is checked out (but not both).
+# List of file names that are either in active-repos OR in the directory listing (but not both).
 # uniq -u only includes non-duplicate lines
-ITEMS_IN_ONE_LIST=`echo -e "${ACTIVE_REPOS}\n${DIRECTORIES}" | sort | uniq -u`
+missingFiles=`echo -e "${activeRepos}\n${workingFiles}" | sort | uniq -u`
 
+# List of missing repos. That is, file names that are in active-repos, but not in the directory listing.
 # uniq -d only includes duplicate lines
-echo -e "${ACTIVE_REPOS}\n${ITEMS_IN_ONE_LIST}" | sort | uniq -d
+echo -e "${activeRepos}\n${missingFiles}" | sort | uniq -d
