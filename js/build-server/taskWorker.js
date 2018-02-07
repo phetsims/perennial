@@ -235,7 +235,7 @@ async function taskWorker( task ) {
   if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
     await execWithAbort( 'grunt', [ '--allHTML', '--debugHTML', '--brands=' + brands.join( ',' ), '--locales=' + brandLocales ], simDir );
   }
-  else if ( chipperVersion.major === 1 && chipperVersion.minor === 0 ) {
+  else if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ) {
     await execWithAbort( 'grunt', [ 'build-for-server', '--allHTML', '--brand=' + brands[ 0 ], '--locales=' + brandLocales ], simDir );
   }
   else {
