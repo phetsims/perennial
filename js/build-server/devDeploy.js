@@ -20,8 +20,8 @@ function scpAll( buildDir, simVersionDirectory ) {
  * @param simDir
  * @param simName
  * @param version
+ * @param chipperVersion
  * @param brands
- * @param api
  *
  * @return Promise
  */
