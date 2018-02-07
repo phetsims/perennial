@@ -229,10 +229,18 @@ async function taskWorker( task ) {
   const brandLocales = ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) ? locales : 'en';
   winston.log( 'info', 'building for brands: ' + brands + ' version: ' + version );
 
-  await execWithAbort( 'grunt', [ '--allHTML', '--debugHTML', '--brands=' + brands.join( ',' ), '--locales=' + brandLocales ], simDir );
-
   const chipperVersion = ChipperVersion.getFromRepository();
   winston.debug( 'Chipper version detected: ' + chipperVersion.toString() );
+
+  if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
+    await execWithAbort( 'grunt', [ '--allHTML', '--debugHTML', '--brands=' + brands.join( ',' ), '--locales=' + brandLocales ], simDir );
+  }
+  else if ( chipperVersion.major === 1 && chipperVersion.minor === 0 ) {
+    await execWithAbort( 'grunt', [ 'build-for-server', '--allHTML', '--brand=' + brands[ 0 ], '--locales=' + brandLocales ], simDir );
+  }
+  else {
+    return Promise.reject( 'Unsupported chipper version' );
+  }
 
   winston.debug( 'deploying to servers: ' + JSON.stringify( servers ) );
 
