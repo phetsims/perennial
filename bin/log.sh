@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #=============================================================================================
 # To be used by commit-report.sh only
 # Author: Sam Reid (PhET Interactive Simulations)
