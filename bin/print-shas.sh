@@ -7,9 +7,9 @@
 #
 #=======================================================================================
 
-PERENNIAL_BIN=`dirname "${BASH_SOURCE[0]}"`
-WORKING_DIR=${PERENNIAL_BIN}/../..
-cd ${WORKING_DIR}
+binDir=`dirname "${BASH_SOURCE[0]}"`
+workingDir=${binDir}/../..
+cd ${workingDir}
 
 for repo in `ls -1`
 do
