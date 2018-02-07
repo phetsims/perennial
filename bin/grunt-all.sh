@@ -1,7 +1,7 @@
 #!/bin/bash
 #====================================================================================================
 #
-# Runs grunt for all simulations.
+# Runs grunt for all runnables.
 # Command-line args are passed through to grunt.
 # With no args, this runs the default grunt task (build).
 #
