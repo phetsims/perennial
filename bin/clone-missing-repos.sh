@@ -2,18 +2,15 @@
 #=============================================================================================
 #
 # Clones all missing repos.
-# Missing repos are identified by comparing your working directory to the active-repos file.
 #
 # Author: Aaron Davis
+# Author: Chris Malley (PixelZoom, Inc.)
 #
 #=============================================================================================
 
-PERENNIAL_BIN=`dirname "${BASH_SOURCE[0]}"`
-WORKING_DIR=${PERENNIAL_BIN}/../..
-cd ${WORKING_DIR}
+binDir=`dirname "${BASH_SOURCE[0]}"`
 
-MISSING_REPOS=`./perennial/bin/print-missing-repos.sh`
-for repo in `echo "${MISSING_REPOS}" | xargs`
+for repo in `${binDir}/print-missing-repos.sh | xargs`
 do
-  git clone https://github.com/phetsims/"$repo".git
+  git clone https://github.com/phetsims/"${repo}".git
 done
