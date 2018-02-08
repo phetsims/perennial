@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #====================================================================================================
 #
 # For each active repository, prints the names of all remote branches.
