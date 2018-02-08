@@ -8,13 +8,13 @@
 #
 #====================================================================================================
 
-PERENNIAL_BIN=`dirname "${BASH_SOURCE[0]}"`
-WORKING_DIR=${PERENNIAL_BIN}/../..
-cd ${WORKING_DIR}
+binDir=`dirname "${BASH_SOURCE[0]}"`
+workingDir=${binDir}/../..
+cd ${workingDir}
 
 # ANSI escape sequences
-RED="\033[31m"
-RESET="\033[0m"
+red="\033[31m"
+reset="\033[0m"
 
 # Use GitHub markdown for table output
 echo "Repo  | 1st line of LICENSE"
@@ -29,10 +29,10 @@ do
     if [ -e "LICENSE" ]; then
         echo "$repo | " `cat LICENSE | head -1`
     else
-        echo -e "${RED}$repo | missing license${RESET}"
+        echo -e "${red}$repo | missing license${reset}"
     fi
     cd .. &> /dev/null
   else
-    echo -e "${RED}$repo | missing repository{RESET}"
+    echo -e "${red}$repo | missing repository{reset}"
   fi
 done
