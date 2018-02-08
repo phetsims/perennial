@@ -28,40 +28,40 @@ if [ $# -lt 2 ]; then
 fi
 
 # remember the directory where the script was run
-RUN_DIR=`pwd`
+runDir=`pwd`
 
 # cd to working directory
-PERENNIAL_BIN=`dirname "${BASH_SOURCE[0]}"`
-WORKING_DIR=${PERENNIAL_BIN}/../..
-cd ${WORKING_DIR}
-WORKING_DIR=`pwd` # clean up the path, since it appears in error messages
+binDir=`dirname "${BASH_SOURCE[0]}"`
+workingDir=${binDir}/../..
+cd ${workingDir}
+workingDir=`pwd` # clean up the path, since it appears in error messages
 
 # filename is the first arg
-filename=$1
+filename=${1}
 if [ "${filename:0:1}" != "/" ]; then
 
   # relative path
-  filename=${RUN_DIR}/$1
+  filename=${runDir}/${1}
 
   # if the relative path doesn't exist, default to perennial/data/
-  if [ ! -e $filename ]; then
-    filename=${WORKING_DIR}/perennial/data/$1
+  if [ ! -e ${filename} ]; then
+    filename=${workingDir}/perennial/data/${1}
   fi
 fi
 
 # verify that input file exists
-if [ ! -e $filename ]; then
-  echo "$1 does not exist"
+if [ ! -e ${filename} ]; then
+  echo "${1} does not exist"
   exit 1
 fi
 
 # run the command in each repository directory
-for repository in `cat $filename | tr -d '\r' | xargs`
+for repository in `cat ${filename} | tr -d '\r' | xargs`
 do
-  if [ -d "$repository" ]; then
-    echo $repository
-    (cd $repository > /dev/null; "${@:2}") # command is all args after the filename
+  if [ -d "${repository}" ]; then
+    echo ${repository}
+    (cd ${repository} > /dev/null; "${@:2}") # command is all args after the filename
   else
-    echo ">>>>>>>>>>>>>>>> MISSING " ${WORKING_DIR}/$repository
+    echo ">>>>>>>>>>>>>>>> MISSING " ${workingDir}/${repository}
   fi
 done
