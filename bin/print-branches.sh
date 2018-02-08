@@ -7,18 +7,18 @@
 #
 #====================================================================================================
 
-PERENNIAL_BIN=`dirname "${BASH_SOURCE[0]}"`
-WORKING_DIR=${PERENNIAL_BIN}/../..
-cd ${WORKING_DIR}
+binDir=`dirname "${BASH_SOURCE[0]}"`
+workingDir=${binDir}/../..
+cd ${workingDir}
 
-for sim in `cat perennial/data/active-repos | sort | xargs`
+for repo in `cat perennial/data/active-repos | sort | xargs`
 do
-  if [ -d "$sim" ]; then
-    echo $sim
-    cd $sim > /dev/null
+  if [ -d "${repo}" ]; then
+    echo ${repo}
+    cd ${repo} > /dev/null
     git branch -r
     cd ..
   else
-    echo ">>>>>>>>>>>>>>>>>>>>>>>> Missing repo: $sim"
+    echo ">>>>>>>>>>>>>>>>>>>>>>>> Missing repo: ${repo}"
   fi
 done
