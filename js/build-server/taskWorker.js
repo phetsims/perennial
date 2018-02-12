@@ -312,7 +312,7 @@ async function taskWorker( task ) {
           // if this build request comes from rosetta it will have a userId field and only one locale
           const localesArray = typeof( locales ) === 'string' ? locales.split( ',' ) : locales;
           if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
-            await addTranslator( localesArray[ 0 ], afterDeploy );
+            await addTranslator( localesArray[ 0 ], simName, userId );
           }
         }
         else if ( brand === constants.PHET_IO_BRAND ) {
