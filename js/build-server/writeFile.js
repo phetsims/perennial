@@ -7,21 +7,19 @@ const fs = require( 'fs.extra' ); // eslint-disable-line
 const winston = require( 'winston' );
 
 const ATTEMPTS = 3;
-const INTERVAL = 500;
 
 module.exports = async function ( filepath, contents ) {
   let count = 0;
-  const writeInterval = setInterval( () => {
+  let success = false;
+  while ( !success && count < ATTEMPTS ) {
     try {
       fs.writeFileSync( filepath, contents );
+      success = true;
     }
     catch ( e ) {
       winston.error( e );
       winston.info( 'Error writing ' + filepath + ', will try again a few times' );
     }
-    if ( count >= ATTEMPTS ) {
-      clearInterval( writeInterval );
-    }
     count += 1;
-  }, INTERVAL );
+  }
 };

@@ -74,7 +74,8 @@ module.exports = async function( simName, version ) {
 
   finalXML = finalXML.concat( '</simulations>\n' + '</project>' );
 
-  writeFile( constants.HTML_SIMS_DIRECTORY + simName + '/' + version + '/' + simName + '.xml', finalXML );
-  winston.log( 'info', 'wrote XML file:\n' + finalXML );
+  const xmlFilepath = constants.HTML_SIMS_DIRECTORY + simName + '/' + version + '/' + simName + '.xml'
+  await writeFile( xmlFilepath, finalXML );
+  winston.log( 'info', 'wrote XML file:\n' + fs.readFileSync( xmlFilepath ).toString() );
   return Promise.resolve( simTitle );
 };
