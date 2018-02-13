@@ -17,17 +17,17 @@ activeRepos=`cat ./perennial/data/active-repos | tr -d '\015'`
 
 for filename in `ls -1 .`
 do
-  if [ -d $filename/.git ]; then
+  if [ -d ${filename}/.git ]; then
     found="false"
-    for repository in $activeRepos
+    for repository in ${activeRepos}
     do
-      if [ "$filename" == "$repository" ]; then
+      if [ "${filename}" == "${repository}" ]; then
         found="true"
         break
       fi
     done
-    if [ "$found" == "false" ]; then
-      echo "$filename is not in active-repos"
+    if [ "${found}" == "false" ]; then
+      echo "${filename} is not in active-repos"
     fi
   fi
 done
