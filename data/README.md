@@ -15,6 +15,7 @@ phet-io (auto-generated) is the list of all simulations that are instrumented wi
     for more information.
 
 testable-phet-io (auto-generated) - Like phet-io, but ignoring sims with automatedTestEnabled=false
+
 testable-runnables (auto-generated) - Like active-runnables, but ignoring sims with automatedTestEnabled=false
 
 wrappers - A list of phet-io wrappers
