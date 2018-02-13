@@ -10,15 +10,15 @@
 #
 #====================================================================================================
 
-PERENNIAL_BIN=`dirname "${BASH_SOURCE[0]}"`
-WORKING_DIR=${PERENNIAL_BIN}/../..
-cd ${WORKING_DIR}
+binDir=`dirname "${BASH_SOURCE[0]}"`
+workingDir=${binDir}/../..
+cd ${workingDir}
 
 # ANSI escape sequences to move to the right (in the same line) or to apply or reset colors
-MOVE_RIGHT="\033[42G"
-RED="\033[31m"
-GREEN="\033[32m"
-RESET="\033[0m"
+moveRight="\033[42G"
+red="\033[31m"
+green="\033[32m"
+reset="\033[0m"
 
 for dir in *
 do
@@ -29,56 +29,58 @@ do
     if [ -d ".git" ]; then
       echo -n "${dir}" # -n for no newline
 
-      REF=`git symbolic-ref -q HEAD`
+      symbolicRef=`git symbolic-ref -q HEAD`
 
       # current branch name OR an empty string (if detached head)
-      BRANCH=`echo "${REF}" | sed -e 's/refs\/heads\///'`
+      branch=`echo "${symbolicRef}" | sed -e 's/refs\/heads\///'`
 
       # current SHA
-      SHA=`git rev-parse HEAD`
+      sha=`git rev-parse HEAD`
 
       # status (empty string if clean)
-      STATUS=`git status --porcelain`
+      gitStatus=`git status --porcelain`
 
       # if no branch, print our SHA (detached head)
-      if [ -z "$BRANCH" ]; then
-        echo -e -n "${MOVE_RIGHT}${RED}${SHA}${RESET}"
+      if [ -z "${branch}" ]; then
+        echo -e -n "${moveRight}${red}${sha}${reset}"
       else
         # Safe method to get ahead/behind counts, see http://stackoverflow.com/questions/2969214/git-programmatically-know-by-how-much-the-branch-is-ahead-behind-a-remote-branc
         # get the tracking-branch name
-        TRACKING_BRANCH=`git for-each-ref --format='%(upstream:short)' ${REF}`
+        trackingBranch=`git for-each-ref --format='%(upstream:short)' ${symbolicRef}`
+
         # creates global variables $1 and $2 based on left vs. right tracking
         # inspired by @adam_spiers
-        COUNTS=`git rev-list --left-right --count $TRACKING_BRANCH...HEAD` # e.g. behind-count + '\t' + ahead-count
-        # split the behind and ahead count
-        BEHIND=`echo "${COUNTS}" | awk '{ print $1 }'`
-        AHEAD=`echo "${COUNTS}" | awk '{ print $2 }'`
+        counts=`git rev-list --left-right --count ${trackingBranch}...HEAD` # e.g. behind-count + '\t' + ahead-count
 
-        # color branch name based on branch and status. GREEN for clean master, RED for anything else
-        if [ "$BRANCH" = "master" ]; then
-          if [ -z "$STATUS" -a "$AHEAD" -eq 0 ]; then
-            echo -e -n "${MOVE_RIGHT}${GREEN}master${RESET}"
+        # split the behind and ahead count
+        behind=`echo "${counts}" | awk '{ print $1 }'`
+        ahead=`echo "${counts}" | awk '{ print $2 }'`
+
+        # color branch name based on branch and status. green for clean master, red for anything else
+        if [ "${branch}" = "master" ]; then
+          if [ -z "$gitStatus" -a "${ahead}" -eq 0 ]; then
+            echo -e -n "${moveRight}${green}master${reset}"
           else
-            echo -e -n "${MOVE_RIGHT}${RED}master${RESET}"
+            echo -e -n "${moveRight}${red}master${reset}"
           fi
         else
-          echo -e -n "${MOVE_RIGHT}${RED}${BRANCH}${RESET}"
+          echo -e -n "${moveRight}${red}${branch}${reset}"
         fi
 
-        if [ ! "$AHEAD" -eq 0 ]; then
-          echo -e -n " ahead ${AHEAD}"
+        if [ ! "${ahead}" -eq 0 ]; then
+          echo -e -n " ahead ${ahead}"
         fi
 
-        if [ ! "$BEHIND" -eq 0 ]; then
-          echo -e -n " behind ${BEHIND}"
+        if [ ! "${behind}" -eq 0 ]; then
+          echo -e -n " behind ${behind}"
         fi
       fi
 
       echo ""
 
       # print status, if any
-      if [ ! -z "$STATUS" ]; then
-        echo "$STATUS"
+      if [ ! -z "${gitStatus}" ]; then
+        echo "${gitStatus}"
       fi
     fi
     cd .. > /dev/null
