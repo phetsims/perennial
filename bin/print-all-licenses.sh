@@ -22,17 +22,17 @@ echo "------------- | -------------"
 
 for repo in `cat perennial/data/active-repos | xargs`
 do
-  if [ -d "$repo" ]; then
-    cd $repo &> /dev/null
+  if [ -d "${repo}" ]; then
+    cd ${repo} &> /dev/null
 
     # If the license file exists, print its 1st line
     if [ -e "LICENSE" ]; then
-        echo "$repo | " `cat LICENSE | head -1`
+        echo "${repo} | "`cat LICENSE | head -1`
     else
-        echo -e "${red}$repo | missing license${reset}"
+        echo -e "${red}${repo} | missing license${reset}"
     fi
     cd .. &> /dev/null
   else
-    echo -e "${red}$repo | missing repository{reset}"
+    echo -e "${red}${repo} | missing repository${reset}"
   fi
 done
