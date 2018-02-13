@@ -68,9 +68,9 @@ for rep in $reposToCheckout; do
     cd "$rep"
 
     # status (empty string if clean)
-    STATUS=`git status --porcelain`
+    gitStatus=`git status --porcelain`
 
-    if [ -n "$STATUS" ]; then
+    if [ -n "$gitStatus" ]; then
       echo "Working copy changes in $rep, commit or stash changes"
       exit 1
     fi
