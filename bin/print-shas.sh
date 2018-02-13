@@ -14,11 +14,11 @@ cd ${workingDir}
 for repo in `ls -1`
 do
   # if it's a Git repository...
-  if [ -d $repo/.git ]; then
-    cd $repo > /dev/null
+  if [ -d ${repo}/.git ]; then
+    cd ${repo} > /dev/null
 
     # format is "{{repo}} {{sha}}"
-    echo "$repo `git rev-parse HEAD`"
+    echo "${repo} `git rev-parse HEAD`"
     cd .. > /dev/null
   fi
 done
