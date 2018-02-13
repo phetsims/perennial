@@ -25,10 +25,10 @@ for dir in */; do
      cd $dir &> /dev/null
      git ls-remote --exit-code . origin/${branch} &> /dev/null
      if [ $? != 0 ]; then
-       echo "WARNING: $dir has no such branch"
+       echo "WARNING: ${dir} has no such branch"
      else
        git checkout $1 &> /dev/null
-       echo $dir
+       echo ${dir}
      fi
      cd ..
    fi
