@@ -79,7 +79,7 @@ The build server does the following steps when a deploy request is received:
 - grunt checkout-shas
 - checkout sha for the current sim
 - npm update in chipper and the sim directory
-- grunt build-for-server --brand=phet for selected locales (see chipper's Gruntfile for details)
+- grunt build-for-server --brands=phet for selected locales (see chipper's Gruntfile for details)
 - for rc deploys:
     - deploy to spot, checkout master for all repositories, and finish
 - for production deploys:
