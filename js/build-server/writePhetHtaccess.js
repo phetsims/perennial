@@ -16,7 +16,9 @@ const writeFile = require( './writeFile' );
  */
 module.exports = function writePhetHtaccess( simName, version ) {
   const metadataURL = constants.BUILD_SERVER_CONFIG.productionServerURL + '/services/metadata/1.2/simulations?' +
-                      'format=json&type=html&summary&simulation=' + simName;
+                      'format=json&type=html&summary&include-unpublished=true&simulation=' + simName;
+  const pass = constants.BUILD_SERVER_CONFIG.serverToken;
+
   request( metadataURL, function( error, response, body ) {
     try {
       body = JSON.parse( body );
@@ -56,5 +58,5 @@ module.exports = function writePhetHtaccess( simName, version ) {
                      'RewriteRule ([^/]*)$ - [L,E=download:$1]\n' +
                      'Header onsuccess set Content-disposition "attachment; filename=%{download}e" env=download\n';
     writeFile( constants.HTML_SIMS_DIRECTORY + simName + '/.htaccess', contents );
-  } );
+  } ).auth( 'token', pass, true );
 };
