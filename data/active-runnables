@@ -51,7 +51,6 @@ gravity-force-lab
 gravity-force-lab-basics
 griddle
 hookes-law
-interaction-dashboard
 isotopes-and-atomic-mass
 john-travoltage
 joist
@@ -70,6 +69,7 @@ optics-lab
 pendulum-lab
 ph-scale
 ph-scale-basics
+phet-io-wrapper-visualizing-engagement
 plinko-probability
 projectile-motion
 proportion-playground
