@@ -240,7 +240,7 @@ async function taskWorker( task ) {
     if ( brands[ 0 ] === constants.PHET_BRAND ) {
       args.push( '--allHTML' );
     }
-    await execWithAbort( 'grunt', [ 'build-for-server', '--allHTML', '--brand=' + brands[ 0 ], '--locales=' + brandLocales ], simDir );
+    await execWithAbort( 'grunt', args, simDir );
   }
   else {
     return Promise.reject( 'Unsupported chipper version' );
