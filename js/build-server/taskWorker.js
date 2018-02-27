@@ -236,6 +236,10 @@ async function taskWorker( task ) {
     await execWithAbort( 'grunt', [ '--allHTML', '--debugHTML', '--brands=' + brands.join( ',' ), '--locales=' + brandLocales ], simDir );
   }
   else if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ) {
+    const args = [ 'build-for-server', '--brand=' + brands[ 0 ], '--locales=' + brandLocales  ];
+    if ( brands[ 0 ] === constants.PHET_BRAND ) {
+      args.push( '--allHTML' );
+    }
     await execWithAbort( 'grunt', [ 'build-for-server', '--allHTML', '--brand=' + brands[ 0 ], '--locales=' + brandLocales ], simDir );
   }
   else {
