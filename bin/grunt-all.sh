@@ -1,7 +1,7 @@
 #!/bin/bash
 #====================================================================================================
 #
-# Runs grunt for all simulations.
+# Runs grunt for all runnables.
 # Command-line args are passed through to grunt.
 # With no args, this runs the default grunt task (build).
 #
@@ -10,22 +10,30 @@
 #
 #====================================================================================================
 
-PERENNIAL_BIN=`dirname "${BASH_SOURCE[0]}"`
-WORKING_DIR=${PERENNIAL_BIN}/../..
-cd ${WORKING_DIR}
+binDir=`dirname "${BASH_SOURCE[0]}"`
+workingDir=${binDir}/../..
+cd ${workingDir}
 
 # Exit immediately on Ctrl-C
 trap "exit 1" SIGINT
 
-for sim in `cat perennial/data/active-runnables | xargs | tr -d '\015'`
+for runnable in `cat perennial/data/active-runnables | xargs | tr -d '\015'`
 do
-  if [ -d "$sim" ]; then
-    echo "Building" $sim
-    cd $sim                 # build.sh needs to be run from the sim directory
-    npm update             # executes quickly when everything is up to date compared to build.sh
-    grunt $*                # run grunt with command-line args
-    cd ..                   # and back to the original directory
+  if [ -d "${runnable}" ]; then
+    echo "${runnable} ..."
+
+    # run grunt from the runnable's directory
+    cd ${runnable} > /dev/null
+
+    # executes quickly when everything is up to date
+    npm update
+     
+    # run grunt with command-line args
+    grunt ${*}
+
+    # and back to the original directory
+    cd ..
   else
-    echo ">>>>>>>>>>>>>>>> MISSING " $sim
+    echo ">>>>>>>>>>>>>>>> MISSING " ${runnable}
   fi
 done

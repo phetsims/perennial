@@ -17,35 +17,35 @@
 
 # verify number of command line args
 if [ $# -gt 1 ]; then
-  echo "usage: `basename ${BASH_SOURCE[0]}` [logfile]"
+  echo "usage: `basename $0` [logfile]"
   exit 1
 fi
 
 # default logfile
-LOGFILE=${HOME}/.phet/print-shas.out
+logFile=${HOME}/.phet/print-shas.out
 
 # get log file from command line or use default
 if [ $# = 1 ]; then
-  LOGFILE=${1}
+  logFile=${1}
 fi
 
 # verify that logfile exists
-if [ ! -f ${LOGFILE} ]; then
-    echo "log file does not exist: ${LOGFILE}"
+if [ ! -f ${logFile} ]; then
+    echo "log file does not exist: ${logFile}"
     exit 1
 fi
 
 # get path to working directory
-PERENNIAL_BIN=`dirname "${BASH_SOURCE[0]}"`
-WORKING_DIR=${PERENNIAL_BIN}/../..
+binDir=`dirname "${BASH_SOURCE[0]}"`
+workingDir=${binDir}/../..
 
 # for each repo, checkout the sha specified in logfile
-cat ${LOGFILE} | while read -r line; do
+cat ${logFile} | while read -r line; do
 
   # format of print-shas.sh output is "{{repo}} {{sha}}"
-  REPO=`echo $line |cut -d' ' -f1`
-  SHA=`echo $line |cut -d' ' -f2`
+  repo=`echo ${line} | cut -d' ' -f1`
+  sha=`echo ${line} | cut -d' ' -f2`
 
-  cd ${WORKING_DIR}/${REPO}
-  git checkout ${SHA}
+  cd ${workingDir}/${repo}
+  git checkout ${sha}
 done

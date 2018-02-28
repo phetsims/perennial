@@ -42,7 +42,6 @@ energy-skate-park-basics
 equality-explorer
 estimation
 example-sim
-exemplar
 expression-exchange
 faradays-law
 fluid-pressure-and-flow
@@ -63,6 +62,7 @@ gravity-force-lab-basics
 griddle
 hookes-law
 installer-builder
+interaction-dashboard
 inverse-square-law-common
 isotopes-and-atomic-mass
 john-travoltage
@@ -97,7 +97,6 @@ phet-io-wrappers
 phet-io-wrapper-classroom-activity
 phet-io-wrapper-lab-book
 phet-io-wrapper-sonification
-phet-io-wrapper-visualizing-engagement
 phet-io-website
 plinko-probability
 projectile-motion

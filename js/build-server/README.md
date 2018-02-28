@@ -2,7 +2,7 @@
 
 PhET build and deploy server. The server is designed to run on the same host as the production site (phet-server.int.colorado.edu).
 
-##Starting and Stopping the Server
+## Starting and Stopping the Server
 
 To start, stop, or restart the build server on phet-server.int.colorado.edu (production) or phet-server.int.colorado.edu (test), run this command:
 `sudo systemctl [start|stop|restart] build-server`
@@ -16,7 +16,7 @@ To edit startup options, please see `/usr/lib/systemd/system/build-server.servic
 To start, stop, or restart the build server on figaro or simian, run this command:
 `sudo /etc/init.d/build-server {{start|stop|restart}}`
 
-##Build Server Configuration
+## Build Server Configuration
 
 
 All of the phet repos live on the production and dev servers under /data/share/phet/phet-repos. The build server
@@ -49,7 +49,7 @@ build-server needs to be able to make commits to github to notify rosetta that a
 There must be valid git credentials in the .netrc file phet-admin's home directory.
 
 
-##Using the Build Server for Production Deploys
+## Using the Build Server for Production Deploys
 
 The build server starts a build process upon receiving an https POST request to /deploy-html-simulation.
 It takes as input a JSON object with the following properties:
@@ -67,7 +67,7 @@ Note: You will NOT want to assemble these request URLs manually, instead use "gr
 `grunt deploy-rc` for rc deploys.
 
 
-##What the Build Server Does
+## What the Build Server Does
 
 The build server does the following steps when a deploy request is received:
 
@@ -79,7 +79,7 @@ The build server does the following steps when a deploy request is received:
 - grunt checkout-shas
 - checkout sha for the current sim
 - npm update in chipper and the sim directory
-- grunt build-for-server --brand=phet for selected locales (see chipper's Gruntfile for details)
+- grunt build-for-server --brands=phet for selected locales (see chipper's Gruntfile for details)
 - for rc deploys:
     - deploy to spot, checkout master for all repositories, and finish
 - for production deploys:

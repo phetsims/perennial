@@ -9,6 +9,7 @@ const winston = require( 'winston' );
 
 const addToRosetta = require( './addToRosetta' );
 const addTranslator = require( './addTranslator' );
+const ChipperVersion = require( '../common/ChipperVersion' );
 const constants = require( './constants' );
 const createTranslationsXML = require( './createTranslationsXML' );
 const devDeploy = require( './devDeploy' );
@@ -228,10 +229,22 @@ async function taskWorker( task ) {
   const brandLocales = ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) ? locales : 'en';
   winston.log( 'info', 'building for brands: ' + brands + ' version: ' + version );
 
-  await execWithAbort( 'grunt', [ '--allHTML', '--debugHTML', '--brands=' + brands.join( ',' ), '--locales=' + brandLocales ], simDir );
+  const chipperVersion = ChipperVersion.getFromRepository();
+  winston.debug( 'Chipper version detected: ' + chipperVersion.toString() );
 
-  const chipperVersion = JSON.parse( fs.readFileSync( '../chipper/package.json' ) ).version;
-  winston.debug( 'Chipper version detected: ' + chipperVersion );
+  if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
+    await execWithAbort( 'grunt', [ '--allHTML', '--debugHTML', '--brands=' + brands.join( ',' ), '--locales=' + brandLocales ], simDir );
+  }
+  else if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ) {
+    const args = [ 'build-for-server', '--brand=' + brands[ 0 ], '--locales=' + brandLocales  ];
+    if ( brands[ 0 ] === constants.PHET_BRAND ) {
+      args.push( '--allHTML' );
+    }
+    await execWithAbort( 'grunt', args, simDir );
+  }
+  else {
+    return Promise.reject( 'Unsupported chipper version' );
+  }
 
   winston.debug( 'deploying to servers: ' + JSON.stringify( servers ) );
 
@@ -255,7 +268,7 @@ async function taskWorker( task ) {
         if ( brand === constants.PHET_BRAND ) {
           targetDir = constants.HTML_SIMS_DIRECTORY + simName + '/' + version + '/';
 
-          if ( chipperVersion === '2.0.0' ) {
+          if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
             // Remove _phet from all filenames in the phet directory
             const files = fs.readdirSync( simDir + '/build/phet' );
             for ( let i in files ) {
@@ -308,7 +321,7 @@ async function taskWorker( task ) {
           // if this build request comes from rosetta it will have a userId field and only one locale
           const localesArray = typeof( locales ) === 'string' ? locales.split( ',' ) : locales;
           if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
-            await addTranslator( localesArray[ 0 ], afterDeploy );
+            await addTranslator( localesArray[ 0 ], simName, userId );
           }
         }
         else if ( brand === constants.PHET_IO_BRAND ) {

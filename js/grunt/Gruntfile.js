@@ -346,7 +346,7 @@ module.exports = function( grunt ) {
 
   grunt.registerTask( 'create-sim',
     'Creates a sim based on the simula-rasa template.\n' +
-    '--repo="string" : the repository repo\n' +
+    '--repo="string" : the repository name\n' +
     '--author="string" : the author name\n' +
     '--title="string" : (optional) the simulation title\n' +
     '--clean=true : (optional) deletes the repository directory if it exists',

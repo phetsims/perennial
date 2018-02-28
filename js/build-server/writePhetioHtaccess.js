@@ -1,13 +1,10 @@
-// Copyright 2017, University of Colorado Boulder
+// Copyright 2017-2018, University of Colorado Boulder
 
 /* eslint-env node */
 'use strict';
 
-
 const writeFile = require( './writeFile' );
-var getBuildServerConfig = require( './getBuildServerConfig' );
-var BUILD_SERVER_CONFIG = getBuildServerConfig( fs );
-const PHETIO_SIMS_DIRECTORY = BUILD_SERVER_CONFIG.phetioSimsDirectory;
+
 /**
  * Writes the htaccess file to password protect the exclusive content for phet-io sims
  * @param passwordProtectFilepath - location of .htaccess file for controlling access to wrappers
@@ -16,7 +13,7 @@ const PHETIO_SIMS_DIRECTORY = BUILD_SERVER_CONFIG.phetioSimsDirectory;
  * @param simName
  * @param version
  */
-module.exports = function writePhetioHtaccess( passwordProtectFilepath, authFilepath, redirectFilepath, simName, version ) {
+module.exports = async function writePhetioHtaccess( passwordProtectFilepath, authFilepath, redirectFilepath, simName, version ) {
   const latestRedirectContents = 'RewriteEngine on\n' +
                                  'RewriteBase /sims/' + simName + '/\n' +
                                  'RewriteRule latest(.*) ' + version + '$1\n' +

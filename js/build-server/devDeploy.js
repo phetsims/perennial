@@ -1,4 +1,4 @@
-// Copyright 2017, University of Colorado Boulder
+// Copyright 2017-2018, University of Colorado Boulder
 
 /* eslint-env node */
 'use strict';
@@ -21,8 +21,8 @@ function scpAll( buildDir, simVersionDirectory ) {
  * @param simDir
  * @param simName
  * @param version
+ * @param chipperVersion
  * @param brands
- * @param api
  *
  * @return Promise
  */
@@ -34,13 +34,13 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
   const buildDir = simDir + '/build';
 
   // copy the files
-  if ( chipperVersion === '2.0.0' ) {
+  if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
     scpAll( buildDir, simVersionDirectory );
     if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
       await devScp( buildDir + '/.htaccess', simVersionDirectory + '/phet-io/wrappers/' );
     }
   }
-  else {
+  else if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ){
     if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
       // copy english and all html and all non-html files
       await devScp( buildDir + '/' + simName + '_en.html', simVersionDirectory );
@@ -60,6 +60,9 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
     if ( brands.indexOf( brands.indexOf( constants.PHET_BRAND ) < 0 && brands.indexOf( constants.PHET_IO_BRAND ) < 0 ) ) {
       scpAll( buildDir, simVersionDirectory );
     }
+  }
+  else {
+    return Promise.reject( 'Unsupported chipper version' );
   }
 
   await devSsh( 'chmod -R g+w ' + simVersionDirectory );
