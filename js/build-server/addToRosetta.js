@@ -62,7 +62,7 @@ module.exports = async function addToRosetta( simTitle, simName, email ) {
   const contents = JSON.stringify( data, null, 2 );
 
   try {
-    writeFile( simInfoArray, contents );
+    await writeFile( simInfoArray, contents );
   }
   catch( err ) {
     return Promise.reject( 'couldn\'t write simInfoArray ' + err );

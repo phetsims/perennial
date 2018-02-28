@@ -193,7 +193,7 @@ async function taskWorker( task ) {
   }
 
   try {
-    writeFile( buildDir + '/dependencies.json', JSON.stringify( repos ) );
+    await writeFile( buildDir + '/dependencies.json', JSON.stringify( repos ) );
   }
   catch( err ) {
     return abortBuild( err );
@@ -236,7 +236,7 @@ async function taskWorker( task ) {
     await execWithAbort( 'grunt', [ '--allHTML', '--debugHTML', '--brands=' + brands.join( ',' ), '--locales=' + brandLocales ], simDir );
   }
   else if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ) {
-    const args = [ 'build-for-server', '--brand=' + brands[ 0 ], '--locales=' + brandLocales  ];
+    const args = [ 'build-for-server', '--brand=' + brands[ 0 ], '--locales=' + brandLocales ];
     if ( brands[ 0 ] === constants.PHET_BRAND ) {
       args.push( '--allHTML' );
     }
@@ -251,7 +251,12 @@ async function taskWorker( task ) {
   if ( servers.indexOf( constants.DEV_SERVER ) >= 0 ) {
     winston.info( 'deploying to dev' );
     if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
-      await writePhetioHtaccess( simDir + '/build/.htaccess', '/htdocs/physics/phet-io/config/.htpasswd' );
+      try {
+        await writePhetioHtaccess( simDir + '/build/.htaccess', '/htdocs/physics/phet-io/config/.htpasswd' );
+      }
+      catch( err ) {
+        return abortBuild( err );
+      }
     }
     await devDeploy( simDir, simName, version, chipperVersion, brands );
   }
@@ -302,7 +307,7 @@ async function taskWorker( task ) {
           } );
         };
 
-        const copySource = simDir + '/build' + ( chipperVersion === '2.0.0' ? ( '/' + brand ) : '');
+        const copySource = simDir + '/build' + ( chipperVersion === '2.0.0' ? ( '/' + brand ) : '' );
         try {
           await copyR( copySource, targetDir );
         }
@@ -325,13 +330,18 @@ async function taskWorker( task ) {
           }
         }
         else if ( brand === constants.PHET_IO_BRAND ) {
-          await writePhetioHtaccess(
-            constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess',
-            '/etc/httpd/conf/phet-io_pw',
-            constants.PHETIO_SIMS_DIRECTORY + simName + '/.htaccess',
-            simName,
-            version
-          );
+          try {
+            await writePhetioHtaccess(
+              constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess',
+              '/etc/httpd/conf/phet-io_pw',
+              constants.PHETIO_SIMS_DIRECTORY + simName + '/.htaccess',
+              simName,
+              version
+            );
+          }
+          catch( err ) {
+            return abortBuild( err );
+          }
         }
       }
     }

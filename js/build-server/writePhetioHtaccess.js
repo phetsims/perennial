@@ -21,11 +21,21 @@ module.exports = async function writePhetioHtaccess( passwordProtectFilepath, au
                                  'RewriteCond %{QUERY_STRING} =download\n' +
                                  'RewriteRule ([^/]*)$ - [L,E=download:$1]\n' +
                                  'Header onsuccess set Content-disposition "attachment; filename=%{download}e" env=download\n';
-  writeFile( redirectFilepath, latestRedirectContents );
+  try {
+    await writeFile( redirectFilepath, latestRedirectContents );
+  }
+  catch( err ) {
+    return Promise.reject( err );
+  }
 
   const passwordProtectWrapperContents = 'AuthType Basic\n' +
                                          'AuthName "PhET-iO Password Protected Area"\n' +
                                          'AuthUserFile ' + authFilepath + '\n' +
                                          'Require valid-user\n';
-  writeFile( passwordProtectFilepath, passwordProtectWrapperContents );
+  try {
+    await writeFile( passwordProtectFilepath, passwordProtectWrapperContents );
+  }
+  catch( err ) {
+    return Promise.reject( err );
+  }
 };
