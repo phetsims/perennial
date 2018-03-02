@@ -237,29 +237,33 @@ module.exports = function( grunt ) {
   grunt.registerTask( 'create-release',
     'Creates a new release branch for a given simulation\n' +
     '--repo : The repository to add the release branch to\n' +
-    '--branch : The branch name, which should be {{MAJOR}}.{{MINOR}}, e.g. 1.0',
+    '--branch : The branch name, which should be {{MAJOR}}.{{MINOR}}, e.g. 1.0\n' +
+    '--message : An optional message that will be appended on version-change commits.',
     wrapTask( async () => {
       const repo = grunt.option( 'repo' );
       const branch = grunt.option( 'branch' );
+      const message = grunt.option( 'message' );
       assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( branch, 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( branch.split( '.' ).length === 2, 'Branch should be {{MAJOR}}.{{MINOR}}' );
 
-      await createRelease( repo, branch );
+      await createRelease( repo, branch, message );
     } ) );
 
   grunt.registerTask( 'create-one-off',
     'Creates a new release branch for a given simulation\n' +
     '--repo : The repository to add the release branch to\n' +
-    '--branch : The branch/one-off name, which should be anything without dahes or periods',
+    '--branch : The branch/one-off name, which should be anything without dahes or periods\n' +
+    '--message : An optional message that will be appended on version-change commits.',
     wrapTask( async () => {
       const repo = grunt.option( 'repo' );
       const branch = grunt.option( 'branch' );
+      const message = grunt.option( 'message' );
       assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( branch, 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( !branch.includes( '-' ) && !branch.includes( '.' ), 'Branch should not contain dashes or periods' );
 
-      await createOneOff( repo, branch );
+      await createOneOff( repo, branch, message );
     } ) );
 
   grunt.registerTask( 'cherry-pick',
@@ -283,23 +287,25 @@ module.exports = function( grunt ) {
   grunt.registerTask( 'wrapper',
     'Deploys a phet-io wrapper\n' +
     '--repo : The name of the wrapper repository to deploy\n' +
-    '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out',
+    '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out\n' +
+    '--message : An optional message that will be appended on version-change commits.',
     wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
-      await wrapper( grunt.option( 'repo' ), noninteractive );
+      await wrapper( grunt.option( 'repo' ), noninteractive, grunt.option( 'message' ) );
     } ) );
 
   grunt.registerTask( 'dev',
     'Deploys a dev version of the simulation\n' +
     '--repo : The name of the repository to deploy\n' +
     '--brands : A comma-separated list of brand names to deploy\n' +
-    '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out',
+    '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out\n' +
+    '--message : An optional message that will be appended on version-change commits.',
     wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
-      await dev( grunt.option( 'repo' ), grunt.option( 'brands' ).split( ',' ), noninteractive, 'master' );
+      await dev( grunt.option( 'repo' ), grunt.option( 'brands' ).split( ',' ), noninteractive, 'master', grunt.option( 'message' ) );
     } ) );
 
   grunt.registerTask( 'one-off',
@@ -307,13 +313,14 @@ module.exports = function( grunt ) {
     '--repo : The name of the repository to deploy\n' +
     '--branch : The name of the one-off branch (the name of the one-off)\n' +
     '--brands : A comma-separated list of brand names to deploy\n' +
-    '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out',
+    '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out\n' +
+    '--message : An optional message that will be appended on version-change commits.',
     wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'branch' ), 'Requires specifying a branch (one-off name) with --branch={{BRANCH}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
-      await dev( grunt.option( 'repo' ), grunt.option( 'brands' ).split( ',' ), noninteractive, grunt.option( 'branch' ) );
+      await dev( grunt.option( 'repo' ), grunt.option( 'brands' ).split( ',' ), noninteractive, grunt.option( 'branch' ), grunt.option( 'message' ) );
     } ) );
 
   grunt.registerTask( 'rc',
@@ -321,13 +328,14 @@ module.exports = function( grunt ) {
     '--repo : The name of the wrapper repository to deploy\n' +
     '--branch : The release branch name (e.g. "1.7") that should be used for deployment\n' +
     '--brands : A comma-separated list of brand names to deploy\n' +
-    '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out',
+    '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out\n' +
+    '--message : An optional message that will be appended on version-change commits.',
     wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
-      await rc( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ), noninteractive );
+      await rc( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ), noninteractive, grunt.option( 'message' ) );
     } ) );
 
   grunt.registerTask( 'production',
@@ -335,13 +343,14 @@ module.exports = function( grunt ) {
     '--repo : The name of the wrapper repository to deploy\n' +
     '--branch : The release branch name (e.g. "1.7") that should be used for deployment\n' +
     '--brands : A comma-separated list of brand names to deploy\n' +
-    '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out',
+    '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out\n' +
+    '--message : An optional message that will be appended on version-change commits.',
     wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
-      await production( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ), noninteractive );
+      await production( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ), noninteractive, grunt.option( 'message' ) );
     } ) );
 
   grunt.registerTask( 'create-sim',
