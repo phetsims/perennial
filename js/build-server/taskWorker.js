@@ -146,17 +146,24 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             reject( err );
           }
           else {
+            winston.info('successfully removed old build dir');
             fs.mkdir( buildDir, err => {
               if ( err ) {
-                winston.error('Error creating fresh build dir: ');
+                winston.error('Error creating new build dir: ');
                 winston.error( err );
                 reject( err );
               }
-              else { resolve(); }
+              else {
+                winston.info('successfully created build dir');
+                resolve();
+              }
             } );
           }
         } ); }
-        else { resolve(); }
+        else {
+          winston.info('successfully created build dir');
+          resolve();
+        }
       } );
     } );
 
@@ -241,7 +248,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           }
 
           // Copy steps
-          await new Promise( ( reject, resolve ) => {
+          await new Promise( ( resolve, reject ) => {
             fs.mkdirp( targetDir, err => {
               if ( err ) { reject( err ); }
               else { resolve(); }
@@ -281,7 +288,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             await writePhetioHtaccess( constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess', '/etc/httpd/conf/phet-io_pw' );
           }
 
-          await new Promise( ( reject, resolve ) => {
+          await new Promise( ( resolve, reject ) => {
             fs.rmrf( targetDir, err => {
               if ( err ) { reject( err ); }
               else { resolve(); }
@@ -291,7 +298,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
       }
 
       // clean up the temporary build directory
-      await new Promise( ( reject, resolve ) => {
+      await new Promise( ( resolve, reject ) => {
         fs.rmrf( buildDir, err => {
           if ( err ) { reject( err ); }
           else { resolve(); }
