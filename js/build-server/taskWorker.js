@@ -136,15 +136,23 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
     const simDir = '../' + simName;
     winston.log( 'info', 'building sim ' + simName );
 
-    await ( () => {
-        return new Promise( ( resolve, reject ) => {
-          fs.mkdirSync( buildDir, err => {
+    // Create the temporary build dir, removing the existing dir if it exists.
+    await new Promise( ( resolve, reject ) => {
+      fs.mkdir( buildDir, err => {
+        if ( err ) { reject( err ); }
+        else {
+          fs.rmrf( buildDir, err => {
             if ( err ) { reject( err ); }
-            else { resolve(); }
+            else {
+              fs.mkdir( buildDir, err => {
+                if ( err ) { reject( err ); }
+                else { resolve(); }
+              } );
+            }
           } );
-        } );
-      }
-    )();
+        }
+      } );
+    } );
 
     await writeFile( buildDir + '/dependencies.json', JSON.stringify( repos ) );
     winston.log( 'info', 'wrote file ' + buildDir + '/dependencies.json' );
@@ -227,7 +235,12 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           }
 
           // Copy steps
-          await mkVersionDir( targetDir );
+          await new Promise( ( reject, resolve ) => {
+            fs.mkdirp( targetDir, err => {
+              if ( err ) { reject( err ); }
+              else { resolve(); }
+            } );
+          } );
           let copyCommand = 'cp -r ' + simDir + '/build/';
           if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
             copyCommand += brand + '/* ';
@@ -238,14 +251,12 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           else {
             return Promise.reject( 'Unsupported chipper version' );
           }
-          await ( () => {
-            return new Promise( ( resolve, reject ) => {
-              child_process.exec( copyCommand + targetDir, ( err ) => {
-                if ( err ) { reject( err ); }
-                else { resolve(); }
-              } );
+          await new Promise( ( resolve, reject ) => {
+            child_process.exec( copyCommand + targetDir, ( err ) => {
+              if ( err ) { reject( err ); }
+              else { resolve(); }
             } );
-          } )();
+          } );
 
           // Post-copy steps
           if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
@@ -263,8 +274,23 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           else if ( brand === constants.PHET_IO_BRAND ) {
             await writePhetioHtaccess( constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess', '/etc/httpd/conf/phet-io_pw' );
           }
+
+          await new Promise( ( reject, resolve ) => {
+            fs.rmrf( targetDir, err => {
+              if ( err ) { reject( err ); }
+              else { resolve(); }
+            } );
+          } );
         }
       }
+
+      // clean up the temporary build directory
+      await new Promise( ( reject, resolve ) => {
+        fs.rmrf( buildDir, err => {
+          if ( err ) { reject( err ); }
+          else { resolve(); }
+        } );
+      } );
     }
   }
   catch( err ) {
