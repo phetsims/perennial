@@ -140,10 +140,18 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
       fs.mkdir( buildDir, err => {
         // If there is an error, try to remove the directory and contents and try again
         if ( err ) { fs.rmrf( buildDir, err => {
-          if ( err ) { reject( err ); }
+          if ( err ) {
+            winston.error('Error removing previous build dir: ');
+            winston.error( err );
+            reject( err );
+          }
           else {
             fs.mkdir( buildDir, err => {
-              if ( err ) { reject( err ); }
+              if ( err ) {
+                winston.error('Error creating fresh build dir: ');
+                winston.error( err );
+                reject( err );
+              }
               else { resolve(); }
             } );
           }
