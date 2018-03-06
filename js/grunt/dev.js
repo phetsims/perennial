@@ -36,9 +36,10 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  * @param {Array.<string>} brands
  * @param {boolean} noninteractive
  * @param {string} - 'master' for normal dev deploys, otherwise is the name of a one-off branch
+ * @param {string} [message] - Optional message to append to the version-increment commit.
  * @returns {Promise}
  */
-module.exports = async function( repo, brands, noninteractive, branch ) {
+module.exports = async function( repo, brands, noninteractive, branch, message ) {
   const isOneOff = branch !== 'master';
   const testType = isOneOff ? branch : 'dev';
 
@@ -87,7 +88,7 @@ module.exports = async function( repo, brands, noninteractive, branch ) {
     grunt.fail.fatal( `Aborted ${testType} deploy` );
   }
 
-  await setRepoVersion( repo, version );
+  await setRepoVersion( repo, version, message );
   await gitPush( repo, branch );
 
   // Make sure our correct npm dependencies are set

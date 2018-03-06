@@ -22,9 +22,10 @@ const writeJSON = require( './writeJSON' );
  *
  * @param {string} repo - The repository name
  * @param {SimVersion} version
+ * @param {string} [message] - Optional. If provided, appended at the end
  * @returns {Promise}
  */
-module.exports = async function( repo, version ) {
+module.exports = async function( repo, version, message ) {
   winston.info( `Setting version from package.json for ${repo} to ${version.toString()}` );
 
   const packageFile = `../${repo}/package.json`;
@@ -39,5 +40,5 @@ module.exports = async function( repo, version ) {
 
   await writeJSON( packageFile, packageObject );
   await gitAdd( repo, 'package.json' );
-  await gitCommit( repo, `Bumping version to ${version.toString()}` );
+  await gitCommit( repo, `Bumping version to ${version.toString()}${message ? ', ' + message : ''}` );
 };

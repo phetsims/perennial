@@ -37,9 +37,10 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  * @param {string} branch
  * @param {Array.<string>} brands
  * @param {boolean} noninteractive
+ * @param {string} [message] - Optional message to append to the version-increment commit.
  * @returns {Promise}
  */
-module.exports = async function( repo, branch, brands, noninteractive ) {
+module.exports = async function( repo, branch, brands, noninteractive, message ) {
   SimVersion.ensureReleaseBranch( branch );
 
   const isClean = await gitIsClean( repo );
@@ -83,7 +84,7 @@ module.exports = async function( repo, branch, brands, noninteractive ) {
       grunt.fail.fatal( 'Aborted rc deployment' );
     }
 
-    await setRepoVersion( repo, version );
+    await setRepoVersion( repo, version, message );
     await gitPush( repo, branch );
 
     // Make sure our correct npm dependencies are set
@@ -97,7 +98,7 @@ module.exports = async function( repo, branch, brands, noninteractive ) {
 
     if ( !await booleanPrompt( `Please test the built version of ${repo}.\nIs it ready to deploy`, noninteractive ) ) {
       // Abort version update
-      await setRepoVersion( repo, previousVersion );
+      await setRepoVersion( repo, previousVersion, message );
       await gitPush( repo, branch );
 
       // Abort checkout
