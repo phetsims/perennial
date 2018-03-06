@@ -13,7 +13,6 @@ const devDeploy = require( './devDeploy' );
 const execute = require( '../common/execute' );
 const fs = require( 'fs.extra' ); // eslint-disable-line
 const getLocales = require( './getLocales' );
-const mkVersionDir = require( './mkVersionDir' );
 const notifyServer = require( './notifyServer' );
 const pullMaster = require( './pullMaster' );
 const winston = require( 'winston' );
