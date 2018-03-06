@@ -4,11 +4,16 @@
 'use strict';
 
 const fs = require( 'fs.extra' ); // eslint-disable-line
+const winston = require( 'winston' );
 
 module.exports = async function ( filepath, contents ) {
   return new Promise( ( reject, resolve ) => {
     fs.writeFile( filepath, contents, e => {
-      if ( e ) { reject( e ); }
+      if ( e ) {
+        winston.error( 'Failed to write file: ' + filepath );
+        winston.error( e );
+        reject( e );
+      }
       else { resolve(); }
     } );
   });
