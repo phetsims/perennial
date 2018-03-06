@@ -138,18 +138,17 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
     // Create the temporary build dir, removing the existing dir if it exists.
     await new Promise( ( resolve, reject ) => {
       fs.mkdir( buildDir, err => {
-        if ( err ) { reject( err ); }
-        else {
-          fs.rmrf( buildDir, err => {
-            if ( err ) { reject( err ); }
-            else {
-              fs.mkdir( buildDir, err => {
-                if ( err ) { reject( err ); }
-                else { resolve(); }
-              } );
-            }
-          } );
-        }
+        // If there is an error, try to remove the directory and contents and try again
+        if ( err ) { fs.rmrf( buildDir, err => {
+          if ( err ) { reject( err ); }
+          else {
+            fs.mkdir( buildDir, err => {
+              if ( err ) { reject( err ); }
+              else { resolve(); }
+            } );
+          }
+        } ); }
+        else { resolve(); }
       } );
     } );
 
