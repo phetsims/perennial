@@ -287,13 +287,6 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           else if ( brand === constants.PHET_IO_BRAND ) {
             await writePhetioHtaccess( constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess', '/etc/httpd/conf/phet-io_pw' );
           }
-
-          await new Promise( ( resolve, reject ) => {
-            fs.rmrf( targetDir, err => {
-              if ( err ) { reject( err ); }
-              else { resolve(); }
-            } );
-          } );
         }
       }
 
