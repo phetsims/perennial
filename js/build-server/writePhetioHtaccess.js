@@ -10,10 +10,10 @@ const writeFile = require( './writeFile' );
  * @param filepath - location to write the .htaccess file
  * @param authFilepath - location of AuthUserFile on the dev server
  */
-module.exports = function writePhetioHtaccess( filepath, authFilepath ) {
+module.exports = async function writePhetioHtaccess( filepath, authFilepath ) {
   const contents = 'AuthType Basic\n' +
                    'AuthName "PhET-iO Password Protected Area"\n' +
                    'AuthUserFile ' + authFilepath + '\n' +
                    'Require valid-user\n';
-  writeFile( filepath, contents );
+  await writeFile( filepath, contents );
 };
