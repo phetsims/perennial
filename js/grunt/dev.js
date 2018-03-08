@@ -42,6 +42,9 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
 module.exports = async function( repo, brands, noninteractive, branch, message ) {
   const isOneOff = branch !== 'master';
   const testType = isOneOff ? branch : 'dev';
+  if ( isOneOff ) {
+    assert( !branch.includes( '-' ), 'One-off versions should be from branches that do not include hyphens' );
+  }
 
   const currentBranch = await getBranch( repo );
   if ( currentBranch !== branch ) {
@@ -51,7 +54,12 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
   const previousVersion = await getRepoVersion( repo );
 
   if ( previousVersion.testType !== testType ) {
-    grunt.fail.fatal( 'The current version identifier is not a dev version, aborting.' );
+    if ( isOneOff ) {
+      grunt.fail.fatal( `The current version identifier is not a one-off version (should be something like ${previousVersion.major}.${previousVersion.minor}.${previousVersion.maintenance}-${testType}.${previousVersion.testNumber === null ? '0' : previousVersion.testNumber}), aborting.` );
+    }
+    else {
+      grunt.fail.fatal( 'The current version identifier is not a dev version, aborting.' );
+    }
   }
 
   const isClean = await gitIsClean( repo );

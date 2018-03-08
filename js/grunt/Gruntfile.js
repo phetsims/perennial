@@ -23,6 +23,7 @@ const createSim = require( './createSim' );
 const dev = require( './dev' );
 const execute = require( '../common/execute' );
 const generateData = require( './generateData' );
+const getBranch = require( '../common/getBranch' );
 const gruntCommand = require( '../common/gruntCommand' );
 const insertRequireStatement = require( './insertRequireStatement' );
 const maintenance = require( './maintenance' );
@@ -309,18 +310,27 @@ module.exports = function( grunt ) {
     } ) );
 
   grunt.registerTask( 'one-off',
-    'Deploys a dev version of the simulation\n' +
+    'Deploys a one-off version of the simulation (using the current or specified branch)\n' +
     '--repo : The name of the repository to deploy\n' +
     '--branch : The name of the one-off branch (the name of the one-off)\n' +
     '--brands : A comma-separated list of brand names to deploy\n' +
     '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out\n' +
     '--message : An optional message that will be appended on version-change commits.',
     wrapTask( async () => {
-      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
-      assert( grunt.option( 'branch' ), 'Requires specifying a branch (one-off name) with --branch={{BRANCH}}' );
-      assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
+      const repo = grunt.option( 'repo' );
+      const brands = grunt.option( 'brands' );
 
-      await dev( grunt.option( 'repo' ), grunt.option( 'brands' ).split( ',' ), noninteractive, grunt.option( 'branch' ), grunt.option( 'message' ) );
+      assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+      assert( brands, 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
+
+      var branch = grunt.option( 'branch' );
+      if ( !branch ) {
+        branch = await getBranch( repo );
+        console.log( `--branch not provided, using ${branch} detected from ${repo}` );
+      }
+      assert( branch !== 'master', 'One-off deploys for master are unsupported.' );
+
+      await dev( repo, brands.split( ',' ), noninteractive, branch, grunt.option( 'message' ) );
     } ) );
 
   grunt.registerTask( 'rc',
