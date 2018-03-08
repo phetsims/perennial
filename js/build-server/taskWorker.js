@@ -223,7 +223,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
       for ( let i in brands ) {
         if ( brands.hasOwnProperty( i ) ) {
           const brand = brands[ i ];
-
+          winston.info( 'deploying brand: ' + brand );
 
           // Pre-copy steps
           if ( brand === constants.PHET_BRAND ) {
@@ -272,7 +272,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           } );
 
           // Post-copy steps
-          if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
+          if ( brand === constants.PHET_BRAND ) {
             await writePhetHtaccess( simName, version );
             let simTitle = await createTranslationsXML( simName, version );
             await notifyServer( simName, email );
