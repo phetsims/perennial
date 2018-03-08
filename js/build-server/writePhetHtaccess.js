@@ -6,7 +6,6 @@
 const constants = require( './constants' );
 const request = require( 'request' );
 const SimVersion = require( '../common/SimVersion' );
-const winston = require( 'winston' );
 const writeFile = require( './writeFile' );
 
 /**
