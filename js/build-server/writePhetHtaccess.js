@@ -43,6 +43,7 @@ module.exports = async function writePhetHtaccess( simName, version ) {
         // The requested deploy is earlier than the latest version, exit without updating the .htacess
         if ( thisVersion.compareNumber( latestVersion ) < 0 ) {
           resolve();
+          return;
         }
       }
 
