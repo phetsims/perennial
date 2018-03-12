@@ -31,9 +31,10 @@ const SimVersion = require( '../common/SimVersion' );
  *
  * @param {string} repo - The repository name
  * @param {string} branch - The branch to create (should be {{MAJOR}}.{{MINOR}})
+ * @param {string} [message] - Optional message to append to the version-increment commit.
  * @returns {Promise}
  */
-module.exports = async function( repo, branch ) {
+module.exports = async function( repo, branch, message ) {
   const major = parseInt( branch.split( '.' )[ 0 ], 10 );
   const minor = parseInt( branch.split( '.' )[ 1 ], 10 );
   assert( major > 0, 'Major version for a branch should be greater than zero' );
@@ -61,7 +62,7 @@ module.exports = async function( repo, branch ) {
 
   // Create the branch, update the version info
   await execute( 'git', [ 'checkout', '-b', branch ], '../' + repo );
-  await setRepoVersion( repo, newVersion );
+  await setRepoVersion( repo, newVersion, message );
   await gitPush( repo, branch );
 
   // Update dependencies.json for the release branch
@@ -80,7 +81,7 @@ module.exports = async function( repo, branch ) {
   await setRepoVersion( repo, new SimVersion( major, minor + 1, 0, {
     testType: 'dev',
     testNumber: 0
-  } ) );
+  } ), message );
   await gitPush( repo, 'master' );
 
   // Go back to the branch (as they may want to do a deploy)

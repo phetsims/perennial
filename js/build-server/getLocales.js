@@ -38,7 +38,7 @@ async function getLocales( locales, simName ) {
   else {
     // from grunt deploy-production
     const simDirectory = constants.HTML_SIMS_DIRECTORY + simName;
-    const versionDirectories = getSortedVersionDirectories( simDirectory );
+    const versionDirectories = await getSortedVersionDirectories( simDirectory );
     if ( versionDirectories.length > 0 ) {
       const latest = versionDirectories[ versionDirectories.length - 1 ];
       const translationsXMLFile = constants.HTML_SIMS_DIRECTORY + simName + '/' + latest + '/' + simName + '.xml';

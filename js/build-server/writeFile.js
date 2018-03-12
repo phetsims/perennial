@@ -6,8 +6,6 @@
 const fs = require( 'fs.extra' ); // eslint-disable-line
 const winston = require( 'winston' );
 
-const ATTEMPTS = 3;
-
 module.exports = async function ( filepath, contents ) {
   return new Promise( ( resolve, reject ) => {
     fs.writeFile( filepath, contents, err => {

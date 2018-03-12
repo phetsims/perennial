@@ -15,7 +15,7 @@ const fs = require( 'fs.extra' ); // eslint-disable-line
  * @param path - Filename of the directory.  It's ok if the path does not exist.
  * @returns {Array} - returns a sorted array of version directories.  Returns an empty array if none exist or if the path does not exist.
  */
-module.exports = function getSortedVersionDirectories( path ) {
+module.exports = async function getSortedVersionDirectories( path ) {
 
   let versions;
 

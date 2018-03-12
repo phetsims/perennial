@@ -29,9 +29,10 @@ const SimVersion = require( '../common/SimVersion' );
  *
  * @param {string} repo - The repository name
  * @param {string} branch - The branch to create (should be {{MAJOR}}.{{MINOR}})
+ * @param {string} [message] - Optional message to append to the version-increment commit.
  * @returns {Promise}
  */
-module.exports = async function( repo, branch ) {
+module.exports = async function( repo, branch, message ) {
   const hasBranchAlready = await hasRemoteBranch( repo, branch );
   if ( hasBranchAlready ) {
     grunt.fail.fatal( 'Branch already exists, aborting' );
@@ -51,7 +52,7 @@ module.exports = async function( repo, branch ) {
 
   // Create the branch, update the version info
   await execute( 'git', [ 'checkout', '-b', branch ], '../' + repo );
-  await setRepoVersion( repo, newVersion );
+  await setRepoVersion( repo, newVersion, message );
   await gitPush( repo, branch );
 
   // Update dependencies.json for the release branch

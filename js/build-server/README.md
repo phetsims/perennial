@@ -48,8 +48,28 @@ build-server log files can be tailed by running /usr/lib/systemd/system/build-se
 build-server needs to be able to make commits to github to notify rosetta that a new sim is translatable. To do this,
 There must be valid git credentials in the .netrc file phet-admin's home directory.
 
+## Using the Build Server for Production Deploys with Chipper 2.0
 
-## Using the Build Server for Production Deploys
+The build server starts a build process upon receiving an https POST request to /deploy-html-simulation.
+It takes as input a JSON object with the following properties:
+
+    const servers = req.body[ constants.SERVERS_KEY ];
+    const brands = req.body[ constants.BRANDS_KEY ];
+   
+    
+- `{String} api` - the only option is `"2.0"` 
+- `{JSON.Array<String>} brands` - a list brands to deploy.
+- `{JSON.Array<String>} servers` - a list of servers to receive the deployment.  Should be a subset of `[ "dev", "production" ]`
+- `{JSON.Array} dependencies` - a json object with dependency repos and shas, in the form of dependencies.json files
+- `{JSON.Array} locales` - a list of locales to build (optional, defaults to all locales in babel).
+- `{String} simName` - the standardized name of the sim, lowercase with hyphens instead of spaces (i.e. area-builder)
+- `{String} version` - the version to be built.
+- `{String} authorizationCode` - a password to authorize legitimate requests
+- `{String} email` - optional parameter, used to send success/failure notifications
+- `{Number} translatorId` - optional parameter for production/rc deploys, required for translation deploys from rosetta to add the user's credit to the website.
+
+
+## Using the Build Server for Production Deploys with Chipper 1.0
 
 The build server starts a build process upon receiving an https POST request to /deploy-html-simulation.
 It takes as input a JSON object with the following properties:
@@ -62,10 +82,6 @@ It takes as input a JSON object with the following properties:
 - `option` - optional parameter, can be set to "rc" to do an rc deploy instead of production
 - `email` - optional parameter, used to send success/failure notifications
 - `translatorId` - optional parameter for production/rc deploys, required for translation deploys from rosetta to add the user's credit to the website.
-
-Note: You will NOT want to assemble these request URLs manually, instead use "grunt deploy-production" for production deploys and
-`grunt deploy-rc` for rc deploys.
-
 
 ## What the Build Server Does
 

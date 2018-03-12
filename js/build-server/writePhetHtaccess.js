@@ -6,7 +6,6 @@
 const constants = require( './constants' );
 const request = require( 'request' );
 const SimVersion = require( '../common/SimVersion' );
-const winston = require( 'winston' );
 const writeFile = require( './writeFile' );
 
 /**
@@ -26,25 +25,23 @@ module.exports = async function writePhetHtaccess( simName, version ) {
       }
         // The JSON object wasn't formatted right, bail!
       catch( e ) {
-        winston.error( e );
-        return;
+        reject( e );
       }
       // There was some error in the request, bail!
       if ( error ) {
-        winston.error( error );
-        return;
+        reject( error );
       }
       // We got an error and the simulation has already been deployed to the website, bail!
       else if ( body.error && body.error[ 0 ] !== 'No sims found with the criteria provided' ) {
-        body.error.forEach( ( e ) => {winston.error( e );} );
-        return;
+        reject( new Error( body.error ) );
       }
       // We did not get an error, compare the deploy request version with the website, if the request is for a later version, update it.
       else if ( !body.error ) {
         const thisVersion = SimVersion.parse( version );
         const latestVersion = SimVersion.parse( body.projects[ 0 ].version.string );
-        // The requested deploy is earlier than the latest version, bail!
+        // The requested deploy is earlier than the latest version, exit without updating the .htacess
         if ( thisVersion.compareNumber( latestVersion ) < 0 ) {
+          resolve();
           return;
         }
       }
@@ -58,15 +55,8 @@ module.exports = async function writePhetHtaccess( simName, version ) {
                        'RewriteCond %{QUERY_STRING} =download\n' +
                        'RewriteRule ([^/]*)$ - [L,E=download:$1]\n' +
                        'Header onsuccess set Content-disposition "attachment; filename=%{download}e" env=download\n';
-
-      try {
-        await writeFile( constants.HTML_SIMS_DIRECTORY + simName + '/.htaccess', contents );
-        resolve();
-      }
-      catch ( err ) {
-        reject( err );
-      }
+      await writeFile( constants.HTML_SIMS_DIRECTORY + simName + '/.htaccess', contents );
+      resolve();
     } ).auth( 'token', pass, true );
   } );
-
 };

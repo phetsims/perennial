@@ -138,12 +138,12 @@ function postQueueDeploy( req, res ) {
  * @param {Array.<String>} brands
  * @param {Array.<String>} servers
  * @param {String} email
- * @param {String} translatorId
+ * @param {String} userId
  * @param {String} authorizationKey
  * @param {express.Request} req
  * @param {express.Response} res
  */
-function queueDeploy( api, repos, simName, version, locales, brands, servers, email, translatorId, authorizationKey, req, res ) {
+function queueDeploy( api, repos, simName, version, locales, brands, servers, email, userId, authorizationKey, req, res ) {
 
   if ( repos && simName && version && authorizationKey ) {
     const productionBrands = [ constants.PHET_BRAND, constants.PHET_IO_BRAND ];
@@ -162,7 +162,7 @@ function queueDeploy( api, repos, simName, version, locales, brands, servers, em
     }
     else {
       winston.log( 'info', 'queuing build for ' + simName + ' ' + version );
-      taskQueue.push( { api, repos, simName, version, locales, servers, brands, email, translatorId, res }, function( err ) {
+      taskQueue.push( { api, repos, simName, version, locales, servers, brands, email, userId, res }, function( err ) {
         const simInfoString = 'Sim = ' + simName +
                               ' Version = ' + version +
                               ' Locales = ' + locales;

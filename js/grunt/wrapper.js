@@ -37,9 +37,10 @@ const SimVersion = require( '../common/SimVersion' );
  *
  * @param {string} repo
  * @param {boolean} noninteractive
+ * @param {string} [message] - Optional message to append to the version-increment commit.
  * @returns {Promise}
  */
-module.exports = async function( repo, noninteractive ) {
+module.exports = async function( repo, noninteractive, message ) {
   const currentBranch = await getBranch( repo );
   if ( currentBranch !== 'master' ) {
     grunt.fail.fatal( 'Dev deployments are only supported from the master branch, not: ' + ( currentBranch ? currentBranch : '(detached head)' ) );
@@ -78,7 +79,7 @@ module.exports = async function( repo, noninteractive ) {
     grunt.fail.fatal( 'Aborted wrapper deploy' );
   }
 
-  await setRepoVersion( repo, version );
+  await setRepoVersion( repo, version, message );
   await gitPush( repo, 'master' );
 
   // Make sure our correct npm dependencies are set

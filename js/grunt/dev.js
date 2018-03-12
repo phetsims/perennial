@@ -36,11 +36,15 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  * @param {Array.<string>} brands
  * @param {boolean} noninteractive
  * @param {string} - 'master' for normal dev deploys, otherwise is the name of a one-off branch
+ * @param {string} [message] - Optional message to append to the version-increment commit.
  * @returns {Promise}
  */
-module.exports = async function( repo, brands, noninteractive, branch ) {
+module.exports = async function( repo, brands, noninteractive, branch, message ) {
   const isOneOff = branch !== 'master';
   const testType = isOneOff ? branch : 'dev';
+  if ( isOneOff ) {
+    assert( !branch.includes( '-' ), 'One-off versions should be from branches that do not include hyphens' );
+  }
 
   const currentBranch = await getBranch( repo );
   if ( currentBranch !== branch ) {
@@ -50,7 +54,12 @@ module.exports = async function( repo, brands, noninteractive, branch ) {
   const previousVersion = await getRepoVersion( repo );
 
   if ( previousVersion.testType !== testType ) {
-    grunt.fail.fatal( 'The current version identifier is not a dev version, aborting.' );
+    if ( isOneOff ) {
+      grunt.fail.fatal( `The current version identifier is not a one-off version (should be something like ${previousVersion.major}.${previousVersion.minor}.${previousVersion.maintenance}-${testType}.${previousVersion.testNumber === null ? '0' : previousVersion.testNumber}), aborting.` );
+    }
+    else {
+      grunt.fail.fatal( 'The current version identifier is not a dev version, aborting.' );
+    }
   }
 
   const isClean = await gitIsClean( repo );
@@ -87,7 +96,7 @@ module.exports = async function( repo, brands, noninteractive, branch ) {
     grunt.fail.fatal( `Aborted ${testType} deploy` );
   }
 
-  await setRepoVersion( repo, version );
+  await setRepoVersion( repo, version, message );
   await gitPush( repo, branch );
 
   // Make sure our correct npm dependencies are set
