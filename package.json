@@ -23,6 +23,7 @@
     "xml2js": "^0.4.15"
   },
   "dependencies": {
+    "scp": "0.0.3",
     "thread-sleep": "^2.0.0"
   }
 }
