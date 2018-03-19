@@ -19,6 +19,7 @@ bending-light
 blackbody-spectrum
 blast
 brand
+build-a-fraction
 build-a-molecule
 build-an-atom
 bumper
@@ -48,7 +49,10 @@ fluid-pressure-and-flow
 forces-and-motion-basics
 fraction-comparison
 fraction-matcher
+fractions-common
+fractions-equality
 fractions-intro
+fractions-mixed-numbers
 friction
 function-builder
 function-builder-basics
