@@ -211,7 +211,10 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
     if ( servers.indexOf( constants.DEV_SERVER ) >= 0 ) {
       winston.info( 'deploying to dev' );
       if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
-        await writePhetioHtaccess( simDir + '/build/.htaccess', '/htdocs/physics/phet-io/config/.htpasswd' );
+        const htaccessLocation = ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) ?
+                                 simDir + '/build/phet-io/wrappers/.htaccess' :
+                                 simDir + '/build/.htaccess';
+        await writePhetioHtaccess( htaccessLocation, '/htdocs/physics/phet-io/config/.htpasswd' );
       }
       await devDeploy( simDir, simName, version, chipperVersion, brands );
     }
@@ -254,18 +257,18 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
               else { resolve(); }
             } );
           } );
-          let copyCommand = 'cp -r ' + simDir + '/build/';
+          let sourceDir = simDir + '/build/';
           if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
-            copyCommand += brand + '/* ';
+            sourceDir += brand + '/*';
           }
           else if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ) {
-            copyCommand += '/* ';
+            sourceDir += '/*';
           }
           else {
             return Promise.reject( 'Unsupported chipper version' );
           }
           await new Promise( ( resolve, reject ) => {
-            child_process.exec( copyCommand + targetDir, ( err ) => {
+            fs.copyRecursive( sourceDir, targetDir, ( err ) => {
               if ( err ) { reject( err ); }
               else { resolve(); }
             } );

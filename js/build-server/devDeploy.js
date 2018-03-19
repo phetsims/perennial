@@ -3,16 +3,47 @@
 /* eslint-env node */
 'use strict';
 
-const child_process = require( 'child_process' );
+
 const constants = require( './constants' );
-const devScp = require( '../common/devScp' );
 const devSsh = require( '../common/devSsh' );
-const fs = require( 'fs' );
+const scp = require( 'scp' );
+const walk = require( 'walk' );
+const winston = require( 'winston' );
 
-const userAtServer = constants.BUILD_SERVER_CONFIG.devUsername + '@' + constants.BUILD_SERVER_CONFIG.devDeployServer;
+const user = constants.BUILD_SERVER_CONFIG.devUsername;
+const host = constants.BUILD_SERVER_CONFIG.devDeployServer;
 
-function scpAll( buildDir, simVersionDirectory ) {
-  child_process.execSync( 'scp -r ' + buildDir + '/* ' + userAtServer + ':' + simVersionDirectory );
+/**
+ * Performs a recursive copy to the dev server
+ * @param {String} buildDir - filepath of build directory
+ * @param {String} simVersionDirectory - target filepath
+ * @param {function} shouldFilter - shouldFilter( file:string ) : {boolean}
+ * @returns {Promise<any>}
+ */
+async function scpAll( buildDir, simVersionDirectory, shouldFilter ) {
+  return new Promise( ( resolve, reject ) => {
+    walk.walk( buildDir ).on( 'file', ( root, fileStats, next ) => {
+      const path = simVersionDirectory + root.replace( buildDir );
+      const file = root + '/' + fileStats.name;
+
+      if ( !shouldFilter( file ) ) {
+        scp.send( { file, path, user, host }, err => {
+          if ( err ) { reject( err ); }
+          else { next(); }
+        } );
+      }
+      else {
+        next();
+      }
+    } ).on( 'errors', ( root, nodeStatsArray ) => {
+      nodeStatsArray.forEach( nodeStats => {
+        winston.error( JSON.stringify( nodeStats ) );
+      } );
+      reject( new Error( 'error during dev deploy walk' ) );
+    } ).on( 'end', () => {
+      resolve();
+    } );
+  } );
 }
 
 /**
@@ -29,41 +60,48 @@ function scpAll( buildDir, simVersionDirectory ) {
 module.exports = async function( simDir, simName, version, chipperVersion, brands ) {
   const simVersionDirectory = constants.BUILD_SERVER_CONFIG.devDeployPath + simName + '/' + version;
 
-  // mkdir first in case it doesn't exist already
-  await devSsh( 'mkdir -p ' + simVersionDirectory );
-  const buildDir = simDir + '/build';
+  try {
+    // mkdir first in case it doesn't exist already
+    await devSsh( 'mkdir -p ' + simVersionDirectory );
+    const buildDir = simDir + '/build';
 
-  // copy the files
-  if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
-    scpAll( buildDir, simVersionDirectory );
-    if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
-      await devScp( buildDir + '/.htaccess', simVersionDirectory + '/phet-io/wrappers/' );
+    // copy the files
+    let shouldFilter = ( file ) => { return false; };
+    if ( brands.includes( constants.PHET_BRAND ) ) {
+      if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
+        shouldFilter = ( file ) => {
+          // Filter file if it contains '/phet/' and if it contains '.html' but not if it contains '_en' or '_all'
+          if ( file.includes( '_en' ) || file.includes( '_all' ) ) {
+            return false;
+          }
+          else {
+            return file.includes( '/phet/' ) && file.includes( '.html' );
+          }
+        };
+
+      }
+      else if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ) {
+        shouldFilter = file => {
+          // Filter file if it contains '.html' but not if it contains '_en' or '_all'
+          if ( file.includes( '_en' ) || file.includes( '_all' ) ) {
+            return false;
+          }
+          else {
+            return file.includes( '.html' );
+          }
+        };
+      }
+      else {
+        return Promise.reject( 'Unsupported chipper version' );
+      }
     }
+    await scpAll( buildDir, simVersionDirectory, shouldFilter );
   }
-  else if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ){
-    if ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) {
-      // copy english and all html and all non-html files
-      await devScp( buildDir + '/' + simName + '_en.html', simVersionDirectory );
-      child_process.execSync( 'find . -type f ! -iname \'*.html\' -exec scp {} ' + simVersionDirectory + ' \\;', { cwd: buildDir } );
-      fs.readdirSync( buildDir ).forEach( ( filename ) => {
-        if ( !filename.includes( '.html' ) ) {
-          devScp( buildDir + filename, simVersionDirectory );
-        }
-      } );
-    }
-
-    if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
-      scpAll( buildDir, simVersionDirectory );
-      await devScp( buildDir + '/.htaccess', simVersionDirectory + '/wrappers/' );
-    }
-
-    if ( brands.indexOf( brands.indexOf( constants.PHET_BRAND ) < 0 && brands.indexOf( constants.PHET_IO_BRAND ) < 0 ) ) {
-      scpAll( buildDir, simVersionDirectory );
-    }
-  }
-  else {
-    return Promise.reject( 'Unsupported chipper version' );
+  catch
+    ( err ) {
+    return Promise.reject( err );
   }
 
-  await devSsh( 'chmod -R g+w ' + simVersionDirectory );
-};
+  return await devSsh( 'chmod -R g+w ' + simVersionDirectory );
+}
+;
