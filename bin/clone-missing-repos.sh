@@ -9,6 +9,7 @@
 #=============================================================================================
 
 binDir=`dirname "${BASH_SOURCE[0]}"`
+cd ${binDir}/../..
 
 for repo in `${binDir}/print-missing-repos.sh | xargs`
 do
