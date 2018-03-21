@@ -5,7 +5,6 @@
 
 const addToRosetta = require( './addToRosetta' );
 const addTranslator = require( './addTranslator' );
-const child_process = require( 'child_process' );
 const ChipperVersion = require( '../common/ChipperVersion' );
 const constants = require( './constants' );
 const createTranslationsXML = require( './createTranslationsXML' );
@@ -16,6 +15,7 @@ const getLocales = require( './getLocales' );
 const notifyServer = require( './notifyServer' );
 const pullMaster = require( './pullMaster' );
 const winston = require( 'winston' );
+const walk = require( 'walk' );
 const writeFile = require( './writeFile' );
 const writePhetHtaccess = require( './writePhetHtaccess' );
 const writePhetioHtaccess = require( './writePhetioHtaccess' );
@@ -139,29 +139,31 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
     await new Promise( ( resolve, reject ) => {
       fs.mkdir( buildDir, err => {
         // If there is an error, try to remove the directory and contents and try again
-        if ( err ) { fs.rmrf( buildDir, err => {
-          if ( err ) {
-            winston.error('Error removing previous build dir: ');
-            winston.error( err );
-            reject( err );
-          }
-          else {
-            winston.info('successfully removed old build dir');
-            fs.mkdir( buildDir, err => {
-              if ( err ) {
-                winston.error('Error creating new build dir: ');
-                winston.error( err );
-                reject( err );
-              }
-              else {
-                winston.info('successfully created build dir');
-                resolve();
-              }
-            } );
-          }
-        } ); }
+        if ( err ) {
+          fs.rmrf( buildDir, err => {
+            if ( err ) {
+              winston.error( 'Error removing previous build dir: ' );
+              winston.error( err );
+              reject( err );
+            }
+            else {
+              winston.info( 'successfully removed old build dir' );
+              fs.mkdir( buildDir, err => {
+                if ( err ) {
+                  winston.error( 'Error creating new build dir: ' );
+                  winston.error( err );
+                  reject( err );
+                }
+                else {
+                  winston.info( 'successfully created build dir' );
+                  resolve();
+                }
+              } );
+            }
+          } );
+        }
         else {
-          winston.info('successfully created build dir');
+          winston.info( 'successfully created build dir' );
           resolve();
         }
       } );
@@ -269,10 +271,25 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           }
           await new Promise( ( resolve, reject ) => {
             winston.debug( 'Copying recursive ' + sourceDir + ' to ' + targetDir );
-            fs.copyRecursive( sourceDir, targetDir, ( err ) => {
-              if ( err ) { reject( err ); }
-              else { resolve(); }
-            } );
+            walk.walk( sourceDir )
+              .on( 'file', ( root, fileStats, next ) => {
+                const path = targetDir + root.replace( sourceDir, '' );
+                const file = root + '/' + fileStats.name;
+                winston.debug( 'Copying file "' + file + '" to path "' + path + '"' );
+                fs.copy( file, path, err => {
+                  if ( err ) { reject( err ); }
+                  else { next(); }
+                } );
+              } )
+              .on( 'errors', ( root, nodeStatsArray ) => {
+                nodeStatsArray.forEach( nodeStats => {
+                  winston.error( JSON.stringify( nodeStats ) );
+                } );
+                reject( new Error( 'error during production deploy walk' ) );
+              } )
+              .on( 'end', () => {
+                resolve();
+              } );
           } );
 
           // Post-copy steps
