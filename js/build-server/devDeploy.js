@@ -23,7 +23,7 @@ const host = constants.BUILD_SERVER_CONFIG.devDeployServer;
 async function scpAll( buildDir, simVersionDirectory, shouldFilter ) {
   return new Promise( ( resolve, reject ) => {
     walk.walk( buildDir ).on( 'file', ( root, fileStats, next ) => {
-      const path = simVersionDirectory + root.replace( buildDir );
+      const path = simVersionDirectory + root.replace( buildDir, '' );
       const file = root + '/' + fileStats.name;
 
       if ( !shouldFilter( file ) ) {
