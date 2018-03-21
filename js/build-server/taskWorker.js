@@ -270,7 +270,13 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
                 const path = targetDir + root.replace( sourceDir, '' ) + fileStats.name;
                 const file = root + '/' + fileStats.name;
                 winston.debug( 'Copying file "' + file + '" to path "' + path + '"' );
-                return await copyFile( file, path );
+                try {
+                  await copyFile( file, path );
+                }
+                catch ( err ) {
+                  reject( err );
+                }
+                next();
               } )
               .on( 'errors', ( root, nodeStatsArray ) => {
                 nodeStatsArray.forEach( nodeStats => {
