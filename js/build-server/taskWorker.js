@@ -262,7 +262,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             sourceDir += brand + '/*';
           }
           else if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ) {
-            sourceDir += '/*';
+            sourceDir += '*';
           }
           else {
             return Promise.reject( 'Unsupported chipper version' );
