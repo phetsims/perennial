@@ -265,8 +265,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           await new Promise( ( resolve, reject ) => {
             winston.debug( 'Copying recursive ' + sourceDir + ' to ' + targetDir );
             walk.walk( sourceDir )
-              .on( 'file', ( root, fileStats, next ) => {
-                next();
+              .on( 'file', async ( root, fileStats, next ) => {
                 const path = targetDir + root.replace( sourceDir, '' ) + fileStats.name;
                 const file = root + '/' + fileStats.name;
                 winston.debug( 'Copying file "' + file + '" to path "' + path + '"' );
@@ -277,6 +276,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
                   }
                   else {
                     winston.debug( 'Copy success for ' + file );
+                    next();
                   }
                 } );
               } )
