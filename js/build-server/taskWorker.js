@@ -266,12 +266,12 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             winston.debug( 'Copying recursive ' + sourceDir + ' to ' + targetDir );
             walk.walk( sourceDir )
               .on( 'file', ( root, fileStats, next ) => {
+                next();
                 const path = targetDir + root.replace( sourceDir, '' ) + fileStats.name;
                 const file = root + '/' + fileStats.name;
                 winston.debug( 'Copying file "' + file + '" to path "' + path + '"' );
                 fs.copyFile( file, path, err => {
                   if ( err ) { reject( err ); }
-                  else { next(); }
                 } );
               } )
               .on( 'errors', ( root, nodeStatsArray ) => {
