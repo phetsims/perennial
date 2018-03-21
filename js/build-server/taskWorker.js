@@ -268,6 +268,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             return Promise.reject( 'Unsupported chipper version' );
           }
           await new Promise( ( resolve, reject ) => {
+            winston.debug( 'Copying recursive ' + sourceDir + ' to ' + targetDir );
             fs.copyRecursive( sourceDir, targetDir, ( err ) => {
               if ( err ) { reject( err ); }
               else { resolve(); }
