@@ -4,7 +4,7 @@
 'use strict';
 
 const constants = require( './constants' );
-const fs = require( 'fs.extra' ); // eslint-disable-line
+const fs = require( 'fs' );
 const winston = require( 'winston' );
 const writeFile = require( './writeFile' );
 
