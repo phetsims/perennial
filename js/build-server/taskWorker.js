@@ -10,7 +10,7 @@ const constants = require( './constants' );
 const createTranslationsXML = require( './createTranslationsXML' );
 const devDeploy = require( './devDeploy' );
 const execute = require( '../common/execute' );
-const fs = require( 'fs.extra' ); // eslint-disable-line
+const fs = require( 'fs' );
 const getLocales = require( './getLocales' );
 const notifyServer = require( './notifyServer' );
 const pullMaster = require( './pullMaster' );
@@ -137,30 +137,27 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
 
     // Create the temporary build dir, removing the existing dir if it exists.
     await new Promise( ( resolve, reject ) => {
-      fs.mkdir( buildDir, err => {
+      fs.mkdir( buildDir, async err => {
         // If there is an error, try to remove the directory and contents and try again
         if ( err ) {
-          fs.rmrf( buildDir, err => {
+          try {
+            await execute( 'rm', [ '-rf', buildDir ], '.' );
+          }
+          catch ( e ) {
+            reject( e );
+          }
+          fs.mkdir( buildDir, err => {
             if ( err ) {
-              winston.error( 'Error removing previous build dir: ' );
+              winston.error( 'Error creating new build dir: ' );
               winston.error( err );
               reject( err );
             }
             else {
-              winston.info( 'successfully removed old build dir' );
-              fs.mkdir( buildDir, err => {
-                if ( err ) {
-                  winston.error( 'Error creating new build dir: ' );
-                  winston.error( err );
-                  reject( err );
-                }
-                else {
-                  winston.info( 'successfully created build dir' );
-                  resolve();
-                }
-              } );
+              winston.info( 'successfully created build dir' );
+              resolve();
             }
           } );
+
         }
         else {
           winston.info( 'successfully created build dir' );
@@ -254,9 +251,11 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
 
           // Copy steps
           await new Promise( ( resolve, reject ) => {
-            fs.mkdirp( targetDir, err => {
-              if ( err ) { reject( err ); }
-              else { resolve(); }
+            fs.mkdir( targetDir, err => {
+              if ( err ) {
+                winston.info( err );
+              }
+              resolve();
             } );
           } );
           let sourceDir = simDir + '/build';
@@ -304,14 +303,6 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           }
         }
       }
-
-      // clean up the temporary build directory
-      await new Promise( ( resolve, reject ) => {
-        fs.rmrf( buildDir, err => {
-          if ( err ) { reject( err ); }
-          else { resolve(); }
-        } );
-      } );
     }
   }
   catch( err ) {
