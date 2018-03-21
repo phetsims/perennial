@@ -13,6 +13,7 @@ beers-law-lab
 bending-light
 blackbody-spectrum
 blast
+build-a-fraction
 build-a-molecule
 build-an-atom
 bumper
@@ -38,7 +39,9 @@ fluid-pressure-and-flow
 forces-and-motion-basics
 fraction-comparison
 fraction-matcher
+fractions-equality
 fractions-intro
+fractions-mixed-numbers
 friction
 function-builder
 function-builder-basics
@@ -82,6 +85,7 @@ simula-rasa
 states-of-matter
 states-of-matter-basics
 sun
+tambo
 trig-tour
 twixt
 under-pressure
