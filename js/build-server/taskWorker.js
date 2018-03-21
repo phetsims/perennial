@@ -272,7 +272,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
                 winston.debug( 'Copying file "' + file + '" to path "' + path + '"' );
                 fs.copyFile( file, path, err => {
                   if ( err ) {
-                    winston.error( err );
+                    winston.error( JSON.stringify( err ) );
                     reject( err );
                   }
                   else {
