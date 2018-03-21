@@ -5,7 +5,7 @@
 
 const constants = require( './constants' );
 const execute = require( '../common/execute' );
-const fs = require( 'graceful-fs' );
+const fs = require( 'graceful-fs' ); // eslint-disable-line
 const gitPull = require( '../common/gitPull' );
 const sendEmail = require( './sendEmail' );
 const writeFile = require( './writeFile' );

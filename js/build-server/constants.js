@@ -9,7 +9,7 @@
 /* eslint-env node */
 'use strict';
 
-const fs = require( 'graceful-fs' );
+const fs = require( 'graceful-fs' ); //eslint-disable-line
 const getBuildServerConfig = require( './getBuildServerConfig' );
 
 const BUILD_SERVER_CONFIG = getBuildServerConfig( fs );

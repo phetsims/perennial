@@ -3,7 +3,7 @@
 /* eslint-env node */
 'use strict';
 
-var assert = require( 'assert' );
+const assert = require( 'assert' );
 
 /**
  * Gets configuration information that is related to deploying sims.
@@ -44,8 +44,8 @@ function getDeployConfig( fs ) {
 
   //------------------------------------------------------------------------------------
   // read configuration file
-  var BUILD_LOCAL_FILENAME = process.env.HOME + '/.phet/build-local.json';
-  var buildLocalJSON = JSON.parse( fs.readFileSync( BUILD_LOCAL_FILENAME, { encoding: 'utf-8' } ) );
+  const BUILD_LOCAL_FILENAME = process.env.HOME + '/.phet/build-local.json';
+  const buildLocalJSON = JSON.parse( fs.readFileSync( BUILD_LOCAL_FILENAME, { encoding: 'utf-8' } ) );
   assert( buildLocalJSON.buildServerAuthorizationCode, 'buildServerAuthorizationCode missing from ' + BUILD_LOCAL_FILENAME );
   assert( buildLocalJSON.devUsername, 'devUsername missing from ' + BUILD_LOCAL_FILENAME );
 

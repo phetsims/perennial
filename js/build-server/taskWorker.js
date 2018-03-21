@@ -7,10 +7,11 @@ const addToRosetta = require( './addToRosetta' );
 const addTranslator = require( './addTranslator' );
 const ChipperVersion = require( '../common/ChipperVersion' );
 const constants = require( './constants' );
+const copyFile = require( './copyFile' );
 const createTranslationsXML = require( './createTranslationsXML' );
 const devDeploy = require( './devDeploy' );
 const execute = require( '../common/execute' );
-const fs = require( 'graceful-fs' );
+const fs = require( 'graceful-fs' ); //eslint-disable-line
 const getLocales = require( './getLocales' );
 const notifyServer = require( './notifyServer' );
 const pullMaster = require( './pullMaster' );
@@ -269,16 +270,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
                 const path = targetDir + root.replace( sourceDir, '' ) + fileStats.name;
                 const file = root + '/' + fileStats.name;
                 winston.debug( 'Copying file "' + file + '" to path "' + path + '"' );
-                fs.copyFile( file, path, err => {
-                  if ( err ) {
-                    winston.error( JSON.stringify( err ) );
-                    reject( err );
-                  }
-                  else {
-                    winston.debug( 'Copy success for ' + file );
-                    next();
-                  }
-                } );
+                return await copyFile( file, path );
               } )
               .on( 'errors', ( root, nodeStatsArray ) => {
                 nodeStatsArray.forEach( nodeStats => {
