@@ -261,13 +261,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           } );
           let sourceDir = simDir + '/build/';
           if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
-            sourceDir += brand + '/*';
-          }
-          else if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ) {
-            sourceDir += '*';
-          }
-          else {
-            return Promise.reject( 'Unsupported chipper version' );
+            sourceDir += brand + '/';
           }
           await new Promise( ( resolve, reject ) => {
             winston.debug( 'Copying recursive ' + sourceDir + ' to ' + targetDir );
