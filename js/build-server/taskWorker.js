@@ -259,15 +259,15 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
               else { resolve(); }
             } );
           } );
-          let sourceDir = simDir + '/build/';
+          let sourceDir = simDir + '/build';
           if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
-            sourceDir += brand + '/';
+            sourceDir += '/' + brand;
           }
           await new Promise( ( resolve, reject ) => {
             winston.debug( 'Copying recursive ' + sourceDir + ' to ' + targetDir );
             walk.walk( sourceDir )
               .on( 'file', ( root, fileStats, next ) => {
-                const path = targetDir + root.replace( sourceDir, '' );
+                const path = targetDir + root.replace( sourceDir, '' ) + '/' + fileStats.name;
                 const file = root + '/' + fileStats.name;
                 winston.debug( 'Copying file "' + file + '" to path "' + path + '"' );
                 fs.copy( file, path, err => {
