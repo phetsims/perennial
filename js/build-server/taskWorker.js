@@ -143,7 +143,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           try {
             await execute( 'rm', [ '-rf', buildDir ], '.' );
           }
-          catch ( e ) {
+          catch( e ) {
             reject( e );
           }
           fs.mkdir( buildDir, err => {
@@ -253,7 +253,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           await new Promise( ( resolve, reject ) => {
             fs.mkdir( targetDir, err => {
               if ( err ) {
-                winston.info( err );
+                winston.info( 'Error on mkdir, probably due to the fact that the target already exists' );
               }
               resolve();
             } );
@@ -271,7 +271,13 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
                 const file = root + '/' + fileStats.name;
                 winston.debug( 'Copying file "' + file + '" to path "' + path + '"' );
                 fs.copyFile( file, path, err => {
-                  if ( err ) { reject( err ); }
+                  if ( err ) {
+                    winston.error( err );
+                    reject( err );
+                  }
+                  else {
+                    winston.debug( 'Copy success for ' + file );
+                  }
                 } );
               } )
               .on( 'errors', ( root, nodeStatsArray ) => {
