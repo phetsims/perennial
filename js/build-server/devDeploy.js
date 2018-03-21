@@ -69,32 +69,21 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
     // copy the files
     let shouldFilter = ( file ) => { return false; };
     if ( brands.includes( constants.PHET_BRAND ) ) {
-      if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
-        shouldFilter = ( file ) => {
-          // Filter file if it contains '/phet/' and if it contains '.html' but not if it contains '_en' or '_all'
-          if ( file.includes( '_en' ) || file.includes( '_all' ) ) {
-            return false;
-          }
-          else {
+      shouldFilter = ( file ) => {
+        // Do not filter file if it contains if it contains '_en' or '_all' unless it is the canadian translation.
+        if ( file.includes( '_en' ) || file.includes( '_all' ) ) {
+          return file.includes( '_en_CA' );
+        }
+        else {
+          // Second check for phet brand for chipper 2.0
+          if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
             return file.includes( '/phet/' ) && file.includes( '.html' );
           }
-        };
-
-      }
-      else if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ) {
-        shouldFilter = file => {
-          // Filter file if it contains '.html' but not if it contains '_en' or '_all'
-          if ( file.includes( '_en' ) || file.includes( '_all' ) ) {
-            return false;
-          }
-          else {
+          else if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ) {
             return file.includes( '.html' );
           }
-        };
-      }
-      else {
-        return Promise.reject( 'Unsupported chipper version' );
-      }
+        }
+      };
     }
     await scpAll( buildDir, simVersionDirectory, shouldFilter );
   }
