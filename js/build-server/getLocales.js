@@ -4,7 +4,7 @@
 'use strict';
 
 const constants = require( './constants' );
-const fs = require( 'fs' );
+const fs = require( 'graceful-fs' );
 const getSortedVersionDirectories = require( './getSortedVersionDirectories' );
 const parseString = require( 'xml2js' ).parseString; // eslint-disable-line
 const winston = require( 'winston' );

@@ -4,7 +4,7 @@
 'use strict';
 
 const constants = require( './constants' );
-const fs = require( 'fs' );
+const fs = require( 'graceful-fs' );
 const winston = require( 'winston' );
 const writeFile = require( './writeFile' );
 

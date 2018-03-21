@@ -3,7 +3,7 @@
 /* eslint-env node */
 'use strict';
 
-const fs = require( 'fs' );
+const fs = require( 'graceful-fs' );
 
 /**
  * Define a helper function that will get a list of the PhET-style version directories at the given path.  The

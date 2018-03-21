@@ -5,7 +5,7 @@
 
 const constants = require( './constants' );
 const execute = require( '../common/execute' );
-const fs = require( 'fs' );
+const fs = require( 'graceful-fs' );
 const gitPull = require( '../common/gitPull' );
 const sendEmail = require( './sendEmail' );
 const writeFile = require( './writeFile' );

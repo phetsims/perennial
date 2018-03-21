@@ -3,7 +3,7 @@
 /* eslint-env node */
 'use strict';
 
-const fs = require( 'fs' ); // eslint-disable-line
+const fs = require( 'graceful-fs' ); // eslint-disable-line
 const winston = require( 'winston' );
 
 module.exports = async function ( filepath, contents ) {
