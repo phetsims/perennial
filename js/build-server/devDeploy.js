@@ -27,6 +27,7 @@ async function scpAll( buildDir, simVersionDirectory, shouldFilter ) {
       const file = root + '/' + fileStats.name;
 
       if ( !shouldFilter( file ) ) {
+        winston.debug( 'Sending file "' + file + '" to dev server path "' + path + '"' );
         scp.send( { file, path, user, host }, err => {
           if ( err ) { reject( err ); }
           else { next(); }
