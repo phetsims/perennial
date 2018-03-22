@@ -49,7 +49,7 @@ async function scpAll( buildDir, simVersionDirectory, shouldFilter ) {
   }
   else {
     return new Promise( ( resolve, reject ) => {
-      scp.send( { file: buildDir, path: simVersionDirectory, user, host }, err => {
+      scp.send( { file: buildDir + '*', path: simVersionDirectory, user, host }, err => {
         if ( err ) { reject( err ); }
         else { resolve(); }
       } );
