@@ -6,6 +6,7 @@
 
 const constants = require( './constants' );
 const devSsh = require( '../common/devSsh' );
+const rsync = require( 'rsync' );
 const scp = require( 'scp' );
 const walk = require( 'walk' );
 const winston = require( 'winston' );
@@ -49,13 +50,14 @@ async function scpAll( buildDir, simVersionDirectory, shouldFilter ) {
   }
   else {
     return new Promise( ( resolve, reject ) => {
-      const file = buildDir + '/*';
-      const path = simVersionDirectory;
-      winston.debug( 'Copying ' + file + ' to ' + path );
-      scp.send( { file, path, user, host }, err => {
-        if ( err ) { reject( err ); }
-        else { resolve(); }
-      } );
+      new rsync()
+        .flags( 'razp' )
+        .source( buildDir )
+        .destination( user + '@' + host + ':' + simVersionDirectory )
+        .execute( err => {
+          if ( err ) { reject( err ); }
+          else { resolve(); }
+        } );
     } );
   }
 }
@@ -99,6 +101,9 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
       };
     }
     await scpAll( buildDir, simVersionDirectory, shouldFilter );
+    if ( brands.includes( constants.PHET_IO_BRAND ) ) {
+
+    }
   }
   catch
     ( err ) {
