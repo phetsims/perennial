@@ -53,7 +53,7 @@ async function scpAll( buildDir, simVersionDirectory, shouldFilter ) {
       new rsync()
         .set( 'rsync-path', '/usr/local/bin/rsync' )
         .flags( 'razp' )
-        .source( buildDir )
+        .source( buildDir + '/' )
         .destination( user + '@' + host + ':' + simVersionDirectory )
         .execute( ( err, code, cmd ) => {
           if ( err ) {
