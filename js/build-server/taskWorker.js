@@ -273,7 +273,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
                 } );
               } )
               .on( 'file', async ( root, fileStats, next ) => {
-                const path = targetDir + root.replace( sourceDir + '/', '' ) + '/' + fileStats.name;
+                const path = targetDir + root.replace( sourceDir, '' ) + fileStats.name;
                 const file = root + '/' + fileStats.name;
                 winston.debug( 'Copying file "' + file + '" to path "' + path + '"' );
                 try {
