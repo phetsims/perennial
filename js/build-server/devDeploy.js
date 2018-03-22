@@ -51,7 +51,7 @@ async function scpAll( buildDir, simVersionDirectory, shouldFilter ) {
   else {
     return new Promise( ( resolve, reject ) => {
       new rsync()
-        .shell( 'ssh' )
+        .set( 'rsync-path', '/usr/local/bin/rsync' )
         .flags( 'razp' )
         .source( buildDir )
         .destination( user + '@' + host + ':' + simVersionDirectory )
