@@ -7,7 +7,6 @@ const addToRosetta = require( './addToRosetta' );
 const addTranslator = require( './addTranslator' );
 const ChipperVersion = require( '../common/ChipperVersion' );
 const constants = require( './constants' );
-// const copyFile = require( './copyFile' );
 const createTranslationsXML = require( './createTranslationsXML' );
 const devDeploy = require( './devDeploy' );
 const execute = require( '../common/execute' );
@@ -17,7 +16,6 @@ const notifyServer = require( './notifyServer' );
 const pullMaster = require( './pullMaster' );
 const rsync = require( 'rsync' );
 const winston = require( 'winston' );
-// const walk = require( 'walk' );
 const writeFile = require( './writeFile' );
 const writePhetHtaccess = require( './writePhetHtaccess' );
 const writePhetioHtaccess = require( './writePhetioHtaccess' );
@@ -275,41 +273,6 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
                 }
                 else { resolve(); }
               } );
-
-            // walk.walk( sourceDir )
-            //   .on( 'directory', ( root, dirStats, next ) => {
-            //     const path = targetDir + root.replace( sourceDir + '/', '' ) + '/' + dirStats.name;
-            //     fs.mkdir( path, err => {
-            //       if ( err ) {
-            //         console.log( 'error creating path, probably already exists' );
-            //       }
-            //       next();
-            //     } );
-            //   } )
-            //   .on( 'file', async ( root, fileStats, next ) => {
-            //     const pathDir = targetDir + root.replace( sourceDir, '' );
-            //     const path = pathDir + fileStats.name;
-            //     const file = root + '/' + fileStats.name;
-            //
-            //     await new Promise( r => { fs.mkdir( pathDir, () => { r(); } ); } );
-            //     winston.debug( 'Copying file "' + file + '" to path "' + path + '"' );
-            //     try {
-            //       await copyFile( file, path );
-            //     }
-            //     catch( err ) {
-            //       reject( err );
-            //     }
-            //     next();
-            //   } )
-            //   .on( 'errors', ( root, nodeStatsArray ) => {
-            //     nodeStatsArray.forEach( nodeStats => {
-            //       winston.error( JSON.stringify( nodeStats ) );
-            //     } );
-            //     reject( new Error( 'error during production deploy walk' ) );
-            //   } )
-            //   .on( 'end', () => {
-            //     resolve();
-            //   } );
           } );
 
           // Post-copy steps
@@ -326,7 +289,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             }
           }
           else if ( brand === constants.PHET_IO_BRAND ) {
-            await writePhetioHtaccess( constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess', '/etc/httpd/conf/phet-io_pw', simName, version );
+            await writePhetioHtaccess( constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess', '/etc/httpd/conf/phet-io_pw', simName, originalVersion );
           }
         }
       }
