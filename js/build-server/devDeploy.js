@@ -17,34 +17,44 @@ const host = constants.BUILD_SERVER_CONFIG.devDeployServer;
  * Performs a recursive copy to the dev server
  * @param {String} buildDir - filepath of build directory
  * @param {String} simVersionDirectory - target filepath
- * @param {function} shouldFilter - shouldFilter( file:string ) : {boolean}
+ * @param {function(file:string):{boolean}} shouldFilter - shouldFilter
  * @returns {Promise<any>}
  */
 async function scpAll( buildDir, simVersionDirectory, shouldFilter ) {
-  return new Promise( ( resolve, reject ) => {
-    walk.walk( buildDir ).on( 'file', ( root, fileStats, next ) => {
-      const path = simVersionDirectory + root.replace( buildDir, '' );
-      const file = root + '/' + fileStats.name;
+  if ( shouldFilter ) {
+    return new Promise( ( resolve, reject ) => {
+      walk.walk( buildDir ).on( 'file', ( root, fileStats, next ) => {
+        const path = simVersionDirectory + root.replace( buildDir, '' );
+        const file = root + '/' + fileStats.name;
 
-      if ( !shouldFilter( file ) ) {
-        winston.debug( 'Sending file "' + file + '" to dev server path "' + path + '"' );
-        scp.send( { file, path, user, host }, err => {
-          if ( err ) { reject( err ); }
-          else { next(); }
+        if ( !shouldFilter( file ) ) {
+          winston.debug( 'Sending file "' + file + '" to dev server path "' + path + '"' );
+          scp.send( { file, path, user, host }, err => {
+            if ( err ) { reject( err ); }
+            else { next(); }
+          } );
+        }
+        else {
+          next();
+        }
+      } ).on( 'errors', ( root, nodeStatsArray ) => {
+        nodeStatsArray.forEach( nodeStats => {
+          winston.error( JSON.stringify( nodeStats ) );
         } );
-      }
-      else {
-        next();
-      }
-    } ).on( 'errors', ( root, nodeStatsArray ) => {
-      nodeStatsArray.forEach( nodeStats => {
-        winston.error( JSON.stringify( nodeStats ) );
+        reject( new Error( 'error during dev deploy walk' ) );
+      } ).on( 'end', () => {
+        resolve();
       } );
-      reject( new Error( 'error during dev deploy walk' ) );
-    } ).on( 'end', () => {
-      resolve();
     } );
-  } );
+  }
+  else {
+    return new Promise( ( resolve, reject ) => {
+      scp.send( { file: buildDir, path: simVersionDirectory, user, host }, err => {
+        if ( err ) { reject( err ); }
+        else { resolve(); }
+      } );
+    } );
+  }
 }
 
 /**
@@ -67,7 +77,7 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
     const buildDir = simDir + '/build';
 
     // copy the files
-    let shouldFilter = ( file ) => { return false; };
+    let shouldFilter = null;
     if ( brands.includes( constants.PHET_BRAND ) ) {
       shouldFilter = ( file ) => {
         // Do not filter file if it contains if it contains '_en' or '_all' unless it is the canadian translation.
