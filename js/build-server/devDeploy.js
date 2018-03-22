@@ -54,8 +54,12 @@ async function scpAll( buildDir, simVersionDirectory, shouldFilter ) {
         .flags( 'razp' )
         .source( buildDir )
         .destination( user + '@' + host + ':' + simVersionDirectory )
-        .execute( err => {
-          if ( err ) { reject( err ); }
+        .execute( ( err, code, cmd ) => {
+          if ( err ) {
+            winston.debug( code );
+            winston.debug( cmd );
+            reject( err );
+          }
           else { resolve(); }
         } );
     } );
