@@ -263,14 +263,23 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           await new Promise( ( resolve, reject ) => {
             winston.debug( 'Copying recursive ' + sourceDir + ' to ' + targetDir );
             walk.walk( sourceDir )
+              .on( 'directory', ( root, dirStats, next ) => {
+                const path = targetDir + root.replace( sourceDir + '/', '' ) + '/' + dirStats.name;
+                fs.mkdir( path, err => {
+                  if ( err ) {
+                    console.log( 'error creating path, probably already exists' );
+                  }
+                  next();
+                } );
+              } )
               .on( 'file', async ( root, fileStats, next ) => {
-                const path = targetDir + root.replace( sourceDir, '' ) + fileStats.name;
+                const path = targetDir + root.replace( sourceDir + '/', '' ) + '/' + fileStats.name;
                 const file = root + '/' + fileStats.name;
                 winston.debug( 'Copying file "' + file + '" to path "' + path + '"' );
                 try {
                   await copyFile( file, path );
                 }
-                catch ( err ) {
+                catch( err ) {
                   reject( err );
                 }
                 next();
