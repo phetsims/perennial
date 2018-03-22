@@ -129,9 +129,6 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
         return abortBuild( 'invalid version number: ' + version );
       }
     }
-    else {
-      // TODO: handle version validation for https://github.com/phetsims/chipper/issues/560
-    }
 
     const simDir = '../' + simName;
     winston.log( 'info', 'building sim ' + simName );
@@ -303,7 +300,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             }
           }
           else if ( brand === constants.PHET_IO_BRAND ) {
-            await writePhetioHtaccess( constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess', '/etc/httpd/conf/phet-io_pw' );
+            await writePhetioHtaccess( constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess', '/etc/httpd/conf/phet-io_pw', simName, version );
           }
         }
       }
