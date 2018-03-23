@@ -7,65 +7,11 @@
 const constants = require( './constants' );
 const devSsh = require( '../common/devSsh' );
 const rsync = require( 'rsync' );
-const scp = require( 'scp' );
-const walk = require( 'walk' );
 const winston = require( 'winston' );
+const writeFile = require( 'writeFile' );
 
 const user = constants.BUILD_SERVER_CONFIG.devUsername;
 const host = constants.BUILD_SERVER_CONFIG.devDeployServer;
-
-/**
- * Performs a recursive copy to the dev server
- * @param {String} buildDir - filepath of build directory
- * @param {String} simVersionDirectory - target filepath
- * @param {function(file:string):{boolean}} shouldFilter - shouldFilter
- * @returns {Promise<any>}
- */
-async function scpAll( buildDir, simVersionDirectory, shouldFilter ) {
-  if ( shouldFilter ) {
-    return new Promise( ( resolve, reject ) => {
-      walk.walk( buildDir ).on( 'file', ( root, fileStats, next ) => {
-        const path = simVersionDirectory + root.replace( buildDir, '' );
-        const file = root + '/' + fileStats.name;
-
-        if ( !shouldFilter( file ) ) {
-          winston.debug( 'Sending file "' + file + '" to dev server path "' + path + '"' );
-          scp.send( { file, path, user, host }, err => {
-            if ( err ) { reject( err ); }
-            else { next(); }
-          } );
-        }
-        else {
-          next();
-        }
-      } ).on( 'errors', ( root, nodeStatsArray ) => {
-        nodeStatsArray.forEach( nodeStats => {
-          winston.error( JSON.stringify( nodeStats ) );
-        } );
-        reject( new Error( 'error during dev deploy walk' ) );
-      } ).on( 'end', () => {
-        resolve();
-      } );
-    } );
-  }
-  else {
-    return new Promise( ( resolve, reject ) => {
-      new rsync()
-        .set( 'rsync-path', '/usr/local/bin/rsync' )
-        .flags( 'razp' )
-        .source( buildDir + '/' )
-        .destination( user + '@' + host + ':' + simVersionDirectory )
-        .execute( ( err, code, cmd ) => {
-          if ( err ) {
-            winston.debug( code );
-            winston.debug( cmd );
-            reject( err );
-          }
-          else { resolve(); }
-        } );
-    } );
-  }
-}
 
 /**
  * Copy files to dev server, typically spot.colorado.edu.
@@ -87,28 +33,31 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
     const buildDir = simDir + '/build';
 
     // copy the files
-    let shouldFilter = null;
     if ( brands.includes( constants.PHET_BRAND ) ) {
-      shouldFilter = ( file ) => {
-        // Do not filter file if it contains if it contains '_en' or '_all' unless it is the canadian translation.
-        if ( file.includes( '_en' ) || file.includes( '_all' ) ) {
-          return file.includes( '_en_CA' );
-        }
-        else {
-          // Second check for phet brand for chipper 2.0
-          if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
-            return file.includes( '/phet/' ) && file.includes( '.html' );
-          }
-          else if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ) {
-            return file.includes( '.html' );
-          }
-        }
-      };
-    }
-    await scpAll( buildDir, simVersionDirectory, shouldFilter );
-    if ( brands.includes( constants.PHET_IO_BRAND ) ) {
+      let targetDir = buildDir;
+      if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
+        targetDir += '/phet';
+      }
+      targetDir += '/.rsync-filter';
 
+      const rsyncFilterContents = '+ *_en*\n+ *_all*\n- *.html';
+      await writeFile( targetDir, rsyncFilterContents );
     }
+    return new Promise( ( resolve, reject ) => {
+      new rsync()
+        .set( 'rsync-path', '/usr/local/bin/rsync' )
+        .flags( 'razpFF' )
+        .source( buildDir + '/' )
+        .destination( user + '@' + host + ':' + simVersionDirectory )
+        .execute( ( err, code, cmd ) => {
+          if ( err ) {
+            winston.debug( code );
+            winston.debug( cmd );
+            reject( err );
+          }
+          else { resolve(); }
+        } );
+    } );
   }
   catch
     ( err ) {

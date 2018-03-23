@@ -17,14 +17,10 @@
     "minimist": "^1.1.1",
     "qunit": "~2.4.1",
     "request": "^2.55.0",
-    "scp": "0.0.3",
+    "rsync": "^0.6.1",
     "thread-sleep": "^2.0.0",
-    "walk": "^2.3.9",
     "winston": "^0.9.0",
     "winston-loggly": "^1.3.1",
     "xml2js": "^0.4.15"
-  },
-  "dependencies": {
-    "rsync": "^0.6.1"
   }
 }
