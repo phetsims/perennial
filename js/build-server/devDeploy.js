@@ -40,10 +40,10 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
       }
       targetDir += '/.rsync-filter';
 
-      const rsyncFilterContents = '+ *_en*\n+ *_all*\n- *.html';
+      const rsyncFilterContents = '+ *_en*\n+ *_all*\n- *_CA*\n- *.html';
       await writeFile( targetDir, rsyncFilterContents );
     }
-    return new Promise( ( resolve, reject ) => {
+    await new Promise( ( resolve, reject ) => {
       new rsync()
         .set( 'rsync-path', '/usr/local/bin/rsync' )
         .flags( 'razpFF' )
@@ -65,5 +65,4 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
   }
 
   return await devSsh( 'chmod -R g+w ' + simVersionDirectory );
-}
-;
+};
