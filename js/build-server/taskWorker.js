@@ -265,10 +265,10 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
               .flags( 'razp' )
               .source( sourceDir + '/' )
               .destination( targetDir )
-              .output( stdout => { winston.debug( JSON.stringify( stdout ) ); },
-                stderr => { winston.error( JSON.stringify( stderr ) ); } )
+              .output( stdout => { winston.debug( stdout.toString() ); },
+                stderr => { winston.error( stderr.toString() ); } )
               .execute( ( err, code, cmd ) => {
-                if ( err ) {
+                if ( err && code !== 23 ) {
                   winston.debug( code );
                   winston.debug( cmd );
                   reject( err );
