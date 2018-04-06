@@ -14,7 +14,7 @@ const user = constants.BUILD_SERVER_CONFIG.devUsername;
 const host = constants.BUILD_SERVER_CONFIG.devDeployServer;
 
 /**
- * Copy files to dev server, typically spot.colorado.edu.
+ * Copy files to dev server, typically bayes.colorado.edu.
  *
  * @param simDir
  * @param simName

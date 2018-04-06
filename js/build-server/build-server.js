@@ -91,6 +91,7 @@ function queueDeployApiVersion1( req, res, key ) {
   const translatorId = decodeURIComponent( req[ key ][ constants.USER_ID_KEY ] ) || null;
   const authorizationKey = decodeURIComponent( req[ key ][ constants.AUTHORIZATION_KEY ] );
 
+  // TODO: determine if this comment needs updating for chipper 1.0 deploys
   // For RC deploys, only send to spot.  For production deploys, the local build will send to spot so the build-server
   // only sends to the production server (phet-server).
   const servers = ( option === 'rc' ) ? [ constants.DEV_SERVER ] : [ constants.PRODUCTION_SERVER ];

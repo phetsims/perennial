@@ -18,6 +18,8 @@ To start, stop, or restart the build server on figaro or simian, run this comman
 
 ## Build Server Configuration
 
+The "dev server" is currently `bayes.colorado.edu`.
+The "production server" is currently `phet-server.colorado.edu`
 
 All of the phet repos live on the production and dev servers under /data/share/phet/phet-repos. The build server
 lives in perennial: `/data/share/phet/phet-repos/perennial/js/build-server`.
@@ -29,19 +31,19 @@ The build server is configured to send an email on build failure. The configurat
 phet-admin's `HOME/.phet/build-local.json` (these fields are described in getBuildServerConfig.js). To add other email
 recipients, you can add email addresses to the emailTo field in this file.
 
-Additionally, phet-admin needs an ssh key set up to copy files from the production server to spot. This should already be set up,
+Additionally, phet-admin needs an ssh key set up to copy files from the production server to the dev server. This should already be set up,
 but should you to do to set it up somewhere else, you'll need to have an rsa key in ~/.ssh on the production server and authorized
 (run "ssh-keygen -t rsa" to generate a key if you don't already have one).
-Also, you will need to add an entry for spot in `~/.ssh/config` like so:
+Also, you will need to add an entry for the dev server in `~/.ssh/config` like so:
 
 ```
-Host spot
-    HostName spot.colorado.edu
+Host {{dev server host name, e.g. bayes}}
+    HostName {{dev server FQDN, e.g. bayes.colorado.edu.}}
     User [identikey]
     Port 22
     IdentityFile ~/.ssh/id_rsa
 ```
-On spot, you'll need to add the public key from phet-server to a file ~/.ssh/authorized_keys
+On the dev server, you'll need to add the public key from the production server to a file ~/.ssh/authorized_keys.  You can usually do this by running `ssh-copy-id {{dev server}}`.
 
 build-server log files can be tailed by running /usr/lib/systemd/system/build-server.service
 
@@ -97,7 +99,7 @@ The build server does the following steps when a deploy request is received:
 - npm update in chipper and the sim directory
 - grunt build-for-server --brands=phet for selected locales (see chipper's Gruntfile for details)
 - for rc deploys:
-    - deploy to spot, checkout master for all repositories, and finish
+    - deploy to the dev server, checkout master for all repositories, and finish
 - for production deploys:
     - mkdir for the new sim version
     - copy the build files to the correct location in the server doc root

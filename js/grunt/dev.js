@@ -123,10 +123,10 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
     await devScp( `../${repo}/build/${brand}`, `${versionPath}/` );
   }
 
-  // If there is a protected directory and we are copying to spot, include the .htaccess file
+  // If there is a protected directory and we are copying to the dev server, include the .htaccess file
   // This is for PhET-iO simulations, to protected the password protected wrappers, see
   // https://github.com/phetsims/phet-io/issues/641
-  if ( brands.includes( 'phet-io' ) && buildLocal.devDeployServer === 'spot.colorado.edu' ) {
+  if ( brands.includes( 'phet-io' ) && buildLocal.devDeployServer === 'bayes.colorado.edu' ) {
     await devScp( '../phet-io/templates/spot/.htaccess', `${versionPath}/phet-io/wrappers/.htaccess` );
   }
 

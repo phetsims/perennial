@@ -15,8 +15,8 @@
  * MAINTENANCE: Sequential integer, starts at 0, and is incremented whenever we build with the same major/minor (but with different SHAs).
  *   Resets to 0 whenever the minor number is incremented.
  * TEST_TYPE (when present): Indicates that this is a non-production build when present. Typically will take the values:
- *   'dev' - A normal dev deployment, which goes to spot (www.colorado.edu/physics/phet/dev/html/)
- *   'rc' -  A release-candidate deployment (off of a release branch). Also goes to spot only.
+ *   'dev' - A normal dev deployment, which goes to www.colorado.edu/physics/phet/dev/html/
+ *   'rc' -  A release-candidate deployment (off of a release branch). Also goes to www.colorado.edu/physics/phet/dev/html/ only.
  *   anything else - A one-off deployment name, which is the same name as the branch it was deployed from.
  * TEST_NUMBER (when present): Indicates the version of the test/one-off type (gets incremented for every deployment).
  *   starts at 0 in package.json, but since it is incremented on every deploy, the first version published will be 1.

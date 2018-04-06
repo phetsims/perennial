@@ -792,8 +792,8 @@ module.exports = function( doneCallback ) {
      * Deploys an RC for this simulation for the maintenance release. Bumps the version as necessary.
      * @public
      *
-     * NOTE: Recommended to execute "exec ssh-agent bash" and ensure SSH to spot will work without any user input.
-     *       This is untested with any SCP needing a password entered inline (that will probably fail).
+     * NOTE: Recommended to execute "exec ssh-agent bash" and ensure ssh to the dev server will work without any user input.
+     *       This is untested with any scp needing a password entered inline (that will probably fail).
      *
      * @param {string} simName
      * @param {string} message - Additional information for the version-bump commit.
@@ -858,8 +858,8 @@ module.exports = function( doneCallback ) {
      * Deploys a simulation to production with the patches, bumping the version number as necessary.
      * @public
      *
-     * NOTE: Recommended to execute "exec ssh-agent bash" and ensure SSH to spot will work without any user input.
-     *       This is untested with any SCP needing a password entered inline (that will probably fail).
+     * NOTE: Recommended to execute "exec ssh-agent bash" and ensure ssh to the dev server will work without any user input.
+     *       This is untested with any scp needing a password entered inline (that will probably fail).
      *
      * @param {string} simName
      * @param {string} message - Additional information for the version-bump commit.
