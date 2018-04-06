@@ -33,8 +33,8 @@ module.exports = {
     return buildLocalObject.buildServerAuthorizationCode;
   },
   // Wrappers are now deployed to the dev location (for convenience)
-  devDeployServer: buildLocalObject.devDeployServer || 'spot.colorado.edu',
-  devDeployPath: buildLocalObject.devDeployPath || '/htdocs/physics/phet/dev/html/',
+  devDeployServer: buildLocalObject.devDeployServer || 'bayes.colorado.edu',
+  devDeployPath: buildLocalObject.devDeployPath || '/data/web/htdocs/dev/',
   buildServerNotifyEmail: buildLocalObject.buildServerNotifyEmail || null,
   productionServerURL: buildLocalObject.productionServerURL || 'https://phet.colorado.edu'
 };

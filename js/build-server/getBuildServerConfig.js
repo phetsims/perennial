@@ -17,7 +17,7 @@ const assert = require( 'assert' );
  *
  * Optional:
  * {string} devDeployServer - name of the dev server, defaults to 'bayes.colorado.edu'
- * {string} devDeployPath - path on dev server to deploy to, defaults to '/htdocs/physics/phet/dev/html/'
+ * {string} devDeployPath - path on dev server to deploy to, defaults to '/data/web/htdocs/dev'
  * {string} productionServerName - production server name, defaults to 'phet-server.int.colorado.edu', can be over-ridden to dev server for testing
  * {string} productionServerURL - production server url, defaults to 'https://phet.colorado.edu', can be over-ridden to 'https://phet-dev.colorado.edu'
  *
@@ -55,7 +55,7 @@ function getDeployConfig( fs ) {
   return {
     buildServerAuthorizationCode: buildLocalJSON.buildServerAuthorizationCode,
     databaseAuthorizationCode: buildLocalJSON.databaseAuthorizationCode,
-    devDeployPath: buildLocalJSON.devDeployPath || '/htdocs/physics/phet/dev/html/',
+    devDeployPath: buildLocalJSON.devDeployPath || '/data/web/htdocs/dev',
     devDeployServer: buildLocalJSON.devDeployServer || 'bayes.colorado.edu',
     devUsername: buildLocalJSON.devUsername,
     emailPassword: buildLocalJSON.emailPassword,
