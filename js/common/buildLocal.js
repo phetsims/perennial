@@ -34,7 +34,7 @@ module.exports = {
   },
   // Wrappers are now deployed to the dev location (for convenience)
   devDeployServer: buildLocalObject.devDeployServer || 'bayes.colorado.edu',
-  devDeployPath: buildLocalObject.devDeployPath || '/data/web/htdocs/dev/',
+  devDeployPath: buildLocalObject.devDeployPath || '/data/web/htdocs/dev/html',
   buildServerNotifyEmail: buildLocalObject.buildServerNotifyEmail || null,
   productionServerURL: buildLocalObject.productionServerURL || 'https://phet.colorado.edu'
 };
