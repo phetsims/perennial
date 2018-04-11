@@ -31,7 +31,7 @@ module.exports = function( directory ) {
     }
   } ).catch( reason => {
     if ( reason.stderr.includes( 'Connection timed out' ) ) {
-      throw new Error( 'Cannot reach the dev server.  Check that you have an internet connection and that you are either on campus or on the VPN.')
+      throw new Error( 'Cannot reach the dev server.  Check that you have an internet connection and that you are either on campus or on the VPN.' );
     }
     throw new Error( reason );
   } );
