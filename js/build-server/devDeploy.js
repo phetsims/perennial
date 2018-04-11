@@ -45,7 +45,6 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
     }
     await new Promise( ( resolve, reject ) => {
       new rsync()
-        .set( 'rsync-path', '/usr/local/bin/rsync' )
         .flags( 'razpFF' )
         .source( buildDir + '/' )
         .destination( user + '@' + host + ':' + simVersionDirectory )
