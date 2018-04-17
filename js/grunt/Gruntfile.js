@@ -416,7 +416,7 @@ module.exports = function( grunt ) {
     require( '../../../chipper/js/grunt/lint' )( grunt.file.read( 'data/active-repos' ).trim().split( /\r?\n/ ), cache );
   } ) );
 
-  grunt.registerTask( 'generate-data', '[NOTE: Runs automatically on bayes] Generates the lists under perennial/data/, and if there were changes, will commit and push.', wrapTask( async () => {
+  grunt.registerTask( 'generate-data', '[NOTE: Runs automatically on bayes. DO NOT run locally] Generates the lists under perennial/data/, and if there were changes, will commit and push.', wrapTask( async () => {
     await generateData( grunt );
   } ) );
 };
