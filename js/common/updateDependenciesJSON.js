@@ -9,6 +9,7 @@
 'use strict';
 
 // modules
+const ChipperVersion = require( '../common/ChipperVersion' );
 const copyFile = require( './copyFile' );
 const gitAdd = require( './gitAdd' );
 const gitCommit = require( './gitCommit' );
@@ -28,7 +29,23 @@ const winston = require( 'winston' );
 module.exports = async function( repo, brands, versionString, branch ) {
   winston.info( `updating top-level dependencies.json for ${repo} ${versionString}` );
 
-  await copyFile( `../${repo}/build/${brands[ 0 ]}/dependencies.json`, `../${repo}/dependencies.json` );
+  const chipperVersion = ChipperVersion.getFromRepository();
+
+  let buildDepdenciesFile;
+
+  // Chipper "1.0" (it was called such) had version 0.0.0 in its package.json
+  if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ) {
+    buildDepdenciesFile = `../${repo}/build/dependencies.json`;
+  }
+  // Chipper 2.0
+  else if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
+    buildDepdenciesFile = `../${repo}/build/${brands[ 0 ]}/dependencies.json`;
+  }
+  else {
+    throw new Error( `unsupported chipper version: ${chipperVersion.toString()}` );
+  }
+
+  await copyFile( buildDepdenciesFile, `../${repo}/dependencies.json` );
   await gitAdd( repo, 'dependencies.json' );
   await gitCommit( repo, `updated dependencies.json for version ${versionString}` );
   await gitPush( repo, branch );
