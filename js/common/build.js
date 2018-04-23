@@ -55,7 +55,7 @@ module.exports = async function( repo, options ) {
     if ( twitterCard ) {
       args.push( 'generate-twitter-card' );
     }
-    args.push( `--brand=${brands[ 0 ]}}` );
+    args.push( `--brand=${brands[ 0 ]}` );
     args.push( `--locales=${locales}` );
     if ( !uglify ) {
       args.push( '--uglify=false' );
