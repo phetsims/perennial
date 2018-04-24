@@ -144,7 +144,9 @@ module.exports = function( grunt ) {
     '--repo : repository to check for the SHA\n' +
     '--sha : git SHA',
     wrapTask( async () => {
-      shaCheck( this.async() ).check( grunt.option( 'repo' ), grunt.option( 'sha' ) );
+      await new Promise( ( resolve, reject ) => {
+        shaCheck( resolve ).check( grunt.option( 'repo' ), grunt.option( 'sha' ) );
+      } );
     } ) );
 
   grunt.registerTask( 'maintenance-start',
@@ -152,7 +154,9 @@ module.exports = function( grunt ) {
     'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
     '--sims : A comma-separated list of simulations that may be involved in this maintenance release process',
     wrapTask( async () => {
-      maintenance( this.async() ).maintenanceStart( grunt.option( 'sims' ) );
+      await new Promise( ( resolve, reject ) => {
+        maintenance( resolve ).maintenanceStart( grunt.option( 'sims' ) );
+      } );
     } ) );
 
   grunt.registerTask( 'maintenance-patch-info',
@@ -160,7 +164,9 @@ module.exports = function( grunt ) {
     'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
     '--repos : A comma-separated list of repo names that need a combined patch',
     wrapTask( async () => {
-      maintenance( this.async() ).maintenancePatchInfo( grunt.option( 'repos' ) );
+      await new Promise( ( resolve, reject ) => {
+        maintenance( resolve ).maintenancePatchInfo( grunt.option( 'repos' ) );
+      } );
     } ) );
 
   grunt.registerTask( 'maintenance-patch-checkout',
@@ -170,7 +176,9 @@ module.exports = function( grunt ) {
     '--shas : A comma-separated list of SHAs for the respective repos that need a combined patch\n' +
     '--sim : [optional] preferred sim to test with',
     wrapTask( async () => {
-      maintenance( this.async() ).maintenancePatchCheckout( grunt.option( 'repos' ), grunt.option( 'shas' ), grunt.option( 'sim' ) );
+      await new Promise( ( resolve, reject ) => {
+        maintenance( resolve ).maintenancePatchCheckout( grunt.option( 'repos' ), grunt.option( 'shas' ), grunt.option( 'sim' ) );
+      } );
     } ) );
 
   grunt.registerTask( 'maintenance-patch-apply',
@@ -180,7 +188,9 @@ module.exports = function( grunt ) {
     '--repos : A comma-separated list of repo names that need a combined patch\n' +
     '--message : Additional part of message for the dependencies.json commit',
     wrapTask( async () => {
-      maintenance( this.async() ).maintenancePatchApply( grunt.option( 'repos' ), grunt.option( 'message' ) );
+      await new Promise( ( resolve, reject ) => {
+        maintenance( resolve ).maintenancePatchApply( grunt.option( 'repos' ), grunt.option( 'message' ) );
+      } );
     } ) );
 
   grunt.registerTask( 'maintenance-deploy-rc',
@@ -189,7 +199,9 @@ module.exports = function( grunt ) {
     '--sim : Sim name\n' +
     '--message : Additional part of message for the version bump commit',
     wrapTask( async () => {
-      maintenance( this.async() ).maintenanceDeployRC( grunt.option( 'sim' ), grunt.option( 'message' ) );
+      await new Promise( ( resolve, reject ) => {
+        maintenance( resolve ).maintenanceDeployRC( grunt.option( 'sim' ), grunt.option( 'message' ) );
+      } );
     } ) );
 
   grunt.registerTask( 'maintenance-deploy-rc-no-version-bump',
@@ -197,7 +209,9 @@ module.exports = function( grunt ) {
     'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
     '--sim : Sim name',
     wrapTask( async () => {
-      maintenance( this.async() ).maintenanceDeployRCNoVersionBump( grunt.option( 'sim' ) );
+      await new Promise( ( resolve, reject ) => {
+        maintenance( resolve ).maintenanceDeployRCNoVersionBump( grunt.option( 'sim' ) );
+      } );
     } ) );
 
   grunt.registerTask( 'maintenance-deploy-production',
@@ -206,13 +220,17 @@ module.exports = function( grunt ) {
     '--sim : Sim name\n' +
     '--message : Additional part of message for the version bump commit',
     wrapTask( async () => {
-      maintenance( this.async() ).maintenanceDeployProduction( grunt.option( 'sim' ), grunt.option( 'message' ) );
+      await new Promise( ( resolve, reject ) => {
+        maintenance( resolve ).maintenanceDeployProduction( grunt.option( 'sim' ), grunt.option( 'message' ) );
+      } );
     } ) );
 
   grunt.registerTask( 'update-gh-pages',
     'Updates the gh-pages branches for various repos, including building of dot/kite/scenery',
     wrapTask( async () => {
-      maintenance( this.async() ).updateGithubPages();
+      await new Promise( ( resolve, reject ) => {
+        maintenance( resolve ).updateGithubPages();
+      } );
     } ) );
 
   grunt.registerTask( 'sim-list',
