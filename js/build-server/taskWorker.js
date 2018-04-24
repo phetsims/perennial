@@ -253,12 +253,15 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           await new Promise( async ( resolve, reject ) => {
             // If this is a deploy of 1.0.0, create the sim directory
             if ( fs.existsSync( targetSimDir ) ) {
+              winston.debug( 'Creating sim dir: ' + targetSimDir );
               try {
                 await new Promise( ( resolve, reject ) => {
                   fs.mkdir( targetSimDir, err => {
                     if ( err && err.code !== 'EEXIST' ) {
+                      winston.debug( 'Failure creating sim dir' );
                       reject( err );
                     }
+                    winston.debug('Success creating sim dir');
                     resolve();
                   } );
                 } );
@@ -268,10 +271,13 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
               }
             }
             // Create the version directory
+            winston.debug( 'Creating version dir: ' + targetVersionDir );
             fs.mkdir( targetVersionDir, err => {
               if ( err && err.code !== 'EEXIST' ) {
+                winston.debug( 'Failure creating version dir' );
                 reject( err );
               }
+              winston.debug('Success creating sim dir');
               resolve();
             } );
           } );
