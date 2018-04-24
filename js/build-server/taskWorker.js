@@ -252,7 +252,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           // Copy steps - allow EEXIST errors but reject anything else
           await new Promise( async ( resolve, reject ) => {
             // If this is a deploy of 1.0.0, create the sim directory
-            if ( fs.existsSync( targetSimDir ) ) {
+            if ( !fs.existsSync( targetSimDir ) ) {
               winston.debug( 'Creating sim dir: ' + targetSimDir );
               try {
                 await new Promise( ( resolve, reject ) => {
