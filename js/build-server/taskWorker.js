@@ -217,7 +217,8 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
 
     if ( servers.indexOf( constants.PRODUCTION_SERVER ) >= 0 ) {
       winston.info( 'deploying to production' );
-      let targetDir;
+      let targetVersionDir;
+      let targetSimDir;
       // Loop over all brands
       for ( let i in brands ) {
         if ( brands.hasOwnProperty( i ) ) {
@@ -226,7 +227,8 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
 
           // Pre-copy steps
           if ( brand === constants.PHET_BRAND ) {
-            targetDir = constants.HTML_SIMS_DIRECTORY + simName + '/' + version + '/';
+            targetSimDir = constants.HTML_SIMS_DIRECTORY + simName;
+            targetVersionDir = targetSimDir + '/' + version + '/';
 
             if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
               // Remove _phet from all filenames in the phet directory
@@ -243,14 +245,32 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             }
           }
           else if ( brand === constants.PHET_IO_BRAND ) {
-            targetDir = constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/';
+            targetSimDir = constants.PHETIO_SIMS_DIRECTORY + simName;
+            targetVersionDir = targetSimDir + '/' + originalVersion + '/';
           }
 
-          // Copy steps
-          await new Promise( ( resolve, reject ) => {
-            fs.mkdir( targetDir, err => {
-              if ( err ) {
-                winston.info( 'Error on mkdir, probably due to the fact that the target already exists' );
+          // Copy steps - allow EEXIST errors but reject anything else
+          await new Promise( async ( resolve, reject ) => {
+            // If this is a deploy of 1.0.0, create the sim directory
+            if ( fs.existsSync( targetSimDir ) ) {
+              try {
+                await new Promise( ( resolve, reject ) => {
+                  fs.mkdir( targetSimDir, err => {
+                    if ( err && err.code !== 'EEXIST' ) {
+                      reject( err );
+                    }
+                    resolve();
+                  } );
+                } );
+              }
+              catch ( e ) {
+                reject( e );
+              }
+            }
+            // Create the version directory
+            fs.mkdir( targetVersionDir, err => {
+              if ( err && err.code !== 'EEXIST' ) {
+                reject( err );
               }
               resolve();
             } );
@@ -260,12 +280,12 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             sourceDir += '/' + brand;
           }
           await new Promise( ( resolve, reject ) => {
-            winston.debug( 'Copying recursive ' + sourceDir + ' to ' + targetDir );
+            winston.debug( 'Copying recursive ' + sourceDir + ' to ' + targetVersionDir );
             new rsync()
               .flags( 'razp' )
               .set( 'exclude', '.rsync-filter' )
               .source( sourceDir + '/' )
-              .destination( targetDir )
+              .destination( targetVersionDir )
               .output( stdout => { winston.debug( stdout.toString() ); },
                 stderr => { winston.error( stderr.toString() ); } )
               .execute( ( err, code, cmd ) => {
