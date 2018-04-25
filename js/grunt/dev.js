@@ -136,7 +136,7 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
   // Move over dependencies.json and commit/push
   await updateDependenciesJSON( repo, brands, versionString, branch );
 
-  const versionURL = `https://www.colorado.edu/physics/phet/dev/html/${repo}/${versionString}`;
+  const versionURL = `https://phet-dev.colorado.edu/html/${repo}/${versionString}`;
 
   if ( brands.includes( 'phet' ) ) {
     grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_en_phet.html` );
