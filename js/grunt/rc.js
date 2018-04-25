@@ -119,7 +119,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     // Move back to master
     await checkoutMaster( repo, true );
 
-    const versionURL = `https://www.colorado.edu/physics/phet/dev/html/${repo}/${versionString}`;
+    const versionURL = `https://phet-dev.colorado.edu/html/${repo}/${versionString}`;
 
     if ( brands.includes( 'phet' ) ) {
       grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_en_phet.html` );

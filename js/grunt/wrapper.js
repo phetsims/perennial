@@ -109,5 +109,5 @@ module.exports = async function( repo, noninteractive, message ) {
   await gitCommit( repo, `updated dependencies.json for version ${versionString}` );
   await gitPush( repo, 'master' );
 
-  grunt.log.writeln( `Deployed https://www.colorado.edu/physics/phet/dev/html/${repo}/${versionString}` );
+  grunt.log.writeln( `Deployed https://phet-dev.colorado.edu/html/${repo}/${versionString}` );
 };
