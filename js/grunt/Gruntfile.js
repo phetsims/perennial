@@ -234,14 +234,23 @@ module.exports = function( grunt ) {
     } ) );
 
   grunt.registerTask( 'sim-list',
-    'Prints out a list of live production HTML sims to stderr (can be filtered from other stdout output)',
+    'Prints out a list of live production HTML sims to stderr (can be filtered from other stdout output)\n' +
+    '--versions : Outputs the sim version after its name.',
     wrapTask( async () => {
       winston.default.transports.console.level = 'error';
       const data = await simMetadata( {
         summary: true,
         type: 'html'
       } );
-      console.error( data.projects.map( project => project.name.slice( project.name.indexOf( '/' ) + 1 ) ).join( '\n' ) );
+      console.error( data.projects.map( project => {
+        const name = project.name.slice( project.name.indexOf( '/' ) + 1 );
+
+        let result = name;
+        if ( grunt.option( 'versions' ) ) {
+          result += ` ${project.version.major}.${project.version.minor}.${project.version.dev}`;
+        }
+        return result;
+      } ).join( '\n' ) );
     } ) );
 
   grunt.registerTask( 'npm-update',
