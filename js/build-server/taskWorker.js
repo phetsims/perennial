@@ -3,7 +3,6 @@
 /* eslint-env node */
 'use strict';
 
-const addToRosetta = require( './addToRosetta' );
 const addTranslator = require( './addTranslator' );
 const ChipperVersion = require( '../common/ChipperVersion' );
 const constants = require( './constants' );
@@ -309,7 +308,6 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             await writePhetHtaccess( simName, version );
             let simTitle = await createTranslationsXML( simName, version );
             await notifyServer( simName, email );
-            await addToRosetta( simTitle, simName, email );
 
             // if this build request comes from rosetta it will have a userId field and only one locale
             const localesArray = typeof( locales ) === 'string' ? locales.split( ',' ) : locales;
