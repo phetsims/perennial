@@ -306,7 +306,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           // Post-copy steps
           if ( brand === constants.PHET_BRAND ) {
             await writePhetHtaccess( simName, version );
-            let simTitle = await createTranslationsXML( simName, version );
+            await createTranslationsXML( simName, version );
             await notifyServer( simName, email );
 
             // if this build request comes from rosetta it will have a userId field and only one locale
