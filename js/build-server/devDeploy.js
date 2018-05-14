@@ -40,7 +40,7 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
       }
       targetDir += '/.rsync-filter';
 
-      const rsyncFilterContents = '- *_CA*\n+ *_en*\n+ *_all*\n- *.html';
+      const rsyncFilterContents = '- *_CA*\n+ *_en*\n+ *_all*\n+ *_a11y*\n- *.html';
       await writeFile( targetDir, rsyncFilterContents );
     }
     await new Promise( ( resolve, reject ) => {
