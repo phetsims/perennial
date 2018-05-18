@@ -1,6 +1,7 @@
 aqua
 binder/js
 chipper/js/grunt
+chipper/test
 installer-builder
 perennial
 rosetta
