@@ -53,7 +53,7 @@ module.exports = async function() {
     const repos = activeRepos.filter( repo => {
       // Make sure that if someone doesn't have all repositories checked out that this will FAIL. Otherwise bad things.
       assert( grunt.file.exists( `../${repo}` ) );
-      
+
       var packageObject;
       try {
         packageObject = JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) );
@@ -71,6 +71,8 @@ module.exports = async function() {
   writeList( 'accessibility', phet => phet.accessible );
   writeList( 'active-runnables', phet => phet.runnable );
   writeList( 'active-sims', phet => phet.simulation );
+  writeList( 'unit-tests', phet => phet.generatedUnitTests );
+  writeList( 'color-profiles', phet => phet.colorProfile );
   writeList( 'phet-io', phet => phet.runnable && phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) );
   writeList( 'testable-runnables', phet => phet.runnable && phet.automatedTestEnabled !== false );
   writeList( 'testable-phet-io', phet => phet.runnable && phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) && phet.automatedTestEnabled !== false );
@@ -78,6 +80,8 @@ module.exports = async function() {
   await gitAdd( 'perennial', 'data/accessibility' );
   await gitAdd( 'perennial', 'data/active-runnables' );
   await gitAdd( 'perennial', 'data/active-sims' );
+  await gitAdd( 'perennial', 'data/unit-tests' );
+  await gitAdd( 'perennial', 'data/color-profiles' );
   await gitAdd( 'perennial', 'data/phet-io' );
   await gitAdd( 'perennial', 'data/testable-runnables' );
   await gitAdd( 'perennial', 'data/testable-phet-io' );
