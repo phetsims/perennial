@@ -32,6 +32,13 @@ module.exports = {
     assert( buildLocalObject.buildServerAuthorizationCode );
     return buildLocalObject.buildServerAuthorizationCode;
   },
+  get localhostURL() {
+    assert( buildLocalObject.localhostURL );
+    return buildLocalObject.localhostURL;
+  },
+  get localhostPort() {
+    return buildLocalObject.localhostPort;
+  },
   // Wrappers are now deployed to the dev location (for convenience)
   devDeployServer: buildLocalObject.devDeployServer || 'bayes.colorado.edu',
   devDeployPath: buildLocalObject.devDeployPath || '/data/web/htdocs/dev/html/',
