@@ -209,7 +209,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
         const htaccessLocation = ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) ?
                                  simDir + '/build/phet-io/wrappers/.htaccess' :
                                  simDir + '/build/wrappers/.htaccess';
-        await writePhetioHtaccess( htaccessLocation, '/htdocs/physics/phet-io/config/.htpasswd' );
+        await writePhetioHtaccess( htaccessLocation, constants.PHETIO_AUTH_FILEPATH );
       }
       await devDeploy( simDir, simName, version, chipperVersion, brands );
     }

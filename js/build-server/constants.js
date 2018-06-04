@@ -19,6 +19,7 @@ module.exports = {
   LISTEN_PORT: 16371,
   HTML_SIMS_DIRECTORY: BUILD_SERVER_CONFIG.htmlSimsDirectory,
   PHETIO_SIMS_DIRECTORY: BUILD_SERVER_CONFIG.phetioSimsDirectory,
+  PHETIO_AUTH_FILEPATH: BUILD_SERVER_CONFIG.phetioAuthFilepath || '/data/web/htdocs/dev/.htaccess',
   REPOS_KEY: 'repos',
   DEPENDENCIES_KEY: 'dependencies',
   LOCALES_KEY: 'locales',
