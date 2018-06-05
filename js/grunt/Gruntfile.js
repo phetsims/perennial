@@ -16,6 +16,7 @@ const checkoutMaster = require( '../common/checkoutMaster' );
 const checkoutMasterAll = require( './checkoutMasterAll' );
 const checkoutRelease = require( '../common/checkoutRelease' );
 const checkoutTarget = require( '../common/checkoutTarget' );
+const checkoutTimestamp = require( '../common/checkoutTimestamp' );
 const cherryPick = require( './cherryPick' );
 const createOneOff = require( './createOneOff' );
 const createRelease = require( './createRelease' );
@@ -121,6 +122,18 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
       await checkoutRelease( grunt.option( 'repo' ), !grunt.option( 'skipNpmUpdate' ) );
+    } ) );
+
+  grunt.registerTask( 'checkout-timestamp',
+    'Check out a specific timestamp for a simulation and all of its declared dependencies\n' +
+    '--repo : repository name where package.json should be read from\n' +
+    '--timestamp : the timestamp to check things out for, e.g. --timestamp="Jan 08 2018"\n' +
+    '--skipNpmUpdate : If provided, will prevent the usual npm update',
+    wrapTask( async () => {
+      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+      assert( grunt.option( 'timestamp' ), 'Requires specifying a timestamp with --timestamp={{BRANCH}}' );
+
+      await checkoutTimestamp( grunt.option( 'repo' ), grunt.option( 'timestamp' ), !grunt.option( 'skipNpmUpdate' ) );
     } ) );
 
   grunt.registerTask( 'checkout-master',
