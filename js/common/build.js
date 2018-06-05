@@ -63,7 +63,7 @@ module.exports = async function( repo, options ) {
     if ( !mangle ) {
       args.push( '--mangle=false' );
     }
-    if ( allHTML ) {
+    if ( allHTML && brands[ 0 ] !== 'phet-io' ) {
       args.push( '--allHTML' );
     }
     if ( debugHTML ) {
