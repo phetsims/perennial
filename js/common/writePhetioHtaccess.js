@@ -46,7 +46,7 @@ module.exports = async function writePhetioHtaccess( passwordProtectFilepath, la
     authFilepath = PRODUCTION_AUTH_FILE;
   }
   else {
-    authFilepath = DEV_AUTH_FILE
+    authFilepath = DEV_AUTH_FILE;
   }
 
   // Always write a file to add authentication to the ./wrappers directory
