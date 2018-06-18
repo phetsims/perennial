@@ -6,7 +6,7 @@
 const constants = require( './constants' );
 const request = require( 'request' );
 const SimVersion = require( '../common/SimVersion' );
-const writeFile = require( './writeFile' );
+const writeFile = require( '../common/writeFile' );
 
 /**
  * Write the .htaccess file to make "latest" point to the version being deployed and allow "download" links to work on Safari

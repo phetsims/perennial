@@ -27,6 +27,7 @@ const npmUpdate = require( '../common/npmUpdate' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 const SimVersion = require( '../common/SimVersion' );
 const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
+const writePhetioHtaccess = require( '../common/writePhetioHtaccess' );
 
 /**
  * Deploys a dev version after incrementing the test version number.
@@ -127,7 +128,9 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
   // This is for PhET-iO simulations, to protected the password protected wrappers, see
   // https://github.com/phetsims/phet-io/issues/641
   if ( brands.includes( 'phet-io' ) && buildLocal.devDeployServer === 'bayes.colorado.edu' ) {
-    await devScp( '../phet-io/templates/dev/.htaccess', `${versionPath}/phet-io/wrappers/.htaccess` );
+    const htaccessLocation = `../${repo}/build/phet-io/.htaccess`;
+    await writePhetioHtaccess( htaccessLocation );
+    await devScp( htaccessLocation, `${versionPath}/phet-io/wrappers/.htaccess` );
   }
 
   // Permissions fixes so others can write over it later

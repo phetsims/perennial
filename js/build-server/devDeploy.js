@@ -8,7 +8,7 @@ const constants = require( './constants' );
 const devSsh = require( '../common/devSsh' );
 const rsync = require( 'rsync' );
 const winston = require( 'winston' );
-const writeFile = require( './writeFile' );
+const writeFile = require( '../common/writeFile' );
 
 const user = constants.BUILD_SERVER_CONFIG.devUsername;
 const host = constants.BUILD_SERVER_CONFIG.devDeployServer;

@@ -13,12 +13,14 @@ module.exports = async function( filepath, contents ) {
     const writeFileInterval = setInterval( () => {
       fs.writeFile( filepath, contents, err => {
         if ( err ) {
-          winston.error( 'Write failed with error: ' + JSON.stringify( err ) + ', trying again' );
           tries += 1;
           if ( tries >= 10 ) {
             winston.error( 'Write operation failed ' + tries + ' time(s). I\'m giving up, all hope is lost.' );
             clearInterval( writeFileInterval );
             reject( err );
+          }
+          else {
+            winston.error( 'Write failed with error: ' + JSON.stringify( err ) + ', trying again' );
           }
         }
         else {

@@ -15,9 +15,9 @@ const notifyServer = require( './notifyServer' );
 const pullMaster = require( './pullMaster' );
 const rsync = require( 'rsync' );
 const winston = require( 'winston' );
-const writeFile = require( './writeFile' );
+const writeFile = require( '../common/writeFile' );
 const writePhetHtaccess = require( './writePhetHtaccess' );
-const writePhetioHtaccess = require( './writePhetioHtaccess' );
+const writePhetioHtaccess = require( '../common/writePhetioHtaccess' );
 
 const buildDir = './js/build-server/tmp';
 
@@ -209,7 +209,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
         const htaccessLocation = ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) ?
                                  simDir + '/build/phet-io/wrappers/.htaccess' :
                                  simDir + '/build/wrappers/.htaccess';
-        await writePhetioHtaccess( htaccessLocation, constants.PHETIO_AUTH_FILEPATH );
+        await writePhetioHtaccess( htaccessLocation );
       }
       await devDeploy( simDir, simName, version, chipperVersion, brands );
     }
@@ -260,12 +260,12 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
                       winston.debug( 'Failure creating sim dir' );
                       reject( err );
                     }
-                    winston.debug('Success creating sim dir');
+                    winston.debug( 'Success creating sim dir' );
                     resolve();
                   } );
                 } );
               }
-              catch ( e ) {
+              catch( e ) {
                 reject( e );
               }
             }
@@ -276,7 +276,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
                 winston.debug( 'Failure creating version dir' );
                 reject( err );
               }
-              winston.debug('Success creating sim dir');
+              winston.debug( 'Success creating sim dir' );
               resolve();
             } );
           } );
@@ -316,7 +316,10 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             }
           }
           else if ( brand === constants.PHET_IO_BRAND ) {
-            await writePhetioHtaccess( constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess', '/etc/httpd/conf/phet-io_pw', simName, originalVersion );
+            await writePhetioHtaccess(
+              constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess',
+              { simName, originalVersion, directory: constants.PHETIO_SIMS_DIRECTORY }
+            );
           }
         }
       }

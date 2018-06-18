@@ -6,7 +6,7 @@
 const constants = require( './constants' );
 const fs = require( 'graceful-fs' ); //eslint-disable-line
 const winston = require( 'winston' );
-const writeFile = require( './writeFile' );
+const writeFile = require( '../common/writeFile' );
 
 /**
  * Create a [sim name].xml file in the live sim directory in htdocs. This file tells the website which
