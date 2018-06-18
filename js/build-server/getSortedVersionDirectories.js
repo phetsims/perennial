@@ -13,7 +13,8 @@ const fs = require( 'graceful-fs' ); //eslint-disable-line
  * necessary, see https://github.com/phetsims/perennial/issues/28.
  *
  * @param path - Filename of the directory.  It's ok if the path does not exist.
- * @returns {Array} - returns a sorted array of version directories.  Returns an empty array if none exist or if the path does not exist.
+ * @returns {Array} - returns a sorted array of version directories.  Returns an empty array if none exist or if the
+ * path does not exist.
  */
 module.exports = async function getSortedVersionDirectories( path ) {
 
