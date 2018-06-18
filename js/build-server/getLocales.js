@@ -23,19 +23,21 @@ async function getJsonFromXML( xmlString ) {
 }
 
 /**
- * Get all of the deployed locales from the latest version before publishing the next version,
- * so we know which locales to rebuild.
- * @param {String} locales
- * @param {String} simName
+ * Get all of the deployed locales for the latest deployed version of the specified simulation.  This is generally done
+ * before publishing a new version so that we can know which locales to rebuild.
+ * @param {String} locales - comma separated list of locale codes
+ * @param {String} simName - name of the sim, should match GitHub repo name, e.g. "energy-skate-park-basics"
  */
 async function getLocales( locales, simName ) {
   let callbackLocales;
 
   if ( locales && locales !== '*' ) {
+
     // from rosetta
     callbackLocales = locales;
   }
   else {
+
     // from grunt deploy-production
     const simDirectory = constants.HTML_SIMS_DIRECTORY + simName;
     const versionDirectories = await getSortedVersionDirectories( simDirectory );
