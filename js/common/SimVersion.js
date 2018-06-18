@@ -144,7 +144,7 @@ const assert = require( 'assert' );
    * @returns {SimVersion}
    */
   SimVersion.parse = function( versionString, buildTimestamp ) {
-    const matches = versionString.match( /(\d+)\.(\d+)\.(\d+)(-(([^\.-]+)\.(\d+)))?(-([^.-]+))?/ );
+    const matches = versionString.match( /^(\d+)\.(\d+)\.(\d+)(-(([^\.-]+)\.(\d+)))?(-([^.-]+))?$/ );
 
     if ( !matches ) {
       throw new Error( 'could not parse version: ' + versionString );
