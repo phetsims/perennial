@@ -5,8 +5,8 @@
 
 const writeFile = require( './writeFile' );
 
-const PRODUCTION_AUTH_FILE = '/data/web/htdocs/dev/.htpasswd';
-const DEV_AUTH_FILE = '/etc/httpd/conf/phet-io_pw';
+const DEV_AUTH_FILE = '/data/web/htdocs/dev/.htpasswd';
+const PRODUCTION_AUTH_FILE = '/etc/httpd/conf/phet-io_pw';
 
 /**
  * Writes the htaccess file to password protect the exclusive content for phet-io sims
