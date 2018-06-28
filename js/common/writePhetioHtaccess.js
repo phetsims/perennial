@@ -5,9 +5,6 @@
 
 const writeFile = require( './writeFile' );
 
-const DEV_AUTH_FILE = '/data/web/htdocs/dev/.htpasswd';
-const PRODUCTION_AUTH_FILE = '/etc/httpd/conf/phet-io_pw';
-
 /**
  * Writes the htaccess file to password protect the exclusive content for phet-io sims
  * @param {string} passwordProtectFilepath - location of .htaccess file for controlling access to wrappers
@@ -19,7 +16,7 @@ const PRODUCTION_AUTH_FILE = '/etc/httpd/conf/phet-io_pw';
  * @property {string} latestOption.directory
  */
 module.exports = async function writePhetioHtaccess( passwordProtectFilepath, latestOption ) {
-  let authFilepath;
+  const authFilepath = '/etc/httpd/conf/phet-io_pw';
 
   // This option is for production deploys by the build-server
   // If we are provided a simName and version then write a .htaccess file to redirect
@@ -43,10 +40,6 @@ module.exports = async function writePhetioHtaccess( passwordProtectFilepath, la
     else {
       return Promise.reject( 'latestOption is missing one of the required parameters (simName, version, or directory)' );
     }
-    authFilepath = PRODUCTION_AUTH_FILE;
-  }
-  else {
-    authFilepath = DEV_AUTH_FILE;
   }
 
   // Always write a file to add authentication to the ./wrappers directory
