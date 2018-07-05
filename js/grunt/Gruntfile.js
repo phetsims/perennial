@@ -294,7 +294,7 @@ module.exports = function( grunt ) {
   grunt.registerTask( 'create-one-off',
     'Creates a new release branch for a given simulation\n' +
     '--repo : The repository to add the release branch to\n' +
-    '--branch : The branch/one-off name, which should be anything without dahes or periods\n' +
+    '--branch : The branch/one-off name, which should be anything without dashes or periods\n' +
     '--message : An optional message that will be appended on version-change commits.',
     wrapTask( async () => {
       const repo = grunt.option( 'repo' );
