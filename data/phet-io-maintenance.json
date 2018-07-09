@@ -1,0 +1,124 @@
+{
+  "simBranches": [
+    {
+      "repo": "balloons-and-static-electricity",
+      "branch": "1.2-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "balloons-and-static-electricity",
+      "branch": "1.3-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "beers-law-lab",
+      "branch": "1.5-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "beers-law-lab",
+      "branch": "1.6-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "build-an-atom",
+      "branch": "1.4-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "build-an-atom",
+      "branch": "1.5-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "capacitor-lab-basics",
+      "branch": "1.3-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "capacitor-lab-basics",
+      "branch": "1.6",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "charges-and-fields",
+      "branch": "1.0-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "circuit-construction-kit-black-box-study",
+      "branch": "1.0-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "circuit-construction-kit-black-box-study",
+      "branch": "1.1-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "color-vision",
+      "branch": "1.2-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "concentration",
+      "branch": "1.5-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "energy-skate-park-basics",
+      "branch": "1.3-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "expression-exchange",
+      "branch": "1.0-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "faradays-law",
+      "branch": "1.3-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "forces-and-motion-basics",
+      "branch": "2.1-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "forces-and-motion-basics",
+      "branch": "2.3-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "function-builder",
+      "branch": "1.1-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "john-travoltage",
+      "branch": "1.4-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "molecules-and-light",
+      "branch": "1.3-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "plinko-probability",
+      "branch": "1.1-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "proportion-playground",
+      "branch": "1.0-phetio",
+      "brands": [ "phet-io" ]
+    },
+    {
+      "repo": "resistance-in-a-wire",
+      "branch": "1.3-phetio",
+      "brands": [ "phet-io" ]
+    }
+  ]
+}
