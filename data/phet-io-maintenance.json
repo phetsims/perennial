@@ -91,11 +91,6 @@
       "brands": [ "phet-io" ]
     },
     {
-      "repo": "function-builder",
-      "branch": "1.1-phetio",
-      "brands": [ "phet-io" ]
-    },
-    {
       "repo": "john-travoltage",
       "branch": "1.4-phetio",
       "brands": [ "phet-io" ]
