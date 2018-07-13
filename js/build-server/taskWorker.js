@@ -318,7 +318,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           else if ( brand === constants.PHET_IO_BRAND ) {
             await writePhetioHtaccess(
               constants.PHETIO_SIMS_DIRECTORY + simName + '/' + originalVersion + '/wrappers/.htaccess',
-              { simName, originalVersion, directory: constants.PHETIO_SIMS_DIRECTORY }
+              { simName, version: originalVersion, directory: constants.PHETIO_SIMS_DIRECTORY }
             );
           }
         }
