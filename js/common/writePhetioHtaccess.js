@@ -3,6 +3,7 @@
 /* eslint-env node */
 'use strict';
 
+const winston = require( 'winston' );
 const writeFile = require( './writeFile' );
 
 const PRODUCTION_AUTH_FILE = '/data/web/htdocs/dev/.htpasswd';
@@ -41,6 +42,9 @@ module.exports = async function writePhetioHtaccess( passwordProtectFilepath, la
       }
     }
     else {
+      winston.error( 'simName: ' + latestOption.simName );
+      winston.error( 'version: ' + latestOption.version );
+      winston.error( 'directory: ' + latestOption.directory );
       return Promise.reject( 'latestOption is missing one of the required parameters (simName, version, or directory)' );
     }
     authFilepath = PRODUCTION_AUTH_FILE;
