@@ -45,7 +45,7 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
     }
     await new Promise( ( resolve, reject ) => {
       new rsync()
-        .flags( 'razpFF' )
+        .flags( 'razpFFO' )
         .source( buildDir + '/' )
         .destination( user + '@' + host + ':' + simVersionDirectory )
         .execute( ( err, code, cmd ) => {
