@@ -24,6 +24,7 @@ const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 const SimVersion = require( '../common/SimVersion' );
+const winston = require( 'winston' );
 
 /**
  * For `grunt create-release`, see Gruntfile for details
@@ -59,6 +60,8 @@ module.exports = async function( repo, branch, message ) {
   if ( !isClean ) {
     throw new Error( `Unclean status in ${repo}, cannot create release branch` );
   }
+
+  winston.info( 'Setting the release branch version to rc.0 so it will auto-increment to rc.1 for the first RC deployment' );
 
   // Create the branch, update the version info
   await execute( 'git', [ 'checkout', '-b', branch ], '../' + repo );

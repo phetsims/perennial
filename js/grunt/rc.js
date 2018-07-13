@@ -45,12 +45,12 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
 
   const isClean = await gitIsClean( repo );
   if ( !isClean ) {
-    grunt.fail.fatal( `Unclean status in ${repo}, cannot create release branch` );
+    throw new Error( `Unclean status in ${repo}, cannot create release branch` );
   }
 
   if ( !( await hasRemoteBranch( repo, branch ) ) ) {
     if ( noninteractive || !await booleanPrompt( `Release branch ${branch} does not exist. Create it?`, false ) ) {
-      grunt.fail.fatal( 'Aborted rc deployment due to non-existing branch' );
+      throw new Error( 'Aborted rc deployment due to non-existing branch' );
     }
 
     await createRelease( repo, branch );
@@ -62,7 +62,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     const previousVersion = await getRepoVersion( repo );
 
     if ( previousVersion.testType !== 'rc' && previousVersion.testType !== null ) {
-      grunt.fail.fatal( `Aborted rc deployment since the version number cannot be incremented safely (testType:${previousVersion.testType})` );
+      throw new Error( `Aborted rc deployment since the version number cannot be incremented safely (testType:${previousVersion.testType})` );
     }
 
     const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance + ( previousVersion.testType === null ? 1 : 0 ), {
@@ -77,11 +77,11 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     const versionPathExists = await devDirectoryExists( versionPath );
 
     if ( versionPathExists ) {
-      grunt.fail.fatal( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
+      throw new Error( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
     }
 
     if ( !await booleanPrompt( `Deploy ${versionString} to ${buildLocal.devDeployServer}`, noninteractive ) ) {
-      grunt.fail.fatal( 'Aborted rc deployment' );
+      throw new Error( 'Aborted rc deployment' );
     }
 
     await setRepoVersion( repo, version, message );
@@ -103,7 +103,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
 
       // Abort checkout
       await checkoutMaster( repo, true );
-      grunt.fail.fatal( 'Aborted rc deployment (aborted version change too).' );
+      throw new Error( 'Aborted rc deployment (aborted version change too).' );
     }
 
     // Move over dependencies.json and commit/push
@@ -115,7 +115,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       brands,
       servers: [ 'dev' ]
     } );
-    
+
     // Move back to master
     await checkoutMaster( repo, true );
 
@@ -128,7 +128,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       grunt.log.writeln( `Deployed: ${versionURL}/phet-io/wrappers/index` );
     }
 
-    grunt.log.writeln( 'Please test!' );
+    grunt.log.writeln( 'Please wait for the build-server to complete the deployment, and then test!' );
   }
   catch ( e ) {
     grunt.log.warn( 'Detected failure during deploy, reverting to master' );

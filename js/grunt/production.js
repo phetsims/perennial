@@ -47,19 +47,19 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
 
   const isClean = await gitIsClean( repo );
   if ( !isClean ) {
-    grunt.fail.fatal( `Unclean status in ${repo}, cannot create release branch` );
+    throw new Error( `Unclean status in ${repo}, cannot create release branch` );
   }
 
   if ( !( await hasRemoteBranch( repo, branch ) ) ) {
-    grunt.fail.fatal( `Cannot find release branch ${branch} for ${repo}` );
+    throw new Error( `Cannot find release branch ${branch} for ${repo}` );
   }
 
   if ( !grunt.file.exists( `../${repo}/assets/${repo}-screenshot.png` ) ) {
-    grunt.fail.fatal( `Missing screenshot file (${repo}/assets/${repo}-screenshot.png), aborting production deployment` );    
+    throw new Error( `Missing screenshot file (${repo}/assets/${repo}-screenshot.png), aborting production deployment` );
   }
 
   if ( !await booleanPrompt( 'Are QA credits up-to-date', noninteractive ) ) {
-    grunt.fail.fatal( 'Aborted production deployment' );
+    throw new Error( 'Aborted production deployment' );
   }
 
   await checkoutTarget( repo, branch, true ); // include npm update
@@ -71,7 +71,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
 
     if ( previousVersion.testType === null ) {
       if ( noninteractive || !await booleanPrompt( `It appears that the last deployment was a production deployment (${previousVersion.toString()}).\nWould you like to redeploy (i.e. did the last production deploy fail for some reason?)`, false ) ) {
-        grunt.fail.fatal( 'Aborted production deployment' );
+        throw new Error( 'Aborted production deployment' );
       }
 
       version = previousVersion;
@@ -82,7 +82,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       versionChanged = true;
     }
     else {
-      grunt.fail.fatal( 'Aborted production deployment since the version number cannot be incremented safely' );
+      throw new Error( 'Aborted production deployment since the version number cannot be incremented safely' );
     }
 
     const isFirstVersion = !( await simMetadata( {
@@ -93,7 +93,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     // Initial deployment nags
     if ( isFirstVersion ) {
       if ( !await booleanPrompt( 'Is the master checklist complete (e.g. are screenshots added to assets, etc.)', noninteractive ) ) {
-        grunt.fail.fatal( 'Aborted production deployment' );
+        throw new Error( 'Aborted production deployment' );
       }
     }
 
@@ -102,7 +102,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     // caps-lock should hopefully shout this at people. do we have a text-to-speech synthesizer we can shout out of their speakers?
     // SECOND THOUGHT: this would be horrible during automated maintenance releases.
     if ( !await booleanPrompt( `DEPLOY ${repo} ${versionString} (brands: ${brands.join( ',' )}) to PRODUCTION`, noninteractive ) ) {
-      grunt.fail.fatal( 'Aborted production deployment' );
+      throw new Error( 'Aborted production deployment' );
     }
 
     if ( versionChanged ) {
@@ -128,7 +128,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
 
       // Abort checkout
       await checkoutMaster( repo, true );
-      grunt.fail.fatal( 'Aborted production deployment (aborted version change too).' );
+      throw new Error( 'Aborted production deployment (aborted version change too).' );
     }
 
     // Move over dependencies.json and commit/push
@@ -151,7 +151,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       grunt.log.writeln( `Deployed: https://phet-io.colorado.edu/sims/${repo}/${versionString}/wrappers/index/` );
     }
 
-    grunt.log.writeln( 'Please test!' );
+    grunt.log.writeln( 'Please wait for the build-server to complete the deployment, and then test!' );
 
     if ( isFirstVersion && brands.includes( 'phet' ) ) {
       grunt.log.writeln( 'After testing, let the simulation lead know it has been deployed, so they can edit metadata on the website' );
