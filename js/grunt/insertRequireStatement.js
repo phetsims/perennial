@@ -38,7 +38,7 @@ module.exports = function( file, name ) {
       if ( grunt.file.exists( simPath ) ) {
         grunt.file.recurse( simPath, function( absolutePath ) {
           var t = grunt.file.read( absolutePath, 'utf8' );
-          var index = t.indexOf( 'var ' + name + ' = require( \'' );
+          var index = t.indexOf( 'const ' + name + ' = require( \'' );
           if ( index >= 0 ) {
             var nextEndLine = t.indexOf( '\n', index );
             var substring = t.substring( index, nextEndLine );
