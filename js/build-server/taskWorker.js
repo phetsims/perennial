@@ -288,6 +288,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             winston.debug( 'Copying recursive ' + sourceDir + ' to ' + targetVersionDir );
             new rsync()
               .flags( 'razpO' )
+              .set( 'no-perms' )
               .set( 'exclude', '.rsync-filter' )
               .source( sourceDir + '/' )
               .destination( targetVersionDir )
