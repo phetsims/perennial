@@ -54,7 +54,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     throw new Error( `Cannot find release branch ${branch} for ${repo}` );
   }
 
-  if ( !grunt.file.exists( `../${repo}/assets/${repo}-screenshot.png` ) ) {
+  if ( !grunt.file.exists( `../${repo}/assets/${repo}-screenshot.png` ) && brands.includes( 'phet' ) ) {
     throw new Error( `Missing screenshot file (${repo}/assets/${repo}-screenshot.png), aborting production deployment` );
   }
 
