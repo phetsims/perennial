@@ -28,6 +28,7 @@ const getBranch = require( '../common/getBranch' );
 const gruntCommand = require( '../common/gruntCommand' );
 const insertRequireStatement = require( './insertRequireStatement' );
 const maintenance = require( './maintenance' );
+const Maintenance = require( '../common/Maintenance' );
 const npmUpdate = require( '../common/npmUpdate' );
 const production = require( './production' );
 const rc = require( './rc' );
@@ -458,5 +459,11 @@ module.exports = function( grunt ) {
 
   grunt.registerTask( 'generate-data', '[NOTE: Runs automatically on bayes. DO NOT run locally] Generates the lists under perennial/data/, and if there were changes, will commit and push.', wrapTask( async () => {
     await generateData( grunt );
+  } ) );
+
+  grunt.registerTask( 'maintenance-check-branch-status', 'Reports out on release branch statuses', wrapTask( async () => {
+    winston.default.transports.console.level = 'error';
+
+    await Maintenance.checkBranchStatus();
   } ) );
 };

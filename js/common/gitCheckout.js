@@ -19,11 +19,10 @@ const winston = require( 'winston' );
  *
  * @param {string} repo - The repository name
  * @param {string} target - The SHA/branch/whatnot to check out
- * @param {Object} [options]
  * @returns {Promise.<string>} - Stdout
  * @rejects {ExecuteError}
  */
-module.exports = function( repo, target, options ) {
+module.exports = function( repo, target ) {
   assert( typeof repo === 'string' );
   assert( typeof target === 'string' );
 
