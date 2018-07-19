@@ -16,6 +16,7 @@ const checkoutTarget = require( './checkoutTarget' );
 const getBranches = require( './getBranches' );
 const getDependencies = require( './getDependencies' );
 const gitCheckout = require( './gitCheckout' );
+const gitIsAncestor = require( './gitIsAncestor' );
 const gitRevParse = require( './gitRevParse' );
 const simMetadata = require( './simMetadata' );
 const winston = require( 'winston' );
@@ -67,6 +68,58 @@ module.exports = ( function() {
      */
     static deserialize( { repo, branch, brands } ) {
       return new ReleaseBranch( repo, branch, brands );
+    }
+
+    /**
+     * Whether this release branch includes the given SHA for the given repo dependency. Will be false if it doesn't
+     * depend on this repository.
+     * @public
+     *
+     * @param {string} repo
+     * @param {string} sha
+     * @returns {Promise.<boolean>}
+     */
+    async includesSHA( repo, sha ) {
+      let result = false;
+
+      await checkoutTarget( this.repo, this.branch, false ); // don't npm update
+
+      const dependencies = await getDependencies( this.repo );
+
+      if ( dependencies[ repo ] ) {
+        const currentSHA = await gitRevParse( repo, 'HEAD' );
+        result = sha === currentSHA || await gitIsAncestor( repo, sha, currentSHA );
+      }
+
+      await checkoutMaster( this.repo, false ); // don't npm update
+
+      return result;
+    }
+
+    /**
+     * Whether this release branch does NOT include the given SHA for the given repo dependency. Will be false if it doesn't
+     * depend on this repository.
+     * @public
+     *
+     * @param {string} repo
+     * @param {string} sha
+     * @returns {Promise.<boolean>}
+     */
+    async missingSHA( repo, sha ) {
+      let result = false;
+
+      await checkoutTarget( this.repo, this.branch, false ); // don't npm update
+
+      const dependencies = await getDependencies( this.repo );
+
+      if ( dependencies[ repo ] ) {
+        const currentSHA = await gitRevParse( repo, 'HEAD' );
+        result = sha !== currentSHA && !( await gitIsAncestor( repo, sha, currentSHA ) );
+      }
+
+      await checkoutMaster( this.repo, false ); // don't npm update
+
+      return result;
     }
 
     /**

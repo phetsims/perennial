@@ -25,7 +25,8 @@ module.exports = ( function() {
     constructor( repo, message, shas = [] ) {
       assert( typeof repo === 'string' );
       assert( typeof message === 'string' );
-      assert( Array.isArray( shas ) && shas.forEach( sha => assert( typeof sha === 'string' ) ) );
+      assert( Array.isArray( shas ) );
+      shas.forEach( sha => assert( typeof sha === 'string' ) );
 
       // @public {string}
       this.repo = repo;

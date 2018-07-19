@@ -466,4 +466,20 @@ module.exports = function( grunt ) {
 
     await Maintenance.checkBranchStatus();
   } ) );
+
+  grunt.registerTask( 'maintenance-list', 'Lists out the current maintenance process state', wrapTask( async () => {
+    await Maintenance.list();
+  } ) );
+
+  grunt.registerTask( 'maintenance-create-patch', 'Adds a patch to the maintenance process', wrapTask( async () => {
+    const repo = grunt.option( 'repo' );
+    const message = grunt.option( 'message' );
+
+    // TODO: doc
+
+    assert( grunt.option( 'repo' ), 'Requires specifying a repo that will need to be patched with --repo={{REPO}}' );
+    assert( grunt.option( 'message' ), 'Requires specifying a message (included with commits) with --message={{MESSAGE}}' );
+
+    await Maintenance.createPatch( repo, message );
+  } ) );
 };

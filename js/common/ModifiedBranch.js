@@ -15,7 +15,7 @@ const ReleaseBranch = require( './ReleaseBranch' );
 
 module.exports = ( function() {
 
-  class ModifiedReleaseBranch {
+  class ModifiedBranch {
     /**
      * @public
      * @constructor
@@ -28,8 +28,10 @@ module.exports = ( function() {
     constructor( releaseBranch, changedDependencies = {}, neededPatches = [], messages = [] ) {
       assert( releaseBranch instanceof ReleaseBranch );
       assert( typeof changedDependencies === 'object' );
-      assert( Array.isArray( neededPatches ) && neededPatches.forEach( patch => assert( patch instanceof Patch ) ) );
-      assert( Array.isArray( messages ) && messages.forEach( message => assert( typeof message === 'string' ) ) );
+      assert( Array.isArray( neededPatches ) );
+      neededPatches.forEach( patch => assert( patch instanceof Patch ) );
+      assert( Array.isArray( messages ) );
+      messages.forEach( message => assert( typeof message === 'string' ) );
 
       // @public {ReleaseBranch}
       this.releaseBranch = releaseBranch;
@@ -42,6 +44,13 @@ module.exports = ( function() {
 
       // @public {Array.<string>} - Messages from already-applied patches or other changes
       this.messages = messages;
+
+      // @public {string}
+      this.repo = releaseBranch.repo;
+      this.branch = releaseBranch.branch;
+
+      // @public {Array.<string>}
+      this.brands = releaseBranch.brands;
     }
 
     /**
@@ -60,22 +69,34 @@ module.exports = ( function() {
     }
 
     /**
-     * Takes a serialized form of the ModifiedReleaseBranch and returns an actual instance.
+     * Takes a serialized form of the ModifiedBranch and returns an actual instance.
      * @public
      *
      * @param {Object}
      * @param {Array.<Patch>} - We only want to store patches in one location, so don't fully save the info.
-     * @returns {ModifiedReleaseBranch}
+     * @returns {ModifiedBranch}
      */
     static deserialize( { releaseBranch, changedDependencies, neededPatches, messages }, patches ) {
-      return new ModifiedReleaseBranch(
+      return new ModifiedBranch(
         ReleaseBranch.deserialize( releaseBranch ),
         changedDependencies,
         neededPatches.map( repo => patches.find( patch => patch.repo === repo ) ),
         messages
       );
     }
+
+    /**
+     * Whether there is no need to keep a reference to us.
+     * @public
+     *
+     * @returns {boolean}
+     */
+    get isUnused() {
+      return this.neededPatches.length === 0 &&
+             Object.keys( this.changedDependencies ).length === 0 &&
+             this.messages.length === 0;
+    }
   }
 
-  return ModifiedReleaseBranch;
+  return ModifiedBranch;
 } )();
