@@ -28,6 +28,7 @@ const getBranch = require( '../common/getBranch' );
 const gruntCommand = require( '../common/gruntCommand' );
 const insertRequireStatement = require( './insertRequireStatement' );
 const maintenance = require( './maintenance' );
+const Maintenance = require( '../common/Maintenance' );
 const npmUpdate = require( '../common/npmUpdate' );
 const production = require( './production' );
 const rc = require( './rc' );
@@ -458,5 +459,27 @@ module.exports = function( grunt ) {
 
   grunt.registerTask( 'generate-data', '[NOTE: Runs automatically on bayes. DO NOT run locally] Generates the lists under perennial/data/, and if there were changes, will commit and push.', wrapTask( async () => {
     await generateData( grunt );
+  } ) );
+
+  grunt.registerTask( 'maintenance-check-branch-status', 'Reports out on release branch statuses', wrapTask( async () => {
+    winston.default.transports.console.level = 'error';
+
+    await Maintenance.checkBranchStatus();
+  } ) );
+
+  grunt.registerTask( 'maintenance-list', 'Lists out the current maintenance process state', wrapTask( async () => {
+    await Maintenance.list();
+  } ) );
+
+  grunt.registerTask( 'maintenance-create-patch', 'Adds a patch to the maintenance process', wrapTask( async () => {
+    const repo = grunt.option( 'repo' );
+    const message = grunt.option( 'message' );
+
+    // TODO: doc
+
+    assert( grunt.option( 'repo' ), 'Requires specifying a repo that will need to be patched with --repo={{REPO}}' );
+    assert( grunt.option( 'message' ), 'Requires specifying a message (included with commits) with --message={{MESSAGE}}' );
+
+    await Maintenance.createPatch( repo, message );
   } ) );
 };
