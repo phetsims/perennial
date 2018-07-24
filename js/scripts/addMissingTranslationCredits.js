@@ -38,7 +38,7 @@ const usermap = {};
 // FIND ALL TRANSLATION CREDITS
 repos.forEach( repo => {
   try {
-    const repoPath = '../babel/' + repo + '/'
+    const repoPath = '../babel/' + repo + '/';
     fs.readdirSync( repoPath ).forEach( localizedFilename => {
       const locale = localizedFilename.slice( ( repo + '-strings_' ).length, localizedFilename.indexOf( '.' ) );
       const content = JSON.parse( fs.readFileSync( repoPath + localizedFilename ).toString() );
