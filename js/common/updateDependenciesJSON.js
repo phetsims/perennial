@@ -22,12 +22,12 @@ const winston = require( 'winston' );
  *
  * @param {string} repo - The repository that was built
  * @param {Array.<string>} brands - The brands that were built
- * @param {string} versionString
+ * @param {string} message
  * @param {string} branch - The branch we're on (to push to)
  * @returns {Promise}
  */
-module.exports = async function( repo, brands, versionString, branch ) {
-  winston.info( `updating top-level dependencies.json for ${repo} ${versionString}` );
+module.exports = async function( repo, brands, message, branch ) {
+  winston.info( `updating top-level dependencies.json for ${repo} ${message}` );
 
   const chipperVersion = ChipperVersion.getFromRepository();
 
@@ -47,6 +47,6 @@ module.exports = async function( repo, brands, versionString, branch ) {
 
   await copyFile( buildDepdenciesFile, `../${repo}/dependencies.json` );
   await gitAdd( repo, 'dependencies.json' );
-  await gitCommit( repo, `updated dependencies.json for version ${versionString}` );
+  await gitCommit( repo, `updated dependencies.json for ${message}` );
   await gitPush( repo, branch );
 };

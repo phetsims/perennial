@@ -10,6 +10,10 @@
 'use strict';
 
 const assert = require( 'assert' );
+const checkoutDependencies = require( './checkoutDependencies' );
+const getDependencies = require( './getDependencies' );
+const gitCheckout = require( './gitCheckout' );
+const gitPull = require( './gitPull' );
 const Patch = require( './Patch' );
 const ReleaseBranch = require( './ReleaseBranch' );
 
@@ -95,6 +99,27 @@ module.exports = ( function() {
       return this.neededPatches.length === 0 &&
              Object.keys( this.changedDependencies ).length === 0 &&
              this.messages.length === 0;
+    }
+
+    /**
+     * Returns the branch name that should be used in dependency repositories.
+     * @public
+     *
+     * @returns {string}
+     */
+    get dependencyBranch() {
+      return `${this.repo}-${this.branch}`;
+    }
+
+    async checkout( includeNpmUpdate = true ) {
+      await gitCheckout( this.repo, this.branch );
+      await gitPull( this.repo );
+      const dependencies = await getDependencies( this.repo );
+      for ( let key of Object.keys( this.changedDependencies ) ) {
+        // This should exist hopefully
+        dependencies[ key ].sha = this.changedDependencies[ key ];
+      }
+      return await checkoutDependencies( this.repo, dependencies, includeNpmUpdate );
     }
   }
 

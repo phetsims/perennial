@@ -12,11 +12,11 @@
 const assert = require( 'assert' );
 const build = require( '../common/build' );
 const copyFile = require( '../common/copyFile' );
-const execute = require( '../common/execute' );
 const getBranch = require( '../common/getBranch' );
 const gitAdd = require( '../common/gitAdd' );
 const gitCheckout = require( '../common/gitCheckout' );
 const gitCommit = require( '../common/gitCommit' );
+const gitCreateBranch = require( '../common/gitCreateBranch' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
 const grunt = require( 'grunt' );
@@ -64,7 +64,7 @@ module.exports = async function( repo, branch, message ) {
   winston.info( 'Setting the release branch version to rc.0 so it will auto-increment to rc.1 for the first RC deployment' );
 
   // Create the branch, update the version info
-  await execute( 'git', [ 'checkout', '-b', branch ], '../' + repo );
+  await gitCreateBranch( repo, branch );
   await setRepoVersion( repo, newVersion, message );
   await gitPush( repo, branch );
 

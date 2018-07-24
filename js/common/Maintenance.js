@@ -10,10 +10,24 @@
 'use strict';
 
 const assert = require( 'assert' );
+const build = require( './build' );
+const checkoutMaster = require( './checkoutMaster' );
+const checkoutTarget = require( './checkoutTarget' );
+const execute = require( './execute' );
 const fs = require( 'fs' );
+const getBranches = require( './getBranches' );
+const getDependencies = require( './getDependencies' );
+const gitCheckout = require( './gitCheckout' );
+const gitCherryPick = require( './gitCherryPick' );
+const gitCreateBranch = require( './gitCreateBranch' );
+const gitPull = require( './gitPull' );
+const gitPush = require( './gitPush' );
+const gitRevParse = require( './gitRevParse' );
 const ModifiedBranch = require( './ModifiedBranch' );
+const npmUpdate = require( './npmUpdate' );
 const Patch = require( './Patch' );
 const ReleaseBranch = require( './ReleaseBranch' );
+const updateDependenciesJSON = require( './updateDependenciesJSON' );
 // const winston = require( 'winston' );
 
 const MAINTENANCE_FILE = '.maintenance.json';
@@ -120,12 +134,16 @@ module.exports = ( function() {
      *
      * @param {string} repo
      * @param {string} branch
+     * @param {boolean} [errorIfMissing]
      * @returns {Promise.<ModifiedBranch>}
      */
-    async ensureModifiedBranch( repo, branch ) {
-      let modifiedBranch = this.modifiedBranches.find( branch => branch.releaseBranch.repo === repo && branch.releaseBranch.branch === branch );
+    async ensureModifiedBranch( repo, branch, errorIfMissing = false ) {
+      let modifiedBranch = this.modifiedBranches.find( modifiedBranch => modifiedBranch.repo === repo && modifiedBranch.branch === branch );
 
       if ( !modifiedBranch ) {
+        if ( errorIfMissing ) {
+          throw new Error( `Could not find a tracked modified branch for ${repo} ${branch}` );
+        }
         const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
         const releaseBranch = releaseBranches.find( release => release.repo === repo && release.branch === branch );
         assert( releaseBranch, `Could not find a release branch for repo=${repo} branch=${branch}` );
@@ -185,14 +203,14 @@ module.exports = ( function() {
 
       for ( let modifiedBranch of maintenance.modifiedBranches ) {
         console.log( `${modifiedBranch.repo} ${modifiedBranch.branch} ${modifiedBranch.brands.join( ',' )}` );
-        if ( Object.keys( modifiedBranch.changedDependencies ).length > 0 ) {
-          console.log( `Deps: ${JSON.stringify( modifiedBranch.changedDependencies, null, 2 )}` );
-        }
         if ( modifiedBranch.neededPatches.length ) {
-          console.log( `Needed patches: ${modifiedBranch.neededPatches.map( patch => patch.repo ).join( ',' )}` );
+          console.log( `  needs: ${modifiedBranch.neededPatches.map( patch => patch.repo ).join( ',' )}` );
         }
         if ( modifiedBranch.messages.length ) {
-          console.log( `Messages: ${modifiedBranch.messages.join( ' and ' )}` );
+          console.log( `  messages: ${modifiedBranch.messages.join( ' and ' )}` );
+        }
+        if ( Object.keys( modifiedBranch.changedDependencies ).length > 0 ) {
+          console.log( `  deps: ${JSON.stringify( modifiedBranch.changedDependencies, null, 2 )}` );
         }
       }
 
@@ -229,6 +247,8 @@ module.exports = ( function() {
       maintenance.patches.push( new Patch( repo, message ) );
 
       maintenance.save();
+
+      console.log( `Created patch for ${repo} with message: ${message}` );
     }
 
     /**
@@ -252,6 +272,8 @@ module.exports = ( function() {
       maintenance.patches.splice( maintenance.patches.indexOf( patch ), 1 );
 
       maintenance.save();
+
+      console.log( `Removed patch for ${repo}` );
     }
 
     /**
@@ -270,6 +292,8 @@ module.exports = ( function() {
       patch.shas.push( sha );
 
       maintenance.save();
+
+      console.log( `Added SHA ${sha} to patch ${repo}` );
     }
 
     /**
@@ -291,6 +315,8 @@ module.exports = ( function() {
       patch.shas.splice( index, 1 );
 
       maintenance.save();
+
+      console.log( `Removed SHA ${sha} from patch ${repo}` );
     }
 
     /**
@@ -310,6 +336,8 @@ module.exports = ( function() {
       modifiedBranch.neededPatches.push( patch );
 
       maintenance.save();
+
+      console.log( `Added patch ${patchRepo} as needed for ${repo} ${branch}` );
     }
 
     /**
@@ -326,13 +354,20 @@ module.exports = ( function() {
       const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
 
       for ( let releaseBranch of releaseBranches ) {
-        if ( !( await filter( releaseBranch ) ) ) {
+        const needsPatch = await filter( releaseBranch );
+
+        if ( !needsPatch ) {
+          console.log( `  skipping ${releaseBranch.repo} ${releaseBranch.branch}` );
           continue;
         }
 
         const modifiedBranch = await maintenance.ensureModifiedBranch( releaseBranch.repo, releaseBranch.branch );
         if ( !modifiedBranch.neededPatches.includes( patch ) ) {
           modifiedBranch.neededPatches.push( patch );
+          console.log( `Added needed patch ${patchRepo} to ${releaseBranch.repo} ${releaseBranch.branch}` );
+        }
+        else {
+          console.log( `Patch ${patchRepo} already included in ${releaseBranch.repo} ${releaseBranch.branch}` );
         }
       }
 
@@ -396,6 +431,8 @@ module.exports = ( function() {
       maintenance.tryRemovingModifiedBranch( modifiedBranch );
 
       maintenance.save();
+
+      console.log( `Removed patch ${patchRepo} from ${repo} ${branch}` );
     }
 
     /**
@@ -411,7 +448,10 @@ module.exports = ( function() {
       const patch = maintenance.findPatch( patchRepo );
 
       for ( let modifiedBranch of maintenance.modifiedBranches ) {
-        if ( !( await filter( modifiedBranch.releaseBranch ) ) ) {
+        const needsRemoval = filter( modifiedBranch.releaseBranch );
+
+        if ( !needsRemoval ) {
+          console.log( `  skipping ${modifiedBranch.repo} ${modifiedBranch.branch}` );
           continue;
         }
 
@@ -420,6 +460,8 @@ module.exports = ( function() {
 
         modifiedBranch.neededPatches.splice( index, 1 );
         maintenance.tryRemovingModifiedBranch( modifiedBranch );
+
+        console.log( `Removed needed patch ${patchRepo} from ${modifiedBranch.repo} ${modifiedBranch.branch}` );
       }
 
       maintenance.save();
@@ -449,6 +491,157 @@ module.exports = ( function() {
       Maintenance.removeNeededPatches( patchRepo, async ( releaseBranch ) => {
         return await releaseBranch.includesSHA( patchRepo, sha );
       } );
+    }
+
+    static async checkoutBranch( repo, branch ) {
+      const maintenance = Maintenance.load();
+
+      const modifiedBranch = await maintenance.ensureModifiedBranch( repo, branch, true );
+      await modifiedBranch.checkout();
+
+      // No need to save, shouldn't be changing things
+      console.log( `Checked out ${repo} ${branch}` );
+    }
+
+    static async applyPatches() {
+      const maintenance = Maintenance.load();
+      let numApplied = 0;
+
+      for ( let modifiedBranch of maintenance.modifiedBranches ) {
+        if ( modifiedBranch.neededPatches.length === 0 ) {
+          continue;
+        }
+
+        const repo = modifiedBranch.repo;
+        const branch = modifiedBranch.branch;
+
+        // Defensive copy, since we modify it during iteration
+        for ( let patch of modifiedBranch.neededPatches.slice() ) {
+          if ( patch.shas.length === 0 ) {
+            continue;
+          }
+
+          const patchRepo = patch.repo;
+
+          try {
+            // Checkout whatever the latest patched SHA is (if we've patched it)
+            if ( modifiedBranch.changedDependencies[ patchRepo ] ) {
+              await gitCheckout( patchRepo, modifiedBranch.changedDependencies[ patchRepo ] );
+            }
+            else {
+              // Look up the SHA to check out
+              await gitCheckout( repo, branch );
+              const dependencies = await getDependencies( repo );
+              const sha = dependencies[ patchRepo ].sha;
+              await gitCheckout( repo, 'master' );
+
+              // Then check it out
+              await gitCheckout( patchRepo, sha );
+            }
+
+            console.log( `Checked out ${patchRepo} SHA for ${repo} ${branch}` );
+
+            for ( let sha of patch.shas ) {
+              const cherryPickSuccess = await gitCherryPick( patchRepo, sha );
+
+              if ( cherryPickSuccess ) {
+                const currentSHA = await gitRevParse( patchRepo, 'HEAD' );
+                console.log( `Cherry-pick success for ${sha}, result is ${currentSHA}` );
+
+                modifiedBranch.changedDependencies[ patchRepo ] = currentSHA;
+                modifiedBranch.neededPatches.splice( modifiedBranch.neededPatches.indexOf( patch ), 1 );
+                numApplied++;
+
+                // Don't include duplicate messages, since multiple patches might be for a single issue
+                if ( !modifiedBranch.messages.includes( patch.message ) ) {
+                  modifiedBranch.messages.push( patch.message );
+                }
+
+                break;
+              }
+              else {
+                console.log( `Could not cherry-pick ${sha}` );
+              }
+            }
+          } catch ( e ) {
+            maintenance.save();
+
+            throw new Error( `Failure applying patch ${patchRepo} to ${repo} ${branch}: ${JSON.stringify( e, null, 2 )}` );
+          }
+        }
+
+        await gitCheckout( modifiedBranch.repo, 'master' );
+      }
+
+      maintenance.save();
+
+      console.log( `${numApplied} patches applied` );
+    }
+
+    // TODO: add try/catch in appropriate places?  Can we partially update maintenance.json instead of NO updates? yikes
+
+    static async updateDependencies() {
+      const maintenance = Maintenance.load();
+
+      for ( let modifiedBranch of maintenance.modifiedBranches ) {
+        const changedRepos = Object.keys( modifiedBranch.changedDependencies );
+        if ( changedRepos.length === 0 ) {
+          continue;
+        }
+
+        try {
+          await checkoutTarget( modifiedBranch.repo, modifiedBranch.branch, true ); // npm update, since we'll build.
+          console.log( `Checked out ${modifiedBranch.repo} ${modifiedBranch.branch}` );
+
+          for ( let dependency of changedRepos ) {
+            const dependencyBranch = modifiedBranch.dependencyBranch;
+            const branches = await getBranches( dependency );
+            const sha = modifiedBranch.changedDependencies[ dependency ];
+
+            if ( branches.includes( dependencyBranch ) ) {
+              console.log( `Branch ${dependencyBranch} already exists in ${dependency}` );
+              await gitCheckout( dependency, dependencyBranch );
+              await gitPull( dependency );
+              const currentSHA = await gitRevParse( dependency, 'HEAD' );
+
+              if ( sha !== currentSHA ) {
+                console.log( `Attempting to (hopefully fast-forward) merge ${sha}` );
+                await execute( 'git', [ 'merge', sha ], `../${dependency}` );
+                await gitPush( dependency, dependencyBranch );
+              }
+            }
+            else {
+              console.log( `Branch ${dependencyBranch} does not exist in ${dependency}, creating.` );
+              await gitCheckout( dependency, sha );
+              await gitCreateBranch( dependency, dependencyBranch );
+              await gitPush( dependency, dependencyBranch );
+            }
+
+            delete modifiedBranch.changedDependencies[ dependency ];
+          }
+
+          if ( changedRepos.includes( 'chipper' ) ) {
+            await npmUpdate( 'chipper' );
+          }
+
+          console.log( await build( modifiedBranch.repo, {
+            brands: modifiedBranch.brands
+          } ) );
+
+          const message = modifiedBranch.messages.join( ' and ' );
+          await updateDependenciesJSON( modifiedBranch.repo, modifiedBranch.brands, message, modifiedBranch.branch );
+
+          await checkoutMaster( modifiedBranch.repo, true ); // npm update back, so we don't leave the sim in a weird state
+        } catch ( e ) {
+          maintenance.save();
+
+          throw new Error( `Failure updating dependencoes for ${modifiedBranch.repo} to ${modifiedBranch.branch}: ${JSON.stringify( e, null, 2 )}` );
+        }
+      }
+
+      maintenance.save();
+
+      console.log( 'Dependencies updated' );
     }
   }
 
