@@ -232,6 +232,34 @@ module.exports = ( function() {
       }
     }
 
+    static async linkList() {
+      const maintenance = Maintenance.load();
+
+      const deployedBranches = maintenance.modifiedBranches.filter( modifiedBranch => !!modifiedBranch.deployedVersion );
+      const productionBranches = deployedBranches.filter( modifiedBranch => modifiedBranch.deployedVersion.testType === null );
+      const releaseCandidateBranches = deployedBranches.filter( modifiedBranch => modifiedBranch.deployedVersion.testType === 'rc' );
+
+      if ( productionBranches.length ) {
+        console.log( '\nProduction links\n' );
+
+        for ( let modifiedBranch of productionBranches ) {
+          const links = await modifiedBranch.getDeployedLinkLines();
+          links.forEach( console.log );
+        }
+      }
+
+      if ( releaseCandidateBranches.length ) {
+        console.log( '\nRelease Candidate links\n' );
+
+        for ( let modifiedBranch of releaseCandidateBranches ) {
+          const links = await modifiedBranch.getDeployedLinkLines();
+          for ( let link of links ) {
+            console.log( link );
+          }
+        }
+      }
+    }
+
     /**
      * Creates a patch
      * @public

@@ -86,11 +86,6 @@
       "brands": [ "phet-io" ]
     },
     {
-      "repo": "forces-and-motion-basics",
-      "branch": "2.3-phetio",
-      "brands": [ "phet-io" ]
-    },
-    {
       "repo": "john-travoltage",
       "branch": "1.4-phetio",
       "brands": [ "phet-io" ]
@@ -98,16 +93,6 @@
     {
       "repo": "molecules-and-light",
       "branch": "1.3-phetio",
-      "brands": [ "phet-io" ]
-    },
-    {
-      "repo": "plinko-probability",
-      "branch": "1.1-phetio",
-      "brands": [ "phet-io" ]
-    },
-    {
-      "repo": "proportion-playground",
-      "branch": "1.0-phetio",
       "brands": [ "phet-io" ]
     },
     {

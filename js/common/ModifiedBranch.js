@@ -13,6 +13,7 @@ const assert = require( 'assert' );
 const checkoutDependencies = require( './checkoutDependencies' );
 const getDependencies = require( './getDependencies' );
 const gitCheckout = require( './gitCheckout' );
+const gitIsAncestor = require( './gitIsAncestor' );
 const gitPull = require( './gitPull' );
 const Patch = require( './Patch' );
 const ReleaseBranch = require( './ReleaseBranch' );
@@ -94,7 +95,7 @@ module.exports = ( function() {
         changedDependencies,
         neededPatches.map( repo => patches.find( patch => patch.repo === repo ) ),
         messages,
-        deployedVersion || null
+        deployedVersion ? SimVersion.deserialize( deployedVersion ) : null
       );
     }
 
@@ -143,6 +144,81 @@ module.exports = ( function() {
      */
     get dependencyBranch() {
       return `${this.repo}-${this.branch}`;
+    }
+
+    /**
+     * Returns whether phet-io.standalone is the correct phet-io query parameter (otherwise it's the newer
+     * phetioStandalone).
+     * Looks for the presence of https://github.com/phetsims/chipper/commit/4814d6966c54f250b1c0f3909b71f2b9cfcc7665.
+     * @public
+     *
+     * @returns {Promise.<boolean>}
+     */
+    async usesOldPhetioStandalone() {
+      await gitCheckout( this.repo, this.branch );
+      const dependencies = await getDependencies( this.repo );
+      const sha = dependencies.chipper.sha;
+      await gitCheckout( this.repo, 'master' );
+
+      return !( await gitIsAncestor( 'chipper', '4814d6966c54f250b1c0f3909b71f2b9cfcc7665', sha ) );
+    }
+
+    /**
+     * Returns whether the relativeSimPath query parameter is used for wrappers (instead of launchLocalVersion).
+     * Looks for the presence of https://github.com/phetsims/phet-io/commit/e3fc26079358d86074358a6db3ebaf1af9725632
+     * @public
+     *
+     * @returns {Promise.<boolean>}
+     */
+    async usesRelativeSimPath() {
+      await gitCheckout( this.repo, this.branch );
+      const dependencies = await getDependencies( this.repo );
+
+      if ( !dependencies[ 'phet-io' ] ) {
+        return true; // Doesn't really matter now, does it?
+      }
+
+      const sha = dependencies[ 'phet-io' ].sha;
+      await gitCheckout( this.repo, 'master' );
+
+      return await gitIsAncestor( 'phet-io', 'e3fc26079358d86074358a6db3ebaf1af9725632', sha );
+    }
+
+    /**
+     * Returns a list of deployed links for testing (depending on the brands deployed).
+     * @public
+     *
+     * @returns {Promise.<Array.<string>>}
+     */
+    async getDeployedLinkLines() {
+      assert( this.deployedVersion !== null );
+
+      const linkSuffixes = [];
+      const versionString = this.deployedVersion.toString();
+
+      const standaloneParams = ( await this.usesOldPhetioStandalone() ) ? 'phet-io.standalone' : 'phetioStandalone';
+      const proxiesParams = ( await this.usesRelativeSimPath() ) ? 'relativeSimPath' : 'launchLocalVersion';
+
+      if ( this.deployedVersion.testType === 'rc' ) {
+        if ( this.brands.includes( 'phet' ) ) {
+          linkSuffixes.push( `](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}/${this.repo}_en.html)` );
+        }
+        if ( this.brands.includes( 'phet-io' ) ) {
+          linkSuffixes.push( ` phet-io](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}/${this.repo}_en-phetio.html?${standaloneParams})` );
+          linkSuffixes.push( ` phet-io Instance Proxies](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}/wrappers/instance-proxies/instance-proxies.html?sim=${this.repo}&${proxiesParams})` );
+        }
+      }
+      else {
+        if ( this.brands.includes( 'phet' ) ) {
+          linkSuffixes.push( `](https://phet.colorado.edu/sims/html/${this.repo}/${versionString}/${this.repo}_en.html)` );
+        }
+        if ( this.brands.includes( 'phet-io' ) ) {
+          linkSuffixes.push( ` phet-io](https://phet-io.colorado.edu/sims/${this.repo}/${versionString}/${this.repo}_en-phetio.html?${standaloneParams})` );
+          linkSuffixes.push( ` phet-io Instance Proxies](https://phet-io.colorado.edu/sims/${this.repo}/${versionString}/wrappers/instance-proxies/instance-proxies.html?sim=${this.repo}&${proxiesParams})` );
+        }
+      }
+
+      return linkSuffixes.map( link => `- [ ] [${this.repo} ${versionString}${link}` );
     }
 
     async checkout( includeNpmUpdate = true ) {
