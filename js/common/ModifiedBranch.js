@@ -11,6 +11,7 @@
 
 const assert = require( 'assert' );
 const checkoutDependencies = require( './checkoutDependencies' );
+const ChipperVersion = require( '../common/ChipperVersion' );
 const getDependencies = require( './getDependencies' );
 const gitCheckout = require( './gitCheckout' );
 const gitIsAncestor = require( './gitIsAncestor' );
@@ -185,6 +186,27 @@ module.exports = ( function() {
     }
 
     /**
+     * Returns whether an additional folder exists in the build directory of the sim based on the brand.
+     * @public
+     *
+     * @returns {Promise.<boolean>}
+     */
+    async usesChipper2() {
+      await gitCheckout( this.repo, this.branch );
+      const dependencies = await getDependencies( this.repo );
+      await gitCheckout( 'chipper', dependencies.chipper.sha );
+
+      const chipperVersion = ChipperVersion.getFromRepository();
+
+      const result = chipperVersion.major !== 0 || chipperVersion.minor !== 0;
+
+      await gitCheckout( this.repo, 'master' );
+      await gitCheckout( 'chipper', 'master' );
+
+      return result;
+    }
+
+    /**
      * Returns a list of deployed links for testing (depending on the brands deployed).
      * @public
      *
@@ -198,23 +220,28 @@ module.exports = ( function() {
 
       const standaloneParams = ( await this.usesOldPhetioStandalone() ) ? 'phet-io.standalone' : 'phetioStandalone';
       const proxiesParams = ( await this.usesRelativeSimPath() ) ? 'relativeSimPath' : 'launchLocalVersion';
+      const usesChipper2 = await this.usesChipper2();
+      const phetFolder = usesChipper2 ? '/phet' : '';
+      const phetioFolder = usesChipper2 ? '/phet-io' : '';
+      const phetSuffix = usesChipper2 ? '_phet' : '';
+      const phetioSuffix = usesChipper2 ? '_phet-io' : '-phetio';
 
       if ( this.deployedVersion.testType === 'rc' ) {
         if ( this.brands.includes( 'phet' ) ) {
-          linkSuffixes.push( `](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}/${this.repo}_en.html)` );
+          linkSuffixes.push( `](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}${phetFolder}/${this.repo}_en${phetSuffix}.html)` );
         }
         if ( this.brands.includes( 'phet-io' ) ) {
-          linkSuffixes.push( ` phet-io](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}/${this.repo}_en-phetio.html?${standaloneParams})` );
-          linkSuffixes.push( ` phet-io Instance Proxies](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}/wrappers/instance-proxies/instance-proxies.html?sim=${this.repo}&${proxiesParams})` );
+          linkSuffixes.push( ` phet-io](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}${phetioFolder}/${this.repo}_en${phetioSuffix}.html?${standaloneParams})` );
+          linkSuffixes.push( ` phet-io Instance Proxies](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}${phetioFolder}/wrappers/instance-proxies/instance-proxies.html?sim=${this.repo}&${proxiesParams})` );
         }
       }
       else {
         if ( this.brands.includes( 'phet' ) ) {
-          linkSuffixes.push( `](https://phet.colorado.edu/sims/html/${this.repo}/${versionString}/${this.repo}_en.html)` );
+          linkSuffixes.push( `](https://phet.colorado.edu/sims/html/${this.repo}/${versionString}/${this.repo}_en${phetSuffix}.html)` );
         }
         if ( this.brands.includes( 'phet-io' ) ) {
-          linkSuffixes.push( ` phet-io](https://phet-io.colorado.edu/sims/${this.repo}/${versionString}/${this.repo}_en-phetio.html?${standaloneParams})` );
-          linkSuffixes.push( ` phet-io Instance Proxies](https://phet-io.colorado.edu/sims/${this.repo}/${versionString}/wrappers/instance-proxies/instance-proxies.html?sim=${this.repo}&${proxiesParams})` );
+          linkSuffixes.push( ` phet-io](https://phet-io.colorado.edu/sims/${this.repo}/${versionString}${phetioFolder}${phetFolder}/${this.repo}_en${phetioSuffix}.html?${standaloneParams})` );
+          linkSuffixes.push( ` phet-io Instance Proxies](https://phet-io.colorado.edu/sims/${this.repo}/${versionString}${phetioFolder}/wrappers/instance-proxies/instance-proxies.html?sim=${this.repo}&${proxiesParams})` );
         }
       }
 
