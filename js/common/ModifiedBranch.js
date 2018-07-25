@@ -30,16 +30,17 @@ module.exports = ( function() {
      * @param {ReleaseBranch} releaseBranch
      * @param {Object} [changedDependencies]
      * @param {Array.<Patch>} [neededPatches]
-     * @param {Array.<string>} [messages]
+     * @param {Array.<string>} [pendingMessages]
+     * @param {Array.<string>} [pushedMessages]
      * @param {SimVersion|null} [deployedVersion]
      */
-    constructor( releaseBranch, changedDependencies = {}, neededPatches = [], messages = [], deployedVersion = null ) {
+    constructor( releaseBranch, changedDependencies = {}, neededPatches = [], pendingMessages = [], pushedMessages = [], deployedVersion = null ) {
       assert( releaseBranch instanceof ReleaseBranch );
       assert( typeof changedDependencies === 'object' );
       assert( Array.isArray( neededPatches ) );
       neededPatches.forEach( patch => assert( patch instanceof Patch ) );
-      assert( Array.isArray( messages ) );
-      messages.forEach( message => assert( typeof message === 'string' ) );
+      assert( Array.isArray( pushedMessages ) );
+      pushedMessages.forEach( message => assert( typeof message === 'string' ) );
       assert( deployedVersion === null || deployedVersion instanceof SimVersion );
 
       // @public {ReleaseBranch}
@@ -51,8 +52,11 @@ module.exports = ( function() {
       // @public {Array.<Patch>}
       this.neededPatches = neededPatches;
 
-      // @public {Array.<string>} - Messages from already-applied patches or other changes
-      this.messages = messages;
+      // @public {Array.<string>} - Messages from already-applied patches or other changes NOT included in dependencies.json yet
+      this.pendingMessages = pendingMessages;
+
+      // @public {Array.<string>} - Messages from already-applied patches or other changes that have been included in dependencies.json
+      this.pushedMessages = pushedMessages;
 
       // @public {string}
       this.repo = releaseBranch.repo;
@@ -77,7 +81,8 @@ module.exports = ( function() {
         releaseBranch: this.releaseBranch.serialize(),
         changedDependencies: this.changedDependencies,
         neededPatches: this.neededPatches.map( patch => patch.repo ),
-        messages: this.messages,
+        pendingMessages: this.pendingMessages,
+        pushedMessages: this.pushedMessages,
         deployedVersion: this.deployedVersion ? this.deployedVersion.serialize() : null
       };
     }
@@ -90,12 +95,13 @@ module.exports = ( function() {
      * @param {Array.<Patch>} - We only want to store patches in one location, so don't fully save the info.
      * @returns {ModifiedBranch}
      */
-    static deserialize( { releaseBranch, changedDependencies, neededPatches, messages, deployedVersion }, patches ) {
+    static deserialize( { releaseBranch, changedDependencies, neededPatches, pendingMessages, pushedMessages, deployedVersion }, patches ) {
       return new ModifiedBranch(
         ReleaseBranch.deserialize( releaseBranch ),
         changedDependencies,
         neededPatches.map( repo => patches.find( patch => patch.repo === repo ) ),
-        messages,
+        pendingMessages,
+        pushedMessages,
         deployedVersion ? SimVersion.deserialize( deployedVersion ) : null
       );
     }
@@ -109,7 +115,8 @@ module.exports = ( function() {
     get isUnused() {
       return this.neededPatches.length === 0 &&
              Object.keys( this.changedDependencies ).length === 0 &&
-             this.messages.length === 0;
+             this.pushedMessages.length === 0 &&
+             this.pendingMessages.length === 0;
     }
 
     /**
@@ -120,7 +127,7 @@ module.exports = ( function() {
      */
     get isReadyForReleaseCandidate() {
       return this.neededPatches.length === 0 &&
-             this.messages.length > 0 &&
+             this.pushedMessages.length > 0 &&
              this.deployedVersion === null;
     }
 
@@ -132,7 +139,7 @@ module.exports = ( function() {
      */
     get isReadyForProduction() {
       return this.neededPatches.length === 0 &&
-             this.messages.length > 0 &&
+             this.pushedMessages.length > 0 &&
              this.deployedVersion !== null &&
              this.deployedVersion.testType === 'rc';
     }
@@ -210,9 +217,10 @@ module.exports = ( function() {
      * Returns a list of deployed links for testing (depending on the brands deployed).
      * @public
      *
+     * @param {boolean} [includeMessages]
      * @returns {Promise.<Array.<string>>}
      */
-    async getDeployedLinkLines() {
+    async getDeployedLinkLines( includeMessages = true ) {
       assert( this.deployedVersion !== null );
 
       const linkSuffixes = [];
@@ -245,7 +253,14 @@ module.exports = ( function() {
         }
       }
 
-      return linkSuffixes.map( link => `- [ ] [${this.repo} ${versionString}${link}` );
+      const results = linkSuffixes.map( link => `${includeMessages ? '  ' : ''}- [ ] [${this.repo} ${versionString}${link}` );
+      if ( includeMessages ) {
+        for ( let message of this.pushedMessages ) {
+          results.unshift( `  - ${message}` );
+        }
+        results.unshift( `- ${this.repo} ${this.branch}` );
+      }
+      return results;
     }
 
     async checkout( includeNpmUpdate = true ) {

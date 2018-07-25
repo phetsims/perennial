@@ -211,8 +211,11 @@ module.exports = ( function() {
         if ( modifiedBranch.neededPatches.length ) {
           console.log( `  needs: ${modifiedBranch.neededPatches.map( patch => patch.repo ).join( ',' )}` );
         }
-        if ( modifiedBranch.messages.length ) {
-          console.log( `  messages: ${modifiedBranch.messages.join( ' and ' )}` );
+        if ( modifiedBranch.pushedMessages.length ) {
+          console.log( `  pushedMessages: ${modifiedBranch.pushedMessages.join( ' and ' )}` );
+        }
+        if ( modifiedBranch.pendingMessages.length ) {
+          console.log( `  pendingMessages: ${modifiedBranch.pendingMessages.join( ' and ' )}` );
         }
         if ( Object.keys( modifiedBranch.changedDependencies ).length > 0 ) {
           console.log( '  deps:' );
@@ -235,7 +238,7 @@ module.exports = ( function() {
       }
     }
 
-    static async linkList() {
+    static async linkList( includePatches = false ) {
       const maintenance = Maintenance.load();
 
       const deployedBranches = maintenance.modifiedBranches.filter( modifiedBranch => !!modifiedBranch.deployedVersion );
@@ -247,7 +250,9 @@ module.exports = ( function() {
 
         for ( let modifiedBranch of productionBranches ) {
           const links = await modifiedBranch.getDeployedLinkLines();
-          links.forEach( console.log );
+          for ( let link of links ) {
+            console.log( link );
+          }
         }
       }
 
@@ -589,8 +594,8 @@ module.exports = ( function() {
                 numApplied++;
 
                 // Don't include duplicate messages, since multiple patches might be for a single issue
-                if ( !modifiedBranch.messages.includes( patch.message ) ) {
-                  modifiedBranch.messages.push( patch.message );
+                if ( !modifiedBranch.pendingMessages.includes( patch.message ) ) {
+                  modifiedBranch.pendingMessages.push( patch.message );
                 }
 
                 break;
@@ -613,8 +618,6 @@ module.exports = ( function() {
 
       console.log( `${numApplied} patches applied` );
     }
-
-    // TODO: add try/catch in appropriate places?  Can we partially update maintenance.json instead of NO updates? yikes
 
     static async updateDependencies() {
       const maintenance = Maintenance.load();
@@ -665,8 +668,16 @@ module.exports = ( function() {
             brands: modifiedBranch.brands
           } ) );
 
-          const message = modifiedBranch.messages.join( ' and ' );
+          const message = modifiedBranch.pendingMessages.join( ' and ' );
           await updateDependenciesJSON( modifiedBranch.repo, modifiedBranch.brands, message, modifiedBranch.branch );
+
+          // Move messages from pending to pushed
+          for ( let message of modifiedBranch.pendingMessages ) {
+            if ( !modifiedBranch.pushedMessages.contains( message ) ) {
+              modifiedBranch.pushedMessages.push( message );
+            }
+          }
+          modifiedBranch.pendingMessages = [];
 
           await checkoutMaster( modifiedBranch.repo, true ); // npm update back, so we don't leave the sim in a weird state
         } catch ( e ) {
@@ -692,7 +703,7 @@ module.exports = ( function() {
         try {
           console.log( `Running RC deploy for ${modifiedBranch.repo} ${modifiedBranch.branch}` );
 
-          const version = await rc( modifiedBranch.repo, modifiedBranch.branch, modifiedBranch.brands, true, modifiedBranch.messages.join( ', ' ) );
+          const version = await rc( modifiedBranch.repo, modifiedBranch.branch, modifiedBranch.brands, true, modifiedBranch.pushedMessages.join( ', ' ) );
           modifiedBranch.deployedVersion = version;
         } catch ( e ) {
           maintenance.save();
@@ -717,9 +728,9 @@ module.exports = ( function() {
         try {
           console.log( `Running production deploy for ${modifiedBranch.repo} ${modifiedBranch.branch}` );
 
-          const version = await production( modifiedBranch.repo, modifiedBranch.branch, modifiedBranch.brands, true, modifiedBranch.messages.join( ', ' ) );
+          const version = await production( modifiedBranch.repo, modifiedBranch.branch, modifiedBranch.brands, true, modifiedBranch.pushedMessages.join( ', ' ) );
           modifiedBranch.deployedVersion = version;
-          modifiedBranch.messages = [];
+          modifiedBranch.pushedMessages = [];
         } catch ( e ) {
           maintenance.save();
 
