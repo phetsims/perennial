@@ -38,7 +38,7 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  * @param {Array.<string>} brands
  * @param {boolean} noninteractive
  * @param {string} [message] - Optional message to append to the version-increment commit.
- * @returns {Promise}
+ * @returns {Promise.<SimVersion>}
  */
 module.exports = async function( repo, branch, brands, noninteractive, message ) {
   SimVersion.ensureReleaseBranch( branch );
@@ -129,6 +129,8 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     }
 
     grunt.log.writeln( 'Please wait for the build-server to complete the deployment, and then test!' );
+
+    return version;
   }
   catch ( e ) {
     grunt.log.warn( 'Detected failure during deploy, reverting to master' );

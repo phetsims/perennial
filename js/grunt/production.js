@@ -40,7 +40,7 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  * @param {Array.<string>} brands
  * @param {boolean} noninteractive
  * @param {string} [message] - Optional message to append to the version-increment commit.
- * @returns {Promise}
+ * @returns {Promise.<SimVersion>}
  */
 module.exports = async function( repo, branch, brands, noninteractive, message ) {
   SimVersion.ensureReleaseBranch( branch );
@@ -193,6 +193,8 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     catch ( e ) {
       grunt.log.writeln( 'Third party licenses are already up-to-date' );
     }
+
+    return version;
   }
   catch ( e ) {
     grunt.log.warn( 'Detected failure during deploy, reverting to master' );

@@ -26,6 +26,8 @@ const gitRevParse = require( './gitRevParse' );
 const ModifiedBranch = require( './ModifiedBranch' );
 const npmUpdate = require( './npmUpdate' );
 const Patch = require( './Patch' );
+const production = require( '../grunt/production' );
+const rc = require( '../grunt/rc' );
 const ReleaseBranch = require( './ReleaseBranch' );
 const updateDependenciesJSON = require( './updateDependenciesJSON' );
 // const winston = require( 'winston' );
@@ -210,7 +212,10 @@ module.exports = ( function() {
           console.log( `  messages: ${modifiedBranch.messages.join( ' and ' )}` );
         }
         if ( Object.keys( modifiedBranch.changedDependencies ).length > 0 ) {
-          console.log( `  deps: ${JSON.stringify( modifiedBranch.changedDependencies, null, 2 )}` );
+          console.log( '  deps:' );
+          for ( let key of Object.keys( modifiedBranch.changedDependencies ) ) {
+            console.log( `    ${key}: ${modifiedBranch.changedDependencies[ key ]}` );
+          }
         }
       }
 
@@ -618,6 +623,7 @@ module.exports = ( function() {
             }
 
             delete modifiedBranch.changedDependencies[ dependency ];
+            modifiedBranch.deployedVersion = null;
           }
 
           if ( changedRepos.includes( 'chipper' ) ) {
@@ -642,6 +648,57 @@ module.exports = ( function() {
       maintenance.save();
 
       console.log( 'Dependencies updated' );
+    }
+
+    static async deployReleaseCandidates() {
+      const maintenance = Maintenance.load();
+
+      for ( let modifiedBranch of maintenance.modifiedBranches ) {
+        if ( !modifiedBranch.isReadyForReleaseCandidate ) {
+          continue;
+        }
+
+        try {
+          console.log( `Running RC deploy for ${modifiedBranch.repo} ${modifiedBranch.branch}` );
+
+          const version = await rc( modifiedBranch.repo, modifiedBranch.branch, modifiedBranch.brands, true, modifiedBranch.messages.join( ', ' ) );
+          modifiedBranch.deployedVersion = version;
+        } catch ( e ) {
+          maintenance.save();
+
+          throw new Error( `Failure with RC deploy for ${modifiedBranch.repo} to ${modifiedBranch.branch}: ${JSON.stringify( e, null, 2 )}` );
+        }
+      }
+
+      maintenance.save();
+
+      console.log( 'RC versions deployed' );
+    }
+
+    static async deployProduction() {
+      const maintenance = Maintenance.load();
+
+      for ( let modifiedBranch of maintenance.modifiedBranches ) {
+        if ( !modifiedBranch.isReadyForProduction ) {
+          continue;
+        }
+
+        try {
+          console.log( `Running production deploy for ${modifiedBranch.repo} ${modifiedBranch.branch}` );
+
+          const version = await production( modifiedBranch.repo, modifiedBranch.branch, modifiedBranch.brands, true, modifiedBranch.messages.join( ', ' ) );
+          modifiedBranch.deployedVersion = version;
+          modifiedBranch.messages = [];
+        } catch ( e ) {
+          maintenance.save();
+
+          throw new Error( `Failure with production deploy for ${modifiedBranch.repo} to ${modifiedBranch.branch}: ${JSON.stringify( e, null, 2 )}` );
+        }
+      }
+
+      maintenance.save();
+
+      console.log( 'production versions deployed' );
     }
   }
 

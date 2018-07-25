@@ -16,6 +16,7 @@ const gitCheckout = require( './gitCheckout' );
 const gitPull = require( './gitPull' );
 const Patch = require( './Patch' );
 const ReleaseBranch = require( './ReleaseBranch' );
+const SimVersion = require( './SimVersion' );
 
 module.exports = ( function() {
 
@@ -28,14 +29,16 @@ module.exports = ( function() {
      * @param {Object} [changedDependencies]
      * @param {Array.<Patch>} [neededPatches]
      * @param {Array.<string>} [messages]
+     * @param {SimVersion|null} [deployedVersion]
      */
-    constructor( releaseBranch, changedDependencies = {}, neededPatches = [], messages = [] ) {
+    constructor( releaseBranch, changedDependencies = {}, neededPatches = [], messages = [], deployedVersion = null ) {
       assert( releaseBranch instanceof ReleaseBranch );
       assert( typeof changedDependencies === 'object' );
       assert( Array.isArray( neededPatches ) );
       neededPatches.forEach( patch => assert( patch instanceof Patch ) );
       assert( Array.isArray( messages ) );
       messages.forEach( message => assert( typeof message === 'string' ) );
+      assert( deployedVersion === null || deployedVersion instanceof SimVersion );
 
       // @public {ReleaseBranch}
       this.releaseBranch = releaseBranch;
@@ -55,6 +58,10 @@ module.exports = ( function() {
 
       // @public {Array.<string>}
       this.brands = releaseBranch.brands;
+
+      // @public {SimVersion|null} - The deployed version for the latest patches applied. Will be reset to null when
+      // updates are made.
+      this.deployedVersion = deployedVersion;
     }
 
     /**
@@ -68,7 +75,8 @@ module.exports = ( function() {
         releaseBranch: this.releaseBranch.serialize(),
         changedDependencies: this.changedDependencies,
         neededPatches: this.neededPatches.map( patch => patch.repo ),
-        messages: this.messages
+        messages: this.messages,
+        deployedVersion: this.deployedVersion ? this.deployedVersion.serialize() : null
       };
     }
 
@@ -80,12 +88,13 @@ module.exports = ( function() {
      * @param {Array.<Patch>} - We only want to store patches in one location, so don't fully save the info.
      * @returns {ModifiedBranch}
      */
-    static deserialize( { releaseBranch, changedDependencies, neededPatches, messages }, patches ) {
+    static deserialize( { releaseBranch, changedDependencies, neededPatches, messages, deployedVersion }, patches ) {
       return new ModifiedBranch(
         ReleaseBranch.deserialize( releaseBranch ),
         changedDependencies,
         neededPatches.map( repo => patches.find( patch => patch.repo === repo ) ),
-        messages
+        messages,
+        deployedVersion || null
       );
     }
 
@@ -99,6 +108,31 @@ module.exports = ( function() {
       return this.neededPatches.length === 0 &&
              Object.keys( this.changedDependencies ).length === 0 &&
              this.messages.length === 0;
+    }
+
+    /**
+     * Whether it is safe to deploy a release candidate for this branch.
+     * @public
+     *
+     * @returns {boolean}
+     */
+    get isReadyForReleaseCandidate() {
+      return this.neededPatches.length === 0 &&
+             this.messages.length > 0 &&
+             this.deployedVersion === null;
+    }
+
+    /**
+     * Whether it is safe to deploy a production version for this branch.
+     * @public
+     *
+     * @returns {boolean}
+     */
+    get isReadyForProduction() {
+      return this.neededPatches.length === 0 &&
+             this.messages.length > 0 &&
+             this.deployedVersion !== null &&
+             this.deployedVersion.testType === 'rc';
     }
 
     /**
