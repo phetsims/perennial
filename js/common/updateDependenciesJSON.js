@@ -27,7 +27,7 @@ const winston = require( 'winston' );
  * @returns {Promise}
  */
 module.exports = async function( repo, brands, message, branch ) {
-  winston.info( `updating top-level dependencies.json for ${repo} ${message}` );
+  winston.info( `updating top-level dependencies.json for ${repo} ${message} to branch ${branch}` );
 
   const chipperVersion = ChipperVersion.getFromRepository();
 

@@ -13,6 +13,7 @@ const assert = require( 'assert' );
 const build = require( './build' );
 const checkoutMaster = require( './checkoutMaster' );
 const checkoutTarget = require( './checkoutTarget' );
+const ChipperVersion = require( './ChipperVersion' );
 const execute = require( './execute' );
 const fs = require( 'fs' );
 const getBranches = require( './getBranches' );
@@ -80,7 +81,17 @@ module.exports = ( function() {
     static deserialize( { patches, modifiedBranches } ) {
       // Pass in patch references to branch deserialization
       const deserializedPatches = patches.map( Patch.deserialize );
-      return new Maintenance( deserializedPatches, modifiedBranches.map( modifiedBranch => ModifiedBranch.deserialize( modifiedBranch, deserializedPatches ) ) );
+      modifiedBranches = modifiedBranches.map( modifiedBranch => ModifiedBranch.deserialize( modifiedBranch, deserializedPatches ) );
+      modifiedBranches.sort( ( a, b ) => {
+        if ( a.repo !== b.repo ) {
+          return a.repo < b.repo ? -1 : 1;
+        }
+        if ( a.branch !== b.branch ) {
+          return a.branch < b.branch ? -1 : 1;
+        }
+        return 0;
+      } );
+      return new Maintenance( deserializedPatches, modifiedBranches );
     }
 
     /**
@@ -167,13 +178,12 @@ module.exports = ( function() {
      */
     tryRemovingModifiedBranch( modifiedBranch ) {
       if ( modifiedBranch.isUnused ) {
-        const index = this.branches.indexOf( modifiedBranch );
+        const index = this.modifiedBranches.indexOf( modifiedBranch );
         assert( index >= 0 );
 
-        this.branches.splice( index, 1 );
+        this.modifiedBranches.splice( index, 1 );
       }
     }
-
 
 
 
@@ -189,6 +199,36 @@ module.exports = ( function() {
       for ( let releaseBranch of releaseBranches ) {
         console.log( `Checking ${releaseBranch.repo} ${releaseBranch.branch}` );
         ( await releaseBranch.getStatus() ).forEach( console.log );
+      }
+    }
+
+    /**
+     * Builds all release branches (so that the state of things can be checked). Puts in in perennial/build.
+     * @public
+     */
+    static async buildAll() {
+      const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
+
+      const failed = [];
+
+      for ( let releaseBranch of releaseBranches ) {
+        console.log( `building ${releaseBranch.repo} ${releaseBranch.branch}` );
+        try {
+          await checkoutTarget( releaseBranch.repo, releaseBranch.branch, true ); // include npm update
+          await build( releaseBranch.repo, {
+            brands: releaseBranch.brands
+          } );
+          throw new Error( 'UNIMPLEMENTED, copy over' );
+        } catch ( e ) {
+          failed.push( `${releaseBranch.repo} ${releaseBranch.brand}` );
+        }
+      }
+
+      if ( failed.length ) {
+        console.log( `Failed builds:\n${failed.join( '\n' )}` );
+      }
+      else {
+        console.log( 'Builds complete' );
       }
     }
 
@@ -422,7 +462,7 @@ module.exports = ( function() {
      * @param {string} patchRepo
      */
     static async addAllNeededPatches( patchRepo ) {
-      Maintenance.addNeededPatches( patchRepo, async () => true );
+      await Maintenance.addNeededPatches( patchRepo, async () => true );
     }
 
     /**
@@ -433,7 +473,7 @@ module.exports = ( function() {
      * @param {string} sha
      */
     static async addNeededPatchesBefore( patchRepo, sha ) {
-      Maintenance.addNeededPatches( patchRepo, async ( releaseBranch ) => {
+      await Maintenance.addNeededPatches( patchRepo, async ( releaseBranch ) => {
         return await releaseBranch.missingSHA( patchRepo, sha );
       } );
     }
@@ -446,8 +486,33 @@ module.exports = ( function() {
      * @param {string} sha
      */
     static async addNeededPatchesAfter( patchRepo, sha ) {
-      Maintenance.addNeededPatches( patchRepo, async ( releaseBranch ) => {
+      await Maintenance.addNeededPatches( patchRepo, async ( releaseBranch ) => {
         return await releaseBranch.includesSHA( patchRepo, sha );
+      } );
+    }
+
+    /**
+     * Adds a needed patch to all release branches that satisfy the given filter( releaseBranch, builtFileString )
+     * where it builds the simulation with the defaults (brand=phet) and provides it as a string.
+     * @public
+     *
+     * @param {string} patchRepo
+     * @param {function} sha - function( ReleaseBranch, builtFile:string ): Promise.<boolean>
+     */
+    static async addNeededPatchesBuildFilter( patchRepo, filter ) {
+      await Maintenance.addNeededPatches( 'chipper', async ( releaseBranch ) => {
+        await checkoutTarget( releaseBranch.repo, releaseBranch.branch, true );
+        await gitPull( releaseBranch.repo );
+        await build( releaseBranch.repo );
+        const chipperVersion = ChipperVersion.getFromRepository();
+        let filename;
+        if ( chipperVersion.major !== 0 ) {
+          filename = `../${releaseBranch.repo}/build/phet/${releaseBranch.repo}_en_phet.html`;
+        }
+        else {
+          filename = `../${releaseBranch.repo}/build/${releaseBranch.repo}_en.html`;
+        }
+        return await filter( releaseBranch, fs.readFileSync( filename, 'utf8' ) );
       } );
     }
 
@@ -496,8 +561,11 @@ module.exports = ( function() {
           continue;
         }
 
+        // Check if there's actually something to remove
         const index = modifiedBranch.neededPatches.indexOf( patch );
-        assert( index >= 0, 'Could not find needed patch on the modified branch' );
+        if ( index < 0 ) {
+          continue;
+        }
 
         modifiedBranch.neededPatches.splice( index, 1 );
         maintenance.tryRemovingModifiedBranch( modifiedBranch );
@@ -516,7 +584,7 @@ module.exports = ( function() {
      * @param {string} sha
      */
     static async removeNeededPatchesBefore( patchRepo, sha ) {
-      Maintenance.removeNeededPatches( patchRepo, async ( releaseBranch ) => {
+      await Maintenance.removeNeededPatches( patchRepo, async ( releaseBranch ) => {
         return await releaseBranch.missingSHA( patchRepo, sha );
       } );
     }
@@ -529,7 +597,7 @@ module.exports = ( function() {
      * @param {string} sha
      */
     static async removeNeededPatchesAfter( patchRepo, sha ) {
-      Maintenance.removeNeededPatches( patchRepo, async ( releaseBranch ) => {
+      await Maintenance.removeNeededPatches( patchRepo, async ( releaseBranch ) => {
         return await releaseBranch.includesSHA( patchRepo, sha );
       } );
     }
@@ -607,7 +675,7 @@ module.exports = ( function() {
           } catch ( e ) {
             maintenance.save();
 
-            throw new Error( `Failure applying patch ${patchRepo} to ${repo} ${branch}: ${JSON.stringify( e, null, 2 )}` );
+            throw new Error( `Failure applying patch ${patchRepo} to ${repo} ${branch}: ${e}` );
           }
         }
 
@@ -673,7 +741,7 @@ module.exports = ( function() {
 
           // Move messages from pending to pushed
           for ( let message of modifiedBranch.pendingMessages ) {
-            if ( !modifiedBranch.pushedMessages.contains( message ) ) {
+            if ( !modifiedBranch.pushedMessages.includes( message ) ) {
               modifiedBranch.pushedMessages.push( message );
             }
           }
@@ -683,7 +751,7 @@ module.exports = ( function() {
         } catch ( e ) {
           maintenance.save();
 
-          throw new Error( `Failure updating dependencoes for ${modifiedBranch.repo} to ${modifiedBranch.branch}: ${JSON.stringify( e, null, 2 )}` );
+          throw new Error( `Failure updating dependencies for ${modifiedBranch.repo} to ${modifiedBranch.branch}: ${e}` );
         }
       }
 
@@ -708,7 +776,7 @@ module.exports = ( function() {
         } catch ( e ) {
           maintenance.save();
 
-          throw new Error( `Failure with RC deploy for ${modifiedBranch.repo} to ${modifiedBranch.branch}: ${JSON.stringify( e, null, 2 )}` );
+          throw new Error( `Failure with RC deploy for ${modifiedBranch.repo} to ${modifiedBranch.branch}: ${e}` );
         }
       }
 
@@ -734,7 +802,7 @@ module.exports = ( function() {
         } catch ( e ) {
           maintenance.save();
 
-          throw new Error( `Failure with production deploy for ${modifiedBranch.repo} to ${modifiedBranch.branch}: ${JSON.stringify( e, null, 2 )}` );
+          throw new Error( `Failure with production deploy for ${modifiedBranch.repo} to ${modifiedBranch.branch}: ${e}` );
         }
       }
 
