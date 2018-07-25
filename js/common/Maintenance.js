@@ -205,6 +205,9 @@ module.exports = ( function() {
 
       for ( let modifiedBranch of maintenance.modifiedBranches ) {
         console.log( `${modifiedBranch.repo} ${modifiedBranch.branch} ${modifiedBranch.brands.join( ',' )}` );
+        if ( modifiedBranch.deployedVersion ) {
+          console.log( `  deployed: ${modifiedBranch.deployedVersion.toString()}` );
+        }
         if ( modifiedBranch.neededPatches.length ) {
           console.log( `  needs: ${modifiedBranch.neededPatches.map( patch => patch.repo ).join( ',' )}` );
         }
