@@ -255,10 +255,7 @@ module.exports = ( function() {
 
       const results = linkSuffixes.map( link => `${includeMessages ? '  ' : ''}- [ ] [${this.repo} ${versionString}${link}` );
       if ( includeMessages ) {
-        for ( let message of this.pushedMessages ) {
-          results.unshift( `  - ${message}` );
-        }
-        results.unshift( `- ${this.repo} ${this.branch}` );
+        results.unshift( `- ${this.repo} ${this.branch} (${this.pushedMessages.join( ', ' )})` );
       }
       return results;
     }
