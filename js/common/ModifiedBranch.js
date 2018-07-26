@@ -253,9 +253,9 @@ module.exports = ( function() {
         }
       }
 
-      const results = linkSuffixes.map( link => `${includeMessages ? '  ' : ''}- [ ] [${this.repo} ${versionString}${link}` );
+      const results = linkSuffixes.map( link => `- [ ] [${this.repo} ${versionString}${link}` );
       if ( includeMessages ) {
-        results.unshift( `- ${this.repo} ${this.branch} (${this.pushedMessages.join( ', ' )})` );
+        results.unshift( `\n${this.repo} ${this.branch} (${this.pushedMessages.join( ', ' )})\n` );
       }
       return results;
     }
