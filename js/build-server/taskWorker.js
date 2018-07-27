@@ -245,7 +245,11 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           }
           else if ( brand === constants.PHET_IO_BRAND ) {
             targetSimDir = constants.PHETIO_SIMS_DIRECTORY + simName;
-            targetVersionDir = targetSimDir + '/' + originalVersion + '/';
+            targetVersionDir = targetSimDir + '/' + originalVersion;
+            if ( chipperVersion.major === 0 && !originalVersion.match( '-phetio' ) ) {
+              targetVersionDir += '-phetio';
+            }
+            targetVersionDir += '/';
           }
 
           // Copy steps - allow EEXIST errors but reject anything else
