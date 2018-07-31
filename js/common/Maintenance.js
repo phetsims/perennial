@@ -612,6 +612,8 @@ module.exports = ( function() {
       console.log( `Checked out ${repo} ${branch}` );
     }
 
+    // TODO: checkout "next"
+
     static async applyPatches() {
       const maintenance = Maintenance.load();
       let numApplied = 0;
