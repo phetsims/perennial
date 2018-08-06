@@ -10,5 +10,6 @@ phet-io
 phet-io-wrappers
 query-string-machine
 scenery
+scenery-phet
 tandem
 twixt
