@@ -233,6 +233,7 @@ module.exports = ( function() {
       const phetioFolder = usesChipper2 ? '/phet-io' : '';
       const phetSuffix = usesChipper2 ? '_phet' : '';
       const phetioSuffix = usesChipper2 ? '_all_phet-io' : '_en-phetio';
+      const phetioBrandSuffix = usesChipper2 ? '' : '-phetio';
 
       if ( this.deployedVersion.testType === 'rc' ) {
         if ( this.brands.includes( 'phet' ) ) {
@@ -248,8 +249,8 @@ module.exports = ( function() {
           linkSuffixes.push( `](https://phet.colorado.edu/sims/html/${this.repo}/${versionString}/${this.repo}_en.html)` );
         }
         if ( this.brands.includes( 'phet-io' ) ) {
-          linkSuffixes.push( ` phet-io](https://phet-io.colorado.edu/sims/${this.repo}/${versionString}${phetioFolder}${phetFolder}/${this.repo}${phetioSuffix}.html?${standaloneParams})` );
-          linkSuffixes.push( ` phet-io Instance Proxies](https://phet-io.colorado.edu/sims/${this.repo}/${versionString}${phetioFolder}/wrappers/instance-proxies/instance-proxies.html?sim=${this.repo}&${proxiesParams})` );
+          linkSuffixes.push( ` phet-io](https://phet-io.colorado.edu/sims/${this.repo}/${versionString}${phetioBrandSuffix}/${this.repo}${phetioSuffix}.html?${standaloneParams})` );
+          linkSuffixes.push( ` phet-io Instance Proxies](https://phet-io.colorado.edu/sims/${this.repo}/${versionString}${phetioBrandSuffix}/wrappers/instance-proxies/instance-proxies.html?sim=${this.repo}&${proxiesParams})` );
         }
       }
 

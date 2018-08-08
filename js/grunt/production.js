@@ -70,9 +70,9 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     var versionChanged;
 
     if ( previousVersion.testType === null ) {
-      if ( noninteractive || !await booleanPrompt( `It appears that the last deployment was a production deployment (${previousVersion.toString()}).\nWould you like to redeploy (i.e. did the last production deploy fail for some reason?)`, false ) ) {
-        throw new Error( 'Aborted production deployment: It appears that the last deployment was for production.' );
-      }
+      // if ( noninteractive || !await booleanPrompt( `It appears that the last deployment was a production deployment (${previousVersion.toString()}).\nWould you like to redeploy (i.e. did the last production deploy fail for some reason?)`, false ) ) {
+      //   throw new Error( 'Aborted production deployment: It appears that the last deployment was for production.' );
+      // }
 
       version = previousVersion;
       versionChanged = false;
