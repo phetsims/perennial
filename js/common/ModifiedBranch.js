@@ -245,7 +245,7 @@ module.exports = ( function() {
       }
       else {
         if ( this.brands.includes( 'phet' ) ) {
-          linkSuffixes.push( `](https://phet.colorado.edu/sims/html/${this.repo}/${versionString}/${this.repo}_en${phetSuffix}.html)` );
+          linkSuffixes.push( `](https://phet.colorado.edu/sims/html/${this.repo}/${versionString}/${this.repo}_en.html)` );
         }
         if ( this.brands.includes( 'phet-io' ) ) {
           linkSuffixes.push( ` phet-io](https://phet-io.colorado.edu/sims/${this.repo}/${versionString}${phetioFolder}${phetFolder}/${this.repo}${phetioSuffix}.html?${standaloneParams})` );
