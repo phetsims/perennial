@@ -15,6 +15,7 @@ const build = require( '../common/build' );
 const buildServerRequest = require( '../common/buildServerRequest' );
 const checkoutMaster = require( '../common/checkoutMaster' );
 const checkoutTarget = require( '../common/checkoutTarget' );
+const devAccessAvailable = require( '../common/devAccessAvailable' );
 const execute = require( '../common/execute' );
 const getDependencies = require( '../common/getDependencies' );
 const getRepoVersion = require( '../common/getRepoVersion' );
@@ -44,6 +45,10 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
  */
 module.exports = async function( repo, branch, brands, noninteractive, message ) {
   SimVersion.ensureReleaseBranch( branch );
+
+  if ( !( await devAccessAvailable() ) ) {
+    grunt.fail.fatal( 'Could not access SSH to the dev server. Do you have VPN on and have the correct credentials?' );
+  }
 
   const isClean = await gitIsClean( repo );
   if ( !isClean ) {
