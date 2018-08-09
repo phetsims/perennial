@@ -14,6 +14,7 @@ const assert = require( 'assert' );
 const booleanPrompt = require( '../common/booleanPrompt' );
 const build = require( '../common/build' );
 const buildLocal = require( '../common/buildLocal' );
+const devAccessAvailable = require( '../common/devAccessAvailable' );
 const devDirectoryExists = require( '../common/devDirectoryExists' );
 const devScp = require( '../common/devScp' );
 const devSsh = require( '../common/devSsh' );
@@ -21,6 +22,8 @@ const getBranch = require( '../common/getBranch' );
 const getRepoVersion = require( '../common/getRepoVersion' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
+const getRemoteBranchSHAs = require( '../common/getRemoteBranchSHAs' );
+const gitRevParse = require( '../common/gitRevParse' );
 const grunt = require( 'grunt' );
 const lintAllRunnable = require( '../common/lintAllRunnable' );
 const npmUpdate = require( '../common/npmUpdate' );
@@ -47,6 +50,10 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
     assert( !branch.includes( '-' ), 'One-off versions should be from branches that do not include hyphens' );
   }
 
+  if ( !( await devAccessAvailable() ) ) {
+    grunt.fail.fatal( 'Could not access SSH to the dev server. Do you have VPN on and have the correct credentials?' );
+  }
+
   const currentBranch = await getBranch( repo );
   if ( currentBranch !== branch ) {
     grunt.fail.fatal( `${testType} deployment should be on the branch ${branch}, not: ` + ( currentBranch ? currentBranch : '(detached head)' ) );
@@ -66,6 +73,13 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
   const isClean = await gitIsClean( repo );
   if ( !isClean ) {
     throw new Error( `Unclean status in ${repo}, cannot deploy` );
+  }
+
+  const currentSHA = await gitRevParse( repo, 'HEAD' );
+  const latestSHA = ( await getRemoteBranchSHAs( repo ) ).master;
+  if ( currentSHA !== latestSHA ) {
+    // See https://github.com/phetsims/chipper/issues/699
+    grunt.fail.fatal( `Out of date with remote, please pull repo. Current SHA: ${currentSHA}, latest SHA: ${latestSHA}` );
   }
 
   // Ensure we don't try to request an unsupported brand
