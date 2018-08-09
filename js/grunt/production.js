@@ -114,6 +114,29 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     await npmUpdate( repo );
     await npmUpdate( 'chipper' );
 
+    // Update the README on the branch
+    grunt.log.writeln( 'Updating branch README' );
+    try {
+      await execute( gruntCommand, [ 'published-README' ], `../${repo}` );
+    }
+    catch ( e ) {
+      grunt.log.writeln( 'published-README error, may not exist, will try generate-published-README' );
+      try {
+        await execute( gruntCommand, [ 'generate-published-README' ], `../${repo}` );
+      }
+      catch ( e ) {
+        grunt.log.writeln( 'No published README generation found' );
+      }
+    }
+    await gitAdd( repo, 'README.md' );
+    try {
+      await gitCommit( repo, `Generated published README.md as part of a production deploy for ${versionString}` );
+      await gitPush( repo, branch );
+    }
+    catch ( e ) {
+      grunt.log.writeln( 'Production README is already up-to-date' );
+    }
+
     // No special options required here, as we send the main request to the build server
     grunt.log.writeln( await build( repo, {
       brands
@@ -157,7 +180,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       grunt.log.writeln( 'After testing, let the simulation lead know it has been deployed, so they can edit metadata on the website' );
 
       // Update the README on master
-      grunt.log.writeln( 'Updating README' );
+      grunt.log.writeln( 'Updating master README' );
       await execute( gruntCommand, [ 'published-README' ], `../${repo}` );
       await gitAdd( repo, 'README.md' );
       try {
