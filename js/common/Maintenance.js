@@ -34,6 +34,7 @@ const repl = require( 'repl' );
 const updateDependenciesJSON = require( './updateDependenciesJSON' );
 const winston = require( 'winston' );
 
+// constants
 const MAINTENANCE_FILE = '.maintenance.json';
 
 // TODO: add a help() function?
@@ -106,7 +107,9 @@ module.exports = ( function() {
 
       for ( let releaseBranch of releaseBranches ) {
         console.log( `Checking ${releaseBranch.repo} ${releaseBranch.branch}` );
-        ( await releaseBranch.getStatus() ).forEach( console.log );
+        for ( let line of await releaseBranch.getStatus() ) {
+          console.log( line );
+        }
       }
     }
 
@@ -855,6 +858,7 @@ module.exports = ( function() {
         } );
 
         session.context.Maintenance = Maintenance;
+        session.context.ReleaseBranch = ReleaseBranch;
 
         session.on( 'exit', resolve );
       } );
