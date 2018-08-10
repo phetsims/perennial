@@ -71,6 +71,39 @@ module.exports = ( function() {
     }
 
     /**
+     * Returns whether the two release branches contain identical information.
+     * @public
+     *
+     * @param {ReleaseBranch} releaseBranch
+     * @returns {boolean}
+     */
+    equals( releaseBranch ) {
+      return this.repo === releaseBranch.repo &&
+             this.branch === releaseBranch.branch &&
+             this.brands.join( ',' ) === releaseBranch.brands.join( ',' );
+    }
+
+    /**
+     * Converts it to a (debuggable) string form.
+     * @public
+     *
+     * @returns {string}
+     */
+    toString() {
+      return `${this.repo} ${this.branch} ${this.brands.join( ',' )}`;
+    }
+
+    /**
+     * Checks this release branch out.
+     * @public
+     *
+     * @param {boolean} includeNpmUpdate
+     */
+    async checkout( includeNpmUpdate ) {
+      await checkoutTarget( this.repo, this.branch, includeNpmUpdate );
+    }
+
+    /**
      * Whether this release branch includes the given SHA for the given repo dependency. Will be false if it doesn't
      * depend on this repository.
      * @public
