@@ -14,7 +14,6 @@ const assert = require( 'assert' );
 const booleanPrompt = require( '../common/booleanPrompt' );
 const build = require( '../common/build' );
 const buildLocal = require( '../common/buildLocal' );
-const devAccessAvailable = require( '../common/devAccessAvailable' );
 const devDirectoryExists = require( '../common/devDirectoryExists' );
 const devScp = require( '../common/devScp' );
 const devSsh = require( '../common/devSsh' );
@@ -30,6 +29,7 @@ const npmUpdate = require( '../common/npmUpdate' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 const SimVersion = require( '../common/SimVersion' );
 const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
+const vpnCheck = require( '../common/vpnCheck' );
 const writePhetioHtaccess = require( '../common/writePhetioHtaccess' );
 
 /**
@@ -50,8 +50,8 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
     assert( !branch.includes( '-' ), 'One-off versions should be from branches that do not include hyphens' );
   }
 
-  if ( !( await devAccessAvailable() ) ) {
-    grunt.fail.fatal( 'Could not access SSH to the dev server. Do you have VPN on and have the correct credentials?' );
+  if ( !( await vpnCheck() ) ) {
+    grunt.fail.fatal( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server.int.colorado.edu' );
   }
 
   const currentBranch = await getBranch( repo );

@@ -15,7 +15,6 @@ const build = require( '../common/build' );
 const buildServerRequest = require( '../common/buildServerRequest' );
 const checkoutMaster = require( '../common/checkoutMaster' );
 const checkoutTarget = require( '../common/checkoutTarget' );
-const devAccessAvailable = require( '../common/devAccessAvailable' );
 const execute = require( '../common/execute' );
 const getDependencies = require( '../common/getDependencies' );
 const getRepoVersion = require( '../common/getRepoVersion' );
@@ -31,6 +30,7 @@ const setRepoVersion = require( '../common/setRepoVersion' );
 const simMetadata = require( '../common/simMetadata' );
 const SimVersion = require( '../common/SimVersion' );
 const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
+const vpnCheck = require( '../common/vpnCheck' );
 
 /**
  * Deploys a production version after incrementing the test version number.
@@ -46,8 +46,8 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
 module.exports = async function( repo, branch, brands, noninteractive, message ) {
   SimVersion.ensureReleaseBranch( branch );
 
-  if ( !( await devAccessAvailable() ) ) {
-    grunt.fail.fatal( 'Could not access SSH to the dev server. Do you have VPN on and have the correct credentials?' );
+  if ( !( await vpnCheck() ) ) {
+    grunt.fail.fatal( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server.int.colorado.edu' );
   }
 
   const isClean = await gitIsClean( repo );
