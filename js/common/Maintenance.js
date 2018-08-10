@@ -30,10 +30,39 @@ const Patch = require( './Patch' );
 const production = require( '../grunt/production' );
 const rc = require( '../grunt/rc' );
 const ReleaseBranch = require( './ReleaseBranch' );
+const repl = require( 'repl' );
 const updateDependenciesJSON = require( './updateDependenciesJSON' );
-// const winston = require( 'winston' );
+const winston = require( 'winston' );
 
 const MAINTENANCE_FILE = '.maintenance.json';
+
+// TODO: add a help() function?
+const PUBLIC_FUNCTIONS = [
+  'addAllNeededPatches',
+  'addNeededPatch',
+  'addNeededPatches',
+  'addNeededPatchesAfter',
+  'addNeededPatchesBefore',
+  'addNeededPatchesBuildFilter',
+  'addPatchSHA',
+  'applyPatches',
+  'buildAll',
+  'checkBranchStatus',
+  'checkoutBranch',
+  'createPatch',
+  'deployProduction',
+  'deployReleaseCandidates',
+  'linkList',
+  'list',
+  'removeNeededPatch',
+  'removeNeededPatches',
+  'removeNeededPatchesAfter',
+  'removeNeededPatchesBefore',
+  'removePatch',
+  'removePatchSHA',
+  'reset',
+  'updateDependencies'
+];
 
 module.exports = ( function() {
 
@@ -59,133 +88,12 @@ module.exports = ( function() {
     }
 
     /**
-     * Convert into a plain JS object meant for JSON serialization.
-     * @public
-     *
-     * @returns {Object}
-     */
-    serialize() {
-      return {
-        patches: this.patches.map( patch => patch.serialize() ),
-        modifiedBranches: this.modifiedBranches.map( modifiedBranch => modifiedBranch.serialize() )
-      };
-    }
-
-    /**
-     * Takes a serialized form of the Maintenance and returns an actual instance.
-     * @public
-     *
-     * @param {Object}
-     * @returns {Maintenance}
-     */
-    static deserialize( { patches, modifiedBranches } ) {
-      // Pass in patch references to branch deserialization
-      const deserializedPatches = patches.map( Patch.deserialize );
-      modifiedBranches = modifiedBranches.map( modifiedBranch => ModifiedBranch.deserialize( modifiedBranch, deserializedPatches ) );
-      modifiedBranches.sort( ( a, b ) => {
-        if ( a.repo !== b.repo ) {
-          return a.repo < b.repo ? -1 : 1;
-        }
-        if ( a.branch !== b.branch ) {
-          return a.branch < b.branch ? -1 : 1;
-        }
-        return 0;
-      } );
-      return new Maintenance( deserializedPatches, modifiedBranches );
-    }
-
-    /**
-     * Saves the state of this object into the maintenance file.
-     * @public
-     */
-    save() {
-      return fs.writeFileSync( MAINTENANCE_FILE, JSON.stringify( this.serialize(), null, 2 ) );
-    }
-
-    /**
-     * Loads a new Maintenance object (if possible) from the maintenance file.
-     * @public
-     *
-     * @returns {Maintenance}
-     */
-    static load() {
-      if ( fs.existsSync( MAINTENANCE_FILE ) ) {
-        return Maintenance.deserialize( JSON.parse( fs.readFileSync( MAINTENANCE_FILE, 'utf8' ) ) );
-      }
-      else {
-        return new Maintenance();
-      }
-    }
-
-    /**
-     * Resets all state.
+     * Resets ALL of the maintenance state to a default "blank" state.
      * @public
      */
     static reset() {
       new Maintenance().save();
     }
-
-
-
-    /**
-     * Looks up a patch by its repository.
-     * @public
-     *
-     * @param {string} repo
-     * @returns {Patch}
-     */
-    findPatch( repo ) {
-      const patch = this.patches.find( p => p.repo === repo );
-      assert( patch, `Patch not found for ${repo}` );
-
-      return patch;
-    }
-
-    /**
-     * Looks up (or adds) a ModifiedBranch by its identifying information.
-     * @public
-     *
-     * @param {string} repo
-     * @param {string} branch
-     * @param {boolean} [errorIfMissing]
-     * @returns {Promise.<ModifiedBranch>}
-     */
-    async ensureModifiedBranch( repo, branch, errorIfMissing = false ) {
-      let modifiedBranch = this.modifiedBranches.find( modifiedBranch => modifiedBranch.repo === repo && modifiedBranch.branch === branch );
-
-      if ( !modifiedBranch ) {
-        if ( errorIfMissing ) {
-          throw new Error( `Could not find a tracked modified branch for ${repo} ${branch}` );
-        }
-        const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
-        const releaseBranch = releaseBranches.find( release => release.repo === repo && release.branch === branch );
-        assert( releaseBranch, `Could not find a release branch for repo=${repo} branch=${branch}` );
-
-        modifiedBranch = new ModifiedBranch( releaseBranch );
-
-        // If we are creating it, add it to our list.
-        this.modifiedBranches.push( modifiedBranch );
-      }
-
-      return modifiedBranch;
-    }
-
-    /**
-     * Attempts to remove a modified branch (if it doesn't need to be kept around).
-     * @public
-     *
-     * @param {ModifiedBranch} modifiedBranch
-     */
-    tryRemovingModifiedBranch( modifiedBranch ) {
-      if ( modifiedBranch.isUnused ) {
-        const index = this.modifiedBranches.indexOf( modifiedBranch );
-        assert( index >= 0 );
-
-        this.modifiedBranches.splice( index, 1 );
-      }
-    }
-
-
 
     /**
      * Runs a number of checks through every release branch.
@@ -239,8 +147,6 @@ module.exports = ( function() {
      * @returns {Promise}
      */
     static async list() {
-      console.log( 'Maintenance Status' );
-
       const maintenance = Maintenance.load();
 
       for ( let modifiedBranch of maintenance.modifiedBranches ) {
@@ -811,6 +717,205 @@ module.exports = ( function() {
       maintenance.save();
 
       console.log( 'production versions deployed' );
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Convert into a plain JS object meant for JSON serialization.
+     * @public
+     *
+     * @returns {Object}
+     */
+    serialize() {
+      return {
+        patches: this.patches.map( patch => patch.serialize() ),
+        modifiedBranches: this.modifiedBranches.map( modifiedBranch => modifiedBranch.serialize() )
+      };
+    }
+
+    /**
+     * Takes a serialized form of the Maintenance and returns an actual instance.
+     * @public
+     *
+     * @param {Object}
+     * @returns {Maintenance}
+     */
+    static deserialize( { patches, modifiedBranches } ) {
+      // Pass in patch references to branch deserialization
+      const deserializedPatches = patches.map( Patch.deserialize );
+      modifiedBranches = modifiedBranches.map( modifiedBranch => ModifiedBranch.deserialize( modifiedBranch, deserializedPatches ) );
+      modifiedBranches.sort( ( a, b ) => {
+        if ( a.repo !== b.repo ) {
+          return a.repo < b.repo ? -1 : 1;
+        }
+        if ( a.branch !== b.branch ) {
+          return a.branch < b.branch ? -1 : 1;
+        }
+        return 0;
+      } );
+      return new Maintenance( deserializedPatches, modifiedBranches );
+    }
+
+    /**
+     * Saves the state of this object into the maintenance file.
+     * @public
+     */
+    save() {
+      return fs.writeFileSync( MAINTENANCE_FILE, JSON.stringify( this.serialize(), null, 2 ) );
+    }
+
+    /**
+     * Loads a new Maintenance object (if possible) from the maintenance file.
+     * @public
+     *
+     * @returns {Maintenance}
+     */
+    static load() {
+      if ( fs.existsSync( MAINTENANCE_FILE ) ) {
+        return Maintenance.deserialize( JSON.parse( fs.readFileSync( MAINTENANCE_FILE, 'utf8' ) ) );
+      }
+      else {
+        return new Maintenance();
+      }
+    }
+
+    /**
+     * Starts a command-line REPL with features loaded.
+     * @public
+     *
+     * @returns {Promise}
+     */
+    static startREPL() {
+      return new Promise( ( resolve, reject ) => {
+        winston.default.transports.console.level = 'error';
+
+        const session = repl.start( {
+          prompt: 'maintenance> ',
+          useColors: true,
+          replMode: repl.REPL_MODE_STRICT,
+          ignoreUndefined: true
+        } );
+
+        // Wait for promises before being ready for input
+        const nodeEval = session.eval;
+        session.eval = async ( cmd, context, filename, callback ) => {
+          nodeEval( cmd, context, filename, ( _, result ) => {
+            if ( result instanceof Promise ) {
+              result.then( val => callback( _, val ) ).catch( e => {
+                if ( e.stack ) {
+                  console.error( `Maintenance task failed:\n${e.stack}\nFull Error details:\n${JSON.stringify( e, null, 2 )}` );
+                }
+                else if ( typeof e === 'string' ) {
+                  console.error( `Maintenance task failed: ${e}` );
+                }
+                else {
+                  console.error( `Maintenance task failed with unknown error: ${JSON.stringify( e, null, 2 )}` );
+                }
+              } );
+            }
+            else {
+              callback( _, result );
+            }
+          } );
+        };
+
+        // Only autocomplete "public" api functions for Maintenance.
+        const nodeCompleter = session.completer;
+        session.completer = function( text, cb ) {
+          nodeCompleter( text, ( _, [ completions, completed ] ) => {
+            const match = completed.match( /^Maintenance\.(\w*)+/ );
+            if ( match ) {
+              const funcStart = match[ 1 ];
+              cb( null, [ PUBLIC_FUNCTIONS.filter( f => f.startsWith( funcStart ) ).map( f => `Maintenance.${f}` ), completed ] );
+            }
+            else {
+              cb( null, [ completions, completed ] );
+            }
+          } );
+        };
+
+        // Allow controlling verbosity
+        Object.defineProperty( global, 'verbose', {
+          get() {
+            return winston.default.transports.console.level === 'info';
+          },
+          set( value ) {
+            winston.default.transports.console.level = value ? 'info' : 'error';
+          }
+        } );
+
+        session.context.Maintenance = Maintenance;
+
+        session.on( 'exit', resolve );
+      } );
+    }
+
+    /**
+     * Looks up a patch by its repository.
+     * @public
+     *
+     * @param {string} repo
+     * @returns {Patch}
+     */
+    findPatch( repo ) {
+      const patch = this.patches.find( p => p.repo === repo );
+      assert( patch, `Patch not found for ${repo}` );
+
+      return patch;
+    }
+
+    /**
+     * Looks up (or adds) a ModifiedBranch by its identifying information.
+     * @private
+     *
+     * @param {string} repo
+     * @param {string} branch
+     * @param {boolean} [errorIfMissing]
+     * @returns {Promise.<ModifiedBranch>}
+     */
+    async ensureModifiedBranch( repo, branch, errorIfMissing = false ) {
+      let modifiedBranch = this.modifiedBranches.find( modifiedBranch => modifiedBranch.repo === repo && modifiedBranch.branch === branch );
+
+      if ( !modifiedBranch ) {
+        if ( errorIfMissing ) {
+          throw new Error( `Could not find a tracked modified branch for ${repo} ${branch}` );
+        }
+        const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
+        const releaseBranch = releaseBranches.find( release => release.repo === repo && release.branch === branch );
+        assert( releaseBranch, `Could not find a release branch for repo=${repo} branch=${branch}` );
+
+        modifiedBranch = new ModifiedBranch( releaseBranch );
+
+        // If we are creating it, add it to our list.
+        this.modifiedBranches.push( modifiedBranch );
+      }
+
+      return modifiedBranch;
+    }
+
+    /**
+     * Attempts to remove a modified branch (if it doesn't need to be kept around).
+     * @public
+     *
+     * @param {ModifiedBranch} modifiedBranch
+     */
+    tryRemovingModifiedBranch( modifiedBranch ) {
+      if ( modifiedBranch.isUnused ) {
+        const index = this.modifiedBranches.indexOf( modifiedBranch );
+        assert( index >= 0 );
+
+        this.modifiedBranches.splice( index, 1 );
+      }
     }
   }
 

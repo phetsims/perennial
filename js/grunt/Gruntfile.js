@@ -461,6 +461,10 @@ module.exports = function( grunt ) {
     await generateData( grunt );
   } ) );
 
+  grunt.registerTask( 'maintenance', 'Starts a maintenance REPL', wrapTask( async () => {
+    await Maintenance.startREPL();
+  } ) );
+
   grunt.registerTask( 'maintenance-check-branch-status', 'Reports out on release branch statuses', wrapTask( async () => {
     winston.default.transports.console.level = 'error';
 
