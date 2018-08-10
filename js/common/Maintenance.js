@@ -463,7 +463,7 @@ module.exports = ( function() {
       const patch = maintenance.findPatch( patchRepo );
 
       for ( let modifiedBranch of maintenance.modifiedBranches ) {
-        const needsRemoval = filter( modifiedBranch.releaseBranch );
+        const needsRemoval = await filter( modifiedBranch.releaseBranch );
 
         if ( !needsRemoval ) {
           console.log( `  skipping ${modifiedBranch.repo} ${modifiedBranch.branch}` );
