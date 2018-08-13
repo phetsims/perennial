@@ -3,13 +3,13 @@
 /* eslint-env node */
 'use strict';
 
+const fs = require( 'graceful-fs' ); //eslint-disable-line
 const winston = require( 'winston' );
 const writeFile = require( './writeFile' );
 
 /**
  * Writes the htaccess file to password protect the exclusive content for phet-io sims
- * @param {string} passwordProtectFilepath - location of .htaccess file for controlling access to wrappers
- * @param {string} authFilepath - location of AuthUserFile on the dev server\
+ * @param {string} passwordProtectFilepath - deployment location
  * @param {object} [latestOption] - if provided, then write the /latest/ redirect .htaccess file.
  *                                - this is only to be used for production deploys by the build-server
  * @property {string} latestOption.simName
@@ -52,7 +52,20 @@ module.exports = async function writePhetioHtaccess( passwordProtectFilepath, la
                                          'AuthUserFile ' + authFilepath + '\n' +
                                          'Require valid-user\n';
   try {
-    await writeFile( passwordProtectFilepath, passwordProtectWrapperContents );
+    await writeFile( passwordProtectFilepath + '/wrappers/.htaccess', passwordProtectWrapperContents );
+  }
+  catch( err ) {
+    return Promise.reject( err );
+  }
+
+  try {
+    const indexProtectWrapperContents = '<FilesMatch "index.html">\n'
+                                        + passwordProtectWrapperContents
+                                        + '</FilesMatch>\n';
+    const phetioPackage = JSON.parse( fs.readFileSync( '../phet-io/package.json' ) );
+    if ( phetioPackage.addRootHTAccessFile ) {
+      await writeFile( passwordProtectFilepath + '/.htaccess', indexProtectWrapperContents );
+    }
   }
   catch( err ) {
     return Promise.reject( err );

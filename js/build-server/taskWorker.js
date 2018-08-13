@@ -207,8 +207,8 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
       winston.info( 'deploying to dev' );
       if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
         const htaccessLocation = ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) ?
-                                 simDir + '/build/phet-io/wrappers/.htaccess' :
-                                 simDir + '/build/wrappers/.htaccess';
+                                 simDir + '/build/phet-io' :
+                                 simDir + '/build';
         await writePhetioHtaccess( htaccessLocation );
       }
       await devDeploy( simDir, simName, version, chipperVersion, brands );
@@ -322,7 +322,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           }
           else if ( brand === constants.PHET_IO_BRAND ) {
             await writePhetioHtaccess(
-              targetVersionDir + '/wrappers/.htaccess',
+              targetVersionDir,
               { simName, version: originalVersion, directory: constants.PHETIO_SIMS_DIRECTORY }
             );
           }
