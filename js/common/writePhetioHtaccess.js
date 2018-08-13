@@ -63,7 +63,7 @@ module.exports = async function writePhetioHtaccess( passwordProtectFilepath, la
                                         + passwordProtectWrapperContents
                                         + '</FilesMatch>\n';
     const phetioPackage = JSON.parse( fs.readFileSync( '../phet-io/package.json' ) );
-    if ( phetioPackage.addRootHTAccessFile ) {
+    if ( phetioPackage.phet && phetioPackage.phet.addRootHTAccessFile ) {
       await writeFile( passwordProtectFilepath + '/.htaccess', indexProtectWrapperContents );
     }
   }
