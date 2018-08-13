@@ -76,7 +76,7 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
   }
 
   const currentSHA = await gitRevParse( repo, 'HEAD' );
-  const latestSHA = ( await getRemoteBranchSHAs( repo ) ).master;
+  const latestSHA = ( await getRemoteBranchSHAs( repo ) )[ branch ];
   if ( currentSHA !== latestSHA ) {
     // See https://github.com/phetsims/chipper/issues/699
     grunt.fail.fatal( `Out of date with remote, please pull repo. Current SHA: ${currentSHA}, latest SHA: ${latestSHA}` );
