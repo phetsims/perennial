@@ -14,7 +14,11 @@ module.exports = async function( filepath, contents ) {
       fs.writeFile( filepath, contents, err => {
         if ( err ) {
           tries += 1;
-          if ( tries >= 10 ) {
+          if ( err.code === 'ENOENT' ) {
+            winston.error( 'Write operation failed. The target directory did not exist.' );
+            reject( err );
+          }
+          else if ( tries >= 10 ) {
             winston.error( 'Write operation failed ' + tries + ' time(s). I\'m giving up, all hope is lost.' );
             clearInterval( writeFileInterval );
             reject( err );

@@ -146,9 +146,9 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
   // This is for PhET-iO simulations, to protected the password protected wrappers, see
   // https://github.com/phetsims/phet-io/issues/641
   if ( brands.includes( 'phet-io' ) && buildLocal.devDeployServer === 'bayes.colorado.edu' ) {
-    const htaccessLocation = `../${repo}/build/phet-io/.htaccess`;
+    const htaccessLocation = `../${repo}/build/phet-io/`;
     await writePhetioHtaccess( htaccessLocation );
-    await devScp( htaccessLocation, `${versionPath}/phet-io/wrappers/.htaccess` );
+    await devScp( `${htaccessLocation}/.htaccess`, `${versionPath}/phet-io/wrappers/.htaccess` );
   }
 
   // Permissions fixes so others can write over it later
