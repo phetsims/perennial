@@ -91,6 +91,11 @@
       "brands": [ "phet-io" ]
     },
     {
+      "repo": "molarity",
+      "branch": "1.4",
+      "brands": [ "phet-io" ]
+    },
+    {
       "repo": "molecules-and-light",
       "branch": "1.3-phetio",
       "brands": [ "phet-io" ]
