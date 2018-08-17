@@ -115,7 +115,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     await updateDependenciesJSON( repo, brands, versionString, branch );
 
     // Send the build request
-    await buildServerRequest( repo, version, await getDependencies( repo ), {
+    await buildServerRequest( repo, version, branch, await getDependencies( repo ), {
       locales: [ 'en' ],
       brands,
       servers: [ 'dev' ]

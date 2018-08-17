@@ -20,11 +20,12 @@ const winston = require( 'winston' );
  *
  * @param {string} repo
  * @param {SimVersion} version
+ * @param {string} branch
  * @param {Object} dependencies - Dependencies object, use getDependencies?
  * @param {Object} [options]
  * @returns {Promise} - No resolved value
  */
-module.exports = async function( repo, version, dependencies, options ) {
+module.exports = async function( repo, version, branch, dependencies, options ) {
   return new Promise( ( resolve, reject ) => {
 
     const {
@@ -45,6 +46,7 @@ module.exports = async function( repo, version, dependencies, options ) {
       locales,
       servers,
       brands,
+      branch,
       authorizationCode: buildLocal.buildServerAuthorizationCode
     };
     if ( buildLocal.buildServerNotifyEmail ) {
