@@ -62,7 +62,7 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
 
     const phetioPackage = JSON.parse( fs.readFileSync( '../phet-io/package.json' ) );
     if ( phetioPackage.phet && phetioPackage.phet.addRootHTAccessFile ) {
-      const passwordProtectIndexContents = '<FilesMatch "index.html">\n'
+      const passwordProtectIndexContents = '<FilesMatch "index.*">\n'
                                            + passwordProtectWrapperContents
                                            + '</FilesMatch>\n';
       filePath = '.htaccess';
