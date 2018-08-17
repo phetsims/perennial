@@ -176,7 +176,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       grunt.log.writeln( `Deployed: https://phet.colorado.edu/sims/html/${repo}/latest/${repo}_en.html` );
     }
     if ( brands.includes( 'phet-io' ) ) {
-      grunt.log.writeln( `Deployed: https://phet-io.colorado.edu/sims/${repo}/${versionString}/wrappers/index/` );
+      grunt.log.writeln( `Deployed: https://phet-io.colorado.edu/sims/${repo}/${versionString}/` );
     }
 
     grunt.log.writeln( 'Please wait for the build-server to complete the deployment, and then test!' );
