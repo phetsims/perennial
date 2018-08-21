@@ -90,6 +90,7 @@ function queueDeployApiVersion1( req, res, key ) {
   const email = decodeURIComponent( req[ key ][ constants.EMAIL_KEY ] ) || null;
   const translatorId = decodeURIComponent( req[ key ][ constants.USER_ID_KEY ] ) || null;
   const authorizationKey = decodeURIComponent( req[ key ][ constants.AUTHORIZATION_KEY ] );
+  const branch = decodeURIComponent( req[ key ][ constants.BRANCH_KEY ] );
 
   // TODO: determine if this comment needs updating for chipper 1.0 deploys
   // For RC deploys, only send to the dev server.  For production deploys, the local build will send to the dev server so the build-server
@@ -97,7 +98,7 @@ function queueDeployApiVersion1( req, res, key ) {
   const servers = ( option === 'rc' ) ? [ constants.DEV_SERVER ] : [ constants.PRODUCTION_SERVER ];
   const brands = version.indexOf( 'phetio' ) < 0 ? [ constants.PHET_BRAND ] : [ constants.PHET_IO_BRAND ];
 
-  queueDeploy( '1.0', repos, simName, version, locales, brands, servers, email, translatorId, authorizationKey, req, res );
+  queueDeploy( '1.0', repos, simName, version, locales, brands, servers, email, translatorId, branch, authorizationKey, req, res );
 }
 
 function getQueueDeploy( req, res ) {
@@ -120,8 +121,9 @@ function postQueueDeploy( req, res ) {
     const authorizationKey = req.body[ constants.AUTHORIZATION_KEY ];
     const translatorId = req.body[ constants.TRANSLATOR_ID_KEY ] || null;
     const email = req.body[ constants.EMAIL_KEY ] || null;
+    const branch = req.body[ constants.BRANCH_KEY ] || null;
 
-    queueDeploy( api, repos, simName, version, locales, brands, servers, email, translatorId, authorizationKey, req, res );
+    queueDeploy( api, repos, simName, version, locales, brands, servers, email, translatorId, branch, authorizationKey, req, res );
   }
   else {
     queueDeployApiVersion1( req, res, 'body' );
@@ -140,11 +142,12 @@ function postQueueDeploy( req, res ) {
  * @param {Array.<String>} servers
  * @param {String} email
  * @param {String} userId
+ * @param {String} branch
  * @param {String} authorizationKey
  * @param {express.Request} req
  * @param {express.Response} res
  */
-function queueDeploy( api, repos, simName, version, locales, brands, servers, email, userId, authorizationKey, req, res ) {
+function queueDeploy( api, repos, simName, version, locales, brands, servers, email, userId, branch, authorizationKey, req, res ) {
 
   if ( repos && simName && version && authorizationKey ) {
     const productionBrands = [ constants.PHET_BRAND, constants.PHET_IO_BRAND ];
@@ -163,7 +166,7 @@ function queueDeploy( api, repos, simName, version, locales, brands, servers, em
     }
     else {
       winston.log( 'info', 'queuing build for ' + simName + ' ' + version );
-      taskQueue.push( { api, repos, simName, version, locales, servers, brands, email, userId, res }, function( err ) {
+      taskQueue.push( { api, repos, simName, version, locales, servers, brands, email, userId, res, branch }, function( err ) {
         const simInfoString = 'Sim = ' + simName +
                               ' Version = ' + version +
                               ' Locales = ' + locales;
