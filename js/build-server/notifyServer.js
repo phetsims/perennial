@@ -65,7 +65,7 @@ module.exports = async function notifyServer( simName, email, brand, phetioOptio
                   '&versionMaintenance=' + phetioOptions.version.maintenance +
                   '&versionSuffix=' + phetioOptions.suffix +
                   '&branch=' + phetioOptions.branch;
-      request( {
+      request.post( {
         url: url,
         auth: {
           user: 'token',
