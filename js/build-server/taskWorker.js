@@ -313,6 +313,8 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
               } );
           } );
 
+          winston.debug( 'Copy finished' );
+
           // Post-copy steps
           if ( brand === constants.PHET_BRAND ) {
             await writePhetHtaccess( simName, version );
@@ -328,10 +330,12 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           else if ( brand === constants.PHET_IO_BRAND ) {
             const suffix = originalVersion.split( '-' ).length >= 2 ? originalVersion.split( '-' )[ 1 ] : ( chipperVersion.major < 2 ? 'phetio' : '' );
             await notifyServer( simName, email, brand, { branch, suffix, version: SimVersion.parse( version, '' ) } );
+            winston.debug( 'server notified' );
             await writePhetioHtaccess(
               targetVersionDir,
               { simName, version: originalVersion, directory: constants.PHETIO_SIMS_DIRECTORY }
             );
+            winston.debug( 'phetio htaccess written' );
           }
         }
       }
