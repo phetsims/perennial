@@ -130,7 +130,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_en_phet.html` );
     }
     if ( brands.includes( 'phet-io' ) ) {
-      grunt.log.writeln( `Deployed: ${versionURL}/phet-io/wrappers/index` );
+      grunt.log.writeln( `Deployed: ${versionURL}/phet-io/` );
     }
 
     grunt.log.writeln( 'Please wait for the build-server to complete the deployment, and then test!' );

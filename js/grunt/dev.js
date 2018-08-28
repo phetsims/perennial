@@ -163,6 +163,6 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
     grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_en_phet.html` );
   }
   if ( brands.includes( 'phet-io' ) ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/phet-io/wrappers/index` );
+    grunt.log.writeln( `Deployed: ${versionURL}/phet-io/` );
   }
 };
