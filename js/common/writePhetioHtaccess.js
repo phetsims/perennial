@@ -3,8 +3,10 @@
 /* eslint-env node */
 'use strict';
 
+const buildLocal = require( './buildLocal' );
 const devScp = require( '../common/devScp' );
 const fs = require( 'graceful-fs' ); //eslint-disable-line
+const request = require( 'request-promise-native' ); //eslint-disable-line
 const winston = require( 'winston' );
 const writeFile = require( './writeFile' );
 
@@ -23,16 +25,20 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
 
   // This option is for production deploys by the build-server
   // If we are provided a simName and version then write a .htaccess file to redirect
-  // https://phet-io.colorado.edu/sims/{{sim-name}}/latest to https://phet-io.colorado.edu/sims/{{sim-name}}/{{version}}
+  // https://phet-io.colorado.edu/sims/{{sim-name}}/{{major}}.{{minor}} to https://phet-io.colorado.edu/sims/{{sim-name}}/{{major}}.{{minor}}.{{latest}}{{[-suffix]}}
   if ( latestOption ) {
     if ( latestOption.simName && latestOption.version && latestOption.directory ) {
       const redirectFilepath = latestOption.directory + latestOption.simName + '/.htaccess';
-      const latestRedirectContents = 'RewriteEngine on\n' +
-                                     'RewriteBase /sims/' + latestOption.simName + '/\n' +
-                                     'RewriteRule latest(.*) ' + latestOption.version + '$1\n' +
-                                     'RewriteCond %{QUERY_STRING} =download\n' +
-                                     'RewriteRule ([^/]*)$ - [L,E=download:$1]\n' +
-                                     'Header onsuccess set Content-disposition "attachment; filename=%{download}e" env=download\n';
+      let latestRedirectContents = 'RewriteEngine on\n' +
+                                   `RewriteBase /sims/${latestOption.simName}/\n`;
+      const versions = JSON.parse( await request( buildLocal.productionServerURL + `/services/metadata/phetio?name=${latestOption.simName}&latest=true` ) );
+      for ( let v of versions ) {
+        latestRedirectContents += `RewriteRule ${v.versionMajor}.${v.versionMinor} ${v.versionMajor}.${v.versionMinor}.${v.versionMaintenance}${v.versionSuffix ? '' : '-'}${v.versionSuffix}\n`;
+      }
+      // 'RewriteRule latest(.*) ' + latestOption.version + '$1\n';
+      latestRedirectContents += 'RewriteCond %{QUERY_STRING} =download\n' +
+                                'RewriteRule ([^/]*)$ - [L,E=download:$1]\n' +
+                                'Header onsuccess set Content-disposition "attachment; filename=%{download}e" env=download\n';
       try {
         await writeFile( redirectFilepath, latestRedirectContents );
       }
