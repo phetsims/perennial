@@ -33,7 +33,7 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
                                    `RewriteBase /sims/${latestOption.simName}/\n`;
       const versions = JSON.parse( await request( buildLocal.productionServerURL + `/services/metadata/phetio?name=${latestOption.simName}&latest=true` ) );
       for ( let v of versions ) {
-        latestRedirectContents += `RewriteRule ${v.versionMajor}.${v.versionMinor}/ ${v.versionMajor}.${v.versionMinor}.${v.versionMaintenance}${v.versionSuffix ? '' : '-'}${v.versionSuffix}/\n`;
+        latestRedirectContents += `RewriteRule ${v.versionMajor}.${v.versionMinor}/ ${v.versionMajor}.${v.versionMinor}.${v.versionMaintenance}${v.versionSuffix ? '-' : ''}${v.versionSuffix}/\n`;
       }
       // 'RewriteRule latest(.*) ' + latestOption.version + '$1\n';
       latestRedirectContents += 'RewriteCond %{QUERY_STRING} =download\n' +
