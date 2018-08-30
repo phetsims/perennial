@@ -27,7 +27,6 @@ const generateData = require( './generateData' );
 const getBranch = require( '../common/getBranch' );
 const gruntCommand = require( '../common/gruntCommand' );
 const insertRequireStatement = require( './insertRequireStatement' );
-const maintenance = require( './maintenance' );
 const Maintenance = require( '../common/Maintenance' );
 const npmUpdate = require( '../common/npmUpdate' );
 const production = require( './production' );
@@ -163,87 +162,64 @@ module.exports = function( grunt ) {
       } );
     } ) );
 
-  grunt.registerTask( 'maintenance-start',
-    'Starts the maintenance-release process.\n' +
-    'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
-    '--sims : A comma-separated list of simulations that may be involved in this maintenance release process',
-    wrapTask( async () => {
-      await new Promise( ( resolve, reject ) => {
-        maintenance( resolve ).maintenanceStart( grunt.option( 'sims' ) );
-      } );
-    } ) );
-
-  grunt.registerTask( 'maintenance-patch-info',
-    'Stores and prints out information about what SHAs of the repositories all of the simulations use.\n' +
-    'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
-    '--repos : A comma-separated list of repo names that need a combined patch',
-    wrapTask( async () => {
-      await new Promise( ( resolve, reject ) => {
-        maintenance( resolve ).maintenancePatchInfo( grunt.option( 'repos' ) );
-      } );
-    } ) );
-
-  grunt.registerTask( 'maintenance-patch-checkout',
-    'Checks out SHAs for modification and testing.\n' +
-    'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
-    '--repos : A comma-separated list of repo names that need a combined patch\n' +
-    '--shas : A comma-separated list of SHAs for the respective repos that need a combined patch\n' +
-    '--sim : [optional] preferred sim to test with',
-    wrapTask( async () => {
-      await new Promise( ( resolve, reject ) => {
-        maintenance( resolve ).maintenancePatchCheckout( grunt.option( 'repos' ), grunt.option( 'shas' ), grunt.option( 'sim' ) );
-      } );
-    } ) );
-
-  grunt.registerTask( 'maintenance-patch-apply',
-    'Applies committed changes to common repos\' sim-specific branches, and updates dependencies.json for affected\n' +
-    'sim repos\n' +
-    'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
-    '--repos : A comma-separated list of repo names that need a combined patch\n' +
-    '--message : Additional part of message for the dependencies.json commit',
-    wrapTask( async () => {
-      await new Promise( ( resolve, reject ) => {
-        maintenance( resolve ).maintenancePatchApply( grunt.option( 'repos' ), grunt.option( 'message' ) );
-      } );
-    } ) );
-
-  grunt.registerTask( 'maintenance-deploy-rc',
-    'Deploys an RC (release candidate) for the simulation from the maintenance branch, bumping versions.\n' +
-    'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
-    '--sim : Sim name\n' +
-    '--message : Additional part of message for the version bump commit',
-    wrapTask( async () => {
-      await new Promise( ( resolve, reject ) => {
-        maintenance( resolve ).maintenanceDeployRC( grunt.option( 'sim' ), grunt.option( 'message' ) );
-      } );
-    } ) );
-
-  grunt.registerTask( 'maintenance-deploy-rc-no-version-bump',
-    'Deploys an RC (release candidate) for the simulation from the maintenance branch without bumping versions.\n' +
-    'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
-    '--sim : Sim name',
-    wrapTask( async () => {
-      await new Promise( ( resolve, reject ) => {
-        maintenance( resolve ).maintenanceDeployRCNoVersionBump( grunt.option( 'sim' ) );
-      } );
-    } ) );
-
-  grunt.registerTask( 'maintenance-deploy-production',
-    'Deploys the simulation maintenance release to production, bumping the version number.\n' +
-    'See https://github.com/phetsims/phet-info/blob/master/maintenance-release-process.md for details.\n' +
-    '--sim : Sim name\n' +
-    '--message : Additional part of message for the version bump commit',
-    wrapTask( async () => {
-      await new Promise( ( resolve, reject ) => {
-        maintenance( resolve ).maintenanceDeployProduction( grunt.option( 'sim' ), grunt.option( 'message' ) );
-      } );
-    } ) );
-
   grunt.registerTask( 'update-gh-pages',
     'Updates the gh-pages branches for various repos, including building of dot/kite/scenery',
     wrapTask( async () => {
       await new Promise( ( resolve, reject ) => {
-        maintenance( resolve ).updateGithubPages();
+        reject( 'For now unimplemented, see commented-out-code below, contact JO' );
+        /*
+        ar self = this;
+      var repos = [
+        { name: 'assert' },
+        { name: 'phet-core' },
+        { name: 'chipper' },
+        { name: 'sherpa' },
+        { name: 'axon' },
+        { name: 'dot', build: true },
+        { name: 'kite', build: true },
+        { name: 'scenery', build: true }
+      ];
+
+      function next() {
+        if ( repos.length ) {
+          var repo = repos.shift();
+          var name = repo.name;
+          var cwd = '../' + name;
+
+          self.gitCheckout( name, 'gh-pages', function() {
+            self.gitPull( name, function() {
+              self.execute( 'git', [ 'merge', 'master' ], cwd, function() {
+                function afterOptionalBuild() {
+                  self.gitPush( name, 'gh-pages', function() {
+                    self.gitClean( name, function() {
+                      next();
+                    } );
+                  } );
+                }
+
+                if ( repo.build ) {
+                  self.npmUpdate( name, function() {
+                    self.execute( GRUNT_CMD, [], cwd, function() {
+                      self.execute( 'git', [ 'add', 'build' ], cwd, function() {
+                        self.execute( 'git', [ 'commit', '-m', 'Updating Build' ], cwd, afterOptionalBuild, afterOptionalBuild );
+                      } );
+                    } );
+                  } );
+                }
+                else {
+                  afterOptionalBuild();
+                }
+              } );
+            } );
+          } );
+        }
+        else {
+          self.success( 'Updated gh-pages' );
+        }
+      }
+
+      next();
+      */
       } );
     } ) );
 

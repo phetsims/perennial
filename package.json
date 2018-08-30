@@ -12,7 +12,7 @@
     "express": "^4.16.2",
     "graceful-fs": "^4.1.11",
     "grunt": "^1.0.2",
-    "lodash": "^3.10.1",
+    "lodash": "^4.17.10",
     "mimelib": "~0.2.19",
     "minimist": "^1.1.1",
     "qunit": "~2.4.1",
