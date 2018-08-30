@@ -14,6 +14,7 @@ const getLocales = require( './getLocales' );
 const notifyServer = require( './notifyServer' );
 const pullMaster = require( './pullMaster' );
 const rsync = require( 'rsync' );
+const SimVersion = require( '../common/SimVersion' );
 const winston = require( 'winston' );
 const writeFile = require( '../common/writeFile' );
 const writePhetHtaccess = require( './writePhetHtaccess' );
@@ -61,7 +62,7 @@ const afterDeploy = async buildDir => {
  * @property {String} res - express response object
  * @property {winston} winston - logger
  */
-async function taskWorker( { api, repos, locales, simName, version, email, brands, servers, userId } ) {
+async function taskWorker( { api, repos, locales, simName, version, email, brands, servers, userId, branch } ) {
   try {
     //-------------------------------------------------------------------------------------
     // Parse and validate parameters
@@ -73,6 +74,10 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
     const simNameRegex = /^[a-z-]+$/;
 
     winston.debug( JSON.stringify( repos ) );
+
+    if ( branch === null ) {
+      branch = repos[ simName ].branch;
+    }
 
     // make sure the repos passed in validates
     for ( let key in repos ) {
@@ -308,11 +313,13 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
               } );
           } );
 
+          winston.debug( 'Copy finished' );
+
           // Post-copy steps
           if ( brand === constants.PHET_BRAND ) {
             await writePhetHtaccess( simName, version );
             await createTranslationsXML( simName, version );
-            await notifyServer( simName, email );
+            await notifyServer( simName, email, brand );
 
             // if this build request comes from rosetta it will have a userId field and only one locale
             const localesArray = typeof( locales ) === 'string' ? locales.split( ',' ) : locales;
@@ -321,10 +328,14 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             }
           }
           else if ( brand === constants.PHET_IO_BRAND ) {
+            const suffix = originalVersion.split( '-' ).length >= 2 ? originalVersion.split( '-' )[ 1 ] : ( chipperVersion.major < 2 ? 'phetio' : '' );
+            await notifyServer( simName, email, brand, { branch, suffix, version: SimVersion.parse( version, '' ) } );
+            winston.debug( 'server notified' );
             await writePhetioHtaccess(
               targetVersionDir,
               { simName, version: originalVersion, directory: constants.PHETIO_SIMS_DIRECTORY }
             );
+            winston.debug( 'phetio htaccess written' );
           }
         }
       }
