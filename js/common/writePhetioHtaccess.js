@@ -34,7 +34,7 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
       const versions = JSON.parse( await request( buildLocal.productionServerURL + `/services/metadata/phetio?name=${latestOption.simName}&latest=true` ) );
       for ( let v of versions ) {
         // Add a trailing slash to /sims/sim-name/x.y
-        latestRedirectContents += `RewriteRule ${v.versionMajor}.${v.versionMinor}$ ${v.versionMajor}.${v.versionMinor}.${v.versionMaintenance}${v.versionSuffix ? '-' : ''}${v.versionSuffix}/ [R=302]\n`;
+        latestRedirectContents += `RewriteRule ${v.versionMajor}.${v.versionMinor}$ ${v.versionMajor}.${v.versionMinor}$/ [R=301,L]\n`;
         // Rewrite /sims/sim-name/x.y/* to /sims/sim-name/x.y.z/*
         latestRedirectContents += `RewriteRule ${v.versionMajor}.${v.versionMinor}/(.*) ${v.versionMajor}.${v.versionMinor}.${v.versionMaintenance}${v.versionSuffix ? '-' : ''}${v.versionSuffix}/$1\n`;
       }
