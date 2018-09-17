@@ -1,6 +1,6 @@
 
 NOTE: These should be regenerated whenever certain flags in package.json (for repos) are modified, e.g. simulation/runnable/accessible/supportedBrands/automatedTestEnabled. 
-  To do so, run `grunt generate-data` in perennial, then check in the modified files.
+  To do so, run `grunt generate-data` in perennial, then check in the modified files (although the task will likely commit and push for you).
 
 accessibility (auto-generated) is a list of all repositories that have been outfitted with accessibility like keyboard navigation. Sims in progress are also included in this list.  
 
