@@ -10,7 +10,6 @@
 'use strict';
 
 const assert = require( 'assert' );
-const fs = require( 'fs' );
 const checkoutMaster = require( './checkoutMaster' );
 const checkoutTarget = require( './checkoutTarget' );
 const getBranches = require( './getBranches' );
@@ -19,6 +18,7 @@ const gitCheckout = require( './gitCheckout' );
 const gitIsAncestor = require( './gitIsAncestor' );
 const gitRevParse = require( './gitRevParse' );
 const simMetadata = require( './simMetadata' );
+const simPhetioMetadata = require( './simPhetioMetadata' );
 const winston = require( 'winston' );
 
 module.exports = ( function() {
@@ -220,9 +220,6 @@ module.exports = ( function() {
     static async getMaintenanceBranches() {
       winston.debug( 'retrieving available sim branches' );
 
-      const phetioBranchesJSON = JSON.parse( fs.readFileSync( '../perennial/data/phet-io-maintenance.json', 'utf8' ) );
-      const phetioBranches = phetioBranchesJSON.simBranches.map( ReleaseBranch.deserialize );
-
       const phetBranches = ( await simMetadata( {
         summary: true,
         type: 'html'
@@ -230,6 +227,17 @@ module.exports = ( function() {
         let repo = simData.name.slice( simData.name.indexOf( '/' ) + 1 );
         let branch = simData.version.major + '.' + simData.version.minor;
         return new ReleaseBranch( repo, branch, [ 'phet' ] );
+      } );
+
+      const phetioBranches = ( await simPhetioMetadata( {
+        active: true,
+        latest: true
+      } ) ).filter( simData => simData.active && simData.latest ).map( simData => {
+        let branch = `${simData.versionMajor}.${simData.versionMinor}`;
+        if ( simData.versionSuffix.length ) {
+          branch += '-' + simData.versionSuffix; // additional dash required
+        }
+        return new ReleaseBranch( simData.name, branch, [ 'phet-io' ] );
       } );
 
       return ReleaseBranch.combineLists( [ ...phetBranches, ...phetioBranches ] );

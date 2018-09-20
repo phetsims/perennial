@@ -17,7 +17,7 @@ const _ = require( 'lodash' ); // eslint-disable-line
  * Returns metadata from the production website.
  * @public
  *
- * @param {string} options - The repository name
+ * @param {Object} [options]
  * @returns {Promise.<Object>} - Resolves with metadata object
  */
 module.exports = function( options ) {
