@@ -34,6 +34,7 @@ const rc = require( './rc' );
 const shaCheck = require( './shaCheck' );
 const simMetadata = require( '../common/simMetadata' );
 const sortRequireStatements = require( './sortRequireStatements' );
+const updateGithubPages = require( '../common/updateGithubPages' );
 const winston = require( 'winston' );
 const wrapper = require( './wrapper' );
 
@@ -165,62 +166,7 @@ module.exports = function( grunt ) {
   grunt.registerTask( 'update-gh-pages',
     'Updates the gh-pages branches for various repos, including building of dot/kite/scenery',
     wrapTask( async () => {
-      await new Promise( ( resolve, reject ) => {
-        reject( 'For now unimplemented, see commented-out-code below, contact JO' );
-        /*
-        ar self = this;
-      var repos = [
-        { name: 'assert' },
-        { name: 'phet-core' },
-        { name: 'chipper' },
-        { name: 'sherpa' },
-        { name: 'axon' },
-        { name: 'dot', build: true },
-        { name: 'kite', build: true },
-        { name: 'scenery', build: true }
-      ];
-
-      function next() {
-        if ( repos.length ) {
-          var repo = repos.shift();
-          var name = repo.name;
-          var cwd = '../' + name;
-
-          self.gitCheckout( name, 'gh-pages', function() {
-            self.gitPull( name, function() {
-              self.execute( 'git', [ 'merge', 'master' ], cwd, function() {
-                function afterOptionalBuild() {
-                  self.gitPush( name, 'gh-pages', function() {
-                    self.gitClean( name, function() {
-                      next();
-                    } );
-                  } );
-                }
-
-                if ( repo.build ) {
-                  self.npmUpdate( name, function() {
-                    self.execute( GRUNT_CMD, [], cwd, function() {
-                      self.execute( 'git', [ 'add', 'build' ], cwd, function() {
-                        self.execute( 'git', [ 'commit', '-m', 'Updating Build' ], cwd, afterOptionalBuild, afterOptionalBuild );
-                      } );
-                    } );
-                  } );
-                }
-                else {
-                  afterOptionalBuild();
-                }
-              } );
-            } );
-          } );
-        }
-        else {
-          self.success( 'Updated gh-pages' );
-        }
-      }
-
-      next();
-      */
-      } );
+      await updateGithubPages();
     } ) );
 
   grunt.registerTask( 'sim-list',
