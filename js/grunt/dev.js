@@ -111,10 +111,6 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
     grunt.fail.fatal( `Aborted ${testType} deploy` );
   }
 
-  if ( !await booleanPrompt( 'Are you using the CU Boulder network (on campus or via VPN)?', noninteractive ) ) {
-    grunt.fail.fatal( 'CU Boulder network required for dev deploy' );
-  }
-
   await setRepoVersion( repo, version, message );
   await gitPush( repo, branch );
 
