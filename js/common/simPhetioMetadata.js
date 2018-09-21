@@ -27,7 +27,7 @@ module.exports = function( options ) {
       latest: null // {boolean|null} - If set, will only include active branches
     }, options );
 
-    var metadataURL = 'https://phet.colorado.edu/services/metadata/phetio?';
+    let metadataURL = 'https://phet.colorado.edu/services/metadata/phetio?';
     if ( options.active !== null ) {
       metadataURL += `&active=${options.active}`;
     }
