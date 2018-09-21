@@ -409,7 +409,7 @@ module.exports = ( function() {
      * @param {function} sha - function( ReleaseBranch, builtFile:string ): Promise.<boolean>
      */
     static async addNeededPatchesBuildFilter( patchRepo, filter ) {
-      await Maintenance.addNeededPatches( 'chipper', async ( releaseBranch ) => {
+      await Maintenance.addNeededPatches( patchRepo, async ( releaseBranch ) => {
         await checkoutTarget( releaseBranch.repo, releaseBranch.branch, true );
         await gitPull( releaseBranch.repo );
         await build( releaseBranch.repo );
