@@ -138,7 +138,7 @@ module.exports = ( function() {
      * @param {string} sha
      * @returns {Promise.<boolean>}
      */
-    async missingSHA( repo, sha ) {
+    async isMissingSHA( repo, sha ) {
       let result = false;
 
       await checkoutTarget( this.repo, this.branch, false ); // don't npm update

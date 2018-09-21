@@ -383,7 +383,7 @@ module.exports = ( function() {
      */
     static async addNeededPatchesBefore( patchRepo, sha ) {
       await Maintenance.addNeededPatches( patchRepo, async ( releaseBranch ) => {
-        return await releaseBranch.missingSHA( patchRepo, sha );
+        return await releaseBranch.isMissingSHA( patchRepo, sha );
       } );
     }
 
@@ -494,7 +494,7 @@ module.exports = ( function() {
      */
     static async removeNeededPatchesBefore( patchRepo, sha ) {
       await Maintenance.removeNeededPatches( patchRepo, async ( releaseBranch ) => {
-        return await releaseBranch.missingSHA( patchRepo, sha );
+        return await releaseBranch.isMissingSHA( patchRepo, sha );
       } );
     }
 
