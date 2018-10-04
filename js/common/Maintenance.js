@@ -37,7 +37,6 @@ const winston = require( 'winston' );
 // constants
 const MAINTENANCE_FILE = '.maintenance.json';
 
-// TODO: add a help() function?
 const PUBLIC_FUNCTIONS = [
   'addAllNeededPatches',
   'addNeededPatch',
@@ -91,6 +90,9 @@ module.exports = ( function() {
     /**
      * Resets ALL of the maintenance state to a default "blank" state.
      * @public
+     *
+     * CAUTION: This will remove any information about any ongoing/complete maintenance release from your
+     * .maintenance.json. Generally this should be done before any new maintenance release.
      */
     static reset() {
       new Maintenance().save();
