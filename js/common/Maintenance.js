@@ -44,6 +44,7 @@ const PUBLIC_FUNCTIONS = [
   'addNeededPatchesAfter',
   'addNeededPatchesBefore',
   'addNeededPatchesBuildFilter',
+  'addNeededPatchReleaseBranch',
   'addPatchSHA',
   'applyPatches',
   'buildAll',
@@ -330,6 +331,26 @@ module.exports = ( function() {
       maintenance.save();
 
       console.log( `Added patch ${patchRepo} as needed for ${repo} ${branch}` );
+    }
+
+    /**
+     * Adds a needed patch to a given release branch
+     * @public
+     *
+     * @param {ReleaseBranch} releaseBranch
+     * @param {string} patchRepo
+     */
+    static async addNeededPatchReleaseBranch( releaseBranch, patchRepo ) {
+      const maintenance = Maintenance.load();
+
+      const patch = maintenance.findPatch( patchRepo );
+
+      const modifiedBranch = new ModifiedBranch( releaseBranch );
+      maintenance.modifiedBranches.push( modifiedBranch );
+      modifiedBranch.neededPatches.push( patch );
+      maintenance.save();
+
+      console.log( `Added patch ${patchRepo} as needed for ${releaseBranch.repo} ${releaseBranch.branch}` );
     }
 
     /**
