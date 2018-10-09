@@ -26,6 +26,10 @@ This exposes a few additional global objects, such as `Maintenance` and `Release
 exposes a global boolean `verbose` (default false), such that if it is set to true (`verbose = true;`) then it will
 display more information (particularly for debugging issues).
 
+## Release branches
+
+It's good to understand .... TODO TODO TODO
+
 ## General procedure
 
 Before starting:
@@ -75,12 +79,12 @@ The current state of the maintenance release process is stored at `perennial/.ma
 inspected / backed up, and potentially modified manually in some cases. Loading the Maintenance REPL loads this file
 from disk, and most changes should save it back to disk.
 
-## Maintenance.list()
+## Viewing current maintenance state: `Maintenance.list()`
 
 When run, this will output the main status of the process. It will first show a list of affected release branches and
 associated information, e.g.:
 
-`
+```
 area-model-algebra 1.0 phet
   pushedMessages: https://github.com/phetsims/scenery/issues/837
   pendingMessages: https://github.com/phetsims/phetcommon/issues/46
@@ -93,25 +97,46 @@ area-model-decimals 1.0 phet
   deps:
     chipper: 1fb99a869c0bbe46528c7a2abdd1cf141b3a04ca
     phetcommon: 80d991a2fc3c17f95ae39439f833099b19bcaf92
-`
+```
 
 then it will show a list of all patches (with associated information, like patch SHAs and release branches that have not
 yet had applied patches), e.g.:
 
-`
+```
 [phetcommon] https://github.com/phetsims/phetcommon/issues/46
   9fd76b31b1663de55cac2f67283d9a2063d820a9
     balloons-and-static-electricity 1.4 phet
     equality-explorer 1.0 phet
     equality-explorer-basics 1.0 phet
     equality-explorer-two-variables 1.0 phet
-`
+```
 
 This is essentially a pretty-printed version of what is in your `.maintenance.json` file.
 
+## Checking branch status: `Maintenance.checkBranchStatus()`
 
+This command will iterate through all available release branches, and will make a few checks to see whether they are
+in a consistent form (all common-code related branches are OK, etc.) and whether there were any commits since the last
+time it was released. If it detects any anomalies, it will be printed out. If this is a release branch that has a chance
+of being included in the release, it's best to investigate its status.
 
+For example, in a recent maintenance release, I had made commits on release branches that updated README.md which were
+not released, so things showed up as:
 
+```
+Checking acid-base-solutions 1.2
+[acid-base-solutions 1.2] Potential changes (dependency is not previous commit)
+[acid-base-solutions 1.2] f53124982815b74f99567be834846bc8a1354364 fe00721f0a8a818a84969c298a91c5a6877bd1d6 9dc4b45dcb25933ff2200cf7f9d5bbd115211398
+```
+
+However there was also a more serious issue with a branch where the common-code branch was not correctly set up:
+
+```
+[balloons-and-static-electricity 1.2-phetio] Dependency mismatch for phet-io on branch balloons-and-static-electricity-1.2-phetio
+```
+
+In this case, I investigated both cases to check (a) the only extra commits were the "safe" ones, and (b) handled the
+bad branch issue (in this case, by not doing maintenance releases for that branch then or in the future).
 
 
 
