@@ -16,6 +16,7 @@ const getBranches = require( './getBranches' );
 const getDependencies = require( './getDependencies' );
 const gitCheckout = require( './gitCheckout' );
 const gitIsAncestor = require( './gitIsAncestor' );
+const gitPull = require( './gitPull' );
 const gitRevParse = require( './gitRevParse' );
 const simMetadata = require( './simMetadata' );
 const simPhetioMetadata = require( './simPhetioMetadata' );
@@ -197,6 +198,7 @@ module.exports = ( function() {
         if ( branches.includes( potentialReleaseBranch ) ) {
           const currentCommit = await gitRevParse( dependency, 'HEAD' );
           await gitCheckout( dependency, potentialReleaseBranch );
+          await gitPull( dependency );
           const expectedCommit = await gitRevParse( dependency, 'HEAD' );
 
           if ( currentCommit !== expectedCommit ) {
