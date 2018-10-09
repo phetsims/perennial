@@ -7,7 +7,7 @@ const puppeteer = require( 'puppeteer' );
 module.exports = function( targetURL ) {
   'use strict';
 
-  const myFirstPromise = new Promise( async function( resolve, reject ) {
+  return new Promise( async function( resolve, reject ) {
     // do something asynchronous which eventually calls either:
     //
     //   resolve(someValue); // fulfilled
@@ -80,8 +80,7 @@ module.exports = function( targetURL ) {
       console.log( stats.join( ', ' ) );
 
       browser.close();
-      console.log( 'hello' );
-      resolve( 'hello2' );
+      resolve( stats );
     } );
 
     await page.goto( targetURL );
@@ -99,7 +98,4 @@ module.exports = function( targetURL ) {
       console.log( '\nRunning: ' + JSON.stringify( QUnit.urlParams ) + '\n' );
     } );
   } );
-
-  return myFirstPromise;
-
 };
