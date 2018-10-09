@@ -378,6 +378,7 @@ module.exports = ( function() {
         if ( !modifiedBranch.neededPatches.includes( patch ) ) {
           modifiedBranch.neededPatches.push( patch );
           console.log( `Added needed patch ${patchRepo} to ${releaseBranch.repo} ${releaseBranch.branch}` );
+          maintenance.save(); // save here in case a future failure would "revert" things
         }
         else {
           console.log( `Patch ${patchRepo} already included in ${releaseBranch.repo} ${releaseBranch.branch}` );
@@ -660,6 +661,7 @@ module.exports = ( function() {
 
             delete modifiedBranch.changedDependencies[ dependency ];
             modifiedBranch.deployedVersion = null;
+            maintenance.save(); // save here in case a future failure would "revert" things
           }
 
           if ( changedRepos.includes( 'chipper' ) ) {
@@ -680,6 +682,7 @@ module.exports = ( function() {
             }
           }
           modifiedBranch.pendingMessages = [];
+          maintenance.save(); // save here in case a future failure would "revert" things
 
           await checkoutMaster( modifiedBranch.repo, true ); // npm update back, so we don't leave the sim in a weird state
         } catch ( e ) {
@@ -707,6 +710,7 @@ module.exports = ( function() {
 
           const version = await rc( modifiedBranch.repo, modifiedBranch.branch, modifiedBranch.brands, true, modifiedBranch.pushedMessages.join( ', ' ) );
           modifiedBranch.deployedVersion = version;
+          maintenance.save(); // save here in case a future failure would "revert" things
         } catch ( e ) {
           maintenance.save();
 
@@ -733,6 +737,7 @@ module.exports = ( function() {
           const version = await production( modifiedBranch.repo, modifiedBranch.branch, modifiedBranch.brands, true, modifiedBranch.pushedMessages.join( ', ' ) );
           modifiedBranch.deployedVersion = version;
           modifiedBranch.pushedMessages = [];
+          maintenance.save(); // save here in case a future failure would "revert" things
         } catch ( e ) {
           maintenance.save();
 
