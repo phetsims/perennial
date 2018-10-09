@@ -4,89 +4,102 @@
 
 const puppeteer = require( 'puppeteer' );
 
-module.exports = async function( targetURL ) {
+module.exports = function( targetURL ) {
   'use strict';
 
-  // const timeout = 30000;
+  const myFirstPromise = new Promise( async function( resolve, reject ) {
+    // do something asynchronous which eventually calls either:
+    //
+    //   resolve(someValue); // fulfilled
+    // or
+    //   reject("failure reason"); // rejected
 
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
 
-  // Output log
-  // page.on( 'console', msg => console.log( 'PAGE LOG:', msg.text() ) );
+    // const timeout = 30000;
 
-  var moduleErrors = [];
-  var testErrors = [];
-  var assertionErrors = [];
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
 
-  await page.exposeFunction( 'harness_moduleDone', context => {
-    if ( context.failed ) {
-      var msg = 'Module Failed: ' + context.name + '\n' + testErrors.join( '\n' );
-      moduleErrors.push( msg );
-      testErrors = [];
-    }
-  } );
+    // Output log
+    // page.on( 'console', msg => console.log( 'PAGE LOG:', msg.text() ) );
 
-  await page.exposeFunction( 'harness_testDone', context => {
-    if ( context.failed ) {
-      var msg = '  Test Failed: ' + context.name + assertionErrors.join( '    ' );
-      testErrors.push( msg );
-      assertionErrors = [];
-      process.stdout.write( 'F' );
-    }
-    else {
-      process.stdout.write( '.' );
-    }
-  } );
+    var moduleErrors = [];
+    var testErrors = [];
+    var assertionErrors = [];
 
-  await page.exposeFunction( 'harness_log', context => {
-    if ( context.result ) { return; } // If success don't log
-
-    var msg = '\n    Assertion Failed:';
-    if ( context.message ) {
-      msg += ' ' + context.message;
-    }
-
-    if ( context.expected ) {
-      msg += '\n      Expected: ' + context.expected + ', Actual: ' + context.actual;
-    }
-
-    assertionErrors.push( msg );
-  } );
-
-  await page.exposeFunction( 'harness_done', context => {
-    console.log( '\n' );
-
-    if ( moduleErrors.length > 0 ) {
-      for ( var idx = 0; idx < moduleErrors.length; idx++ ) {
-        console.error( moduleErrors[ idx ] + '\n' );
+    await page.exposeFunction( 'harness_moduleDone', context => {
+      if ( context.failed ) {
+        var msg = 'Module Failed: ' + context.name + '\n' + testErrors.join( '\n' );
+        moduleErrors.push( msg );
+        testErrors = [];
       }
-    }
+    } );
 
-    var stats = [
-      'Time: ' + context.runtime + 'ms',
-      'Total: ' + context.total,
-      'Passed: ' + context.passed,
-      'Failed: ' + context.failed
-    ];
-    console.log( stats.join( ', ' ) );
+    await page.exposeFunction( 'harness_testDone', context => {
+      if ( context.failed ) {
+        var msg = '  Test Failed: ' + context.name + assertionErrors.join( '    ' );
+        testErrors.push( msg );
+        assertionErrors = [];
+        process.stdout.write( 'F' );
+      }
+      else {
+        process.stdout.write( '.' );
+      }
+    } );
 
-    browser.close();
+    await page.exposeFunction( 'harness_log', context => {
+      if ( context.result ) { return; } // If success don't log
 
+      var msg = '\n    Assertion Failed:';
+      if ( context.message ) {
+        msg += ' ' + context.message;
+      }
+
+      if ( context.expected ) {
+        msg += '\n      Expected: ' + context.expected + ', Actual: ' + context.actual;
+      }
+
+      assertionErrors.push( msg );
+    } );
+
+    await page.exposeFunction( 'harness_done', context => {
+      console.log( '\n' );
+
+      if ( moduleErrors.length > 0 ) {
+        for ( var idx = 0; idx < moduleErrors.length; idx++ ) {
+          console.error( moduleErrors[ idx ] + '\n' );
+        }
+      }
+
+      var stats = [
+        'Time: ' + context.runtime + 'ms',
+        'Total: ' + context.total,
+        'Passed: ' + context.passed,
+        'Failed: ' + context.failed
+      ];
+      console.log( stats.join( ', ' ) );
+
+      browser.close();
+      console.log( 'hello' );
+      resolve( 'hello2' );
+    } );
+
+    await page.goto( targetURL );
+
+    await page.evaluate( () => {
+      QUnit.config.testTimeout = 10000;
+
+      // Cannot pass the window.harness_blah methods directly, because they are
+      // automatically defined as async methods, which QUnit does not support
+      QUnit.moduleDone( context => window.harness_moduleDone( context ) );
+      QUnit.testDone( context => window.harness_testDone( context ) );
+      QUnit.log( context => window.harness_log( context ) );
+      QUnit.done( context => window.harness_done( context ) );
+
+      console.log( '\nRunning: ' + JSON.stringify( QUnit.urlParams ) + '\n' );
+    } );
   } );
 
-  await page.goto( targetURL );
+  return myFirstPromise;
 
-  await page.evaluate( () => {
-    QUnit.config.testTimeout = 10000;
-
-    // Cannot pass the window.harness_blah methods directly, because they are
-    // automatically defined as async methods, which QUnit does not support
-    QUnit.moduleDone( context => window.harness_moduleDone( context ) );
-    QUnit.testDone( context => window.harness_testDone( context ) );
-    QUnit.log( context => window.harness_log( context ) );
-    QUnit.done( context => window.harness_done( context ) );
-
-    console.log( '\nRunning: ' + JSON.stringify( QUnit.urlParams ) + '\n' );
-  } );
 };
