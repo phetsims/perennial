@@ -83,8 +83,8 @@ module.exports = async function notifyServer( simName, email, brand, phetioOptio
             errorMessage = 'request to upsert phetio deployment failed';
           }
           winston.log( 'error', errorMessage );
-          sendEmail( 'PHETIO DEPLOYMENT UPSERT FAILED', errorMessage, email );
-          return reject( 'PHETIO DEPLOYMENT UPSERT FAILED' );
+          sendEmail( 'PHET_IO DEPLOYMENT UPSERT FAILED', errorMessage, email );
+          return reject( 'PHET_IO DEPLOYMENT UPSERT FAILED' );
         }
         else {
           const response = JSON.parse( body );
@@ -98,7 +98,7 @@ module.exports = async function notifyServer( simName, email, brand, phetioOptio
             }
             winston.log( 'error', errorMessage );
             sendEmail( 'SYNCHRONIZE FAILED', errorMessage, email );
-            return reject( 'PHETIO DEPLOYMENT UPSERT FAILED' );
+            return reject( 'PHET_IO DEPLOYMENT UPSERT FAILED' );
           }
           else {
             winston.log( 'info', 'request to upsert phetio deployment for ' + simName + ' on ' + constants.BUILD_SERVER_CONFIG.productionServerName + ' succeeded' );

@@ -249,7 +249,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             }
           }
           else if ( brand === constants.PHET_IO_BRAND ) {
-            targetSimDir = constants.PHETIO_SIMS_DIRECTORY + simName;
+            targetSimDir = constants.PHET_IO_SIMS_DIRECTORY + simName;
             targetVersionDir = targetSimDir + '/' + originalVersion;
             if ( chipperVersion.major === 0 && !originalVersion.match( '-phetio' ) ) {
               targetVersionDir += '-phetio';
@@ -333,7 +333,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             winston.debug( 'server notified' );
             await writePhetioHtaccess(
               targetVersionDir,
-              { simName, version: originalVersion, directory: constants.PHETIO_SIMS_DIRECTORY }
+              { simName, version: originalVersion, directory: constants.PHET_IO_SIMS_DIRECTORY }
             );
             winston.debug( 'phetio htaccess written' );
           }
