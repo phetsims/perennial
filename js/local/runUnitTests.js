@@ -20,7 +20,7 @@ module.exports = function( browser, targetURL ) {
     page.on( 'pageerror', msg => end( { ok: false, result: 'pageerror', message: msg } ) );
 
     // Output log
-    page.on( 'console', msg => console.log( 'PAGE LOG:', msg.text() ) );
+    // page.on( 'console', msg => console.log( 'PAGE LOG:', msg.text() ) );
 
     var moduleErrors = [];
     var testErrors = [];
