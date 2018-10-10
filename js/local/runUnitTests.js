@@ -20,7 +20,7 @@ module.exports = function( browser, targetURL ) {
     page.on( 'pageerror', msg => end( { ok: false, result: 'pageerror', message: msg } ) );
 
     // Output log
-    // page.on( 'console', msg => console.log( 'PAGE LOG:', msg.text() ) );
+    page.on( 'console', msg => console.log( 'PAGE LOG:', msg.text() ) );
 
     var moduleErrors = [];
     var testErrors = [];
@@ -80,17 +80,22 @@ module.exports = function( browser, targetURL ) {
       } );
     } );
 
-    await page.goto( targetURL );
+    try {
+      await page.goto( targetURL );
 
-    await page.evaluate( () => {
-      QUnit.config.testTimeout = 10000;
+      await page.evaluate( () => {
+        QUnit.config.testTimeout = 10000;
 
-      // Cannot pass the window.harness_blah methods directly, because they are
-      // automatically defined as async methods, which QUnit does not support
-      QUnit.moduleDone( context => window.harness_moduleDone( context ) );
-      QUnit.testDone( context => window.harness_testDone( context ) );
-      QUnit.log( context => window.harness_log( context ) );
-      QUnit.done( context => window.harness_done( context ) );
-    } );
+        // Cannot pass the window.harness_blah methods directly, because they are
+        // automatically defined as async methods, which QUnit does not support
+        QUnit.moduleDone( context => window.harness_moduleDone( context ) );
+        QUnit.testDone( context => window.harness_testDone( context ) );
+        QUnit.log( context => window.harness_log( context ) );
+        QUnit.done( context => window.harness_done( context ) );
+      } );
+    }
+    catch( e ) {
+      end( { ok: false, message: 'caught exception ' + e } );
+    }
   } );
 };
