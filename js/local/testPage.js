@@ -2,22 +2,10 @@
 // Adapted from https://github.com/davidtaylorhq/qunit-puppeteer which is distributed under the MIT License // eslint-disable-line
 /* eslint-enable */
 
-const puppeteer = require( 'puppeteer' );
-
-module.exports = function( targetURL ) {
+module.exports = function( browser, targetURL ) {
   'use strict';
 
   return new Promise( async function( resolve, reject ) {
-    // do something asynchronous which eventually calls either:
-    //
-    //   resolve(someValue); // fulfilled
-    // or
-    //   reject("failure reason"); // rejected
-
-
-    // const timeout = 30000;
-
-    const browser = await puppeteer.launch();
     const page = await browser.newPage();
 
     // Output log
@@ -62,7 +50,7 @@ module.exports = function( targetURL ) {
       assertionErrors.push( msg );
     } );
 
-    await page.exposeFunction( 'harness_done', context => {
+    await page.exposeFunction( 'harness_done', async function( context ) {
       console.log( '\n' );
 
       if ( moduleErrors.length > 0 ) {
@@ -79,7 +67,7 @@ module.exports = function( targetURL ) {
       ];
       console.log( stats.join( ', ' ) );
 
-      browser.close();
+      await page.close();
       resolve( stats );
     } );
 
