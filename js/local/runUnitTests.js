@@ -68,7 +68,14 @@ module.exports = function( browser, targetURL ) {
       console.log( stats.join( ', ' ) );
 
       await page.close();
-      resolve( stats );
+      resolve( {
+        ok: context.passed === context.total,
+        time: context.runtime,
+        totalTests: context.total,
+        passed: context.passed,
+        failed: context.failed,
+        errors: moduleErrors
+      } );
     } );
 
     await page.goto( targetURL );
