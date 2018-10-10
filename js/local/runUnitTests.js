@@ -7,6 +7,17 @@ module.exports = function( browser, targetURL ) {
 
   return new Promise( async function( resolve, reject ) {
     const page = await browser.newPage();
+    let ended = false;
+    const end = async function( result ) {
+      if ( !ended ) {
+        ended = true;
+        await page.close();
+        resolve( result );
+      }
+    };
+
+    page.on( 'error', msg => end( { ok: false, result: 'error', message: msg } ) );
+    page.on( 'pageerror', msg => end( { ok: false, result: 'pageerror', message: msg } ) );
 
     // Output log
     // page.on( 'console', msg => console.log( 'PAGE LOG:', msg.text() ) );
@@ -59,16 +70,7 @@ module.exports = function( browser, targetURL ) {
         }
       }
 
-      var stats = [
-        'Time: ' + context.runtime + 'ms',
-        'Total: ' + context.total,
-        'Passed: ' + context.passed,
-        'Failed: ' + context.failed
-      ];
-      console.log( stats.join( ', ' ) );
-
-      await page.close();
-      resolve( {
+      end( {
         ok: context.passed === context.total,
         time: context.runtime,
         totalTests: context.total,
@@ -89,8 +91,6 @@ module.exports = function( browser, targetURL ) {
       QUnit.testDone( context => window.harness_testDone( context ) );
       QUnit.log( context => window.harness_log( context ) );
       QUnit.done( context => window.harness_done( context ) );
-
-      console.log( '\nRunning: ' + JSON.stringify( QUnit.urlParams ) + '\n' );
     } );
   } );
 };
