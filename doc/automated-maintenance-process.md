@@ -28,7 +28,7 @@ command line), or like Chrome's command-line tools. You can assign global variab
 To open up the maintenance REPL:
 
 1. Make sure you have perennial's node_modules (`npm prune` and `npm update` under perennial).
-2. Run `grunt maintenance`.
+2. Run `grunt maintenance` from the perennial directory.
 
 It will open a prompt with `maintenance>` (to let you know you are in the maintenance REPL).
 
@@ -82,7 +82,7 @@ ALL release branches that are marked for maintenance (NOTE that it returns a Pro
 
 NOTE: This is an outline. Details for each step will be listed below in this document.
 
-Before starting:
+Before starting, ensure you have a clean working copy, and:
 
 1. Run `Maintenance.checkBranchStatus()` to see if any commits have snuck into release branches that are unanticipated.
 2. Communicate with the team about maintenance releases for release branches. If there are release branches that are
