@@ -42,7 +42,7 @@ module.exports = function( browser, targetURL ) {
         process.stdout.write( 'F' );
       }
       else {
-        process.stdout.write( '.' );
+        // process.stdout.write( '.' );
       }
     } );
 
@@ -62,7 +62,7 @@ module.exports = function( browser, targetURL ) {
     } );
 
     await page.exposeFunction( 'harness_done', async function( context ) {
-      console.log( '\n' );
+      // console.log( '\n' );
 
       if ( moduleErrors.length > 0 ) {
         for ( var idx = 0; idx < moduleErrors.length; idx++ ) {
