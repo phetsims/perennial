@@ -376,7 +376,7 @@ module.exports = function( grunt ) {
     var cache = !grunt.option( 'disable-eslint-cache' );
 
     // Don't always require this, as we may have an older chipper checked out
-    require( '../../../chipper/js/grunt/lint' )( grunt.file.read( 'data/active-repos' ).trim().split( /\r?\n/ ), cache );
+    require( '../../../chipper/js/grunt/lint' )( grunt.file.read( 'data/active-repos' ).trim().split( /\r?\n/ ), cache, grunt.option( 'say' ) );
   } ) );
 
   grunt.registerTask( 'generate-data', '[NOTE: Runs automatically on bayes. DO NOT run locally] Generates the lists under perennial/data/, and if there were changes, will commit and push.', wrapTask( async () => {
