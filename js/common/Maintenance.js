@@ -108,9 +108,9 @@ module.exports = ( function() {
     static async checkBranchStatus() {
       const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
 
-      for ( let releaseBranch of releaseBranches ) {
+      for ( let releaseBranch of releaseBranches ) { // eslint-disable-line no-restricted-syntax
         console.log( `Checking ${releaseBranch.repo} ${releaseBranch.branch}` );
-        for ( let line of await releaseBranch.getStatus() ) {
+        for ( let line of await releaseBranch.getStatus() ) { // eslint-disable-line no-restricted-syntax
           console.log( line );
         }
       }
@@ -125,7 +125,7 @@ module.exports = ( function() {
 
       const failed = [];
 
-      for ( let releaseBranch of releaseBranches ) {
+      for ( let releaseBranch of releaseBranches ) { // eslint-disable-line no-restricted-syntax
         console.log( `building ${releaseBranch.repo} ${releaseBranch.branch}` );
         try {
           await checkoutTarget( releaseBranch.repo, releaseBranch.branch, true ); // include npm update
@@ -155,7 +155,7 @@ module.exports = ( function() {
     static async list() {
       const maintenance = Maintenance.load();
 
-      for ( let modifiedBranch of maintenance.modifiedBranches ) {
+      for ( let modifiedBranch of maintenance.modifiedBranches ) { // eslint-disable-line no-restricted-syntax
         console.log( `${modifiedBranch.repo} ${modifiedBranch.branch} ${modifiedBranch.brands.join( ',' )}` );
         if ( modifiedBranch.deployedVersion ) {
           console.log( `  deployed: ${modifiedBranch.deployedVersion.toString()}` );
@@ -171,18 +171,18 @@ module.exports = ( function() {
         }
         if ( Object.keys( modifiedBranch.changedDependencies ).length > 0 ) {
           console.log( '  deps:' );
-          for ( let key of Object.keys( modifiedBranch.changedDependencies ) ) {
+          for ( let key of Object.keys( modifiedBranch.changedDependencies ) ) { // eslint-disable-line no-restricted-syntax
             console.log( `    ${key}: ${modifiedBranch.changedDependencies[ key ]}` );
           }
         }
       }
 
-      for ( let patch of maintenance.patches ) {
+      for ( let patch of maintenance.patches ) { // eslint-disable-line no-restricted-syntax
         console.log( `[${patch.repo}] ${patch.message}` );
-        for ( let sha of patch.shas ) {
+        for ( let sha of patch.shas ) { // eslint-disable-line no-restricted-syntax
           console.log( `  ${sha}` );
         }
-        for ( let modifiedBranch of maintenance.modifiedBranches ) {
+        for ( let modifiedBranch of maintenance.modifiedBranches ) { // eslint-disable-line no-restricted-syntax
           if ( modifiedBranch.neededPatches.includes( patch ) ) {
             console.log( `    ${modifiedBranch.repo} ${modifiedBranch.branch} ${modifiedBranch.brands.join( ',' )}` );
           }
@@ -200,9 +200,9 @@ module.exports = ( function() {
       if ( productionBranches.length ) {
         console.log( '\nProduction links\n' );
 
-        for ( let modifiedBranch of productionBranches ) {
+        for ( let modifiedBranch of productionBranches ) { // eslint-disable-line no-restricted-syntax
           const links = await modifiedBranch.getDeployedLinkLines();
-          for ( let link of links ) {
+          for ( let link of links ) { // eslint-disable-line no-restricted-syntax
             console.log( link );
           }
         }
@@ -211,9 +211,9 @@ module.exports = ( function() {
       if ( releaseCandidateBranches.length ) {
         console.log( '\nRelease Candidate links\n' );
 
-        for ( let modifiedBranch of releaseCandidateBranches ) {
+        for ( let modifiedBranch of releaseCandidateBranches ) { // eslint-disable-line no-restricted-syntax
           const links = await modifiedBranch.getDeployedLinkLines();
-          for ( let link of links ) {
+          for ( let link of links ) { // eslint-disable-line no-restricted-syntax
             console.log( link );
           }
         }
@@ -231,7 +231,7 @@ module.exports = ( function() {
     static async createPatch( repo, message ) {
       const maintenance = Maintenance.load();
 
-      for ( let patch of maintenance.patches ) {
+      for ( let patch of maintenance.patches ) { // eslint-disable-line no-restricted-syntax
         if ( patch.repo === repo ) {
           throw new Error( 'Multiple patches with the same repo are not concurrently supported' );
         }
@@ -256,7 +256,7 @@ module.exports = ( function() {
 
       const patch = maintenance.findPatch( repo );
 
-      for ( let branch of maintenance.modifiedBranches ) {
+      for ( let branch of maintenance.modifiedBranches ) { // eslint-disable-line no-restricted-syntax
         if ( branch.neededPatches.includes( patch ) ) {
           throw new Error( 'Patch is marked as needed by at least one branch' );
         }
@@ -366,7 +366,7 @@ module.exports = ( function() {
       const patch = maintenance.findPatch( patchRepo );
       const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
 
-      for ( let releaseBranch of releaseBranches ) {
+      for ( let releaseBranch of releaseBranches ) { // eslint-disable-line no-restricted-syntax
         const needsPatch = await filter( releaseBranch );
 
         if ( !needsPatch ) {
@@ -486,7 +486,7 @@ module.exports = ( function() {
 
       const patch = maintenance.findPatch( patchRepo );
 
-      for ( let modifiedBranch of maintenance.modifiedBranches ) {
+      for ( let modifiedBranch of maintenance.modifiedBranches ) { // eslint-disable-line no-restricted-syntax
         const needsRemoval = await filter( modifiedBranch.releaseBranch );
 
         if ( !needsRemoval ) {
@@ -551,7 +551,7 @@ module.exports = ( function() {
       const maintenance = Maintenance.load();
       let numApplied = 0;
 
-      for ( let modifiedBranch of maintenance.modifiedBranches ) {
+      for ( let modifiedBranch of maintenance.modifiedBranches ) { // eslint-disable-line no-restricted-syntax
         if ( modifiedBranch.neededPatches.length === 0 ) {
           continue;
         }
@@ -560,7 +560,7 @@ module.exports = ( function() {
         const branch = modifiedBranch.branch;
 
         // Defensive copy, since we modify it during iteration
-        for ( let patch of modifiedBranch.neededPatches.slice() ) {
+        for ( let patch of modifiedBranch.neededPatches.slice() ) { // eslint-disable-line no-restricted-syntax
           if ( patch.shas.length === 0 ) {
             continue;
           }
@@ -585,7 +585,7 @@ module.exports = ( function() {
 
             console.log( `Checked out ${patchRepo} SHA for ${repo} ${branch}` );
 
-            for ( let sha of patch.shas ) {
+            for ( let sha of patch.shas ) { // eslint-disable-line no-restricted-syntax
               const cherryPickSuccess = await gitCherryPick( patchRepo, sha );
 
               if ( cherryPickSuccess ) {
@@ -625,7 +625,7 @@ module.exports = ( function() {
     static async updateDependencies() {
       const maintenance = Maintenance.load();
 
-      for ( let modifiedBranch of maintenance.modifiedBranches ) {
+      for ( let modifiedBranch of maintenance.modifiedBranches ) { // eslint-disable-line no-restricted-syntax
         const changedRepos = Object.keys( modifiedBranch.changedDependencies );
         if ( changedRepos.length === 0 ) {
           continue;
@@ -635,7 +635,7 @@ module.exports = ( function() {
           await checkoutTarget( modifiedBranch.repo, modifiedBranch.branch, true ); // npm update, since we'll build.
           console.log( `Checked out ${modifiedBranch.repo} ${modifiedBranch.branch}` );
 
-          for ( let dependency of changedRepos ) {
+          for ( let dependency of changedRepos ) { // eslint-disable-line no-restricted-syntax
             const dependencyBranch = modifiedBranch.dependencyBranch;
             const branches = await getBranches( dependency );
             const sha = modifiedBranch.changedDependencies[ dependency ];
@@ -676,7 +676,7 @@ module.exports = ( function() {
           await updateDependenciesJSON( modifiedBranch.repo, modifiedBranch.brands, message, modifiedBranch.branch );
 
           // Move messages from pending to pushed
-          for ( let message of modifiedBranch.pendingMessages ) {
+          for ( let message of modifiedBranch.pendingMessages ) { // eslint-disable-line no-restricted-syntax
             if ( !modifiedBranch.pushedMessages.includes( message ) ) {
               modifiedBranch.pushedMessages.push( message );
             }
@@ -700,7 +700,7 @@ module.exports = ( function() {
     static async deployReleaseCandidates() {
       const maintenance = Maintenance.load();
 
-      for ( let modifiedBranch of maintenance.modifiedBranches ) {
+      for ( let modifiedBranch of maintenance.modifiedBranches ) { // eslint-disable-line no-restricted-syntax
         if ( !modifiedBranch.isReadyForReleaseCandidate ) {
           continue;
         }
@@ -726,7 +726,7 @@ module.exports = ( function() {
     static async deployProduction() {
       const maintenance = Maintenance.load();
 
-      for ( let modifiedBranch of maintenance.modifiedBranches ) {
+      for ( let modifiedBranch of maintenance.modifiedBranches ) { // eslint-disable-line no-restricted-syntax
         if ( !modifiedBranch.isReadyForProduction ) {
           continue;
         }

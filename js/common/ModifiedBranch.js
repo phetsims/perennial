@@ -265,7 +265,7 @@ module.exports = ( function() {
       await gitCheckout( this.repo, this.branch );
       await gitPull( this.repo );
       const dependencies = await getDependencies( this.repo );
-      for ( let key of Object.keys( this.changedDependencies ) ) {
+      for ( let key of Object.keys( this.changedDependencies ) ) { // eslint-disable-line no-restricted-syntax
         // This should exist hopefully
         dependencies[ key ].sha = this.changedDependencies[ key ];
       }

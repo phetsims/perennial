@@ -30,7 +30,7 @@ module.exports = function( repositoryName, toMaster, buildServer ) {
     }
   }
 
-  for ( let property of dependencies ) {
+  for ( let property of dependencies ) { // eslint-disable-line no-restricted-syntax
     if ( property !== 'comment' && property !== repositoryName && dependencies.hasOwnProperty( property ) ) {
       assert( typeof( dependencies[ property ].branch !== 'undefined' ) && typeof( dependencies[ property ].sha !== 'undefined' ) );
 
