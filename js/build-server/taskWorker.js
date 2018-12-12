@@ -80,7 +80,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
     }
 
     // make sure the repos passed in validates
-    for ( let key in repos ) {
+    for ( const key in repos ) {
       if ( repos.hasOwnProperty( key ) ) {
         winston.log( 'info', 'Validating repo: ' + key );
 
@@ -224,7 +224,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
       let targetVersionDir;
       let targetSimDir;
       // Loop over all brands
-      for ( let i in brands ) {
+      for ( const i in brands ) {
         if ( brands.hasOwnProperty( i ) ) {
           const brand = brands[ i ];
           winston.info( 'deploying brand: ' + brand );
@@ -237,7 +237,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
               // Remove _phet from all filenames in the phet directory
               const files = fs.readdirSync( simDir + '/build/phet' );
-              for ( let i in files ) {
+              for ( const i in files ) {
                 if ( files.hasOwnProperty( i ) ) {
                   const filename = files[ i ];
                   if ( filename.indexOf( '_phet' ) >= 0 ) {

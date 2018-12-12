@@ -191,7 +191,7 @@ module.exports = ( function() {
         results.push( 'Own repository not included in dependencies' );
       }
 
-      for ( let dependency of dependencyNames ) { // eslint-disable-line no-restricted-syntax
+      for ( const dependency of dependencyNames ) { // eslint-disable-line no-restricted-syntax
         const potentialReleaseBranch = `${this.repo}-${this.branch}`;
         const branches = await getBranches( dependency );
 
@@ -226,8 +226,8 @@ module.exports = ( function() {
         summary: true,
         type: 'html'
       } ) ).projects.map( simData => {
-        let repo = simData.name.slice( simData.name.indexOf( '/' ) + 1 );
-        let branch = simData.version.major + '.' + simData.version.minor;
+        const repo = simData.name.slice( simData.name.indexOf( '/' ) + 1 );
+        const branch = simData.version.major + '.' + simData.version.minor;
         return new ReleaseBranch( repo, branch, [ 'phet' ] );
       } );
 
@@ -255,9 +255,9 @@ module.exports = ( function() {
     static combineLists( simBranches ) {
       const resultBranches = [];
 
-      for ( let simBranch of simBranches ) { // eslint-disable-line no-restricted-syntax
+      for ( const simBranch of simBranches ) { // eslint-disable-line no-restricted-syntax
         let foundBranch = false;
-        for ( let resultBranch of resultBranches ) { // eslint-disable-line no-restricted-syntax
+        for ( const resultBranch of resultBranches ) { // eslint-disable-line no-restricted-syntax
           if ( simBranch.repo === resultBranch.repo && simBranch.branch === resultBranch.branch ) {
             foundBranch = true;
             resultBranch.brands = [ ...resultBranch.brands, ...simBranch.brands ];

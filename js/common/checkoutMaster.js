@@ -30,7 +30,7 @@ module.exports = async function( repo, includeNpmUpdate ) {
   // Ignore the comment
   const repoNames = Object.keys( dependencies ).filter( key => key !== 'comment' );
 
-  for ( let repoName of repoNames ) { // eslint-disable-line no-restricted-syntax
+  for ( const repoName of repoNames ) { // eslint-disable-line no-restricted-syntax
     await gitCheckout( repoName, 'master' );
   }
 

@@ -6,7 +6,7 @@
 module.exports = function logRequest( req, type, winston ) {
   // log the request, which is useful for debugging
   let requestBodyString = '';
-  for ( let key in req[ type ] ) {
+  for ( const key in req[ type ] ) {
     if ( req[ type ].hasOwnProperty( key ) ) {
       requestBodyString += key + ':' + JSON.stringify( req[ type ][ key ] ) + '\n';
     }

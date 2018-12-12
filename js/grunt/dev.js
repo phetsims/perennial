@@ -134,7 +134,7 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
   await devSsh( `mkdir -p "${versionPath}"` );
 
   // Copy the build contents into the version-specific directory
-  for ( let brand of brands ) { // eslint-disable-line no-restricted-syntax
+  for ( const brand of brands ) { // eslint-disable-line no-restricted-syntax
     await devScp( `../${repo}/build/${brand}`, `${versionPath}/` );
   }
 

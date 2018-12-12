@@ -24,7 +24,7 @@ module.exports = async function pullMaster( repos ) {
   // Add babel to list of repos to pull
   reposCopy.babel = true;
 
-  for ( let repoName in reposCopy ) {
+  for ( const repoName in reposCopy ) {
     winston.log( 'info', 'pulling from ' + repoName );
     const repoDir = '../' + repoName;
 

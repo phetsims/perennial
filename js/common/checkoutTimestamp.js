@@ -32,7 +32,7 @@ module.exports = async function( repo, timestamp, includeNpmUpdate ) {
   const dependencies = await getDependencies( repo );
   const dependencyNames = Object.keys( dependencies ).filter( key => key !== 'comment' && key !== repo );
   const timestampDependencies = {};
-  for ( let dependency of dependencyNames ) { // eslint-disable-line no-restricted-syntax
+  for ( const dependency of dependencyNames ) { // eslint-disable-line no-restricted-syntax
     timestampDependencies[ dependency ] = {
       sha: await gitFromTimestamp( dependency, 'master', timestamp )
     };

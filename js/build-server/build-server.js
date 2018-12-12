@@ -45,7 +45,7 @@ const defaultOptions = {
   h: false
 };
 
-for ( let key in parsedCommandLineOptions ) {
+for ( const key in parsedCommandLineOptions ) {
   if ( key !== '_' && parsedCommandLineOptions.hasOwnProperty( key ) && !defaultOptions.hasOwnProperty( key ) ) {
     console.error( 'Unrecognized option: ' + key );
     console.error( 'try --help for usage information.' );

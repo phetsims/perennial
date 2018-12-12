@@ -45,7 +45,7 @@ module.exports = async function() {
 
   const activeRepos = getActiveRepos();
 
-  for ( let repo of activeRepos ) { // eslint-disable-line no-restricted-syntax
+  for ( const repo of activeRepos ) { // eslint-disable-line no-restricted-syntax
     await gitPull( repo );
   }
 

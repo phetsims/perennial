@@ -42,7 +42,7 @@ repos.forEach( repo => {
     fs.readdirSync( repoPath ).forEach( localizedFilename => {
       const locale = localizedFilename.slice( ( repo + '-strings_' ).length, localizedFilename.indexOf( '.' ) );
       const content = JSON.parse( fs.readFileSync( repoPath + localizedFilename ).toString() );
-      for ( let stringKey in content ) {
+      for ( const stringKey in content ) {
         if ( content.hasOwnProperty( stringKey ) && content[ stringKey ].history ) {
           content[ stringKey ].history.forEach( entry => {
             if ( !usermap[ entry.userId ] ) {
@@ -75,9 +75,9 @@ repos.forEach( repo => {
 // PREPARE QUEUE
 const urlPath = 'https://phet.colorado.edu/services/add-html-translator?';
 const requests = [];
-for ( let user in usermap ) {
+for ( const user in usermap ) {
   if ( usermap.hasOwnProperty( user ) ) {
-    for ( let locale in usermap[ user ] ) {
+    for ( const locale in usermap[ user ] ) {
       if ( usermap[ user ].hasOwnProperty( locale ) ) {
         usermap[ user ][ locale ].forEach( async repo => {
           const paramString = 'simName=' + repo
