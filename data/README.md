@@ -10,6 +10,12 @@ active-runnables (auto-generated) is a list of all repositories that can be buil
 
 active-sims (auto-generated) is a list of all simulation repositories that can be built with chipper.  Similar to runnables, but doesn't include repos with test code like sun, scenery-phet, etc.
 
+node (manually-generated) is a list of repos that we want to be linted as node code instead of sim code. This will provide 
+    a different set of lint rules
+    
+not-lintable (manually-generated) is the list of repos that have no `js` in them, and so can't be linted without 
+    encountering an eslint error like "Error: No files matching '{repo}' were found."   
+    
 phet-io (auto-generated) is the list of all simulations that are instrumented with PhET-iO features. This list is automatically fuzz
     tested and is used by phetmarks to dictate which sims have wrapper links. See 
     [How to Instrument a PhET Simulation](https://github.com/phetsims/phet-io/blob/master/doc/how-to-instrument-a-phet-simulation-for-phet-io.md)
