@@ -191,7 +191,7 @@ module.exports = ( function() {
         results.push( 'Own repository not included in dependencies' );
       }
 
-      for ( const dependency of dependencyNames ) { // eslint-disable-line no-restricted-syntax
+      for ( const dependency of dependencyNames ) {
         const potentialReleaseBranch = `${this.repo}-${this.branch}`;
         const branches = await getBranches( dependency );
 
@@ -255,9 +255,9 @@ module.exports = ( function() {
     static combineLists( simBranches ) {
       const resultBranches = [];
 
-      for ( const simBranch of simBranches ) { // eslint-disable-line no-restricted-syntax
+      for ( const simBranch of simBranches ) {
         let foundBranch = false;
-        for ( const resultBranch of resultBranches ) { // eslint-disable-line no-restricted-syntax
+        for ( const resultBranch of resultBranches ) {
           if ( simBranch.repo === resultBranch.repo && simBranch.branch === resultBranch.branch ) {
             foundBranch = true;
             resultBranch.brands = [ ...resultBranch.brands, ...simBranch.brands ];

@@ -44,7 +44,7 @@ module.exports = async function() {
     { repo: 'scenery', build: true }
   ];
 
-  for ( const taggedRepo of taggedRepos ) { // eslint-disable-line no-restricted-syntax
+  for ( const taggedRepo of taggedRepos ) {
     const repo = taggedRepo.repo;
 
     winston.info( `Updating ${repo}` );
