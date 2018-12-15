@@ -1,7 +1,9 @@
 babel
+phet-android-app
 phet-info
 phet-io-wrapper-arithmetic
 phet-io-wrapper-hookes-law-energy
+phet-ios-app
 sherpa
 smithers
 tasks
