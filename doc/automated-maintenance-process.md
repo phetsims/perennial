@@ -429,7 +429,6 @@ The automated maintenance process makes this way more convenient than patching 4
 maintenance release was essentially typing:
 
 ```js
-maintenance> Maintenance.list()
 maintenance> Maintenance.reset()
 maintenance> Maintenance.createPatch( 'area-model-common', 'https://github.com/phetsims/area-model-common/issues/172' );
 // Created patch for area-model-common with message: https://github.com/phetsims/area-model-common/issues/172
