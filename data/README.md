@@ -7,12 +7,9 @@ accessibility (auto-generated) is a list of all repositories that have been outf
 active-repos is a list of all repositories that you should have checked out if doing common-code refactoring.
 
 active-runnables (auto-generated) is a list of all repositories that can be built with chipper and launched from an html file.
-
+d
 active-sims (auto-generated) is a list of all simulation repositories that can be built with chipper.  Similar to runnables, but doesn't include repos with test code like sun, scenery-phet, etc.
 
-node (manually-generated) is a list of repos that we want to be linted as node code instead of sim code. This will provide 
-    a different set of lint rules
-    
 not-lintable (manually-generated) is the list of repos that have no `js` in them, and so can't be linted without 
     encountering an eslint error like "Error: No files matching '{repo}' were found."   
     
