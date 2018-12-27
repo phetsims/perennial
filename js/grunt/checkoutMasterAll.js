@@ -3,7 +3,7 @@
 /**
  * This grunt task checks out master for all sims. Useful in some cases where different shas with conflicting dependencies are checked out.
  */
-/* eslint-env node */
+
 'use strict';
 
 const _ = require( 'lodash' ); // eslint-disable-line

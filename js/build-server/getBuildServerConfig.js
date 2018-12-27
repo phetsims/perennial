@@ -1,6 +1,5 @@
 // Copyright 2002-2015, University of Colorado Boulder
 
-/* eslint-env node */
 'use strict';
 
 const assert = require( 'assert' );

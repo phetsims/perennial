@@ -6,7 +6,6 @@
  * @author Matt Pennington
  */
 
-/* eslint-env node */
 'use strict';
 
 const fs = require( 'graceful-fs' ); //eslint-disable-line

@@ -6,7 +6,6 @@
  *
  *  @author Matt Pennington
  **/
-/* eslint-env node */
 'use strict';
 
 const buildLocal = require( '../common/buildLocal' );

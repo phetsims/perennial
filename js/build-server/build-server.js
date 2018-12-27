@@ -8,7 +8,6 @@
  * @author Matt Pennington
  */
 
-/* eslint-env node */
 'use strict';
 
 // constants

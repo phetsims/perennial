@@ -3,7 +3,7 @@
 /**
  * This grunt task checks out the shas for a project, as specified in a dependencies.json file in its top level.
  */
-/* eslint-env node */
+
 'use strict';
 
 const assert = require( 'assert' );

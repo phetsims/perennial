@@ -10,7 +10,7 @@
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
-/* eslint-env node */
+
 'use strict';
 
 // modules

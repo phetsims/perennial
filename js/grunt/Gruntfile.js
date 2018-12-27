@@ -5,7 +5,7 @@
  * In particular, grunt checkout-shas and grunt checkout-master can be run from here
  * without worrying about an older version of chipper being checked out.
  */
-/* eslint-env node */
+
 'use strict';
 
 

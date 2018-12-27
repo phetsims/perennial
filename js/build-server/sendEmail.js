@@ -1,6 +1,5 @@
 // Copyright 2017, University of Colorado Boulder
 
-/* eslint-env node */
 'use strict';
 
 const constants = require( './constants' );

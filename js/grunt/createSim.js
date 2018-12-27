@@ -17,7 +17,7 @@
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Chris Malley (PixelZoom, Inc.)
  */
-/* eslint-env node */
+
 'use strict';
 
 const assert = require( 'assert' );
