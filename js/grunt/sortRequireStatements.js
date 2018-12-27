@@ -6,6 +6,8 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
+'use strict';
+
 // 3rd-party packages
 const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
 const grunt = require( 'grunt' );
@@ -17,7 +19,6 @@ var KEY = ' = require( '; // the substring that is searched to find require stat
  * @param {string} path
  */
 module.exports = function( path ) {
-  'use strict';
 
   // only address js files
   if ( path.indexOf( '.js' ) ) {

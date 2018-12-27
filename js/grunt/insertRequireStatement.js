@@ -6,6 +6,8 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
+'use strict';
+
 const assert = require( 'assert' ); // eslint-disable-line require-statement-match
 const fs = require( 'fs' );
 const grunt = require( 'grunt' );
@@ -18,7 +20,6 @@ const KEY = ' = require( '; // the substring that is searched to find require st
  * @param {string} name
  */
 module.exports = function( file, name ) {
-  'use strict';
 
   assert && assert( file, 'file should be defined' );
   assert && assert( name, 'name should be defined' );
