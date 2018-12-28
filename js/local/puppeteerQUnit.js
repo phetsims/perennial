@@ -23,13 +23,13 @@ module.exports = function( browser, targetURL ) {
     // Output log
     // page.on( 'console', msg => console.log( 'PAGE LOG:', msg.text() ) );
 
-    var moduleErrors = [];
-    var testErrors = [];
-    var assertionErrors = [];
+    const moduleErrors = [];
+    let testErrors = [];
+    let assertionErrors = [];
 
     await page.exposeFunction( 'harness_moduleDone', context => {
       if ( context.failed ) {
-        var msg = 'Module Failed: ' + context.name + '\n' + testErrors.join( '\n' );
+        const msg = 'Module Failed: ' + context.name + '\n' + testErrors.join( '\n' );
         moduleErrors.push( msg );
         testErrors = [];
       }
@@ -37,7 +37,7 @@ module.exports = function( browser, targetURL ) {
 
     await page.exposeFunction( 'harness_testDone', context => {
       if ( context.failed ) {
-        var msg = '  Test Failed: ' + context.name + assertionErrors.join( '    ' );
+        const msg = '  Test Failed: ' + context.name + assertionErrors.join( '    ' );
         testErrors.push( msg );
         assertionErrors = [];
         process.stdout.write( 'F' );
@@ -50,7 +50,7 @@ module.exports = function( browser, targetURL ) {
     await page.exposeFunction( 'harness_log', context => {
       if ( context.result ) { return; } // If success don't log
 
-      var msg = '\n    Assertion Failed:';
+      let msg = '\n    Assertion Failed:';
       if ( context.message ) {
         msg += ' ' + context.message;
       }
@@ -66,7 +66,7 @@ module.exports = function( browser, targetURL ) {
       // console.log( '\n' );
 
       if ( moduleErrors.length > 0 ) {
-        for ( var idx = 0; idx < moduleErrors.length; idx++ ) {
+        for ( let idx = 0; idx < moduleErrors.length; idx++ ) {
           console.error( moduleErrors[ idx ] + '\n' );
         }
       }
