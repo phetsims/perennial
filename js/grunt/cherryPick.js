@@ -21,10 +21,10 @@ const grunt = require( 'grunt' );
  * @returns {Promise}
  */
 module.exports = async function( repo, shas ) {
-  for ( var i = 0; i < shas.length; i++ ) {
+  for ( let i = 0; i < shas.length; i++ ) {
     const sha = shas[ i ];
 
-    var success;
+    let success;
     try {
       success = await gitCherryPick( repo, sha );
     }

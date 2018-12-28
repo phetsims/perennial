@@ -55,8 +55,8 @@ module.exports = function( cmd, args, cwd ) {
     } );
     winston.debug( `running ${cmd} ${args.join( ' ' )} from ${cwd}` );
 
-    var stdout = ''; // to be appended to
-    var stderr = '';
+    let stdout = ''; // to be appended to
+    let stderr = '';
 
     process.stderr.on( 'data', data => {
       stderr += data;

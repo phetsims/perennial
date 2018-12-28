@@ -13,7 +13,7 @@ const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
 const grunt = require( 'grunt' );
 
 // constants
-var KEY = ' = require( '; // the substring that is searched to find require statements
+const KEY = ' = require( '; // the substring that is searched to find require statements
 
 /**
  * @param {string} path
@@ -24,22 +24,22 @@ module.exports = function( path ) {
   if ( path.indexOf( '.js' ) ) {
 
     // read the file as text
-    var text = grunt.file.read( path ).toString();
+    const text = grunt.file.read( path ).toString();
 
     // split by line
-    var lines = text.split( /\r?\n/ );
+    const lines = text.split( /\r?\n/ );
 
     // full text
-    var result = [];
+    const result = [];
 
     // accumulated require statement lines
-    var accumulator = [];
+    let accumulator = [];
 
     // total number of require statements
-    var count = 0;
+    let count = 0;
 
-    for ( var i = 0; i < lines.length; i++ ) {
-      var line = lines[ i ];
+    for ( let i = 0; i < lines.length; i++ ) {
+      const line = lines[ i ];
 
       // If it was a require statement, store it for sorting.
       if ( line.indexOf( KEY ) >= 0 ) {
@@ -55,7 +55,7 @@ module.exports = function( path ) {
           // case insensitive so that inherit and namespaces don't show up last
           return o.toLowerCase();
         } );
-        var previous = null;
+        let previous = null;
         accumulator.forEach( function( a ) {
 
           // Omit duplicate require statements

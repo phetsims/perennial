@@ -22,9 +22,9 @@ module.exports = function( repositoryName, toMaster, buildServer ) {
 
   const dependencies = grunt.file.readJSON( ( buildServer ) ? '../perennial/js/build-server/tmp/dependencies.json' : '../' + repositoryName + '/dependencies.json' );
   const done = grunt.task.current.async();
-  var numToCheckOut = 0;
-  var numCheckedOut = 0;
-  for ( var property in dependencies ) {
+  let numToCheckOut = 0;
+  let numCheckedOut = 0;
+  for ( const property in dependencies ) {
     if ( property !== 'comment' && property !== repositoryName ) {
       numToCheckOut++;
     }
@@ -39,7 +39,7 @@ module.exports = function( repositoryName, toMaster, buildServer ) {
       //To execute something from a different directory:
       //cp.exec('foocommand', { cwd: 'path/to/dir/' }, callback);
       //http://stackoverflow.com/questions/14026967/calling-child-process-exec-in-node-as-though-it-was-executed-in-a-specific-folde
-      var command = 'git checkout ' + ( toMaster ? 'master' : dependencies[ property ].sha );
+      const command = 'git checkout ' + ( toMaster ? 'master' : dependencies[ property ].sha );
       child_process.exec( command, { cwd: '../' + property }, function( error1, stdout1, stderr1 ) {
         assert( !error1, 'error in ' + command + ' for repo ' + property );
         grunt.log.writeln( 'Finished checkout.' );

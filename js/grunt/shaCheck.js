@@ -45,12 +45,12 @@ module.exports = function( doneCallback ) {
 
         function nextSim() {
           if ( sims.length ) {
-            var sim = sims.shift();
+            const sim = sims.shift();
             console.log( 'checking ' + sim.name );
 
             gitCheckout( sim.name, sim.branch, function() {
               getDependencies( sim.name, function( dependencies ) {
-                var repoSHA = dependencies[ repo ].sha;
+                const repoSHA = dependencies[ repo ].sha;
                 gitIsAncestor( repo, sha, repoSHA, function( isAncestor ) {
                   ( isAncestor ? includedSims : excludedSims ).push( sim );
                   gitCheckout( sim.name, 'master', function() {

@@ -24,25 +24,25 @@ module.exports = function( file, name ) {
   assert && assert( file, 'file should be defined' );
   assert && assert( name, 'name should be defined' );
 
-  var activeSims = fs.readFileSync( '../perennial/data/active-repos' ).toString();
+  let activeSims = fs.readFileSync( '../perennial/data/active-repos' ).toString();
   activeSims = activeSims.split( /\r?\n/ );
   activeSims.length = activeSims.length - 1;
 
-  var simulationRoot = process.cwd();
+  const simulationRoot = process.cwd();
 
-  var statement = null;
+  let statement = null;
   try {
 
     // Search over all active sims for a require statement that matches the desired one
-    for ( var k = 0; k < activeSims.length; k++ ) {
-      var simPath = simulationRoot + '/../' + activeSims[ k ] + '/js';
+    for ( let k = 0; k < activeSims.length; k++ ) {
+      const simPath = simulationRoot + '/../' + activeSims[ k ] + '/js';
       if ( grunt.file.exists( simPath ) ) {
         grunt.file.recurse( simPath, function( absolutePath ) {
-          var t = grunt.file.read( absolutePath, 'utf8' );
-          var index = t.indexOf( 'const ' + name + ' = require( \'' );
+          const t = grunt.file.read( absolutePath, 'utf8' );
+          const index = t.indexOf( 'const ' + name + ' = require( \'' );
           if ( index >= 0 ) {
-            var nextEndLine = t.indexOf( '\n', index );
-            var substring = t.substring( index, nextEndLine );
+            const nextEndLine = t.indexOf( '\n', index );
+            const substring = t.substring( index, nextEndLine );
 
             // poor man's way out of recursion
             throw substring;
@@ -64,17 +64,17 @@ module.exports = function( file, name ) {
   else {
 
     // read the file as text
-    var text = grunt.file.read( file ).toString();
+    const text = grunt.file.read( file ).toString();
 
     // split by line
-    var lines = text.split( /\r?\n/ );
+    const lines = text.split( /\r?\n/ );
 
     // full text
-    var result = [];
-    var inserted = false;
+    const result = [];
+    let inserted = false;
 
-    for ( var i = 0; i < lines.length; i++ ) {
-      var line = lines[ i ];
+    for ( let i = 0; i < lines.length; i++ ) {
+      const line = lines[ i ];
 
       // If it was a require statement, store it for sorting.
       if ( line.indexOf( KEY ) >= 0 && !inserted ) {

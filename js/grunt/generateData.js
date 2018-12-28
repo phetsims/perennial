@@ -54,7 +54,7 @@ module.exports = async function() {
       // Make sure that if someone doesn't have all repositories checked out that this will FAIL. Otherwise bad things.
       assert( grunt.file.exists( `../${repo}` ) );
 
-      var packageObject;
+      let packageObject;
       try {
         packageObject = JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) );
       }

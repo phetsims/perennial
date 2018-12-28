@@ -157,7 +157,7 @@ const assert = require( 'assert' );
      * @returns {string}
      */
     toString() {
-      var str = `${this.major}.${this.minor}.${this.maintenance}`;
+      let str = `${this.major}.${this.minor}.${this.maintenance}`;
       if ( typeof this.testType === 'string' ) {
         str += `-${this.testType}.${this.testNumber}`;
       }

@@ -32,11 +32,11 @@ module.exports = async function( repo, dependencies, includeNpmUpdate ) {
   // Ignore the repo we just checked out, and the comment
   const repoNames = Object.keys( dependencies ).filter( key => key !== 'comment' && key !== repo );
 
-  for ( var i = 0; i < repoNames.length; i++ ) {
-    var dependencyRepoName = repoNames[ i ];
+  for ( let i = 0; i < repoNames.length; i++ ) {
+    const dependencyRepoName = repoNames[ i ];
 
     checkedOutRepoNames.push( dependencyRepoName );
-    var sha = dependencies[ dependencyRepoName ].sha;
+    const sha = dependencies[ dependencyRepoName ].sha;
     if ( !sha ) {
       throw new Error( `Missing sha for ${dependencyRepoName} in ${repo}` );
     }

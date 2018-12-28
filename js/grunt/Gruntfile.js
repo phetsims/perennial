@@ -286,7 +286,7 @@ module.exports = function( grunt ) {
       assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( brands, 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
-      var branch = grunt.option( 'branch' );
+      let branch = grunt.option( 'branch' );
       if ( !branch ) {
         branch = await getBranch( repo );
         console.log( `--branch not provided, using ${branch} detected from ${repo}` );
@@ -373,7 +373,7 @@ module.exports = function( grunt ) {
 
   grunt.registerTask( 'lint-everything', 'lint all js files for all repos', wrapTask( async () => {
     // --disable-eslint-cache disables the cache, useful for developing rules
-    var cache = !grunt.option( 'disable-eslint-cache' );
+    const cache = !grunt.option( 'disable-eslint-cache' );
 
     // Don't always require this, as we may have an older chipper checked out
     require( '../../../chipper/js/grunt/lint' )( grunt.file.read( 'data/active-repos' ).trim().split( /\r?\n/ ), cache, grunt.option( 'say' ) );

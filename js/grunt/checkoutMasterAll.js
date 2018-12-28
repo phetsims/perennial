@@ -22,8 +22,8 @@ module.exports = function() {
   const gitRoots = grunt.file.expand( { cwd: '..' }, '*' );
   const finished = _.after( gitRoots.length, done );
 
-  for ( var i = 0; i < gitRoots.length; i++ ) {
-    const filename = gitRoots[ i ]; // Don't change to var without rewrapping usages in the closure
+  for ( let i = 0; i < gitRoots.length; i++ ) {
+    const filename = gitRoots[ i ]; // Don't change to const without rewrapping usages in the closure
     if ( filename !== 'babel' && grunt.file.isDir( '../' + filename ) && grunt.file.exists( '../' + filename + '/.git' ) ) {
       child_process.exec( command, { cwd: '../' + filename }, function( error ) {
         if ( error ) {

@@ -29,7 +29,7 @@ module.exports = function( options ) {
       simulation: null // {string|null} - If provided, will limit to a specific simulation simulation
     }, options );
 
-    var metadataURL = 'https://phet.colorado.edu/services/metadata/1.0/simulations?format=json';
+    let metadataURL = 'https://phet.colorado.edu/services/metadata/1.0/simulations?format=json';
     if ( options.summary ) {
       metadataURL += '&summary';
     }

@@ -48,7 +48,7 @@ module.exports = async function( repo, author, options ) {
    * @returns {string}
    */
   function toTitle( simName ) {
-    var tmpString = simName.replace( /-(.)/g, function( match, group1 ) {
+    const tmpString = simName.replace( /-(.)/g, function( match, group1 ) {
       return ' ' + group1.toUpperCase();
     } );
     return tmpString.substring( 0, 1 ).toUpperCase() + tmpString.substring( 1 );
@@ -102,7 +102,7 @@ module.exports = async function( repo, author, options ) {
       // do nothing
     }
     else {
-      var contents = grunt.file.read( abspath );
+      let contents = grunt.file.read( abspath );
 
       // Replace variations of the repository name
       contents = contents.replace( /simula-rasa/g, repo );
@@ -120,7 +120,7 @@ module.exports = async function( repo, author, options ) {
       contents = contents.replace( /\/\/ Copyright \d\d\d\d.*/g, `// Copyright ${yearToday}, University of Colorado Boulder` );
 
       // Replace names in the path where the contents will be written
-      var contentsPath = subdir ? ( destinationPath + '/' + subdir + '/' + filename ) : ( destinationPath + '/' + filename );
+      let contentsPath = subdir ? ( destinationPath + '/' + subdir + '/' + filename ) : ( destinationPath + '/' + filename );
       contentsPath = contentsPath.replace( /simula-rasa/, repo );
       contentsPath = contentsPath.replace( /simulaRasa/, lowerCamelCase );
       contentsPath = contentsPath.replace( /SimulaRasa/, upperCamelCase );
