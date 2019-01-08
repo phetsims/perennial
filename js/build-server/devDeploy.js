@@ -21,7 +21,7 @@ const host = constants.BUILD_SERVER_CONFIG.devDeployServer;
  * @param chipperVersion
  * @param brands
  *
- * @return Promise
+ * @returns {Promise}
  */
 module.exports = async function( simDir, simName, version, chipperVersion, brands ) {
   const simVersionDirectory = constants.BUILD_SERVER_CONFIG.devDeployPath + simName + '/' + version;
