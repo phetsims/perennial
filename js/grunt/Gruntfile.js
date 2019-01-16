@@ -25,6 +25,7 @@ const dev = require( './dev' );
 const execute = require( '../common/execute' );
 const generateData = require( './generateData' );
 const getBranch = require( '../common/getBranch' );
+const getDataFile = require( '../common/getDataFile' );
 const gruntCommand = require( '../common/gruntCommand' );
 const insertRequireStatement = require( './insertRequireStatement' );
 const Maintenance = require( '../common/Maintenance' );
@@ -58,7 +59,8 @@ module.exports = function( grunt ) {
 
     try {
       await promise;
-    } catch ( e ) {
+    }
+    catch( e ) {
       if ( e.stack ) {
         grunt.fail.fatal( `Perennial task failed:\n${e.stack}\nFull Error details:\n${JSON.stringify( e, null, 2 )}` );
       }
@@ -375,8 +377,20 @@ module.exports = function( grunt ) {
     // --disable-eslint-cache disables the cache, useful for developing rules
     const cache = !grunt.option( 'disable-eslint-cache' );
 
+
+    const activeRepos = getDataFile( 'active-repos' );
+
+    // get a list of all the repos that can't be linted
+    const eslintBlacklist = getDataFile( 'no-lint' );
+
+    // filter out all unlintable repo. An unlintable repo is one that has no js in it, so it will fail when trying to
+    // lint it.
+    const filteredRepos = activeRepos.filter( repo => {
+      return eslintBlacklist.indexOf( repo ) < 0;
+    } );
+
     // Don't always require this, as we may have an older chipper checked out
-    require( '../../../chipper/js/grunt/lint' )( grunt.file.read( 'data/active-repos' ).trim().split( /\r?\n/ ), cache, grunt.option( 'say' ) );
+    require( '../../../chipper/js/grunt/lint' )( filteredRepos, cache, grunt.option( 'say' ) );
   } ) );
 
   grunt.registerTask( 'generate-data', '[NOTE: Runs automatically on bayes. DO NOT run locally] Generates the lists under perennial/data/, and if there were changes, will commit and push.', wrapTask( async () => {
