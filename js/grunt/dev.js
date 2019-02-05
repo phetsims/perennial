@@ -79,7 +79,7 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
   const latestSHA = ( await getRemoteBranchSHAs( repo ) )[ branch ];
   if ( currentSHA !== latestSHA ) {
     // See https://github.com/phetsims/chipper/issues/699
-    grunt.fail.fatal( `Out of date with remote, please pull repo. Current SHA: ${currentSHA}, latest SHA: ${latestSHA}` );
+    grunt.fail.fatal( `Out of date with remote, please push or pull repo. Current SHA: ${currentSHA}, latest SHA: ${latestSHA}` );
   }
 
   // Ensure we don't try to request an unsupported brand
