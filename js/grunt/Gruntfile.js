@@ -118,7 +118,7 @@ module.exports = function( grunt ) {
     } ) );
 
   grunt.registerTask( 'checkout-release',
-    'Check out the latest release branch for a simulation and all of its declared dependencies\n' +
+    'Check out the latest deployed production release branch for a simulation and all of its declared dependencies\n' +
     '--repo : repository name where package.json should be read from\n' +
     '--skipNpmUpdate : If provided, will prevent the usual npm update',
     wrapTask( async () => {

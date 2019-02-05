@@ -1,7 +1,7 @@
 // Copyright 2017, University of Colorado Boulder
 
 /**
- * Checks out the latest release branch (and dependencies) for a repository.
+ * Checks out the latest deployed production release branch (and dependencies) for a repository.
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
