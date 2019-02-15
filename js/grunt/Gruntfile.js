@@ -343,7 +343,7 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository name with --repo={{REPO}}' );
       assert( grunt.option( 'author' ), 'Requires specifying a author with --author={{AUTHOR}}' );
 
-      await createSim( repo, author, { title, clean } );
+      await createSim( repo, author, { title: title, clean: clean } );
     } ) );
 
   grunt.registerTask( 'sort-require-statements', 'Sort the require statements for a single file (if --file={{FILE}} is provided), or does so for all JS files in a repo (if --repo={{REPO}} is specified)', wrapTask( async () => {

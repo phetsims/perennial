@@ -115,9 +115,9 @@ const assert = require( 'assert' );
      */
     static deserialize( { major, minor, maintenance, testType, testNumber, buildTimestamp } ) {
       return new SimVersion( major, minor, maintenance, {
-        testType,
-        testNumber,
-        buildTimestamp
+        testType: testType,
+        testNumber: testNumber,
+        buildTimestamp: buildTimestamp
       } );
     }
 
@@ -185,7 +185,7 @@ const assert = require( 'assert' );
       const testType = matches[ 6 ];
       const testNumber = matches[ 7 ] === undefined ? matches[ 7 ] : parseInt( matches[ 7 ], 10 );
 
-      return new SimVersion( major, minor, maintenance, { testType, testNumber, buildTimestamp } );
+      return new SimVersion( major, minor, maintenance, { testType: testType, testNumber: testNumber, buildTimestamp: buildTimestamp } );
     }
 
     /**

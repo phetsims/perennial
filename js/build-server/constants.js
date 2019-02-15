@@ -14,7 +14,7 @@ const getBuildServerConfig = require( './getBuildServerConfig' );
 const BUILD_SERVER_CONFIG = getBuildServerConfig( fs );
 
 module.exports = {
-  BUILD_SERVER_CONFIG,
+  BUILD_SERVER_CONFIG: BUILD_SERVER_CONFIG,
   LISTEN_PORT: 16371,
   HTML_SIMS_DIRECTORY: BUILD_SERVER_CONFIG.htmlSimsDirectory,
   PHET_IO_SIMS_DIRECTORY: BUILD_SERVER_CONFIG.phetioSimsDirectory,

@@ -43,10 +43,10 @@ module.exports = async function( repo, version, branch, dependencies, options ) 
       dependencies: JSON.stringify( dependencies ),
       simName: repo,
       version: version.toString(),
-      locales,
-      servers,
-      brands,
-      branch,
+      locales: locales,
+      servers: servers,
+      brands: brands,
+      branch: branch,
       authorizationCode: buildLocal.buildServerAuthorizationCode
     };
     if ( buildLocal.buildServerNotifyEmail ) {

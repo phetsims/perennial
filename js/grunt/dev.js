@@ -119,7 +119,7 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
   await npmUpdate( 'chipper' );
 
   grunt.log.writeln( await build( repo, {
-    brands,
+    brands: brands,
     allHTML: true,
     debugHTML: true
   } ) );

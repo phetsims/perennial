@@ -165,7 +165,7 @@ function queueDeploy( api, repos, simName, version, locales, brands, servers, em
     }
     else {
       winston.log( 'info', 'queuing build for ' + simName + ' ' + version );
-      taskQueue.push( { api, repos, simName, version, locales, servers, brands, email, userId, res, branch }, function( err ) {
+      taskQueue.push( { api: api, repos: repos, simName: simName, version: version, locales: locales, servers: servers, brands: brands, email: email, userId: userId, res: res, branch: branch }, function( err ) {
         const simInfoString = 'Sim = ' + simName +
                               ' Version = ' + version +
                               ' Locales = ' + locales;
