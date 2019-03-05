@@ -160,9 +160,7 @@ module.exports = function( grunt ) {
     '--repo : repository to check for the SHA\n' +
     '--sha : git SHA',
     wrapTask( async () => {
-      await new Promise( ( resolve, reject ) => {
-        shaCheck( resolve ).check( grunt.option( 'repo' ), grunt.option( 'sha' ) );
-      } );
+      await shaCheck( grunt.option( 'repo' ), grunt.option( 'sha' ) );
     } ) );
 
   grunt.registerTask( 'update-gh-pages',
