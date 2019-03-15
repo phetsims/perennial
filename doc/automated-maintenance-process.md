@@ -126,7 +126,7 @@ verify that the production deploys completed successfully.
 Below will be detailed information about all of the general steps, and all of the related commands. Usually running
 `Maintenance.list()` often to see the current state is recommended.
 
-https://github.com/phetsims/special-ops/blob/master/firefox-google-analytics-maintenance-example.md shows an example of
+https://github.com/phetsims/special-ops/blob/master/doc/firefox-google-analytics-maintenance-example.md shows an example of
 this general setup being followed (two issues, one simple and one complicated).
 
 ## .maintenance.json
