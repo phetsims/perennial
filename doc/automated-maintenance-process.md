@@ -259,7 +259,7 @@ Running `Maintenance.list()` afterwards should show the patch in maintenance sta
 [scenery] https://github.com/phetsims/scenery/issues/837
 ```
 
-## 6: Adding "needed patches"
+## #6: Adding "needed patches"
 
 Now that the patch references are in the system, you'll want to mark which release branches need which patches.
 Sometimes this can be simple (add all release branches, or add release branches that don't include commit X), but
