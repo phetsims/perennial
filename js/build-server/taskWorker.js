@@ -205,6 +205,18 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
       return abortBuild( 'Unsupported chipper version' );
     }
 
+    const simBuildDir = simDir + '/build/phet';
+    const allHTMLFilename = simName + '_all_phet.html';
+    if ( fs.existsSync( simBuildDir + '/' + allHTMLFilename ) ) {
+      try {
+        await execute( 'xz', [ allHTMLFilename, '-k' ], simBuildDir );
+      }
+      catch ( e ) {
+        winston.error( 'failure writing xz file' );
+        throw new Error( e );
+      }
+    }
+
     winston.debug( 'deploying to servers: ' + JSON.stringify( servers ) );
 
     if ( servers.indexOf( constants.DEV_SERVER ) >= 0 ) {
