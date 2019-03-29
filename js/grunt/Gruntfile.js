@@ -378,17 +378,8 @@ module.exports = function( grunt ) {
 
     const activeRepos = getDataFile( 'active-repos' );
 
-    // get a list of all the repos that can't be linted
-    const eslintBlacklist = getDataFile( 'no-lint' );
-
-    // filter out all unlintable repo. An unlintable repo is one that has no js in it, so it will fail when trying to
-    // lint it.
-    const filteredRepos = activeRepos.filter( repo => {
-      return eslintBlacklist.indexOf( repo ) < 0;
-    } );
-
     // Don't always require this, as we may have an older chipper checked out
-    require( '../../../chipper/js/grunt/lint' )( filteredRepos, cache, grunt.option( 'say' ) );
+    require( '../../../chipper/js/grunt/lint' )( activeRepos, cache, grunt.option( 'say' ) );
   } ) );
 
   grunt.registerTask( 'generate-data', '[NOTE: Runs automatically on bayes. DO NOT run locally] Generates the lists under perennial/data/, and if there were changes, will commit and push.', wrapTask( async () => {
