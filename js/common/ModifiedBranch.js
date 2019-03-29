@@ -243,7 +243,7 @@ module.exports = ( function() {
 
       const standaloneParams = ( await this.usesOldPhetioStandalone() ) ? 'phet-io.standalone' : 'phetioStandalone';
       const proxiesParams = ( await this.usesRelativeSimPath() ) ? 'relativeSimPath' : 'launchLocalVersion';
-      const studioName = ( await this.usesPhetioStudio() ) ? 'studio' : 'instance-proxies';
+      const studioName = ( this.brands.includes( 'phet-io' ) && await this.usesPhetioStudio() ) ? 'studio' : 'instance-proxies';
       const studioNameBeautified = studioName === 'studio' ? 'Studio' : 'Instance Proxies';
       const usesChipper2 = await this.usesChipper2();
       const phetFolder = usesChipper2 ? '/phet' : '';
