@@ -201,7 +201,7 @@ module.exports = ( function() {
       await gitCheckout( this.repo, this.branch );
       const dependencies = await getDependencies( this.repo );
 
-      const sha = dependencies[ 'chipper' ].sha;
+      const sha = dependencies.chipper.sha;
       await gitCheckout( this.repo, 'master' );
 
       return await gitIsAncestor( 'chipper', '7375f6a57b5874b6bbf97a54c9a908f19f88d38f', sha );
