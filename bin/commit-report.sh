@@ -8,7 +8,7 @@
 #
 #=============================================================================================
 
-binDir=`dirname "${BASH_SOURCE[0]}"`
+binDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 if [ -z "$1" ]
   then
@@ -16,4 +16,4 @@ if [ -z "$1" ]
     exit 1
 fi
 
-${binDir}/for-each.sh active-repos log.sh $1
+${binDir}/for-each.sh active-repos ${binDir}/log.sh $1

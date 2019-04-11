@@ -36,7 +36,7 @@ if [ ! -f ${logFile} ]; then
 fi
 
 # get path to working directory
-binDir=`dirname "${BASH_SOURCE[0]}"`
+binDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 workingDir=${binDir}/../..
 
 # for each repo, checkout the sha specified in logfile

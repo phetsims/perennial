@@ -8,7 +8,7 @@
 #
 #====================================================================================================
 
-binDir=`dirname "${BASH_SOURCE[0]}"`
+binDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 workingDir=${binDir}/../..
 cd ${workingDir}
 
@@ -22,6 +22,9 @@ echo "------------- | -------------"
 
 for repo in `cat perennial/data/active-repos | xargs`
 do
+  # Strip newline from end of repo
+  repo=`echo ${repo}`
+
   if [ -d "${repo}" ]; then
     cd ${repo} &> /dev/null
 
