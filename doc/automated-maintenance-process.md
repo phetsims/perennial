@@ -407,7 +407,8 @@ will include the SHAs.
 ## Deploying RCs and the QA issue: `Maintenance.deployReleaseCandidates()`
 
 Running `Maintenance.deployReleaseCandidates()` will deploy release-candidate versions for any release branches that
-have maintenance changes since the last deploy (it won't needlessly deploy RCs for branches that didn't change).
+have maintenance changes since the last deploy (it won't needlessly deploy RCs for branches that didn't change). Like 
+normal rc deploys, you will need to be on campus or on vpn for this process.
 
 After running this, it's best to create a QA report with `Maintenance.linkList()`, which will generate a markdown list
 of links that should be ready for a QA issue. Generally prepend this with the information about what testing should be
