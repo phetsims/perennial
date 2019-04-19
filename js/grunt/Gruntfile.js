@@ -30,6 +30,7 @@ const gruntCommand = require( '../common/gruntCommand' );
 const insertRequireStatement = require( './insertRequireStatement' );
 const Maintenance = require( '../common/Maintenance' );
 const npmUpdate = require( '../common/npmUpdate' );
+const printPhetioLinks = require( './printPhetioLinks' );
 const production = require( './production' );
 const rc = require( './rc' );
 const shaCheck = require( './shaCheck' );
@@ -161,6 +162,12 @@ module.exports = function( grunt ) {
     '--sha : git SHA',
     wrapTask( async () => {
       await shaCheck( grunt.option( 'repo' ), grunt.option( 'sha' ) );
+    } ) );
+
+  grunt.registerTask( 'print-phet-io-links',
+    'Print the current list of all phet-io sims\' links',
+    wrapTask( async () => {
+      await printPhetioLinks();
     } ) );
 
   grunt.registerTask( 'update-gh-pages',
