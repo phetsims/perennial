@@ -117,10 +117,10 @@ Once that is done (or when you want to make the changes permanent on the server)
    and patches, creates/updates branches where necessary, etc.
 
 Once that is done for every issue, then generally RCs are deployed with `Maintenance.deployReleaseCandidates()`, a list
-for QA is generated with `Maintenance.linkList()`, and an RC testing issue is created. If phet-io sims are involved,
+for QA is generated with `Maintenance.listLinks()`, and an RC testing issue is created. If phet-io sims are involved,
 generally an issue will be made in special-ops with the actual links (and a qa issue will link to it).
 
-Once RC testing is complete, `Maintenance.deployProduction()` is run, and `Maintenance.linkList()` can be used to
+Once RC testing is complete, `Maintenance.deployProduction()` is run, and `Maintenance.listLinks()` can be used to
 verify that the production deploys completed successfully.
 
 Below will be detailed information about all of the general steps, and all of the related commands. Usually running
@@ -128,6 +128,9 @@ Below will be detailed information about all of the general steps, and all of th
 
 [firefox-google-analytics-maintenance-example.md](https://github.com/phetsims/special-ops/blob/master/doc/firefox-google-analytics-maintenance-example.md) shows an example of
 this general setup being followed (two issues, one simple and one complicated).
+
+Also note that if there are multiple required changes to a specific repository, it is best to make all of the changes
+at once.
 
 ## .maintenance.json
 
@@ -412,13 +415,16 @@ After this is run, all of the commits that were in a detached-HEAD local-only st
 servers. Additionally, the remote state of the release branches (and their `dependencies.json`) should be correct, and
 will include the SHAs.
 
+NOTE: It is ideal to keep the computer that this is running on "awake", so the process is not interrupted!
+https://support.apple.com/kb/PH25222?locale=en_US may be helpful for this.
+
 ## #12: Deploying RCs and the QA issue: `Maintenance.deployReleaseCandidates()`
 
 Running `Maintenance.deployReleaseCandidates()` will deploy release-candidate versions for any release branches that
 have maintenance changes since the last deploy (it won't needlessly deploy RCs for branches that didn't change). Like
 normal rc deploys, you will need to be on campus or on vpn for this process.
 
-After running this, it's best to create a QA report with `Maintenance.linkList()`, which will generate a markdown list
+After running this, it's best to create a QA report with `Maintenance.listLinks()`, which will generate a markdown list
 of links that should be ready for a QA issue. Generally prepend this with the information about what testing should be
 done. I always recommend 10-30 seconds of general testing per sim to make sure nothing is horribly broken. Additionally,
 there is almost always testing related to the specific fixed issue (e.g. "does this bad behavior happen still").
@@ -427,7 +433,7 @@ there is almost always testing related to the specific fixed issue (e.g. "does t
 
 Once RCs are green-lit for deployment, run `Maintenance.deployProduction()` to deploy production versions.
 
-Afterwards, `Maintenance.linkList()` will print out links to where the production versions should be. Quickly open all
+Afterwards, `Maintenance.listLinks()` will print out links to where the production versions should be. Quickly open all
 of these links to make sure the production deploys succeeded.
 
 ## #14: Patching unpublished release branches

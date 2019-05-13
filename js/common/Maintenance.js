@@ -53,8 +53,8 @@ const PUBLIC_FUNCTIONS = [
   'createPatch',
   'deployProduction',
   'deployReleaseCandidates',
-  'linkList',
   'list',
+  'listLinks',
   'removeNeededPatch',
   'removeNeededPatches',
   'removeNeededPatchesAfter',
@@ -190,7 +190,7 @@ module.exports = ( function() {
       }
     }
 
-    static async linkList( includePatches = false ) {
+    static async listLinks( includePatches = false ) {
       const maintenance = Maintenance.load();
 
       const deployedBranches = maintenance.modifiedBranches.filter( modifiedBranch => !!modifiedBranch.deployedVersion );
