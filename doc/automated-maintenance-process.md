@@ -169,6 +169,14 @@ yet had applied patches), e.g.:
 
 This is essentially a pretty-printed version of what is in your `.maintenance.json` file.
 
+## Prerequisites
+
+It is assumed that your `~/.phet/build.json` file will be properly configured so that simulations can be deployed. The
+standard developer guide instructions to set this up should be done before beginning the maintenance process. Notably,
+it is important that `npm config set save false` should be applied, so that package files are not changed during npm
+operations used by the maintenance process. In addition, it is helpful to set up build server notifications (with
+`buildServerNotifyEmail` in `~/.phet/build.json`) so that any failed deployments can be flagged.
+
 # General maintenance steps
 
 ## #1: Checking branch status: `Maintenance.checkBranchStatus()`
@@ -404,10 +412,10 @@ After this is run, all of the commits that were in a detached-HEAD local-only st
 servers. Additionally, the remote state of the release branches (and their `dependencies.json`) should be correct, and
 will include the SHAs.
 
-## Deploying RCs and the QA issue: `Maintenance.deployReleaseCandidates()`
+## #12: Deploying RCs and the QA issue: `Maintenance.deployReleaseCandidates()`
 
 Running `Maintenance.deployReleaseCandidates()` will deploy release-candidate versions for any release branches that
-have maintenance changes since the last deploy (it won't needlessly deploy RCs for branches that didn't change). Like 
+have maintenance changes since the last deploy (it won't needlessly deploy RCs for branches that didn't change). Like
 normal rc deploys, you will need to be on campus or on vpn for this process.
 
 After running this, it's best to create a QA report with `Maintenance.linkList()`, which will generate a markdown list
@@ -415,12 +423,27 @@ of links that should be ready for a QA issue. Generally prepend this with the in
 done. I always recommend 10-30 seconds of general testing per sim to make sure nothing is horribly broken. Additionally,
 there is almost always testing related to the specific fixed issue (e.g. "does this bad behavior happen still").
 
-## Deploying changes to production: `Maintenance.deployProduction()`
+## #13: Deploying changes to production: `Maintenance.deployProduction()`
 
 Once RCs are green-lit for deployment, run `Maintenance.deployProduction()` to deploy production versions.
 
 Afterwards, `Maintenance.linkList()` will print out links to where the production versions should be. Quickly open all
 of these links to make sure the production deploys succeeded.
+
+## #14: Patching unpublished release branches
+
+Usually there will be some release branches that have not been published, and are still in their initial RC process.
+For now, the best process is to record all of the "patch SHAs" that were applied in previous steps,
+`Maintenance.reset()` to clear the maintenance state (once the main production deployments have finished), and do a
+similar process to the main procedure for all release branches that are unpublished, with the following changes:
+
+1. `Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( repo, branch, brands ), patchRepo );`, for example:
+   `Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( 'area-model-algebra', '1.1', [ 'phet' ] ), 'chipper' );`
+2. Do NOT run any of the deployment steps after `Maintenance.updateDependencies()`.
+3. Once the branches have been patched, please note that fact in any open RC issues in the QA repo.
+
+The list for this should ideally have been determined in #2, but it may be helpful to see a list of all of the RC
+issues: https://github.com/phetsims/QA/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+%22RC+test%22.
 
 # Maintenance patches for a suite of sims in RC
 
