@@ -12,6 +12,8 @@
 const assert = require( 'assert' );
 const checkoutMaster = require( './checkoutMaster' );
 const checkoutTarget = require( './checkoutTarget' );
+const fs = require( 'fs' );
+const getActiveSims = require( './getActiveSims' );
 const getBranches = require( './getBranches' );
 const getDependencies = require( './getDependencies' );
 const gitCheckout = require( './gitCheckout' );
@@ -32,11 +34,13 @@ module.exports = ( function() {
      * @param {string} repo
      * @param {string} branch
      * @param {Array.<string>} brands
+     * @param {boolean} isReleased
      */
-    constructor( repo, branch, brands ) {
+    constructor( repo, branch, brands, isReleased ) {
       assert( typeof repo === 'string' );
       assert( typeof branch === 'string' );
       assert( Array.isArray( brands ) );
+      assert( typeof isReleased === 'boolean' );
 
       // @public {string}
       this.repo = repo;
@@ -44,6 +48,9 @@ module.exports = ( function() {
 
       // @public {Array.<string>}
       this.brands = brands;
+
+      // @public {boolean}
+      this.isReleased = isReleased;
     }
 
     /**
@@ -56,7 +63,8 @@ module.exports = ( function() {
       return {
         repo: this.repo,
         branch: this.branch,
-        brands: this.brands
+        brands: this.brands,
+        isReleased: this.isReleased
       };
     }
 
@@ -67,8 +75,8 @@ module.exports = ( function() {
      * @param {Object}
      * @returns {ReleaseBranch}
      */
-    static deserialize( { repo, branch, brands } ) {
-      return new ReleaseBranch( repo, branch, brands );
+    static deserialize( { repo, branch, brands, isReleased } ) {
+      return new ReleaseBranch( repo, branch, brands, isReleased );
     }
 
     /**
@@ -81,7 +89,8 @@ module.exports = ( function() {
     equals( releaseBranch ) {
       return this.repo === releaseBranch.repo &&
              this.branch === releaseBranch.branch &&
-             this.brands.join( ',' ) === releaseBranch.brands.join( ',' );
+             this.brands.join( ',' ) === releaseBranch.brands.join( ',' ) &&
+             this.isReleased === releaseBranch.isReleased;
     }
 
     /**
@@ -91,7 +100,7 @@ module.exports = ( function() {
      * @returns {string}
      */
     toString() {
-      return `${this.repo} ${this.branch} ${this.brands.join( ',' )}`;
+      return `${this.repo} ${this.branch} ${this.brands.join( ',' )}${this.isReleased ? '' : ' (unreleased)'}`;
     }
 
     /**
@@ -222,15 +231,21 @@ module.exports = ( function() {
     static async getMaintenanceBranches() {
       winston.debug( 'retrieving available sim branches' );
 
-      const phetBranches = ( await simMetadata( {
+      const simMetadataResult = await simMetadata( {
         summary: true,
         type: 'html'
-      } ) ).projects.map( simData => {
-        const repo = simData.name.slice( simData.name.indexOf( '/' ) + 1 );
-        const branch = simData.version.major + '.' + simData.version.minor;
-        return new ReleaseBranch( repo, branch, [ 'phet' ] );
       } );
 
+      const activeSimRepos = getActiveSims();
+
+      // Released phet branches
+      const phetBranches = simMetadataResult.projects.map( simData => {
+        const repo = simData.name.slice( simData.name.indexOf( '/' ) + 1 );
+        const branch = simData.version.major + '.' + simData.version.minor;
+        return new ReleaseBranch( repo, branch, [ 'phet' ], true );
+      } );
+
+      // Released phet-io branches
       const phetioBranches = ( await simPhetioMetadata( {
         active: true,
         latest: true
@@ -239,10 +254,51 @@ module.exports = ( function() {
         if ( simData.versionSuffix.length ) {
           branch += '-' + simData.versionSuffix; // additional dash required
         }
-        return new ReleaseBranch( simData.name, branch, [ 'phet-io' ] );
+        return new ReleaseBranch( simData.name, branch, [ 'phet-io' ], true );
       } );
 
-      return ReleaseBranch.combineLists( [ ...phetBranches, ...phetioBranches ] );
+      // Unreleased branches
+      const unreleasedBranches = [];
+      for ( const repo of activeSimRepos ) {
+        // Exclude explicitly excluded repos
+        if ( JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) ).phet.ignoreForAutomatedMaintenanceReleases ) {
+          continue;
+        }
+
+        const branches = await getBranches( repo );
+
+        for ( const branch of branches ) {
+          const match = branch.match( /^(\d+)\.(\d+)$/ );
+
+          if ( match ) {
+            const major = parseInt( match[ 1 ], 10 );
+            const minor = parseInt( match[ 2 ], 10 );
+
+            const projectMetadata = simMetadataResult.projects.find( project => project.name === `html/${repo}` ) || null;
+            const productionVersion = projectMetadata ? projectMetadata.version : null;
+
+            if ( !productionVersion ||
+                 major > productionVersion.major ||
+                 ( major === productionVersion.major && minor > productionVersion.minor ) ) {       
+
+              // Do a checkout so we can determine supported brands
+              await gitCheckout( repo, branch );
+              const packageObject = JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) );
+              const includesPhetio = packageObject.phet && packageObject.phet.supportedBrands && packageObject.phet.supportedBrands.includes( 'phet-io' );
+              await gitCheckout( repo, 'master' );
+
+              const brands = [
+                'phet',
+                ...( includesPhetio ? [ 'phet-io' ] : [] )
+              ];
+
+              unreleasedBranches.push( new ReleaseBranch( repo, branch, brands, false ) );
+            }
+          }
+        }
+      }
+
+      return ReleaseBranch.combineLists( [ ...phetBranches, ...phetioBranches, ...unreleasedBranches ] );
     }
 
     /**
