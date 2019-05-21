@@ -218,7 +218,7 @@ module.exports = ( function() {
 
       await checkoutMaster( this.repo, false ); // don't npm update
 
-      return results.map( line => `[${this.repo} ${this.branch}] ${line}` ); // tag with the repo name
+      return results.map( line => `[${this.toString()}] ${line}` ); // tag with the repo name
     }
 
     /**
