@@ -701,7 +701,7 @@ module.exports = ( function() {
       const maintenance = Maintenance.load();
 
       for ( const modifiedBranch of maintenance.modifiedBranches ) {
-        if ( !modifiedBranch.isReadyForReleaseCandidate ) {
+        if ( !modifiedBranch.isReadyForReleaseCandidate || !modifiedBranch.releaseBranch.isReleased ) {
           continue;
         }
 
@@ -727,7 +727,7 @@ module.exports = ( function() {
       const maintenance = Maintenance.load();
 
       for ( const modifiedBranch of maintenance.modifiedBranches ) {
-        if ( !modifiedBranch.isReadyForProduction ) {
+        if ( !modifiedBranch.isReadyForProduction || !modifiedBranch.releaseBranch.isReleased ) {
           continue;
         }
 

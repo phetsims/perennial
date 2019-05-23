@@ -211,9 +211,9 @@ bad branch issue (in this case, by not doing maintenance releases for that branc
 
 Generally send a Slack message, and try to find out whether:
 
-1. Anyone has any release branches that have not yet been published. They won't be handled manually by this process.
-   You'll want to coordinate with the responsible developer to patch in the changes you're making (if necessary), and
-   you'll want to inform QA that they should test specifically for this issue (they usually do anyways).
+1. Anyone has any release branches that have not yet been published. Notify them that the branch will soon be patched
+   (and will NOT be automatically deployed) and you'll want to inform QA that they should test specifically for this
+   issue (they usually do anyways).
 2. Whether anyone is doing (or has recently done) any maintenance work on release branches that hasn't been published or
    cleared by QA yet.
 
@@ -436,20 +436,11 @@ Once RCs are green-lit for deployment, run `Maintenance.deployProduction()` to d
 Afterwards, `Maintenance.listLinks()` will print out links to where the production versions should be. Quickly open all
 of these links to make sure the production deploys succeeded.
 
-## #14: Patching unpublished release branches
+## #14: Notify for unpublished RC branches
 
-Usually there will be some release branches that have not been published, and are still in their initial RC process.
-For now, the best process is to record all of the "patch SHAs" that were applied in previous steps,
-`Maintenance.reset()` to clear the maintenance state (once the main production deployments have finished), and do a
-similar process to the main procedure for all release branches that are unpublished, with the following changes:
-
-1. `Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( repo, branch, brands ), patchRepo );`, for example:
-   `Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( 'area-model-algebra', '1.1', [ 'phet' ] ), 'chipper' );`
-2. Do NOT run any of the deployment steps after `Maintenance.updateDependencies()`.
-3. Once the branches have been patched, please note that fact in any open RC issues in the QA repo.
-
-The list for this should ideally have been determined in #2, but it may be helpful to see a list of all of the RC
-issues: https://github.com/phetsims/QA/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+%22RC+test%22.
+For any unreleased branches that were patched, it's best to look for QA issues in e.g.
+https://github.com/phetsims/QA/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+%22RC+test%22
+and add a comment if it was patched with the issues.
 
 # Maintenance patches for a suite of sims in RC
 
@@ -507,3 +498,17 @@ maintenance> Maintenance.updateDependencies();
 
 Notably, we need to somewhat manually add the release branches, since they can't be detected from the website (they
 aren't published!)
+
+# Deprecating "unwanted" unpublished release branches
+
+If a release branch is discontinued (without being published), you can rename the branch to add the suffix
+`-deprecated` with the following (with either `${BRANCH}` replaced, or defined in an environment variable:
+
+```sh
+git checkout ${BRANCH}
+git pull
+git branch -m ${BRANCH} ${BRANCH}-deprecated
+git push origin :${BRANCH}
+git push --set-upstream origin ${BRANCH}-deprecated
+git checkout master
+```
