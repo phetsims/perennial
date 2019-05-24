@@ -12,6 +12,9 @@
 # // checkout master for all repos:
 # for-each.sh active-repos git checkout master
 #
+# // you can also string multiple commands together by putting everything inside quotes:
+# for-each.sh active-sims "npm install && grunt update"
+#
 # Author: Sam Reid
 # Author: Chris Malley
 # Author: Jonathan Olson (from work in grunt-all.sh)
@@ -60,7 +63,7 @@ for repository in `cat ${filename} | tr -d '\r' | xargs`
 do
   if [ -d "${repository}" ]; then
     echo ${repository}
-    (cd ${repository} > /dev/null; "${@:2}") # command is all args after the filename
+    (cd ${repository} > /dev/null; eval "${@:2}") # command is all args after the filename
   else
     echo ">>>>>>>>>>>>>>>> MISSING " ${workingDir}/${repository}
   fi
