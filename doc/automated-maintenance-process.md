@@ -97,7 +97,7 @@ complications):
    will need to be patched? (Even if the patch on master was only for 1 repository, other repos might also need to be
    changed if your change depends on newer features). If it exists, having a SHA that does "all" of the changes is nice.
    What types of release branches do you anticipate needing changes?
-5. Create patches for each repo that needs to change, e.g. `Maintenance.createPatch( '{{REPO}}', '{{ISSUE_URL}}' )`.
+5. Create patches for each repo that needs to change, e.g. `Maintenance.createPatch( '{{REPO}}', '{{ISSUE_URL}}', '{{OPTIONAL_PATCH_NAME}}' )`.
 6. Mark which release branches need which patches. For simple cases, this can just be something like
    `Maintenance.addNeededPatchesAfter( '{{REPO}}', '{{SHA}}' )`, but things can be added dynamically or through filters.
 
@@ -258,11 +258,14 @@ patches that affect disjoint groups of sims. For example, you would create a pat
 restriction mentioned above and complete it, THEN create a patch for all sims WITH the restriction. More detail will
 be below.
 
-## #5: Create a patch: `Maintenance.createPatch( repo, message )`
+## #5: Create a patch: `Maintenance.createPatch( repo, message, [patchName] )`
 
 This should be called for each repository that will need to have code changes (generally common repos). For the message,
 it should almost always include the issue URL used for tracking the maintenance release, and can also contain
 additional information if desired. It will be included in commit messages, QA reports, etc.
+
+If no patchName is provided, the patch will use the repo as its name. If multiple patches are needed for a single
+repository, it's best to create two patches, both with non-default patchNames.
 
 Running `Maintenance.list()` afterwards should show the patch in maintenance state, e.g.:
 
@@ -297,39 +300,39 @@ branches available. If you need more control, it's possible to grab a reference 
 
 ### Manually adding/removing needed patches
 
-`Maintenance.addNeededPatch( repo, branch, patchRepo )` will add a single release branch (with brands determined from
-the website metadata) as needing a patch for the given `patchRepo` (in the above example, `joist`). If you need to
+`Maintenance.addNeededPatch( repo, branch, patchName )` will add a single release branch (with brands determined from
+the website metadata) as needing a patch for the given `patchName` (in the above example, `joist`). If you need to
 manually specify brands, or add release branches that are outside of the normal system,
-`Maintenance.addNeededPatchReleaseBranch( releaseBranch, patchRepo )` will take a `ReleaseBranch` object that you can
+`Maintenance.addNeededPatchReleaseBranch( releaseBranch, patchName )` will take a `ReleaseBranch` object that you can
 manually create, or could get from `ReleaseBranch.getMaintenanceBranches()` if you are using the REPL to enumerate what
 will need a maintenance release.
 
-`Maintenance.removeNeededPatch( repo, branch, patchRepo )` will do the corresponding manual removal. Sometimes it's
+`Maintenance.removeNeededPatch( repo, branch, patchName )` will do the corresponding manual removal. Sometimes it's
 easier to add "all" sims and remove ones that are not needed, and this makes it possible.
 
 ### Adding ALL needed patches
 
-`Maintenance.addAllNeededPatches( patchRepo )` will add all release branches as needing a patch, which is helpful if
+`Maintenance.addAllNeededPatches( patchName )` will add all release branches as needing a patch, which is helpful if
 you just fixed something in master (every sim is guaranteed to NOT have the change).
 
 ### Adding/removing filtered needed patches based on a SHA
 
 If you have a specific SHA that is a fix (included in some release branches), you can add/remove simulations that do
-NOT have the fix with `Maintenance.addNeededPatchesBefore( patchRepo, sha )` and
-`Maintenance.removeNeededPatchesBefore( patchRepo, sha )`. This will add/remove release branches that do NOT have the
+NOT have the fix with `Maintenance.addNeededPatchesBefore( patchName, sha )` and
+`Maintenance.removeNeededPatchesBefore( patchName, sha )`. This will add/remove release branches that do NOT have the
 specific SHA in their history. Note that this may not pick up "related" shas (if it was cherry-picked, or someone
 rewrote the commit).
 
 If you have a specific SHA that is where something is broken (i.e. the state at the commit and after is broken), you can
-add/remove simulations that have the commit with `Maintenance.addNeededPatchesAfter( patchRepo, sha )` or
-`Maintenance.removeNeededPatchesAfter( patchRepo, sha )`. This is similar to the above "before" case, but includes the
+add/remove simulations that have the commit with `Maintenance.addNeededPatchesAfter( patchName, sha )` or
+`Maintenance.removeNeededPatchesAfter( patchName, sha )`. This is similar to the above "before" case, but includes the
 exact opposite set of release branches (ones that have the SHA in their history).
 
 ### Adding/removing filtered needed patches with a predicate function
 
 For more complicated cases (and as the internal implementation used by many of the above commands), you can specify
 an asynchronous predicate function (returns a Promise that will resolve as a boolean) to either
-`Maintenance.addNeededPatches( patchRepo, filter )` or `Maintenance.removeNeededPatches( patchRepo, filter )`. This will
+`Maintenance.addNeededPatches( patchName, filter )` or `Maintenance.removeNeededPatches( patchName, filter )`. This will
 apply the add/remove operation to release branches where `filter( releaseBranch )` returns a Promise that resolves as
 truthy.
 
@@ -351,7 +354,7 @@ const fs = require( 'fs' );
 It's also possible to build the simulations and inspect output (or even see if it failed) or run other operations.
 
 A helper function for building the release branch and comparing the output is provided as
-`Maintenance.addNeededPatchesBuildFilter( patchRepo, filter )`, where in this case `filter` is given the
+`Maintenance.addNeededPatchesBuildFilter( patchName, filter )`, where in this case `filter` is given the
 `ReleaseBranch` object AND the built simulation output as a string.
 
 ## #7: Checking out a "modified" release branch
@@ -374,10 +377,10 @@ step, these commits will be stored only locally on your checked-out copy. This i
 developer can patch all of the sims quickly, and then let the build/commit/etc. process do all of the slower tasks
 in one batch.
 
-## #9: Add the patch SHAs: `Maintenance.addPatchSHA( patchRepo, sha )`
+## #9: Add the patch SHAs: `Maintenance.addPatchSHA( patchName, sha )`
 
 For each of the SHAs determined as "fixes", those should be added to the patch with
-`Maintenance.addPatchSHA( patchRepo, sha )`. This marks that the given SHA is essentially a "fix" for the patch, and it
+`Maintenance.addPatchSHA( patchName, sha )`. This marks that the given SHA is essentially a "fix" for the patch, and it
 will be tried (with cherry-picking) on release branches in future steps.
 
 ## #10: Apply patches: `Maintenance.applyPatches()`

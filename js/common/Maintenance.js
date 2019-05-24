@@ -161,7 +161,7 @@ module.exports = ( function() {
           console.log( `  deployed: ${modifiedBranch.deployedVersion.toString()}` );
         }
         if ( modifiedBranch.neededPatches.length ) {
-          console.log( `  needs: ${modifiedBranch.neededPatches.map( patch => patch.repo ).join( ',' )}` );
+          console.log( `  needs: ${modifiedBranch.neededPatches.map( patch => patch.name ).join( ',' )}` );
         }
         if ( modifiedBranch.pushedMessages.length ) {
           console.log( `  pushedMessages: ${modifiedBranch.pushedMessages.join( ' and ' )}` );
@@ -178,7 +178,7 @@ module.exports = ( function() {
       }
 
       for ( const patch of maintenance.patches ) {
-        console.log( `[${patch.repo}] ${patch.message}` );
+        console.log( `[${patch.name}]${patch.name === patch.repo ? ` (${patch.repo})` : ''} ${patch.message}` );
         for ( const sha of patch.shas ) {
           console.log( `  ${sha}` );
         }
@@ -226,18 +226,21 @@ module.exports = ( function() {
      *
      * @param {string} repo
      * @param {string} message
+     * @param {string} [patchName] - If no name is provided, the repo string will be used.
      * @returns {Promise}
      */
-    static async createPatch( repo, message ) {
+    static async createPatch( repo, message, patchName ) {
       const maintenance = Maintenance.load();
 
+      patchName = patchName || repo;
+
       for ( const patch of maintenance.patches ) {
-        if ( patch.repo === repo ) {
-          throw new Error( 'Multiple patches with the same repo are not concurrently supported' );
+        if ( patch.name === patchName ) {
+          throw new Error( 'Multiple patches with the same name are not concurrently supported' );
         }
       }
 
-      maintenance.patches.push( new Patch( repo, message ) );
+      maintenance.patches.push( new Patch( repo, patchName, message ) );
 
       maintenance.save();
 
@@ -248,13 +251,13 @@ module.exports = ( function() {
      * Removes a patch
      * @public
      *
-     * @param {string} repo
+     * @param {string} patchName
      * @returns {Promise}
      */
-    static async removePatch( repo ) {
+    static async removePatch( patchName ) {
       const maintenance = Maintenance.load();
 
-      const patch = maintenance.findPatch( repo );
+      const patch = maintenance.findPatch( patchName );
 
       for ( const branch of maintenance.modifiedBranches ) {
         if ( branch.neededPatches.includes( patch ) ) {
@@ -266,41 +269,41 @@ module.exports = ( function() {
 
       maintenance.save();
 
-      console.log( `Removed patch for ${repo}` );
+      console.log( `Removed patch for ${patchName}` );
     }
 
     /**
      * Adds a particular SHA (to cherry-pick) to a patch.
      * @public
      *
-     * @param {string} repo
+     * @param {string} patchName
      * @param {string} sha
      * @returns {Promise}
      */
-    static async addPatchSHA( repo, sha ) {
+    static async addPatchSHA( patchName, sha ) {
       const maintenance = Maintenance.load();
 
-      const patch = maintenance.findPatch( repo );
+      const patch = maintenance.findPatch( patchName );
 
       patch.shas.push( sha );
 
       maintenance.save();
 
-      console.log( `Added SHA ${sha} to patch ${repo}` );
+      console.log( `Added SHA ${sha} to patch ${patchName}` );
     }
 
     /**
      * Removes a particular SHA (to cherry-pick) from a patch.
      * @public
      *
-     * @param {string} repo
+     * @param {string} patchName
      * @param {string} sha
      * @returns {Promise}
      */
-    static async removePatchSHA( repo, sha ) {
+    static async removePatchSHA( patchName, sha ) {
       const maintenance = Maintenance.load();
 
-      const patch = maintenance.findPatch( repo );
+      const patch = maintenance.findPatch( patchName );
 
       const index = patch.shas.indexOf( sha );
       assert( index >= 0, 'SHA not found' );
@@ -309,7 +312,7 @@ module.exports = ( function() {
 
       maintenance.save();
 
-      console.log( `Removed SHA ${sha} from patch ${repo}` );
+      console.log( `Removed SHA ${sha} from patch ${patchName}` );
     }
 
     /**
@@ -318,19 +321,19 @@ module.exports = ( function() {
      *
      * @param {string} repo
      * @param {string} branch
-     * @param {string} patchRepo
+     * @param {string} patchName
      */
-    static async addNeededPatch( repo, branch, patchRepo ) {
+    static async addNeededPatch( repo, branch, patchName ) {
       const maintenance = Maintenance.load();
 
-      const patch = maintenance.findPatch( patchRepo );
+      const patch = maintenance.findPatch( patchName );
 
       const modifiedBranch = await maintenance.ensureModifiedBranch( repo, branch );
       modifiedBranch.neededPatches.push( patch );
 
       maintenance.save();
 
-      console.log( `Added patch ${patchRepo} as needed for ${repo} ${branch}` );
+      console.log( `Added patch ${patchName} as needed for ${repo} ${branch}` );
     }
 
     /**
@@ -338,32 +341,32 @@ module.exports = ( function() {
      * @public
      *
      * @param {ReleaseBranch} releaseBranch
-     * @param {string} patchRepo
+     * @param {string} patchName
      */
-    static async addNeededPatchReleaseBranch( releaseBranch, patchRepo ) {
+    static async addNeededPatchReleaseBranch( releaseBranch, patchName ) {
       const maintenance = Maintenance.load();
 
-      const patch = maintenance.findPatch( patchRepo );
+      const patch = maintenance.findPatch( patchName );
 
       const modifiedBranch = new ModifiedBranch( releaseBranch );
       maintenance.modifiedBranches.push( modifiedBranch );
       modifiedBranch.neededPatches.push( patch );
       maintenance.save();
 
-      console.log( `Added patch ${patchRepo} as needed for ${releaseBranch.repo} ${releaseBranch.branch}` );
+      console.log( `Added patch ${patchName} as needed for ${releaseBranch.repo} ${releaseBranch.branch}` );
     }
 
     /**
      * Adds a needed patch to whatever subset of release branches match the filter.
      * @public
      *
-     * @param {string} patchRepo
+     * @param {string} patchName
      * @param {function} filter - function( ReleaseBranch ): Promise.<boolean>
      */
-    static async addNeededPatches( patchRepo, filter ) {
+    static async addNeededPatches( patchName, filter ) {
       const maintenance = Maintenance.load();
 
-      const patch = maintenance.findPatch( patchRepo );
+      const patch = maintenance.findPatch( patchName );
       const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
 
       for ( const releaseBranch of releaseBranches ) {
@@ -377,11 +380,11 @@ module.exports = ( function() {
         const modifiedBranch = await maintenance.ensureModifiedBranch( releaseBranch.repo, releaseBranch.branch );
         if ( !modifiedBranch.neededPatches.includes( patch ) ) {
           modifiedBranch.neededPatches.push( patch );
-          console.log( `Added needed patch ${patchRepo} to ${releaseBranch.repo} ${releaseBranch.branch}` );
+          console.log( `Added needed patch ${patchName} to ${releaseBranch.repo} ${releaseBranch.branch}` );
           maintenance.save(); // save here in case a future failure would "revert" things
         }
         else {
-          console.log( `Patch ${patchRepo} already included in ${releaseBranch.repo} ${releaseBranch.branch}` );
+          console.log( `Patch ${patchName} already included in ${releaseBranch.repo} ${releaseBranch.branch}` );
         }
       }
 
@@ -392,22 +395,25 @@ module.exports = ( function() {
      * Adds a needed patch to all release branches.
      * @public
      *
-     * @param {string} patchRepo
+     * @param {string} patchName
      */
-    static async addAllNeededPatches( patchRepo ) {
-      await Maintenance.addNeededPatches( patchRepo, async () => true );
+    static async addAllNeededPatches( patchName ) {
+      await Maintenance.addNeededPatches( patchName, async () => true );
     }
 
     /**
      * Adds a needed patch to all release branches that do NOT include the given commit on the repo
      * @public
      *
-     * @param {string} patchRepo
+     * @param {string} patchName
      * @param {string} sha
      */
-    static async addNeededPatchesBefore( patchRepo, sha ) {
-      await Maintenance.addNeededPatches( patchRepo, async ( releaseBranch ) => {
-        return await releaseBranch.isMissingSHA( patchRepo, sha );
+    static async addNeededPatchesBefore( patchName, sha ) {
+      const maintenance = Maintenance.load();
+      const patch = maintenance.findPatch( patchName );
+
+      await Maintenance.addNeededPatches( patchName, async ( releaseBranch ) => {
+        return await releaseBranch.isMissingSHA( patch.repo, sha );
       } );
     }
 
@@ -415,12 +421,15 @@ module.exports = ( function() {
      * Adds a needed patch to all release branches that DO include the given commit on the repo
      * @public
      *
-     * @param {string} patchRepo
+     * @param {string} patchName
      * @param {string} sha
      */
-    static async addNeededPatchesAfter( patchRepo, sha ) {
-      await Maintenance.addNeededPatches( patchRepo, async ( releaseBranch ) => {
-        return await releaseBranch.includesSHA( patchRepo, sha );
+    static async addNeededPatchesAfter( patchName, sha ) {
+      const maintenance = Maintenance.load();
+      const patch = maintenance.findPatch( patchName );
+
+      await Maintenance.addNeededPatches( patchName, async ( releaseBranch ) => {
+        return await releaseBranch.includesSHA( patch.repo, sha );
       } );
     }
 
@@ -429,11 +438,11 @@ module.exports = ( function() {
      * where it builds the simulation with the defaults (brand=phet) and provides it as a string.
      * @public
      *
-     * @param {string} patchRepo
+     * @param {string} patchName
      * @param {function} sha - function( ReleaseBranch, builtFile:string ): Promise.<boolean>
      */
-    static async addNeededPatchesBuildFilter( patchRepo, filter ) {
-      await Maintenance.addNeededPatches( patchRepo, async ( releaseBranch ) => {
+    static async addNeededPatchesBuildFilter( patchName, filter ) {
+      await Maintenance.addNeededPatches( patchName, async ( releaseBranch ) => {
         await checkoutTarget( releaseBranch.repo, releaseBranch.branch, true );
         await gitPull( releaseBranch.repo );
         await build( releaseBranch.repo );
@@ -455,12 +464,12 @@ module.exports = ( function() {
      *
      * @param {string} repo
      * @param {string} branch
-     * @param {string} patchRepo
+     * @param {string} patchName
      */
-    static async removeNeededPatch( repo, branch, patchRepo ) {
+    static async removeNeededPatch( repo, branch, patchName ) {
       const maintenance = Maintenance.load();
 
-      const patch = maintenance.findPatch( patchRepo );
+      const patch = maintenance.findPatch( patchName );
 
       const modifiedBranch = await maintenance.ensureModifiedBranch( repo, branch );
       const index = modifiedBranch.neededPatches.indexOf( patch );
@@ -471,20 +480,20 @@ module.exports = ( function() {
 
       maintenance.save();
 
-      console.log( `Removed patch ${patchRepo} from ${repo} ${branch}` );
+      console.log( `Removed patch ${patchName} from ${repo} ${branch}` );
     }
 
     /**
      * Removes a needed patch from whatever subset of (current) release branches match the filter.
      * @public
      *
-     * @param {string} patchRepo
+     * @param {string} patchName
      * @param {function} filter - function( ReleaseBranch ): Promise.<boolean>
      */
-    static async removeNeededPatches( patchRepo, filter ) {
+    static async removeNeededPatches( patchName, filter ) {
       const maintenance = Maintenance.load();
 
-      const patch = maintenance.findPatch( patchRepo );
+      const patch = maintenance.findPatch( patchName );
 
       for ( const modifiedBranch of maintenance.modifiedBranches ) {
         const needsRemoval = await filter( modifiedBranch.releaseBranch );
@@ -503,7 +512,7 @@ module.exports = ( function() {
         modifiedBranch.neededPatches.splice( index, 1 );
         maintenance.tryRemovingModifiedBranch( modifiedBranch );
 
-        console.log( `Removed needed patch ${patchRepo} from ${modifiedBranch.repo} ${modifiedBranch.branch}` );
+        console.log( `Removed needed patch ${patchName} from ${modifiedBranch.repo} ${modifiedBranch.branch}` );
       }
 
       maintenance.save();
@@ -513,12 +522,15 @@ module.exports = ( function() {
      * Removes a needed patch from all release branches that do NOT include the given commit on the repo
      * @public
      *
-     * @param {string} patchRepo
+     * @param {string} patchName
      * @param {string} sha
      */
-    static async removeNeededPatchesBefore( patchRepo, sha ) {
-      await Maintenance.removeNeededPatches( patchRepo, async ( releaseBranch ) => {
-        return await releaseBranch.isMissingSHA( patchRepo, sha );
+    static async removeNeededPatchesBefore( patchName, sha ) {
+      const maintenance = Maintenance.load();
+      const patch = maintenance.findPatch( patchName );
+
+      await Maintenance.removeNeededPatches( patchName, async ( releaseBranch ) => {
+        return await releaseBranch.isMissingSHA( patch.repo, sha );
       } );
     }
 
@@ -526,12 +538,15 @@ module.exports = ( function() {
      * Removes a needed patch from all release branches that DO include the given commit on the repo
      * @public
      *
-     * @param {string} patchRepo
+     * @param {string} patchName
      * @param {string} sha
      */
-    static async removeNeededPatchesAfter( patchRepo, sha ) {
-      await Maintenance.removeNeededPatches( patchRepo, async ( releaseBranch ) => {
-        return await releaseBranch.includesSHA( patchRepo, sha );
+    static async removeNeededPatchesAfter( patchName, sha ) {
+      const maintenance = Maintenance.load();
+      const patch = maintenance.findPatch( patchName );
+
+      await Maintenance.removeNeededPatches( patchName, async ( releaseBranch ) => {
+        return await releaseBranch.includesSHA( patch.repo, sha );
       } );
     }
 
@@ -893,15 +908,15 @@ module.exports = ( function() {
     }
 
     /**
-     * Looks up a patch by its repository.
+     * Looks up a patch by its name.
      * @public
      *
-     * @param {string} repo
+     * @param {string} patchName
      * @returns {Patch}
      */
-    findPatch( repo ) {
-      const patch = this.patches.find( p => p.repo === repo );
-      assert( patch, `Patch not found for ${repo}` );
+    findPatch( patchName ) {
+      const patch = this.patches.find( p => p.name === patchName );
+      assert( patch, `Patch not found for ${patchName}` );
 
       return patch;
     }

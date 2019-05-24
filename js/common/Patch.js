@@ -19,17 +19,20 @@ module.exports = ( function() {
      * @constructor
      *
      * @param {string} repo
+     * @param {string} name
      * @param {string} message - Usually an issue URL, but can include other things
      * @param {Array.<string>} shas - SHAs used to cherry-pick
      */
-    constructor( repo, message, shas = [] ) {
+    constructor( repo, name, message, shas = [] ) {
       assert( typeof repo === 'string' );
+      assert( typeof name === 'string' );
       assert( typeof message === 'string' );
       assert( Array.isArray( shas ) );
       shas.forEach( sha => assert( typeof sha === 'string' ) );
 
       // @public {string}
       this.repo = repo;
+      this.name = name;
       this.message = message;
 
       // @public {Array.<string>}
@@ -45,6 +48,7 @@ module.exports = ( function() {
     serialize() {
       return {
         repo: this.repo,
+        name: this.name,
         message: this.message,
         shas: this.shas
       };
@@ -57,8 +61,8 @@ module.exports = ( function() {
      * @param {Object}
      * @returns {Patch}
      */
-    static deserialize( { repo, message, shas } ) {
-      return new Patch( repo, message, shas );
+    static deserialize( { repo, name, message, shas } ) {
+      return new Patch( repo, name, message, shas );
     }
   }
 
