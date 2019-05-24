@@ -937,7 +937,7 @@ module.exports = ( function() {
         if ( errorIfMissing ) {
           throw new Error( `Could not find a tracked modified branch for ${repo} ${branch}` );
         }
-        const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
+        const releaseBranches = await ReleaseBranch.getMaintenanceBranches( testRepo => testRepo === repo );
         const releaseBranch = releaseBranches.find( release => release.repo === repo && release.branch === branch );
         assert( releaseBranch, `Could not find a release branch for repo=${repo} branch=${branch}` );
 

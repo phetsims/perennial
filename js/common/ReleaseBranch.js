@@ -225,10 +225,11 @@ module.exports = ( function() {
      * Gets a list of ReleaseBranches which would be potential candidates for a maintenance release.
      * @public
      *
+     * @param {function} filterRepo - Passed {string} repo, return false if it should be excluded.
      * @returns {Promise.<Array.<ReleaseBranch>>}
      * @rejects {ExecuteError}
      */
-    static async getMaintenanceBranches() {
+    static async getMaintenanceBranches( filterRepo = () => true ) {
       winston.debug( 'retrieving available sim branches' );
 
       const simMetadataResult = await simMetadata( {
@@ -259,7 +260,7 @@ module.exports = ( function() {
 
       // Unreleased branches
       const unreleasedBranches = [];
-      for ( const repo of activeSimRepos ) {
+      for ( const repo of activeSimRepos.filter( filterRepo ) ) {
         // Exclude explicitly excluded repos
         if ( JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) ).phet.ignoreForAutomatedMaintenanceReleases ) {
           continue;
@@ -279,7 +280,7 @@ module.exports = ( function() {
 
             if ( !productionVersion ||
                  major > productionVersion.major ||
-                 ( major === productionVersion.major && minor > productionVersion.minor ) ) {       
+                 ( major === productionVersion.major && minor > productionVersion.minor ) ) {
 
               // Do a checkout so we can determine supported brands
               await gitCheckout( repo, branch );
@@ -298,7 +299,9 @@ module.exports = ( function() {
         }
       }
 
-      return ReleaseBranch.combineLists( [ ...phetBranches, ...phetioBranches, ...unreleasedBranches ] );
+      return ReleaseBranch.combineLists( [ ...phetBranches, ...phetioBranches, ...unreleasedBranches ] ).filter( releaseBranch => {
+        return filterRepo( releaseBranch.repo );
+      } );
     }
 
     /**
