@@ -178,7 +178,7 @@ module.exports = ( function() {
       }
 
       for ( const patch of maintenance.patches ) {
-        console.log( `[${patch.name}]${patch.name === patch.repo ? ` (${patch.repo})` : ''} ${patch.message}` );
+        console.log( `[${patch.name}]${patch.name !== patch.repo ? ` (${patch.repo})` : ''} ${patch.message}` );
         for ( const sha of patch.shas ) {
           console.log( `  ${sha}` );
         }
