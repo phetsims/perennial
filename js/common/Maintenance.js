@@ -377,7 +377,7 @@ module.exports = ( function() {
           continue;
         }
 
-        const modifiedBranch = await maintenance.ensureModifiedBranch( releaseBranch.repo, releaseBranch.branch );
+        const modifiedBranch = await maintenance.ensureModifiedBranch( releaseBranch.repo, releaseBranch.branch, false, releaseBranches );
         if ( !modifiedBranch.neededPatches.includes( patch ) ) {
           modifiedBranch.neededPatches.push( patch );
           console.log( `Added needed patch ${patchName} to ${releaseBranch.repo} ${releaseBranch.branch}` );
@@ -928,16 +928,17 @@ module.exports = ( function() {
      * @param {string} repo
      * @param {string} branch
      * @param {boolean} [errorIfMissing]
+     * @param {Array.<ReleaseBranch>} [releaseBranches] - If provided, it will speed up the process
      * @returns {Promise.<ModifiedBranch>}
      */
-    async ensureModifiedBranch( repo, branch, errorIfMissing = false ) {
+    async ensureModifiedBranch( repo, branch, errorIfMissing = false, releaseBranches = null ) {
       let modifiedBranch = this.modifiedBranches.find( modifiedBranch => modifiedBranch.repo === repo && modifiedBranch.branch === branch );
 
       if ( !modifiedBranch ) {
         if ( errorIfMissing ) {
           throw new Error( `Could not find a tracked modified branch for ${repo} ${branch}` );
         }
-        const releaseBranches = await ReleaseBranch.getMaintenanceBranches( testRepo => testRepo === repo );
+        releaseBranches = releaseBranches || await ReleaseBranch.getMaintenanceBranches( testRepo => testRepo === repo );
         const releaseBranch = releaseBranches.find( release => release.repo === repo && release.branch === branch );
         assert( releaseBranch, `Could not find a release branch for repo=${repo} branch=${branch}` );
 
