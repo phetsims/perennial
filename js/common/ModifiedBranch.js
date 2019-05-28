@@ -80,7 +80,7 @@ module.exports = ( function() {
       return {
         releaseBranch: this.releaseBranch.serialize(),
         changedDependencies: this.changedDependencies,
-        neededPatches: this.neededPatches.map( patch => patch.repo ),
+        neededPatches: this.neededPatches.map( patch => patch.name ),
         pendingMessages: this.pendingMessages,
         pushedMessages: this.pushedMessages,
         deployedVersion: this.deployedVersion ? this.deployedVersion.serialize() : null
@@ -99,7 +99,7 @@ module.exports = ( function() {
       return new ModifiedBranch(
         ReleaseBranch.deserialize( releaseBranch ),
         changedDependencies,
-        neededPatches.map( repo => patches.find( patch => patch.repo === repo ) ),
+        neededPatches.map( name => patches.find( patch => patch.name === name ) ),
         pendingMessages,
         pushedMessages,
         deployedVersion ? SimVersion.deserialize( deployedVersion ) : null

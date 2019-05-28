@@ -156,7 +156,7 @@ module.exports = ( function() {
       const maintenance = Maintenance.load();
 
       for ( const modifiedBranch of maintenance.modifiedBranches ) {
-        console.log( `${modifiedBranch.repo} ${modifiedBranch.branch} ${modifiedBranch.brands.join( ',' )}` );
+        console.log( `${modifiedBranch.repo} ${modifiedBranch.branch} ${modifiedBranch.brands.join( ',' )}${modifiedBranch.releaseBranch.isReleased ? '' : ' (unreleased)'}` );
         if ( modifiedBranch.deployedVersion ) {
           console.log( `  deployed: ${modifiedBranch.deployedVersion.toString()}` );
         }
