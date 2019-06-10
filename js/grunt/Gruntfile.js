@@ -31,6 +31,7 @@ const insertRequireStatement = require( './insertRequireStatement' );
 const Maintenance = require( '../common/Maintenance' );
 const npmUpdate = require( '../common/npmUpdate' );
 const printPhetioLinks = require( './printPhetioLinks' );
+const PDOMComparison = require( './PDOMComparison' );
 const production = require( './production' );
 const rc = require( './rc' );
 const shaCheck = require( './shaCheck' );
@@ -168,6 +169,12 @@ module.exports = function( grunt ) {
     'Print the current list of all phet-io sims\' links',
     wrapTask( async () => {
       await printPhetioLinks();
+    } ) );
+
+  grunt.registerTask( 'pdom-comparison',
+    'Compare two sim versions\' pdom',
+    wrapTask( async () => {
+      await PDOMComparison( grunt.option( 'repo' ) );
     } ) );
 
   grunt.registerTask( 'update-gh-pages',

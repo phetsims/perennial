@@ -17,8 +17,8 @@ const winston = require( 'winston' );
 let buildLocalObject;
 try {
   buildLocalObject = JSON.parse( fs.readFileSync( process.env.HOME + '/.phet/build-local.json', 'utf8' ) );
-} 
-catch ( e ) {
+}
+catch( e ) {
   winston.warn( 'No build-local.json detected!' );
   buildLocalObject = {};
 }
@@ -40,5 +40,6 @@ module.exports = {
   devDeployServer: buildLocalObject.devDeployServer || 'bayes.colorado.edu',
   devDeployPath: buildLocalObject.devDeployPath || '/data/web/htdocs/dev/html/',
   buildServerNotifyEmail: buildLocalObject.buildServerNotifyEmail || null,
-  productionServerURL: buildLocalObject.productionServerURL || 'https://phet.colorado.edu'
+  productionServerURL: buildLocalObject.productionServerURL || 'https://phet.colorado.edu',
+  localTestingURL: buildLocalObject.localTestingURL || null
 };
