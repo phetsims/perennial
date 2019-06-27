@@ -362,7 +362,7 @@ module.exports = ( function() {
      * @public
      *
      * @param {string} patchName
-     * @param {function} filter - function( ReleaseBranch ): Promise.<boolean>
+     * @param {function(ReleaseBranch):Promise.<boolean>} filter
      */
     static async addNeededPatches( patchName, filter ) {
       const maintenance = Maintenance.load();
@@ -440,7 +440,7 @@ module.exports = ( function() {
      * @public
      *
      * @param {string} patchName
-     * @param {function} sha - function( ReleaseBranch, builtFile:string ): Promise.<boolean>
+     * @param {function(ReleaseBranch, builtFile:string): Promise.<boolean>} filter
      */
     static async addNeededPatchesBuildFilter( patchName, filter ) {
       await Maintenance.addNeededPatches( patchName, async ( releaseBranch ) => {
@@ -489,7 +489,7 @@ module.exports = ( function() {
      * @public
      *
      * @param {string} patchName
-     * @param {function} filter - function( ReleaseBranch ): Promise.<boolean>
+     * @param {function(ReleaseBranch): Promise.<boolean>} filter
      */
     static async removeNeededPatches( patchName, filter ) {
       const maintenance = Maintenance.load();
