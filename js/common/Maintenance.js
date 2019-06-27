@@ -774,7 +774,7 @@ module.exports = ( function() {
      * Convert into a plain JS object meant for JSON serialization.
      * @public
      *
-     * @returns {Object}
+     * @returns {{patches:Array.<Object>, modifiedBranches:Array.<Object>}} - see Patch.serialize() and ModifiedBranch.serialize()
      */
     serialize() {
       return {
@@ -787,7 +787,7 @@ module.exports = ( function() {
      * Takes a serialized form of the Maintenance and returns an actual instance.
      * @public
      *
-     * @param {Object}
+     * @param {{patches:Array.<Object>, modifiedBranches:Array.<Object>}} - see Maintenance.serialize()
      * @returns {Maintenance}
      */
     static deserialize( { patches, modifiedBranches } ) {
