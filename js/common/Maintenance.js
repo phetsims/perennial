@@ -133,7 +133,8 @@ module.exports = ( function() {
             brands: releaseBranch.brands
           } );
           throw new Error( 'UNIMPLEMENTED, copy over' );
-        } catch ( e ) {
+        }
+        catch( e ) {
           failed.push( `${releaseBranch.repo} ${releaseBranch.brand}` );
         }
       }
@@ -622,7 +623,8 @@ module.exports = ( function() {
                 console.log( `Could not cherry-pick ${sha}` );
               }
             }
-          } catch ( e ) {
+          }
+          catch( e ) {
             maintenance.save();
 
             throw new Error( `Failure applying patch ${patchRepo} to ${repo} ${branch}: ${e}` );
@@ -700,7 +702,8 @@ module.exports = ( function() {
           maintenance.save(); // save here in case a future failure would "revert" things
 
           await checkoutMaster( modifiedBranch.repo, true ); // npm update back, so we don't leave the sim in a weird state
-        } catch ( e ) {
+        }
+        catch( e ) {
           maintenance.save();
 
           throw new Error( `Failure updating dependencies for ${modifiedBranch.repo} to ${modifiedBranch.branch}: ${e}` );
@@ -726,7 +729,8 @@ module.exports = ( function() {
           const version = await rc( modifiedBranch.repo, modifiedBranch.branch, modifiedBranch.brands, true, modifiedBranch.pushedMessages.join( ', ' ) );
           modifiedBranch.deployedVersion = version;
           maintenance.save(); // save here in case a future failure would "revert" things
-        } catch ( e ) {
+        }
+        catch( e ) {
           maintenance.save();
 
           throw new Error( `Failure with RC deploy for ${modifiedBranch.repo} to ${modifiedBranch.branch}: ${e}` );
@@ -753,7 +757,8 @@ module.exports = ( function() {
           modifiedBranch.deployedVersion = version;
           modifiedBranch.pushedMessages = [];
           maintenance.save(); // save here in case a future failure would "revert" things
-        } catch ( e ) {
+        }
+        catch( e ) {
           maintenance.save();
 
           throw new Error( `Failure with production deploy for ${modifiedBranch.repo} to ${modifiedBranch.branch}: ${e}` );
@@ -764,17 +769,6 @@ module.exports = ( function() {
 
       console.log( 'production versions deployed' );
     }
-
-
-
-
-
-
-
-
-
-
-
 
     /**
      * Convert into a plain JS object meant for JSON serialization.
