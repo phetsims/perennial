@@ -49,7 +49,7 @@ module.exports = async function writePhetHtaccess( simName, version ) {
       // Update the .htaccess file that controls the /latest/ rewrite
       const contents = 'RewriteEngine on\n' +
                        'RewriteBase /sims/html/' + simName + '/\n' +
-                       'RewriteRule latest(.*) ' + version + '$1\n' +
+                       'RewriteRule ^latest(.*) ' + version + '$1\n' +
                        'Header set Access-Control-Allow-Origin "*"\n\n' +
                        'RewriteCond %{QUERY_STRING} =download\n' +
                        'RewriteRule ([^/]*)$ - [L,E=download:$1]\n' +
