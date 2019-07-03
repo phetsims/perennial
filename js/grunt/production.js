@@ -26,6 +26,7 @@ const grunt = require( 'grunt' );
 const gruntCommand = require( '../common/gruntCommand' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
+const phetioAPIChangeCheck = require( './phetioAPIChangeCheck' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 const simMetadata = require( '../common/simMetadata' );
 const SimVersion = require( '../common/SimVersion' );
@@ -124,12 +125,12 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     try {
       await execute( gruntCommand, [ 'published-README' ], `../${repo}` );
     }
-    catch ( e ) {
+    catch( e ) {
       grunt.log.writeln( 'published-README error, may not exist, will try generate-published-README' );
       try {
         await execute( gruntCommand, [ 'generate-published-README' ], `../${repo}` );
       }
-      catch ( e ) {
+      catch( e ) {
         grunt.log.writeln( 'No published README generation found' );
       }
     }
@@ -138,7 +139,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       await gitCommit( repo, `Generated published README.md as part of a production deploy for ${versionString}` );
       await gitPush( repo, branch );
     }
-    catch ( e ) {
+    catch( e ) {
       grunt.log.writeln( 'Production README is already up-to-date' );
     }
 
@@ -147,16 +148,30 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       brands: brands
     } ) );
 
-    if ( !await booleanPrompt( `Please test the built version of ${repo}.\nIs it ready to deploy`, noninteractive ) ) {
+    /**
+     * The necessary clean up steps to do if aborting after the build
+     * @param {string} message - message to error out with
+     * @returns {Promise<void>}
+     */
+    const postBuildAbort = async message => {
+
       // Abort version update
       if ( versionChanged ) {
         await setRepoVersion( repo, previousVersion, message );
         await gitPush( repo, branch );
       }
 
-      // Abort checkout
-      await checkoutMaster( repo, true );
-      throw new Error( 'Aborted production deployment (aborted version change too).' );
+      // Abort checkout, (will be caught and master will be checked out
+      throw new Error( message );
+    };
+
+    // Test that phet-io api changes didn't occur between this production build and the last maintenance release for it.
+    if ( brands.includes( 'phet-io' ) && version.maintenance > 0 ) {
+      await phetioAPIChangeCheck( repo, version, postBuildAbort );
+    }
+
+    if ( !await booleanPrompt( `Please test the built version of ${repo}.\nIs it ready to deploy?`, noninteractive ) ) {
+      await postBuildAbort( 'Aborted production deployment (aborted version change too).' );
     }
 
     // Move over dependencies.json and commit/push
@@ -192,7 +207,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
         await gitCommit( repo, `Generated published README.md as part of a production deploy for ${versionString}` );
         await gitPush( repo, 'master' );
       }
-      catch ( e ) {
+      catch( e ) {
         grunt.log.writeln( 'Production README is already up-to-date' );
       }
     }
@@ -218,13 +233,13 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       await gitCommit( 'sherpa', `Updating third-party-licenses for deploy of ${repo} ${versionString}` );
       await gitPush( 'sherpa', 'master' );
     }
-    catch ( e ) {
+    catch( e ) {
       grunt.log.writeln( 'Third party licenses are already up-to-date' );
     }
 
     return version;
   }
-  catch ( e ) {
+  catch( e ) {
     grunt.log.warn( 'Detected failure during deploy, reverting to master' );
     await checkoutMaster( repo, true );
     throw e;
