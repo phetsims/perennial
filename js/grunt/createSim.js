@@ -2,15 +2,15 @@
 
 /**
  * This grunt task creates a simulation based on the simula-rasa template.
- * Run from any repository directory that is a sibling of simula-rasa.
+ * This task must be run from perennial directory.
  *
  * Example usage:
- * grunt create-sim --name=cannon-blaster --author="Sam Reid (PhET Interactive Simulations)"
+ * grunt create-sim --repo=cannon-blaster --author="Sam Reid (PhET Interactive Simulations)"
  *
  * This task will attempt to coerce a sim title from the repository name. For example,
  * 'cannon-blaster' becomes 'Cannon Blaster'.  If this is not suitable, then use --title
  * to specify a title.  For example:
- * grunt create-sim --name=fractions-basics --title="Fractions: Basics" --author="Sam Reid (PhET Interactive Simulations)"
+ * grunt create-sim --repo=fractions-basics --title="Fractions: Basics" --author="Sam Reid (PhET Interactive Simulations)"
  *
  * For development and debugging, add --clean=true to delete the repository directory.
  *
