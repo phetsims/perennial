@@ -78,7 +78,7 @@ module.exports = async ( repo, sha ) => {
   const diff = htmlDiffer.diffHtml( workingCopyPDOM, oldShaPDOM );
 
   // TODO: better interpretation of the diff that is output. Perhaps by looking at "diff" more manually, see https://www.npmjs.com/package/html-differ
-  console.log( logger.getDiffText( diff, { charsAroundDiff: 40 } ) );
+  console.log( logger.getDiffText( diff, { charsAroundDiff: 400 } ) );
 };
 
 
@@ -128,8 +128,6 @@ const stashAll = async repos => {
       shouldStash = true;
     }
     if ( shouldStash ) {
-
-      // TODO: why are all repos being pushed here!?!?
       needsUnstashing.push( repo );
 
       // stash working copy changes
