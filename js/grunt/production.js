@@ -64,8 +64,17 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     throw new Error( `Missing screenshot file (${repo}/assets/${repo}-screenshot.png), aborting production deployment` );
   }
 
-  if ( !await booleanPrompt( 'Are QA credits up-to-date', noninteractive ) ) {
+  if ( !await booleanPrompt( 'Are QA credits up-to-date?', noninteractive ) ) {
     throw new Error( 'Aborted production deployment' );
+  }
+
+  // This check is to prevent a discrepancy between the generated baseline file and the api of the computed sim.
+  // Validation does not take place in build sims with assertions stripped out, so it is good to check this early,
+  // see https://github.com/phetsims/phet-io/issues/1524
+  if ( brands.includes( 'phet-io' ) &&
+       !await booleanPrompt( 'Does this sim run in PhET-iO brand (requirejs with assertions enabled)? This ' +
+                             'ensures up-to-date api files before continuing.', noninteractive ) ) {
+    throw new Error( 'Aborted production deployment: You may need to regenerate the PhET-iO api files.' );
   }
 
   await checkoutTarget( repo, branch, true ); // include npm update
