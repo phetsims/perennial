@@ -174,7 +174,7 @@ module.exports = function( grunt ) {
   grunt.registerTask( 'pdom-comparison',
     'Compare two sim versions\' pdom',
     wrapTask( async () => {
-      await PDOMComparison( grunt.option( 'repo' ) );
+      await PDOMComparison( grunt.option( 'repo' ), grunt.option( 'sha' ) );
     } ) );
 
   grunt.registerTask( 'update-gh-pages',
