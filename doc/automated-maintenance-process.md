@@ -84,6 +84,7 @@ NOTE: This is an outline. Details for each step will be listed below in this doc
 
 Before starting, ensure you have a clean working copy, and:
 
+0. This process can take a lot of time, all the while taking over every repo checked out. It may be nice to use separate device besides your primary development environment. Or checkout a separate clone of phet repos, and use them for this process so that you can still develop while the MR process is occurring. 
 1. Run `Maintenance.checkBranchStatus()` to see if any commits have snuck into release branches that are unanticipated.
 2. Communicate with the team about maintenance releases for release branches. If there are release branches that are
    unpublished, they'll need to manually include the fixes. From this point on (until complete), you should be the only
