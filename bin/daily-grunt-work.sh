@@ -1,7 +1,8 @@
 #!/bin/bash
 #=======================================================================================
 #
-# Run work that should be done automatically. When written the thought was about daily.
+# This script is run daily on bayes, doing automatic grunt work to keep the project up
+# to date. Edit this script and commit to automatically add to the daily cron job.
 #
 # Author: Michael Kauzmann
 # 
