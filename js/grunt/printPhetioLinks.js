@@ -71,13 +71,7 @@ async function usesTopLevelIndex( repo, branch ) {
 }
 
 // {Object} metadata -> version string
-const getVersion = ( simData ) => {
-  let string = `${simData.versionMajor}.${simData.versionMinor}.${simData.versionMaintenance}`;
-  if ( simData.versionSuffix ) {
-    string += `-${simData.versionSuffix}`;
-  }
-  return string;
-};
+const getVersion = simData => `${simData.versionMajor}.${simData.versionMinor}`;
 
 // {Object} metadata -> branch name
 const getBranch = ( simData ) => {
