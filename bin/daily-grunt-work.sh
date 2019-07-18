@@ -11,7 +11,6 @@
 # Exit immediately on Ctrl-C
 trap "exit 1" SIGINT
 
-
 # cd to the directory where your git repositories live
 binDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 workingDir=${binDir}/../..
@@ -20,10 +19,12 @@ cd ${workingDir}
 echo "running daily grunt work. . ."
 
 cd perennial
+git pull
 npm prune && npm update
 grunt checkout-master-all
 cd ..
 
+perennial/bin/clone-missing-repos.sh
 perennial/bin/pull-all.sh -p
 
 # update-copyright-dates
