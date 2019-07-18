@@ -47,7 +47,7 @@ module.exports = async () => {
 
     const useTopLevelIndex = await usesTopLevelIndex( simData.name, getBranch( simData ) );
 
-    phetioLinks.push( `https://phet-io.colorado.edu/sims/${simData.name}/${getVersion( simData )}${useTopLevelIndex ? '' : '/wrappers/index'}` );
+    phetioLinks.push( `https://phet-io.colorado.edu/sims/${simData.name}/${getVersion( simData )}/${useTopLevelIndex ? '' : 'wrappers/index/'}` );
   }
 
   console.log( 'Latest Links:' );
