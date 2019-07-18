@@ -5,7 +5,9 @@
 
 - Release Branch: A specific "sim", "branch", "brands" combination that will be patched/deployed as one unit. Sometimes
   this term will be used to refer specifically to the branch itself (ignoring the brands), and sometimes the brands will
-  be assumed.
+  be assumed. A "published/production" release branch is one that has had a production deployment before, and is
+  usually in contrast with an "RC" release branch (one that is unpublished, but is out for testing in a release
+  candidate QA issue).
 - Patch: A logical change to a specific repository that needs to be made. Sometimes changes for an issue will result in
   multiple "patches" if it affects multiple repositories.
 - Patch SHA: A particular git SHA that can be cherry-picked to a patch's repo. Usually a patch will have multiple SHAs,
@@ -84,7 +86,7 @@ NOTE: This is an outline. Details for each step will be listed below in this doc
 
 Before starting, ensure you have a clean working copy, and:
 
-0. This process can take a lot of time, all the while taking over every repo checked out. It may be nice to use separate device besides your primary development environment. Or checkout a separate clone of phet repos, and use them for this process so that you can still develop while the MR process is occurring. 
+0. This process can take a lot of time, all the while taking over every repo checked out. It may be nice to use separate device besides your primary development environment. Or checkout a separate clone of phet repos, and use them for this process so that you can still develop while the MR process is occurring.
 1. Run `Maintenance.checkBranchStatus()` to see if any commits have snuck into release branches that are unanticipated.
 2. Communicate with the team about maintenance releases for release branches. If there are release branches that are
    unpublished, they'll need to manually include the fixes. From this point on (until complete), you should be the only
@@ -422,7 +424,16 @@ will include the SHAs.
 NOTE: It is ideal to keep the computer that this is running on "awake", so the process is not interrupted!
 https://support.apple.com/kb/PH25222?locale=en_US may be helpful for this.
 
-## #12: Deploying RCs and the QA issue: `Maintenance.deployReleaseCandidates()`
+## #12: Notify for unpublished RC branches
+
+For any unreleased branches that were patched, it's best to look for QA issues in e.g.
+https://github.com/phetsims/QA/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+%22RC+test%22
+and add a comment if it was patched with the issues.
+
+## #13: Deploying RCs and the QA issue: `Maintenance.deployReleaseCandidates()`
+
+NOTE: This will not deploy any unpublished release branches (i.e. if a sim is in RC testing, this process will only
+patch it, but will not deploy any RC or production versions).
 
 Running `Maintenance.deployReleaseCandidates()` will deploy release-candidate versions for any release branches that
 have maintenance changes since the last deploy (it won't needlessly deploy RCs for branches that didn't change). Like
@@ -433,18 +444,13 @@ of links that should be ready for a QA issue. Generally prepend this with the in
 done. I always recommend 10-30 seconds of general testing per sim to make sure nothing is horribly broken. Additionally,
 there is almost always testing related to the specific fixed issue (e.g. "does this bad behavior happen still").
 
-## #13: Deploying changes to production: `Maintenance.deployProduction()`
+## #14: Deploying changes to production: `Maintenance.deployProduction()`
 
-Once RCs are green-lit for deployment, run `Maintenance.deployProduction()` to deploy production versions.
+Once RCs are green-lit for deployment, run `Maintenance.deployProduction()` to deploy production versions to published
+release branches.
 
 Afterwards, `Maintenance.listLinks()` will print out links to where the production versions should be. Quickly open all
 of these links to make sure the production deploys succeeded.
-
-## #14: Notify for unpublished RC branches
-
-For any unreleased branches that were patched, it's best to look for QA issues in e.g.
-https://github.com/phetsims/QA/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+%22RC+test%22
-and add a comment if it was patched with the issues.
 
 # Maintenance patches for a suite of sims in RC
 
