@@ -29,8 +29,8 @@ perennial/bin/pull-all.sh -p
 
 # update-copyright-dates
 cd chipper && npm prune && npm update && cd ..
-updateCommand="npm update && grunt update-copyright-dates && git commit -am 'update copyright dates'"
-perennial/bin/for-each.sh perennial/data/active-runnables "${updateCommand}"
+updateCommand="npm update && grunt update-copyright-dates && git commit -am 'update copyright dates from daily grunt work' && git push"
+perennial/bin/for-each.sh perennial/data/active-repos "${updateCommand}"
 
 # supplementary repos to update copyrights on
 for repo in "scenery" "tandem" "axon" "dot" "kite" "phet-core" "phetcommon" "chipper";
@@ -43,18 +43,8 @@ for repo in "scenery" "tandem" "axon" "dot" "kite" "phet-core" "phetcommon" "chi
 # report third party
 cd chipper
 grunt report-third-party
-
 cd ../sherpa
 git pull
 echo "report third party done, potentially committing"
-
-# this will exit with a non-zero code if there are working copy changes
-git diff-index --quiet HEAD --
-exitCode=$(echo $?)
-echo $exitCode
-if [ $exitCode != 0 ]; then
-  echo "committing third party report"
-  git add .
-  git commit -m "Updating third-party-licenses from daily grunt work"
-  git push
-fi
+git commit -m a"Updating third-party-licenses from daily grunt work"
+git push
