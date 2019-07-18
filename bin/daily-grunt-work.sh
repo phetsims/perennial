@@ -20,15 +20,24 @@ cd ${workingDir}
 echo "running daily grunt work. . ."
 
 cd perennial
-npm update
+npm prune && npm update
 grunt checkout-master-all
 cd ..
 
 perennial/bin/pull-all.sh -p
 
 # update-copyright-dates
-cd chipper && npm install && cd ..
-perennial/bin/for-each.sh perennial/data/active-runnables "npm update && grunt update-copyright-dates && git commit -am 'update copyright dates'"
+cd chipper && npm prune && npm update && cd ..
+updateCommand="npm update && grunt update-copyright-dates && git commit -am 'update copyright dates'"
+perennial/bin/for-each.sh perennial/data/active-runnables "${updateCommand}"
+
+# supplementary repos to update copyrights on
+for repo in "scenery" "tandem" "axon" "dot" "kite" "phet-core" "phetcommon" "chipper";
+  do
+    cd $repo
+    $updateCommand
+    cd ..
+  done
 
 # report third party
 cd chipper
