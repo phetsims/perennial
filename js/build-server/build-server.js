@@ -168,6 +168,7 @@ function queueDeploy( api, repos, simName, version, locales, brands, servers, em
       taskQueue.push( { api: api, repos: repos, simName: simName, version: version, locales: locales, servers: servers, brands: brands, email: email, userId: userId, res: res, branch: branch }, function( err ) {
         const simInfoString = 'Sim = ' + simName +
                               ' Version = ' + version +
+                              ' Brands = ' + brands +
                               ' Locales = ' + locales;
 
         if ( err ) {
