@@ -27,19 +27,13 @@ cd ..
 perennial/bin/clone-missing-repos.sh
 perennial/bin/pull-all.sh -p
 
+###########################################################################################################
 # update-copyright-dates
 cd chipper && npm prune && npm update && cd ..
-updateCommand="npm prune && npm update && grunt update-copyright-dates && git commit -am 'update copyright dates from daily grunt work' && git push"
-perennial/bin/for-each.sh perennial/data/active-repos "${updateCommand}"
+copyrightUpdateCommand="npm prune && npm update && grunt update-copyright-dates && git commit -am 'update copyright dates from daily grunt work' && git push"
+perennial/bin/for-each.sh perennial/data/active-repos "${copyrightUpdateCommand}"
 
-# supplementary repos to update copyrights on
-for repo in "scenery" "tandem" "axon" "dot" "kite" "phet-core" "phetcommon" "chipper";
-  do
-    cd $repo
-    $updateCommand
-    cd ..
-  done
-
+###########################################################################################################
 # report third party
 cd chipper
 grunt report-third-party
@@ -49,6 +43,7 @@ echo "report third party done, potentially committing"
 git commit -m a"Updating third-party-licenses from daily grunt work"
 git push
 
+###########################################################################################################
 # regenerate documentation
 cd ../binder
 npm prune && npm update
