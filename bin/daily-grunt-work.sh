@@ -29,7 +29,7 @@ perennial/bin/pull-all.sh -p
 
 # update-copyright-dates
 cd chipper && npm prune && npm update && cd ..
-updateCommand="npm update && grunt update-copyright-dates && git commit -am 'update copyright dates from daily grunt work' && git push"
+updateCommand="npm prune && npm update && grunt update-copyright-dates && git commit -am 'update copyright dates from daily grunt work' && git push"
 perennial/bin/for-each.sh perennial/data/active-repos "${updateCommand}"
 
 # supplementary repos to update copyrights on
