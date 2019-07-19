@@ -48,3 +48,8 @@ git pull
 echo "report third party done, potentially committing"
 git commit -m a"Updating third-party-licenses from daily grunt work"
 git push
+
+# regenerate documentation
+cd ../binder
+npm prune && npm update
+npm run build
