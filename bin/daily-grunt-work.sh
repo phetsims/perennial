@@ -48,3 +48,5 @@ git push
 cd ../binder
 npm prune && npm update
 npm run build
+git commit -am "update binder doc from daily grunt work"
+git push
