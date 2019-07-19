@@ -234,18 +234,6 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       grunt.log.writeln( 'Read the intro of the document to make sure that you format the entry correctly.' );
     }
 
-    // Update the third-party-licenses report
-    grunt.log.writeln( 'Running third-party report (do not ctrl-C it)' );
-    await execute( gruntCommand, [ 'report-third-party' ], '../chipper' );
-    await gitAdd( 'sherpa', 'third-party-licenses.md' );
-    try {
-      await gitCommit( 'sherpa', `Updating third-party-licenses for deploy of ${repo} ${versionString}` );
-      await gitPush( 'sherpa', 'master' );
-    }
-    catch( e ) {
-      grunt.log.writeln( 'Third party licenses are already up-to-date' );
-    }
-
     return version;
   }
   catch( e ) {
