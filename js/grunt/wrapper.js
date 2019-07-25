@@ -98,7 +98,7 @@ module.exports = async function( repo, noninteractive, message ) {
   await devSsh( `mkdir -p "${versionPath}"` );
 
   // Copy the build contents into the version-specific directory
-  await devScp( `../${repo}/build/*`, `${versionPath}/` );
+  await devScp( `../${repo}/build`, `${versionPath}/` );
 
   // Permissions fixes so others can write over it later
   await devSsh( `chmod g+w "${versionPath}"` );
