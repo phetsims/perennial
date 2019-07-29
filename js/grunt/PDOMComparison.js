@@ -78,7 +78,7 @@ module.exports = async ( repo, sha ) => {
   const diff = htmlDiffer.diffHtml( workingCopyPDOM, oldShaPDOM );
 
   // TODO: better interpretation of the diff that is output. Perhaps by looking at "diff" more manually, see https://www.npmjs.com/package/html-differ
-  console.log( logger.getDiffText( diff, { charsAroundDiff: 400 } ) );
+  console.log( logger.getDiffText( diff, { charsAroundDiff: 40 } ) );
 };
 
 
@@ -152,23 +152,46 @@ const launchSimAndGetPDOMText = async repo => {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
 
-    page.on( 'console', async msg => {
-
-      console.log( msg.text() );
+    page.on( 'console', msg => {
+      if ( msg.type() === 'error' ) {
+        console.error( 'PAGE ERROR:', msg.text() );
+      }
+      else {
+        console.log( 'PAGE LOG:', msg.text() );
+      }
     } );
 
     page.on( 'load', async () => {
 
-      // TODO: find a better way to wait until the sim is loaded, we can't use postMessageOnLoad or sim.endedSimConstructionEmitter because of timing
-      setTimeout( async () => {
+      const pdoms = await page.evaluate( () => {
+        return new Promise( function( resolve, reject ) {
 
-        const pdomText = await page.evaluate( () => {
-          return phet.joist.sim.display.accessibleDOMElement.outerHTML;
+          // TODO:
+          // window.phet.sim.joist.frameEndedEmitter.addListener();
+
+          window.addEventListener( 'message', function( event ) {
+            if ( event.data ) {
+              try {
+                const messageData = JSON.parse( event.data );
+                if ( messageData.type === 'load' ) {
+                  console.log( 'sim loaded' );
+                  resolve( phet.joist.sim.display.accessibleDOMElement.outerHTML );
+                }
+              }
+              catch( e ) {
+
+                // message isn't what we wanted it to be, so ignore it
+                console.log( 'CAUGHT ERROR:', e.message );
+              }
+            }
+          } );
+          setTimeout( function() {
+            reject( 'Load timeout' );
+          }, 20000 );
         } );
-        browser.close();
-
-        resolve( pdomText );
-      }, 10000 );
+      } );
+      browser.close();
+      resolve( pdoms );
     } );
 
     page.on( 'error', msg => reject( msg ) );
