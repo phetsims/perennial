@@ -147,8 +147,8 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
   }
 
   // Permissions fixes so others can write over it later
-  await devSsh( `chmod -R g+w "${simPath}"` );
-  await devSsh( `chown -R :phet "${simPath}"` );
+  await devSsh( `chmod -R g+w "${versionPath}"` );
+  await devSsh( `chown -R :phet "${versionPath}"` );
 
   // Move over dependencies.json and commit/push
   await updateDependenciesJSON( repo, brands, versionString, branch );
