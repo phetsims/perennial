@@ -127,7 +127,6 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
   // Create (and fix permissions for) the main simulation directory, if it didn't already exist
   if ( !simPathExists ) {
     await devSsh( `mkdir -p "${simPath}" && echo "IndexOrderDefault Descending Date\n" > "${simPath}/.htaccess"` );
-    // await devSsh( `chmod -R g+w "${simPath}"` );
   }
 
   // Create the version-specific directory
@@ -145,10 +144,6 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
     const htaccessLocation = `../${repo}/build/phet-io/`;
     await writePhetioHtaccess( htaccessLocation, null, versionPath );
   }
-
-  // Permissions fixes so others can write over it later
-  await devSsh( `chmod -R g+w "${versionPath}"` );
-  await devSsh( `chown -R :phet "${versionPath}"` );
 
   // Move over dependencies.json and commit/push
   await updateDependenciesJSON( repo, brands, versionString, branch );

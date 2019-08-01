@@ -42,7 +42,7 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
       const rsyncFilterContents = '- *_CA*\n+ *_en*\n+ *_all*\n+ *_a11y*\n- *.html';
       await writeFile( targetDir, rsyncFilterContents );
     }
-    await new Promise( ( resolve, reject ) => {
+    return await new Promise( ( resolve, reject ) => {
       new rsync()
         .flags( 'razpFFO' )
         .set( 'no-perms')
@@ -62,6 +62,4 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
     ( err ) {
     return Promise.reject( err );
   }
-
-  return await devSsh( 'chmod -R g+w ' + simVersionDirectory );
 };
