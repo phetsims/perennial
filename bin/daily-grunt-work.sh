@@ -40,7 +40,7 @@ grunt report-third-party
 cd ../sherpa
 git pull
 echo "report third party done, potentially committing"
-git commit -m a"Updating third-party-licenses from daily grunt work"
+git commit -am "Updating third-party-licenses from daily grunt work"
 git push
 
 ###########################################################################################################
