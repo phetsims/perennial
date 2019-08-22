@@ -5,20 +5,20 @@
 # to date. Edit this script and commit to automatically add to the daily cron job.
 #
 # Author: Michael Kauzmann
-# 
+#
 #=======================================================================================
 
 # Exit immediately on Ctrl-C
 trap "exit 1" SIGINT
 
 # cd to the directory where your git repositories live
-binDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+binDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 workingDir=${binDir}/../..
-cd ${workingDir}
+cd ${workingDir} || exit
 
 echo "running daily grunt work. . ."
 
-cd perennial
+cd perennial || exit
 git pull
 npm prune && npm update
 grunt checkout-master-all
@@ -35,9 +35,9 @@ perennial/bin/for-each.sh perennial/data/active-repos "${copyrightUpdateCommand}
 
 ###########################################################################################################
 # report third party
-cd chipper
+cd chipper || exit
 grunt report-third-party
-cd ../sherpa
+cd ../sherpa || exit
 git pull
 echo "report third party done, potentially committing"
 git commit -am "Updating third-party-licenses from daily grunt work"
@@ -45,7 +45,7 @@ git push
 
 ###########################################################################################################
 # regenerate documentation
-cd ../binder
+cd ../binder || exit
 npm prune && npm update
 npm run build
 git commit -am "update binder doc from daily grunt work"
