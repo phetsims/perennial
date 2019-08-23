@@ -321,20 +321,29 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             await notifyServer( simName, email, brand );
 
             // if this build request comes from rosetta it will have a userId field and only one locale
-            const localesArray = typeof( locales ) === 'string' ? locales.split( ',' ) : locales;
+            const localesArray = typeof ( locales ) === 'string' ? locales.split( ',' ) : locales;
             if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
               await addTranslator( localesArray[ 0 ], simName, userId );
             }
           }
           else if ( brand === constants.PHET_IO_BRAND ) {
             const suffix = originalVersion.split( '-' ).length >= 2 ? originalVersion.split( '-' )[ 1 ] : ( chipperVersion.major < 2 ? 'phetio' : '' );
-            await notifyServer( simName, email, brand, { branch: branch, suffix: suffix, version: SimVersion.parse( version, '' ) } );
+            const parsedVersion = SimVersion.parse( version, '' );
+            await notifyServer( simName, email, brand, { branch: branch, suffix: suffix, version: parsedVersion } );
             winston.debug( 'server notified' );
-            await writePhetioHtaccess(
-              targetVersionDir,
-              { simName: simName, version: originalVersion, directory: constants.PHET_IO_SIMS_DIRECTORY }
-            );
-            winston.debug( 'phetio htaccess written' );
+
+            // Password protect all public releases, except the maintenance releases for Graphing Quadratics 1.1, which
+            // must be public so they can appear with the devguide, see https://github.com/phetsims/perennial/issues/148
+            if ( !( simName === 'graphing-quadratics' && parsedVersion.major === 1 && parsedVersion.minor === 1 ) ) {
+              await writePhetioHtaccess(
+                targetVersionDir,
+                { simName: simName, version: originalVersion, directory: constants.PHET_IO_SIMS_DIRECTORY }
+              );
+              winston.debug( 'phetio htaccess written' );
+            }
+            else {
+              winston.debug( 'phetio htaccess not written for graphing-quadratics' );
+            }
           }
         }
       }
