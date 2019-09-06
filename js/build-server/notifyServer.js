@@ -10,19 +10,24 @@ const winston = require( 'winston' );
 /**
  * Notify the website that a new sim or translation has been deployed. This will cause the project to
  * synchronize and the new translation will appear on the website.
- * @param {string} simName
- * @param {string} email
- * @param {string} brand
- * @param {Object} [phetioOptions]
- * @property {SimVersion} version
- * @property {string} branch
- * @property {string} suffix
+ * @param {Object} options
+ *  @property {string} simName
+ *  @property {string} email
+ *  @property {string} brand
+ *  @property {string} locales
+ *  @property {Object} [phetioOptions]
+ *    @property {SimVersion} version
+ *    @property {string} branch
+ *    @property {string} suffix
  */
-module.exports = async function notifyServer( simName, email, brand, phetioOptions ) {
-  if ( brand === constants.PHET_BRAND ) {
+module.exports = async function notifyServer( options ) {
+  if ( options.brand === constants.PHET_BRAND ) {
     return new Promise( ( resolve ) => {
-      const project = 'html/' + simName;
-      const url = constants.BUILD_SERVER_CONFIG.productionServerURL + '/services/synchronize-project?projectName=' + project;
+      const project = 'html/' + options.simName;
+      let url = constants.BUILD_SERVER_CONFIG.productionServerURL + '/services/synchronize-project?projectName=' + project;
+      if ( option.locales && option.locales !== '*' && option.locales !== 'en' && option.locales.indexOf( ',' ) < 0 ) {
+        url += '&locale=' + option.locales;
+      }
       request( {
         url: url,
         auth: {
@@ -39,7 +44,7 @@ module.exports = async function notifyServer( simName, email, brand, phetioOptio
           if ( !syncResponse.success ) {
             errorMessage = 'request to synchronize project ' + project + ' on ' + constants.BUILD_SERVER_CONFIG.productionServerName + ' failed with message: ' + syncResponse.error;
             winston.log( 'error', errorMessage );
-            sendEmail( 'SYNCHRONIZE FAILED', errorMessage, email );
+            sendEmail( 'SYNCHRONIZE FAILED', errorMessage, options.email );
           }
           else {
             winston.log( 'info', 'request to synchronize project ' + project + ' on ' + constants.BUILD_SERVER_CONFIG.productionServerName + ' succeeded' );
@@ -48,22 +53,22 @@ module.exports = async function notifyServer( simName, email, brand, phetioOptio
         else {
           errorMessage = 'request to synchronize project errored or returned a non 200 status code';
           winston.log( 'error', errorMessage );
-          sendEmail( 'SYNCHRONIZE FAILED', errorMessage, email );
+          sendEmail( 'SYNCHRONIZE FAILED', errorMessage, options.email );
         }
 
         return resolve();
       } );
     } );
   }
-  else if ( brand === constants.PHET_IO_BRAND ) {
+  else if ( options.brand === constants.PHET_IO_BRAND ) {
     return new Promise( ( resolve, reject ) => {
       const url = constants.BUILD_SERVER_CONFIG.productionServerURL + '/services/metadata/phetio' +
-                  '?name=' + simName +
-                  '&versionMajor=' + phetioOptions.version.major +
-                  '&versionMinor=' + phetioOptions.version.minor +
-                  '&versionMaintenance=' + phetioOptions.version.maintenance +
-                  '&versionSuffix=' + phetioOptions.suffix +
-                  '&branch=' + phetioOptions.branch;
+                  '?name=' + options.simName +
+                  '&versionMajor=' + options.phetioOptions.version.major +
+                  '&versionMinor=' + options.phetioOptions.version.minor +
+                  '&versionMaintenance=' + options.phetioOptions.version.maintenance +
+                  '&versionSuffix=' + options.phetioOptions.suffix +
+                  '&branch=' + options.phetioOptions.branch;
       request.post( {
         url: url,
         auth: {
@@ -82,7 +87,7 @@ module.exports = async function notifyServer( simName, email, brand, phetioOptio
             errorMessage = 'request to upsert phetio deployment failed';
           }
           winston.log( 'error', errorMessage );
-          sendEmail( 'PHET_IO DEPLOYMENT UPSERT FAILED', errorMessage, email );
+          sendEmail( 'PHET_IO DEPLOYMENT UPSERT FAILED', errorMessage, options.email );
           return reject( 'PHET_IO DEPLOYMENT UPSERT FAILED' );
         }
         else {
@@ -96,11 +101,11 @@ module.exports = async function notifyServer( simName, email, brand, phetioOptio
               errorMessage = 'request to upsert phetio deployment failed';
             }
             winston.log( 'error', errorMessage );
-            sendEmail( 'SYNCHRONIZE FAILED', errorMessage, email );
+            sendEmail( 'SYNCHRONIZE FAILED', errorMessage, options.email );
             return reject( 'PHET_IO DEPLOYMENT UPSERT FAILED' );
           }
           else {
-            winston.log( 'info', 'request to upsert phetio deployment for ' + simName + ' on ' + constants.BUILD_SERVER_CONFIG.productionServerName + ' succeeded' );
+            winston.log( 'info', 'request to upsert phetio deployment for ' + options.simName + ' on ' + constants.BUILD_SERVER_CONFIG.productionServerName + ' succeeded' );
           }
         }
 

@@ -318,7 +318,12 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           if ( brand === constants.PHET_BRAND ) {
             await writePhetHtaccess( simName, version );
             await createTranslationsXML( simName, version );
-            await notifyServer( simName, email, brand );
+            await notifyServer( {
+              simName: simName,
+              email: email,
+              brand: brand,
+              locales: locales
+            } );
 
             // if this build request comes from rosetta it will have a userId field and only one locale
             const localesArray = typeof ( locales ) === 'string' ? locales.split( ',' ) : locales;
@@ -329,7 +334,17 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           else if ( brand === constants.PHET_IO_BRAND ) {
             const suffix = originalVersion.split( '-' ).length >= 2 ? originalVersion.split( '-' )[ 1 ] : ( chipperVersion.major < 2 ? 'phetio' : '' );
             const parsedVersion = SimVersion.parse( version, '' );
-            await notifyServer( simName, email, brand, { branch: branch, suffix: suffix, version: parsedVersion } );
+            await notifyServer( {
+              simName: simName,
+              email: email,
+              brand: brand,
+              phetioOptions: {
+                branch: branch,
+                suffix: suffix,
+                version: parsedVersion
+              }
+            } )
+            ;
             winston.debug( 'server notified' );
 
             // Password protect all public releases, except the maintenance releases for Graphing Quadratics 1.1, which
