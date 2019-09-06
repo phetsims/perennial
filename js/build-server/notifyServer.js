@@ -25,8 +25,8 @@ module.exports = async function notifyServer( options ) {
     return new Promise( ( resolve ) => {
       const project = 'html/' + options.simName;
       let url = constants.BUILD_SERVER_CONFIG.productionServerURL + '/services/synchronize-project?projectName=' + project;
-      if ( option.locales && option.locales !== '*' && option.locales !== 'en' && option.locales.indexOf( ',' ) < 0 ) {
-        url += '&locale=' + option.locales;
+      if ( options.locales && options.locales !== '*' && options.locales !== 'en' && options.locales.indexOf( ',' ) < 0 ) {
+        url += '&locale=' + options.locales;
       }
       request( {
         url: url,
