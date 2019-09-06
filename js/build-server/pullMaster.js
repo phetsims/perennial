@@ -24,9 +24,10 @@ module.exports = async function pullMaster( repos ) {
   // Pull the appropriate babel branch
   try {
     await execute( 'git', [ 'checkout', constants.BUILD_SERVER_CONFIG.babelBranch ], '../babel' );
+    await gitPull( 'babel' );
   }
   catch( error ) {
-    return Promise.reject( 'git checkout master failed in babel' );
+    return Promise.reject( 'git checkout/pull failed in babel' );
   }
 
   for ( const repoName in reposCopy ) {
@@ -38,13 +39,6 @@ module.exports = async function pullMaster( repos ) {
     }
     catch( error ) {
       return Promise.reject( 'git checkout master failed in ' + repoName );
-    }
-
-    try {
-      await gitPull( repoName );
-    }
-    catch( error ) {
-      errors.push( error );
     }
   }
 
