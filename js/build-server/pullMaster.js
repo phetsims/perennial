@@ -2,6 +2,7 @@
 
 'use strict';
 
+const constants = require( './constants' );
 const execute = require( '../common/execute' );
 const gitPull = require( '../common/gitPull' );
 const winston = require( 'winston' );
@@ -20,8 +21,13 @@ module.exports = async function pullMaster( repos ) {
 
   const errors = [];
 
-  // Add babel to list of repos to pull
-  reposCopy.babel = true;
+  // Pull the appropriate babel branch
+  try {
+    await execute( 'git', [ 'checkout', constants.BUILD_SERVER_CONFIG.babelBranch ], '../babel' );
+  }
+  catch( error ) {
+    return Promise.reject( 'git checkout master failed in babel' );
+  }
 
   for ( const repoName in reposCopy ) {
     winston.log( 'info', 'pulling from ' + repoName );

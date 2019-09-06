@@ -52,6 +52,7 @@ function getDeployConfig( fs ) {
   // Assemble the deployConfig
 
   return {
+    babelBranch: buildLocalJSON.babelBranch || 'master',
     buildServerAuthorizationCode: buildLocalJSON.buildServerAuthorizationCode,
     databaseAuthorizationCode: buildLocalJSON.databaseAuthorizationCode,
     devDeployPath: buildLocalJSON.devDeployPath || '/data/web/htdocs/dev/html/',
