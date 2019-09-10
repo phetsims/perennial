@@ -40,6 +40,13 @@ module.exports = async function pullMaster( repos ) {
     catch( error ) {
       return Promise.reject( 'git checkout master failed in ' + repoName );
     }
+
+    try {
+      await gitPull( repoName );
+    }
+    catch( error ) {
+      errors.push( error );
+    }
   }
 
   if ( errors.length > 0 ) {
