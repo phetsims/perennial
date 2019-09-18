@@ -132,7 +132,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
       }
     }
 
-    const simDir = '../' + simName;
+    const simDir = `../${simName}`;
     winston.log( 'info', 'building sim ' + simName );
 
     // Create the temporary build dir, removing the existing dir if it exists.
@@ -335,6 +335,8 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             const suffix = originalVersion.split( '-' ).length >= 2 ? originalVersion.split( '-' )[ 1 ] :
                            ( chipperVersion.major < 2 ? 'phetio' : '' );
             const parsedVersion = SimVersion.parse( version, '' );
+            const simPackage = JSON.parse( fs.readFileSync( `${simDir}/package.json` ) );
+            const ignoreForAutomatedMaintenanceReleases = !!( simPackage && simPackage.phet && simPackage.phet.ignoreForAutomatedMaintenanceReleases );
             await notifyServer( {
               simName: simName,
               email: email,
@@ -342,10 +344,11 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
               phetioOptions: {
                 branch: branch,
                 suffix: suffix,
-                version: parsedVersion
+                version: parsedVersion,
+                ignoreForAutomatedMaintenanceReleases: ignoreForAutomatedMaintenanceReleases
               }
-            } )
-            ;
+            } );
+
             winston.debug( 'server notified' );
             await writePhetioHtaccess( targetVersionDir, {
               simName: simName,

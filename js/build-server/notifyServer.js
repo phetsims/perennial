@@ -19,6 +19,7 @@ const winston = require( 'winston' );
  *    @property {SimVersion} version
  *    @property {string} branch
  *    @property {string} suffix
+ *    @property {boolean} ignoreForAutomatedMaintenanceReleases
  */
 module.exports = async function notifyServer( options ) {
   if ( options.brand === constants.PHET_BRAND ) {
@@ -68,7 +69,8 @@ module.exports = async function notifyServer( options ) {
                   '&versionMinor=' + options.phetioOptions.version.minor +
                   '&versionMaintenance=' + options.phetioOptions.version.maintenance +
                   '&versionSuffix=' + options.phetioOptions.suffix +
-                  '&branch=' + options.phetioOptions.branch;
+                  '&branch=' + options.phetioOptions.branch +
+                  '&ignoreForAutomatedMaintenanceReleases=' + options.phetioOptions.ignoreForAutomatedMaintenanceReleases;
       request.post( {
         url: url,
         auth: {
@@ -83,7 +85,7 @@ module.exports = async function notifyServer( options ) {
           try {
             errorMessage = JSON.parse( body ).error;
           }
-          catch ( e ) {
+          catch( e ) {
             errorMessage = 'request to upsert phetio deployment failed';
           }
           winston.log( 'error', errorMessage );
@@ -97,7 +99,7 @@ module.exports = async function notifyServer( options ) {
             try {
               errorMessage = JSON.parse( body ).error;
             }
-            catch ( e ) {
+            catch( e ) {
               errorMessage = 'request to upsert phetio deployment failed';
             }
             winston.log( 'error', errorMessage );
