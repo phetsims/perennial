@@ -59,8 +59,25 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
 
   const simPackage = isProductionDeploy ? JSON.parse( fs.readFileSync( `../${latestOption.simName}/package.json` ) ) : null;
 
+  const wrapperHtaccessPath = 'wrappers/.htaccess';
+  const wrapperHtaccessFullPath = `${passwordProtectPath}/${wrapperHtaccessPath}`;
+  const rootHtaccessPath = '.htaccess';
+  const rootHtaccessFullPath = `${passwordProtectPath}/${rootHtaccessPath}`;
+
   // Only skip htaccess creation if in production deploy when the "allowPublicAccess" flag is present
-  if ( !( simPackage && simPackage.phet && simPackage.phet[ 'phet-io' ] && simPackage.phet[ 'phet-io' ].allowPublicAccess ) ) {
+  // If we are allowing public access, make sure that the htaccess files don't already exist locally already. This can
+  // occur when an rc is published (first) during a production deploy.
+  if ( simPackage && simPackage.phet && simPackage.phet[ 'phet-io' ] && simPackage.phet[ 'phet-io' ].allowPublicAccess ) {
+    try {
+      await fs.removeFileSync( wrapperHtaccessFullPath );
+    }
+    catch( e ) { /* don't worry about it */ }
+    try {
+      await fs.removeFileSync( rootHtaccessFullPath );
+    }
+    catch( e ) { /* don't worry about it */ }
+  }
+  else {
     try {
       const passwordProtectWrapperContents = 'AuthType Basic\n' +
                                              'AuthName "PhET-iO Password Protected Area"\n' +
@@ -68,10 +85,9 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
                                              'Require valid-user\n';
 
       // Write a file to add authentication to the ./wrappers directory
-      let filePath = 'wrappers/.htaccess';
-      await writeFile( `${passwordProtectPath}/${filePath}`, passwordProtectWrapperContents );
+      await writeFile( wrapperHtaccessFullPath, passwordProtectWrapperContents );
       if ( devVersionPath ) {
-        await devScp( `${passwordProtectPath}/${filePath}`, `${devVersionPath}/phet-io/${filePath}` );
+        await devScp( wrapperHtaccessFullPath, `${devVersionPath}/phet-io/${wrapperHtaccessPath}` );
       }
 
       const phetioPackage = JSON.parse( fs.readFileSync( '../phet-io/package.json' ) );
@@ -81,10 +97,9 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
         const passwordProtectIndexContents = '<FilesMatch "index.*">\n'
                                              + passwordProtectWrapperContents
                                              + '</FilesMatch>\n';
-        filePath = '.htaccess';
-        await writeFile( `${passwordProtectPath}/${filePath}`, passwordProtectIndexContents );
+        await writeFile( rootHtaccessFullPath, passwordProtectIndexContents );
         if ( devVersionPath ) {
-          await devScp( `${passwordProtectPath}/${filePath}`, `${devVersionPath}/phet-io/${filePath}` );
+          await devScp( rootHtaccessFullPath, `${devVersionPath}/phet-io/${rootHtaccessPath}` );
         }
       }
       winston.debug( 'phetio authentication htaccess written' );
