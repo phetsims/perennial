@@ -71,13 +71,17 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
 
     // Use individual try/catch blocks to ensure atomic operations.
     try {
-      await fs.removeFileSync( wrapperHtaccessFullPath );
+      await fs.unlinkSync( wrapperHtaccessFullPath );
     }
-    catch( e ) { /* don't worry about it */ }
+    catch( e ) {
+      winston.debug( 'did not remove wrapper htaccess ' + e );
+    }
     try {
-      await fs.removeFileSync( rootHtaccessFullPath );
+      await fs.unlinkSync( rootHtaccessFullPath );
     }
-    catch( e ) { /* don't worry about it */ }
+    catch( e ) {
+      winston.debug( 'did not remove root htaccess ' + e );
+    }
   }
   else {
     try {
