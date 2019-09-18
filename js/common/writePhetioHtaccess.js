@@ -79,8 +79,10 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
         await devScp( `${passwordProtectPath}/${filePath}`, `${devVersionPath}/phet-io/${filePath}` );
       }
     }
+    winston.debug( 'phetio htaccess written' );
   }
   catch( err ) {
+    winston.debug( 'phetio htaccess not written' );
     return Promise.reject( err );
   }
 };

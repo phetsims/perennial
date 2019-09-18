@@ -332,7 +332,8 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             }
           }
           else if ( brand === constants.PHET_IO_BRAND ) {
-            const suffix = originalVersion.split( '-' ).length >= 2 ? originalVersion.split( '-' )[ 1 ] : ( chipperVersion.major < 2 ? 'phetio' : '' );
+            const suffix = originalVersion.split( '-' ).length >= 2 ? originalVersion.split( '-' )[ 1 ] :
+                           ( chipperVersion.major < 2 ? 'phetio' : '' );
             const parsedVersion = SimVersion.parse( version, '' );
             await notifyServer( {
               simName: simName,
@@ -346,19 +347,11 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             } )
             ;
             winston.debug( 'server notified' );
-
-            // Password protect all public releases, except the maintenance releases for Graphing Quadratics 1.1, which
-            // must be public so they can appear with the devguide, see https://github.com/phetsims/perennial/issues/148
-            if ( !( simName === 'graphing-quadratics' && parsedVersion.major === 1 && parsedVersion.minor === 1 ) ) {
-              await writePhetioHtaccess(
-                targetVersionDir,
-                { simName: simName, version: originalVersion, directory: constants.PHET_IO_SIMS_DIRECTORY }
-              );
-              winston.debug( 'phetio htaccess written' );
-            }
-            else {
-              winston.debug( 'phetio htaccess not written for graphing-quadratics' );
-            }
+            await writePhetioHtaccess( targetVersionDir, {
+              simName: simName,
+              version: originalVersion,
+              directory: constants.PHET_IO_SIMS_DIRECTORY
+            } );
           }
         }
       }
