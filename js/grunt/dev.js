@@ -1,4 +1,4 @@
-// Copyright 2017, University of Colorado Boulder
+// Copyright 2017-2019, University of Colorado Boulder
 
 /**
  * Deploys a dev version after incrementing the test version number.
@@ -142,7 +142,7 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
   // https://github.com/phetsims/phet-io/issues/641
   if ( brands.includes( 'phet-io' ) && buildLocal.devDeployServer === 'bayes.colorado.edu' ) {
     const htaccessLocation = `../${repo}/build/phet-io/`;
-    await writePhetioHtaccess( htaccessLocation, null, versionPath );
+    await writePhetioHtaccess( htaccessLocation, repo, null, versionPath );
   }
 
   // Move over dependencies.json and commit/push

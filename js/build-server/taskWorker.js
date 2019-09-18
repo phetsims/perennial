@@ -1,4 +1,4 @@
-// Copyright 2017-2018, University of Colorado Boulder
+// Copyright 2017-2019, University of Colorado Boulder
 
 'use strict';
 
@@ -213,7 +213,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
         const htaccessLocation = ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) ?
                                  simDir + '/build/phet-io' :
                                  simDir + '/build';
-        await writePhetioHtaccess( htaccessLocation );
+        await writePhetioHtaccess( htaccessLocation, simName );
       }
       await devDeploy( simDir, simName, version, chipperVersion, brands );
     }
@@ -347,8 +347,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
             } )
             ;
             winston.debug( 'server notified' );
-            await writePhetioHtaccess( targetVersionDir, {
-              simName: simName,
+            await writePhetioHtaccess( targetVersionDir, simName, {
               version: originalVersion,
               directory: constants.PHET_IO_SIMS_DIRECTORY
             } );
