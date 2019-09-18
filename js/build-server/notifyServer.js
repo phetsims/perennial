@@ -70,7 +70,7 @@ module.exports = async function notifyServer( options ) {
                   '&versionMaintenance=' + options.phetioOptions.version.maintenance +
                   '&versionSuffix=' + options.phetioOptions.suffix +
                   '&branch=' + options.phetioOptions.branch +
-                  '&ignoreForAutomatedMaintenanceReleases=' + options.phetioOptions.ignoreForAutomatedMaintenanceReleases;
+                  '&active=' + !options.phetioOptions.ignoreForAutomatedMaintenanceReleases;
       request.post( {
         url: url,
         auth: {
