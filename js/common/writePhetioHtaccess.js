@@ -68,6 +68,8 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
   // If we are allowing public access, make sure that the htaccess files don't already exist locally already. This can
   // occur when an rc is published (first) during a production deploy.
   if ( simPackage && simPackage.phet && simPackage.phet[ 'phet-io' ] && simPackage.phet[ 'phet-io' ].allowPublicAccess ) {
+
+    // Use individual try/catch blocks to ensure atomic operations.
     try {
       await fs.removeFileSync( wrapperHtaccessFullPath );
     }
