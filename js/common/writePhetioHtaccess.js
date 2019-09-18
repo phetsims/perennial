@@ -12,24 +12,26 @@ const writeFile = require( './writeFile' );
 /**
  * Writes the htaccess file to password protect the exclusive content for phet-io sims
  * @param {string} passwordProtectPath - deployment location
- * @param {string} simName
- * @param {{version:string, directory:string}} [latestOption] - if provided, then write the /latest/ redirect .htaccess file.
- *                                - this is only to be used for production deploys by the build-server
+ * @param {{simName:string, version:string, directory:string}} [latestOption]
+ *      if provided, then we are publishing to production. We then write the /latest/ redirect .htaccess file.
+ *      This is only to be used for production deploys by the build-server.
  * @param {string} [devVersionPath] - if provided, scp the htaccess files to here, relatively
 
  */
-module.exports = async function writePhetioHtaccess( passwordProtectPath, simName, latestOption, devVersionPath ) {
+module.exports = async function writePhetioHtaccess( passwordProtectPath, latestOption, devVersionPath ) {
   const authFilepath = '/etc/httpd/conf/phet-io_pw';
+
+  const isProductionDeploy = !!latestOption;
 
   // This option is for production deploys by the build-server
   // If we are provided a simName and version then write a .htaccess file to redirect
   // https://phet-io.colorado.edu/sims/{{sim-name}}/{{major}}.{{minor}} to https://phet-io.colorado.edu/sims/{{sim-name}}/{{major}}.{{minor}}.{{latest}}{{[-suffix]}}
-  if ( latestOption ) {
-    if ( simName && latestOption.version && latestOption.directory ) {
-      const redirectFilepath = latestOption.directory + simName + '/.htaccess';
+  if ( isProductionDeploy ) {
+    if ( latestOption.simName && latestOption.version && latestOption.directory ) {
+      const redirectFilepath = latestOption.directory + latestOption.simName + '/.htaccess';
       let latestRedirectContents = 'RewriteEngine on\n' +
-                                   `RewriteBase /sims/${simName}/\n`;
-      const versions = JSON.parse( await request( buildLocal.productionServerURL + `/services/metadata/phetio?name=${simName}&latest=true` ) );
+                                   `RewriteBase /sims/${latestOption.simName}/\n`;
+      const versions = JSON.parse( await request( buildLocal.productionServerURL + `/services/metadata/phetio?name=${latestOption.simName}&latest=true` ) );
       for ( const v of versions ) {
         // Add a trailing slash to /sims/sim-name/x.y
         latestRedirectContents += `RewriteRule ^${v.versionMajor}.${v.versionMinor}$ ${v.versionMajor}.${v.versionMinor}/ [R=301,L]\n`;
@@ -48,21 +50,24 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, simNam
       }
     }
     else {
-      winston.error( `simName: ${simName}` );
+      winston.error( `simName: ${latestOption.simName}` );
       winston.error( `version: ${latestOption.version}` );
       winston.error( `directory: ${latestOption.directory}` );
       return Promise.reject( 'latestOption is missing one of the required parameters (simName, version, or directory)' );
     }
   }
 
-  // Write a file to add authentication to the ./wrappers directory
-  const simPackage = JSON.parse( fs.readFileSync( `../${simName}/package.json` ) );
-  if ( !( simPackage.phet && simPackage.phet[ 'phet-io' ] && simPackage.phet[ 'phet-io' ].allowPublicAccess ) ) {
+  const simPackage = isProductionDeploy ? JSON.parse( fs.readFileSync( `../${latestOption.simName}/package.json` ) ) : null;
+
+  // Only skip htaccess creation if in production deploy when the "allowPublicAccess" flag is present
+  if ( !( simPackage && simPackage.phet && simPackage.phet[ 'phet-io' ] && simPackage.phet[ 'phet-io' ].allowPublicAccess ) ) {
     try {
       const passwordProtectWrapperContents = 'AuthType Basic\n' +
                                              'AuthName "PhET-iO Password Protected Area"\n' +
                                              'AuthUserFile ' + authFilepath + '\n' +
                                              'Require valid-user\n';
+
+      // Write a file to add authentication to the ./wrappers directory
       let filePath = 'wrappers/.htaccess';
       await writeFile( `${passwordProtectPath}/${filePath}`, passwordProtectWrapperContents );
       if ( devVersionPath ) {
@@ -70,6 +75,8 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, simNam
       }
 
       const phetioPackage = JSON.parse( fs.readFileSync( '../phet-io/package.json' ) );
+
+      // Write a file to add authentication to the top level index pages
       if ( phetioPackage.phet && phetioPackage.phet.addRootHTAccessFile ) {
         const passwordProtectIndexContents = '<FilesMatch "index.*">\n'
                                              + passwordProtectWrapperContents

@@ -142,7 +142,7 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
   // https://github.com/phetsims/phet-io/issues/641
   if ( brands.includes( 'phet-io' ) && buildLocal.devDeployServer === 'bayes.colorado.edu' ) {
     const htaccessLocation = `../${repo}/build/phet-io/`;
-    await writePhetioHtaccess( htaccessLocation, repo, null, versionPath );
+    await writePhetioHtaccess( htaccessLocation, null, versionPath );
   }
 
   // Move over dependencies.json and commit/push
