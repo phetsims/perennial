@@ -14,7 +14,7 @@ const winston = require( 'winston' );
  * @param translatorId
  */
 module.exports = async function addTranslator( locale, simName, translatorId ) {
-  return new Promise( ( resolve ) => {
+  return new Promise( resolve => {
     // create the URL
     const addTranslatorURL = constants.BUILD_SERVER_CONFIG.productionServerURL + '/services/add-html-translator?simName=' + simName +
                              '&locale=' + locale + '&userId=' + translatorId + '&authorizationCode=' +

@@ -371,7 +371,7 @@ module.exports = ( task, taskCallback ) => {
     .then( () => {
         taskCallback();
       }
-    ).catch( ( reason ) => {
+    ).catch( reason => {
     taskCallback( reason );
   } );
 };

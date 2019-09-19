@@ -23,7 +23,7 @@ const winston = require( 'winston' );
  */
 module.exports = async function notifyServer( options ) {
   if ( options.brand === constants.PHET_BRAND ) {
-    return new Promise( ( resolve ) => {
+    return new Promise( resolve => {
       const project = 'html/' + options.simName;
       let url = constants.BUILD_SERVER_CONFIG.productionServerURL + '/services/synchronize-project?projectName=' + project;
       if ( options.locales && options.locales !== '*' && options.locales !== 'en' && options.locales.indexOf( ',' ) < 0 ) {

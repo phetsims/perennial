@@ -413,7 +413,7 @@ module.exports = ( function() {
       const maintenance = Maintenance.load();
       const patch = maintenance.findPatch( patchName );
 
-      await Maintenance.addNeededPatches( patchName, async ( releaseBranch ) => {
+      await Maintenance.addNeededPatches( patchName, async releaseBranch => {
         return await releaseBranch.isMissingSHA( patch.repo, sha );
       } );
     }
@@ -429,7 +429,7 @@ module.exports = ( function() {
       const maintenance = Maintenance.load();
       const patch = maintenance.findPatch( patchName );
 
-      await Maintenance.addNeededPatches( patchName, async ( releaseBranch ) => {
+      await Maintenance.addNeededPatches( patchName, async releaseBranch => {
         return await releaseBranch.includesSHA( patch.repo, sha );
       } );
     }
@@ -443,7 +443,7 @@ module.exports = ( function() {
      * @param {function(ReleaseBranch, builtFile:string): Promise.<boolean>} filter
      */
     static async addNeededPatchesBuildFilter( patchName, filter ) {
-      await Maintenance.addNeededPatches( patchName, async ( releaseBranch ) => {
+      await Maintenance.addNeededPatches( patchName, async releaseBranch => {
         await checkoutTarget( releaseBranch.repo, releaseBranch.branch, true );
         await gitPull( releaseBranch.repo );
         await build( releaseBranch.repo );
@@ -530,7 +530,7 @@ module.exports = ( function() {
       const maintenance = Maintenance.load();
       const patch = maintenance.findPatch( patchName );
 
-      await Maintenance.removeNeededPatches( patchName, async ( releaseBranch ) => {
+      await Maintenance.removeNeededPatches( patchName, async releaseBranch => {
         return await releaseBranch.isMissingSHA( patch.repo, sha );
       } );
     }
@@ -546,7 +546,7 @@ module.exports = ( function() {
       const maintenance = Maintenance.load();
       const patch = maintenance.findPatch( patchName );
 
-      await Maintenance.removeNeededPatches( patchName, async ( releaseBranch ) => {
+      await Maintenance.removeNeededPatches( patchName, async releaseBranch => {
         return await releaseBranch.includesSHA( patch.repo, sha );
       } );
     }

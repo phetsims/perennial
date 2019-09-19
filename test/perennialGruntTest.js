@@ -34,20 +34,20 @@ async function getLikelyNextBranch( repo, incrementMajor, incrementMinor ) {
   return `${currentMajor}.${currentMinor}`;
 }
 
-qunit.test( 'Checkout target', async ( assert ) => {
+qunit.test( 'Checkout target', async assert => {
   assert.timeout( 120000 );
   await execute( gruntCommand, [ 'checkout-target', '--repo=chains', '--target=1.9' ], '.' );
   await execute( gruntCommand, [ 'checkout-master', '--repo=chains' ], '.' );
   assert.expect( 0 );
 } );
 
-qunit.test( 'NPM update', async ( assert ) => {
+qunit.test( 'NPM update', async assert => {
   assert.timeout( 120000 );
   await execute( gruntCommand, [ 'npm-update', '--repo=chains' ], '.' );
   assert.expect( 0 );
 } );
 
-qunit.test( 'Bumper one-off (random)', async ( assert ) => {
+qunit.test( 'Bumper one-off (random)', async assert => {
   assert.timeout( 3000000 );
   const branch = 'oneoff' + Math.random().toString( 36 ).substring( 2 );
 
@@ -60,25 +60,25 @@ qunit.test( 'Bumper one-off (random)', async ( assert ) => {
   assert.expect( 0 );
 } );
 
-qunit.test( 'Bumper dev phet,phet-io', async ( assert ) => {
+qunit.test( 'Bumper dev phet,phet-io', async assert => {
   assert.timeout( 600000 );
   await execute( gruntCommand, [ 'dev', '--repo=bumper', '--brands=phet,phet-io', '--noninteractive' ], '.' );
   assert.expect( 0 );
 } );
 
-qunit.test( 'Bumper dev phet', async ( assert ) => {
+qunit.test( 'Bumper dev phet', async assert => {
   assert.timeout( 600000 );
   await execute( gruntCommand, [ 'dev', '--repo=bumper', '--brands=phet', '--noninteractive' ], '.' );
   assert.expect( 0 );
 } );
 
-qunit.test( 'Bumper dev phet-io', async ( assert ) => {
+qunit.test( 'Bumper dev phet-io', async assert => {
   assert.timeout( 600000 );
   await execute( gruntCommand, [ 'dev', '--repo=bumper', '--brands=phet-io', '--noninteractive' ], '.' );
   assert.expect( 0 );
 } );
 
-qunit.test( 'Major bump, RC/Production', async( assert ) => {
+qunit.test( 'Major bump, RC/Production', async assert => {
   assert.timeout( 3000000 );
   const branch = await getLikelyNextBranch( 'bumper', true, false );
 
