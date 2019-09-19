@@ -23,7 +23,7 @@ try {
   repos = fs.readFileSync( '../perennial/data/active-sims' )
     .toString()
     .split( '\r\n' )
-    .filter( e => { return e !== ''; } );
+    .filter( e => e !== '' );
 }
 catch (e) {
   console.log( e );

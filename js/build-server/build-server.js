@@ -157,7 +157,7 @@ function queueDeploy( api, repos, simName, version, locales, brands, servers, em
       res.status( 401 );
       res.send( err );
     }
-    else if ( servers.indexOf( constants.PRODUCTION_SERVER ) >= 0 && brands.some( brand => { return !productionBrands.includes( brand ); } ) ) {
+    else if ( servers.indexOf( constants.PRODUCTION_SERVER ) >= 0 && brands.some( brand => !productionBrands.includes( brand ) ) ) {
       const err = 'Cannot complete production deploys for brands outside of phet and phet-io';
       winston.log( 'error', err );
       res.status( 400 );
