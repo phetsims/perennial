@@ -51,7 +51,7 @@ module.exports = function( path ) {
         // Not a require statement, sort and flush any pending require statements then continue
         accumulator = _.sortBy( accumulator, function( o ) {
 
-          // sort by the beginning of the line, including 'var X = require("PATH/dir/X")
+          // sort by the beginning of the line, including 'const X = require("PATH/dir/X")
           // case insensitive so that inherit and namespaces don't show up last
           return o.toLowerCase();
         } );
