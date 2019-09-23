@@ -53,7 +53,7 @@ module.exports = function( context ) {
           if ( rhs && rhs.indexOf( 'string!' ) === 0 ) {
 
             const lastSlash = rhs.lastIndexOf( '/' );
-            const key = rhs.substring( lastSlash + 1 );
+            let key = rhs.substring( lastSlash + 1 );
 
             // For a11y strings, no need to prefix vars with "a11y"
             if ( key.indexOf( 'a11y.' ) === 0 ) {
@@ -61,7 +61,7 @@ module.exports = function( context ) {
             }
 
             // Convert various separators to whitespace
-            const withWhitespace = key.replace( /\./g, ' ' ).replace( /-/g, ' ' ).replace( /_/g, ' ' );
+            const withWhitespace = key.replace( /[.\-_]/g, ' ' );
 
             // Convert whitespace delimited string to camel case and append string suffix
             const desiredVarName = toCamelCase( withWhitespace ) + 'String';
