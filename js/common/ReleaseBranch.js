@@ -16,6 +16,7 @@ const fs = require( 'fs' );
 const getActiveSims = require( './getActiveSims' );
 const getBranches = require( './getBranches' );
 const getDependencies = require( './getDependencies' );
+const getRepoVersion = require( './getRepoVersion' );
 const gitCheckout = require( './gitCheckout' );
 const gitIsAncestor = require( './gitIsAncestor' );
 const gitPull = require( './gitPull' );
@@ -190,6 +191,9 @@ module.exports = ( function() {
           if ( dependencies[ this.repo ].sha !== previousCommit ) {
             results.push( 'Potential changes (dependency is not previous commit)' );
             results.push( currentCommit + ' ' + previousCommit + ' ' + dependencies[ this.repo ].sha );
+          }
+          if ( ( await getRepoVersion( this.repo ) ).testType === 'rc' ) {
+            results.push( 'Release candidate version detected (see if there is a QA issue)')
           }
         }
         catch ( e ) {
