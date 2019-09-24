@@ -193,7 +193,7 @@ module.exports = ( function() {
             results.push( currentCommit + ' ' + previousCommit + ' ' + dependencies[ this.repo ].sha );
           }
           if ( ( await getRepoVersion( this.repo ) ).testType === 'rc' ) {
-            results.push( 'Release candidate version detected (see if there is a QA issue)')
+            results.push( 'Release candidate version detected (see if there is a QA issue)');
           }
         }
         catch ( e ) {
