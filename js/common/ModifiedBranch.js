@@ -216,7 +216,12 @@ module.exports = ( function() {
       await gitCheckout( this.repo, this.branch );
       const dependencies = await getDependencies( this.repo );
 
-      const sha = dependencies[ 'phet-io-wrappers' ].sha;
+      const dependency = dependencies[ 'phet-io-wrappers' ];
+      if ( !dependency ) {
+        return false;
+      }
+
+      const sha = dependency.sha;
       await gitCheckout( this.repo, 'master' );
 
       return await gitIsAncestor( 'phet-io-wrappers', '7ec1a04a70fb9707b381b8bcab3ad070815ef7fe', sha );
