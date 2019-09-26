@@ -141,16 +141,6 @@ const assert = require( 'assert' );
     }
 
     /**
-     * Returns whether the simulation (with the given version) is published.
-     * @public
-     *
-     * @returns {boolean}
-     */
-    get isUnpublished() {
-      return this.major >= 1 && this.testType === null;
-    }
-
-    /**
      * Returns the string form of the version.
      * @public
      *
