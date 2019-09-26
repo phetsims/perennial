@@ -40,13 +40,24 @@ grunt report-third-party
 cd ../sherpa || exit
 git pull
 echo "report third party done, potentially committing"
-git commit -am "Updating third-party-licenses from daily grunt work"
+git commit -am "Update third-party-licenses from daily grunt work"
 git push
+cd ..
 
 ###########################################################################################################
 # regenerate documentation
-cd ../binder || exit
+cd binder || exit
 npm prune && npm update
 npm run build
-git commit -am "update binder doc from daily grunt work"
+git commit -am "Update binder doc from daily grunt work"
 git push
+cd ..
+
+##########################################################################################################
+# copy PERENNIAL/SimVersion to chipper to keep them in sync, see https://github.com/phetsims/perennial/issues/111
+
+cp perennial/js/common/SimVersion.js chipper/js/
+cd chipper || exit
+git commit -am "Update chipper's SimVersion from daily grunt work"
+git push
+cd ..
