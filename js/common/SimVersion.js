@@ -1,9 +1,15 @@
-// Copyright 2017-2018, University of Colorado Boulder
+// Copyright 2017-2019, University of Colorado Boulder
 
 /**
  * Handles serializing and deserializing versions for simulations.
  *
- * See https://github.com/phetsims/chipper/issues/560
+ **************************************************************
+ * IMPORTANT NOTE: This file is copied from PERENNIAL to CHIPPER frequently. If this is in CHIPPER, do not edit, as
+ * it will be overwritten. Make sure that any change here is supported by usages of CHIPPER's SimVersion (i.e.
+ * in JOIST/UpdateCheck.js), see https://github.com/phetsims/perennial/issues/111 for more details
+ **************************************************************
+ *
+ * See https://github.com/phetsims/chipper/issues/560 for discussion on version ID definition.
  *
  * The canonical description of our general versions:
  *
@@ -29,10 +35,10 @@
  *
  * Examples:
  *
- * 1.5.0 - Production simulation version (no test type). Major = 1, minor = 5, maintenance = 0
- * 1.5.0.rc.1 - Example of a release-candidate build version that would be published before '1.5.0' for testing.
- * 1.5.0.dev.1 - Example of a dev build that would be from master.
- * 1.5.0.sonification.1 - Example of a one-off build (which would be from the branch 'sonification')
+ * 1.5.0                - Production simulation version (no test type). Major = 1, minor = 5, maintenance = 0
+ * 1.5.0-rc.1           - Example of a release-candidate build version that would be published before '1.5.0' for testing.
+ * 1.5.0-dev.1          - Example of a dev build that would be from master.
+ * 1.5.0-sonification.1 - Example of a one-off build (which would be from the branch 'sonification')
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
@@ -40,9 +46,10 @@
 /* eslint-env browser, node */
 'use strict';
 
-const assert = require( 'assert' );
+// To support loading in Node.js and the browser
+const assert = typeof module !== 'undefined' ? require( 'assert' ) : window && window.assert;
 
-(function() {
+( function( global, assert ) {
 
   class SimVersion {
     /**
@@ -175,7 +182,11 @@ const assert = require( 'assert' );
       const testType = matches[ 6 ];
       const testNumber = matches[ 7 ] === undefined ? matches[ 7 ] : parseInt( matches[ 7 ], 10 );
 
-      return new SimVersion( major, minor, maintenance, { testType: testType, testNumber: testNumber, buildTimestamp: buildTimestamp } );
+      return new SimVersion( major, minor, maintenance, {
+        testType: testType,
+        testNumber: testNumber,
+        buildTimestamp: buildTimestamp
+      } );
     }
 
     /**
@@ -208,5 +219,18 @@ const assert = require( 'assert' );
     }
   }
 
-  module.exports = SimVersion;
-})();
+  // Node.js-compatible definition
+  if ( typeof module !== 'undefined' ) {
+    module.exports = SimVersion;
+  }
+  else {
+
+    // Browser support, assign with
+    window.phet = window.phet || {};
+    window.phet.preloads = window.phet.preloads || {};
+    window.phet.preloads.chipper = window.phet.preloads.chipper || {};
+    window.phet.preloads.chipper.SimVersion = SimVersion;
+  }
+} )( ( 1, eval )( 'this' ), assert );
+// Indirect eval usage done since babel likes to wrap things in strict mode.
+// See http://perfectionkills.com/unnecessarily-comprehensive-look-into-a-rather-insignificant-issue-of-global-objects-creation/#ecmascript_5_strict_mode
