@@ -192,7 +192,7 @@ module.exports = ( function() {
             results.push( 'Potential changes (dependency is not previous commit)' );
             results.push( currentCommit + ' ' + previousCommit + ' ' + dependencies[ this.repo ].sha );
           }
-          if ( ( await getRepoVersion( this.repo ) ).testType === 'rc' ) {
+          if ( ( await getRepoVersion( this.repo ) ).testType === 'rc' && this.isReleased ) {
             results.push( 'Release candidate version detected (see if there is a QA issue)');
           }
         }
