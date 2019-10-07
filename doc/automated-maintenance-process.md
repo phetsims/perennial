@@ -24,8 +24,9 @@
 
 ## The REPL
 
-Most maintenance actions are done in a REPL. It operates basically like a Node.js prompt (if you type just `node` at the
-command line), or like Chrome's command-line tools. You can assign global variables and do assorted operations.
+Most maintenance actions are done in a read-evaluate-print loop (REPL). It operates basically like a Node.js prompt (if
+you type just `node` at the command line), or like Chrome's command-line tools. You can assign global variables and do
+assorted operations.
 
 To open up the maintenance REPL:
 
@@ -265,7 +266,11 @@ be below.
 
 This should be called for each repository that will need to have code changes (generally common repos). For the message,
 it should almost always include the issue URL used for tracking the maintenance release, and can also contain
-additional information if desired. It will be included in commit messages, QA reports, etc.
+additional information if desired. It will be included in commit messages, QA reports, etc.  Here is a real-life
+example:
+```
+ Maintenance.createPatch( "vibe", "https://github.com/phetsims/vibe/issues/39" )
+```
 
 If no patchName is provided, the patch will use the repo as its name. If multiple patches are needed for a single
 repository, it's best to create two patches, both with non-default patchNames.
