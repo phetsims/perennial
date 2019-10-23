@@ -14,6 +14,7 @@ const checkoutDependencies = require( './checkoutDependencies' );
 const ChipperVersion = require( '../common/ChipperVersion' );
 const getDependencies = require( './getDependencies' );
 const gitCheckout = require( './gitCheckout' );
+const githubCreateIssue = require( './githubCreateIssue' );
 const gitIsAncestor = require( './gitIsAncestor' );
 const gitPull = require( './gitPull' );
 const Patch = require( './Patch' );
@@ -246,6 +247,24 @@ module.exports = ( function() {
       await gitCheckout( 'chipper', 'master' );
 
       return result;
+    }
+
+    /**
+     * Creates an issue to note that un-tested changes were patched into a branch, and should at some point be tested.
+     * @public
+     *
+     * @param {string} [additionalNotes]
+     */
+    async createUnreleasedIssue( additionalNotes = '' ) {
+      // TODO: labels or assignees arrays?
+      await githubCreateIssue( this.repo, `Maintenance patches applied to branch ${this.branch}`, {
+        body: `This branch (${this.branch}) had changes related to the following applied:
+
+${this.pushedMessages.map( message => `- ${message}` ).join( '\n' )}
+
+Presumably one or more of these changes is likely to have been applied after the last RC version, and should be spot-checked by QA in the next RC (or if it was ready for a production release, an additional spot-check RC should be created).
+${additionalNotes ? '\n' + additionalNotes : ''}`
+      } );
     }
 
     /**

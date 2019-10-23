@@ -32,6 +32,13 @@ module.exports = {
     assert( buildLocalObject.buildServerAuthorizationCode );
     return buildLocalObject.buildServerAuthorizationCode;
   },
+  get phetDevGitHubAccessToken() {
+    assert( buildLocalObject.phetDevGitHubAccessToken,
+      'The phetDevGitHubAccessToken field of build-local.json is required, and can be retrieved from the PhET ' +
+      'credentials document for the "Github Machine User" row with the node "phetDevGitHubAccessToken" (it is ' +
+      'a hexadecimal string).' );
+    return buildLocalObject.phetDevGitHubAccessToken;
+  },
 
   // Wrappers are now deployed to the dev location (for convenience)
   devDeployServer: buildLocalObject.devDeployServer || 'bayes.colorado.edu',
