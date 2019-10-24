@@ -11,6 +11,7 @@
 
 // grunt tasks
 const assert = require( 'assert' );
+require( './checkNodeVersion' );
 const checkoutDependencies = require( '../common/checkoutDependencies' );
 const checkoutMaster = require( '../common/checkoutMaster' );
 const checkoutMasterAll = require( './checkoutMasterAll' );
