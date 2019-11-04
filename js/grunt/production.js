@@ -68,6 +68,10 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     throw new Error( 'Aborted production deployment' );
   }
 
+  if ( !await booleanPrompt( 'Are there no untested maintenance patches that need spot checks? (An issue would be created in the sim repo)', noninteractive ) ) {
+    throw new Error( 'Aborted production deployment' );
+  }
+
   // This check is to prevent a discrepancy between the generated baseline file and the api of the computed sim.
   // Validation does not take place in build sims with assertions stripped out, so it is good to check this early,
   // see https://github.com/phetsims/phet-io/issues/1524
