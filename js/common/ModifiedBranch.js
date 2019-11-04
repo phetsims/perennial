@@ -258,6 +258,7 @@ module.exports = ( function() {
     async createUnreleasedIssue( additionalNotes = '' ) {
       // TODO: labels or assignees arrays?
       await githubCreateIssue( this.repo, `Maintenance patches applied to branch ${this.branch}`, {
+        labels: [ 'status:ready-for-qa' ],
         body: `This branch (${this.branch}) had changes related to the following applied:
 
 ${this.pushedMessages.map( message => `- ${message}` ).join( '\n' )}
