@@ -5,7 +5,7 @@
  *
  * Ideally, this grunt taks is never run itself, but instead from `/bin/generate-data.sh` from bayes.colorado.edu
  * under the phet-admin user from /data/share/phet/generate-data/perennial:
- * `pm2 start bin/generate-data/sh
+ * `pm2 start bin/generate-data.sh`
  *
  * The task will show up in output of `pm2 list` as "generate-data"
  *
