@@ -44,8 +44,9 @@ module.exports = async function() {
   // Make sure we get an up-to-date list of repos
   await gitPull( 'perennial' );
 
-  // Make sure node packages are up to date
+  // Make sure node packages are up to date in perennial and chipper
   await execute( 'npm', [ 'update' ] );
+  await execute( 'npm', [ 'update' ], '../chipper' );
 
   // Make sure to clone anything we are missing
   await execute( 'bash', [ 'perennial/bin/clone-missing-repos.sh' ], '..' );
@@ -54,6 +55,7 @@ module.exports = async function() {
 
   for ( const repo of activeRepos ) {
     await gitPull( repo );
+    await execute( 'npm', [ 'update' ] );
   }
 
   function writeList( name, packageFilter ) {
