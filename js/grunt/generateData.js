@@ -4,7 +4,9 @@
  * Generates the lists under perennial/data/, and if there were changes, will commit and push.
  *
  * Ideally, run from bayes.colorado.edu under the phet-admin user from /data/share/phet/generate-data/perennial:
- * # pm2 start grunt -- generate-data
+ * # pm2 start grunt --name "generate-data" -- generate-data
+ *
+ * The task will show up in output of `pm2 list` as "generate-data"
  *
  * See https://github.com/phetsims/perennial/issues/66
  *
@@ -37,6 +39,9 @@ module.exports = async function() {
     grunt.fail.fatal( 'Data will only be generated if perennial is on master with no working-copy changes.' );
   }
 
+  // Make sure node packages are up to date
+  await execute( 'npm', [ 'update' ] );
+
   // Make sure we get an up-to-date list of repos
   await gitPull( 'perennial' );
 
@@ -58,7 +63,7 @@ module.exports = async function() {
       try {
         packageObject = JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) );
       }
-      catch ( e ) {
+      catch( e ) {
         return false;
       }
       return packageObject.phet && packageFilter( packageObject.phet );
