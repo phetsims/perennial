@@ -39,11 +39,11 @@ module.exports = async function() {
     grunt.fail.fatal( 'Data will only be generated if perennial is on master with no working-copy changes.' );
   }
 
-  // Make sure node packages are up to date
-  await execute( 'npm', [ 'update' ] );
-
   // Make sure we get an up-to-date list of repos
   await gitPull( 'perennial' );
+
+  // Make sure node packages are up to date
+  await execute( 'npm', [ 'update' ] );
 
   // Make sure to clone anything we are missing
   await execute( 'bash', [ 'perennial/bin/clone-missing-repos.sh' ], '..' );
