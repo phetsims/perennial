@@ -4,9 +4,11 @@
  * Generates the lists under perennial/data/, and if there were changes, will commit and push.
  *
  * Ideally, run from bayes.colorado.edu under the phet-admin user from /data/share/phet/generate-data/perennial:
- * # pm2 start grunt --name "generate-data" -- generate-data
+ * `pm2 start grunt --name "generate-data" -- generate-data`
  *
  * The task will show up in output of `pm2 list` as "generate-data"
+ *
+ * If you are curious about the state of this process, you can see logs with `pm2 logs generate-data`
  *
  * See https://github.com/phetsims/perennial/issues/66
  *
