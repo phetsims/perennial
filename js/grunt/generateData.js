@@ -55,7 +55,6 @@ module.exports = async function() {
 
   for ( const repo of activeRepos ) {
     await gitPull( repo );
-    await execute( 'npm', [ 'update' ] );
   }
 
   function writeList( name, packageFilter ) {
