@@ -173,7 +173,6 @@ module.exports = ( function() {
      * @returns {Promise.<Array.<string>>}
      */
     async getStatus() {
-      // TODO: gitIsClean before any of these are run for status
       const results = [];
 
       await checkoutTarget( this.repo, this.branch, false ); // don't npm update

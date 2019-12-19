@@ -16,11 +16,13 @@ const checkoutTarget = require( './checkoutTarget' );
 const ChipperVersion = require( './ChipperVersion' );
 const execute = require( './execute' );
 const fs = require( 'fs' );
+const getActiveRepos = require( './getActiveRepos' );
 const getBranches = require( './getBranches' );
 const getDependencies = require( './getDependencies' );
 const gitCheckout = require( './gitCheckout' );
 const gitCherryPick = require( './gitCherryPick' );
 const gitCreateBranch = require( './gitCreateBranch' );
+const gitIsClean = require( './gitIsClean' );
 const gitPull = require( './gitPull' );
 const gitPush = require( './gitPush' );
 const gitRevParse = require( './gitRevParse' );
@@ -106,6 +108,13 @@ module.exports = ( function() {
      * @returns {Promise}
      */
     static async checkBranchStatus() {
+      for ( const repo of getActiveRepos() ) {
+        if ( !( await gitIsClean( repo ) ) ) {
+          console.log( `Unclean repository: ${repo}, please resolve this and then run checkBranchStatus again` );
+          return;
+        }
+      }
+
       const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
 
       for ( const releaseBranch of releaseBranches ) {
@@ -579,8 +588,6 @@ module.exports = ( function() {
       // No need to save, shouldn't be changing things
       console.log( `Checked out ${repo} ${branch}` );
     }
-
-    // TODO: checkout "next"
 
     static async applyPatches() {
       const maintenance = Maintenance.load();
