@@ -33,8 +33,6 @@ const SimVersion = require( '../common/SimVersion' );
  * Deploys a phet-io wrapper (incrementing the version number)
  * @public
  *
- * TODO: deduplicate code (where possible) with dev.js
- *
  * @param {string} repo
  * @param {boolean} noninteractive
  * @param {string} [message] - Optional message to append to the version-increment commit.

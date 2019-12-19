@@ -420,8 +420,6 @@ module.exports = function( grunt ) {
     const repo = grunt.option( 'repo' );
     const message = grunt.option( 'message' );
 
-    // TODO: doc
-
     assert( grunt.option( 'repo' ), 'Requires specifying a repo that will need to be patched with --repo={{REPO}}' );
     assert( grunt.option( 'message' ), 'Requires specifying a message (included with commits) with --message={{MESSAGE}}' );
 
