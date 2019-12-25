@@ -53,4 +53,16 @@ git reset --hard
 cd ../utterance-queue
 git reset --hard
 
+cd ../circuit-construction-kit-ac
+git reset --hard
+
+cd ../circuit-construction-kit-common
+git reset --hard
+
+cd ../griddle
+git reset --hard
+
+cd ../twixt
+git reset --hard
+
 cd ../example-sim
