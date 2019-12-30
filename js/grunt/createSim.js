@@ -20,6 +20,7 @@
 
 'use strict';
 
+const _ = require( 'lodash' ); // eslint-disable-line
 const assert = require( 'assert' );
 const execute = require( '../common/execute' );
 const grunt = require( 'grunt' );
@@ -54,19 +55,6 @@ module.exports = async function( repo, author, options ) {
     return tmpString.substring( 0, 1 ).toUpperCase() + tmpString.substring( 1 );
   }
 
-  /**
-   * Converts a string to camel case, eg: 'simula-rasa' -> 'simulaRasa'
-   * See http://stackoverflow.com/questions/10425287/convert-string-to-camelcase-with-regular-expression
-   *
-   * @param {string} str - the input string
-   * @returns {string} a new string
-   */
-  function toCamelCase( str ) {
-    return str.toLowerCase().replace( /-(.)/g, function( match, group1 ) {
-      return group1.toUpperCase();
-    } );
-  }
-
   grunt.log.writeln( `Greetings ${author}!` );
   grunt.log.writeln( `creating sim with repository name ${repo}` );
 
@@ -85,7 +73,7 @@ module.exports = async function( repo, author, options ) {
 
   // Create variations of the repository name
   const configPath = repo.toUpperCase().replace( /-/g, '_' ); // eg, 'simula-rasa' -> 'SIMULA_RASA'
-  const lowerCamelCase = toCamelCase( repo ); // eg, 'simula-rasa' -> 'simulaRasa'
+  const lowerCamelCase = _.camelCase( repo ); // eg, 'simula-rasa' -> 'simulaRasa'
   const upperCamelCase = lowerCamelCase.substring( 0, 1 ).toUpperCase() + lowerCamelCase.substring( 1 ); // eg, 'simula-rasa' -> 'SimulaRasa'
 
   const yearToday = grunt.template.today( 'yyyy' );
