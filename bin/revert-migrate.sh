@@ -65,4 +65,13 @@ git reset --hard
 cd ../twixt
 git reset --hard
 
+cd ../nitroglycerin
+git reset --hard
+
+cd ../molecule-shapes
+git reset --hard
+
+cd ../molarity
+git reset --hard
+
 cd ../example-sim
