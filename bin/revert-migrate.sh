@@ -74,4 +74,28 @@ git reset --hard
 cd ../molarity
 git reset --hard
 
+cd ../vegas
+git reset --hard
+
+cd ../acid-base-solutions
+git reset --hard
+
+cd ../area-model-algebra
+git reset --hard
+
+cd ../area-model-common
+git reset --hard
+
+cd ../area-model-decimals
+git reset --hard
+
+cd ../area-model-introduction
+git reset --hard
+
+cd ../area-model-multiplication
+git reset --hard
+
+cd ../molecule-shapes-basics
+git reset --hard
+
 cd ../example-sim
