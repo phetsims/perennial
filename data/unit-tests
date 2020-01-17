@@ -17,6 +17,7 @@ phet-io-wrappers
 query-string-machine
 scenery
 scenery-phet
+studio
 tandem
 twixt
 utterance-queue
