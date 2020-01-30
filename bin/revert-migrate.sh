@@ -15,7 +15,10 @@ do
     git reset --hard
     # revert modulify artifacts
     rm -rf strings/
-    rm images/**/*.js
+    rm images/*.js
+    rm images/cards/*.js
+    rm images/functions/*.js
+    rm images/speaker/*.js
     rm sounds/*.js
     # brand .js
     rm phet/images/*.js
