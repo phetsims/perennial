@@ -2,7 +2,7 @@
 #====================================================================================================
 #
 # Visits each repository listed in a file and applies the same command to each.
-# If the specified file cannot be found, it will check for a matching file in perennial/bin/data.
+# If the specified file cannot be found, it will check for a matching file in perennial/data/.
 #
 # Examples:
 #
