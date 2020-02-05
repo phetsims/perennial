@@ -10,7 +10,7 @@ const winston = require( 'winston' );
 /**
  * Notify the website that a new sim or translation has been deployed. This will cause the project to
  * synchronize and the new translation will appear on the website.
- * @param {Object} options
+ * @param {Object} [options]
  *  @property {string} simName
  *  @property {string} email
  *  @property {string} brand
