@@ -18,7 +18,7 @@ let buildLocalObject;
 try {
   buildLocalObject = JSON.parse( fs.readFileSync( process.env.HOME + '/.phet/build-local.json', 'utf8' ) );
 }
-catch( e ) {
+catch ( e ) {
   winston.warn( 'No build-local.json detected!' );
   buildLocalObject = {};
 }
@@ -38,6 +38,20 @@ module.exports = {
       'credentials document for the "Github Machine User" row with the node "phetDevGitHubAccessToken" (it is ' +
       'a hexadecimal string).' );
     return buildLocalObject.phetDevGitHubAccessToken;
+  },
+
+  get developerGithubAccessToken() {
+    assert( buildLocalObject.developerGithubAccessToken,
+      'The developerGithubAccessToken field of build-local.json is required for the use of the scripts in' +
+      'phet-info/github-labels.  For information on how to create one, see' +
+      'https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line#creating-a-token' );
+    return buildLocalObject.developerGithubAccessToken;
+  },
+  get developerGithubUsername() {
+    assert( buildLocalObject.developerGithubUsername,
+      'The developerGithubUsername field of build-local.json is required for the use of the scripts in' +
+      'phet-info/github-labels.' );
+    return buildLocalObject.developerGithubUsername;
   },
 
   // Wrappers are now deployed to the dev location (for convenience)
