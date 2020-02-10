@@ -30,7 +30,7 @@ const npmUpdate = require( '../common/npmUpdate' );
 /**
  * @param {string} repo
  * @param {string} author
- * @param {Object} options
+ * @param {Object} [options]
  */
 module.exports = async function( repo, author, options ) {
   const {
