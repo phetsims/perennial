@@ -16,6 +16,14 @@ do
     # revert modulify artifacts
     rm -rf strings/
     rm js/*-strings.js
+    rm js/areaModelAlgebra.js
+    rm js/areaModelDecimals.js
+    rm js/areaModelIntroduction.js
+    rm js/concentration.js
+    rm js/diffusion.js
+    rm js/moleculeShapesBasics.js
+    rm js/phScaleBasics.js
+    rm js/underPressure.js
     rm images/*.js
     rm images/cards/*.js
     rm images/functions/*.js
@@ -25,3 +33,6 @@ do
     rm phet/images/*.js
     cd ../chipper
 done
+
+cd ../chipper
+rm -Rf build/
