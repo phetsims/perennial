@@ -31,6 +31,8 @@ do
     rm sounds/*.js
     # brand .js
     rm phet/images/*.js
+    rm adapted-from-phet/images/*.js
+    rm phet-io/images/*.js
     cd ../chipper
 done
 
