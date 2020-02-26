@@ -31,6 +31,7 @@ do
     rm images/speaker/*.js
     rm sounds/*.js
     rm mipmaps/*.js
+    rm mipmaps/functions/*.js # for function-builder
     # brand .js
     rm phet/images/*.js
     rm adapted-from-phet/images/*.js
