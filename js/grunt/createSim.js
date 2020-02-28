@@ -121,5 +121,4 @@ module.exports = async function( repo, author, options ) {
 
   await npmUpdate( repo );
   await execute( gruntCommand, [ 'unpublished-README' ], `../${repo}` );
-  await execute( gruntCommand, [ 'generate-config' ], `../${repo}` );
 };
