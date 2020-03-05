@@ -272,6 +272,12 @@ module.exports = ( function() {
         const branches = await getBranches( repo );
 
         for ( const branch of branches ) {
+          // We aren't unreleased if we're included in either phet or phet-io metadata.
+          // See https://github.com/phetsims/balancing-act/issues/118
+          if ( phetBranches.concat( phetioBranches ).filter( releaseBranch => releaseBranch.repo === repo && releaseBranch.branch === branch ).length  ) {
+            continue;
+          }
+
           const match = branch.match( /^(\d+)\.(\d+)$/ );
 
           if ( match ) {
