@@ -18,6 +18,7 @@ const winston = require( 'winston' );
 const writeFile = require( '../common/writeFile' );
 const writePhetHtaccess = require( './writePhetHtaccess' );
 const writePhetioHtaccess = require( '../common/writePhetioHtaccess' );
+const deployImages = require( './deployImages' );
 
 const buildDir = './js/build-server/tmp';
 
@@ -40,7 +41,7 @@ const afterDeploy = async buildDir => {
     await execute( 'grunt', [ 'checkout-master-all' ], constants.PERENNIAL );
     await execute( 'rm', [ '-rf', buildDir ], '.' );
   }
-  catch( err ) {
+  catch ( err ) {
     return abortBuild( err );
   }
 };
@@ -61,11 +62,25 @@ const afterDeploy = async buildDir => {
  * @property {String} res - express response object
  * @property {winston} winston - logger
  */
-async function taskWorker( { api, repos, locales, simName, version, email, brands, servers, userId, branch } ) {
+async function taskWorker( options ) {
+  if ( options.deployImages ) {
+    return await deployImages( options );
+  }
   try {
     //-------------------------------------------------------------------------------------
     // Parse and validate parameters
     //-------------------------------------------------------------------------------------
+    const api = options.api;
+    const repos = options.repos;
+    const locales = options.locales;
+    const simName = options.simName;
+    const version = options.version;
+    const email = options.email;
+    const brands = options.brands;
+    const servers = options.servers;
+    const userId = options.userId;
+    const branch = options.branch;
+
     if ( userId ) {
       winston.log( 'info', 'setting userId = ' + userId );
     }
@@ -143,7 +158,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
           try {
             await execute( 'rm', [ '-rf', buildDir ], '.' );
           }
-          catch( e ) {
+          catch ( e ) {
             reject( e );
           }
           fs.mkdir( buildDir, err => {
@@ -273,7 +288,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
                   } );
                 } );
               }
-              catch( e ) {
+              catch ( e ) {
                 reject( e );
               }
             }
@@ -360,7 +375,7 @@ async function taskWorker( { api, repos, locales, simName, version, email, brand
       }
     }
   }
-  catch( err ) {
+  catch ( err ) {
     return abortBuild( err );
   }
   return afterDeploy();

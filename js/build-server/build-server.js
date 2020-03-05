@@ -80,7 +80,7 @@ const taskQueue = async.queue( taskWorker, 1 ); // 1 is the max number of tasks 
  * @param {express.Response} res
  * @param {String} key - one of 'query' or 'body', used to differentiate query parameters or POST data.
  */
-function queueDeployApiVersion1( req, res, key ) {
+const queueDeployApiVersion1 = ( req, res, key ) => {
   const repos = JSON.parse( decodeURIComponent( req[ key ][ constants.REPOS_KEY ] ) );
   const simName = decodeURIComponent( req[ key ][ constants.SIM_NAME_KEY ] );
   const version = decodeURIComponent( req[ key ][ constants.VERSION_KEY ] );
@@ -98,14 +98,14 @@ function queueDeployApiVersion1( req, res, key ) {
   const brands = version.indexOf( 'phetio' ) < 0 ? [ constants.PHET_BRAND ] : [ constants.PHET_IO_BRAND ];
 
   queueDeploy( '1.0', repos, simName, version, locales, brands, servers, email, translatorId, branch, authorizationKey, req, res );
-}
+};
 
-function getQueueDeploy( req, res ) {
+const getQueueDeploy = ( req, res ) => {
   logRequest( req, 'query', winston );
   queueDeployApiVersion1( req, res, 'query' );
-}
+};
 
-function postQueueDeploy( req, res ) {
+const postQueueDeploy = ( req, res ) => {
   logRequest( req, 'body', winston );
 
   const api = decodeURIComponent( req.body[ constants.API_KEY ] );
@@ -127,7 +127,7 @@ function postQueueDeploy( req, res ) {
   else {
     queueDeployApiVersion1( req, res, 'body' );
   }
-}
+};
 
 /**
  * Adds the request to the processing queue and handles email notifications about success or failures
@@ -146,7 +146,7 @@ function postQueueDeploy( req, res ) {
  * @param {express.Request} req
  * @param {express.Response} res
  */
-function queueDeploy( api, repos, simName, version, locales, brands, servers, email, userId, branch, authorizationKey, req, res ) {
+const queueDeploy = ( api, repos, simName, version, locales, brands, servers, email, userId, branch, authorizationKey, req, res ) => {
 
   if ( repos && simName && version && authorizationKey ) {
     const productionBrands = [ constants.PHET_BRAND, constants.PHET_IO_BRAND ];
@@ -165,7 +165,7 @@ function queueDeploy( api, repos, simName, version, locales, brands, servers, em
     }
     else {
       winston.log( 'info', 'queuing build for ' + simName + ' ' + version );
-      taskQueue.push( { api: api, repos: repos, simName: simName, version: version, locales: locales, servers: servers, brands: brands, email: email, userId: userId, res: res, branch: branch }, function( err ) {
+      taskQueue.push( { api: api, repos: repos, simName: simName, version: version, locales: locales, servers: servers, brands: brands, email: email, userId: userId, res: res, branch: branch },  err => {
         const simInfoString = 'Sim = ' + simName +
                               ' Version = ' + version +
                               ' Brands = ' + brands +
@@ -204,7 +204,29 @@ function queueDeploy( api, repos, simName, version, locales, brands, servers, em
     res.status( 400 );
     res.send( errorString );
   }
-}
+};
+
+const postQueueImageDeploy = (req, res) => {
+  logRequest( req, 'body', winston );
+
+  const email = req.body[ constants.EMAIL_KEY ] || null;
+  const emailBodyText = 'Not implemented';
+
+  taskQueue.push( { deployImages: true },  err => {
+    if ( err ) {
+      const errorMessage = `Image deploy failure: ${err}`;
+      winston.log( 'error', errorMessage );
+      sendEmail( 'IMAGE DEPLOY ERROR', errorMessage, email );
+    }
+    else {
+      winston.log( 'info', 'Image deploy finished successfully' );
+      sendEmail( 'Image deploy succeeded', emailBodyText, email, true );
+    }
+  } );
+
+  res.status( 202 );
+  res.send( 'build process initiated, check logs for details' );
+};
 
 // Create the ExpressJS app
 const app = express();
@@ -216,9 +238,10 @@ app.use( bodyParser.json() );
 // add the route to build and deploy
 app.get( '/deploy-html-simulation', getQueueDeploy );
 app.post( '/deploy-html-simulation', postQueueDeploy );
+app.post( '/deploy-images', postQueueImageDeploy );
 
 // start the server
-app.listen( constants.LISTEN_PORT, function() {
+app.listen( constants.LISTEN_PORT, () => {
   winston.log( 'info', 'Listening on port ' + constants.LISTEN_PORT );
   winston.log( 'info', 'Verbose mode: ' + verbose );
 } );
