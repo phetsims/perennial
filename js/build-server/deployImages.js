@@ -1,5 +1,6 @@
 // Copyright 2020, University of Colorado Boulder
 
+const constants = require( './constants' );
 const execute = require( '../common/execute' );
 const gitCheckout = require( '../common/gitCheckout' );
 const gitPull = require( '../common/gitPull' );
