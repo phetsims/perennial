@@ -1,6 +1,7 @@
 // Copyright 2020, University of Colorado Boulder
 
 const gitCheckout = require( '../common/gitCheckout' );
+const gitPull = require( '../common/gitPull' );
 const pullMaster = require( './pullMaster' );
 
 /**
