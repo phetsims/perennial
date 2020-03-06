@@ -165,7 +165,19 @@ const queueDeploy = ( api, repos, simName, version, locales, brands, servers, em
     }
     else {
       winston.log( 'info', 'queuing build for ' + simName + ' ' + version );
-      taskQueue.push( { api: api, repos: repos, simName: simName, version: version, locales: locales, servers: servers, brands: brands, email: email, userId: userId, res: res, branch: branch },  err => {
+      taskQueue.push( {
+        api: api,
+        repos: repos,
+        simName: simName,
+        version: version,
+        locales: locales,
+        servers: servers,
+        brands: brands,
+        email: email,
+        userId: userId,
+        res: res,
+        branch: branch
+      }, err => {
         const simInfoString = 'Sim = ' + simName +
                               ' Version = ' + version +
                               ' Brands = ' + brands +
@@ -178,7 +190,7 @@ const queueDeploy = ( api, repos, simName, version, locales, brands, servers, em
           try {
             shas = JSON.stringify( JSON.parse( shas ), null, 2 );
           }
-          catch( e ) {
+          catch ( e ) {
             // invalid JSON
           }
           const errorMessage = 'Build failure: ' + err + '. ' + simInfoString + ' Shas = ' + JSON.stringify( shas );
@@ -206,13 +218,21 @@ const queueDeploy = ( api, repos, simName, version, locales, brands, servers, em
   }
 };
 
-const postQueueImageDeploy = (req, res) => {
+const postQueueImageDeploy = ( req, res ) => {
   logRequest( req, 'body', winston );
+
+  if ( authorizationKey !== constants.BUILD_SERVER_CONFIG.buildServerAuthorizationCode ) {
+    const err = 'wrong authorization code';
+    winston.log( 'error', err );
+    res.status( 401 );
+    res.send( err );
+    return;
+  }
 
   const email = req.body[ constants.EMAIL_KEY ] || null;
   const emailBodyText = 'Not implemented';
 
-  taskQueue.push( { deployImages: true },  err => {
+  taskQueue.push( { deployImages: true }, err => {
     if ( err ) {
       const errorMessage = `Image deploy failure: ${err}`;
       winston.log( 'error', errorMessage );

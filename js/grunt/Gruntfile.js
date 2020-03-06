@@ -22,6 +22,7 @@ const cherryPick = require( './cherryPick' );
 const createOneOff = require( './createOneOff' );
 const createRelease = require( './createRelease' );
 const createSim = require( './createSim' );
+const deployImages = require( './deployImages' );
 const dev = require( './dev' );
 const execute = require( '../common/execute' );
 const generateData = require( './generateData' );
@@ -41,7 +42,7 @@ const updateGithubPages = require( '../common/updateGithubPages' );
 const winston = require( 'winston' );
 const wrapper = require( './wrapper' );
 
-module.exports = function( grunt ) {
+module.exports = function ( grunt ) {
 
   if ( grunt.option( 'debug' ) ) {
     winston.default.transports.console.level = 'debug';
@@ -62,7 +63,7 @@ module.exports = function( grunt ) {
     try {
       await promise;
     }
-    catch( e ) {
+    catch ( e ) {
       if ( e.stack ) {
         grunt.fail.fatal( `Perennial task failed:\n${e.stack}\nFull Error details:\n${JSON.stringify( e, null, 2 )}` );
       }
@@ -286,6 +287,17 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
       await dev( grunt.option( 'repo' ), grunt.option( 'brands' ).split( ',' ), noninteractive, 'master', grunt.option( 'message' ) );
+    } ) );
+
+  grunt.registerTask( 'deploy-images',
+    'Rebuilds all images for all sims\n' +
+    '--branch : The chipper branch to use for image generation\n' +
+    '--brands : A comma-separated list of brand names to deploy, currently only phet supported',
+    wrapTask( async () => {
+      const brands = grunt.option( 'brands' ) || 'phet';
+      const branch = grunt.option( 'branch' ) || 'master';
+
+      await deployImages( branch, brands );
     } ) );
 
   grunt.registerTask( 'one-off',
