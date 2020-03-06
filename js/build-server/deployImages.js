@@ -9,12 +9,14 @@ const pullMaster = require( './pullMaster' );
  * @param options
  */
 const deployImages = async options => {
-
-  await pullMaster();
   if ( options.branch ) {
     await gitCheckout( 'chipper', options.branch );
+    await gitPull( 'chipper' );
   }
+
   return new Promise( ( resolve, reject ) => {
+
+    // Get all published sims
     request( 'https://phet.colorado.edu/services/metadata/1.2/simulations?format=json&summary&locale=en&type=html', function ( error, response, body ) {
       if ( error ) {
         console.error( 'failed to fetch metadata request', e );
@@ -38,10 +40,16 @@ const deployImages = async options => {
         projects.forEach( project => {
           project.simulations.forEach( async simulation => {
             const repoDir = `../${simulation.name}`;
+
+            // Get master
+            await gitCheckout( simulation.name, 'master' );
+            await gitPull( simulation.name );
+
+            // Build screenshots
             await execute( 'grunt', [ `--brands=${options.brands || 'phet'}`, 'generate-image-assets' ], repoDir );
 
+            // Copy into the document root
             const brands = options.brands ? options.brands.split( ',' ) : [ 'phet' ];
-
             brands.forEach( async brand => {
               if ( brand !== 'phet' ) {
                 reject( `Image deploy not implemented for brand: ${brand}` );
