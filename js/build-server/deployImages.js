@@ -2,7 +2,7 @@
 
 const gitCheckout = require( '../common/gitCheckout' );
 const gitPull = require( '../common/gitPull' );
-const pullMaster = require( './pullMaster' );
+const request = require( 'request' );
 
 /**
  * This task deploys all image assets from the master branch to the latest version of all published sims.
