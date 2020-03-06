@@ -1,7 +1,7 @@
 // Copyright 2020, University of Colorado Boulder
 
 const gitCheckout = require( '../common/gitCheckout' );
-const checkoutMasterAll = require( '../grunt/checkoutMasterAll' );
+const pullMaster = require( './pullMaster' );
 
 /**
  * This task deploys all image assets from the master branch to the latest version of all published sims.
@@ -10,7 +10,7 @@ const checkoutMasterAll = require( '../grunt/checkoutMasterAll' );
  */
 const deployImages = async options => {
 
-  await checkoutMasterAll();
+  await pullMaster();
   if ( options.branch ) {
     await gitCheckout( 'chipper', options.branch );
   }
