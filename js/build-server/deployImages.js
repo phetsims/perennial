@@ -13,6 +13,7 @@ const chipperDir = '../chipper';
  * @param options
  */
 const deployImages = async options => {
+  console.log( `deploying images with branch ${options.branch}, brands ${options.brands}` );
   if ( options.branch ) {
     await gitCheckout( 'chipper', options.branch );
     await gitPull( 'chipper' );
