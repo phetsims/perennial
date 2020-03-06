@@ -64,7 +64,16 @@ const afterDeploy = async buildDir => {
  */
 async function taskWorker( options ) {
   if ( options.deployImages ) {
-    return await deployImages( options );
+    try {
+      await deployImages( options );
+      await gitCheckout( 'chipper', 'master' );
+      await gitPull( 'chipper' );
+      return Promise.resolve();
+    }
+    catch ( e ) {
+      return Promise.reject( e );
+    }
+
   }
   try {
     //-------------------------------------------------------------------------------------
