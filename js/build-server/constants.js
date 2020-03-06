@@ -26,7 +26,7 @@ module.exports = {
   VERSION_KEY: 'version',
   OPTION_KEY: 'option',
   EMAIL_KEY: 'email',
-  BRANCH_KEY: ' branch',
+  BRANCH_KEY: 'branch',
   USER_ID_KEY: 'userId',
   TRANSLATOR_ID_KEY: 'translatorId',
   AUTHORIZATION_KEY: 'authorizationCode',
