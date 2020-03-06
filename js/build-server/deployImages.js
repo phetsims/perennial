@@ -5,6 +5,8 @@ const gitCheckout = require( '../common/gitCheckout' );
 const gitPull = require( '../common/gitPull' );
 const request = require( 'request' );
 
+const chipperDir = '../chipper';
+
 /**
  * This task deploys all image assets from the master branch to the latest version of all published sims.
  *
@@ -14,8 +16,8 @@ const deployImages = async options => {
   if ( options.branch ) {
     await gitCheckout( 'chipper', options.branch );
     await gitPull( 'chipper' );
-    await execute( 'npm', [ 'prune' ], '../chipper' );
-    await execute( 'npm', [ 'update' ], '../chipper' );
+    await execute( 'npm', [ 'prune' ], chipperDir );
+    await execute( 'npm', [ 'update' ], chipperDir );
   }
 
   return new Promise( ( resolve, reject ) => {
@@ -48,11 +50,9 @@ const deployImages = async options => {
             // Get master
             await gitCheckout( simulation.name, 'master' );
             await gitPull( simulation.name );
-            await execute( 'npm', [ 'prune' ], repoDir );
-            await execute( 'npm', [ 'update' ], repoDir );
 
             // Build screenshots
-            await execute( 'grunt', [ `--brands=${options.brands || 'phet'}`, 'generate-image-assets' ], repoDir );
+            await execute( 'grunt', [ `--brands=${options.brands || 'phet'}`, `--repo=${simulation.name}`, 'generate-image-assets' ], chipperDir );
 
             // Copy into the document root
             const brands = options.brands ? options.brands.split( ',' ) : [ 'phet' ];
