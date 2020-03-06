@@ -2,7 +2,6 @@
 
 const gitCheckout = require( '../common/gitCheckout' );
 const checkoutMasterAll = require( '../grunt/checkoutMasterAll' );
-const generateImageAssets = require( '../../../chipper/grunt/generateImageAssets' );
 
 /**
  * This task deploys all image assets from the master branch to the latest version of all published sims.
