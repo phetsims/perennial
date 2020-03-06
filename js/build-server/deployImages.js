@@ -14,6 +14,8 @@ const deployImages = async options => {
   if ( options.branch ) {
     await gitCheckout( 'chipper', options.branch );
     await gitPull( 'chipper' );
+    await execute( 'npm', [ 'prune' ], '../chipper' );
+    await execute( 'npm', [ 'update' ], '../chipper' );
   }
 
   return new Promise( ( resolve, reject ) => {
@@ -46,6 +48,8 @@ const deployImages = async options => {
             // Get master
             await gitCheckout( simulation.name, 'master' );
             await gitPull( simulation.name );
+            await execute( 'npm', [ 'prune' ], repoDir );
+            await execute( 'npm', [ 'update' ], repoDir );
 
             // Build screenshots
             await execute( 'grunt', [ `--brands=${options.brands || 'phet'}`, 'generate-image-assets' ], repoDir );
