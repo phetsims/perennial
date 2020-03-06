@@ -221,6 +221,7 @@ const queueDeploy = ( api, repos, simName, version, locales, brands, servers, em
 const postQueueImageDeploy = ( req, res ) => {
   logRequest( req, 'body', winston );
 
+  const authorizationKey = req.body[ constants.AUTHORIZATION_KEY ];
   if ( authorizationKey !== constants.BUILD_SERVER_CONFIG.buildServerAuthorizationCode ) {
     const err = 'wrong authorization code';
     winston.log( 'error', err );
@@ -229,10 +230,12 @@ const postQueueImageDeploy = ( req, res ) => {
     return;
   }
 
+  const branch = req.body[ constants.BRANCH_KEY ] || 'master';
+  const brands = req.body[ constants.BRANDS_KEY ] || 'phet';
   const email = req.body[ constants.EMAIL_KEY ] || null;
   const emailBodyText = 'Not implemented';
 
-  taskQueue.push( { deployImages: true }, err => {
+  taskQueue.push( { deployImages: true, branch: branch, brands: brands }, err => {
     if ( err ) {
       const errorMessage = `Image deploy failure: ${err}`;
       winston.log( 'error', errorMessage );

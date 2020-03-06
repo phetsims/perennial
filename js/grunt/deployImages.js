@@ -25,28 +25,25 @@ const winston = require( 'winston' );
  * @param {string} brands - CSV
  * @returns {Promise} - No resolved value
  */
-module.exports = async function(  branch, brands ) {
+module.exports = async function ( branch, brands ) {
   return new Promise( ( resolve, reject ) => {
-
-    winston.info( `sending build request for ${repo} ${version.toString()} with dependencies: ${JSON.stringify( dependencies )}` );
-
-    servers.forEach( server => assert( [ 'dev', 'production' ].includes( server ), `Unknown server: ${server}` ) );
-
     const requestObject = {
-      brands: brands,
-      branch: branch,
+      brands: brands || 'phet',
+      branch: branch || 'master',
       authorizationCode: buildLocal.buildServerAuthorizationCode
     };
     if ( buildLocal.buildServerNotifyEmail ) {
       requestObject.email = buildLocal.buildServerNotifyEmail;
     }
 
+    winston.info( `sending image deploy request for ${requestObject.branch}, ${requestObject.brands}` );
+
     const url = `${buildLocal.productionServerURL}/deploy-images`;
 
     winston.info( url );
     winston.info( JSON.stringify( requestObject ) );
 
-    request.post( { url: url, json: requestObject }, function( error, response ) {
+    request.post( { url: url, json: requestObject }, function ( error, response ) {
       if ( error ) {
         reject( new Error( `Image deploy request failed with error ${error}.` ) );
       }
