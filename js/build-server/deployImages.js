@@ -25,7 +25,7 @@ const deployImages = async options => {
   return new Promise( ( resolve, reject ) => {
 
     // Get all published sims
-    request( 'https://phet.colorado.edu/services/metadata/1.2/simulations?format=json&summary&locale=en&type=html', function ( error, response, body ) {
+    request( 'https://phet.colorado.edu/services/metadata/1.2/simulations?format=json&summary&locale=en&type=html', async function ( error, response, body ) {
       if ( error ) {
         console.error( 'failed to fetch metadata request', e );
         reject( e );
@@ -45,8 +45,11 @@ const deployImages = async options => {
           return;
         }
 
-        projects.forEach( project => {
-          project.simulations.forEach( async simulation => {
+        // Use for index loop to allow async/await
+        for ( let projectIndex = 0; projectIndex < projects.length; projectIndex++ ) {
+          const project = projects[ projectIndex ];
+          for ( let simulationIndex = 0; simulationIndex < project.simulations.length; simulationIndex++ ) {
+            const simulation = project.simulations[ simulationIndex ];
             const repoDir = `../${simulation.name}`;
 
             // Get master
@@ -58,7 +61,8 @@ const deployImages = async options => {
 
             // Copy into the document root
             const brands = options.brands ? options.brands.split( ',' ) : [ 'phet' ];
-            brands.forEach( async brand => {
+            for ( brandIndex = 0; brandIndex < brands.length; brandIndex++ ) {
+              const brand = brands[ brandIndex ];
               if ( brand !== 'phet' ) {
                 reject( `Image deploy not implemented for brand: ${brand}` );
               }
@@ -67,10 +71,9 @@ const deployImages = async options => {
                 const targetDir = `${constants.HTML_SIMS_DIRECTORY}${simulation.name}/${project.version.string}/`;
                 await execute( 'cp', [ '-r', sourceDir, targetDir ], '.' );
               }
-            } );
-
-          } );
-        } );
+            }
+          }
+        }
       }
     } );
   } );
