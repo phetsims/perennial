@@ -11,9 +11,9 @@ interaction-dashboard
 joist
 kite
 phet-core
-phetcommon
 phet-io
 phet-io-wrappers
+phetcommon
 query-string-machine
 scenery
 scenery-phet
