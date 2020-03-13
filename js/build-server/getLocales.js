@@ -50,7 +50,7 @@ async function getLocales( locales, simName ) {
         json = await getJsonFromXML( xmlString );
       }
       catch( err ) {
-        // TODO: should we call reject here? what happens when callbackLocales is undefined?
+        // TODO https://github.com/phetsims/perennial/issues/167 should we call reject here? what happens when callbackLocales is undefined?
         winston.log( 'error', 'error parsing XML, err = ' + err );
       }
       winston.log( 'info', 'data extracted from translations XML file:' );

@@ -91,7 +91,7 @@ function queueDeployApiVersion1( req, res, key ) {
   const authorizationKey = decodeURIComponent( req[ key ][ constants.AUTHORIZATION_KEY ] );
   const branch = decodeURIComponent( req[ key ][ constants.BRANCH_KEY ] );
 
-  // TODO: determine if this comment needs updating for chipper 1.0 deploys
+  // TODO https://github.com/phetsims/perennial/issues/167 determine if this comment needs updating for chipper 1.0 deploys
   // For RC deploys, only send to the dev server.  For production deploys, the local build will send to the dev server so the build-server
   // only sends to the production server (phet-server).
   const servers = ( option === 'rc' ) ? [ constants.DEV_SERVER ] : [ constants.PRODUCTION_SERVER ];
