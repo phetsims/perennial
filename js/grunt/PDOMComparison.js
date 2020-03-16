@@ -25,7 +25,7 @@ const assert = require( 'assert' );
 const buildLocal = require( '../common/buildLocal' );
 const execute = require( '../common/execute' );
 const getActiveRepos = require( '../common/getActiveRepos' );
-const getPhetLibs = require( '../../../chipper/js/grunt/getPhetLibs' );
+const getDependencies = require( '../common/getDependencies' );
 const htmlDiffer = require( 'html-differ' ); // eslint-disable-line require-statement-match
 const logger = require( 'html-differ/lib/logger' );
 const puppeteer = require( 'puppeteer' );
@@ -38,8 +38,7 @@ module.exports = async ( repo, sha ) => {
   assert( typeof sha === 'string', 'need a sha to compare against' );
   winston.debug( `running pdom comparison in ${repo} between current working copy and ${sha}` );
 
-  // TODO: perennial shouldn't depend on chipper, https://github.com/phetsims/perennial/issues/138, https://github.com/phetsims/perennial/issues/166
-  const dependencies = getPhetLibs( repo );
+  const dependencies = Object.keys( getDependencies( repo ) ).filter( key => key !== 'comment' && key !== repo );
 
   // get the current working copy PDOM
   const workingCopyPDOM = await launchSimAndGetPDOMText( repo );
