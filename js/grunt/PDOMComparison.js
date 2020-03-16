@@ -76,7 +76,7 @@ module.exports = async ( repo, sha ) => {
 
   const diff = htmlDiffer.diffHtml( workingCopyPDOM, oldShaPDOM );
 
-  // TODO https://github.com/phetsims/perennial/issues/166 better interpretation of the diff that is output. Perhaps by looking at "diff" more manually, see https://www.npmjs.com/package/html-differ
+  // TODO https://github.com/phetsims/perennial/issues/138 better interpretation of the diff that is output. Perhaps by looking at "diff" more manually, see https://www.npmjs.com/package/html-differ
   console.log( logger.getDiffText( diff, { charsAroundDiff: 40 } ) );
 };
 
@@ -139,8 +139,8 @@ const stashAll = async repos => {
 
 /**
  * Launch a chrome version, run the simulation, and get the PDOM from the simulation.
- * TODO https://github.com/phetsims/perennial/issues/166 add in functions that can be executed to change the model in between tests.
- * TODO https://github.com/phetsims/perennial/issues/166 maybe we could fuzz a few frames, and then test while setting the random seed to be the same for all pages
+ * TODO https://github.com/phetsims/perennial/issues/138 add in functions that can be executed to change the model in between tests.
+ * TODO https://github.com/phetsims/perennial/issues/138 maybe we could fuzz a few frames, and then test while setting the random seed to be the same for all pages
  * @param repo
  * @returns {Promise<string>}
  */
@@ -165,7 +165,7 @@ const launchSimAndGetPDOMText = async repo => {
       const pdoms = await page.evaluate( () => {
         return new Promise( function( resolve, reject ) {
 
-          // TODO https://github.com/phetsims/perennial/issues/166
+          // TODO https://github.com/phetsims/perennial/issues/138
           // window.phet.sim.joist.frameEndedEmitter.addListener();
 
           window.addEventListener( 'message', function( event ) {
