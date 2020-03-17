@@ -70,7 +70,7 @@ module.exports = async function() {
     fs.writeFileSync( `data/${name}`, repos.join( os.EOL ) + os.EOL );
   }
 
-  writeList( 'accessibility', phet => phet.accessible );
+  writeList( 'interactive-descriptions', phet => phet.supportsInteractiveDescriptions );
   writeList( 'active-runnables', phet => phet.runnable );
   writeList( 'active-sims', phet => phet.simulation );
   writeList( 'unit-tests', phet => phet.generatedUnitTests );
@@ -79,7 +79,7 @@ module.exports = async function() {
   writeList( 'testable-runnables', phet => phet.runnable && phet.automatedTestEnabled !== false );
   writeList( 'testable-phet-io', phet => phet.runnable && phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) && phet.automatedTestEnabled !== false );
 
-  await gitAdd( 'perennial', 'data/accessibility' );
+  await gitAdd( 'perennial', 'data/interactive-descriptions' );
   await gitAdd( 'perennial', 'data/active-runnables' );
   await gitAdd( 'perennial', 'data/active-sims' );
   await gitAdd( 'perennial', 'data/unit-tests' );
