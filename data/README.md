@@ -2,13 +2,13 @@
 NOTE: These should be regenerated whenever certain flags in package.json (for repos) are modified, e.g. simulation/runnable/accessible/supportedBrands/automatedTestEnabled. 
   To do so, run `grunt generate-data` in perennial, then check in the modified files (although the task will likely commit and push for you).
 
-accessibility (auto-generated) is a list of all repositories that have been outfitted with accessibility like keyboard navigation. Sims in progress are also included in this list.  
-
 active-repos is a list of all repositories that you should have checked out if doing common-code refactoring.
 
 active-runnables (auto-generated) is a list of all repositories that can be built with chipper and launched from an html file.
 d
 active-sims (auto-generated) is a list of all simulation repositories that can be built with chipper.  Similar to runnables, but doesn't include repos with test code like sun, scenery-phet, etc.
+
+interactive-descriptions (auto-generated) is a list of all repositories that have been outfitted with interactive descriptions like keyboard navigation. Sims in progress are also included in this list.  
 
 phet-io (auto-generated) is the list of all simulations that are instrumented with PhET-iO features. This list is automatically fuzz
     tested and is used by phetmarks to dictate which sims have wrapper links. See 
