@@ -12,3 +12,20 @@
 #==================================================================================
 
 grunt lint-everything --say
+
+## get status ##
+status=$?
+echo $status > ~/bitbar-data/status.txt
+
+## see https://gist.github.com/rxaviers/7360908
+if [ $status -eq 0 ]
+then
+  echo :green_heart: > ~/bitbar-data/status.txt
+  echo "PASS"
+else
+  echo :fire: > ~/bitbar-data/status.txt
+  echo "FAIL"
+fi
+
+# https://github.com/matryer/bitbar/issues/331
+open -g bitbar://refreshPlugin?name=*
