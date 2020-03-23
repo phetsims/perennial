@@ -11,6 +11,9 @@
 #
 #==================================================================================
 
+value=$(<~/bitbar-data/status.txt)
+echo "Prior status: $value"
+
 grunt lint-everything
 
 ## get status ##
@@ -24,20 +27,16 @@ else
   result=':fire:'
 fi
 
-echo "GOT RESULT"
-echo $result
+echo "Current status: $result"
 
-value=$(<~/bitbar-data/status.txt)
-echo "$value"
 if [ $result = $value ]
 then
-  echo "same status"
+  echo "Same status"
 else
-  echo "different status"
+  echo "Different status"
+  echo $result > ~/bitbar-data/status.txt
+
+  # https://github.com/matryer/bitbar/issues/331
+  open -g bitbar://refreshPlugin?name=*
   say $result
 fi
-
-echo $result > ~/bitbar-data/status.txt
-
-# https://github.com/matryer/bitbar/issues/331
-open -g bitbar://refreshPlugin?name=*
