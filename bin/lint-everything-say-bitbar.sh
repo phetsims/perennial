@@ -21,7 +21,7 @@ if [ $status -eq 0 ]
 then
   result=':green_heart:'
 else
-  result=':fire'
+  result=':fire:'
 fi
 
 echo "GOT RESULT"
