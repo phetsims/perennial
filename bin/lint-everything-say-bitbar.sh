@@ -11,21 +11,33 @@
 #
 #==================================================================================
 
-grunt lint-everything --say
+grunt lint-everything
 
 ## get status ##
 status=$?
-echo $status > ~/bitbar-data/status.txt
 
 ## see https://gist.github.com/rxaviers/7360908
 if [ $status -eq 0 ]
 then
-  echo :green_heart: > ~/bitbar-data/status.txt
-  echo "PASS"
+  result=':green_heart:'
 else
-  echo :fire: > ~/bitbar-data/status.txt
-  echo "FAIL"
+  result=':fire'
 fi
+
+echo "GOT RESULT"
+echo $result
+
+value=$(<~/bitbar-data/status.txt)
+echo "$value"
+if [ $result = $value ]
+then
+  echo "same status"
+else
+  echo "different status"
+  say $result
+fi
+
+echo $result > ~/bitbar-data/status.txt
 
 # https://github.com/matryer/bitbar/issues/331
 open -g bitbar://refreshPlugin?name=*
