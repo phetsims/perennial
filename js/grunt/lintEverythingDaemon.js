@@ -34,6 +34,7 @@ const callback = () => {
   const report = lint( activeRepos, true, false, false );
 
   const passing = report.warningCount === 0 && report.errorCount === 0;
+  process.stdout.write( passing ? '💚' : '🔥' );
 
   if ( priorPassing !== passing ) {
     const textToWrite = passing ? ':green_heart:' : ':fire:';
