@@ -29,6 +29,7 @@ const getBranch = require( '../common/getBranch' );
 const getDataFile = require( '../common/getDataFile' );
 const gruntCommand = require( '../common/gruntCommand' );
 const insertRequireStatement = require( './insertRequireStatement' );
+const lintEverythingDaemon = require( './lintEverythingDaemon' );
 const Maintenance = require( '../common/Maintenance' );
 const npmUpdate = require( '../common/npmUpdate' );
 const printPhetioLinks = require( './printPhetioLinks' );
@@ -425,4 +426,15 @@ module.exports = function( grunt ) {
 
     await Maintenance.createPatch( repo, message );
   } ) );
+
+  grunt.registerTask(
+    'lint-everything-daemon',
+    'Triggered by standard input, tracks changes in status and signifies changes via notifications',
+    function() {
+
+      // Prevent grunt from exiting
+      this.async();
+      lintEverythingDaemon();
+    }
+  );
 };
