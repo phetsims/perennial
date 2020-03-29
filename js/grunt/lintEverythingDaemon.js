@@ -6,7 +6,7 @@
  *
  * USAGE:
  * cd perennial
- * fswatch ../ -e ".*" -i "\\.js$" | grunt listen-for-filesystem-changes
+ * fswatch ../ -e ".*" -i "\\.js$" | grunt lint-everything-daemon
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */
