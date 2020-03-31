@@ -22,6 +22,7 @@ const cherryPick = require( './cherryPick' );
 const createOneOff = require( './createOneOff' );
 const createRelease = require( './createRelease' );
 const createSim = require( './createSim' );
+const deployDecaf = require( './deployDecaf' );
 const dev = require( './dev' );
 const execute = require( '../common/execute' );
 const generateData = require( './generateData' );
@@ -341,6 +342,14 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
       await production( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ), noninteractive, grunt.option( 'message' ) );
+    } ) );
+
+  grunt.registerTask( 'deploy-decaf',
+    'Deploys a decaf version of the simulation\n' +
+    '--project : The name of the project to deploy',
+    wrapTask( async () => {
+      assert( grunt.option( 'project' ), 'Requires specifying a repository with --project={{PROJECT}}' );
+      await deployDecaf( grunt.option( 'project' ));
     } ) );
 
   grunt.registerTask( 'create-sim',
