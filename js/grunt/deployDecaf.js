@@ -10,7 +10,6 @@
 
 // modules
 const _ = require( 'lodash' ); // eslint-disable-line
-const booleanPrompt = require( '../common/booleanPrompt' );
 const buildLocal = require( '../common/buildLocal' );
 const devDirectoryExists = require( '../common/devDirectoryExists' );
 const devScp = require( '../common/devScp' );
@@ -90,9 +89,9 @@ module.exports = async function( project ) {
     grunt.fail.fatal( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
   }
 
-  if ( !await booleanPrompt( `Deploy ${versionString} to ${buildLocal.devDeployServer}`, false ) ) {
-    grunt.fail.fatal( 'Aborted deploy' );
-  }
+  // if ( !await booleanPrompt( `Deploy ${versionString} to ${buildLocal.devDeployServer}`, false ) ) {
+  //   grunt.fail.fatal( 'Aborted deploy' );
+  // }
 
   packageObject.version = version.toString();
   await writeJSON( packageFile, packageObject );
