@@ -80,6 +80,7 @@ module.exports = async function( project ) {
   let html = fs.readFileSync( '../decaf/html/template.html', 'utf-8' );
   html = html.split( '{{PROJECT}}' ).join( project );
   html = html.split( '{{VERSION}}' ).join( versionString );
+  html = html.split( '{{IS_BUILT}}' ).join( 'true' );
   fs.writeFileSync( '../decaf/build/index.html',html );
 
   const simPathExists = await devDirectoryExists( simPath );
