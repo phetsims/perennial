@@ -33,10 +33,6 @@ const vpnCheck = require( '../common/vpnCheck' );
  * @public
  *
  * @param {string} project
- * @param {Array.<string>} brands
- * @param {boolean} noninteractive
- * @param {string} branch - 'master' for normal dev deploys, otherwise is the name of a one-off branch
- * @param {string} [message] - Optional message to append to the version-increment commit.
  * @returns {Promise}
  */
 module.exports = async function( project ) {
@@ -77,7 +73,7 @@ module.exports = async function( project ) {
   const simPath = buildLocal.decafDeployPath + project;
   const versionPath = simPath + '/' + versionString;
 
-  let html = fs.readFileSync( '../decaf/html/template.html', 'utf-8' );
+  let html = fs.readFileSync( '../decaf/html/index.html', 'utf-8' );
   html = html.split( '{{PROJECT}}' ).join( project );
   html = html.split( '{{VERSION}}' ).join( versionString );
   html = html.split( '{{IS_BUILT}}' ).join( 'true' );
