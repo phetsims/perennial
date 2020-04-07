@@ -118,8 +118,8 @@ module.exports = async function( project ) {
   await devScp( `../decaf/projects/${project}/${project}_all.jar`, `${versionPath}/` );
   await devScp( `../decaf/projects/${project}/${project}_all.jar.js`, `${versionPath}/` );
   await devScp( '../decaf/build/index.html', `${versionPath}/` );
-  await devScp( '../decaf/build/splash.gif', `${versionPath}/` );
-  await devScp( '../decaf/build/style.css', `${versionPath}/` );
+  await devScp( '../decaf/html/splash.gif', `${versionPath}/` );
+  await devScp( '../decaf/html/style.css', `${versionPath}/` );
   //
   // // If there is a protected directory and we are copying to the dev server, include the .htaccess file
   // // This is for PhET-iO simulations, to protected the password protected wrappers, see
