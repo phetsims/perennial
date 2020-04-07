@@ -3,7 +3,7 @@
 /**
  * Generates the lists under perennial/data/, and if there were changes, will commit and push.
  *
- * Ideally, this grunt taks is never run itself, but instead from `/bin/generate-data.sh` from bayes.colorado.edu
+ * Ideally, this grunt task is never run itself, but instead from `/bin/generate-data.sh` from bayes.colorado.edu
  * under the phet-admin user from /data/share/phet/generate-data/perennial:
  * `pm2 start bin/generate-data.sh`
  *
