@@ -29,7 +29,6 @@ const generateData = require( './generateData' );
 const getBranch = require( '../common/getBranch' );
 const getDataFile = require( '../common/getDataFile' );
 const gruntCommand = require( '../common/gruntCommand' );
-const insertRequireStatement = require( './insertRequireStatement' );
 const lintEverythingDaemon = require( './lintEverythingDaemon' );
 const Maintenance = require( '../common/Maintenance' );
 const npmUpdate = require( '../common/npmUpdate' );
@@ -38,7 +37,6 @@ const production = require( './production' );
 const rc = require( './rc' );
 const shaCheck = require( './shaCheck' );
 const simMetadata = require( '../common/simMetadata' );
-const sortRequireStatements = require( './sortRequireStatements' );
 const updateGithubPages = require( '../common/updateGithubPages' );
 const winston = require( 'winston' );
 const wrapper = require( './wrapper' );
@@ -370,33 +368,6 @@ module.exports = function( grunt ) {
 
       await createSim( repo, author, { title: title, clean: clean } );
     } ) );
-
-  grunt.registerTask( 'sort-require-statements', 'Sort the require statements for a single file (if --file={{FILE}} is provided), or does so for all JS files in a repo (if --repo={{REPO}} is specified)', wrapTask( async () => {
-    const file = grunt.option( 'file' );
-    const repo = grunt.option( 'repo' );
-
-    assert( !( file && repo ), 'Only one of --file and --repo should be specified' );
-    assert( file || repo, 'At least one of --file and --repo should be specified, see documentation' );
-
-    if ( file ) {
-      sortRequireStatements( file );
-    }
-    else {
-      grunt.file.recurse( `../${repo}/js`, absfile => sortRequireStatements( absfile ) );
-    }
-  } ) );
-
-  grunt.registerTask( 'insert-require-statement', 'Insert a require statement into the specified file.\n' +
-                                                  '--file absolute path of the file that will receive the require statement\n' +
-                                                  '--name to be required', wrapTask( async () => {
-    const file = grunt.option( 'file' );
-    const name = grunt.option( 'name' );
-
-    assert( grunt.option( 'file' ), 'Requires specifying a file to update with --file={{FILE}}' );
-    assert( grunt.option( 'name' ), 'Requires specifying an (import) name with --name={{NAME}}' );
-
-    insertRequireStatement( file, name );
-  } ) );
 
   grunt.registerTask( 'lint-everything', 'lint all js files for all repos', wrapTask( async () => {
     // --disable-eslint-cache disables the cache, useful for developing rules
