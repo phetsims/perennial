@@ -77,7 +77,7 @@ module.exports = async function( project, preloadResources ) {
   html = html.split( '{{PROJECT}}' ).join( project );
   html = html.split( '{{VERSION}}' ).join( versionString );
   html = html.split( '{{IS_BUILT}}' ).join( 'true' );
-  html = html.split( '{{PRELOAD_RESOURCES}}' ).join( preloadResources );
+  html = html.split( '\'{{PRELOAD_RESOURCES}}\'' ).join( preloadResources );
   fs.writeFileSync( '../decaf/build/index.html', html );
 
   const simPathExists = await devDirectoryExists( simPath );
