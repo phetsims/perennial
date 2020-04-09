@@ -116,8 +116,8 @@ module.exports = async function( project, preloadResources ) {
   // // Copy the build contents into the version-specific directory
   console.log( `../decaf/projects/${project}` );
   console.log( `${versionPath}/` );
-  // await devScp( `../decaf/projects/${project}/${project}_all.jar`, `${versionPath}/` );
-  await devScp( `../decaf/projects/${project}/${project}_all_pack.jar`, `${versionPath}/` );
+  await devScp( `../decaf/projects/${project}/${project}_all.jar`, `${versionPath}/` );
+  // await devScp( `../decaf/projects/${project}/${project}_all_pack.jar`, `${versionPath}/` );
   await devScp( `../decaf/projects/${project}/${project}_all.jar.js`, `${versionPath}/` );
   await devScp( '../decaf/build/index.html', `${versionPath}/` );
   await devScp( '../decaf/html/splash.gif', `${versionPath}/` );
