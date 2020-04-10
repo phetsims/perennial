@@ -75,7 +75,7 @@ const deployImages = async options => {
                   const file = files[ fileIndex ];
                   if ( file.endsWith( 'png' ) ) {
                     console.log( `copying file ${file}` );
-                    fs.copyFileSync( `${sourceDir}${file}`, `${targetDir}${file}` );
+                    await execute( 'cp', [ `${sourceDir}${file}`, `${targetDir}${file}` ], '.' );
                   }
                 }
 
