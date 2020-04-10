@@ -57,7 +57,7 @@ const deployImages = async options => {
             await gitPull( simulation.name );
 
             // Build screenshots
-            await execute( 'grunt', [ `--brands=${options.brands || 'phet'}`, `--repo=${simulation.name}`, 'generate-image-assets' ], chipperDir );
+            await execute( 'grunt', [ `--brands=${options.brands || 'phet'}`, `--repo=${simulation.name}`, 'build-images' ], chipperDir );
 
             // Copy into the document root
             const brands = options.brands ? options.brands.split( ',' ) : [ 'phet' ];
