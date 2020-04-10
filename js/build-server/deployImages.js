@@ -70,11 +70,15 @@ const deployImages = async options => {
               else {
                 const sourceDir = `${repoDir}/build/${brand}/`;
                 const targetDir = `${constants.HTML_SIMS_DIRECTORY}${simulation.name}/${project.version.string}/`;
-                fs.readdirSync( sourceDir ).forEach( file => {
+                const files = fs.readdirSync( sourceDir );
+                for ( let fileIndex = 0; fileIndex < files.length; fileIndex++ ) {
+                  const file = files[ fileIndex ];
                   if ( file.endsWith( 'png' ) ) {
+                    console.log( `copying file ${file}` );
                     fs.copyFileSync( `${sourceDir}${file}`, `${targetDir}${file}` );
                   }
-                } );
+                }
+
                 console.log( `Done copying files for ${simulation.name}` );
               }
             }
