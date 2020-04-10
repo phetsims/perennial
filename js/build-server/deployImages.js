@@ -69,6 +69,8 @@ const deployImages = async options => {
               else {
                 const sourceDir = `${repoDir}/build/${brand}/*`;
                 const targetDir = `${constants.HTML_SIMS_DIRECTORY}${simulation.name}/${project.version.string}/`;
+                await execute( 'pwd', [], '.' );
+                await execute( 'ls -ls', [ sourceDir ], '.' );
                 await execute( 'cp', [ '-r', sourceDir, targetDir ], '.' );
               }
             }
