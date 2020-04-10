@@ -2,6 +2,7 @@
 
 const constants = require( './constants' );
 const execute = require( '../common/execute' );
+const fs = require( 'fs' );
 const gitCheckout = require( '../common/gitCheckout' );
 const gitPull = require( '../common/gitPull' );
 const request = require( 'request' );
@@ -27,8 +28,8 @@ const deployImages = async options => {
     // Get all published sims
     request( 'https://phet.colorado.edu/services/metadata/1.2/simulations?format=json&summary&locale=en&type=html', async function ( error, response, body ) {
       if ( error ) {
-        console.error( 'failed to fetch metadata request', e );
-        reject( e );
+        console.error( 'failed to fetch metadata request', error );
+        reject( error );
       }
       else if ( response.statusCode < 200 || response.statusCode > 299 ) {
         console.error( 'Bad Status while fetching metadata', response.statusCode );
@@ -61,7 +62,7 @@ const deployImages = async options => {
 
             // Copy into the document root
             const brands = options.brands ? options.brands.split( ',' ) : [ 'phet' ];
-            for ( brandIndex = 0; brandIndex < brands.length; brandIndex++ ) {
+            for ( let brandIndex = 0; brandIndex < brands.length; brandIndex++ ) {
               const brand = brands[ brandIndex ];
               if ( brand !== 'phet' ) {
                 reject( `Image deploy not implemented for brand: ${brand}` );

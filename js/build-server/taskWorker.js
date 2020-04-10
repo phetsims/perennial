@@ -9,6 +9,8 @@ const createTranslationsXML = require( './createTranslationsXML' );
 const devDeploy = require( './devDeploy' );
 const execute = require( '../common/execute' );
 const fs = require( 'graceful-fs' ); //eslint-disable-line
+const gitCheckout = require( '../common/gitCheckout' );
+const gitPull = require( '../common/gitPull' );
 const getLocales = require( './getLocales' );
 const notifyServer = require( './notifyServer' );
 const pullMaster = require( './pullMaster' );
@@ -81,14 +83,14 @@ async function taskWorker( options ) {
     //-------------------------------------------------------------------------------------
     const api = options.api;
     const repos = options.repos;
-    const locales = options.locales;
+    let locales = options.locales;
     const simName = options.simName;
-    const version = options.version;
+    let version = options.version;
     const email = options.email;
     const brands = options.brands;
     const servers = options.servers;
     const userId = options.userId;
-    const branch = options.branch;
+    let branch = options.branch;
 
     if ( userId ) {
       winston.log( 'info', 'setting userId = ' + userId );
