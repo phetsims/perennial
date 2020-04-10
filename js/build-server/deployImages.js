@@ -67,11 +67,14 @@ const deployImages = async options => {
                 reject( `Image deploy not implemented for brand: ${brand}` );
               }
               else {
-                const sourceDir = `${repoDir}/build/${brand}/*`;
+                const sourceDir = `${repoDir}/build/${brand}/`;
                 const targetDir = `${constants.HTML_SIMS_DIRECTORY}${simulation.name}/${project.version.string}/`;
-                await execute( 'pwd', [], '.' );
-                await execute( 'ls -ls', [ sourceDir ], '.' );
-                await execute( 'cp', [ '-r', sourceDir, targetDir ], '.' );
+                fs.readdirSync( sourceDir ).forEach( file => {
+                  if ( file.endsWith( 'png' ) ) {
+                    fs.copyFileSync( `${sourceDir}${file}`, `${targetDir}${file}` );
+                  }
+                } );
+                console.log( `Done copying files for ${simulation.name}` );
               }
             }
           }
