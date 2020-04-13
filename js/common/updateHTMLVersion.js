@@ -10,7 +10,6 @@
 
 'use strict';
 
-// modules
 const execute = require( './execute' );
 const gitAdd = require( './gitAdd' );
 const gitCommit = require( './gitCommit' );

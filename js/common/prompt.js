@@ -8,7 +8,6 @@
 
 'use strict';
 
-// modules
 const readline = require( 'readline' );
 const winston = require( 'winston' );
 

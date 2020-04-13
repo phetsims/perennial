@@ -19,15 +19,14 @@
 
 'use strict';
 
-// modules
-const _ = require( 'lodash' ); // eslint-disable-line
-const assert = require( 'assert' );
 const buildLocal = require( '../common/buildLocal' );
 const execute = require( '../common/execute' );
 const getActiveRepos = require( '../common/getActiveRepos' );
 const getDependencies = require( '../common/getDependencies' );
+const assert = require( 'assert' );
 const htmlDiffer = require( 'html-differ' ); // eslint-disable-line require-statement-match
 const logger = require( 'html-differ/lib/logger' );
+const _ = require( 'lodash' ); // eslint-disable-line
 const puppeteer = require( 'puppeteer' );
 const winston = require( 'winston' );
 

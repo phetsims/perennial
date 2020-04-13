@@ -8,13 +8,12 @@
 
 'use strict';
 
-// modules
 const gitAdd = require( './gitAdd' );
 const gitCommit = require( './gitCommit' );
 const gitIsClean = require( './gitIsClean' );
 const loadJSON = require( './loadJSON' );
-const winston = require( 'winston' );
 const writeJSON = require( './writeJSON' );
+const winston = require( 'winston' );
 
 /**
  * Sets the version for a current checked-in repo, creating a commit with the change

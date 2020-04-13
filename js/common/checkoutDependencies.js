@@ -8,8 +8,6 @@
 
 'use strict';
 
-// modules
-const _ = require( 'lodash' ); // eslint-disable-line
 const gitCheckout = require( './gitCheckout' );
 const npmUpdate = require( './npmUpdate' );
 const winston = require( 'winston' );

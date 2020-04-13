@@ -8,7 +8,6 @@
 
 'use strict';
 
-// modules
 const execute = require( './execute' );
 const npmCommand = require( './npmCommand' );
 const winston = require( 'winston' );

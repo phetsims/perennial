@@ -8,9 +8,8 @@
 
 'use strict';
 
-// modules
-const assert = require( 'assert' );
 const buildLocal = require( '../common/buildLocal' );
+const assert = require( 'assert' );
 const request = require( 'request' );
 const winston = require( 'winston' );
 

@@ -8,25 +8,24 @@
 
 'use strict';
 
-// modules
-const _ = require( 'lodash' ); // eslint-disable-line
+const SimVersion = require( '../common/SimVersion' );
 const buildLocal = require( '../common/buildLocal' );
 const devDirectoryExists = require( '../common/devDirectoryExists' );
 const devScp = require( '../common/devScp' );
 const devSsh = require( '../common/devSsh' );
-const fs = require( 'fs' );
 const getBranch = require( '../common/getBranch' );
+const getRemoteBranchSHAs = require( '../common/getRemoteBranchSHAs' );
 const gitAdd = require( '../common/gitAdd' );
 const gitCommit = require( '../common/gitCommit' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
-const getRemoteBranchSHAs = require( '../common/getRemoteBranchSHAs' );
 const gitRevParse = require( '../common/gitRevParse' );
-const grunt = require( 'grunt' );
 const loadJSON = require( '../common/loadJSON' );
-const writeJSON = require( '../common/writeJSON' );
-const SimVersion = require( '../common/SimVersion' );
 const vpnCheck = require( '../common/vpnCheck' );
+const writeJSON = require( '../common/writeJSON' );
+const fs = require( 'fs' );
+const grunt = require( 'grunt' );
+const _ = require( 'lodash' ); // eslint-disable-line
 
 /**
  * Deploys a dev version after incrementing the test version number.

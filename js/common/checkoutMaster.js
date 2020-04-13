@@ -8,7 +8,6 @@
 
 'use strict';
 
-// modules
 const getDependencies = require( './getDependencies' );
 const gitCheckout = require( './gitCheckout' );
 const npmUpdate = require( './npmUpdate' );

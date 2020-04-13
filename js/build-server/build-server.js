@@ -10,20 +10,16 @@
 
 'use strict';
 
-// constants
 const constants = require( './constants' );
-
-// modules
-const async = require( 'async' );
-const express = require( 'express' );
 const winston = require( './log.js' ); // eslint-disable-line
-const parseArgs = require( 'minimist' ); // eslint-disable-line
-const _ = require( 'lodash' ); // eslint-disable-line
-
-// functions
 const logRequest = require( './logRequest' );
 const sendEmail = require( './sendEmail' );
 const taskWorker = require( './taskWorker' );
+const async = require( 'async' );
+const bodyParser = require( 'body-parser' ); // eslint-disable-line require-statement-match
+const express = require( 'express' );
+const _ = require( 'lodash' ); // eslint-disable-line
+const parseArgs = require( 'minimist' ); // eslint-disable-line
 
 // set this process up with the appropriate permissions, value is in octal
 process.umask( parseInt( '0002', 8 ) );
@@ -210,7 +206,6 @@ function queueDeploy( api, repos, simName, version, locales, brands, servers, em
 const app = express();
 
 // to support JSON-encoded bodies
-const bodyParser = require( 'body-parser' ); // eslint-disable-line require-statement-match
 app.use( bodyParser.json() );
 
 // add the route to build and deploy

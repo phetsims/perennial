@@ -8,8 +8,7 @@
 
 'use strict';
 
-// modules
-const _ = require( 'lodash' ); // eslint-disable-line
+const SimVersion = require( '../common/SimVersion' );
 const booleanPrompt = require( '../common/booleanPrompt' );
 const buildLocal = require( '../common/buildLocal' );
 const copyFile = require( '../common/copyFile' );
@@ -19,15 +18,14 @@ const devSsh = require( '../common/devSsh' );
 const execute = require( '../common/execute' );
 const getBranch = require( '../common/getBranch' );
 const getRepoVersion = require( '../common/getRepoVersion' );
-const gitIsClean = require( '../common/gitIsClean' );
 const gitAdd = require( '../common/gitAdd' );
 const gitCommit = require( '../common/gitCommit' );
+const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
-const grunt = require( 'grunt' );
 const gruntCommand = require( '../common/gruntCommand' );
 const npmUpdate = require( '../common/npmUpdate' );
 const setRepoVersion = require( '../common/setRepoVersion' );
-const SimVersion = require( '../common/SimVersion' );
+const grunt = require( 'grunt' );
 
 /**
  * Deploys a phet-io wrapper (incrementing the version number)

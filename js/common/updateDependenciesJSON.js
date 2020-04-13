@@ -8,7 +8,6 @@
 
 'use strict';
 
-// modules
 const ChipperVersion = require( '../common/ChipperVersion' );
 const copyFile = require( './copyFile' );
 const gitAdd = require( './gitAdd' );

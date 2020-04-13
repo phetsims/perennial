@@ -8,10 +8,9 @@
 
 'use strict';
 
-// modules
-const _ = require( 'lodash' ); // eslint-disable-line
 const buildLocal = require( './buildLocal' );
 const Octokit = require( '@octokit/rest' ); // eslint-disable-line
+const _ = require( 'lodash' ); // eslint-disable-line
 const winston = require( 'winston' );
 
 /**

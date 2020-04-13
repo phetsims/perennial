@@ -18,10 +18,7 @@
 
 'use strict';
 
-// modules
-const assert = require( 'assert' );
 const execute = require( '../common/execute' );
-const fs = require( 'fs' );
 const getActiveRepos = require( '../common/getActiveRepos' );
 const getBranch = require( '../common/getBranch' );
 const gitAdd = require( '../common/gitAdd' );
@@ -29,6 +26,8 @@ const gitCommit = require( '../common/gitCommit' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPull = require( '../common/gitPull' );
 const gitPush = require( '../common/gitPush' );
+const assert = require( 'assert' );
+const fs = require( 'fs' );
 const grunt = require( 'grunt' );
 const os = require( 'os' );
 const winston = require( 'winston' );

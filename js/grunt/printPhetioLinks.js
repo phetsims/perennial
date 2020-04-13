@@ -10,9 +10,8 @@
 
 'use strict';
 
-// modules
-const gitCheckout = require( '../common/gitCheckout' );
 const getDependencies = require( '../common/getDependencies' );
+const gitCheckout = require( '../common/gitCheckout' );
 const gitIsAncestor = require( '../common/gitIsAncestor' );
 const simPhetioMetadata = require( '../common/simPhetioMetadata' );
 

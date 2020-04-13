@@ -8,7 +8,6 @@
 
 'use strict';
 
-// modules
 const SimVersion = require( '../common/SimVersion' );
 const booleanPrompt = require( '../common/booleanPrompt' );
 const build = require( '../common/build' );

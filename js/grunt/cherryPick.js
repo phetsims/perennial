@@ -8,7 +8,6 @@
 
 'use strict';
 
-// modules
 const gitCherryPick = require( '../common/gitCherryPick' );
 const grunt = require( 'grunt' );
 

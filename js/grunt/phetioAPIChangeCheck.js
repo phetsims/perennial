@@ -15,12 +15,11 @@
 
 'use strict';
 
-// modules
-const _ = require( 'lodash' ); // eslint-disable-line
-const assert = require( 'assert' );
 const booleanPrompt = require( '../common/booleanPrompt' );
 const buildLocal = require( '../common/buildLocal' );
+const assert = require( 'assert' );
 const grunt = require( 'grunt' );
+const _ = require( 'lodash' ); // eslint-disable-line
 const request = require( 'request-promise-native' ); //eslint-disable-line
 
 /**

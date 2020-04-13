@@ -8,8 +8,7 @@
 
 'use strict';
 
-// modules
-const _ = require( 'lodash' ); // eslint-disable-line
+const SimVersion = require( '../common/SimVersion' );
 const booleanPrompt = require( '../common/booleanPrompt' );
 const build = require( '../common/build' );
 const buildServerRequest = require( '../common/buildServerRequest' );
@@ -22,16 +21,16 @@ const gitAdd = require( '../common/gitAdd' );
 const gitCommit = require( '../common/gitCommit' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
-const grunt = require( 'grunt' );
 const gruntCommand = require( '../common/gruntCommand' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
-const phetioAPIChangeCheck = require( './phetioAPIChangeCheck' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 const simMetadata = require( '../common/simMetadata' );
-const SimVersion = require( '../common/SimVersion' );
 const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
 const vpnCheck = require( '../common/vpnCheck' );
+const phetioAPIChangeCheck = require( './phetioAPIChangeCheck' );
+const grunt = require( 'grunt' );
+const _ = require( 'lodash' ); // eslint-disable-line
 
 /**
  * Deploys a production version after incrementing the test version number.

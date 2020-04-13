@@ -8,9 +8,8 @@
 
 'use strict';
 
-// modules
-const gitCheckout = require( './gitCheckout' );
 const getDependencies = require( './getDependencies' );
+const gitCheckout = require( './gitCheckout' );
 const gitIsAncestor = require( './gitIsAncestor' );
 const winston = require( 'winston' );
 
