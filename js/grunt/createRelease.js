@@ -9,7 +9,7 @@
 'use strict';
 
 // modules
-const assert = require( 'assert' );
+const SimVersion = require( '../common/SimVersion' );
 const build = require( '../common/build' );
 const copyFile = require( '../common/copyFile' );
 const getBranch = require( '../common/getBranch' );
@@ -19,11 +19,12 @@ const gitCommit = require( '../common/gitCommit' );
 const gitCreateBranch = require( '../common/gitCreateBranch' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
-const grunt = require( 'grunt' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
 const setRepoVersion = require( '../common/setRepoVersion' );
-const SimVersion = require( '../common/SimVersion' );
+const updateHTMLVersion = require( '../common/updateHTMLVersion' );
+const assert = require( 'assert' );
+const grunt = require( 'grunt' );
 const winston = require( 'winston' );
 
 /**
@@ -85,6 +86,7 @@ module.exports = async function( repo, branch, message ) {
     testType: 'dev',
     testNumber: 0
   } ), message );
+  await updateHTMLVersion( repo );
   await gitPush( repo, 'master' );
 
   // Go back to the branch (as they may want to do a deploy)
