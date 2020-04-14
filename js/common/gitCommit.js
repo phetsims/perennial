@@ -23,5 +23,5 @@ const winston = require( 'winston' );
 module.exports = function( repo, message ) {
   winston.info( `git commit on ${repo} with message:\n${message}` );
 
-  return execute( 'git', [ 'commit', '-m', message ], `../${repo}` );
+  return execute( 'git', [ 'commit', '--no-verify', '-m', message ], `../${repo}` );
 };
