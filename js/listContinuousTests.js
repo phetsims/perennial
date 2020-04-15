@@ -23,6 +23,7 @@ const interactiveDescriptionRepos = getRepoList( 'interactive-descriptions' );
  * {Array.<string>} test
  * {string} type
  * {string} [url]
+ * {string} [repo]
  * {string} [queryParameters]
  * {boolean} [es5]
  * {string} [brand]
@@ -40,7 +41,8 @@ const tests = [];
   tests.push( {
     test: [ repo, 'build', 'phet' ],
     type: 'build',
-    brand: 'phet'
+    brand: 'phet',
+    repo: repo
   } );
 } );
 
@@ -49,7 +51,8 @@ phetioRepos.forEach( repo => {
   tests.push( {
     test: [ repo, 'build', 'phet-io' ],
     type: 'build',
-    brand: 'phet-io'
+    brand: 'phet-io',
+    repo: repo
   } );
 } );
 
@@ -58,7 +61,8 @@ repos.forEach( repo => {
   if ( fs.existsSync( `../${repo}/Gruntfile.js` ) ) {
     tests.push( {
       test: [ repo, 'lint' ],
-      type: 'lint'
+      type: 'lint',
+      repo: repo
     } );
   }
 } );
