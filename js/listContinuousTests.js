@@ -41,17 +41,7 @@ const tests = [];
   tests.push( {
     test: [ repo, 'build', 'phet' ],
     type: 'build',
-    brand: 'phet',
-    repo: repo
-  } );
-} );
-
-// phet-io brand builds
-phetioRepos.forEach( repo => {
-  tests.push( {
-    test: [ repo, 'build', 'phet-io' ],
-    type: 'build',
-    brand: 'phet-io',
+    brands: phetioRepos.includes( repo ) ? [ 'phet', 'phet-io' ] : [ 'phet' ],
     repo: repo
   } );
 } );
