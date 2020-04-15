@@ -39,7 +39,7 @@ const tests = [];
   'dot'
 ].forEach( repo => {
   tests.push( {
-    test: [ repo, 'build', 'phet' ],
+    test: [ repo, 'build' ],
     type: 'build',
     brands: phetioRepos.includes( repo ) ? [ 'phet', 'phet-io' ] : [ 'phet' ],
     repo: repo
