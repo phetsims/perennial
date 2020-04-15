@@ -8,38 +8,37 @@
 
 'use strict';
 
-
-// grunt tasks
-const assert = require( 'assert' );
-require( './checkNodeVersion' );
+const Maintenance = require( '../common/Maintenance' );
 const checkoutDependencies = require( '../common/checkoutDependencies' );
 const checkoutMaster = require( '../common/checkoutMaster' );
-const checkoutMasterAll = require( './checkoutMasterAll' );
 const checkoutRelease = require( '../common/checkoutRelease' );
 const checkoutTarget = require( '../common/checkoutTarget' );
 const checkoutTimestamp = require( '../common/checkoutTimestamp' );
+const cloneMissingRepos = require( '../common/cloneMissingRepos' );
+const execute = require( '../common/execute' );
+const getBranch = require( '../common/getBranch' );
+const getDataFile = require( '../common/getDataFile' );
+const gruntCommand = require( '../common/gruntCommand' );
+const npmUpdate = require( '../common/npmUpdate' );
+const simMetadata = require( '../common/simMetadata' );
+const updateGithubPages = require( '../common/updateGithubPages' );
+const checkoutMasterAll = require( './checkoutMasterAll' );
 const cherryPick = require( './cherryPick' );
 const createOneOff = require( './createOneOff' );
 const createRelease = require( './createRelease' );
 const createSim = require( './createSim' );
 const deployDecaf = require( './deployDecaf' );
 const dev = require( './dev' );
-const execute = require( '../common/execute' );
 const generateData = require( './generateData' );
-const getBranch = require( '../common/getBranch' );
-const getDataFile = require( '../common/getDataFile' );
-const gruntCommand = require( '../common/gruntCommand' );
 const lintEverythingDaemon = require( './lintEverythingDaemon' );
-const Maintenance = require( '../common/Maintenance' );
-const npmUpdate = require( '../common/npmUpdate' );
 const printPhetioLinks = require( './printPhetioLinks' );
 const production = require( './production' );
 const rc = require( './rc' );
 const shaCheck = require( './shaCheck' );
-const simMetadata = require( '../common/simMetadata' );
-const updateGithubPages = require( '../common/updateGithubPages' );
-const winston = require( 'winston' );
 const wrapper = require( './wrapper' );
+const assert = require( 'assert' );
+const winston = require( 'winston' );
+require( './checkNodeVersion' );
 
 module.exports = function( grunt ) {
 
@@ -382,6 +381,10 @@ module.exports = function( grunt ) {
 
   grunt.registerTask( 'generate-data', '[NOTE: Runs automatically on bayes. DO NOT run locally] Generates the lists under perennial/data/, and if there were changes, will commit and push.', wrapTask( async () => {
     await generateData( grunt );
+  } ) );
+
+  grunt.registerTask( 'clone-missing-repos', 'Clones missing repos', wrapTask( async () => {
+    await cloneMissingRepos();
   } ) );
 
   grunt.registerTask( 'maintenance', 'Starts a maintenance REPL', wrapTask( async () => {

@@ -8,17 +8,24 @@
 
 'use strict';
 
-const execute = require( './execute' );
+const cloneRepo = require( './cloneRepo' );
+const getMissingRepos = require( './getMissingRepos' );
 const winston = require( 'winston' );
 
 /**
  * Clones missing repositories
  * @public
  *
- * @returns {Promise} - Resolves with no value
+ * @returns {Promise.<string>} - The names of the repos cloned
  */
 module.exports = async () => {
   winston.info( 'Cloning missing repos' );
 
-  return execute( 'bash', [ 'perennial/bin/clone-missing-repos.sh' ], '../' );
+  const missingRepos = getMissingRepos();
+
+  for ( const repo of missingRepos ) {
+    await cloneRepo( repo );
+  }
+
+  return missingRepos;
 };
