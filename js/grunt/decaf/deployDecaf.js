@@ -45,9 +45,7 @@ module.exports = async function( project, dev, production, username ) {
 
 // like  project.flavor.moving-man.mainclass=edu.colorado.phet.movingman.MovingManApplication
 
-  const flavors = javaProperties.split( '\n' ).filter( line => line.startsWith( 'project.flavor' ) ).map( line => {
-    return line.split( '.' )[ 2 ];
-  } );
+  const flavors = javaProperties.split( '\n' ).filter( line => line.startsWith( 'project.flavor' ) ).map( line => line.split( '.' )[ 2 ] );
   console.log( flavors.join( '\n' ) );
 
   if ( !( await vpnCheck() ) ) {

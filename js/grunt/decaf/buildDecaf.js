@@ -57,7 +57,16 @@ module.exports = async function( project ) {
   await execute( '/Applications/cheerpj/cheerpjfy.py', [ allJar ] );
   console.log( 'cheerpjed' );
 
-  const url = `http://localhost/main/decaf/html?project=${project}`;
+  const javaProperties = fs.readFileSync( `/Users/samreid/phet-svn-trunk-2020/simulations-java/simulations/${project}/${project}-build.properties`, 'utf-8' );
+  const flavors = javaProperties.split( '\n' ).filter( line => line.startsWith( 'project.flavor' ) ).map( line => line.split( '.' )[ 2 ] );
+  let url = '';
+  if ( flavors.length === 0 ) {
+    url = `http://localhost/main/decaf/html?project=${project}`;
+  }
+  else {
+    url = `http://localhost/main/decaf/html?project=${project}&simulation=${flavors[ 0 ]}`;
+  }
+
   console.log( `awaiting preloads via puppeteer at url = ${url}` );
   const preloadResources = await getPreloads( url );
   console.log( 'We have the preloads!\n' + preloadResources );
@@ -90,6 +99,7 @@ module.exports = async function( project ) {
 
   const decafSHA = await gitRevParse( 'decaf', 'HEAD' );
   const chipperSHA = await gitRevParse( 'chipper', 'HEAD' );
+  const perennialSHA = await gitRevParse( 'perennial', 'HEAD' );
 
   const svnInfo = await execute( 'svn', [ 'info' ], '/Users/samreid/phet-svn-trunk-2020' );
 
@@ -98,10 +108,19 @@ module.exports = async function( project ) {
     decaf: decafSHA,
     notes: 'The decaf sha is from before the version commit.',
     chipper: chipperSHA,
+    perennial: perennialSHA,
     svnInfo: svnInfo
   };
   console.log( dependencies );
   await writeJSON( `${buildDir}/dependencies.json`, dependencies );
 
-  console.log( `build and ready for local testing: http://localhost/main/decaf/projects/${project}/build/${project}.html` );
+  if ( flavors.length === 0 ) {
+    console.log( `build and ready for local testing: http://localhost/main/decaf/projects/${project}/build/${project}.html` );
+  }
+  else {
+    console.log( 'build and ready for local testing:' );
+    flavors.forEach( flavor => {
+      console.log( `build and ready for local testing: http://localhost/main/decaf/projects/${project}/build/${project}.html?simulation=${flavor}` );
+    } );
+  }
 };
