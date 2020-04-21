@@ -29,6 +29,7 @@ const _ = require( 'lodash' ); // eslint-disable-line
  * @param {string} project
  * @param {boolean} dev
  * @param {boolean} production
+ * @param {string} username
  * @returns {Promise}
  */
 module.exports = async function( project, dev, production, username ) {
@@ -106,8 +107,13 @@ module.exports = async function( project, dev, production, username ) {
 mkdir ${project}
 cd ${project}
 scp -r ${username}@bayes.colorado.edu:/data/web/htdocs/dev/decaf/${project}/${version} .
+
+sudo chmod g+w *
+printf "RewriteEngine on\\nRewriteBase /sims/cheerpj/${project}/\\nRewriteRule ^latest(.*) ${version}\\$1\\nHeader set Access-Control-Allow-Origin \\"*\\"\\n" > .htaccess
+
 cd ${version}
-sudo chmod g+w *`;
+sudo chmod g+w *
+`;
     console.log( 'SERVER SCRIPT TO PROMOTE DEV VERSION TO PRODUCTION VERSION' );
     console.log( template );
   }
