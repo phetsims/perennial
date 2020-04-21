@@ -111,22 +111,29 @@ module.exports = async function( project, dev, production, username ) {
     await devScp( `../decaf/projects/${project}/build/splash.gif`, `${versionPath}/` );
     await devScp( `../decaf/projects/${project}/build/style.css`, `${versionPath}/` );
     await devScp( `../decaf/projects/${project}/build/dependencies.json`, `${versionPath}/` );
+    await devScp( `../decaf/projects/${project}/build/locales.txt`, `${versionPath}/` );
+    await devScp( `../decaf/projects/${project}/build/simulations.txt`, `${versionPath}/` );
 
     const versionURL = `https://phet-dev.colorado.edu/decaf/${project}/${versionString}`;
+    console.log( 'DEPLOYED' );
     flavors.forEach( flavor => {
-      grunt.log.writeln( `Deployed: ${versionURL}/${project}.html?simulation=${flavor}` );
+      const url = `${versionURL}/${project}.html?simulation=${flavor}`;
+      grunt.log.writeln( url );
+      fs.appendFileSync( '/Users/samreid/apache-document-root/main/decaf/build/log.txt', url );
     } );
 
-    if (flavors.length===0){
-      grunt.log.writeln( `Deployed: ${versionURL}/${project}.html` );
+    if ( flavors.length === 0 ) {
+      const URL = `${versionURL}/${project}.html`;
+      grunt.log.writeln( URL );
+      fs.appendFileSync( '/Users/samreid/apache-document-root/main/decaf/build/log.txt', URL );
     }
   }
 
   console.log( 'FLAVORS' );
-  console.log( flavors.join( '\n' ) );
+  console.log( flavors.join( ', ' ) );
 
   console.log( 'LOCALES' );
-  console.log( locales.join( '\n' ) );
+  console.log( locales.join( ', ' ) );
 
   if ( production ) {
     // await devSsh( `mkdir -p "/data/web/static/phetsims/sims/cheerpj/${project}"` );

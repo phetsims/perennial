@@ -94,6 +94,13 @@ module.exports = async function( project ) {
 
   fs.writeFileSync( `${buildDir}/${project}.html`, html );
 
+  const stringFiles = fs.readdirSync( `/Users/samreid/phet-svn-trunk-2020/simulations-java/simulations/${project}/data/${project}/localization` );
+  const locales = stringFiles.filter( stringFile => stringFile.indexOf( '_' ) >= 0 ).map( file => file.substring( file.indexOf( '_' ) + 1, file.lastIndexOf( '.' ) ) );
+  console.log( locales.join( '\n' ) );
+
+  fs.writeFileSync( `${buildDir}/locales.txt`, locales.join( '\n' ) );
+  fs.writeFileSync( `${buildDir}/simulations.txt`, flavors.join( '\n' ) );
+
   await copyFile( '../decaf/html/style.css', `${buildDir}/style.css` );
   await copyFile( '../decaf/html/splash.gif', `${buildDir}/splash.gif` );
 
