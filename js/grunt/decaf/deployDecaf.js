@@ -131,7 +131,7 @@ module.exports = async function( project, dev, production, username ) {
     const template = `cd /data/web/static/phetsims/sims/cheerpj/
 mkdir ${project}
 cd ${project}
-scp -r ${username}@bayes.colorado.edu:/data/web/htdocs/dev/decaf/${project}/${version} .
+scp -r bayes.colorado.edu:/data/web/htdocs/dev/decaf/${project}/${version} .
 
 sudo chmod g+w *
 printf "RewriteEngine on\\nRewriteBase /sims/cheerpj/${project}/\\nRewriteRule ^latest(.*) ${version}\\$1\\nHeader set Access-Control-Allow-Origin \\"*\\"\\n" > .htaccess
