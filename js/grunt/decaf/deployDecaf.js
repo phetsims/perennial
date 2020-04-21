@@ -21,6 +21,7 @@ const loadJSON = require( '../../common/loadJSON' );
 const vpnCheck = require( '../../common/vpnCheck' );
 const grunt = require( 'grunt' );
 const _ = require( 'lodash' ); // eslint-disable-line
+const fs = require( 'fs' );
 
 /**
  * Deploys a dev version after incrementing the test version number.
@@ -33,6 +34,22 @@ const _ = require( 'lodash' ); // eslint-disable-line
  * @returns {Promise}
  */
 module.exports = async function( project, dev, production, username ) {
+
+  const stringFiles = fs.readdirSync( `/Users/samreid/phet-svn-trunk-2020/simulations-java/simulations/${project}/data/${project}/localization` );
+  const locales = stringFiles.filter( stringFile => stringFile.indexOf( '_' ) >= 0 ).map( file => file.substring( file.indexOf( '_' ) + 1, file.lastIndexOf( '.' ) ) );
+  console.log( locales.join( '\n' ) );
+
+  // Output the flavors and locales
+  const javaProperties = fs.readFileSync( `/Users/samreid/phet-svn-trunk-2020/simulations-java/simulations/${project}/${project}-build.properties`, 'utf-8' );
+  // console.log(javaProperties);
+
+// like  project.flavor.moving-man.mainclass=edu.colorado.phet.movingman.MovingManApplication
+
+  const flavors = javaProperties.split( '\n' ).filter( line => line.startsWith( 'project.flavor' ) ).map( line => {
+    return line.split( '.' )[ 2 ];
+  } );
+  console.log( flavors.join( '\n' ) );
+
   if ( !( await vpnCheck() ) ) {
     grunt.fail.fatal( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server.int.colorado.edu' );
   }
@@ -98,8 +115,16 @@ module.exports = async function( project, dev, production, username ) {
     await devScp( `../decaf/projects/${project}/build/dependencies.json`, `${versionPath}/` );
 
     const versionURL = `https://phet-dev.colorado.edu/decaf/${project}/${versionString}`;
-    grunt.log.writeln( `Deployed: ${versionURL}/${project}.html` );
+    flavors.forEach( flavor => {
+      grunt.log.writeln( `Deployed: ${versionURL}/${project}.html?simulation=${flavor}` );
+    } );
   }
+
+  console.log( 'FLAVORS' );
+  console.log( flavors.join( '\n' ) );
+
+  console.log( 'LOCALES' );
+  console.log( locales.join( '\n' ) );
 
   if ( production ) {
     // await devSsh( `mkdir -p "/data/web/static/phetsims/sims/cheerpj/${project}"` );
