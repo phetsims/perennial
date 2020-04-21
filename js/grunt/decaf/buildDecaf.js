@@ -42,6 +42,14 @@ module.exports = async function( project ) {
   );
   console.log( 'Java build complete' );
 
+  const buildDir = `../decaf/projects/${project}/build/`;
+  try {
+    fs.mkdirSync( buildDir );
+  }
+  catch( e ) {
+    console.log( 'perhaps the build directory exists' );
+  }
+
   const allJar = `/Users/samreid/apache-document-root/main/decaf/projects/${project}/build/${project}_all.jar`;
   await copyFile( `${TRUNK}/simulations-java/simulations/${project}/deploy/${project}_all.jar`, allJar );
   console.log( 'copied' );
@@ -74,13 +82,7 @@ module.exports = async function( project ) {
   html = html.split( '{{VERSION}}' ).join( versionString );
   html = html.split( '{{IS_BUILT}}' ).join( 'true' );
   html = html.split( '\'{{PRELOAD_RESOURCES}}\'' ).join( preloadResources );
-  const buildDir = `../decaf/projects/${project}/build/`;
-  try {
-    fs.mkdirSync( buildDir );
-  }
-  catch( e ) {
-    console.log( 'perhaps the build directory exists' );
-  }
+
   fs.writeFileSync( `${buildDir}/${project}.html`, html );
 
   await copyFile( '../decaf/html/style.css', `${buildDir}/style.css` );
