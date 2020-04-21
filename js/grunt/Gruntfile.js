@@ -347,7 +347,8 @@ module.exports = function( grunt ) {
     '--project : The name of the project to deploy',
     wrapTask( async () => {
       assert( grunt.option( 'project' ), 'Requires specifying a repository with --project={{PROJECT}}' );
-      await deployDecaf( grunt.option( 'project' ));
+      assert( grunt.option( 'dev' ) || grunt.option( 'production' ), 'Requires at least one of --dev or --production' );
+      await deployDecaf( grunt.option( 'project' ), !!grunt.option( 'dev' ), !!grunt.option( 'production' ), grunt.option( 'username' ) );
     } ) );
 
   grunt.registerTask( 'build-decaf',

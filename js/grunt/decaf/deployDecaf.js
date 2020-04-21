@@ -27,9 +27,11 @@ const _ = require( 'lodash' ); // eslint-disable-line
  * @public
  *
  * @param {string} project
+ * @param {boolean} dev
+ * @param {boolean} production
  * @returns {Promise}
  */
-module.exports = async function( project ) {
+module.exports = async function( project, dev, production, username ) {
   if ( !( await vpnCheck() ) ) {
     grunt.fail.fatal( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server.int.colorado.edu' );
   }
@@ -58,48 +60,55 @@ module.exports = async function( project ) {
   }
 
   const versionString = version.toString();
-  const simPath = buildLocal.decafDeployPath + project;
-  const versionPath = simPath + '/' + versionString;
 
-  const simPathExists = await devDirectoryExists( simPath );
-  const versionPathExists = await devDirectoryExists( versionPath );
-
-  if ( versionPathExists ) {
-    grunt.fail.fatal( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
-  }
 
   // await gitAdd( 'decaf', packageFileRelative );
   // await gitCommit( 'decaf', `Bumping version to ${version.toString()}` );
   // await gitPush( 'decaf', 'master' );
 
   // Create (and fix permissions for) the main simulation directory, if it didn't already exist
-  if ( !simPathExists ) {
-    await devSsh( `mkdir -p "${simPath}" && echo "IndexOrderDefault Descending Date\n" > "${simPath}/.htaccess"` );
+  if ( dev ) {
+
+    const simPath = buildLocal.decafDeployPath + project;
+    const versionPath = simPath + '/' + versionString;
+
+    const simPathExists = await devDirectoryExists( simPath );
+    const versionPathExists = await devDirectoryExists( versionPath );
+
+    if ( versionPathExists ) {
+      grunt.fail.fatal( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
+    }
+
+    if ( !simPathExists ) {
+      await devSsh( `mkdir -p "${simPath}" && echo "IndexOrderDefault Descending Date\n" > "${simPath}/.htaccess"` );
+    }
+
+    // Create the version-specific directory
+    await devSsh( `mkdir -p "${versionPath}"` );
+
+    // Copy the build contents into the version-specific directory
+    console.log( `../decaf/projects/${project}` );
+    console.log( `${versionPath}/` );
+    await devScp( `../decaf/projects/${project}/build/${project}_all.jar`, `${versionPath}/` );
+    await devScp( `../decaf/projects/${project}/build/${project}_all.jar.js`, `${versionPath}/` );
+    await devScp( `../decaf/projects/${project}/build/${project}.html`, `${versionPath}/` );
+    await devScp( `../decaf/projects/${project}/build/splash.gif`, `${versionPath}/` );
+    await devScp( `../decaf/projects/${project}/build/style.css`, `${versionPath}/` );
+    await devScp( `../decaf/projects/${project}/build/dependencies.json`, `${versionPath}/` );
+
+    const versionURL = `https://phet-dev.colorado.edu/decaf/${project}/${versionString}`;
+    grunt.log.writeln( `Deployed: ${versionURL}/${project}.html` );
   }
 
-  // Create the version-specific directory
-  await devSsh( `mkdir -p "${versionPath}"` );
-
-  // Copy the build contents into the version-specific directory
-  console.log( `../decaf/projects/${project}` );
-  console.log( `${versionPath}/` );
-  await devScp( `../decaf/projects/${project}/build/${project}_all.jar`, `${versionPath}/` );
-  await devScp( `../decaf/projects/${project}/build/${project}_all.jar.js`, `${versionPath}/` );
-  await devScp( `../decaf/projects/${project}/build/${project}.html`, `${versionPath}/` );
-  await devScp( `../decaf/projects/${project}/build/splash.gif`, `${versionPath}/` );
-  await devScp( `../decaf/projects/${project}/build/style.css`, `${versionPath}/` );
-  //
-  // // If there is a protected directory and we are copying to the dev server, include the .htaccess file
-  // // This is for PhET-iO simulations, to protected the password protected wrappers, see
-  // // https://github.com/phetsims/phet-io/issues/641
-  // if ( brands.includes( 'phet-io' ) && buildLocal.devDeployServer === 'bayes.colorado.edu' ) {
-  //   const htaccessLocation = `../${project}/build/phet-io/`;
-  //   await writePhetioHtaccess( htaccessLocation, null, versionPath );
-  // }
-  //
-  // // Move over dependencies.json and commit/push
-  // await updateDependenciesJSON( project, brands, versionString, branch );
-  //
-  const versionURL = `https://phet-dev.colorado.edu/decaf/${project}/${versionString}`;
-  grunt.log.writeln( `Deployed: ${versionURL}/${project}.html` );
+  if ( production ) {
+    // await devSsh( `mkdir -p "/data/web/static/phetsims/sims/cheerpj/${project}"` );
+    const template = `cd /data/web/static/phetsims/sims/cheerpj/
+mkdir ${project}
+cd ${project}
+scp -r ${username}@bayes.colorado.edu:/data/web/htdocs/dev/decaf/${project}/${version} .
+cd ${version}
+sudo chmod g+w *`;
+    console.log( 'SERVER SCRIPT TO PROMOTE DEV VERSION TO PRODUCTION VERSION' );
+    console.log( template );
+  }
 };
