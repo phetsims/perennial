@@ -101,5 +101,5 @@ module.exports = async function( project ) {
   console.log( dependencies );
   await writeJSON( `${buildDir}/dependencies.json`, dependencies );
 
-  console.log( `build and ready for local testing: http://localhost/main/decaf/projects/${project}/build/${project}.html?testLocalBuild=true` );
+  console.log( `build and ready for local testing: http://localhost/main/decaf/projects/${project}/build/${project}.html` );
 };
