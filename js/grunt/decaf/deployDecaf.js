@@ -119,13 +119,13 @@ module.exports = async function( project, dev, production, username ) {
     flavors.forEach( flavor => {
       const url = `${versionURL}/${project}.html?simulation=${flavor}`;
       grunt.log.writeln( url );
-      fs.appendFileSync( '/Users/samreid/apache-document-root/main/decaf/build/log.txt', url );
+      fs.appendFileSync( '/Users/samreid/apache-document-root/main/decaf/build/log.txt', url+'\n' );
     } );
 
     if ( flavors.length === 0 ) {
       const URL = `${versionURL}/${project}.html`;
       grunt.log.writeln( URL );
-      fs.appendFileSync( '/Users/samreid/apache-document-root/main/decaf/build/log.txt', URL );
+      fs.appendFileSync( '/Users/samreid/apache-document-root/main/decaf/build/log.txt', URL+'\n' );
     }
   }
 
