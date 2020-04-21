@@ -8,22 +8,21 @@
 
 'use strict';
 
-const SimVersion = require( '../common/SimVersion' );
-const buildLocal = require( '../common/buildLocal' );
-const devDirectoryExists = require( '../common/devDirectoryExists' );
-const devScp = require( '../common/devScp' );
-const devSsh = require( '../common/devSsh' );
-const getBranch = require( '../common/getBranch' );
-const getRemoteBranchSHAs = require( '../common/getRemoteBranchSHAs' );
-const gitAdd = require( '../common/gitAdd' );
-const gitCommit = require( '../common/gitCommit' );
-const gitIsClean = require( '../common/gitIsClean' );
-const gitPush = require( '../common/gitPush' );
-const gitRevParse = require( '../common/gitRevParse' );
-const loadJSON = require( '../common/loadJSON' );
-const vpnCheck = require( '../common/vpnCheck' );
-const writeJSON = require( '../common/writeJSON' );
-const fs = require( 'fs' );
+const SimVersion = require( '../../common/SimVersion' );
+const buildLocal = require( '../../common/buildLocal' );
+const devDirectoryExists = require( '../../common/devDirectoryExists' );
+const devScp = require( '../../common/devScp' );
+const devSsh = require( '../../common/devSsh' );
+const getBranch = require( '../../common/getBranch' );
+const getRemoteBranchSHAs = require( '../../common/getRemoteBranchSHAs' );
+const gitAdd = require( '../../common/gitAdd' );
+const gitCommit = require( '../../common/gitCommit' );
+const gitIsClean = require( '../../common/gitIsClean' );
+const gitPush = require( '../../common/gitPush' );
+const gitRevParse = require( '../../common/gitRevParse' );
+const loadJSON = require( '../../common/loadJSON' );
+const vpnCheck = require( '../../common/vpnCheck' );
+const writeJSON = require( '../../common/writeJSON' );
 const grunt = require( 'grunt' );
 const _ = require( 'lodash' ); // eslint-disable-line
 
@@ -34,7 +33,7 @@ const _ = require( 'lodash' ); // eslint-disable-line
  * @param {string} project
  * @returns {Promise}
  */
-module.exports = async function( project, preloadResources ) {
+module.exports = async function( project ) {
   if ( !( await vpnCheck() ) ) {
     grunt.fail.fatal( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server.int.colorado.edu' );
   }
@@ -47,7 +46,7 @@ module.exports = async function( project, preloadResources ) {
   const packageFileRelative = `projects/${project}/package.json`;
   const packageFile = `../decaf/${packageFileRelative}`;
   const packageObject = await loadJSON( packageFile );
-  const previousVersion = SimVersion.parse( packageObject.version );
+  const version = SimVersion.parse( packageObject.version );
 
   const isClean = await gitIsClean( 'decaf' );
   if ( !isClean ) {
@@ -62,22 +61,9 @@ module.exports = async function( project, preloadResources ) {
     grunt.fail.fatal( `Out of date with remote, please push or pull repo. Current SHA: ${currentSHA}, latest SHA: ${latestSHA}` );
   }
 
-  // Bump the version
-  const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, {
-    testType: 'dev',
-    testNumber: previousVersion.testNumber + 1
-  } );
-
   const versionString = version.toString();
   const simPath = buildLocal.decafDeployPath + project;
   const versionPath = simPath + '/' + versionString;
-
-  let html = fs.readFileSync( '../decaf/html/index.html', 'utf-8' );
-  html = html.split( '{{PROJECT}}' ).join( project );
-  html = html.split( '{{VERSION}}' ).join( versionString );
-  html = html.split( '{{IS_BUILT}}' ).join( 'true' );
-  html = html.split( '\'{{PRELOAD_RESOURCES}}\'' ).join( preloadResources );
-  fs.writeFileSync( '../decaf/build/index.html', html );
 
   const simPathExists = await devDirectoryExists( simPath );
   const versionPathExists = await devDirectoryExists( versionPath );
@@ -86,22 +72,11 @@ module.exports = async function( project, preloadResources ) {
     grunt.fail.fatal( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
   }
 
-  // if ( !await booleanPrompt( `Deploy ${versionString} to ${buildLocal.devDeployServer}`, false ) ) {
-  //   grunt.fail.fatal( 'Aborted deploy' );
-  // }
-
   packageObject.version = version.toString();
   await writeJSON( packageFile, packageObject );
   await gitAdd( 'decaf', packageFileRelative );
   await gitCommit( 'decaf', `Bumping version to ${version.toString()}` );
   await gitPush( 'decaf', 'master' );
-
-  // TODO: do we need a build step?
-  // grunt.log.writeln( await build( project, {
-  //   brands: brands,
-  //   allHTML: true,
-  //   debugHTML: true
-  // } ) );
 
   // Create (and fix permissions for) the main simulation directory, if it didn't already exist
   if ( !simPathExists ) {
@@ -111,8 +86,7 @@ module.exports = async function( project, preloadResources ) {
   // Create the version-specific directory
   await devSsh( `mkdir -p "${versionPath}"` );
 
-  //
-  // // Copy the build contents into the version-specific directory
+  // Copy the build contents into the version-specific directory
   console.log( `../decaf/projects/${project}` );
   console.log( `${versionPath}/` );
   await devScp( `../decaf/projects/${project}/${project}_all.jar`, `${versionPath}/` );

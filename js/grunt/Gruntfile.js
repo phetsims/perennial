@@ -27,7 +27,8 @@ const cherryPick = require( './cherryPick' );
 const createOneOff = require( './createOneOff' );
 const createRelease = require( './createRelease' );
 const createSim = require( './createSim' );
-const deployDecaf = require( './deployDecaf' );
+const deployDecaf = require( './decaf/deployDecaf' );
+const buildDecaf = require( './decaf/buildDecaf' );
 const dev = require( './dev' );
 const generateData = require( './generateData' );
 const lintEverythingDaemon = require( './lintEverythingDaemon' );
@@ -348,6 +349,14 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'project' ), 'Requires specifying a repository with --project={{PROJECT}}' );
       assert( grunt.option( 'preloadResources' ), 'Requires specifying preloadResources with --preloadResources={{PRELOAD_RESOURCES}}' );
       await deployDecaf( grunt.option( 'project' ), grunt.option( 'preloadResources' ) );
+    } ) );
+
+  grunt.registerTask( 'build-decaf',
+    'Builds a decaf version of the simulation\n' +
+    '--project : The name of the project to deploy',
+    wrapTask( async () => {
+      assert( grunt.option( 'project' ), 'Requires specifying a repository with --project={{PROJECT}}' );
+      await buildDecaf( grunt.option( 'project' ), grunt.option( 'preloadResources' ) );
     } ) );
 
   grunt.registerTask( 'create-sim',
