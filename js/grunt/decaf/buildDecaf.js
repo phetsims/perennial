@@ -94,6 +94,7 @@ module.exports = async function( project ) {
   const dependencies = {
     version: versionString,
     decaf: decafSHA,
+    notes: 'The decaf sha is from before the version commit.',
     chipper: chipperSHA,
     svnInfo: svnInfo
   };

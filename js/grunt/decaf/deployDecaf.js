@@ -15,14 +15,10 @@ const devScp = require( '../../common/devScp' );
 const devSsh = require( '../../common/devSsh' );
 const getBranch = require( '../../common/getBranch' );
 const getRemoteBranchSHAs = require( '../../common/getRemoteBranchSHAs' );
-const gitAdd = require( '../../common/gitAdd' );
-const gitCommit = require( '../../common/gitCommit' );
 const gitIsClean = require( '../../common/gitIsClean' );
-const gitPush = require( '../../common/gitPush' );
 const gitRevParse = require( '../../common/gitRevParse' );
 const loadJSON = require( '../../common/loadJSON' );
 const vpnCheck = require( '../../common/vpnCheck' );
-const writeJSON = require( '../../common/writeJSON' );
 const grunt = require( 'grunt' );
 const _ = require( 'lodash' ); // eslint-disable-line
 
@@ -72,11 +68,9 @@ module.exports = async function( project ) {
     grunt.fail.fatal( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
   }
 
-  packageObject.version = version.toString();
-  await writeJSON( packageFile, packageObject );
-  await gitAdd( 'decaf', packageFileRelative );
-  await gitCommit( 'decaf', `Bumping version to ${version.toString()}` );
-  await gitPush( 'decaf', 'master' );
+  // await gitAdd( 'decaf', packageFileRelative );
+  // await gitCommit( 'decaf', `Bumping version to ${version.toString()}` );
+  // await gitPush( 'decaf', 'master' );
 
   // Create (and fix permissions for) the main simulation directory, if it didn't already exist
   if ( !simPathExists ) {
@@ -89,12 +83,11 @@ module.exports = async function( project ) {
   // Copy the build contents into the version-specific directory
   console.log( `../decaf/projects/${project}` );
   console.log( `${versionPath}/` );
-  await devScp( `../decaf/projects/${project}/${project}_all.jar`, `${versionPath}/` );
-  // await devScp( `../decaf/projects/${project}/${project}_all_pack.jar`, `${versionPath}/` );
-  await devScp( `../decaf/projects/${project}/${project}_all.jar.js`, `${versionPath}/` );
-  await devScp( '../decaf/build/index.html', `${versionPath}/` );
-  await devScp( '../decaf/html/splash.gif', `${versionPath}/` );
-  await devScp( '../decaf/html/style.css', `${versionPath}/` );
+  await devScp( `../decaf/projects/${project}/build/${project}_all.jar`, `${versionPath}/` );
+  await devScp( `../decaf/projects/${project}/build/${project}_all.jar.js`, `${versionPath}/` );
+  await devScp( `../decaf/projects/${project}/build/${project}.html`, `${versionPath}/` );
+  await devScp( `../decaf/projects/${project}/build/splash.gif`, `${versionPath}/` );
+  await devScp( `../decaf/projects/${project}/build/style.css`, `${versionPath}/` );
   //
   // // If there is a protected directory and we are copying to the dev server, include the .htaccess file
   // // This is for PhET-iO simulations, to protected the password protected wrappers, see
@@ -108,5 +101,5 @@ module.exports = async function( project ) {
   // await updateDependenciesJSON( project, brands, versionString, branch );
   //
   const versionURL = `https://phet-dev.colorado.edu/decaf/${project}/${versionString}`;
-  grunt.log.writeln( `Deployed: ${versionURL}/index.html` );
+  grunt.log.writeln( `Deployed: ${versionURL}/${project}.html` );
 };

@@ -347,8 +347,7 @@ module.exports = function( grunt ) {
     '--project : The name of the project to deploy',
     wrapTask( async () => {
       assert( grunt.option( 'project' ), 'Requires specifying a repository with --project={{PROJECT}}' );
-      assert( grunt.option( 'preloadResources' ), 'Requires specifying preloadResources with --preloadResources={{PRELOAD_RESOURCES}}' );
-      await deployDecaf( grunt.option( 'project' ), grunt.option( 'preloadResources' ) );
+      await deployDecaf( grunt.option( 'project' ));
     } ) );
 
   grunt.registerTask( 'build-decaf',
