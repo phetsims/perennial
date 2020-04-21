@@ -118,6 +118,10 @@ module.exports = async function( project, dev, production, username ) {
     flavors.forEach( flavor => {
       grunt.log.writeln( `Deployed: ${versionURL}/${project}.html?simulation=${flavor}` );
     } );
+
+    if (flavors.length===0){
+      grunt.log.writeln( `Deployed: ${versionURL}/${project}.html` );
+    }
   }
 
   console.log( 'FLAVORS' );
