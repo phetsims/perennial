@@ -18,6 +18,7 @@ const phetioRepos = getRepoList( 'testable-phet-io' );
 const phetioReposValidated = getRepoList( 'testable-phet-io-validated' );
 const runnableRepos = getRepoList( 'testable-runnables' );
 const interactiveDescriptionRepos = getRepoList( 'interactive-descriptions' );
+const phetioNoState = getRepoList( 'phet-io-state-unsupported' );
 
 /**
  * {Array.<string>} test
@@ -117,7 +118,8 @@ phetioRepos.forEach( repo => {
     url: `studio/?sim=${repo}&phetioDebug&fuzz&postMessageToParent`
   } );
 
-  tests.push( {
+  // only test state on phet-io sims that support it
+  phetioNoState.indexOf( repo ) === -1 && tests.push( {
     test: [ repo, 'phet-io-state-fuzz', 'require.js' ],
     type: 'sim-test',
     url: `phet-io-wrappers/state/?sim=${repo}&phetioDebug&fuzz&postMessageToParent`
@@ -255,8 +257,7 @@ phetioRepos.forEach( repo => {
   },
   {
     repo: 'kite',
-    urls: [
-    ]
+    urls: []
   },
   {
     repo: 'scenery',
