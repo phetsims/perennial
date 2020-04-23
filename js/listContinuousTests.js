@@ -34,6 +34,12 @@ const phetioNoState = getRepoList( 'phet-io-state-unsupported' );
  */
 const tests = [];
 
+tests.push( {
+  test: [ 'perennial', 'lint-everything' ],
+  type: 'lint-everything',
+  priority: 100
+} );
+
 // phet brand builds
 [
   ...runnableRepos,
