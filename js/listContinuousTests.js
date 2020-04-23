@@ -28,6 +28,7 @@ const phetioNoState = getRepoList( 'phet-io-state-unsupported' );
  * {string} [queryParameters]
  * {boolean} [es5]
  * {string} [brand]
+ * {number} [priority]
  * {Array.<string>} buildDependencies
  */
 const tests = [];
@@ -43,7 +44,8 @@ const tests = [];
     test: [ repo, 'build' ],
     type: 'build',
     brands: phetioRepos.includes( repo ) ? [ 'phet', 'phet-io' ] : [ 'phet' ],
-    repo: repo
+    repo: repo,
+    priority: 1
   } );
 } );
 
@@ -53,12 +55,11 @@ repos.forEach( repo => {
     tests.push( {
       test: [ repo, 'lint' ],
       type: 'lint',
-      repo: repo
+      repo: repo,
+      priority: 5
     } );
   }
 } );
-
-// 'sim-test.html?url=' + encodeURIComponent( '../../' + snapshotName + '/' + runnableRepo + '/' + runnableRepo + '_en.html' ) + '&simQueryParameters=' + encodeURIComponent( 'brand=phet&ea&fuzz&stringTest=xss&memoryLimit=1000' )
 
 runnableRepos.forEach( repo => {
   tests.push( {
@@ -72,7 +73,8 @@ runnableRepos.forEach( repo => {
     test: [ repo, 'xss-fuzz' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzz&stringTest=xss&memoryLimit=1000'
+    queryParameters: 'brand=phet&ea&fuzz&stringTest=xss&memoryLimit=1000',
+    priority: 0.3
   } );
 
   tests.push( {
@@ -80,6 +82,10 @@ runnableRepos.forEach( repo => {
     type: 'sim-test',
     url: `${repo}/build/phet/${repo}_en_phet.html`,
     queryParameters: 'fuzz&memoryLimit=1000',
+
+    // We want to elevate the priority so that we get a more even balance (we can't test these until they are built,
+    // which doesn't happen always)
+    priority: 2,
 
     brand: 'phet',
     buildDependencies: [ repo ],
@@ -240,7 +246,8 @@ phetioRepos.forEach( repo => {
     tests.push( {
       test: [ repo, 'pageload', '/' + pageloadRelativeURL ],
       type: 'pageload-test',
-      url: repo + '/' + pageloadRelativeURL
+      url: repo + '/' + pageloadRelativeURL,
+      priority: 4 // Fast to test, so test them more
     } );
   } );
 } );
@@ -287,6 +294,7 @@ phetioRepos.forEach( repo => {
       test: [ repo, 'pageload', '/' + pageloadRelativeURL ],
       type: 'pageload-test',
       url: repo + '/' + pageloadRelativeURL,
+      priority: 5, // When these are built, it should be really quick to test
 
       brand: 'phet',
       buildDependencies: [ repo ],
