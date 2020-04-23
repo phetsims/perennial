@@ -57,7 +57,7 @@ repos.forEach( repo => {
       test: [ repo, 'lint' ],
       type: 'lint',
       repo: repo,
-      priority: 5
+      priority: 8
     } );
   }
 } );
