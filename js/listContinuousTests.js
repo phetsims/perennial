@@ -26,6 +26,7 @@ const phetioNoState = getRepoList( 'phet-io-state-unsupported' );
  * {string} [url]
  * {string} [repo]
  * {string} [queryParameters]
+ * {string} [testQueryParameters]
  * {boolean} [es5]
  * {string} [brand]
  * {number} [priority]
@@ -74,6 +75,7 @@ runnableRepos.forEach( repo => {
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
     queryParameters: 'brand=phet&ea&fuzz&stringTest=xss&memoryLimit=1000',
+    testQueryParameters: 'duration=40000',
     priority: 0.3
   } );
 
@@ -82,6 +84,7 @@ runnableRepos.forEach( repo => {
     type: 'sim-test',
     url: `${repo}/build/phet/${repo}_en_phet.html`,
     queryParameters: 'fuzz&memoryLimit=1000',
+    testQueryParameters: 'duration=80000',
 
     // We want to elevate the priority so that we get a more even balance (we can't test these until they are built,
     // which doesn't happen always)
@@ -98,6 +101,7 @@ runnableRepos.forEach( repo => {
       type: 'sim-test',
       url: `${repo}/build/phet-io/${repo}_all_phet-io.html`,
       queryParameters: 'fuzz&memoryLimit=1000&phetioStandalone',
+      testQueryParameters: 'duration=80000',
 
       brand: 'phet-io',
       buildDependencies: [ repo ],
@@ -144,14 +148,16 @@ interactiveDescriptionRepos.forEach( repo => {
     test: [ repo, 'interactive-description-fuzz', 'require.js' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzz&supportsDescriptions&memoryLimit=1000'
+    queryParameters: 'brand=phet&ea&fuzz&supportsDescriptions&memoryLimit=1000',
+    testQueryParameters: 'duration=40000'
   } );
 
   tests.push( {
     test: [ repo, 'interactive-description-fuzzBoard', 'require.js' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzzBoard&supportsDescriptions&memoryLimit=1000'
+    queryParameters: 'brand=phet&ea&fuzzBoard&supportsDescriptions&memoryLimit=1000',
+    testQueryParameters: 'duration=40000'
   } );
 
   tests.push( {
@@ -159,6 +165,7 @@ interactiveDescriptionRepos.forEach( repo => {
     type: 'sim-test',
     url: `${repo}/build/phet/${repo}_en_phet.html`,
     queryParameters: 'fuzz&supportsDescriptions&memoryLimit=1000',
+    testQueryParameters: 'duration=40000',
 
     brand: 'phet',
     buildDependencies: [ repo ],
@@ -170,6 +177,7 @@ interactiveDescriptionRepos.forEach( repo => {
     type: 'sim-test',
     url: `${repo}/build/phet/${repo}_en_phet.html`,
     queryParameters: 'fuzzBoard&supportsDescriptions&memoryLimit=1000',
+    testQueryParameters: 'duration=40000',
 
     brand: 'phet',
     buildDependencies: [ repo ],
