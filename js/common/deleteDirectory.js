@@ -8,7 +8,7 @@
 
 'use strict';
 
-const rimraf = require( 'rimraf' );
+const execute = require( './execute' );
 const winston = require( 'winston' );
 
 /**
@@ -21,14 +21,5 @@ const winston = require( 'winston' );
 module.exports = function( path ) {
   winston.info( `Deleting directory ${path}` );
 
-  return new Promise( ( resolve, reject ) => {
-    rimraf( path, err => {
-      if ( err ) {
-        reject( `rimraf: ${err}` );
-      }
-      else {
-        resolve();
-      }
-    } );
-  } );
+  return execute( 'rm', [ '-Rf', path ], '../' );
 };
