@@ -130,21 +130,24 @@ phetioRepos.forEach( repo => {
   // fuzz test important wrappers
   tests.push( {
     test: [ repo, 'phet-io-studio-fuzz', 'require.js' ],
-    type: 'sim-test',
-    url: `studio/?sim=${repo}&phetioDebug&fuzz&postMessageToParent`
+    type: 'wrapper-test',
+    url: `studio/?sim=${repo}&phetioDebug&fuzz`,
+    testQueryParameters: 'duration=60000'
   } );
 
   // only test state on phet-io sims that support it
   phetioNoState.indexOf( repo ) === -1 && tests.push( {
     test: [ repo, 'phet-io-state-fuzz', 'require.js' ],
-    type: 'sim-test',
-    url: `phet-io-wrappers/state/?sim=${repo}&phetioDebug&fuzz&postMessageToParent`
+    type: 'wrapper-test',
+    url: `phet-io-wrappers/state/?sim=${repo}&phetioDebug&fuzz`,
+    testQueryParameters: 'duration=60000'
   } );
 
   tests.push( {
     test: [ repo, 'phet-io-mirror-inputs-fuzz', 'require.js' ],
-    type: 'sim-test',
-    url: `phet-io-wrappers/mirror-inputs/?sim=${repo}&phetioDebug&fuzz&postMessageToParent`
+    type: 'wrapper-test',
+    url: `phet-io-wrappers/mirror-inputs/?sim=${repo}&phetioDebug&fuzz`,
+    testQueryParameters: 'duration=60000'
   } );
 } );
 
