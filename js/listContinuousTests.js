@@ -19,6 +19,7 @@ const phetioReposValidated = getRepoList( 'testable-phet-io-validated' );
 const runnableRepos = getRepoList( 'testable-runnables' );
 const interactiveDescriptionRepos = getRepoList( 'interactive-descriptions' );
 const phetioNoState = getRepoList( 'phet-io-state-unsupported' );
+const unitTestRepos = getRepoList( 'unit-tests' );
 
 /**
  * {Array.<string>} test
@@ -196,37 +197,31 @@ interactiveDescriptionRepos.forEach( repo => {
 
 // phet-io wrappers tests for each PhET-iO Sim
 phetioRepos.forEach( repo => {
-  tests.push( {
-    test: [ repo, 'phet-io-wrappers-tests', 'no-assert' ],
-    type: 'qunit-test',
-    url: 'phet-io-wrappers/phet-io-wrappers-tests.html?sim=' + repo
-  } );
-
-  tests.push( {
-    test: [ repo, 'phet-io-wrappers-tests', 'assert' ],
-    type: 'qunit-test',
-    url: 'phet-io-wrappers/phet-io-wrappers-tests.html?sim=' + repo + '&phetioDebug'
+  [ false, true ].forEach( useAssert => {
+    tests.push( {
+      test: [ repo, 'phet-io-wrappers-tests', useAssert ? 'assert' : 'no-assert' ],
+      type: 'qunit-test',
+      url: 'phet-io-wrappers/phet-io-wrappers-tests.html?sim=' + repo + ( useAssert ? '&phetioDebug' : '' )
+    } );
   } );
 } );
 
 // repo-specific Unit tests (require.js mode) from `grunt generate-test-harness`
-[ 'axon', 'balloons-and-static-electricity', 'circuit-construction-kit-common', 'dot', 'kite', 'phetcommon', 'phet-core', 'query-string-machine', 'scenery', 'tandem' ].forEach( repo => {
+unitTestRepos.forEach( repo => {
+  // Skip phet-io-wrappers unit tests here, we run it with multiple repos above
+  if ( repo === 'phet-io-wrappers' ) {
+    return;
+  }
   // All tests should work with no query parameters, with assertions enables and also in phet-io brand
   [ '', '?ea', '?brand=phet-io', '?ea&brand=phet-io' ].forEach( queryString => {
+    if ( repo === 'phet-io' && !queryString.includes( 'phet-io' ) ) {
+      return;
+    }
     tests.push( {
       test: [ repo, 'top-level-unit-tests', 'require.js' + queryString ],
       type: 'qunit-test',
       url: repo + '/' + repo + '-tests.html' + queryString
     } );
-  } );
-} );
-
-// phet-io unit tests
-[ '?brand=phet-io', '?ea&brand=phet-io' ].forEach( queryString => {
-  tests.push( {
-    test: [ 'phet-io', 'top-level-unit-tests', 'require.js' + queryString ],
-    type: 'qunit-test',
-    url: 'phet-io/phet-io-tests.html' + queryString
   } );
 } );
 
