@@ -71,7 +71,7 @@ repos.forEach( repo => {
 
 runnableRepos.forEach( repo => {
   tests.push( {
-    test: [ repo, 'fuzz', 'require.js' ],
+    test: [ repo, 'fuzz', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
     queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000'
@@ -122,7 +122,7 @@ phetioRepos.forEach( repo => {
   const validatedParam = validated ? '&phetioValidateTandems' : '';
 
   tests.push( {
-    test: [ repo, 'phet-io-fuzz', 'require.js' ],
+    test: [ repo, 'phet-io-fuzz', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
     queryParameters: 'brand=phet-io&phetioStandalone&ea' + validatedParam + '&fuzz&memoryLimit=1000'
@@ -130,7 +130,7 @@ phetioRepos.forEach( repo => {
 
   // fuzz test important wrappers
   tests.push( {
-    test: [ repo, 'phet-io-studio-fuzz', 'require.js' ],
+    test: [ repo, 'phet-io-studio-fuzz', 'unbuilt' ],
     type: 'wrapper-test',
     url: `studio/?sim=${repo}&phetioDebug&fuzz`,
     testQueryParameters: 'duration=60000'
@@ -138,14 +138,14 @@ phetioRepos.forEach( repo => {
 
   // only test state on phet-io sims that support it
   phetioNoState.indexOf( repo ) === -1 && tests.push( {
-    test: [ repo, 'phet-io-state-fuzz', 'require.js' ],
+    test: [ repo, 'phet-io-state-fuzz', 'unbuilt' ],
     type: 'wrapper-test',
     url: `phet-io-wrappers/state/?sim=${repo}&phetioDebug&fuzz`,
     testQueryParameters: 'duration=60000'
   } );
 
   tests.push( {
-    test: [ repo, 'phet-io-mirror-inputs-fuzz', 'require.js' ],
+    test: [ repo, 'phet-io-mirror-inputs-fuzz', 'unbuilt' ],
     type: 'wrapper-test',
     url: `phet-io-wrappers/mirror-inputs/?sim=${repo}&phetioDebug&fuzz`,
     testQueryParameters: 'duration=60000'
@@ -155,7 +155,7 @@ phetioRepos.forEach( repo => {
 // accessible tests
 interactiveDescriptionRepos.forEach( repo => {
   tests.push( {
-    test: [ repo, 'interactive-description-fuzz', 'require.js' ],
+    test: [ repo, 'interactive-description-fuzz', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
     queryParameters: 'brand=phet&ea&fuzz&supportsDescriptions&memoryLimit=1000',
@@ -163,7 +163,7 @@ interactiveDescriptionRepos.forEach( repo => {
   } );
 
   tests.push( {
-    test: [ repo, 'interactive-description-fuzzBoard', 'require.js' ],
+    test: [ repo, 'interactive-description-fuzzBoard', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
     queryParameters: 'brand=phet&ea&fuzzBoard&supportsDescriptions&memoryLimit=1000',
@@ -206,7 +206,7 @@ phetioRepos.forEach( repo => {
   } );
 } );
 
-// repo-specific Unit tests (require.js mode) from `grunt generate-test-harness`
+// repo-specific Unit tests (unbuilt mode) from `grunt generate-test-harness`
 unitTestRepos.forEach( repo => {
   // Skip phet-io-wrappers unit tests here, we run it with multiple repos above
   if ( repo === 'phet-io-wrappers' ) {
@@ -218,7 +218,7 @@ unitTestRepos.forEach( repo => {
       return;
     }
     tests.push( {
-      test: [ repo, 'top-level-unit-tests', 'require.js' + queryString ],
+      test: [ repo, 'top-level-unit-tests', 'unbuilt' + queryString ],
       type: 'qunit-test',
       url: repo + '/' + repo + '-tests.html' + queryString
     } );
