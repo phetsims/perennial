@@ -315,4 +315,40 @@ unitTestRepos.forEach( repo => {
   } );
 } );
 
+//----------------------------------------------------------------------------------------------------------------------
+// Sim-specific query parameter tests
+//----------------------------------------------------------------------------------------------------------------------
+
+// beers-law-lab
+tests.push( {
+  test: [ 'beers-law-lab', 'fuzz', 'unbuilt', 'query-parameters' ],
+  type: 'sim-test',
+  url: 'beers-law-lab/beers-law-lab_en.html',
+  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&showSoluteAmount&concentrationMeterUnits=percent&beakerUnits=milliliters'
+} );
+
+// gas-properties
+tests.push( {
+  test: [ 'gas-properties', 'fuzz', 'unbuilt', 'query-parameters' ],
+  type: 'sim-test',
+  url: 'gas-properties/gas-properties_en.html',
+  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&pressureNoise=false'
+} );
+
+// natural-selection
+tests.push( {
+  test: [ 'natural-selection', 'fuzz', 'unbuilt', 'secondsPerGeneration' ],
+  type: 'sim-test',
+  url: 'natural-selection/natural-selection_en.html',
+  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&secondsPerGeneration=1'
+} );
+
+// ph-scale
+tests.push( {
+  test: [ 'ph-scale', 'autofill-fuzz', 'unbuilt', 'query-parameters' ],
+  type: 'sim-test',
+  url: 'ph-scale/ph-scale_en.html',
+  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&autoFill=false'
+} );
+
 console.log( JSON.stringify( tests, null, 2 ) );
