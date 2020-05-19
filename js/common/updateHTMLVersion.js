@@ -42,5 +42,7 @@ module.exports = async function( repo ) {
     await execute( gruntCommand, [ 'generate-test-html' ], `../${repo}` );
     await gitAdd( repo, `${repo}-tests.html` );
   }
-  await gitCommit( repo, `Bumping dev${packageObject.phet.generatedUnitTests ? '/test' : ''} HTML with new version` );
+  if ( !gitIsClean( repo ) ) {
+    await gitCommit( repo, `Bumping dev${packageObject.phet.generatedUnitTests ? '/test' : ''} HTML with new version` );
+  }
 };

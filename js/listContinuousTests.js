@@ -336,6 +336,15 @@ tests.push( {
 } );
 
 // natural-selection
+
+tests.push( {
+  test: [ 'natural-selection', 'fuzz', 'unbuilt', 'query-parameters' ],
+  type: 'sim-test',
+  url: 'natural-selection/natural-selection_en.html',
+  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&allelesVisible=false&introMutations=F&introPopulation=10Ff&labMutations=FeT&labPopulation=2FFeett,2ffEEtt,2ffeeTT'
+} );
+
+// To have one test where the generation clock is running faster, and more things are liable to happen
 tests.push( {
   test: [ 'natural-selection', 'fuzz', 'unbuilt', 'secondsPerGeneration' ],
   type: 'sim-test',
