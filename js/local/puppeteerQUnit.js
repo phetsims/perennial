@@ -82,7 +82,10 @@ module.exports = function( browser, targetURL ) {
     } );
 
     try {
-      await page.goto( targetURL );
+      if ( targetURL.indexOf( '?' ) === -1 ) {
+        throw new Error( 'URL should have query parameters' );
+      }
+      await page.goto( `${targetURL}&qunitHooks` );
 
       await page.evaluate( () => {
         QUnit.config.testTimeout = 10000;
@@ -93,6 +96,9 @@ module.exports = function( browser, targetURL ) {
         QUnit.testDone( context => window.harness_testDone( context ) );
         QUnit.log( context => window.harness_log( context ) );
         QUnit.done( context => window.harness_done( context ) );
+
+        // Launch the qunit tests now that listeners are wired up
+        window.qunitLaunchAfterHooks();
       } );
     }
     catch( e ) {
