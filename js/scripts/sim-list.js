@@ -11,10 +11,8 @@
 
 'use strict';
 
-// modules
 const simMetadata = require( '../common/simMetadata' );
 const winston = require( 'winston' );
-
 
 winston.default.transports.console.level = 'error';
 simMetadata( {

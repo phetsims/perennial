@@ -8,8 +8,7 @@
 
 'use strict';
 
-// modules
-const fs = require( 'fs' );
+const getRepoList = require( './getRepoList' );
 
 /**
  * Returns a list of simulation repositories actively handled by tooling for PhET
@@ -18,8 +17,5 @@ const fs = require( 'fs' );
  * @returns {Array.<string>}
  */
 module.exports = function() {
-  const contents = fs.readFileSync( '../perennial/data/active-sims', 'utf8' ).trim();
-
-  // Trim will remove any spaces and carriage returns if they are present.
-  return contents.split( '\n' ).map( sim => sim.trim() );
+  return getRepoList( 'active-sims' );
 };

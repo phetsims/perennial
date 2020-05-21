@@ -8,7 +8,6 @@
 
 'use strict';
 
-// modules
 const buildLocal = require( './buildLocal' );
 const scp = require( './scp' );
 

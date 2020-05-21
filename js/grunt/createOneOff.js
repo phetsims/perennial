@@ -8,7 +8,7 @@
 
 'use strict';
 
-// modules
+const SimVersion = require( '../common/SimVersion' );
 const build = require( '../common/build' );
 const copyFile = require( '../common/copyFile' );
 const execute = require( '../common/execute' );
@@ -17,11 +17,10 @@ const gitAdd = require( '../common/gitAdd' );
 const gitCommit = require( '../common/gitCommit' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
-const grunt = require( 'grunt' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
 const setRepoVersion = require( '../common/setRepoVersion' );
-const SimVersion = require( '../common/SimVersion' );
+const grunt = require( 'grunt' );
 
 /**
  * For `grunt create-one-off`, see Gruntfile for details

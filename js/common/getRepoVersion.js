@@ -8,9 +8,8 @@
 
 'use strict';
 
-// modules
-const loadJSON = require( './loadJSON' );
 const SimVersion = require( './SimVersion' );
+const loadJSON = require( './loadJSON' );
 const winston = require( 'winston' );
 
 /**

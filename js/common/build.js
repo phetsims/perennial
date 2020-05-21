@@ -8,11 +8,10 @@
 
 'use strict';
 
-// modules
-const assert = require( 'assert' );
 const ChipperVersion = require( '../common/ChipperVersion' );
 const execute = require( '../common/execute' );
 const gruntCommand = require( '../common/gruntCommand' );
+const assert = require( 'assert' );
 const winston = require( 'winston' );
 
 /**

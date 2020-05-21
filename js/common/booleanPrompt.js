@@ -8,7 +8,6 @@
 
 'use strict';
 
-// modules
 const prompt = require( './prompt' );
 
 /**

@@ -8,7 +8,6 @@
 
 'use strict';
 
-// modules
 const fs = require( 'fs' );
 const winston = require( 'winston' );
 

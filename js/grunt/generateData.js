@@ -3,7 +3,7 @@
 /**
  * Generates the lists under perennial/data/, and if there were changes, will commit and push.
  *
- * Ideally, this grunt taks is never run itself, but instead from `/bin/generate-data.sh` from bayes.colorado.edu
+ * Ideally, this grunt task is never run itself, but instead from `/bin/generate-data.sh` from bayes.colorado.edu
  * under the phet-admin user from /data/share/phet/generate-data/perennial:
  * `pm2 start bin/generate-data.sh`
  *
@@ -18,10 +18,7 @@
 
 'use strict';
 
-// modules
-const assert = require( 'assert' );
 const execute = require( '../common/execute' );
-const fs = require( 'fs' );
 const getActiveRepos = require( '../common/getActiveRepos' );
 const getBranch = require( '../common/getBranch' );
 const gitAdd = require( '../common/gitAdd' );
@@ -29,6 +26,8 @@ const gitCommit = require( '../common/gitCommit' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPull = require( '../common/gitPull' );
 const gitPush = require( '../common/gitPush' );
+const assert = require( 'assert' );
+const fs = require( 'fs' );
 const grunt = require( 'grunt' );
 const os = require( 'os' );
 const winston = require( 'winston' );
@@ -70,7 +69,7 @@ module.exports = async function() {
     fs.writeFileSync( `data/${name}`, repos.join( os.EOL ) + os.EOL );
   }
 
-  writeList( 'accessibility', phet => phet.accessible );
+  writeList( 'interactive-descriptions', phet => phet.supportsInteractiveDescriptions );
   writeList( 'active-runnables', phet => phet.runnable );
   writeList( 'active-sims', phet => phet.simulation );
   writeList( 'unit-tests', phet => phet.generatedUnitTests );
@@ -79,7 +78,7 @@ module.exports = async function() {
   writeList( 'testable-runnables', phet => phet.runnable && phet.automatedTestEnabled !== false );
   writeList( 'testable-phet-io', phet => phet.runnable && phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) && phet.automatedTestEnabled !== false );
 
-  await gitAdd( 'perennial', 'data/accessibility' );
+  await gitAdd( 'perennial', 'data/interactive-descriptions' );
   await gitAdd( 'perennial', 'data/active-runnables' );
   await gitAdd( 'perennial', 'data/active-sims' );
   await gitAdd( 'perennial', 'data/unit-tests' );

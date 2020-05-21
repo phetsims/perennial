@@ -58,6 +58,7 @@ cd ..
 
 cp perennial/js/common/SimVersion.js chipper/js/
 cd chipper || exit
+grunt update-copyright-dates # update SimVersion.js, this will only hit SimVersion.js since everything was updated above.
 git commit -am "Update chipper's SimVersion from daily grunt work"
 git push
 cd ..

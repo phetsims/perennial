@@ -9,8 +9,6 @@
 
 'use strict';
 
-// modules
-const _ = require( 'lodash' ); // eslint-disable-line
 const getDependencies = require( '../common/getDependencies' );
 const gitCheckout = require( '../common/gitCheckout' );
 const gitIsAncestor = require( '../common/gitIsAncestor' );

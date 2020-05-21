@@ -8,10 +8,9 @@
 
 'use strict';
 
-// modules
+const _ = require( 'lodash' ); // eslint-disable-line
 const request = require( 'request' );
 const winston = require( 'winston' );
-const _ = require( 'lodash' ); // eslint-disable-line
 
 /**
  * Returns metadata from the production website.

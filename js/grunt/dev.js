@@ -8,9 +8,7 @@
 
 'use strict';
 
-// modules
-const _ = require( 'lodash' ); // eslint-disable-line
-const assert = require( 'assert' );
+const SimVersion = require( '../common/SimVersion' );
 const booleanPrompt = require( '../common/booleanPrompt' );
 const build = require( '../common/build' );
 const buildLocal = require( '../common/buildLocal' );
@@ -18,19 +16,21 @@ const devDirectoryExists = require( '../common/devDirectoryExists' );
 const devScp = require( '../common/devScp' );
 const devSsh = require( '../common/devSsh' );
 const getBranch = require( '../common/getBranch' );
+const getRemoteBranchSHAs = require( '../common/getRemoteBranchSHAs' );
 const getRepoVersion = require( '../common/getRepoVersion' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
-const getRemoteBranchSHAs = require( '../common/getRemoteBranchSHAs' );
 const gitRevParse = require( '../common/gitRevParse' );
-const grunt = require( 'grunt' );
 const lintAllRunnable = require( '../common/lintAllRunnable' );
 const npmUpdate = require( '../common/npmUpdate' );
 const setRepoVersion = require( '../common/setRepoVersion' );
-const SimVersion = require( '../common/SimVersion' );
 const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
+const updateHTMLVersion = require( '../common/updateHTMLVersion' );
 const vpnCheck = require( '../common/vpnCheck' );
 const writePhetioHtaccess = require( '../common/writePhetioHtaccess' );
+const assert = require( 'assert' );
+const grunt = require( 'grunt' );
+const _ = require( 'lodash' ); // eslint-disable-line
 
 /**
  * Deploys a dev version after incrementing the test version number.
@@ -111,12 +111,13 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
     grunt.fail.fatal( `Aborted ${testType} deploy` );
   }
 
-  await setRepoVersion( repo, version, message );
-  await gitPush( repo, branch );
-
   // Make sure our correct npm dependencies are set
   await npmUpdate( repo );
   await npmUpdate( 'chipper' );
+
+  await setRepoVersion( repo, version, message );
+  await updateHTMLVersion( repo );
+  await gitPush( repo, branch );
 
   grunt.log.writeln( await build( repo, {
     brands: brands,

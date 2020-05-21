@@ -8,39 +8,39 @@
 
 'use strict';
 
-
-// grunt tasks
-const assert = require( 'assert' );
-require( './checkNodeVersion' );
+const Maintenance = require( '../common/Maintenance' );
 const checkoutDependencies = require( '../common/checkoutDependencies' );
 const checkoutMaster = require( '../common/checkoutMaster' );
-const checkoutMasterAll = require( './checkoutMasterAll' );
 const checkoutRelease = require( '../common/checkoutRelease' );
 const checkoutTarget = require( '../common/checkoutTarget' );
 const checkoutTimestamp = require( '../common/checkoutTimestamp' );
+const cloneMissingRepos = require( '../common/cloneMissingRepos' );
+const execute = require( '../common/execute' );
+const getBranch = require( '../common/getBranch' );
+const getDataFile = require( '../common/getDataFile' );
+const gruntCommand = require( '../common/gruntCommand' );
+const npmUpdate = require( '../common/npmUpdate' );
+const simMetadata = require( '../common/simMetadata' );
+const updateGithubPages = require( '../common/updateGithubPages' );
+const checkoutMasterAll = require( './checkoutMasterAll' );
 const cherryPick = require( './cherryPick' );
 const createOneOff = require( './createOneOff' );
 const createRelease = require( './createRelease' );
 const createSim = require( './createSim' );
 const deployImages = require( './deployImages' );
+const deployDecaf = require( './decaf/deployDecaf' );
+const buildDecaf = require( './decaf/buildDecaf' );
 const dev = require( './dev' );
-const execute = require( '../common/execute' );
 const generateData = require( './generateData' );
-const getBranch = require( '../common/getBranch' );
-const getDataFile = require( '../common/getDataFile' );
-const gruntCommand = require( '../common/gruntCommand' );
-const insertRequireStatement = require( './insertRequireStatement' );
-const Maintenance = require( '../common/Maintenance' );
-const npmUpdate = require( '../common/npmUpdate' );
+const lintEverythingDaemon = require( './lintEverythingDaemon' );
 const printPhetioLinks = require( './printPhetioLinks' );
 const production = require( './production' );
 const rc = require( './rc' );
 const shaCheck = require( './shaCheck' );
-const simMetadata = require( '../common/simMetadata' );
-const sortRequireStatements = require( './sortRequireStatements' );
-const updateGithubPages = require( '../common/updateGithubPages' );
-const winston = require( 'winston' );
 const wrapper = require( './wrapper' );
+const assert = require( 'assert' );
+const winston = require( 'winston' );
+require( './checkNodeVersion' );
 
 module.exports = function ( grunt ) {
 
@@ -354,6 +354,23 @@ module.exports = function ( grunt ) {
       await production( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ), noninteractive, grunt.option( 'message' ) );
     } ) );
 
+  grunt.registerTask( 'deploy-decaf',
+    'Deploys a decaf version of the simulation\n' +
+    '--project : The name of the project to deploy',
+    wrapTask( async () => {
+      assert( grunt.option( 'project' ), 'Requires specifying a repository with --project={{PROJECT}}' );
+      assert( grunt.option( 'dev' ) || grunt.option( 'production' ), 'Requires at least one of --dev or --production' );
+      await deployDecaf( grunt.option( 'project' ), !!grunt.option( 'dev' ), !!grunt.option( 'production' ), grunt.option( 'username' ) );
+    } ) );
+
+  grunt.registerTask( 'build-decaf',
+    'Builds a decaf version of the simulation\n' +
+    '--project : The name of the project to deploy',
+    wrapTask( async () => {
+      assert( grunt.option( 'project' ), 'Requires specifying a repository with --project={{PROJECT}}' );
+      await buildDecaf( grunt.option( 'project' ), grunt.option( 'preloadResources' ) );
+    } ) );
+
   grunt.registerTask( 'create-sim',
     'Creates a sim based on the simula-rasa template.\n' +
     '--repo="string" : the repository name\n' +
@@ -372,33 +389,6 @@ module.exports = function ( grunt ) {
       await createSim( repo, author, { title: title, clean: clean } );
     } ) );
 
-  grunt.registerTask( 'sort-require-statements', 'Sort the require statements for a single file (if --file={{FILE}} is provided), or does so for all JS files in a repo (if --repo={{REPO}} is specified)', wrapTask( async () => {
-    const file = grunt.option( 'file' );
-    const repo = grunt.option( 'repo' );
-
-    assert( !( file && repo ), 'Only one of --file and --repo should be specified' );
-    assert( file || repo, 'At least one of --file and --repo should be specified, see documentation' );
-
-    if ( file ) {
-      sortRequireStatements( file );
-    }
-    else {
-      grunt.file.recurse( `../${repo}/js`, absfile => sortRequireStatements( absfile ) );
-    }
-  } ) );
-
-  grunt.registerTask( 'insert-require-statement', 'Insert a require statement into the specified file.\n' +
-                                                  '--file absolute path of the file that will receive the require statement\n' +
-                                                  '--name to be required', wrapTask( async () => {
-    const file = grunt.option( 'file' );
-    const name = grunt.option( 'name' );
-
-    assert( grunt.option( 'file' ), 'Requires specifying a file to update with --file={{FILE}}' );
-    assert( grunt.option( 'name' ), 'Requires specifying an (import) name with --name={{NAME}}' );
-
-    insertRequireStatement( file, name );
-  } ) );
-
   grunt.registerTask( 'lint-everything', 'lint all js files for all repos', wrapTask( async () => {
     // --disable-eslint-cache disables the cache, useful for developing rules
     const cache = !grunt.option( 'disable-eslint-cache' );
@@ -412,6 +402,10 @@ module.exports = function ( grunt ) {
 
   grunt.registerTask( 'generate-data', '[NOTE: Runs automatically on bayes. DO NOT run locally] Generates the lists under perennial/data/, and if there were changes, will commit and push.', wrapTask( async () => {
     await generateData( grunt );
+  } ) );
+
+  grunt.registerTask( 'clone-missing-repos', 'Clones missing repos', wrapTask( async () => {
+    await cloneMissingRepos();
   } ) );
 
   grunt.registerTask( 'maintenance', 'Starts a maintenance REPL', wrapTask( async () => {
@@ -437,4 +431,15 @@ module.exports = function ( grunt ) {
 
     await Maintenance.createPatch( repo, message );
   } ) );
+
+  grunt.registerTask(
+    'lint-everything-daemon',
+    'Triggered by standard input, tracks changes in status and signifies changes via notifications',
+    function() {
+
+      // Prevent grunt from exiting
+      this.async();
+      lintEverythingDaemon();
+    }
+  );
 };

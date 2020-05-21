@@ -8,10 +8,9 @@
 
 'use strict';
 
-// modules
-const assert = require( 'assert' );
 const checkoutTarget = require( './checkoutTarget' );
 const simMetadata = require( './simMetadata' );
+const assert = require( 'assert' );
 const winston = require( 'winston' );
 
 /**

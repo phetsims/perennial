@@ -8,7 +8,6 @@
 
 'use strict';
 
-// modules
 const devSsh = require( './devSsh' );
 
 /**

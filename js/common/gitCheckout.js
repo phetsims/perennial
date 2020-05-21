@@ -8,9 +8,8 @@
 
 'use strict';
 
-// modules
-const assert = require( 'assert' );
 const execute = require( './execute' );
+const assert = require( 'assert' );
 const winston = require( 'winston' );
 
 /**

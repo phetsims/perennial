@@ -8,7 +8,6 @@
 
 'use strict';
 
-// modules
 const child_process = require( 'child_process' );
 const winston = require( 'winston' );
 

@@ -8,9 +8,8 @@
 
 'use strict';
 
-// modules
-const assert = require( 'assert' );
 const execute = require( './execute' );
+const assert = require( 'assert' );
 
 /**
  * Gets the best SHA from a given branch at the given timestamp

@@ -12,7 +12,7 @@ const grunt = require( 'grunt' );
 
 /**
  * NOTE: This is somewhat vestigial, kept to ensure some build-server behavior for now.
- * TODO(chipper1.0): remove this when possible (when all chipper 1.0 usage is not required, since all sims are chipper 2.0+)
+ * TODO(chipper1.0) https://github.com/phetsims/perennial/issues/169 remove this when possible (when all chipper 1.0 usage is not required, since all sims are chipper 2.0+)
  *
  * @param {string} repositoryName name field from package.json
  * @param {boolean} toMaster whether master should be used, or dependencies.json shas should be used

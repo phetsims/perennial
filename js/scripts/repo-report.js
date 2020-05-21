@@ -8,8 +8,7 @@
  *
  * @author Sam Reid (PhET Interactive Simulations)
  *
- * TODO: This is a "quick" version which could benefit from documentation, better command line hygiene, more options, etc.
- * see https://github.com/phetsims/tasks/issues/942
+ * TODO https://github.com/phetsims/tasks/issues/942 This is a "quick" version which could benefit from documentation, better command line hygiene, more options, etc.
  */
 
 'use strict';

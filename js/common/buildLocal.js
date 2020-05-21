@@ -8,7 +8,6 @@
 
 'use strict';
 
-// modules
 const assert = require( 'assert' );
 const fs = require( 'fs' );
 const winston = require( 'winston' );
@@ -57,6 +56,7 @@ module.exports = {
   // Wrappers are now deployed to the dev location (for convenience)
   devDeployServer: buildLocalObject.devDeployServer || 'bayes.colorado.edu',
   devDeployPath: buildLocalObject.devDeployPath || '/data/web/htdocs/dev/html/',
+  decafDeployPath: buildLocalObject.decafDeployPath || '/data/web/htdocs/dev/decaf/',
   buildServerNotifyEmail: buildLocalObject.buildServerNotifyEmail || null,
   productionServerURL: buildLocalObject.productionServerURL || 'https://phet.colorado.edu',
   localTestingURL: buildLocalObject.localTestingURL || null
