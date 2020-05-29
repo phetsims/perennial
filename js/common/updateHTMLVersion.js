@@ -1,7 +1,8 @@
 // Copyright 2020, University of Colorado Boulder
 
 /**
- * Updates the development/test HTML as needed for a change in the version, and creates a commit.
+ * Updates the development/test HTML as needed for a change in the version. Updates are based on the version in the
+ * package.json. This will also commit if an update occurs.
  *
  * See https://github.com/phetsims/chipper/issues/926
  *
