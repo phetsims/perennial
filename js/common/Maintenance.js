@@ -200,6 +200,12 @@ module.exports = ( function() {
       }
     }
 
+    /**
+     * Shows any required testing links for the simulations.
+     * @public
+     *
+     * @param {boolean} [includePatches]
+     */
     static async listLinks( includePatches = false ) {
       const maintenance = Maintenance.load();
 
@@ -579,6 +585,13 @@ module.exports = ( function() {
       } );
     }
 
+    /**
+     * Checks out a specific branch (using local commit data as necessary).
+     * @public
+     *
+     * @param {string} repo
+     * @param {string} branch
+     */
     static async checkoutBranch( repo, branch ) {
       const maintenance = Maintenance.load();
 
@@ -589,6 +602,10 @@ module.exports = ( function() {
       console.log( `Checked out ${repo} ${branch}` );
     }
 
+    /**
+     * Attempts to apply patches to the modified branches that are marked as needed.
+     * @public
+     */
     static async applyPatches() {
       const maintenance = Maintenance.load();
       let numApplied = 0;
@@ -665,6 +682,10 @@ module.exports = ( function() {
       console.log( `${numApplied} patches applied` );
     }
 
+    /**
+     * Pushes local changes up to GitHub.
+     * @public
+     */
     static async updateDependencies() {
       const maintenance = Maintenance.load();
 
@@ -741,6 +762,10 @@ module.exports = ( function() {
       console.log( 'Dependencies updated' );
     }
 
+    /**
+     * Deploys RC versions of the modified branches that need it.
+     * @public
+     */
     static async deployReleaseCandidates() {
       const maintenance = Maintenance.load();
 
@@ -768,6 +793,10 @@ module.exports = ( function() {
       console.log( 'RC versions deployed' );
     }
 
+    /**
+     * Deploys production versions of the modified branches that need it.
+     * @public
+     */
     static async deployProduction() {
       const maintenance = Maintenance.load();
 

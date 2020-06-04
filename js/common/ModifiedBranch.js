@@ -195,6 +195,7 @@ module.exports = ( function() {
 
     /**
      * Returns whether phet-io Studio is being used instead of deprecated instance proxies wrapper.
+     * @public
      *
      * @returns {Promise.<boolean>}
      */
@@ -210,6 +211,7 @@ module.exports = ( function() {
 
     /**
      * Returns whether phet-io Studio top-level (index.html) is used instead of studio.html.
+     * @public
      *
      * @returns {Promise.<boolean>}
      */
@@ -318,6 +320,13 @@ ${additionalNotes ? '\n' + additionalNotes : ''}`
       return results;
     }
 
+    /**
+     * Checks out the modified branch.
+     * @public
+     *
+     * @param {boolean} [includeNpmUpdate]
+     * @returns {Promise.<Array.<string>>} - Names of checked out repositories
+     */
     async checkout( includeNpmUpdate = true ) {
       await gitCheckout( this.repo, this.branch );
       await gitPull( this.repo );
