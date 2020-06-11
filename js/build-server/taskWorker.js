@@ -70,9 +70,12 @@ async function taskWorker( options ) {
       await deployImages( options );
       await gitCheckout( 'chipper', 'master' );
       await gitPull( 'chipper' );
+      winston.info( 'Deploy images completed successfully.' );
       return Promise.resolve();
     }
     catch ( e ) {
+      winston.error( e );
+      winston.error( 'Deploy images failed. See previous logs for details.')
       return Promise.reject( e );
     }
 

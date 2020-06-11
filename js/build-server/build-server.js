@@ -262,4 +262,13 @@ app.post( '/deploy-images', postQueueImageDeploy );
 app.listen( constants.LISTEN_PORT, () => {
   winston.log( 'info', 'Listening on port ' + constants.LISTEN_PORT );
   winston.log( 'info', 'Verbose mode: ' + verbose );
+
+  // log the SHA of perennial - this may make it easier to duplicate and track down problems
+  try {
+    const sha = childProcess.execSync( 'git rev-parse HEAD' );
+    winston.info( 'current SHA: ' + sha.toString() );
+  }
+  catch( err ) {
+    winston.warn( 'unable to get SHA from git, err: ' + err );
+  }
 } );
