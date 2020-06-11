@@ -84,6 +84,8 @@ const deployImages = async options => {
             }
           }
         }
+
+        resolve();
       }
     } );
   } );
