@@ -75,7 +75,7 @@ async function taskWorker( options ) {
     }
     catch ( e ) {
       winston.error( e );
-      winston.error( 'Deploy images failed. See previous logs for details.')
+      winston.error( 'Deploy images failed. See previous logs for details.');
       return Promise.reject( e );
     }
 

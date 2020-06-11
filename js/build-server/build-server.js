@@ -11,6 +11,7 @@
 'use strict';
 
 const constants = require( './constants' );
+const childProcess = require( 'child_process' ); // eslint-disable-line
 const winston = require( './log.js' ); // eslint-disable-line
 const logRequest = require( './logRequest' );
 const sendEmail = require( './sendEmail' );
