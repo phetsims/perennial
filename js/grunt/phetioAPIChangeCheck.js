@@ -8,6 +8,7 @@
  *   supports json api files (so publications after 7/2019)
  *
  * This code assumes that the built sim has already been created in the build directory.
+ * TODO: add back in a usage in production, see https://github.com/phetsims/perennial/issues/181
  *
  * @author Michael Kauzmann (PhET Interactive Simulations)
  * @author Chris Klusendorf (PhET Interactive Simulations)

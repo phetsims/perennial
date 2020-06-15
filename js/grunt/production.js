@@ -177,11 +177,6 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       throw new Error( message );
     };
 
-    // Test that phet-io api changes didn't occur between this production build and the last maintenance release for it.
-    if ( brands.includes( 'phet-io' ) && version.maintenance > 0 ) {
-      await phetioAPIChangeCheck( repo, version, postBuildAbort );
-    }
-
     if ( !await booleanPrompt( `Please test the built version of ${repo}.\nIs it ready to deploy?`, noninteractive ) ) {
       await postBuildAbort( 'Aborted production deployment (aborted version change too).' );
     }
