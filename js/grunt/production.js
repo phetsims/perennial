@@ -28,7 +28,6 @@ const setRepoVersion = require( '../common/setRepoVersion' );
 const simMetadata = require( '../common/simMetadata' );
 const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
 const vpnCheck = require( '../common/vpnCheck' );
-const phetioAPIChangeCheck = require( './phetioAPIChangeCheck' );
 const grunt = require( 'grunt' );
 const _ = require( 'lodash' ); // eslint-disable-line
 
