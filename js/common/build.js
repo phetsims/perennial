@@ -97,7 +97,7 @@ module.exports = async function( repo, options ) {
 
   // Examine output to see if getDependencies (in chipper) notices any missing phet-io things.
   // Fail out if so. Detects that specific error message.
-  if ( result.includes( 'WARNING404' ) ) {
+  if ( brands.includes( 'phet-io' ) && result.includes( 'WARNING404' ) ) {
     throw new Error( 'phet-io dependencies missing' );
   }
 
