@@ -33,7 +33,7 @@ const fs = require( 'fs' );
  * @param {string} username
  * @returns {Promise}
  */
-module.exports = async function( project, dev, production, username ) {
+module.exports = async function ( project, dev, production, username ) {
 
   const stringFiles = fs.readdirSync( `/Users/samreid/phet-svn-trunk-2020/simulations-java/simulations/${project}/data/${project}/localization` );
   const locales = stringFiles.filter( stringFile => stringFile.indexOf( '_' ) >= 0 ).map( file => file.substring( file.indexOf( '_' ) + 1, file.lastIndexOf( '.' ) ) );
@@ -136,6 +136,7 @@ module.exports = async function( project, dev, production, username ) {
   console.log( locales.join( ', ' ) );
 
   if ( production ) {
+    const productionServerURL = buildLocal.productionServerURL || 'https://phet.colorado.edu';
     // await devSsh( `mkdir -p "/data/web/static/phetsims/sims/cheerpj/${project}"` );
     const template = `cd /data/web/static/phetsims/sims/cheerpj/
 mkdir ${project}
@@ -147,6 +148,9 @@ printf "RewriteEngine on\\nRewriteBase /sims/cheerpj/${project}/\\nRewriteRule ^
 
 cd ${version}
 sudo chmod g+w *
+
+token=$(grep serverToken ~/.phet/build-local.json | sed -r 's/ *"serverToken": "(.*)",/\\1/') && \\
+curl -u "token:$\{token}" '${productionServerURL}/services/deployCheerpj?project=${project}&version=${version}&locales=${locales.join( ',' )}
 `;
     console.log( 'SERVER SCRIPT TO PROMOTE DEV VERSION TO PRODUCTION VERSION' );
     console.log( template );
