@@ -14,5 +14,5 @@ cd ${binDir}/../..
 for repo in `${binDir}/print-missing-repos.sh | xargs`
 do
   git clone https://github.com/phetsims/"${repo}".git
-  cd ${repo}; git init --template=../phet-info/git-template-dir
+  ( cd ${repo}; git init --template=../phet-info/git-template-dir )
 done
