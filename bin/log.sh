@@ -1,6 +1,8 @@
 #!/bin/bash
 #=============================================================================================
-# To be used by commit-report.sh only
+# Prints commits for the past 7 days by a specified author.
+# Expects pwd to be a git repository.
+#
 # Author: Sam Reid (PhET Interactive Simulations)
 #=============================================================================================
 
