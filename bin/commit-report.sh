@@ -17,4 +17,4 @@ if [ -z "$1" ]
     exit 1
 fi
 
-${binDir}/for-each.sh active-repos ${binDir}/log.sh $1
+${binDir}/for-each.sh active-repos ${binDir}/commit-log.sh $1
