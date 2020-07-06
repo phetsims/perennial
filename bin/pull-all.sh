@@ -29,11 +29,6 @@ while getopts ":p" opt; do
   esac
 done
 
-# log the current shas in your working copy, which can be restored using restore-shas.sh
-phetDir=${HOME}/.phet/
-mkdir -p ${phetDir}
-${binDir}/print-shas.sh > ${phetDir}/print-shas.out
-
 # pull each repository
 for repo in `cat perennial/data/active-repos | xargs | tr -d '\r'`
 do
