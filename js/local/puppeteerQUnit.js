@@ -88,17 +88,36 @@ module.exports = function( browser, targetURL ) {
       await page.goto( `${targetURL}&qunitHooks` );
 
       await page.evaluate( () => {
-        QUnit.config.testTimeout = 10000;
 
-        // Cannot pass the window.harness_blah methods directly, because they are
-        // automatically defined as async methods, which QUnit does not support
-        QUnit.moduleDone( context => window.harness_moduleDone( context ) );
-        QUnit.testDone( context => window.harness_testDone( context ) );
-        QUnit.log( context => window.harness_log( context ) );
-        QUnit.done( context => window.harness_done( context ) );
+        const launch = () => {
+          QUnit.config.testTimeout = 10000;
 
-        // Launch the qunit tests now that listeners are wired up
-        window.qunitLaunchAfterHooks();
+          // Cannot pass the window.harness_blah methods directly, because they are
+          // automatically defined as async methods, which QUnit does not support
+          QUnit.moduleDone( context => window.harness_moduleDone( context ) );
+          QUnit.testDone( context => window.harness_testDone( context ) );
+          QUnit.log( context => window.harness_log( context ) );
+          QUnit.done( context => window.harness_done( context ) );
+
+          // Launch the qunit tests now that listeners are wired up
+          window.qunitLaunchAfterHooks();
+        };
+
+        // Start right away if the page is ready
+        if ( window.qunitLaunchAfterHooks ) {
+          launch();
+        }
+        else {
+
+          // Polling to wait until the page is ready for launch
+          let id = null;
+          id = setInterval( () => {
+            if ( window.qunitLaunchAfterHooks ) {
+              clearInterval( id );
+              launch();
+            }
+          }, 16 );
+        }
       } );
     }
     catch( e ) {
