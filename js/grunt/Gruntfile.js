@@ -32,7 +32,6 @@ const deployDecaf = require( './decaf/deployDecaf' );
 const buildDecaf = require( './decaf/buildDecaf' );
 const dev = require( './dev' );
 const generateData = require( './generateData' );
-const lintEverythingDaemon = require( './lintEverythingDaemon' );
 const printPhetioLinks = require( './printPhetioLinks' );
 const production = require( './production' );
 const rc = require( './rc' );
@@ -431,15 +430,4 @@ module.exports = function ( grunt ) {
 
     await Maintenance.createPatch( repo, message );
   } ) );
-
-  grunt.registerTask(
-    'lint-everything-daemon',
-    'Triggered by standard input, tracks changes in status and signifies changes via notifications',
-    function() {
-
-      // Prevent grunt from exiting
-      this.async();
-      lintEverythingDaemon();
-    }
-  );
 };
