@@ -26,11 +26,11 @@ cd ..
 
 perennial/bin/clone-missing-repos.sh
 perennial/bin/pull-all.sh -p
+perennial/bin/for-each.sh perennial/data/active-repos "npm prune && npm update"
 
 ###########################################################################################################
 # update-copyright-dates
-cd chipper && npm prune && npm update && cd ..
-copyrightUpdateCommand="npm prune && npm update && grunt update-copyright-dates && git commit -am 'update copyright dates from daily grunt work' && git push"
+copyrightUpdateCommand="grunt update-copyright-dates && git commit -am 'update copyright dates from daily grunt work' && git push"
 perennial/bin/for-each.sh perennial/data/active-repos "${copyrightUpdateCommand}"
 
 ###########################################################################################################
