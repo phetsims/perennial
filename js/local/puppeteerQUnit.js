@@ -20,9 +20,6 @@ module.exports = function( browser, targetURL ) {
     page.on( 'error', msg => end( { ok: false, result: 'error', message: msg } ) );
     page.on( 'pageerror', msg => end( { ok: false, result: 'pageerror', message: msg } ) );
 
-    // Output log
-    // page.on( 'console', msg => console.log( 'PAGE LOG:', msg.text() ) );
-
     const moduleErrors = [];
     let testErrors = [];
     let assertionErrors = [];
@@ -47,16 +44,16 @@ module.exports = function( browser, targetURL ) {
       }
     } );
 
-    await page.exposeFunction( 'harness_log', context => {
-      if ( context.result ) { return; } // If success don't log
+    await page.exposeFunction( 'harness_log', ( passed, message, source ) => {
+      if ( passed ) { return; } // If success don't log
 
       let msg = '\n    Assertion Failed:';
-      if ( context.message ) {
-        msg += ' ' + context.message;
+      if ( message ) {
+        msg += ' ' + message;
       }
 
-      if ( context.expected ) {
-        msg += '\n      Expected: ' + context.expected + ', Actual: ' + context.actual;
+      if ( source ) {
+        msg += '\n\n' + source;
       }
 
       assertionErrors.push( msg );
@@ -96,7 +93,9 @@ module.exports = function( browser, targetURL ) {
           // automatically defined as async methods, which QUnit does not support
           QUnit.moduleDone( context => window.harness_moduleDone( context ) );
           QUnit.testDone( context => window.harness_testDone( context ) );
-          QUnit.log( context => window.harness_log( context ) );
+
+          // This context could contain objects that can't be sent over to harness_log, so just take the parts we need.
+          QUnit.log( context => window.harness_log( context.result, context.message, context.source ) );
           QUnit.done( context => window.harness_done( context ) );
 
           // Launch the qunit tests now that listeners are wired up
