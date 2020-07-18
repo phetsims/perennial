@@ -17,7 +17,19 @@ const simPhetioMetadata = require( '../common/simPhetioMetadata' );
 
 module.exports = async () => {
 
-  // get sim metadata via metadata api
+  // {Array.<Object>} get sim metadata via metadata api, here is an example of what an entry might look like:
+  /*
+  {
+    "versionMaintenance": 12,
+    "name": "molarity",
+    "active": true,
+    "versionMajor": 1,
+    "versionMinor": 4,
+    "versionSuffix": "",
+    "latest": true,
+    "timestamp": "2019-10-25"
+  }
+   */
   const allSimsData = await simPhetioMetadata( {
     active: true,
     latest: true
@@ -83,8 +95,8 @@ const getBranch = simData => {
 
 /**
  * See SimVersion.compareNumber()
- * @param {string} version1
- * @param {string} version2
+ * @param {Object} version1 - value returned by the phet-io metadata client.
+ * @param {Object} version2
  * @returns {number}
  */
 const compareVersionNumber = ( version1, version2 ) => {
