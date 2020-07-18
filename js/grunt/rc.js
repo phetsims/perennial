@@ -28,6 +28,7 @@ const vpnCheck = require( '../common/vpnCheck' );
 const createRelease = require( './createRelease' );
 const grunt = require( 'grunt' );
 const _ = require( 'lodash' ); // eslint-disable-line
+const loadJSON = require( '../common/loadJSON' );
 
 /**
  * Deploys an rc version after incrementing the test version number.
@@ -42,6 +43,16 @@ const _ = require( 'lodash' ); // eslint-disable-line
  */
 module.exports = async function( repo, branch, brands, noninteractive, message ) {
   SimVersion.ensureReleaseBranch( branch );
+
+  // PhET-iO simulations require validation for RCs. This can be specified by putting "phet.phet-io.validation=true"
+  // in package.json.
+  if ( brands.includes( 'phet-io' ) ) {
+    const packageObject = await loadJSON( `../${repo}/package.json` );
+    const specifiesPhetioValidation = packageObject.phet[ 'phet-io' ] && packageObject.phet[ 'phet-io' ].validation;
+    if ( !specifiesPhetioValidation ) {
+      throw new Error( 'PhET-iO simulations require validation for RCs' );
+    }
+  }
 
   if ( !( await vpnCheck() ) ) {
     grunt.fail.fatal( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server.int.colorado.edu' );
@@ -136,7 +147,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
 
     return version;
   }
-  catch ( e ) {
+  catch( e ) {
     grunt.log.warn( 'Detected failure during deploy, reverting to master' );
     await checkoutMaster( repo, true );
     throw e;
