@@ -15,7 +15,6 @@ const fs = require( 'fs' );
 
 const repos = getActiveRepos();
 const phetioRepos = getRepoList( 'testable-phet-io' );
-const phetioReposValidated = getRepoList( 'testable-phet-io-validated' );
 const runnableRepos = getRepoList( 'testable-runnables' );
 const interactiveDescriptionRepos = getRepoList( 'interactive-descriptions' );
 const phetioNoState = getRepoList( 'phet-io-state-unsupported' );
@@ -118,14 +117,12 @@ runnableRepos.forEach( repo => {
 } );
 
 phetioRepos.forEach( repo => {
-  const validated = phetioReposValidated.includes( repo );
-  const validatedParam = validated ? '&phetioValidateTandems' : '';
 
   tests.push( {
     test: [ repo, 'phet-io-fuzz', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet-io&phetioStandalone&ea' + validatedParam + '&fuzz&memoryLimit=1000'
+    queryParameters: 'ea&brand=phet-io&phetioStandalone&fuzz&memoryLimit=1000'
   } );
 
   // fuzz test important wrappers
