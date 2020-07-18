@@ -35,8 +35,7 @@ module.exports = async () => {
     latest: true
   } );
 
-  const filtered = allSimsData.filter(
-    simData => simData.active && simData.latest );
+  const filtered = allSimsData.filter( simData => simData.active && simData.latest );
 
   // store only the latest version per sim in this map
   const oneVersionPerSimMap = {};
