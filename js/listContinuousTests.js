@@ -211,7 +211,7 @@ unitTestRepos.forEach( repo => {
   }
 
   // All tests should work with no query parameters, with assertions enabled
-  const queryParameters = [ '', '?ea', '?brand=phet-io' ];
+  const queryParameters = [ '', '?ea' ];
 
   // PhET-iO repos also test with brand=phet-io
   if ( phetioRepos.includes( repo ) ) {
