@@ -209,8 +209,16 @@ unitTestRepos.forEach( repo => {
   if ( repo === 'phet-io-wrappers' ) {
     return;
   }
-  // All tests should work with no query parameters, with assertions enables and also in phet-io brand
-  [ '', '?ea', '?brand=phet-io', '?ea&brand=phet-io' ].forEach( queryString => {
+
+  // All tests should work with no query parameters, with assertions enabled
+  const queryParameters = [ '', '?ea', '?brand=phet-io' ];
+
+  // PhET-iO repos also test with brand=phet-io
+  if ( phetioRepos.includes( repo ) ) {
+    queryParameters.push( '?brand=phet-io' );
+    queryParameters.push( '?ea&brand=phet-io' );
+  }
+  queryParameters.forEach( queryString => {
     if ( repo === 'phet-io' && !queryString.includes( 'phet-io' ) ) {
       return;
     }
