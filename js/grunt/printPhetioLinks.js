@@ -10,6 +10,7 @@
 
 'use strict';
 
+const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
 const getDependencies = require( '../common/getDependencies' );
 const gitCheckout = require( '../common/gitCheckout' );
 const gitIsAncestor = require( '../common/gitIsAncestor' );
@@ -35,22 +36,11 @@ module.exports = async () => {
     latest: true
   } );
 
-  const filtered = allSimsData.filter( simData => simData.active && simData.latest );
+  // Get a list of sim versions where the highest versions of each sim are first.
+  const sortedAndReversed = _.sortBy( allSimsData, simData => `${simData.name}${getVersion( simData )}` ).reverse();
 
-  // store only the latest version per sim in this map
-  const oneVersionPerSimMap = {};
-
-  // go through all versions and assign it to the map if it is a "later version" that that which is currently stored.
-  for ( const simData of filtered ) {
-    const simName = simData.name;
-    oneVersionPerSimMap[ simName ] = oneVersionPerSimMap[ simName ] || simData;
-    if ( compareVersionNumber( oneVersionPerSimMap[ simName ], simData ) < 0 ) {
-      oneVersionPerSimMap[ simName ] = simData;
-    }
-  }
-
-  // convert the map into an array of the sim versions
-  const oneVersionPerSimList = Object.keys( oneVersionPerSimMap ).sort().map( name => oneVersionPerSimMap[ name ] );
+  // Get rid of all lower versions, then reverse back to alphabetical sorting.
+  const oneVersionPerSimList = _.uniqBy( sortedAndReversed, simData => simData.name ).reverse();
 
   const phetioLinks = [];
   for ( const simData of oneVersionPerSimList ) {
@@ -90,20 +80,4 @@ const getBranch = simData => {
     branch += '-' + simData.versionSuffix; // additional dash required
   }
   return branch;
-};
-
-/**
- * See SimVersion.compareNumber()
- * @param {Object} version1 - value returned by the phet-io metadata client.
- * @param {Object} version2
- * @returns {number}
- */
-const compareVersionNumber = ( version1, version2 ) => {
-  if ( version1.versionMajor < version2.versionMajor ) { return -1; }
-  if ( version1.versionMajor > version2.versionMajor ) { return 1; }
-  if ( version1.versionMinor < version2.versionMinor ) { return -1; }
-  if ( version1.versionMinor > version2.versionMinor ) { return 1; }
-  if ( version1.versionMaintenance < version2.versionMaintenance ) { return -1; }
-  if ( version1.versionMaintenance > version2.versionMaintenance ) { return 1; }
-  return 0; // equal
 };
