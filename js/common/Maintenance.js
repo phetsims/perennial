@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-/* eslint-env browser, node */
 'use strict';
 
 const assert = require( 'assert' );
