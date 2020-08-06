@@ -330,10 +330,10 @@ unitTestRepos.forEach( repo => {
   'brand=phet&fuzz&memoryLimit=1000&ea&screens=1',
   'brand=phet&fuzz&memoryLimit=1000&ea&screens=2,1',
   'brand=phet&fuzz&memoryLimit=1000&ea&screens=2,1&homeScreen=false',
-  'brand=phet&fuzz&memoryLimit=1000&ea&initialScreens=2&homeScreen=false',
-  'brand=phet&fuzz&memoryLimit=1000&ea&initialScreens=2',
-  'brand=phet&fuzz&memoryLimit=1000&screens=Screen1,Screen2', // no ea here, but it should still run gracefully
-  'brand=phet&fuzz&memoryLimit=1000&screens=1.1,Screen2' // no ea here, but it should still run gracefully
+  'brand=phet&fuzz&memoryLimit=1000&ea&initialScreen=2&homeScreen=false',
+  'brand=phet&fuzz&memoryLimit=1000&ea&initialScreen=2',
+  'brand=phet&fuzz&memoryLimit=1000&ea&screens=Screen1,Screen2',
+  'brand=phet&fuzz&memoryLimit=1000&ea&screens=1.1,Screen2'
 ].forEach( queryString => {
 
   // randomly picked multi-screen sim
