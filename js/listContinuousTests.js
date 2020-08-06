@@ -321,6 +321,31 @@ unitTestRepos.forEach( repo => {
 } );
 
 //----------------------------------------------------------------------------------------------------------------------
+// Public query parameter tests
+//----------------------------------------------------------------------------------------------------------------------
+
+// test non-default public query parameter values to make sure there are no obvious problems.
+[
+  'brand=phet&fuzz&memoryLimit=1000&ea&allowLinks=false',
+  'brand=phet&fuzz&memoryLimit=1000&ea&screens=1',
+  'brand=phet&fuzz&memoryLimit=1000&ea&screens=2,1',
+  'brand=phet&fuzz&memoryLimit=1000&ea&screens=2,1&homeScreen=false',
+  'brand=phet&fuzz&memoryLimit=1000&ea&initialScreens=2&homeScreen=false',
+  'brand=phet&fuzz&memoryLimit=1000&ea&initialScreens=2',
+  'brand=phet&fuzz&memoryLimit=1000&screens=Screen1,Screen2', // no ea here, but it should still run gracefully
+  'brand=phet&fuzz&memoryLimit=1000&screens=1.1,Screen2' // no ea here, but it should still run gracefully
+].forEach( queryString => {
+
+  // randomly picked multi-screen sim
+  tests.push( {
+    test: [ 'acid-base-solution', 'fuzz', 'unbuilt', 'query-parameters', 'common-code-public' ],
+    type: 'sim-test',
+    url: 'acid-base-solutions/acid-base-solutions_en.html',
+    queryParameters: queryString
+  } );
+} );
+
+//----------------------------------------------------------------------------------------------------------------------
 // Sim-specific query parameter tests
 //----------------------------------------------------------------------------------------------------------------------
 
