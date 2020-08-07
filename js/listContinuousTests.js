@@ -325,20 +325,22 @@ unitTestRepos.forEach( repo => {
 //----------------------------------------------------------------------------------------------------------------------
 
 // test non-default public query parameter values to make sure there are no obvious problems.
-[
-  'brand=phet&fuzz&memoryLimit=1000&ea&allowLinks=false',
-  'brand=phet&fuzz&memoryLimit=1000&ea&screens=1',
-  'brand=phet&fuzz&memoryLimit=1000&ea&screens=2,1',
-  'brand=phet&fuzz&memoryLimit=1000&ea&screens=2,1&homeScreen=false',
-  'brand=phet&fuzz&memoryLimit=1000&ea&initialScreen=2&homeScreen=false',
-  'brand=phet&fuzz&memoryLimit=1000&ea&initialScreen=2',
-  'brand=phet&fuzz&memoryLimit=1000&ea&screens=Screen1,Screen2',
-  'brand=phet&fuzz&memoryLimit=1000&ea&screens=1.1,Screen2'
-].forEach( queryString => {
+const commonQueryParameters = {
+  allowLinksFalse: 'brand=phet&fuzz&memoryLimit=1000&ea&allowLinks=false',
+  screens1: 'brand=phet&fuzz&memoryLimit=1000&ea&screens=1',
+  screens21: 'brand=phet&fuzz&memoryLimit=1000&ea&screens=2,1',
+  screens21NoHome: 'brand=phet&fuzz&memoryLimit=1000&ea&screens=2,1&homeScreen=false',
+  initialScreen2NoHome: 'brand=phet&fuzz&memoryLimit=1000&ea&initialScreen=2&homeScreen=false',
+  initialScreen2: 'brand=phet&fuzz&memoryLimit=1000&ea&initialScreen=2',
+  screensVerbose: 'brand=phet&fuzz&memoryLimit=1000&ea&screens=Screen1,Screen2',
+  screensOther: 'brand=phet&fuzz&memoryLimit=1000&ea&screens=1.1,Screen2'
+};
+Object.keys( commonQueryParameters ).forEach( name => {
+  const queryString = commonQueryParameters[ name ];
 
   // randomly picked multi-screen sim
   tests.push( {
-    test: [ 'acid-base-solutions', 'fuzz', 'unbuilt', 'query-parameters', 'common-code-public' ],
+    test: [ 'acid-base-solutions', 'fuzz', 'unbuilt', 'query-parameters', name ],
     type: 'sim-test',
     url: 'acid-base-solutions/acid-base-solutions_en.html',
     queryParameters: queryString
