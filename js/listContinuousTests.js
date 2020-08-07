@@ -338,7 +338,7 @@ unitTestRepos.forEach( repo => {
 
   // randomly picked multi-screen sim
   tests.push( {
-    test: [ 'acid-base-solution', 'fuzz', 'unbuilt', 'query-parameters', 'common-code-public' ],
+    test: [ 'acid-base-solutions', 'fuzz', 'unbuilt', 'query-parameters', 'common-code-public' ],
     type: 'sim-test',
     url: 'acid-base-solutions/acid-base-solutions_en.html',
     queryParameters: queryString
