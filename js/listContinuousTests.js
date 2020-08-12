@@ -12,6 +12,7 @@
 const getActiveRepos = require( './common/getActiveRepos' );
 const getRepoList = require( './common/getRepoList' );
 const fs = require( 'fs' );
+const assert = require( 'assert' );
 
 const repos = getActiveRepos();
 const phetioRepos = getRepoList( 'testable-phet-io' );
@@ -19,6 +20,10 @@ const runnableRepos = getRepoList( 'testable-runnables' );
 const interactiveDescriptionRepos = getRepoList( 'interactive-descriptions' );
 const phetioNoState = getRepoList( 'phet-io-state-unsupported' );
 const unitTestRepos = getRepoList( 'unit-tests' );
+
+// A list of repos not in the testable-phet-io list, but that should still be unit tested in
+const unitTestInPhetioBrand = [ 'axon', 'tandem' ];
+unitTestInPhetioBrand.forEach( repo => assert( unitTestRepos.includes( repo ), `${repo} should be in "unit-tests" list if in this one.` ) );
 
 /**
  * {Array.<string>} test
@@ -214,12 +219,14 @@ unitTestRepos.forEach( repo => {
   const queryParameters = [ '', '?ea' ];
 
   // PhET-iO repos also test with brand=phet-io
-  if ( phetioRepos.includes( repo ) ) {
+  if ( phetioRepos.includes( repo ) || unitTestInPhetioBrand.includes( repo ) ) {
     queryParameters.push( '?brand=phet-io' );
     queryParameters.push( '?ea&brand=phet-io' );
   }
   queryParameters.forEach( queryString => {
-    if ( repo === 'phet-io' && !queryString.includes( 'phet-io' ) ) {
+
+    // Don't test phet-io or tandem unit tests in phet brand, they are meant for phet-io brand
+    if ( ( repo === 'phet-io' || repo === 'tandem' ) && !queryString.includes( 'phet-io' ) ) {
       return;
     }
     tests.push( {
