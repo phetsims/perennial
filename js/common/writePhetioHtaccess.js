@@ -9,9 +9,13 @@ const request = require( 'request-promise-native' ); //eslint-disable-line
 const winston = require( 'winston' );
 const writeFile = require( './writeFile' );
 
+// A list of directories directly nested under the phet-io build output folder that should be password protected. Slashes
+// added later.
+const PASSWORD_PROTECTED_SUB_DIRS = [ 'wrappers', 'doc' ];
+
 /**
  * Writes the htaccess file to password protect the exclusive content for phet-io sims
- * @param {string} passwordProtectPath - deployment location
+ * @param {string} passwordProtectPath - deployment location, with no trailing slash
  * @param {{simName:string, version:string, directory:string}} [latestOption]
  *      if provided, then we are publishing to production. We then write the /latest/ redirect .htaccess file.
  *      This is only to be used for production deploys by the build-server.
@@ -59,8 +63,8 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
 
   const simPackage = isProductionDeploy ? JSON.parse( fs.readFileSync( `../${latestOption.simName}/package.json` ) ) : null;
 
-  const wrapperHtaccessPath = 'wrappers/.htaccess';
-  const wrapperHtaccessFullPath = `${passwordProtectPath}/${wrapperHtaccessPath}`;
+  const getSubdirHtaccessPath = subdir => `${subdir}/.htaccess`;
+  const getSubdirHtaccessFullPath = subdir => `${passwordProtectPath}/${getSubdirHtaccessPath( subdir )}`;
   const rootHtaccessPath = '.htaccess';
   const rootHtaccessFullPath = `${passwordProtectPath}/${rootHtaccessPath}`;
 
@@ -69,12 +73,16 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
   // occur when an rc is published (first) during a production deploy.
   if ( simPackage && simPackage.phet && simPackage.phet[ 'phet-io' ] && simPackage.phet[ 'phet-io' ].allowPublicAccess ) {
 
-    // Use individual try/catch blocks to ensure atomic operations.
-    try {
-      await fs.unlinkSync( wrapperHtaccessFullPath );
-    }
-    catch( e ) {
-      winston.debug( 'did not remove wrapper htaccess ' + e );
+    for ( let i = 0; i < PASSWORD_PROTECTED_SUB_DIRS.length; i++ ) {
+      const subdir = PASSWORD_PROTECTED_SUB_DIRS[ i ];
+
+      // Use individual try/catch blocks to ensure atomic operations.
+      try {
+        await fs.unlinkSync( getSubdirHtaccessFullPath( subdir ) );
+      }
+      catch( e ) {
+        winston.debug( 'did not remove ' + subdir + ' htaccess ' + e );
+      }
     }
     try {
       await fs.unlinkSync( rootHtaccessFullPath );
@@ -90,10 +98,12 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
                                              'AuthUserFile ' + authFilepath + '\n' +
                                              'Require valid-user\n';
 
-      // Write a file to add authentication to the ./wrappers directory
-      await writeFile( wrapperHtaccessFullPath, passwordProtectWrapperContents );
-      if ( devVersionPath ) {
-        await devScp( wrapperHtaccessFullPath, `${devVersionPath}/phet-io/${wrapperHtaccessPath}` );
+      // Write a file to add authentication to subdirectories like wrappers/ or doc/
+      for ( const subdir of PASSWORD_PROTECTED_SUB_DIRS ) {
+        await writeFile( getSubdirHtaccessFullPath( subdir ), passwordProtectWrapperContents );
+        if ( devVersionPath ) {
+          await devScp( getSubdirHtaccessFullPath( subdir ), `${devVersionPath}/phet-io/${getSubdirHtaccessPath( subdir )}` );
+        }
       }
 
       const phetioPackage = JSON.parse( fs.readFileSync( '../phet-io/package.json' ) );
