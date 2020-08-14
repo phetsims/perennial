@@ -44,12 +44,11 @@ const loadJSON = require( '../common/loadJSON' );
 module.exports = async function( repo, branch, brands, noninteractive, message ) {
   SimVersion.ensureReleaseBranch( branch );
 
-  // PhET-iO simulations require validation for RCs. This can be specified by putting "phet.phet-io.validation=true"
-  // in package.json.
+  // PhET-iO simulations require validation for RCs. Error out if "phet.phet-io.validation=false" is in package.json.
   if ( brands.includes( 'phet-io' ) ) {
     const packageObject = await loadJSON( `../${repo}/package.json` );
-    const specifiesPhetioValidation = packageObject.phet[ 'phet-io' ] && packageObject.phet[ 'phet-io' ].validation;
-    if ( !specifiesPhetioValidation ) {
+    if ( packageObject.phet[ 'phet-io' ] && packageObject.phet[ 'phet-io' ].hasOwnProperty( 'validation' ) &&
+         !packageObject.phet[ 'phet-io' ].validation ) {
       throw new Error( 'PhET-iO simulations require validation for RCs' );
     }
   }
