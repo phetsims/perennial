@@ -387,17 +387,17 @@ async function taskWorker( options ) {
           }
         }
       }
+
+      await deployImages( {
+        branch: 'master', // chipper branch, always deploy images from master
+        simulation: options.simName,
+        brands: options.brands
+      } );
     }
   }
   catch ( err ) {
     return abortBuild( err );
   }
-
-  await deployImages( {
-    branch: 'master', // chipper branch, always deploy images from master
-    simulation: options.simName,
-    brands: options.brands
-  } );
 
   return afterDeploy();
 }
