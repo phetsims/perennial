@@ -38,33 +38,33 @@ const winston = require( 'winston' );
 // constants
 const MAINTENANCE_FILE = '.maintenance.json';
 
-const PUBLIC_FUNCTIONS = [
-  'addAllNeededPatches',
-  'addNeededPatch',
-  'addNeededPatches',
-  'addNeededPatchesAfter',
-  'addNeededPatchesBefore',
-  'addNeededPatchesBuildFilter',
-  'addNeededPatchReleaseBranch',
-  'addPatchSHA',
-  'applyPatches',
-  'buildAll',
-  'checkBranchStatus',
-  'checkoutBranch',
-  'createPatch',
-  'deployProduction',
-  'deployReleaseCandidates',
-  'list',
-  'listLinks',
-  'removeNeededPatch',
-  'removeNeededPatches',
-  'removeNeededPatchesAfter',
-  'removeNeededPatchesBefore',
-  'removePatch',
-  'removePatchSHA',
-  'reset',
-  'updateDependencies'
-];
+// const PUBLIC_FUNCTIONS = [
+//   'addAllNeededPatches',
+//   'addNeededPatch',
+//   'addNeededPatches',
+//   'addNeededPatchesAfter',
+//   'addNeededPatchesBefore',
+//   'addNeededPatchesBuildFilter',
+//   'addNeededPatchReleaseBranch',
+//   'addPatchSHA',
+//   'applyPatches',
+//   'buildAll',
+//   'checkBranchStatus',
+//   'checkoutBranch',
+//   'createPatch',
+//   'deployProduction',
+//   'deployReleaseCandidates',
+//   'list',
+//   'listLinks',
+//   'removeNeededPatch',
+//   'removeNeededPatches',
+//   'removeNeededPatchesAfter',
+//   'removeNeededPatchesBefore',
+//   'removePatch',
+//   'removePatchSHA',
+//   'reset',
+//   'updateDependencies'
+// ];
 
 module.exports = ( function() {
 
@@ -924,19 +924,19 @@ module.exports = ( function() {
         };
 
         // Only autocomplete "public" api functions for Maintenance.
-        const nodeCompleter = session.completer;
-        session.completer = function( text, cb ) {
-          nodeCompleter( text, ( _, [ completions, completed ] ) => {
-            const match = completed.match( /^Maintenance\.(\w*)+/ );
-            if ( match ) {
-              const funcStart = match[ 1 ];
-              cb( null, [ PUBLIC_FUNCTIONS.filter( f => f.startsWith( funcStart ) ).map( f => `Maintenance.${f}` ), completed ] );
-            }
-            else {
-              cb( null, [ completions, completed ] );
-            }
-          } );
-        };
+        // const nodeCompleter = session.completer;
+        // session.completer = function( text, cb ) {
+        //   nodeCompleter( text, ( _, [ completions, completed ] ) => {
+        //     const match = completed.match( /^Maintenance\.(\w*)+/ );
+        //     if ( match ) {
+        //       const funcStart = match[ 1 ];
+        //       cb( null, [ PUBLIC_FUNCTIONS.filter( f => f.startsWith( funcStart ) ).map( f => `Maintenance.${f}` ), completed ] );
+        //     }
+        //     else {
+        //       cb( null, [ completions, completed ] );
+        //     }
+        //   } );
+        // };
 
         // Allow controlling verbosity
         Object.defineProperty( global, 'verbose', {
