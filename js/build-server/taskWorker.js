@@ -75,7 +75,7 @@ async function taskWorker( options ) {
     }
     catch ( e ) {
       winston.error( e );
-      winston.error( 'Deploy images failed. See previous logs for details.');
+      winston.error( 'Deploy images failed. See previous logs for details.' );
       return Promise.reject( e );
     }
 
@@ -392,6 +392,13 @@ async function taskWorker( options ) {
   catch ( err ) {
     return abortBuild( err );
   }
+
+  await deployImages( {
+    branch: 'master', // chipper branch, always deploy images from master
+    simulation: options.simName,
+    brands: options.brands
+  } );
+
   return afterDeploy();
 }
 
