@@ -391,7 +391,8 @@ async function taskWorker( options ) {
       await deployImages( {
         branch: 'master', // chipper branch, always deploy images from master
         simulation: options.simName,
-        brands: options.brands
+        brands: options.brands,
+        version: options.version
       } );
     }
   }
