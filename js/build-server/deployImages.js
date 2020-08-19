@@ -24,7 +24,7 @@ const deployImages = async options => {
   }
 
   return new Promise( ( resolve, reject ) => {
-    const url = `https://phet.colorado.edu/services/metadata/1.2/simulations?format=json&summary&locale=en&type=html${options.simulation ? `simulation=${options.simulation}` : ''}`;
+    const url = `https://phet.colorado.edu/services/metadata/1.2/simulations?format=json&summary&locale=en&type=html${options.simulation ? `&simulation=${options.simulation}` : ''}`;
 
     // Get all published sims
     request( url, async function ( error, response, body ) {
