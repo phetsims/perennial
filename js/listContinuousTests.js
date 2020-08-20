@@ -366,6 +366,24 @@ tests.push( {
   queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&showSoluteAmount&concentrationMeterUnits=percent&beakerUnits=milliliters'
 } );
 
+// energy forms and changes
+
+// four blocks and one burner
+tests.push( {
+  test: [ 'energy-forms-and-changes', 'fuzz', 'unbuilt', 'query-parameters' ],
+  type: 'sim-test',
+  url: 'energy-forms-and-changes/energy-forms-and-changes_en.html',
+  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&screens=1&elements=iron,brick,iron,brick&burners=1'
+} );
+
+// two beakers and 2 burners
+tests.push( {
+  test: [ 'energy-forms-and-changes', 'fuzz', 'unbuilt', 'query-parameters' ],
+  type: 'sim-test',
+  url: 'energy-forms-and-changes/energy-forms-and-changes_en.html',
+  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&screens=1&&elements=oliveOil,water&burners=2'
+} );
+
 // gas-properties
 tests.push( {
   test: [ 'gas-properties', 'fuzz', 'unbuilt', 'query-parameters' ],
