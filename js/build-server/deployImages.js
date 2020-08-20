@@ -38,7 +38,7 @@ const processSim = async ( simulation, brands, version ) => {
   await execute( 'grunt', [ `--brands=${brandsString}`, `--repo=${simulation}`, 'build-images' ], chipperDir );
 
   // Copy into the document root
-  for ( let brand of brandsArray ) {
+  for ( const brand of brandsArray ) {
     if ( brand !== 'phet' ) {
       throw `Image deploy not implemented for brand: ${brand}`;
     }
@@ -46,7 +46,7 @@ const processSim = async ( simulation, brands, version ) => {
       const sourceDir = `${repoDir}/build/${brand}/`;
       const targetDir = `${constants.HTML_SIMS_DIRECTORY}${simulation}/${version}/`;
       const files = fs.readdirSync( sourceDir );
-      for ( let file of files ) {
+      for ( const file of files ) {
         if ( file.endsWith( 'png' ) ) {
           console.log( `copying file ${file}` );
           await execute( 'cp', [ `${sourceDir}${file}`, `${targetDir}${file}` ], '.' );
@@ -79,7 +79,7 @@ const deployImages = async options => {
       try {
 
         // Get all published sims
-        request( `https://phet.colorado.edu/services/metadata/1.2/simulations?format=json&summary&locale=en&type=html`, async function ( error, response, body ) {
+        request( 'https://phet.colorado.edu/services/metadata/1.2/simulations?format=json&summary&locale=en&type=html', async function ( error, response, body ) {
           if ( error ) {
             console.error( 'failed to fetch metadata request', error );
             reject( error );
@@ -100,8 +100,8 @@ const deployImages = async options => {
             }
 
             // Use for index loop to allow async/await
-            for ( let project of projects ) {
-              for ( let simulation of project.simulations ) {
+            for ( const project of projects ) {
+              for ( const simulation of project.simulations ) {
                 await processSim( simulation.name, options.brands, project.version.string );
               }
             }
