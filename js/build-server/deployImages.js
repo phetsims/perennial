@@ -40,7 +40,7 @@ const processSim = async ( simulation, brands, version ) => {
   // Copy into the document root
   for ( const brand of brandsArray ) {
     if ( brand !== 'phet' ) {
-      throw `Image deploy not implemented for brand: ${brand}`;
+      console.log( `Skipping images for unsupported brand: ${brand}` );
     }
     else {
       const sourceDir = `${repoDir}/build/${brand}/`;
