@@ -73,8 +73,7 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
   // occur when an rc is published (first) during a production deploy.
   if ( simPackage && simPackage.phet && simPackage.phet[ 'phet-io' ] && simPackage.phet[ 'phet-io' ].allowPublicAccess ) {
 
-    for ( let i = 0; i < PASSWORD_PROTECTED_SUB_DIRS.length; i++ ) {
-      const subdir = PASSWORD_PROTECTED_SUB_DIRS[ i ];
+    for ( const subdir of PASSWORD_PROTECTED_SUB_DIRS ) {
 
       // Use individual try/catch blocks to ensure atomic operations.
       try {
