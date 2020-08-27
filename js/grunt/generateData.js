@@ -75,8 +75,6 @@ module.exports = async function() {
   writeList( 'unit-tests', phet => phet.generatedUnitTests );
   writeList( 'color-profiles', phet => phet.colorProfile );
   writeList( 'phet-io', phet => phet.runnable && phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) );
-  writeList( 'testable-runnables', phet => phet.runnable && phet.automatedTestEnabled !== false );
-  writeList( 'testable-phet-io', phet => phet.runnable && phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) && phet.automatedTestEnabled !== false );
 
   await gitAdd( 'perennial', 'data/interactive-descriptions' );
   await gitAdd( 'perennial', 'data/active-runnables' );
@@ -84,8 +82,6 @@ module.exports = async function() {
   await gitAdd( 'perennial', 'data/unit-tests' );
   await gitAdd( 'perennial', 'data/color-profiles' );
   await gitAdd( 'perennial', 'data/phet-io' );
-  await gitAdd( 'perennial', 'data/testable-runnables' );
-  await gitAdd( 'perennial', 'data/testable-phet-io' );
 
   const hasChanges = !await gitIsClean( 'perennial' );
   if ( hasChanges ) {

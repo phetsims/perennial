@@ -14,8 +14,8 @@ const getRepoList = require( './common/getRepoList' );
 const fs = require( 'fs' );
 
 const repos = getActiveRepos();
-const phetioRepos = getRepoList( 'testable-phet-io' );
-const runnableRepos = getRepoList( 'testable-runnables' );
+const phetioRepos = getRepoList( 'phet-io' );
+const runnableRepos = getRepoList( 'active-runnables' );
 const interactiveDescriptionRepos = getRepoList( 'interactive-descriptions' );
 const phetioNoState = getRepoList( 'phet-io-state-unsupported' );
 const unitTestRepos = getRepoList( 'unit-tests' );
