@@ -453,6 +453,9 @@ of links that should be ready for a QA issue. Generally prepend this with the in
 done. I always recommend 10-30 seconds of general testing per sim to make sure nothing is horribly broken. Additionally,
 there is almost always testing related to the specific fixed issue (e.g. "does this bad behavior happen still").
 
+`Maintenance.listLinks()` will show both production and release candidate links for release branches that have a
+deployed version.
+
 ## #14: Deploying changes to production: `Maintenance.deployProduction()`
 
 Once RCs are green-lit for deployment, run `Maintenance.deployProduction()` to deploy production versions to published
