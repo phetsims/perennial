@@ -367,6 +367,10 @@ A helper function for building the release branch and comparing the output is pr
 
 ## #7: Checking out a "modified" release branch
 
+NOTE: If you have a commit SHA that you'll want to apply, you can skip to step 9 below (adding the patch SHA). Steps 7
+and 8 are for creating the SHAs necessary. Steps 7-10 will be looped until there are no more release branches that
+need patches.
+
 Instead of using `checkout-shas`, or other chipper/perennial commands to check out a branch during this process, it's
 recommended that you use `Maintenance.checkoutBranch( repo, branch )`. Since we don't update the actual
 `dependencies.json` files until later in the process, the "normal" commands would not check out the proper code.
