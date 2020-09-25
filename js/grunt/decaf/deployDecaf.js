@@ -150,7 +150,7 @@ cd ${version}
 sudo chmod g+w *
 
 token=$(grep serverToken ~/.phet/build-local.json | sed -r 's/ *"serverToken": "(.*)",/\\1/') && \\
-curl -u "token:$\{token}" '${productionServerURL}/services/deployCheerpj?project=${project}&version=${version}&locales=${locales.join( ',' )}
+curl -u "token:$\{token}" '${productionServerURL}/services/deployCheerpj?project=${project}&version=${version}&locales=${locales.join( ',' )}&simulations=${flavors.join(',')}'
 `;
     console.log( 'SERVER SCRIPT TO PROMOTE DEV VERSION TO PRODUCTION VERSION' );
     console.log( template );
