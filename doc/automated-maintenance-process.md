@@ -367,6 +367,10 @@ A helper function for building the release branch and comparing the output is pr
 
 ## #7: Checking out a "modified" release branch
 
+NOTE: If you have a commit SHA that you'll want to apply, you can skip to step 9 below (adding the patch SHA). Steps 7
+and 8 are for creating the SHAs necessary. Steps 7-10 will be looped until there are no more release branches that
+need patches.
+
 Instead of using `checkout-shas`, or other chipper/perennial commands to check out a branch during this process, it's
 recommended that you use `Maintenance.checkoutBranch( repo, branch )`. Since we don't update the actual
 `dependencies.json` files until later in the process, the "normal" commands would not check out the proper code.
@@ -448,6 +452,9 @@ After running this, it's best to create a QA report with `Maintenance.listLinks(
 of links that should be ready for a QA issue. Generally prepend this with the information about what testing should be
 done. I always recommend 10-30 seconds of general testing per sim to make sure nothing is horribly broken. Additionally,
 there is almost always testing related to the specific fixed issue (e.g. "does this bad behavior happen still").
+
+`Maintenance.listLinks()` will show both production and release candidate links for release branches that have a
+deployed version.
 
 ## #14: Deploying changes to production: `Maintenance.deployProduction()`
 
