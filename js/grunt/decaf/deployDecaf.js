@@ -139,7 +139,7 @@ module.exports = async function ( project, dev, production, username ) {
     const productionServerURL = buildLocal.productionServerURL || 'https://phet.colorado.edu';
     // await devSsh( `mkdir -p "/data/web/static/phetsims/sims/cheerpj/${project}"` );
     const template = `cd /data/web/static/phetsims/sims/cheerpj/
-mkdir ${project}
+mkdir -p ${project}
 cd ${project}
 scp -r bayes.colorado.edu:/data/web/htdocs/dev/decaf/${project}/${version} .
 
