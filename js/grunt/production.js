@@ -214,10 +214,6 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       grunt.log.writeln( 'If this is a version that will be used with students, then make sure to remove the password protection.' );
       grunt.log.writeln( 'See https://github.com/phetsims/phet-io/blob/master/doc/phet-io-security.md for details.' );
       grunt.log.writeln( '' );
-      grunt.log.writeln( 'Make sure that the current level of instrumentation is represented here in the Instrumentation Status Spreadsheet:' );
-      grunt.log.writeln( 'https://docs.google.com/spreadsheets/d/1pU9izdNQkd9vr8TvLAfXe_v68yh-7potH-y712FBPr8/edit#gid=0' );
-      grunt.log.writeln( 'MAKE SURE TO UPDATE THE "Latest Published Version" COLUMN.' );
-      grunt.log.writeln( '' );
       grunt.log.writeln( 'If you are delivering this to a partner, update partners.md (phet-io/doc/partners.md) to show this delivery.' );
       grunt.log.writeln( 'Read the intro of the document to make sure that you format the entry correctly.' );
     }
