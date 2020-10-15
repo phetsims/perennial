@@ -7,5 +7,5 @@
 #=============================================================================================
 
 git pull
-npm update
+npm prune && npm update
 grunt generate-data
