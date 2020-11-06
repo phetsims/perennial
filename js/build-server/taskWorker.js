@@ -43,7 +43,7 @@ const afterDeploy = async buildDir => {
     await execute( 'grunt', [ 'checkout-master-all' ], constants.PERENNIAL );
     await execute( 'rm', [ '-rf', buildDir ], '.' );
   }
-  catch ( err ) {
+  catch( err ) {
     return abortBuild( err );
   }
 };
@@ -58,7 +58,7 @@ const afterDeploy = async buildDir => {
  * @property {String} simName - lower case simulation name used for creating files/directories
  * @property {String} version - sim version identifier string
  * @property {String} servers - deployment targets, subset of [ 'dev', 'production' ]
- * @property {String} brands - deployment brands
+ * @property {string[]} brands - deployment brands
  * @property {String} email - used for sending notifications about success/failure
  * @property {String} translatorId - rosetta user id for adding translators to the website
  * @property {String} res - express response object
@@ -73,7 +73,7 @@ async function taskWorker( options ) {
       winston.info( 'Deploy images completed successfully.' );
       return Promise.resolve();
     }
-    catch ( e ) {
+    catch( e ) {
       winston.error( e );
       winston.error( 'Deploy images failed. See previous logs for details.' );
       return Promise.reject( e );
@@ -172,7 +172,7 @@ async function taskWorker( options ) {
           try {
             await execute( 'rm', [ '-rf', buildDir ], '.' );
           }
-          catch ( e ) {
+          catch( e ) {
             reject( e );
           }
           fs.mkdir( buildDir, err => {
@@ -279,6 +279,8 @@ async function taskWorker( options ) {
           else if ( brand === constants.PHET_IO_BRAND ) {
             targetSimDir = constants.PHET_IO_SIMS_DIRECTORY + simName;
             targetVersionDir = targetSimDir + '/' + originalVersion;
+
+            // Chipper 1.0 has -phetio in the version schema for PhET-iO branded sims
             if ( chipperVersion.major === 0 && !originalVersion.match( '-phetio' ) ) {
               targetVersionDir += '-phetio';
             }
@@ -302,7 +304,7 @@ async function taskWorker( options ) {
                   } );
                 } );
               }
-              catch ( e ) {
+              catch( e ) {
                 reject( e );
               }
             }
@@ -396,7 +398,7 @@ async function taskWorker( options ) {
       } );
     }
   }
-  catch ( err ) {
+  catch( err ) {
     return abortBuild( err );
   }
 

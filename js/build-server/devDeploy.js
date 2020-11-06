@@ -15,18 +15,26 @@ const host = constants.BUILD_SERVER_CONFIG.devDeployServer;
 /**
  * Copy files to dev server, typically bayes.colorado.edu.
  *
- * @param simDir
- * @param simName
- * @param version
- * @param chipperVersion
- * @param brands
+ * @param {string} simDir
+ * @param {string} simName
+ * @param {string} version
+ * @param {ChipperVersion} chipperVersion
+ * @param {string[]} brands
  *
  * @returns {Promise}
  */
 module.exports = async function( simDir, simName, version, chipperVersion, brands ) {
-  const simVersionDirectory = constants.BUILD_SERVER_CONFIG.devDeployPath + simName + '/' + version;
+  const simDirectory = constants.BUILD_SERVER_CONFIG.devDeployPath + simName;
+  let versionDirectory = version;
 
   try {
+
+    // Chipper 1.0 has -phetio in the version schema for PhET-iO branded sims
+    if ( brands.length === 1 && brands[ 0 ] === constants.PHET_IO_BRAND && chipperVersion.major === 0 && !version.match( '-phetio' ) ) {
+      versionDirectory = version.split( '-' ).join( '-phetio' );
+    }
+    const simVersionDirectory = `${simDirectory}/${versionDirectory}`;
+
     // mkdir first in case it doesn't exist already
     await devSsh( 'mkdir -p ' + simVersionDirectory );
     const buildDir = simDir + '/build';
@@ -45,7 +53,7 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
     return await new Promise( ( resolve, reject ) => {
       new rsync()
         .flags( 'razpFFO' )
-        .set( 'no-perms')
+        .set( 'no-perms' )
         .source( buildDir + '/' )
         .destination( user + '@' + host + ':' + simVersionDirectory )
         .execute( ( err, code, cmd ) => {
