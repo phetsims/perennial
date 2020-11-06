@@ -23,6 +23,12 @@ const grunt = require( 'grunt' );
 const _ = require( 'lodash' ); // eslint-disable-line
 const fs = require( 'fs' );
 
+// constants
+const BUILD_LOCAL_FILENAME = process.env.HOME + '/.phet/build-local.json';
+const buildLocalJSON = JSON.parse( fs.readFileSync( BUILD_LOCAL_FILENAME, { encoding: 'utf-8' } ) );
+const GIT_ROOT = buildLocalJSON.gitRoot;
+const TRUNK_PATH = buildLocalJSON.decafTrunkPath;
+
 /**
  * Deploys a dev version after incrementing the test version number.
  * @public
@@ -30,17 +36,16 @@ const fs = require( 'fs' );
  * @param {string} project
  * @param {boolean} dev
  * @param {boolean} production
- * @param {string} username
  * @returns {Promise}
  */
-module.exports = async function ( project, dev, production, username ) {
+module.exports = async function( project, dev, production ) {
 
-  const stringFiles = fs.readdirSync( `/Users/samreid/phet-svn-trunk-2020/simulations-java/simulations/${project}/data/${project}/localization` );
+  const stringFiles = fs.readdirSync( `${TRUNK_PATH}/simulations-java/simulations/${project}/data/${project}/localization` );
   const locales = stringFiles.filter( stringFile => stringFile.indexOf( '_' ) >= 0 ).map( file => file.substring( file.indexOf( '_' ) + 1, file.lastIndexOf( '.' ) ) );
   console.log( locales.join( '\n' ) );
 
   // Output the flavors and locales
-  const javaProperties = fs.readFileSync( `/Users/samreid/phet-svn-trunk-2020/simulations-java/simulations/${project}/${project}-build.properties`, 'utf-8' );
+  const javaProperties = fs.readFileSync( `${TRUNK_PATH}/simulations-java/simulations/${project}/${project}-build.properties`, 'utf-8' );
   // console.log(javaProperties);
 
 // like  project.flavor.moving-man.mainclass=edu.colorado.phet.movingman.MovingManApplication
@@ -116,16 +121,21 @@ module.exports = async function ( project, dev, production, username ) {
 
     const versionURL = `https://phet-dev.colorado.edu/decaf/${project}/${versionString}`;
     console.log( 'DEPLOYED' );
+
+    if ( !fs.existsSync( `${GIT_ROOT}/decaf/build/log.txt` ) ) {
+      fs.mkdirSync( `${GIT_ROOT}/decaf/build` );
+    }
+
     flavors.forEach( flavor => {
       const url = `${versionURL}/${project}.html?simulation=${flavor}`;
       grunt.log.writeln( url );
-      fs.appendFileSync( '/Users/samreid/apache-document-root/main/decaf/build/log.txt', url + '\n' );
+      fs.appendFileSync( `${GIT_ROOT}/decaf/build/log.txt`, url + '\n' );
     } );
 
     if ( flavors.length === 0 ) {
       const URL = `${versionURL}/${project}.html`;
       grunt.log.writeln( URL );
-      fs.appendFileSync( '/Users/samreid/apache-document-root/main/decaf/build/log.txt', URL + '\n' );
+      fs.appendFileSync( `${GIT_ROOT}/decaf/build/log.txt`, URL + '\n' );
     }
   }
 
@@ -150,7 +160,7 @@ cd ${version}
 sudo chmod g+w *
 
 token=$(grep serverToken ~/.phet/build-local.json | sed -r 's/ *"serverToken": "(.*)",/\\1/') && \\
-curl -u "token:$\{token}" '${productionServerURL}/services/deploy-cheerpj?project=${project}&version=${version}&locales=${locales.join( ',' )}&simulations=${flavors.join(',')}'
+curl -u "token:$\{token}" '${productionServerURL}/services/deploy-cheerpj?project=${project}&version=${version}&locales=${locales.join( ',' )}&simulations=${flavors.join( ',' )}'
 `;
     console.log( 'SERVER SCRIPT TO PROMOTE DEV VERSION TO PRODUCTION VERSION' );
     console.log( template );

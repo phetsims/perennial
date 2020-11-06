@@ -18,11 +18,14 @@ const writeJSON = require( '../../common/writeJSON' );
 const fs = require( 'fs' );
 const _ = require( 'lodash' ); // eslint-disable-line
 
-// TODO: Generalize ROOT directories to pull from build-local.json
-const DIRECTORY_ROOT = '/Users/denz1994';
-const URL_ROOT = 'http://localhost:8080';
-const TRUNK_ROOT = DIRECTORY_ROOT + '/phet-svn-trunk-2020';
-const TRUNK_OUTPUT = DIRECTORY_ROOT + '/phet-svn-trunk-2020-output';
+// constants
+const BUILD_LOCAL_FILENAME = process.env.HOME + '/.phet/build-local.json';
+const buildLocalJSON = JSON.parse( fs.readFileSync( BUILD_LOCAL_FILENAME, { encoding: 'utf-8' } ) );
+const GIT_ROOT = buildLocalJSON.gitRoot;
+const URL_ROOT = buildLocalJSON.urlRoot;
+const TRUNK_PATH = buildLocalJSON.decafTrunkPath;
+const TRUNK_OUTPUT_PATH = buildLocalJSON.decafTrunkOutputPath;
+
 /**
  * Deploys a dev version after incrementing the test version number.
  * @public
@@ -38,9 +41,9 @@ module.exports = async function( project ) {
   await execute( '/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/bin/java', [
       '-Dfile.encoding=UTF-8',
       '-classpath',
-    `/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/charsets.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/deploy.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/ext/dnsns.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/ext/localedata.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/ext/sunec.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/ext/sunjce_provider.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/ext/sunpkcs11.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/ext/zipfs.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/htmlconverter.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/javaws.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/jce.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/jfr.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/jfxrt.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/jsse.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/management-agent.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/plugin.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/resources.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/rt.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/ant-javafx.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/dt.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/javafx-doclet.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/javafx-mx.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/jconsole.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/sa-jdi.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/tools.jar:${TRUNK_OUTPUT}/production/build-tools:${TRUNK_OUTPUT}/production/flash-launcher:${TRUNK_ROOT}/simulations-flash/flash-launcher/data:${TRUNK_OUTPUT}/production/phetcommon:${TRUNK_ROOT}/simulations-java/common/phetcommon/data:${TRUNK_ROOT}/simulations-java/contrib/junit/junit.jar:${TRUNK_ROOT}/simulations-java/contrib/javaws/jnlp.jar:${TRUNK_OUTPUT}/production/think-tank-maths:${TRUNK_ROOT}/simulations-java/contrib/mongodb/mongo-2.7.2.jar:${TRUNK_ROOT}/simulations-java/contrib/lombok/lombok.jar:${TRUNK_ROOT}/simulations-java/contrib/functionaljava/functionaljava-3.1.jar:${TRUNK_ROOT}/build-tools/contrib/jsch/jsch.jar:${TRUNK_ROOT}/build-tools/contrib/apache-ant/lib/ant.jar:${TRUNK_ROOT}/build-tools/contrib/proguard/lib/proguard.jar:${TRUNK_ROOT}/build-tools/contrib/yuicompressor/yuicompressor-2.4.4.jar:${TRUNK_ROOT}/build-tools/contrib/scala/scala-library.jar:${TRUNK_ROOT}/build-tools/contrib/scala/scala-compiler.jar:${TRUNK_ROOT}/build-tools/contrib/apache-ant/lib/ant-launcher.jar:${TRUNK_ROOT}/build-tools/contrib/commons-lang/commons-lang.jar:${TRUNK_ROOT}/build-tools/contrib/jgit/org.eclipse.jgit-1.1.0.201109151100-r.jar:${TRUNK_ROOT}/build-tools/contrib/closure-compiler/compiler.jar`,
+    `/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/charsets.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/deploy.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/ext/dnsns.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/ext/localedata.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/ext/sunec.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/ext/sunjce_provider.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/ext/sunpkcs11.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/ext/zipfs.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/htmlconverter.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/javaws.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/jce.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/jfr.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/jfxrt.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/jsse.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/management-agent.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/plugin.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/resources.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/rt.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/ant-javafx.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/dt.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/javafx-doclet.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/javafx-mx.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/jconsole.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/sa-jdi.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/tools.jar:${TRUNK_OUTPUT_PATH}/production/build-tools:${TRUNK_OUTPUT_PATH}/production/flash-launcher:${TRUNK_PATH}/simulations-flash/flash-launcher/data:${TRUNK_OUTPUT_PATH}/production/phetcommon:${TRUNK_PATH}/simulations-java/common/phetcommon/data:${TRUNK_PATH}/simulations-java/contrib/junit/junit.jar:${TRUNK_PATH}/simulations-java/contrib/javaws/jnlp.jar:${TRUNK_OUTPUT_PATH}/production/think-tank-maths:${TRUNK_PATH}/simulations-java/contrib/mongodb/mongo-2.7.2.jar:${TRUNK_PATH}/simulations-java/contrib/lombok/lombok.jar:${TRUNK_PATH}/simulations-java/contrib/functionaljava/functionaljava-3.1.jar:${TRUNK_PATH}/build-tools/contrib/jsch/jsch.jar:${TRUNK_PATH}/build-tools/contrib/apache-ant/lib/ant.jar:${TRUNK_PATH}/build-tools/contrib/proguard/lib/proguard.jar:${TRUNK_PATH}/build-tools/contrib/yuicompressor/yuicompressor-2.4.4.jar:${TRUNK_PATH}/build-tools/contrib/scala/scala-library.jar:${TRUNK_PATH}/build-tools/contrib/scala/scala-compiler.jar:${TRUNK_PATH}/build-tools/contrib/apache-ant/lib/ant-launcher.jar:${TRUNK_PATH}/build-tools/contrib/commons-lang/commons-lang.jar:${TRUNK_PATH}/build-tools/contrib/jgit/org.eclipse.jgit-1.1.0.201109151100-r.jar:${TRUNK_PATH}/build-tools/contrib/closure-compiler/compiler.jar`,
       'edu.colorado.phet.buildtools.BuildScript',
-    TRUNK_ROOT,
+    TRUNK_PATH,
       project
     ]
   );
@@ -54,14 +57,14 @@ module.exports = async function( project ) {
     console.log( 'perhaps the build directory exists' );
   }
 
-  const allJar = `/Users/denz1994/Git/phet/decaf/projects/${project}/build/${project}_all.jar`;
-  await copyFile( `${TRUNK_ROOT}/simulations-java/simulations/${project}/deploy/${project}_all.jar`, allJar );
+  const allJar = `${GIT_ROOT}decaf/projects/${project}/build/${project}_all.jar`;
+  await copyFile( `${TRUNK_PATH}/simulations-java/simulations/${project}/deploy/${project}_all.jar`, allJar );
   console.log( 'copied' );
 
   await execute( '/Applications/cheerpj/cheerpjfy.py', [ allJar ] );
   console.log( 'cheerpjed' );
 
-  const javaProperties = fs.readFileSync( `${TRUNK_ROOT}/simulations-java/simulations/${project}/${project}-build.properties`, 'utf-8' );
+  const javaProperties = fs.readFileSync( `${TRUNK_PATH}/simulations-java/simulations/${project}/${project}-build.properties`, 'utf-8' );
   const flavors = javaProperties.split( '\n' ).filter( line => line.startsWith( 'project.flavor' ) ).map( line => line.split( '.' )[ 2 ] );
   let url = '';
   if ( flavors.length === 0 ) {
@@ -98,7 +101,7 @@ module.exports = async function( project ) {
 
   fs.writeFileSync( `${buildDir}/${project}.html`, html );
 
-  const stringFiles = fs.readdirSync( `${TRUNK_ROOT}/simulations-java/simulations/${project}/data/${project}/localization` );
+  const stringFiles = fs.readdirSync( `${TRUNK_PATH}/simulations-java/simulations/${project}/data/${project}/localization` );
   const locales = stringFiles.filter( stringFile => stringFile.indexOf( '_' ) >= 0 ).map( file => file.substring( file.indexOf( '_' ) + 1, file.lastIndexOf( '.' ) ) );
   console.log( locales.join( '\n' ) );
 
@@ -112,7 +115,7 @@ module.exports = async function( project ) {
   const chipperSHA = await gitRevParse( 'chipper', 'HEAD' );
   const perennialSHA = await gitRevParse( 'perennial', 'HEAD' );
 
-  const svnInfo = await execute( 'svn', [ 'info' ], `${TRUNK_ROOT}` );
+  const svnInfo = await execute( 'svn', [ 'info' ], `${TRUNK_PATH}` );
 
   const dependencies = {
     version: versionString,
