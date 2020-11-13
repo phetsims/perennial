@@ -26,6 +26,7 @@ const execute = require( '../common/execute' );
 const grunt = require( 'grunt' );
 const gruntCommand = require( '../common/gruntCommand' );
 const npmUpdate = require( '../common/npmUpdate' );
+const fs = require( 'fs' );
 
 /**
  * @param {string} repo
@@ -118,6 +119,14 @@ module.exports = async function( repo, author, options ) {
       grunt.log.writeln( 'wrote', contentsPath );
     }
   } );
+
+  // Delete readmeCreatedManually from template, see https://github.com/phetsims/perennial/issues/199
+  const packagePath = `${destinationPath}/package.json`;
+  const simPackageJSON = grunt.file.readJSON( packagePath );
+  if ( simPackageJSON.phet && simPackageJSON.phet.hasOwnProperty( 'readmeCreatedManually' ) ) {
+    delete simPackageJSON.phet.readmeCreatedManually;
+  }
+  fs.writeFileSync( packagePath, JSON.stringify( simPackageJSON, null, 2 ) );
 
   await npmUpdate( repo );
   await execute( gruntCommand, [ 'unpublished-README' ], `../${repo}` );
