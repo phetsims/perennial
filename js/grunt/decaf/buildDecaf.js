@@ -24,7 +24,6 @@ const buildLocalJSON = JSON.parse( fs.readFileSync( BUILD_LOCAL_FILENAME, { enco
 const GIT_ROOT = buildLocalJSON.gitRoot;
 const URL_ROOT = buildLocalJSON.urlRoot;
 const TRUNK_PATH = buildLocalJSON.decafTrunkPath;
-const TRUNK_OUTPUT_PATH = buildLocalJSON.decafTrunkOutputPath;
 
 /**
  * Deploys a dev version after incrementing the test version number.
@@ -38,16 +37,21 @@ module.exports = async function( project ) {
   console.log( 'building project: ' + project );
 
   // Command obtained from running in IntelliJ IDEA with the given .project.
-  await execute( '/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/bin/java', [
-      '-Dfile.encoding=UTF-8',
-      '-classpath',
-    `/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/charsets.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/deploy.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/ext/dnsns.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/ext/localedata.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/ext/sunec.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/ext/sunjce_provider.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/ext/sunpkcs11.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/ext/zipfs.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/htmlconverter.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/javaws.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/jce.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/jfr.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/jfxrt.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/jsse.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/management-agent.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/plugin.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/resources.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/jre/lib/rt.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/ant-javafx.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/dt.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/javafx-doclet.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/javafx-mx.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/jconsole.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/sa-jdi.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/tools.jar:${TRUNK_OUTPUT_PATH}/production/build-tools:${TRUNK_OUTPUT_PATH}/production/flash-launcher:${TRUNK_PATH}/simulations-flash/flash-launcher/data:${TRUNK_OUTPUT_PATH}/production/phetcommon:${TRUNK_PATH}/simulations-java/common/phetcommon/data:${TRUNK_PATH}/simulations-java/contrib/junit/junit.jar:${TRUNK_PATH}/simulations-java/contrib/javaws/jnlp.jar:${TRUNK_OUTPUT_PATH}/production/think-tank-maths:${TRUNK_PATH}/simulations-java/contrib/mongodb/mongo-2.7.2.jar:${TRUNK_PATH}/simulations-java/contrib/lombok/lombok.jar:${TRUNK_PATH}/simulations-java/contrib/functionaljava/functionaljava-3.1.jar:${TRUNK_PATH}/build-tools/contrib/jsch/jsch.jar:${TRUNK_PATH}/build-tools/contrib/apache-ant/lib/ant.jar:${TRUNK_PATH}/build-tools/contrib/proguard/lib/proguard.jar:${TRUNK_PATH}/build-tools/contrib/yuicompressor/yuicompressor-2.4.4.jar:${TRUNK_PATH}/build-tools/contrib/scala/scala-library.jar:${TRUNK_PATH}/build-tools/contrib/scala/scala-compiler.jar:${TRUNK_PATH}/build-tools/contrib/apache-ant/lib/ant-launcher.jar:${TRUNK_PATH}/build-tools/contrib/commons-lang/commons-lang.jar:${TRUNK_PATH}/build-tools/contrib/jgit/org.eclipse.jgit-1.1.0.201109151100-r.jar:${TRUNK_PATH}/build-tools/contrib/closure-compiler/compiler.jar`,
-      'edu.colorado.phet.buildtools.BuildScript',
+  const cmd = [
+    '-classpath',
+
+    // Build classes with
+    // ~/phet-svn-trunk-2020/build-tools$ chmod u+x ./contrib/apache-ant/bin/ant
+    // ~/phet-svn-trunk-2020/build-tools$ ./build.sh
+    // Other jars taken from /phet-svn-trunk-2020/build-tools/build-tools-build.properties
+    `${TRUNK_PATH}/build-tools/ant_output/phetbuild/classes:${TRUNK_PATH}/build-tools/contrib/proguard/lib/proguard.jar:${TRUNK_PATH}/build-tools/contrib/commons-lang/commons-lang.jar:${TRUNK_PATH}/build-tools/contrib/jsch/jsch.jar:${TRUNK_PATH}/build-tools/contrib/scala/scala-compiler.jar:${TRUNK_PATH}/build-tools/contrib/scala/scala-library.jar:${TRUNK_PATH}/build-tools/contrib/apache-ant/lib/ant.jar:${TRUNK_PATH}/build-tools/contrib/apache-ant/lib/ant-launcher.jar:${TRUNK_PATH}/build-tools/contrib/yuicompressor/yuicompressor-2.4.4.jar:${TRUNK_PATH}/build-tools/contrib/jgit/org.eclipse.jgit-1.1.0.201109151100-r.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/tools.jar`,
+    'edu.colorado.phet.buildtools.BuildScript',
     TRUNK_PATH,
-      project
-    ]
-  );
-  console.log( 'Java build complete' );
+    project
+  ];
+
+  const program = '/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/bin/java';
+  await execute( program, cmd );
 
   const buildDir = `../decaf/projects/${project}/build/`;
   try {
