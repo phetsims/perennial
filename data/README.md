@@ -16,3 +16,4 @@ phet-io (auto-generated) is the list of all simulations that are instrumented wi
     for more information.
 
 phet-io-state-unsupported - A manually supported list of sims that do not support state, and shouldn't be tested as such. 
+Any sim in this list will not have its state wrapper fuzzed on CT.  
