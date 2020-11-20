@@ -18,6 +18,9 @@
 # cd john-travoltage/
 # copy-history-to-different-repo.sh js/SomeButtonFile.js ../sun
 #
+# If you run into problems, it may help to run interactively, comment out the "am" step below and run it manually
+# git am --whitespace=fix --reject --interactive ../patches/griddle/js/bamboo/_patch.txt
+#
 # Author: Sam Reid (PhET Interactive Simulations)
 # Author: Michael Kauzmann (PhET Interactive Simulations)
 #
