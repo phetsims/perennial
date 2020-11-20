@@ -85,6 +85,14 @@ runnableRepos.forEach( repo => {
     priority: 0.3
   } );
 
+    tests.push( {
+      test: [ repo, 'fuzz', 'unbuilt', 'assertSlow' ],
+      type: 'sim-test',
+      url: `${repo}/${repo}_en.html`,
+      queryParameters: 'brand=phet&eall&fuzz&memoryLimit=1000',
+      priority: .001
+    } );
+
   tests.push( {
     test: [ repo, 'fuzz', 'built' ],
     type: 'sim-test',
