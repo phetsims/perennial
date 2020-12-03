@@ -25,7 +25,7 @@ const winston = require( 'winston' );
  * @returns {Promise.<string>} - Stdout
  * @rejects {ExecuteError}
  */
-module.exports = function( cmd, args, cwd ) {
+module.exports = function ( cmd, args, cwd ) {
   class ExecuteError extends Error {
     /**
      * @param {string} cmd
@@ -36,7 +36,7 @@ module.exports = function( cmd, args, cwd ) {
      * @param {number} code - exit code
      */
     constructor( cmd, args, cwd, stdout, stderr, code ) {
-      super( `${cmd} ${args.join( ' ')} in ${cwd} failed with exit code ${code} and stdout:\n${stdout}` );
+      super( `${cmd} ${args.join( ' ' )} in ${cwd} failed with exit code ${code} and stdout:\n${stdout}` );
 
       // @public
       this.cmd = cmd;
@@ -47,26 +47,29 @@ module.exports = function( cmd, args, cwd ) {
       this.code = code;
     }
   }
-  
+
   return new Promise( ( resolve, reject ) => {
     const process = child_process.spawn( cmd, args, {
       cwd: cwd
     } );
-    winston.debug( `running ${cmd} ${args.join( ' ' )} from ${cwd}` );
+    winston.debug( `Running ${cmd} ${args.join( ' ' )} from ${cwd}` );
 
     let stdout = ''; // to be appended to
     let stderr = '';
 
     process.stderr.on( 'data', data => {
       stderr += data;
-      winston.debug( 'stderr: ' + data );
     } );
     process.stdout.on( 'data', data => {
       stdout += data;
-      winston.debug( 'stdout: ' + data );
     } );
 
     process.on( 'close', code => {
+      winston.debug( `Command ${cmd} finished. Output is below.` );
+
+      winston.debug( stderr && `stderr: ${stderr}` || 'stderr is empty.' );
+      winston.debug( stdout && `stdout: ${stdout}` || 'stdout is empty.' );
+
       if ( code !== 0 ) {
         reject( new ExecuteError( cmd, args, cwd, stdout, stderr, code ) );
       }
