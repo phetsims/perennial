@@ -8,6 +8,7 @@
 
 'use strict';
 
+const assert = require( 'assert' );
 const execute = require( '../../common/execute' );
 const copyFile = require( '../../common/copyFile' );
 const getPreloads = require( './getPreloads' );
@@ -20,10 +21,6 @@ const _ = require( 'lodash' ); // eslint-disable-line
 
 // constants
 const BUILD_LOCAL_FILENAME = process.env.HOME + '/.phet/build-local.json';
-const buildLocalJSON = JSON.parse( fs.readFileSync( BUILD_LOCAL_FILENAME, { encoding: 'utf-8' } ) );
-const GIT_ROOT = buildLocalJSON.gitRoot;
-const URL_ROOT = buildLocalJSON.urlRoot;
-const TRUNK_PATH = buildLocalJSON.decafTrunkPath;
 
 /**
  * Deploys a dev version after incrementing the test version number.
@@ -34,7 +31,14 @@ const TRUNK_PATH = buildLocalJSON.decafTrunkPath;
  */
 module.exports = async function( project ) {
 
-  console.log( 'building project: ' + project );
+  const buildLocalJSON = JSON.parse( fs.readFileSync( BUILD_LOCAL_FILENAME, { encoding: 'utf-8' } ) );
+  const gitRoot = buildLocalJSON.gitRoot;
+  const urlRoot = buildLocalJSON.urlRoot;
+  const trunkPath = buildLocalJSON.decafTrunkPath;
+
+  assert && assert( gitRoot !== undefined, 'buildLocal.gitRoot is undefined' );
+  assert && assert( urlRoot !== undefined, 'buildLocal.urlRoot is undefined' );
+  assert && assert( trunkPath !== undefined, 'buildLocal.decafTrunkPath is undefined' );
 
   // Command obtained from running in IntelliJ IDEA with the given .project.
   const cmd = [
@@ -44,9 +48,9 @@ module.exports = async function( project ) {
     // ~/phet-svn-trunk-2020/build-tools$ chmod u+x ./contrib/apache-ant/bin/ant
     // ~/phet-svn-trunk-2020/build-tools$ ./build.sh
     // Other jars taken from /phet-svn-trunk-2020/build-tools/build-tools-build.properties
-    `${TRUNK_PATH}/build-tools/ant_output/phetbuild/classes:${TRUNK_PATH}/build-tools/contrib/proguard/lib/proguard.jar:${TRUNK_PATH}/build-tools/contrib/commons-lang/commons-lang.jar:${TRUNK_PATH}/build-tools/contrib/jsch/jsch.jar:${TRUNK_PATH}/build-tools/contrib/scala/scala-compiler.jar:${TRUNK_PATH}/build-tools/contrib/scala/scala-library.jar:${TRUNK_PATH}/build-tools/contrib/apache-ant/lib/ant.jar:${TRUNK_PATH}/build-tools/contrib/apache-ant/lib/ant-launcher.jar:${TRUNK_PATH}/build-tools/contrib/yuicompressor/yuicompressor-2.4.4.jar:${TRUNK_PATH}/build-tools/contrib/jgit/org.eclipse.jgit-1.1.0.201109151100-r.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/tools.jar`,
+    `${trunkPath}/build-tools/ant_output/phetbuild/classes:${trunkPath}/build-tools/contrib/proguard/lib/proguard.jar:${trunkPath}/build-tools/contrib/commons-lang/commons-lang.jar:${trunkPath}/build-tools/contrib/jsch/jsch.jar:${trunkPath}/build-tools/contrib/scala/scala-compiler.jar:${trunkPath}/build-tools/contrib/scala/scala-library.jar:${trunkPath}/build-tools/contrib/apache-ant/lib/ant.jar:${trunkPath}/build-tools/contrib/apache-ant/lib/ant-launcher.jar:${trunkPath}/build-tools/contrib/yuicompressor/yuicompressor-2.4.4.jar:${trunkPath}/build-tools/contrib/jgit/org.eclipse.jgit-1.1.0.201109151100-r.jar:/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/lib/tools.jar`,
     'edu.colorado.phet.buildtools.BuildScript',
-    TRUNK_PATH,
+    trunkPath,
     project
   ];
 
@@ -61,21 +65,21 @@ module.exports = async function( project ) {
     console.log( 'perhaps the build directory exists' );
   }
 
-  const allJar = `${GIT_ROOT}decaf/projects/${project}/build/${project}_all.jar`;
-  await copyFile( `${TRUNK_PATH}/simulations-java/simulations/${project}/deploy/${project}_all.jar`, allJar );
+  const allJar = `${gitRoot}decaf/projects/${project}/build/${project}_all.jar`;
+  await copyFile( `${trunkPath}/simulations-java/simulations/${project}/deploy/${project}_all.jar`, allJar );
   console.log( 'copied' );
 
   await execute( '/Applications/cheerpj/cheerpjfy.py', [ allJar ] );
   console.log( 'cheerpjed' );
 
-  const javaProperties = fs.readFileSync( `${TRUNK_PATH}/simulations-java/simulations/${project}/${project}-build.properties`, 'utf-8' );
+  const javaProperties = fs.readFileSync( `${trunkPath}/simulations-java/simulations/${project}/${project}-build.properties`, 'utf-8' );
   const flavors = javaProperties.split( '\n' ).filter( line => line.startsWith( 'project.flavor' ) ).map( line => line.split( '.' )[ 2 ] );
   let url = '';
   if ( flavors.length === 0 ) {
-    url = `${URL_ROOT}/decaf/html?project=${project}`;
+    url = `${urlRoot}/decaf/html?project=${project}`;
   }
   else {
-    url = `${URL_ROOT}/decaf/html?project=${project}&simulation=${flavors[ 0 ]}`;
+    url = `${urlRoot}/decaf/html?project=${project}&simulation=${flavors[ 0 ]}`;
   }
 
   console.log( `awaiting preloads via puppeteer at url = ${url}` );
@@ -105,7 +109,7 @@ module.exports = async function( project ) {
 
   fs.writeFileSync( `${buildDir}/${project}.html`, html );
 
-  const stringFiles = fs.readdirSync( `${TRUNK_PATH}/simulations-java/simulations/${project}/data/${project}/localization` );
+  const stringFiles = fs.readdirSync( `${trunkPath}/simulations-java/simulations/${project}/data/${project}/localization` );
   const locales = stringFiles.filter( stringFile => stringFile.indexOf( '_' ) >= 0 ).map( file => file.substring( file.indexOf( '_' ) + 1, file.lastIndexOf( '.' ) ) );
   console.log( locales.join( '\n' ) );
 
@@ -119,7 +123,7 @@ module.exports = async function( project ) {
   const chipperSHA = await gitRevParse( 'chipper', 'HEAD' );
   const perennialSHA = await gitRevParse( 'perennial', 'HEAD' );
 
-  const svnInfo = await execute( 'svn', [ 'info' ], `${TRUNK_PATH}` );
+  const svnInfo = await execute( 'svn', [ 'info' ], `${trunkPath}` );
 
   const dependencies = {
     version: versionString,
@@ -133,12 +137,12 @@ module.exports = async function( project ) {
   await writeJSON( `${buildDir}/dependencies.json`, dependencies );
 
   if ( flavors.length === 0 ) {
-    console.log( `build and ready for local testing: ${URL_ROOT}/decaf/projects/${project}/build/${project}.html` );
+    console.log( `build and ready for local testing: ${urlRoot}/decaf/projects/${project}/build/${project}.html` );
   }
   else {
     console.log( 'build and ready for local testing:' );
     flavors.forEach( flavor => {
-      console.log( `build and ready for local testing: ${URL_ROOT}/decaf/projects/${project}/build/${project}.html?simulation=${flavor}` );
+      console.log( `build and ready for local testing: ${urlRoot}/decaf/projects/${project}/build/${project}.html?simulation=${flavor}` );
     } );
   }
 };

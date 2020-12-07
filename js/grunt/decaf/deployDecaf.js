@@ -25,9 +25,6 @@ const fs = require( 'fs' );
 
 // constants
 const BUILD_LOCAL_FILENAME = process.env.HOME + '/.phet/build-local.json';
-const buildLocalJSON = JSON.parse( fs.readFileSync( BUILD_LOCAL_FILENAME, { encoding: 'utf-8' } ) );
-const GIT_ROOT = buildLocalJSON.gitRoot;
-const TRUNK_PATH = buildLocalJSON.decafTrunkPath;
 
 /**
  * Deploys a dev version after incrementing the test version number.
@@ -40,12 +37,19 @@ const TRUNK_PATH = buildLocalJSON.decafTrunkPath;
  */
 module.exports = async function( project, dev, production ) {
 
-  const stringFiles = fs.readdirSync( `${TRUNK_PATH}/simulations-java/simulations/${project}/data/${project}/localization` );
+  const buildLocalJSON = JSON.parse( fs.readFileSync( BUILD_LOCAL_FILENAME, { encoding: 'utf-8' } ) );
+  const gitRoot = buildLocalJSON.gitRoot;
+  const trunkPath = buildLocalJSON.decafTrunkPath;
+
+  assert && assert( gitRoot !== undefined, 'buildLocal.gitRoot is undefined' );
+  assert && assert( trunkPath !== undefined, 'buildLocal.decafTrunkPath is undefined' );
+
+  const stringFiles = fs.readdirSync( `${trunkPath}/simulations-java/simulations/${project}/data/${project}/localization` );
   const locales = stringFiles.filter( stringFile => stringFile.indexOf( '_' ) >= 0 ).map( file => file.substring( file.indexOf( '_' ) + 1, file.lastIndexOf( '.' ) ) );
   console.log( locales.join( '\n' ) );
 
   // Output the flavors and locales
-  const javaProperties = fs.readFileSync( `${TRUNK_PATH}/simulations-java/simulations/${project}/${project}-build.properties`, 'utf-8' );
+  const javaProperties = fs.readFileSync( `${trunkPath}/simulations-java/simulations/${project}/${project}-build.properties`, 'utf-8' );
   // console.log(javaProperties);
 
 // like  project.flavor.moving-man.mainclass=edu.colorado.phet.movingman.MovingManApplication
@@ -122,20 +126,20 @@ module.exports = async function( project, dev, production ) {
     const versionURL = `https://phet-dev.colorado.edu/decaf/${project}/${versionString}`;
     console.log( 'DEPLOYED' );
 
-    if ( !fs.existsSync( `${GIT_ROOT}/decaf/build/log.txt` ) ) {
-      fs.mkdirSync( `${GIT_ROOT}/decaf/build` );
+    if ( !fs.existsSync( `${gitRoot}/decaf/build/log.txt` ) ) {
+      fs.mkdirSync( `${gitRoot}/decaf/build` );
     }
 
     flavors.forEach( flavor => {
       const url = `${versionURL}/${project}.html?simulation=${flavor}`;
       grunt.log.writeln( url );
-      fs.appendFileSync( `${GIT_ROOT}/decaf/build/log.txt`, url + '\n' );
+      fs.appendFileSync( `${gitRoot}/decaf/build/log.txt`, url + '\n' );
     } );
 
     if ( flavors.length === 0 ) {
       const URL = `${versionURL}/${project}.html`;
       grunt.log.writeln( URL );
-      fs.appendFileSync( `${GIT_ROOT}/decaf/build/log.txt`, URL + '\n' );
+      fs.appendFileSync( `${gitRoot}/decaf/build/log.txt`, URL + '\n' );
     }
   }
 
