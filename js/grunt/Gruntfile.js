@@ -396,7 +396,7 @@ module.exports = function ( grunt ) {
     const activeRepos = getDataFile( 'active-repos' );
 
     // Don't always require this, as we may have an older chipper checked out
-    require( '../../../chipper/js/grunt/lint' )( activeRepos, cache, grunt.option( 'say' ) );
+    require( '../../../chipper/js/grunt/lint' )( activeRepos, cache, grunt.option( 'fix' ) );
   } ) );
 
   grunt.registerTask( 'generate-data', '[NOTE: Runs automatically on bayes. DO NOT run locally] Generates the lists under perennial/data/, and if there were changes, will commit and push.', wrapTask( async () => {
