@@ -50,7 +50,7 @@ module.exports = async function ( branch, brands ) {
         reject( new Error( `Image deploy request failed with status code ${response.statusCode}.` ) );
       }
       else {
-        winston.info( 'Image deploy request sent successfully' );
+        winston.info( 'Image deploy request sent successfully.  If additional alternative images were deployed, go to the main admin page and trigger a recount.' );
         resolve();
       }
     } );
