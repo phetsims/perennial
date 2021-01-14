@@ -41,7 +41,7 @@ const assert = require( 'assert' );
 const winston = require( 'winston' );
 require( './checkNodeVersion' );
 
-module.exports = function ( grunt ) {
+module.exports = function( grunt ) {
 
   if ( grunt.option( 'debug' ) ) {
     winston.default.transports.console.level = 'debug';
@@ -62,7 +62,7 @@ module.exports = function ( grunt ) {
     try {
       await promise;
     }
-    catch ( e ) {
+    catch( e ) {
       if ( e.stack ) {
         grunt.fail.fatal( `Perennial task failed:\n${e.stack}\nFull Error details:\n${JSON.stringify( e, null, 2 )}` );
       }
@@ -261,7 +261,13 @@ module.exports = function ( grunt ) {
     } ) );
 
   grunt.registerTask( 'lint', 'Lints this repository only', wrapTask( async () => {
-    grunt.log.writeln( await execute( gruntCommand, [ 'lint', '--repo=perennial' ], '../chipper' ) );
+
+    const index = process.argv.indexOf( 'lint' );
+    assert && assert( index >= 0, 'lint command does not appear' );
+    const tail = process.argv.slice( index + 1 );
+
+    // Forward to chipper, supporting all of the options
+    grunt.log.writeln( await execute( gruntCommand, [ 'lint', ...tail ], '../chipper' ) );
   } ) );
 
   grunt.registerTask( 'wrapper',
@@ -389,14 +395,20 @@ module.exports = function ( grunt ) {
     } ) );
 
   grunt.registerTask( 'lint-everything', 'lint all js files for all repos', wrapTask( async () => {
+
     // --disable-eslint-cache disables the cache, useful for developing rules
     const cache = !grunt.option( 'disable-eslint-cache' );
-
-
     const activeRepos = getDataFile( 'active-repos' );
+    const fix = grunt.option( 'fix' );
 
-    // Don't always require this, as we may have an older chipper checked out
-    require( '../../../chipper/js/grunt/lint' )( activeRepos, cache, grunt.option( 'say' ) );
+    // Don't always require this, as we may have an older chipper checked out.  Also make sure it is the promise-based lint.
+    const lint = require( '../../../chipper/js/grunt/lint' );
+    if ( lint.chipperAPIVersion === 'promises1' ) {
+      await lint( activeRepos.map( repo => `../${repo}` ), {
+        cache: cache,
+        fix: fix
+      } );
+    }
   } ) );
 
   grunt.registerTask( 'generate-data', '[NOTE: Runs automatically on bayes. DO NOT run locally] Generates the lists under perennial/data/, and if there were changes, will commit and push.', wrapTask( async () => {

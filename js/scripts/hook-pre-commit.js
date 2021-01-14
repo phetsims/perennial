@@ -31,16 +31,30 @@ const outputToConsole = commandLineArguments.indexOf( '--console' ) >= 0;
 // Run lint tests if they exist in the checked-out SHAs.
 try {
   const lint = require( '../../../chipper/js/grunt/lint' );
+  if ( lint.chipperAPIVersion === 'promises1' ) {
 
-  // lint() automatically filters out non-lintable repos
-  const report = lint( [ repo ], true, false, true );
+    ( async () => {
 
-  if ( report.errorCount > 0 || report.warningCount > 0 ) {
-    console.error( `lint failed in ${repo}`, report.results );
-    process.exit( 1 );
+      // lint() automatically filters out non-lintable repos
+      // TODO: https://github.com/phetsims/phet-info/issues/150 we may want to autofix
+      const results = await lint( [ `../${repo}` ], {
+        cache: true,
+        fix: false,
+        warn: false
+      } );
+
+      const problems = results.filter( result => result.errorCount > 0 || result.warningCount > 0 );
+      problems.forEach( result => console.error( `lint failed in ${repo}`, result.filePath, result.messages.map( m => JSON.stringify( m, null, 2 ) ).join( '\n' ) ) );
+      if ( problems.length > 0 ) {
+        process.exit( 1 );
+      }
+
+      outputToConsole && console.log( 'Linting passed with results.length: ' + results.length );
+    } )();
   }
-
-  outputToConsole && console.log( 'Linting passed with results.length: ' + report.results.length );
+  else {
+    console.log( 'chipper/js/grunt/lint not compatible' );
+  }
 }
 catch( e ) {
   console.log( 'chipper/js/grunt/lint not found' );
@@ -84,7 +98,6 @@ try {
       }
 
       outputToConsole && console.log( 'no problems detected' );
-      process.exit( 0 );
     } )();
   }
 }
