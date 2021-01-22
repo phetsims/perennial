@@ -173,7 +173,7 @@ const launchSimAndGetPDOMText = async repo => {
                 const messageData = JSON.parse( event.data );
                 if ( messageData.type === 'load' ) {
                   console.log( 'sim loaded' );
-                  resolve( phet.joist.sim.display.accessibleDOMElement.outerHTML );
+                  resolve( phet.joist.display.accessibleDOMElement.outerHTML );
                 }
               }
               catch( e ) {
