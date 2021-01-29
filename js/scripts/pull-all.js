@@ -1,0 +1,49 @@
+// Copyright 2021, University of Colorado Boulder
+
+const execute = require( '../common/execute' );
+const _ = require( 'lodash' ); // eslint-disable-line
+const fs = require( 'fs' );
+
+// constants
+// Don't use getActiveRepos() since it cannot be run from the root
+const contents = fs.readFileSync( 'perennial/data/active-repos', 'utf8' ).trim();
+const repos = contents.split( '\n' ).map( sim => sim.trim() );
+
+/**
+ * Pulls all repos (with rebase)
+ *
+ * USAGE:
+ * cd ${root containing all repos}
+ * node perennial/js/scripts/pull-all.js
+ *
+ * @author Sam Reid (PhET Interactive Simulations)
+ */
+( async () => {
+
+  const a = repos.map( repo => execute( 'git', [ 'pull', '--rebase' ], `${repo}`, {
+
+    // resolve errors so Promise.all doesn't fail on first repo that cannot pull/rebase
+    errors: 'resolve'
+  } ) );
+  const out = await Promise.all( a );
+
+  // Report results
+  for ( let i = 0; i < a.length; i++ ) {
+    const repo = repos[ i ];
+    const o = out[ i ];
+
+    if ( o.code === 0 && o.stdout === 'Already up to date.\nCurrent branch master is up to date.\n' && o.stderr === '' ) {
+
+      // nothing to do
+    }
+    else {
+      console.log( repo );
+      if ( o.stdout.trim().length > 0 ) {
+        console.log( o.stdout );
+      }
+      if ( o.stderr.trim().length > 0 ) {
+        console.log( o.stderr );
+      }
+    }
+  }
+} )();
