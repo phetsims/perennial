@@ -45,7 +45,7 @@ const repos = contents.split( '\n' ).map( sim => sim.trim() );
     }
   }
 
-  const pushPromises = pushRepos.map( repo => execute( 'git', 'push', `${repo}`, {
+  const pushPromises = pushRepos.map( repo => execute( 'git', ['push'], `${repo}`, {
 
     // resolve errors so Promise.all doesn't fail on first repo that cannot pull/rebase
     errors: 'resolve'
