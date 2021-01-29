@@ -36,7 +36,7 @@ module.exports = function( cmd, args, cwd, options ) {
     //                      - in Promise.all without exiting on the 1st failure
     errors: 'reject'
   }, options );
-  assert && assert( options.errors === 'reject' || options.errors === 'resolve', 'Errors must reject or resolve' );
+  assert( options.errors === 'reject' || options.errors === 'resolve', 'Errors must reject or resolve' );
 
   class ExecuteError extends Error {
     /**
@@ -90,7 +90,7 @@ module.exports = function( cmd, args, cwd, options ) {
           reject( new ExecuteError( cmd, args, cwd, stdout, stderr, code ) );
         }
         else {
-          resolve( { code: code, stdout: stdout, stderr: stderr } );
+          resolve( stdout );
         }
       }
     } );
