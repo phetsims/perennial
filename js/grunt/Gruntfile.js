@@ -214,7 +214,7 @@ module.exports = function( grunt ) {
 
       const branches = await ReleaseBranch.getMaintenanceBranches( filterRepo => !repo || filterRepo === repo );
 
-      console.log( '\nRelease branches:\n' );
+      console.log( '\nRelease branches:\n{repo} {branch} {brand[,brand]+}\n' );
       for ( const branch of branches ) {
         console.log( branch.toString() );
       }
