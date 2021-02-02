@@ -163,7 +163,7 @@ interactiveDescriptionRepos.forEach( repo => {
     test: [ repo, 'interactive-description-fuzz', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzz&supportsDescriptions&memoryLimit=1000',
+    queryParameters: 'brand=phet&ea&fuzz&supportsDescription&memoryLimit=1000',
     testQueryParameters: 'duration=40000'
   } );
 
@@ -171,7 +171,7 @@ interactiveDescriptionRepos.forEach( repo => {
     test: [ repo, 'interactive-description-fuzzBoard', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzzBoard&supportsDescriptions&memoryLimit=1000',
+    queryParameters: 'brand=phet&ea&fuzzBoard&supportsDescription&memoryLimit=1000',
     testQueryParameters: 'duration=40000'
   } );
 
@@ -179,7 +179,7 @@ interactiveDescriptionRepos.forEach( repo => {
     test: [ repo, 'interactive-description-fuzz', 'built' ],
     type: 'sim-test',
     url: `${repo}/build/phet/${repo}_en_phet.html`,
-    queryParameters: 'fuzz&supportsDescriptions&memoryLimit=1000',
+    queryParameters: 'fuzz&supportsDescription&memoryLimit=1000',
     testQueryParameters: 'duration=40000',
 
     brand: 'phet',
@@ -191,7 +191,7 @@ interactiveDescriptionRepos.forEach( repo => {
     test: [ repo, 'interactive-description-fuzzBoard', 'built' ],
     type: 'sim-test',
     url: `${repo}/build/phet/${repo}_en_phet.html`,
-    queryParameters: 'fuzzBoard&supportsDescriptions&memoryLimit=1000',
+    queryParameters: 'fuzzBoard&supportsDescription&memoryLimit=1000',
     testQueryParameters: 'duration=40000',
 
     brand: 'phet',
