@@ -78,7 +78,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     let versionChanged;
 
     if ( previousVersion.testType === null ) {
-      if ( noninteractive || !await booleanPrompt( `It appears that the last deployment was a production deployment (${previousVersion.toString()}).\nWould you like to redeploy (i.e. did the last production deploy fail for some reason?)`, false ) ) {
+      if ( noninteractive || !await booleanPrompt( `The last deployment was a production deployment (${previousVersion.toString()}) and an RC version is required between production versions. Would you like to redeploy ${previousVersion.toString()} (y) or cancel this process and revert to master (N)`, false ) ) {
         throw new Error( 'Aborted production deployment: It appears that the last deployment was for production.' );
       }
 
