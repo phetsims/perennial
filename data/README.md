@@ -8,7 +8,7 @@ active-runnables (auto-generated) is a list of all repositories that can be buil
 d
 active-sims (auto-generated) is a list of all simulation repositories that can be built with chipper.  Similar to runnables, but doesn't include repos with test code like sun, scenery-phet, etc.
 
-interactive-descriptions (auto-generated) is a list of all repositories that have been outfitted with interactive description like keyboard navigation. Sims in progress are also included in this list.  
+interactive-description (auto-generated) is a list of all repositories that have been outfitted with interactive description like keyboard navigation. Sims in progress are also included in this list.  
 
 phet-io (auto-generated) is the list of all simulations that are instrumented with PhET-iO features. This list is automatically fuzz
     tested and is used by phetmarks to dictate which sims have wrapper links. See 

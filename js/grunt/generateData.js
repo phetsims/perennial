@@ -69,14 +69,14 @@ module.exports = async function() {
     fs.writeFileSync( `data/${name}`, repos.join( os.EOL ) + os.EOL );
   }
 
-  writeList( 'interactive-descriptions', phet => phet.supportsInteractiveDescription );
+  writeList( 'interactive-description', phet => phet.supportsInteractiveDescription );
   writeList( 'active-runnables', phet => phet.runnable );
   writeList( 'active-sims', phet => phet.simulation );
   writeList( 'unit-tests', phet => phet.generatedUnitTests );
   writeList( 'color-profiles', phet => phet.colorProfile );
   writeList( 'phet-io', phet => phet.runnable && phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) );
 
-  await gitAdd( 'perennial', 'data/interactive-descriptions' );
+  await gitAdd( 'perennial', 'data/interactive-description' );
   await gitAdd( 'perennial', 'data/active-runnables' );
   await gitAdd( 'perennial', 'data/active-sims' );
   await gitAdd( 'perennial', 'data/unit-tests' );
