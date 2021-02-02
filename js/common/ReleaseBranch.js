@@ -100,7 +100,7 @@ module.exports = ( function() {
      * @returns {string}
      */
     toString() {
-      return `${this.repo} ${this.branch} ${this.brands.join( ',' )}${this.isReleased ? '' : ' (unreleased)'}`;
+      return `${this.repo} ${this.branch} ${this.brands.join( ',' )}${this.isReleased ? '' : ' (unpublished)'}`;
     }
 
     /**
