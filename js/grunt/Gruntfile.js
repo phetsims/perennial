@@ -9,6 +9,7 @@
 'use strict';
 
 const Maintenance = require( '../common/Maintenance' );
+const ReleaseBranch = require( '../common/ReleaseBranch' );
 const checkoutDependencies = require( '../common/checkoutDependencies' );
 const checkoutMaster = require( '../common/checkoutMaster' );
 const checkoutRelease = require( '../common/checkoutRelease' );
@@ -27,9 +28,9 @@ const cherryPick = require( './cherryPick' );
 const createOneOff = require( './createOneOff' );
 const createRelease = require( './createRelease' );
 const createSim = require( './createSim' );
-const deployImages = require( './deployImages' );
-const deployDecaf = require( './decaf/deployDecaf' );
 const buildDecaf = require( './decaf/buildDecaf' );
+const deployDecaf = require( './decaf/deployDecaf' );
+const deployImages = require( './deployImages' );
 const dev = require( './dev' );
 const generateData = require( './generateData' );
 const printPhetioLinks = require( './printPhetioLinks' );
@@ -203,6 +204,20 @@ module.exports = function( grunt ) {
         }
         return result;
       } ).join( '\n' ) );
+    } ) );
+
+  grunt.registerTask( 'release-branch-list',
+    'Prints out a list of all release branches that would need maintenance patches\n' +
+    '--repo : Only show branches for a specific repository',
+    wrapTask( async () => {
+      const repo = grunt.option( 'repo' );
+
+      const branches = await ReleaseBranch.getMaintenanceBranches( filterRepo => !repo || filterRepo === repo );
+
+      console.log( '\nRelease branches:\n' );
+      for ( const branch of branches ) {
+        console.log( branch.toString() );
+      }
     } ) );
 
   grunt.registerTask( 'npm-update',
