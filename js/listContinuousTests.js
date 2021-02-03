@@ -94,6 +94,13 @@ runnableRepos.forEach( repo => {
   } );
 
   tests.push( {
+    test: [ repo, 'multitouch-fuzz', 'unbuilt' ],
+    type: 'sim-test',
+    url: `${repo}/${repo}_en.html`,
+    queryParameters: 'brand=phet&ea&fuzz&fuzzPointers=2&memoryLimit=1000'
+  } );
+
+  tests.push( {
     test: [ repo, 'fuzz', 'built' ],
     type: 'sim-test',
     url: `${repo}/build/phet/${repo}_en_phet.html`,
