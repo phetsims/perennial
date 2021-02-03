@@ -153,7 +153,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     /**
      * The necessary clean up steps to do if aborting after the build
      * @param {string} message - message to error out with
-     * @returns {Promise<void>}
+     * @returns {Promise.<void>}
      */
     const postBuildAbort = async message => {
 

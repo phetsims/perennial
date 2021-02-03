@@ -84,7 +84,7 @@ module.exports = async ( repo, sha ) => {
  * Checkout master again and unstash changes if they apply
  * @param {Array.<string>} repos
  * @param {Array.<string>} reposThatNeedUnstashing
- * @returns {Promise<void>}
+ * @returns {Promise.<void>}
  */
 const restoreWorkingCopy = async ( repos, reposThatNeedUnstashing ) => {
 
@@ -102,7 +102,7 @@ const restoreWorkingCopy = async ( repos, reposThatNeedUnstashing ) => {
 /**
  * Stash working copy changes, keeping track of any repo stashed so it can be unstashed
  * @param {Array.<string>} repos
- * @returns {Promise<Array.<string>>} - the repos that will need unstashing
+ * @returns {Promise.<Array.<string>>} - the repos that will need unstashing
  */
 const stashAll = async repos => {
 
@@ -141,7 +141,7 @@ const stashAll = async repos => {
  * TODO https://github.com/phetsims/perennial/issues/138 add in functions that can be executed to change the model in between tests.
  * TODO https://github.com/phetsims/perennial/issues/138 maybe we could fuzz a few frames, and then test while setting the random seed to be the same for all pages
  * @param repo
- * @returns {Promise<string>}
+ * @returns {Promise.<string>}
  */
 const launchSimAndGetPDOMText = async repo => {
 
