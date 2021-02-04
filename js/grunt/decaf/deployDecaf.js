@@ -55,7 +55,8 @@ module.exports = async function( project, dev, production ) {
 
 // like  project.flavor.moving-man.mainclass=edu.colorado.phet.movingman.MovingManApplication
 
-  const flavors = javaProperties.split( '\n' ).filter( line => line.startsWith( 'project.flavor' ) ).map( line => line.split( '.' )[ 2 ] );
+  const flavorLines = javaProperties.split( '\n' ).filter( line => line.startsWith( 'project.flavor' ) );
+  const flavors = flavorLines.length > 0 ? flavorLines.map( line => line.split( '.' )[ 2 ] ) : [ `${project}` ];
   console.log( flavors.join( '\n' ) );
 
   if ( !( await vpnCheck() ) ) {
@@ -154,9 +155,9 @@ module.exports = async function( project, dev, production ) {
     const productionServerURL = buildLocal.productionServerURL || 'https://phet.colorado.edu';
     // await devSsh( `mkdir -p "/data/web/static/phetsims/sims/cheerpj/${project}"` );
     const template = `cd /data/web/static/phetsims/sims/cheerpj/
-mkdir -p ${project}
+sudo -u phet-admin mkdir -p ${project}
 cd ${project}
-scp -r bayes.colorado.edu:/data/web/htdocs/dev/decaf/${project}/${version} .
+sudo -u phet-admin scp -r bayes.colorado.edu:/data/web/htdocs/dev/decaf/${project}/${version} .
 
 sudo chmod g+w *
 printf "RewriteEngine on\\nRewriteBase /sims/cheerpj/${project}/\\nRewriteRule ^latest(.*) ${version}\\$1\\nHeader set Access-Control-Allow-Origin \\"*\\"\\n" > .htaccess
