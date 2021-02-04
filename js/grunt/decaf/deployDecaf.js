@@ -8,6 +8,7 @@
 
 'use strict';
 
+const assert = require( 'assert' );
 const SimVersion = require( '../../common/SimVersion' );
 const buildLocal = require( '../../common/buildLocal' );
 const devDirectoryExists = require( '../../common/devDirectoryExists' );
