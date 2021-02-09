@@ -97,7 +97,7 @@ runnableRepos.forEach( repo => {
     test: [ repo, 'multitouch-fuzz', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzz&fuzzPointers=2&memoryLimit=1000&supportsPanAndZoom=true'
+    queryParameters: 'brand=phet&ea&fuzz&fuzzPointers=2&memoryLimit=1000&supportsPanAndZoom=false'
   } );
 
   tests.push( {
