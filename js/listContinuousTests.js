@@ -21,7 +21,7 @@ const phetioNoState = getRepoList( 'phet-io-state-unsupported' );
 const unitTestRepos = getRepoList( 'unit-tests' );
 
 /**
- * {Array.<string>} test
+ * {Array.<Object>} test
  * {string} type
  * {string} [url]
  * {string} [repo]
@@ -29,7 +29,7 @@ const unitTestRepos = getRepoList( 'unit-tests' );
  * {string} [testQueryParameters]
  * {boolean} [es5]
  * {string} [brand]
- * {number} [priority]
+ * {number} [priority=1] - higher priorities are tested more eagerly
  * {Array.<string>} buildDependencies
  */
 const tests = [];
@@ -97,7 +97,15 @@ runnableRepos.forEach( repo => {
     test: [ repo, 'multitouch-fuzz', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzz&fuzzPointers=2&memoryLimit=1000'
+    queryParameters: 'brand=phet&ea&fuzz&fuzzPointers=2&memoryLimit=1000&supportsPanAndZoom=true'
+  } );
+
+  tests.push( {
+    test: [ repo, 'pan-and-zoom-fuzz', 'unbuilt' ],
+    type: 'sim-test',
+    url: `${repo}/${repo}_en.html`,
+    queryParameters: 'brand=phet&ea&fuzz&fuzzPointers=2&memoryLimit=1000&supportsPanAndZoom=true',
+    priority: .5 // test this when there isn't other work to be done
   } );
 
   tests.push( {
