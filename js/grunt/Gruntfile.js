@@ -415,13 +415,15 @@ module.exports = function( grunt ) {
     const cache = !grunt.option( 'disable-eslint-cache' );
     const activeRepos = getDataFile( 'active-repos' );
     const fix = grunt.option( 'fix' );
+    const format = grunt.option( 'format' );
 
     // Don't always require this, as we may have an older chipper checked out.  Also make sure it is the promise-based lint.
     const lint = require( '../../../chipper/js/grunt/lint' );
     if ( lint.chipperAPIVersion === 'promises1' ) {
       await lint( activeRepos.map( repo => `../${repo}` ), {
         cache: cache,
-        fix: fix
+        fix: fix,
+        format: format
       } );
     }
   } ) );
