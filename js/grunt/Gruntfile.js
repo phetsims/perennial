@@ -65,13 +65,13 @@ module.exports = function( grunt ) {
     }
     catch( e ) {
       if ( e.stack ) {
-        grunt.fail.fatal( `Perennial task failed:\n${e.stack}\nFull Error details:\n${JSON.stringify( e, null, 2 )}` );
+        grunt.fail.fatal( `Perennial task failed:\n${e.stack}\nFull Error details:\n${e}` );
       }
       else if ( typeof e === 'string' ) {
         grunt.fail.fatal( `Perennial task failed: ${e}` );
       }
       else {
-        grunt.fail.fatal( `Perennial task failed with unknown error: ${JSON.stringify( e, null, 2 )}` );
+        grunt.fail.fatal( `Perennial task failed with unknown error: ${e}` );
       }
     }
 
