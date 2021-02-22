@@ -38,7 +38,7 @@ const repos = contents.split( '\n' ).map( sim => sim.trim() );
       // nothing to do
     }
     else {
-      console.log( repo );
+      console.log( '##', repo );
       if ( o.stdout.trim().length > 0 ) {
         console.log( o.stdout );
       }
