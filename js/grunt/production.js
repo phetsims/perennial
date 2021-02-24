@@ -25,7 +25,6 @@ const grunt = require( 'grunt' );
 const gruntCommand = require( '../common/gruntCommand' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
-const phetioAPIChangeCheck = require( './phetioAPIChangeCheck' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 const simMetadata = require( '../common/simMetadata' );
 const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
@@ -168,10 +167,6 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       throw new Error( message );
     };
 
-    // Test that phet-io api changes didn't occur between this production build and the last maintenance release for it.
-    if ( brands.includes( 'phet-io' ) && version.maintenance > 0 ) {
-      await phetioAPIChangeCheck( repo, version, postBuildAbort );
-    }
 
     if ( !await booleanPrompt( `Please test the built version of ${repo}.\nIs it ready to deploy?`, noninteractive ) ) {
       await postBuildAbort( 'Aborted production deployment (aborted version change too).' );
