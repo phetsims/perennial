@@ -352,6 +352,8 @@ const commonQueryParameters = {
   screens21NoHome: 'brand=phet&fuzz&memoryLimit=1000&ea&screens=2,1&homeScreen=false',
   initialScreen2NoHome: 'brand=phet&fuzz&memoryLimit=1000&ea&initialScreen=2&homeScreen=false',
   initialScreen2: 'brand=phet&fuzz&memoryLimit=1000&ea&initialScreen=2',
+
+  // Purposefully use incorrect syntax to make sure it is caught correctly without crashing
   screensVerbose: 'brand=phet&fuzz&memoryLimit=1000&ea&screens=Screen1,Screen2',
   screensOther: 'brand=phet&fuzz&memoryLimit=1000&ea&screens=1.1,Screen2'
 };
