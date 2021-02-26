@@ -79,7 +79,7 @@ const deployImages = async options => {
       try {
 
         // Get all published sims
-        request( 'https://phet.colorado.edu/services/metadata/1.2/simulations?format=json&summary&locale=en&type=html', async function ( error, response, body ) {
+        request( 'https://phet.colorado.edu/services/metadata/1.2/simulations?format=json&summary&locale=en&type=html', async function( error, response, body ) {
           if ( error ) {
             console.error( 'failed to fetch metadata request', error );
             reject( error );
@@ -93,7 +93,7 @@ const deployImages = async options => {
             try {
               projects = JSON.parse( body ).projects;
             }
-            catch ( e ) {
+            catch( e ) {
               console.error( 'failed to parse json from metadata request', e );
               reject( e );
               return;
@@ -110,7 +110,7 @@ const deployImages = async options => {
           }
         } );
       }
-      catch ( e ) {
+      catch( e ) {
         reject( e );
       }
     } );

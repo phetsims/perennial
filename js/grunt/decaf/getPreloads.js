@@ -24,9 +24,9 @@ module.exports = async url => {
       if ( msg.text().indexOf( 'Simulation started...' ) >= 0 ) {
         receivedResources = true;
 
-        runtimeResources= await page.evaluate(() => window.cjGetRuntimeResources());
+        runtimeResources = await page.evaluate( () => window.cjGetRuntimeResources() );
 
-        await resolved(runtimeResources);
+        await resolved( runtimeResources );
       }
 
       else if ( msg.type() === 'error' ) {
@@ -39,7 +39,7 @@ module.exports = async url => {
     const resolved = async runtimeResources => {
       if ( receivedResources ) {
         await browser.close();
-        resolve(runtimeResources);
+        resolve( runtimeResources );
       }
     };
 

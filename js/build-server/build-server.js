@@ -187,7 +187,7 @@ const queueDeploy = ( api, repos, simName, version, locales, brands, servers, em
           try {
             shas = JSON.stringify( JSON.parse( shas ), null, 2 );
           }
-          catch ( e ) {
+          catch( e ) {
             // invalid JSON
           }
           const errorMessage = 'Build failure: ' + err + '. ' + simInfoString + ' Shas = ' + JSON.stringify( shas );

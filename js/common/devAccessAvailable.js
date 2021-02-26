@@ -21,7 +21,7 @@ module.exports = async function() {
     await devSsh( 'ls' );
     return true;
   }
-  catch ( e ) {
+  catch( e ) {
     return false;
   }
 };

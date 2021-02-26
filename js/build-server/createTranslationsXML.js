@@ -77,7 +77,7 @@ module.exports = async function( simName, version ) {
   try {
     await writeFile( xmlFilepath, finalXML );
   }
-  catch ( err ) {
+  catch( err ) {
     return Promise.reject( err );
   }
   winston.log( 'info', 'wrote XML file:\n' + fs.readFileSync( xmlFilepath ).toString() );

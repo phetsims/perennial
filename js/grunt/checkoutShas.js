@@ -32,7 +32,7 @@ module.exports = function( repositoryName, toMaster, buildServer ) {
 
   for ( const property of dependencies ) {
     if ( property !== 'comment' && property !== repositoryName && dependencies.hasOwnProperty( property ) ) {
-      assert( typeof( dependencies[ property ].branch !== 'undefined' ) && typeof( dependencies[ property ].sha !== 'undefined' ) );
+      assert( typeof ( dependencies[ property ].branch !== 'undefined' ) && typeof ( dependencies[ property ].sha !== 'undefined' ) );
 
       grunt.log.writeln( 'Checking out dependency ' + property + ': ' + dependencies[ property ].branch + '@' + dependencies[ property ].sha );
 

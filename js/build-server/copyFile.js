@@ -4,7 +4,7 @@
 
 const fs = require( 'graceful-fs' ); // eslint-disable-line
 
-module.exports = async function ( src, dest ) {
+module.exports = async function( src, dest ) {
   return new Promise( ( resolve, reject ) => {
     fs.copyFile( src, dest, err => {
       if ( err ) {

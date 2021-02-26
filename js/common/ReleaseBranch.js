@@ -191,10 +191,10 @@ module.exports = ( function() {
             results.push( currentCommit + ' ' + previousCommit + ' ' + dependencies[ this.repo ].sha );
           }
           if ( ( await getRepoVersion( this.repo ) ).testType === 'rc' && this.isReleased ) {
-            results.push( 'Release candidate version detected (see if there is a QA issue)');
+            results.push( 'Release candidate version detected (see if there is a QA issue)' );
           }
         }
-        catch ( e ) {
+        catch( e ) {
           results.push( `Failure to check current/previous commit: ${e.message}` );
         }
       }
@@ -273,7 +273,7 @@ module.exports = ( function() {
         for ( const branch of branches ) {
           // We aren't unreleased if we're included in either phet or phet-io metadata.
           // See https://github.com/phetsims/balancing-act/issues/118
-          if ( phetBranches.concat( phetioBranches ).filter( releaseBranch => releaseBranch.repo === repo && releaseBranch.branch === branch ).length  ) {
+          if ( phetBranches.concat( phetioBranches ).filter( releaseBranch => releaseBranch.repo === repo && releaseBranch.branch === branch ).length ) {
             continue;
           }
 

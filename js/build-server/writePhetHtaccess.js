@@ -57,7 +57,7 @@ module.exports = async function writePhetHtaccess( simName, version ) {
       try {
         await writeFile( constants.HTML_SIMS_DIRECTORY + simName + '/.htaccess', contents );
       }
-      catch ( err ) {
+      catch( err ) {
         reject( err );
       }
       resolve();

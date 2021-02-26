@@ -27,7 +27,7 @@ module.exports = async function( repo, shas ) {
     try {
       success = await gitCherryPick( repo, sha );
     }
-    catch ( e ) {
+    catch( e ) {
       grunt.log.error( 'abort failed :' + JSON.stringify( e ) );
       return;
     }

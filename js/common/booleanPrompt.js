@@ -24,6 +24,6 @@ module.exports = async function( question, noninteractive ) {
   }
 
   const answer = await prompt( `${question} [y/N]?` );
-  
+
   return !( /[Nn]/.test( answer ) ) && /[Yy]/.test( answer );
 };

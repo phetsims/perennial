@@ -47,7 +47,7 @@ module.exports = async ( repo, version, onError = async () => {}, noninteractive
 
   const latestVersionString = `${latestVersion.versionMajor}.${latestVersion.versionMinor}.${latestVersion.versionMaintenance}`;
 
-  const latestDeployedURL= `https://phet-io.colorado.edu/sims/${repo}/${latestVersionString}/${phetioAPIFileName}`;
+  const latestDeployedURL = `https://phet-io.colorado.edu/sims/${repo}/${latestVersionString}/${phetioAPIFileName}`;
   const latestDeployedVersionAPI = JSON.parse( await request( latestDeployedURL ) );
 
   const builtVersionAPI = JSON.parse( grunt.file.read( builtVersionAPIFile ) );

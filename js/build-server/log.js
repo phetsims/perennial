@@ -6,7 +6,7 @@
  * Source: https://stackoverflow.com/a/17737613/2496827
  */
 
-const constants = require('./constants' );
+const constants = require( './constants' );
 const winston = require( 'winston' );
 const Loggly = require( 'winston-loggly' ).Loggly; // eslint-disable-line
 

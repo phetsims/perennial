@@ -24,7 +24,7 @@ const winston = require( 'winston' );
  * @param {string} brands - CSV
  * @returns {Promise} - No resolved value
  */
-module.exports = async function ( branch, brands ) {
+module.exports = async function( branch, brands ) {
   return new Promise( ( resolve, reject ) => {
     const requestObject = {
       brands: brands || 'phet',
@@ -42,7 +42,7 @@ module.exports = async function ( branch, brands ) {
     winston.info( url );
     winston.info( JSON.stringify( requestObject ) );
 
-    request.post( { url: url, json: requestObject }, function ( error, response ) {
+    request.post( { url: url, json: requestObject }, function( error, response ) {
       if ( error ) {
         reject( new Error( `Image deploy request failed with error ${error}.` ) );
       }
