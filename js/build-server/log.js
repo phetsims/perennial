@@ -17,7 +17,7 @@ winston.add( Loggly, loggly_options );
 // add timestamps to log messages
 winston.remove( winston.transports.Console );
 winston.add( winston.transports.Console, {
-  'level': constants.BUILD_SERVER_CONFIG.verbose ? 'debug' : 'info'
+  level: constants.BUILD_SERVER_CONFIG.verbose ? 'debug' : 'info'
 } );
 
 module.exports = winston;
