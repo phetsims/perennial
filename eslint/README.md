@@ -63,10 +63,9 @@ Usually you should use the `extends` keyword to build upon one of the
 above configurations. Linting rules specific to the repo can be declared
 or modified here. For example see `scenery/package.json`.
 
-If there is a sub-directory that requires specific configuration (or the repo
-doesn't have a `package.json`, like `sherpa`), you can
-create a file called `.eslintrc.js` in that directory, and specify the
-necessary configuration there. For example see `chipper/test/eslintrc.js`.
+In each repo's `package.json`, the key `eslintConfig` specifies the eslint config for the repo, and should extend one of 
+the default config files here in `./chipper/eslint`, (described above). Additional rules specific to the directory (like 
+whitelisted globals) can be specified here to. For example see `scenery/package.json`.
 
 Before creating a special configuration unique to one repo or sub-directory,
 answer these questions:
