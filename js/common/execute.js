@@ -83,7 +83,7 @@ module.exports = function( cmd, args, cwd, options ) {
       winston.debug( stdout && `stdout: ${stdout}` || 'stdout is empty.' );
 
       if ( options.errors === 'resolve' ) {
-        resolve( { code: code, stdout: stdout, stderr: stderr } );
+        resolve( { code: code, stdout: stdout, stderr: stderr, cwd: cwd } );
       }
       else {
         if ( code !== 0 ) {
