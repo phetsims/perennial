@@ -11,3 +11,4 @@ node_modules/
 build-server.log
 js/build-server/tmp*
 .maintenance.json
+build-phet-io-macro-api
