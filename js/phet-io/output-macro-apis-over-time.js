@@ -58,10 +58,10 @@ const restore = false;
     verbose && console.log( checkouts );
 
     // see if that chipper knows how to generate a macro API
-    const generateMacroAPI = require( '../../../chipper/js/phet-io/generateMacroAPI' );
+    const generatePhetioMacroAPI = require( '../../../chipper/js/phet-io/generatePhetioMacroAPI' );
     const formatPhetioAPI = require( '../../../chipper/js/phet-io/formatPhetioAPI' );
-    if ( generateMacroAPI.apiVersion === '1.0.0-dev.0' ) {
-      const macroAPI = await generateMacroAPI( [ 'natural-selection' ], {
+    if ( generatePhetioMacroAPI.apiVersion === '1.0.0-dev.0' ) {
+      const macroAPI = await generatePhetioMacroAPI( [ 'natural-selection' ], {
         showProgressBar: true,
         showMessagesFromSim: false
       } );
