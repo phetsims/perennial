@@ -55,6 +55,7 @@ module.exports = async ( repo, sha ) => {
   // checkout-date.sh takes an "opt-out" list of repos that shouldn't be checked out.
   const keepOnMaster = _.without( activeRepos, ...dependencies );
   keepOnMaster.push( 'babel' ); // we don't need to worry about babel, this is only for running in requirejs mode
+  keepOnMaster.push( 'perennial' ); // not perennial!
 
   // checkout date will checkout all needed repos, we don't need to npm update because we are only running in requirejs mode
   await execute( 'sh', [ './perennial/bin/checkout-date.sh', '-m', keepOnMaster, shaDate ], '../' );
@@ -145,62 +146,57 @@ const stashAll = async repos => {
  */
 const launchSimAndGetPDOMText = async repo => {
 
-  return new Promise( async ( resolve, reject ) => {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
 
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-
-    page.on( 'console', msg => {
-      if ( msg.type() === 'error' ) {
-        console.error( 'PAGE ERROR:', msg.text() );
-      }
-      else {
-        console.log( 'PAGE LOG:', msg.text() );
-      }
-    } );
-
-    page.on( 'load', async () => {
-
-      const pdoms = await page.evaluate( () => {
-        return new Promise( function( resolve, reject ) {
-
-          // TODO https://github.com/phetsims/perennial/issues/138
-          // window.phet.sim.joist.frameEndedEmitter.addListener();
-
-          window.addEventListener( 'message', function( event ) {
-            if ( event.data ) {
-              try {
-                const messageData = JSON.parse( event.data );
-                if ( messageData.type === 'load' ) {
-                  console.log( 'sim loaded' );
-                  resolve( phet.joist.display.pdomRootElement.outerHTML );
-                }
-              }
-              catch( e ) {
-
-                // message isn't what we wanted it to be, so ignore it
-                console.log( 'CAUGHT ERROR:', e.message );
-              }
-            }
-          } );
-          setTimeout( function() {
-            reject( 'Load timeout' );
-          }, 20000 );
-        } );
-      } );
-      browser.close();
-      resolve( pdoms );
-    } );
-
-    page.on( 'error', msg => reject( msg ) );
-    page.on( 'pageerror', msg => reject( msg ) );
-
-    try {
-      await page.goto( `${buildLocal.localTestingURL}${repo}/${repo}_en.html?brand=phet&postMessageOnLoad` );
+  page.on( 'console', msg => {
+    if ( msg.type() === 'error' ) {
+      console.error( 'PAGE ERROR:', msg.text() );
     }
-    catch( e ) {
-      browser.close();
-      reject( e );
+    else {
+      console.log( 'PAGE LOG:', msg.text() );
     }
   } );
+
+  page.on( 'load', async () => {
+
+    const pdoms = await page.evaluate( async () => {
+
+      // TODO https://github.com/phetsims/perennial/issues/138
+      // window.phet.sim.joist.frameEndedEmitter.addListener();
+
+      window.addEventListener( 'message', function( event ) {
+        if ( event.data ) {
+          try {
+            const messageData = JSON.parse( event.data );
+            if ( messageData.type === 'load' ) {
+              console.log( 'sim loaded' );
+              return phet.joist.display.pdomRootElement.outerHTML;
+            }
+          }
+          catch( e ) {
+
+            // message isn't what we wanted it to be, so ignore it
+            console.log( 'CAUGHT ERROR:', e.message );
+          }
+        }
+      } );
+      setTimeout( () => {
+        throw new Error( 'Load timeout' );
+      }, 20000 );
+    } );
+    browser.close();
+    return pdoms;
+  } );
+
+  page.on( 'error', msg => { throw new Error( msg ); } );
+  page.on( 'pageerror', msg => { throw new Error( msg ); } );
+
+  try {
+    await page.goto( `${buildLocal.localTestingURL}${repo}/${repo}_en.html?brand=phet&postMessageOnLoad` );
+  }
+  catch( e ) {
+    browser.close();
+    throw new Error( e );
+  }
 };
