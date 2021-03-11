@@ -99,7 +99,7 @@ module.exports = function( grunt ) {
     wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
-      const buildServer = grunt.option( 'buildServer' ) ? true : false;
+      const buildServer = !!grunt.option( 'buildServer' );
 
       const repo = grunt.option( 'repo' );
       const dependencies = grunt.file.readJSON( buildServer ? '../perennial/js/build-server/tmp/dependencies.json' : '../' + repo + '/dependencies.json' );
