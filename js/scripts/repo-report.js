@@ -23,7 +23,7 @@ exec( 'git rev-list master', ( error, stdout, stderr ) => {
 
   if ( stderr.length === 0 && stdout.length !== 0 ) {
     const lines = stdout.trim().split( /\n/ ).reverse();
-    console.log( 'sha' + '\t' + 'date' + '\t' + 'LOC' + '\t' + 'TODO' + '\t' + 'REVIEW' );
+    console.log( 'sha\tdate\tLOC\tTODO\tREVIEW' );
     const visit = function( index ) {
 
       exec( 'git checkout ' + lines[ index ], ( error, stdout, stderr ) => {

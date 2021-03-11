@@ -59,7 +59,7 @@ module.exports = async function( simName, version ) {
   for ( let j = 0; j < stringFiles.length; j++ ) {
     const stringFile = stringFiles[ j ];
     const languageJSON = ( stringFile.locale === constants.ENGLISH_LOCALE ) ? englishStrings :
-                         JSON.parse( fs.readFileSync( '../babel' + '/' + simName + '/' + stringFile.name, { encoding: 'utf-8' } ) );
+                         JSON.parse( fs.readFileSync( '../babel/' + simName + '/' + stringFile.name, { encoding: 'utf-8' } ) );
 
     const simHTML = constants.HTML_SIMS_DIRECTORY + simName + '/' + version + '/' + simName + '_' + stringFile.locale + '.html';
 
@@ -71,7 +71,7 @@ module.exports = async function( simName, version ) {
     }
   }
 
-  finalXML = finalXML.concat( '</simulations>\n' + '</project>' );
+  finalXML = finalXML.concat( '</simulations>\n</project>' );
 
   const xmlFilepath = constants.HTML_SIMS_DIRECTORY + simName + '/' + version + '/' + simName + '.xml';
   try {
