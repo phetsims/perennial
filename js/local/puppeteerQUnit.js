@@ -6,7 +6,7 @@
 
 module.exports = function( browser, targetURL ) {
 
-  return new Promise( async function( resolve, reject ) {
+  return new Promise( async ( resolve, reject ) => {
     const page = await browser.newPage();
     let ended = false;
     const end = async function( result ) {
@@ -59,7 +59,7 @@ module.exports = function( browser, targetURL ) {
       assertionErrors.push( msg );
     } );
 
-    await page.exposeFunction( 'harness_done', async function( context ) {
+    await page.exposeFunction( 'harness_done', async context => {
       // console.log( '\n' );
 
       if ( moduleErrors.length > 0 ) {
