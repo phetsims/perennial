@@ -30,7 +30,7 @@ module.exports = async function( repo, sha ) {
   const sims = data.projects.map( simData => {
     return {
       name: simData.name.slice( simData.name.indexOf( '/' ) + 1 ),
-      branch: simData.version.major + '.' + simData.version.minor
+      branch: `${simData.version.major}.${simData.version.minor}`
     };
   } );
 
@@ -38,7 +38,7 @@ module.exports = async function( repo, sha ) {
   const excludedSims = [];
 
   for ( const sim of sims ) {
-    console.log( 'checking ' + sim.name );
+    console.log( `checking ${sim.name}` );
 
     await gitCheckout( sim.name, sim.branch );
     const dependencies = await getDependencies( sim.name );

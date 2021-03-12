@@ -7,11 +7,11 @@ module.exports = function logRequest( req, type, winston ) {
   let requestBodyString = '';
   for ( const key in req[ type ] ) {
     if ( req[ type ].hasOwnProperty( key ) ) {
-      requestBodyString += key + ':' + JSON.stringify( req[ type ][ key ] ) + '\n';
+      requestBodyString += `${key}:${JSON.stringify( req[ type ][ key ] )}\n`;
     }
   }
   winston.log(
     'info',
-    'deploy request received, original URL = ' + ( req.protocol + '://' + req.get( 'host' ) + req.originalUrl ) + '\n' + requestBodyString
+    `deploy request received, original URL = ${req.protocol}://${req.get( 'host' )}${req.originalUrl}\n${requestBodyString}`
   );
 };

@@ -28,12 +28,12 @@ module.exports = async function( repo, shas ) {
       success = await gitCherryPick( repo, sha );
     }
     catch( e ) {
-      grunt.log.error( 'abort failed :' + JSON.stringify( e ) );
+      grunt.log.error( `abort failed :${JSON.stringify( e )}` );
       return;
     }
 
     if ( success ) {
-      grunt.log.ok( 'Cherry-pick with ' + sha + ' was successful' );
+      grunt.log.ok( `Cherry-pick with ${sha} was successful` );
       return;
     }
   }

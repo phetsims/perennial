@@ -188,7 +188,7 @@ module.exports = ( function() {
           const previousCommit = await gitRevParse( this.repo, `${currentCommit}^` );
           if ( dependencies[ this.repo ].sha !== previousCommit ) {
             results.push( 'Potential changes (dependency is not previous commit)' );
-            results.push( currentCommit + ' ' + previousCommit + ' ' + dependencies[ this.repo ].sha );
+            results.push( `${currentCommit} ${previousCommit} ${dependencies[ this.repo ].sha}` );
           }
           if ( ( await getRepoVersion( this.repo ) ).testType === 'rc' && this.isReleased ) {
             results.push( 'Release candidate version detected (see if there is a QA issue)' );
@@ -244,7 +244,7 @@ module.exports = ( function() {
       // Released phet branches
       const phetBranches = simMetadataResult.projects.map( simData => {
         const repo = simData.name.slice( simData.name.indexOf( '/' ) + 1 );
-        const branch = simData.version.major + '.' + simData.version.minor;
+        const branch = `${simData.version.major}.${simData.version.minor}`;
         return new ReleaseBranch( repo, branch, [ 'phet' ], true );
       } );
 
@@ -255,7 +255,7 @@ module.exports = ( function() {
       } ) ).filter( simData => simData.active && simData.latest ).map( simData => {
         let branch = `${simData.versionMajor}.${simData.versionMinor}`;
         if ( simData.versionSuffix.length ) {
-          branch += '-' + simData.versionSuffix; // additional dash required
+          branch += `-${simData.versionSuffix}`; // additional dash required
         }
         return new ReleaseBranch( simData.name, branch, [ 'phet-io' ], true );
       } );

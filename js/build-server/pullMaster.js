@@ -31,14 +31,14 @@ module.exports = async function pullMaster( repos ) {
   }
 
   for ( const repoName in reposCopy ) {
-    winston.log( 'info', 'pulling from ' + repoName );
-    const repoDir = '../' + repoName;
+    winston.log( 'info', `pulling from ${repoName}` );
+    const repoDir = `../${repoName}`;
 
     try {
       await execute( 'git', [ 'checkout', 'master' ], repoDir );
     }
     catch( error ) {
-      return Promise.reject( 'git checkout master failed in ' + repoName );
+      return Promise.reject( `git checkout master failed in ${repoName}` );
     }
 
     try {

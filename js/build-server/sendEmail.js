@@ -38,7 +38,7 @@ module.exports = function sendEmail( subject, text, emailParameter, emailParamet
         emailTo = emailParameter;
       }
       else {
-        emailTo += ( ', ' + emailParameter );
+        emailTo += ( `, ${emailParameter}` );
       }
     }
 
@@ -56,12 +56,12 @@ module.exports = function sendEmail( subject, text, emailParameter, emailParamet
       },
       ( err, message ) => {
         if ( err ) {
-          winston.log( 'error', 'error when attempted to send email, err = ' + err );
+          winston.log( 'error', `error when attempted to send email, err = ${err}` );
         }
         else {
-          winston.log( 'info', 'sent email to: ' + message.header.to +
-                               ', subject: ' + mimelib.decodeMimeWord( message.header.subject ) +
-                               ', text: ' + message.text );
+          winston.log( 'info', `sent email to: ${message.header.to
+                               }, subject: ${mimelib.decodeMimeWord( message.header.subject )
+                               }, text: ${message.text}` );
         }
       }
     );

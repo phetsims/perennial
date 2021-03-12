@@ -29,10 +29,10 @@ const buildDir = './js/build-server/tmp';
  * @param {String|Error} err - error logged and sent via email
  */
 const abortBuild = async err => {
-  winston.log( 'error', 'BUILD ABORTED! ' + err );
+  winston.log( 'error', `BUILD ABORTED! ${err}` );
   winston.log( 'info', 'build aborted: checking out master for every repo in case build shas are still checked out' );
   await execute( 'grunt', [ 'checkout-master-all' ], constants.PERENNIAL );
-  return Promise.reject( 'Build aborted,' + err );
+  return Promise.reject( `Build aborted,${err}` );
 };
 
 /**
@@ -96,7 +96,7 @@ async function taskWorker( options ) {
     let branch = options.branch;
 
     if ( userId ) {
-      winston.log( 'info', 'setting userId = ' + userId );
+      winston.log( 'info', `setting userId = ${userId}` );
     }
 
     const simNameRegex = /^[a-z-]+$/;
@@ -110,11 +110,11 @@ async function taskWorker( options ) {
     // make sure the repos passed in validates
     for ( const key in repos ) {
       if ( repos.hasOwnProperty( key ) ) {
-        winston.log( 'info', 'Validating repo: ' + key );
+        winston.log( 'info', `Validating repo: ${key}` );
 
         // make sure all keys in repos object are valid sim names
         if ( !simNameRegex.test( key ) ) {
-          return abortBuild( 'invalid simName in repos: ' + simName );
+          return abortBuild( `invalid simName in repos: ${simName}` );
         }
 
         const value = repos[ key ];
@@ -125,18 +125,18 @@ async function taskWorker( options ) {
         }
         else if ( value instanceof Object && value.hasOwnProperty( 'sha' ) ) {
           if ( !/^[a-f0-9]{40}$/.test( value.sha ) ) {
-            return abortBuild( 'invalid sha in repos. key: ' + key + ' value: ' + value + ' sha: ' + value.sha );
+            return abortBuild( `invalid sha in repos. key: ${key} value: ${value} sha: ${value.sha}` );
           }
         }
         else {
-          return abortBuild( 'invalid item in repos. key: ' + key + ' value: ' + value );
+          return abortBuild( `invalid item in repos. key: ${key} value: ${value}` );
         }
       }
     }
 
     // validate simName
     if ( !simNameRegex.test( simName ) ) {
-      return abortBuild( 'invalid simName ' + simName );
+      return abortBuild( `invalid simName ${simName}` );
     }
 
     // Infer brand from version string and keep unstripped version for phet-io
@@ -154,15 +154,15 @@ async function taskWorker( options ) {
           // otherwise strip any suffix
           version = versionMatch[ 1 ];
         }
-        winston.log( 'info', 'detecting version number: ' + version );
+        winston.log( 'info', `detecting version number: ${version}` );
       }
       else {
-        return abortBuild( 'invalid version number: ' + version );
+        return abortBuild( `invalid version number: ${version}` );
       }
     }
 
     const simDir = `../${simName}`;
-    winston.log( 'info', 'building sim ' + simName );
+    winston.log( 'info', `building sim ${simName}` );
 
     // Create the temporary build dir, removing the existing dir if it exists.
     await new Promise( ( resolve, reject ) => {
@@ -195,15 +195,15 @@ async function taskWorker( options ) {
       } );
     } );
 
-    await writeFile( buildDir + '/dependencies.json', JSON.stringify( repos ) );
-    winston.log( 'info', 'wrote file ' + buildDir + '/dependencies.json' );
+    await writeFile( `${buildDir}/dependencies.json`, JSON.stringify( repos ) );
+    winston.log( 'info', `wrote file ${buildDir}/dependencies.json` );
 
     await execute( 'git', [ 'pull' ], constants.PERENNIAL );
     await execute( 'npm', [ 'prune' ], constants.PERENNIAL );
     await execute( 'npm', [ 'update' ], constants.PERENNIAL );
     await execute( './perennial/bin/clone-missing-repos.sh', [], '..' );
     await pullMaster( repos );
-    await execute( 'grunt', [ 'checkout-shas', '--buildServer=true', '--repo=' + simName ], constants.PERENNIAL );
+    await execute( 'grunt', [ 'checkout-shas', '--buildServer=true', `--repo=${simName}` ], constants.PERENNIAL );
     await execute( 'git', [ 'checkout', repos[ simName ].sha ], simDir );
     await execute( 'npm', [ 'prune' ], '../chipper' );
     await execute( 'npm', [ 'update' ], '../chipper' );
@@ -215,16 +215,16 @@ async function taskWorker( options ) {
     }
 
     const brandLocales = ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) ? locales : 'en';
-    winston.log( 'info', 'building for brands: ' + brands + ' version: ' + version );
+    winston.log( 'info', `building for brands: ${brands} version: ${version}` );
 
     const chipperVersion = ChipperVersion.getFromRepository();
-    winston.debug( 'Chipper version detected: ' + chipperVersion.toString() );
+    winston.debug( `Chipper version detected: ${chipperVersion.toString()}` );
 
     if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
-      await execute( 'grunt', [ '--allHTML', '--debugHTML', '--brands=' + brands.join( ',' ), '--locales=' + brandLocales ], simDir );
+      await execute( 'grunt', [ '--allHTML', '--debugHTML', `--brands=${brands.join( ',' )}`, `--locales=${brandLocales}` ], simDir );
     }
     else if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ) {
-      const args = [ 'build-for-server', '--brand=' + brands[ 0 ], '--locales=' + brandLocales ];
+      const args = [ 'build-for-server', `--brand=${brands[ 0 ]}`, `--locales=${brandLocales}` ];
       if ( brands[ 0 ] === constants.PHET_BRAND ) {
         args.push( '--allHTML' );
       }
@@ -234,14 +234,14 @@ async function taskWorker( options ) {
       return abortBuild( 'Unsupported chipper version' );
     }
 
-    winston.debug( 'deploying to servers: ' + JSON.stringify( servers ) );
+    winston.debug( `deploying to servers: ${JSON.stringify( servers )}` );
 
     if ( servers.indexOf( constants.DEV_SERVER ) >= 0 ) {
       winston.info( 'deploying to dev' );
       if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
         const htaccessLocation = ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) ?
-                                 simDir + '/build/phet-io' :
-                                 simDir + '/build';
+                                 `${simDir}/build/phet-io` :
+                                 `${simDir}/build`;
         await writePhetioHtaccess( htaccessLocation );
       }
       await devDeploy( simDir, simName, version, chipperVersion, brands );
@@ -255,22 +255,22 @@ async function taskWorker( options ) {
       for ( const i in brands ) {
         if ( brands.hasOwnProperty( i ) ) {
           const brand = brands[ i ];
-          winston.info( 'deploying brand: ' + brand );
+          winston.info( `deploying brand: ${brand}` );
 
           // Pre-copy steps
           if ( brand === constants.PHET_BRAND ) {
             targetSimDir = constants.HTML_SIMS_DIRECTORY + simName;
-            targetVersionDir = targetSimDir + '/' + version + '/';
+            targetVersionDir = `${targetSimDir}/${version}/`;
 
             if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
               // Remove _phet from all filenames in the phet directory
-              const files = fs.readdirSync( simDir + '/build/phet' );
+              const files = fs.readdirSync( `${simDir}/build/phet` );
               for ( const i in files ) {
                 if ( files.hasOwnProperty( i ) ) {
                   const filename = files[ i ];
                   if ( filename.indexOf( '_phet' ) >= 0 ) {
                     const newFilename = filename.replace( '_phet', '' );
-                    await execute( 'mv', [ filename, newFilename ], simDir + '/build/phet' );
+                    await execute( 'mv', [ filename, newFilename ], `${simDir}/build/phet` );
                   }
                 }
               }
@@ -278,7 +278,7 @@ async function taskWorker( options ) {
           }
           else if ( brand === constants.PHET_IO_BRAND ) {
             targetSimDir = constants.PHET_IO_SIMS_DIRECTORY + simName;
-            targetVersionDir = targetSimDir + '/' + originalVersion;
+            targetVersionDir = `${targetSimDir}/${originalVersion}`;
 
             // Chipper 1.0 has -phetio in the version schema for PhET-iO branded sims
             if ( chipperVersion.major === 0 && !originalVersion.match( '-phetio' ) ) {
@@ -291,7 +291,7 @@ async function taskWorker( options ) {
           await new Promise( async ( resolve, reject ) => {
             // If this is a deploy of 1.0.0, create the sim directory
             if ( !fs.existsSync( targetSimDir ) ) {
-              winston.debug( 'Creating sim dir: ' + targetSimDir );
+              winston.debug( `Creating sim dir: ${targetSimDir}` );
               try {
                 await new Promise( ( resolve, reject ) => {
                   fs.mkdir( targetSimDir, err => {
@@ -309,7 +309,7 @@ async function taskWorker( options ) {
               }
             }
             // Create the version directory
-            winston.debug( 'Creating version dir: ' + targetVersionDir );
+            winston.debug( `Creating version dir: ${targetVersionDir}` );
             fs.mkdir( targetVersionDir, err => {
               if ( err && err.code !== 'EEXIST' ) {
                 winston.debug( 'Failure creating version dir' );
@@ -319,17 +319,17 @@ async function taskWorker( options ) {
               resolve();
             } );
           } );
-          let sourceDir = simDir + '/build';
+          let sourceDir = `${simDir}/build`;
           if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
-            sourceDir += '/' + brand;
+            sourceDir += `/${brand}`;
           }
           await new Promise( ( resolve, reject ) => {
-            winston.debug( 'Copying recursive ' + sourceDir + ' to ' + targetVersionDir );
+            winston.debug( `Copying recursive ${sourceDir} to ${targetVersionDir}` );
             new rsync()
               .flags( 'razpO' )
               .set( 'no-perms' )
               .set( 'exclude', '.rsync-filter' )
-              .source( sourceDir + '/' )
+              .source( `${sourceDir}/` )
               .destination( targetVersionDir )
               .output( stdout => { winston.debug( stdout.toString() ); },
                 stderr => { winston.error( stderr.toString() ); } )

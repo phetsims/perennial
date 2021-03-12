@@ -20,7 +20,7 @@ const fs = require( 'fs' );
 const _ = require( 'lodash' ); // eslint-disable-line
 
 // constants
-const BUILD_LOCAL_FILENAME = process.env.HOME + '/.phet/build-local.json';
+const BUILD_LOCAL_FILENAME = `${process.env.HOME}/.phet/build-local.json`;
 
 /**
  * Deploys a dev version after incrementing the test version number.
@@ -84,7 +84,7 @@ module.exports = async function( project ) {
 
   console.log( `awaiting preloads via puppeteer at url = ${url}` );
   const preloadResources = await getPreloads( url );
-  console.log( 'We have the preloads!\n' + preloadResources );
+  console.log( `We have the preloads!\n${preloadResources}` );
 
   const packageFileRelative = `projects/${project}/package.json`;
   const packageFile = `../decaf/${packageFileRelative}`;

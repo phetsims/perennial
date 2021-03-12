@@ -221,7 +221,7 @@ phetioRepos.forEach( repo => {
     tests.push( {
       test: [ repo, 'phet-io-wrappers-tests', useAssert ? 'assert' : 'no-assert' ],
       type: 'qunit-test',
-      url: 'phet-io-wrappers/phet-io-wrappers-tests.html?sim=' + repo + ( useAssert ? '&phetioDebug' : '' )
+      url: `phet-io-wrappers/phet-io-wrappers-tests.html?sim=${repo}${useAssert ? '&phetioDebug' : ''}`
     } );
   } );
 } );
@@ -243,9 +243,9 @@ unitTestRepos.forEach( repo => {
       return;
     }
     tests.push( {
-      test: [ repo, 'top-level-unit-tests', 'unbuilt' + queryString ],
+      test: [ repo, 'top-level-unit-tests', `unbuilt${queryString}` ],
       type: 'qunit-test',
-      url: repo + '/' + repo + '-tests.html' + queryString
+      url: `${repo}/${repo}-tests.html${queryString}`
     } );
   } );
 } );
@@ -281,9 +281,9 @@ unitTestRepos.forEach( repo => {
 ].forEach( ( { repo, urls } ) => {
   urls.forEach( pageloadRelativeURL => {
     tests.push( {
-      test: [ repo, 'pageload', '/' + pageloadRelativeURL ],
+      test: [ repo, 'pageload', `/${pageloadRelativeURL}` ],
       type: 'pageload-test',
-      url: repo + '/' + pageloadRelativeURL,
+      url: `${repo}/${pageloadRelativeURL}`,
       priority: 4 // Fast to test, so test them more
     } );
   } );
@@ -328,9 +328,9 @@ unitTestRepos.forEach( repo => {
 ].forEach( ( { repo, urls } ) => {
   urls.forEach( pageloadRelativeURL => {
     tests.push( {
-      test: [ repo, 'pageload', '/' + pageloadRelativeURL ],
+      test: [ repo, 'pageload', `/${pageloadRelativeURL}` ],
       type: 'pageload-test',
-      url: repo + '/' + pageloadRelativeURL,
+      url: `${repo}/${pageloadRelativeURL}`,
       priority: 5, // When these are built, it should be really quick to test
 
       brand: 'phet',

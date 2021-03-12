@@ -43,10 +43,10 @@ function getDeployConfig( fs ) {
 
   //------------------------------------------------------------------------------------
   // read configuration file
-  const BUILD_LOCAL_FILENAME = process.env.HOME + '/.phet/build-local.json';
+  const BUILD_LOCAL_FILENAME = `${process.env.HOME}/.phet/build-local.json`;
   const buildLocalJSON = JSON.parse( fs.readFileSync( BUILD_LOCAL_FILENAME, { encoding: 'utf-8' } ) );
-  assert( buildLocalJSON.buildServerAuthorizationCode, 'buildServerAuthorizationCode missing from ' + BUILD_LOCAL_FILENAME );
-  assert( buildLocalJSON.devUsername, 'devUsername missing from ' + BUILD_LOCAL_FILENAME );
+  assert( buildLocalJSON.buildServerAuthorizationCode, `buildServerAuthorizationCode missing from ${BUILD_LOCAL_FILENAME}` );
+  assert( buildLocalJSON.devUsername, `devUsername missing from ${BUILD_LOCAL_FILENAME}` );
 
   //------------------------------------------------------------------------------------
   // Assemble the deployConfig

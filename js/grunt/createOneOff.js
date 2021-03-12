@@ -50,7 +50,7 @@ module.exports = async function( repo, branch, message ) {
   }
 
   // Create the branch, update the version info
-  await execute( 'git', [ 'checkout', '-b', branch ], '../' + repo );
+  await execute( 'git', [ 'checkout', '-b', branch ], `../${repo}` );
   await setRepoVersion( repo, newVersion, message );
   await gitPush( repo, branch );
 

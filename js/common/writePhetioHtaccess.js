@@ -32,10 +32,10 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
   // https://phet-io.colorado.edu/sims/{{sim-name}}/{{major}}.{{minor}} to https://phet-io.colorado.edu/sims/{{sim-name}}/{{major}}.{{minor}}.{{latest}}{{[-suffix]}}
   if ( isProductionDeploy ) {
     if ( latestOption.simName && latestOption.version && latestOption.directory ) {
-      const redirectFilepath = latestOption.directory + latestOption.simName + '/.htaccess';
+      const redirectFilepath = `${latestOption.directory + latestOption.simName}/.htaccess`;
       let latestRedirectContents = 'RewriteEngine on\n' +
                                    `RewriteBase /sims/${latestOption.simName}/\n`;
-      const versions = JSON.parse( await request( buildLocal.productionServerURL + `/services/metadata/phetio?name=${latestOption.simName}&latest=true` ) );
+      const versions = JSON.parse( await request( `${buildLocal.productionServerURL}/services/metadata/phetio?name=${latestOption.simName}&latest=true` ) );
       for ( const v of versions ) {
         // Add a trailing slash to /sims/sim-name/x.y
         latestRedirectContents += `RewriteRule ^${v.versionMajor}.${v.versionMinor}$ ${v.versionMajor}.${v.versionMinor}/ [R=301,L]\n`;
@@ -80,21 +80,21 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
         await fs.unlinkSync( getSubdirHtaccessFullPath( subdir ) );
       }
       catch( e ) {
-        winston.debug( 'did not remove ' + subdir + ' htaccess ' + e );
+        winston.debug( `did not remove ${subdir} htaccess ${e}` );
       }
     }
     try {
       await fs.unlinkSync( rootHtaccessFullPath );
     }
     catch( e ) {
-      winston.debug( 'did not remove root htaccess ' + e );
+      winston.debug( `did not remove root htaccess ${e}` );
     }
   }
   else {
     try {
-      const passwordProtectWrapperContents = 'AuthType Basic\n' +
+      const passwordProtectWrapperContents = `${'AuthType Basic\n' +
                                              'AuthName "PhET-iO Password Protected Area"\n' +
-                                             'AuthUserFile ' + authFilepath + '\n' +
+                                             'AuthUserFile '}${authFilepath}\n` +
                                              'Require valid-user\n';
 
       // Write a file to add authentication to subdirectories like wrappers/ or doc/
@@ -115,9 +115,9 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
 
       // Write a file to add authentication to the top level index pages
       if ( phetioPackage.phet && phetioPackage.phet.addRootHTAccessFile ) {
-        const passwordProtectIndexContents = '<FilesMatch "(index\\.\\w+|api\\.json)$">\n'
-                                             + passwordProtectWrapperContents
-                                             + '</FilesMatch>\n';
+        const passwordProtectIndexContents = `<FilesMatch "(index\\.\\w+|api\\.json)$">\n${
+                                              passwordProtectWrapperContents
+                                              }</FilesMatch>\n`;
         await writeFile( rootHtaccessFullPath, passwordProtectIndexContents );
         if ( devVersionPath ) {
           await devScp( rootHtaccessFullPath, `${devVersionPath}/phet-io/${htaccessFilename}` );

@@ -31,7 +31,7 @@ module.exports = async function( repo, includeNpmUpdate ) {
 
   assert( data.projects.length === 1, 'Metadata request should only return 1 simulation result' );
 
-  const branch = data.projects[ 0 ].version.major + '.' + data.projects[ 0 ].version.minor;
+  const branch = `${data.projects[ 0 ].version.major}.${data.projects[ 0 ].version.minor}`;
 
   return await checkoutTarget( repo, branch, includeNpmUpdate );
 };

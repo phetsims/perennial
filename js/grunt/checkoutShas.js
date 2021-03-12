@@ -20,7 +20,7 @@ const grunt = require( 'grunt' );
  */
 module.exports = function( repositoryName, toMaster, buildServer ) {
 
-  const dependencies = grunt.file.readJSON( ( buildServer ) ? '../perennial/js/build-server/tmp/dependencies.json' : '../' + repositoryName + '/dependencies.json' );
+  const dependencies = grunt.file.readJSON( ( buildServer ) ? '../perennial/js/build-server/tmp/dependencies.json' : `../${repositoryName}/dependencies.json` );
   const done = grunt.task.current.async();
   let numToCheckOut = 0;
   let numCheckedOut = 0;
@@ -34,14 +34,14 @@ module.exports = function( repositoryName, toMaster, buildServer ) {
     if ( property !== 'comment' && property !== repositoryName && dependencies.hasOwnProperty( property ) ) {
       assert( typeof ( dependencies[ property ].branch !== 'undefined' ) && typeof ( dependencies[ property ].sha !== 'undefined' ) );
 
-      grunt.log.writeln( 'Checking out dependency ' + property + ': ' + dependencies[ property ].branch + '@' + dependencies[ property ].sha );
+      grunt.log.writeln( `Checking out dependency ${property}: ${dependencies[ property ].branch}@${dependencies[ property ].sha}` );
 
       //To execute something from a different directory:
       //cp.exec('foocommand', { cwd: 'path/to/dir/' }, callback);
       //http://stackoverflow.com/questions/14026967/calling-child-process-exec-in-node-as-though-it-was-executed-in-a-specific-folde
-      const command = 'git checkout ' + ( toMaster ? 'master' : dependencies[ property ].sha );
-      child_process.exec( command, { cwd: '../' + property }, ( error1, stdout1, stderr1 ) => {
-        assert( !error1, 'error in ' + command + ' for repo ' + property );
+      const command = `git checkout ${toMaster ? 'master' : dependencies[ property ].sha}`;
+      child_process.exec( command, { cwd: `../${property}` }, ( error1, stdout1, stderr1 ) => {
+        assert( !error1, `error in ${command} for repo ${property}` );
         grunt.log.writeln( 'Finished checkout.' );
         grunt.log.writeln( stdout1 );
         grunt.log.writeln( stderr1 );

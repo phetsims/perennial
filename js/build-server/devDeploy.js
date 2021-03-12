@@ -36,8 +36,8 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
     const simVersionDirectory = `${simDirectory}/${versionDirectory}`;
 
     // mkdir first in case it doesn't exist already
-    await devSsh( 'mkdir -p ' + simVersionDirectory );
-    const buildDir = simDir + '/build';
+    await devSsh( `mkdir -p ${simVersionDirectory}` );
+    const buildDir = `${simDir}/build`;
 
     // copy the files
     if ( brands.includes( constants.PHET_BRAND ) ) {
@@ -54,8 +54,8 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
       new rsync()
         .flags( 'razpFFO' )
         .set( 'no-perms' )
-        .source( buildDir + '/' )
-        .destination( user + '@' + host + ':' + simVersionDirectory )
+        .source( `${buildDir}/` )
+        .destination( `${user}@${host}:${simVersionDirectory}` )
         .execute( ( err, code, cmd ) => {
           if ( err ) {
             winston.debug( code );

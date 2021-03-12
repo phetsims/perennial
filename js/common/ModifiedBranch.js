@@ -264,7 +264,7 @@ module.exports = ( function() {
 ${this.pushedMessages.map( message => `- ${message}` ).join( '\n' )}
 
 Presumably one or more of these changes is likely to have been applied after the last RC version, and should be spot-checked by QA in the next RC (or if it was ready for a production release, an additional spot-check RC should be created).
-${additionalNotes ? '\n' + additionalNotes : ''}`
+${additionalNotes ? `\n${additionalNotes}` : ''}`
       } );
     }
 

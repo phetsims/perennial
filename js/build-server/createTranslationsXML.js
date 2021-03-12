@@ -14,8 +14,8 @@ const writeFile = require( '../common/writeFile' );
  * @param version
  */
 module.exports = async function( simName, version ) {
-  const rootdir = '../babel/' + simName;
-  const englishStringsFile = simName + '-strings_en.json';
+  const rootdir = `../babel/${simName}`;
+  const englishStringsFile = `${simName}-strings_en.json`;
   const stringFiles = [ { name: englishStringsFile, locale: constants.ENGLISH_LOCALE } ];
 
   // pull all the string filenames and locales from babel and store in stringFiles array
@@ -36,13 +36,13 @@ module.exports = async function( simName, version ) {
   // try opening the english strings file so we can read the english strings
   let englishStrings;
   try {
-    englishStrings = JSON.parse( fs.readFileSync( '../' + simName + '/' + englishStringsFile, { encoding: 'utf-8' } ) );
+    englishStrings = JSON.parse( fs.readFileSync( `../${simName}/${englishStringsFile}`, { encoding: 'utf-8' } ) );
   }
   catch( e ) {
     return Promise.reject( new Error( 'English strings file not found' ) );
   }
 
-  const simTitleKey = simName + '.title'; // all sims must have a key of this form
+  const simTitleKey = `${simName}.title`; // all sims must have a key of this form
   let simTitle;
   if ( englishStrings[ simTitleKey ] ) {
     simTitle = englishStrings[ simTitleKey ].value;
@@ -52,34 +52,34 @@ module.exports = async function( simName, version ) {
   }
 
   // create xml, making a simulation tag for each language
-  let finalXML = '<?xml version="1.0" encoding="utf-8" ?>\n' +
-                 '<project name="' + simName + '">\n' +
+  let finalXML = `${'<?xml version="1.0" encoding="utf-8" ?>\n' +
+                 '<project name="'}${simName}">\n` +
                  '<simulations>\n';
 
   for ( let j = 0; j < stringFiles.length; j++ ) {
     const stringFile = stringFiles[ j ];
     const languageJSON = ( stringFile.locale === constants.ENGLISH_LOCALE ) ? englishStrings :
-                         JSON.parse( fs.readFileSync( '../babel/' + simName + '/' + stringFile.name, { encoding: 'utf-8' } ) );
+                         JSON.parse( fs.readFileSync( `../babel/${simName}/${stringFile.name}`, { encoding: 'utf-8' } ) );
 
-    const simHTML = constants.HTML_SIMS_DIRECTORY + simName + '/' + version + '/' + simName + '_' + stringFile.locale + '.html';
+    const simHTML = `${constants.HTML_SIMS_DIRECTORY + simName}/${version}/${simName}_${stringFile.locale}.html`;
 
     if ( fs.existsSync( simHTML ) ) {
       const localizedSimTitle = ( languageJSON[ simTitleKey ] ) ? languageJSON[ simTitleKey ].value : englishStrings[ simTitleKey ].value;
-      finalXML = finalXML.concat( '<simulation name="' + simName + '" locale="' + stringFile.locale + '">\n' +
-                                  '<title><![CDATA[' + localizedSimTitle + ']]></title>\n' +
+      finalXML = finalXML.concat( `<simulation name="${simName}" locale="${stringFile.locale}">\n` +
+                                  `<title><![CDATA[${localizedSimTitle}]]></title>\n` +
                                   '</simulation>\n' );
     }
   }
 
   finalXML = finalXML.concat( '</simulations>\n</project>' );
 
-  const xmlFilepath = constants.HTML_SIMS_DIRECTORY + simName + '/' + version + '/' + simName + '.xml';
+  const xmlFilepath = `${constants.HTML_SIMS_DIRECTORY + simName}/${version}/${simName}.xml`;
   try {
     await writeFile( xmlFilepath, finalXML );
   }
   catch( err ) {
     return Promise.reject( err );
   }
-  winston.log( 'info', 'wrote XML file:\n' + fs.readFileSync( xmlFilepath ).toString() );
+  winston.log( 'info', `wrote XML file:\n${fs.readFileSync( xmlFilepath ).toString()}` );
   return Promise.resolve( simTitle );
 };

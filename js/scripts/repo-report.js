@@ -26,7 +26,7 @@ exec( 'git rev-list master', ( error, stdout, stderr ) => {
     console.log( 'sha\tdate\tLOC\tTODO\tREVIEW' );
     const visit = function( index ) {
 
-      exec( 'git checkout ' + lines[ index ], ( error, stdout, stderr ) => {
+      exec( `git checkout ${lines[ index ]}`, ( error, stdout, stderr ) => {
 
         exec( 'grep -ro "TODO" ./js/ | wc -l', ( error, stdout, stderr ) => {
           const todoCount = stdout.trim();
@@ -43,7 +43,7 @@ exec( 'git rev-list master', ( error, stdout, stderr ) => {
                 // console.log( 'hello ' + lines[ index ] );
                 // console.log( stdout.trim() );
                 // console.log( stdout.trim() );
-                console.log( lines[ index ] + '\t' + date + '\t' + lineCount + '\t' + todoCount + '\t' + reviewCount );
+                console.log( `${lines[ index ]}\t${date}\t${lineCount}\t${todoCount}\t${reviewCount}` );
                 if ( index < lines.length - 1 ) {
                   visit( index + 1 );
                 }

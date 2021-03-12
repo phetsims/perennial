@@ -71,6 +71,6 @@ module.exports = function( path ) {
     }
 
     grunt.file.write( path, result.join( '\n' ) );
-    grunt.log.writeln( 'sorted ' + count + ' require statements in ' + path );
+    grunt.log.writeln( `sorted ${count} require statements in ${path}` );
   }
 };

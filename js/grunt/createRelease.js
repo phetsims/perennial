@@ -43,7 +43,7 @@ module.exports = async function( repo, branch, message ) {
 
   const currentBranch = await getBranch( repo );
   if ( currentBranch !== 'master' ) {
-    grunt.fail.fatal( 'Should be on master to create a release branch, not: ' + ( currentBranch ? currentBranch : '(detached head)' ) );
+    grunt.fail.fatal( `Should be on master to create a release branch, not: ${currentBranch ? currentBranch : '(detached head)'}` );
   }
 
   const hasBranchAlready = await hasRemoteBranch( repo, branch );

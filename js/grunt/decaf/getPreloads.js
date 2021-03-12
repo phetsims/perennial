@@ -30,7 +30,7 @@ module.exports = async url => {
       }
 
       else if ( msg.type() === 'error' ) {
-        const location = msg.location ? ':\n  ' + msg.location().url : '';
+        const location = msg.location ? `:\n  ${msg.location().url}` : '';
         const message = msg.text() + location;
         console.error( 'Error from sim:', message );
       }

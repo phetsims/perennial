@@ -1,7 +1,7 @@
 // Copyright 2021, University of Colorado Boulder
 module.exports = {
   toGitHubDate( date ) {
-    return date.toISOString().split( 'T' )[ 0 ] + ' 23:59';
+    return `${date.toISOString().split( 'T' )[ 0 ]} 23:59`;
   },
   toFilename( date ) {
     return this.toGitHubDate( date ).replace( /:/, '_' );

@@ -51,7 +51,7 @@ module.exports = async function( repo, author, options ) {
    */
   function toTitle( simName ) {
     const tmpString = simName.replace( /-(.)/g, ( match, group1 ) => {
-      return ' ' + group1.toUpperCase();
+      return ` ${group1.toUpperCase()}`;
     } );
     return tmpString.substring( 0, 1 ).toUpperCase() + tmpString.substring( 1 );
   }
@@ -63,11 +63,11 @@ module.exports = async function( repo, author, options ) {
   const destinationPath = `../${repo}`;
   if ( grunt.file.exists( destinationPath ) ) {
     if ( clean ) {
-      grunt.log.writeln( 'Cleaning ' + destinationPath );
+      grunt.log.writeln( `Cleaning ${destinationPath}` );
       grunt.file.delete( destinationPath, { force: true } ); // delete won't operate outside of current working dir unless forced
     }
     else {
-      grunt.log.writeln( 'WARNING:' + destinationPath + ' already exists, overwriting' );
+      grunt.log.writeln( `WARNING:${destinationPath} already exists, overwriting` );
     }
   }
   grunt.file.mkdir( destinationPath );
@@ -109,7 +109,7 @@ module.exports = async function( repo, author, options ) {
       contents = contents.replace( /\/\/ Copyright \d\d\d\d.*/g, `// Copyright ${yearToday}, University of Colorado Boulder` );
 
       // Replace names in the path where the contents will be written
-      let contentsPath = subdir ? ( destinationPath + '/' + subdir + '/' + filename ) : ( destinationPath + '/' + filename );
+      let contentsPath = subdir ? ( `${destinationPath}/${subdir}/${filename}` ) : ( `${destinationPath}/${filename}` );
       contentsPath = contentsPath.replace( /simula-rasa/, repo );
       contentsPath = contentsPath.replace( /simulaRasa/, lowerCamelCase );
       contentsPath = contentsPath.replace( /SimulaRasa/, upperCamelCase );

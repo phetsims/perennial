@@ -42,8 +42,8 @@ async function getLocales( locales, simName ) {
     const versionDirectories = await getSortedVersionDirectories( simDirectory );
     if ( versionDirectories.length > 0 ) {
       const latest = versionDirectories[ versionDirectories.length - 1 ];
-      const translationsXMLFile = constants.HTML_SIMS_DIRECTORY + simName + '/' + latest + '/' + simName + '.xml';
-      winston.log( 'info', 'path to translations XML file = ' + translationsXMLFile );
+      const translationsXMLFile = `${constants.HTML_SIMS_DIRECTORY + simName}/${latest}/${simName}.xml`;
+      winston.log( 'info', `path to translations XML file = ${translationsXMLFile}` );
       const xmlString = fs.readFileSync( translationsXMLFile );
       let json;
       try {
@@ -51,7 +51,7 @@ async function getLocales( locales, simName ) {
       }
       catch( err ) {
         // TODO https://github.com/phetsims/perennial/issues/167 should we call reject here? what happens when callbackLocales is undefined?
-        winston.log( 'error', 'error parsing XML, err = ' + err );
+        winston.log( 'error', `error parsing XML, err = ${err}` );
       }
       winston.log( 'info', 'data extracted from translations XML file:' );
       winston.log( 'info', JSON.stringify( json, null, 2 ) );
@@ -68,7 +68,7 @@ async function getLocales( locales, simName ) {
     }
   }
 
-  winston.log( 'info', 'building locales=' + callbackLocales );
+  winston.log( 'info', `building locales=${callbackLocales}` );
 
   return callbackLocales;
 }

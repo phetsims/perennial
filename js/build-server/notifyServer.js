@@ -24,10 +24,10 @@ const winston = require( 'winston' );
 module.exports = async function notifyServer( options ) {
   if ( options.brand === constants.PHET_BRAND ) {
     return new Promise( resolve => {
-      const project = 'html/' + options.simName;
-      let url = constants.BUILD_SERVER_CONFIG.productionServerURL + '/services/synchronize-project?projectName=' + project;
+      const project = `html/${options.simName}`;
+      let url = `${constants.BUILD_SERVER_CONFIG.productionServerURL}/services/synchronize-project?projectName=${project}`;
       if ( options.locales && options.locales !== '*' && options.locales !== 'en' && options.locales.indexOf( ',' ) < 0 ) {
-        url += '&locale=' + options.locales;
+        url += `&locale=${options.locales}`;
       }
       request( {
         url: url,
@@ -43,12 +43,12 @@ module.exports = async function notifyServer( options ) {
           const syncResponse = JSON.parse( body );
 
           if ( !syncResponse.success ) {
-            errorMessage = 'request to synchronize project ' + project + ' on ' + constants.BUILD_SERVER_CONFIG.productionServerName + ' failed with message: ' + syncResponse.error;
+            errorMessage = `request to synchronize project ${project} on ${constants.BUILD_SERVER_CONFIG.productionServerName} failed with message: ${syncResponse.error}`;
             winston.log( 'error', errorMessage );
             sendEmail( 'SYNCHRONIZE FAILED', errorMessage, options.email );
           }
           else {
-            winston.log( 'info', 'request to synchronize project ' + project + ' on ' + constants.BUILD_SERVER_CONFIG.productionServerName + ' succeeded' );
+            winston.log( 'info', `request to synchronize project ${project} on ${constants.BUILD_SERVER_CONFIG.productionServerName} succeeded` );
           }
         }
         else {
@@ -63,14 +63,14 @@ module.exports = async function notifyServer( options ) {
   }
   else if ( options.brand === constants.PHET_IO_BRAND ) {
     return new Promise( ( resolve, reject ) => {
-      const url = constants.BUILD_SERVER_CONFIG.productionServerURL + '/services/metadata/phetio' +
-                  '?name=' + options.simName +
-                  '&versionMajor=' + options.phetioOptions.version.major +
-                  '&versionMinor=' + options.phetioOptions.version.minor +
-                  '&versionMaintenance=' + options.phetioOptions.version.maintenance +
-                  '&versionSuffix=' + options.phetioOptions.suffix +
-                  '&branch=' + options.phetioOptions.branch +
-                  '&active=' + !options.phetioOptions.ignoreForAutomatedMaintenanceReleases;
+      const url = `${constants.BUILD_SERVER_CONFIG.productionServerURL}/services/metadata/phetio` +
+                  `?name=${options.simName
+                  }&versionMajor=${options.phetioOptions.version.major
+                  }&versionMinor=${options.phetioOptions.version.minor
+                  }&versionMaintenance=${options.phetioOptions.version.maintenance
+                  }&versionSuffix=${options.phetioOptions.suffix
+                  }&branch=${options.phetioOptions.branch
+                  }&active=${!options.phetioOptions.ignoreForAutomatedMaintenanceReleases}`;
       request.post( {
         url: url,
         auth: {
@@ -107,7 +107,7 @@ module.exports = async function notifyServer( options ) {
             return reject( 'PHET_IO DEPLOYMENT UPSERT FAILED' );
           }
           else {
-            winston.log( 'info', 'request to upsert phetio deployment for ' + options.simName + ' on ' + constants.BUILD_SERVER_CONFIG.productionServerName + ' succeeded' );
+            winston.log( 'info', `request to upsert phetio deployment for ${options.simName} on ${constants.BUILD_SERVER_CONFIG.productionServerName} succeeded` );
           }
         }
 

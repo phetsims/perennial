@@ -246,7 +246,7 @@ module.exports = ( function() {
 
       for ( const modifiedBranch of maintenance.modifiedBranches ) {
         if ( !modifiedBranch.releaseBranch.isReleased && modifiedBranch.pushedMessages.length > 0 ) {
-          console.log( 'Creating issue for ' + modifiedBranch.releaseBranch.toString() );
+          console.log( `Creating issue for ${modifiedBranch.releaseBranch.toString()}` );
           await modifiedBranch.createUnreleasedIssue( additionalNotes );
         }
       }

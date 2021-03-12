@@ -59,7 +59,7 @@ module.exports = ( function() {
     const matches = versionString.match( /(\d+)\.(\d+)\.(\d+)/ );
 
     if ( !matches ) {
-      throw new Error( 'could not parse chipper version: ' + versionString );
+      throw new Error( `could not parse chipper version: ${versionString}` );
     }
 
     const major = parseInt( matches[ 1 ], 10 );

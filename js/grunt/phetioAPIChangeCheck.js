@@ -33,8 +33,8 @@ module.exports = async ( repo, version, onError = async () => {}, noninteractive
   const phetioAPIFileName = `${repo}-phet-io-api.json`;
   const builtVersionAPIFile = `../${repo}/build/phet-io/${phetioAPIFileName}`;
 
-  const metadataURL = buildLocal.productionServerURL +
-                      `/services/metadata/phetio?name=${repo}&versionMajor=${version.major}&versionMinor=${version.minor}&latest=true`;
+  const metadataURL = `${buildLocal.productionServerURL
+                      }/services/metadata/phetio?name=${repo}&versionMajor=${version.major}&versionMinor=${version.minor}&latest=true`;
   const versions = JSON.parse( await request( metadataURL ) );
 
   // if there is no previously published version for this minor, no API comparison is needed
@@ -42,7 +42,7 @@ module.exports = async ( repo, version, onError = async () => {}, noninteractive
   if ( versions.length === 0 || !grunt.file.exists( builtVersionAPIFile ) ) {
     return;
   }
-  assert( versions.length === 1, 'there should only be one latest maintenance version per minor: ' + versions );
+  assert( versions.length === 1, `there should only be one latest maintenance version per minor: ${versions}` );
   const latestVersion = versions[ 0 ];
 
   const latestVersionString = `${latestVersion.versionMajor}.${latestVersion.versionMinor}.${latestVersion.versionMaintenance}`;

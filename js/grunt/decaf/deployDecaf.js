@@ -25,7 +25,7 @@ const _ = require( 'lodash' ); // eslint-disable-line
 const fs = require( 'fs' );
 
 // constants
-const BUILD_LOCAL_FILENAME = process.env.HOME + '/.phet/build-local.json';
+const BUILD_LOCAL_FILENAME = `${process.env.HOME}/.phet/build-local.json`;
 
 /**
  * Deploys a dev version after incrementing the test version number.
@@ -65,7 +65,7 @@ module.exports = async function( project, dev, production ) {
 
   const currentBranch = await getBranch( 'decaf' );
   if ( currentBranch !== 'master' ) {
-    grunt.fail.fatal( 'deployment should be on the branch master, not: ' + ( currentBranch ? currentBranch : '(detached head)' ) );
+    grunt.fail.fatal( `deployment should be on the branch master, not: ${currentBranch ? currentBranch : '(detached head)'}` );
   }
 
   const packageFileRelative = `projects/${project}/package.json`;
@@ -97,7 +97,7 @@ module.exports = async function( project, dev, production ) {
   if ( dev ) {
 
     const simPath = buildLocal.decafDeployPath + project;
-    const versionPath = simPath + '/' + versionString;
+    const versionPath = `${simPath}/${versionString}`;
 
     const simPathExists = await devDirectoryExists( simPath );
     const versionPathExists = await devDirectoryExists( versionPath );
@@ -135,13 +135,13 @@ module.exports = async function( project, dev, production ) {
     flavors.forEach( flavor => {
       const url = `${versionURL}/${project}.html?simulation=${flavor}`;
       grunt.log.writeln( url );
-      fs.appendFileSync( `${gitRoot}/decaf/build/log.txt`, url + '\n' );
+      fs.appendFileSync( `${gitRoot}/decaf/build/log.txt`, `${url}\n` );
     } );
 
     if ( flavors.length === 0 ) {
       const URL = `${versionURL}/${project}.html`;
       grunt.log.writeln( URL );
-      fs.appendFileSync( `${gitRoot}/decaf/build/log.txt`, URL + '\n' );
+      fs.appendFileSync( `${gitRoot}/decaf/build/log.txt`, `${URL}\n` );
     }
   }
 

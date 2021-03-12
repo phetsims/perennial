@@ -49,7 +49,7 @@ qunit.test( 'NPM update', async assert => {
 
 qunit.test( 'Bumper one-off (random)', async assert => {
   assert.timeout( 3000000 );
-  const branch = 'oneoff' + Math.random().toString( 36 ).substring( 2 );
+  const branch = `oneoff${Math.random().toString( 36 ).substring( 2 )}`;
 
   // Create a random one-off branch
   await execute( gruntCommand, [ 'create-one-off', '--repo=bumper', `--branch=${branch}` ], '.' );

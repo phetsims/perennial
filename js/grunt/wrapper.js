@@ -39,7 +39,7 @@ const grunt = require( 'grunt' );
 module.exports = async function( repo, noninteractive, message ) {
   const currentBranch = await getBranch( repo );
   if ( currentBranch !== 'master' ) {
-    grunt.fail.fatal( 'Dev deployments are only supported from the master branch, not: ' + ( currentBranch ? currentBranch : '(detached head)' ) );
+    grunt.fail.fatal( `Dev deployments are only supported from the master branch, not: ${currentBranch ? currentBranch : '(detached head)'}` );
   }
 
   const previousVersion = await getRepoVersion( repo );
@@ -62,7 +62,7 @@ module.exports = async function( repo, noninteractive, message ) {
   const versionString = version.toString();
 
   const wrapperPath = buildLocal.devDeployPath + repo;
-  const versionPath = wrapperPath + '/' + versionString;
+  const versionPath = `${wrapperPath}/${versionString}`;
 
   const wrapperPathExists = await devDirectoryExists( wrapperPath );
   const versionPathExists = await devDirectoryExists( versionPath );

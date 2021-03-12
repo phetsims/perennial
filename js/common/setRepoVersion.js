@@ -39,5 +39,5 @@ module.exports = async function( repo, version, message ) {
 
   await writeJSON( packageFile, packageObject );
   await gitAdd( repo, 'package.json' );
-  await gitCommit( repo, `Bumping version to ${version.toString()}${message ? ', ' + message : ''}` );
+  await gitCommit( repo, `Bumping version to ${version.toString()}${message ? `, ${message}` : ''}` );
 };

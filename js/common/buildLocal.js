@@ -15,7 +15,7 @@ const winston = require( 'winston' );
 // Handle the lack of build.json
 let buildLocalObject;
 try {
-  buildLocalObject = JSON.parse( fs.readFileSync( process.env.HOME + '/.phet/build-local.json', 'utf8' ) );
+  buildLocalObject = JSON.parse( fs.readFileSync( `${process.env.HOME}/.phet/build-local.json`, 'utf8' ) );
 }
 catch( e ) {
   winston.warn( 'No build-local.json detected!' );

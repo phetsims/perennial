@@ -43,7 +43,7 @@ const defaultOptions = {
 
 for ( const key in parsedCommandLineOptions ) {
   if ( key !== '_' && parsedCommandLineOptions.hasOwnProperty( key ) && !defaultOptions.hasOwnProperty( key ) ) {
-    console.error( 'Unrecognized option: ' + key );
+    console.error( `Unrecognized option: ${key}` );
     console.error( 'try --help for usage information.' );
     process.exit( 1 );
   }
@@ -161,7 +161,7 @@ const queueDeploy = ( api, repos, simName, version, locales, brands, servers, em
       res.send( err );
     }
     else {
-      winston.log( 'info', 'queuing build for ' + simName + ' ' + version );
+      winston.log( 'info', `queuing build for ${simName} ${version}` );
       taskQueue.push( {
         api: api,
         repos: repos,
@@ -175,10 +175,10 @@ const queueDeploy = ( api, repos, simName, version, locales, brands, servers, em
         res: res,
         branch: branch
       }, err => {
-        const simInfoString = 'Sim = ' + simName +
-                              ' Version = ' + version +
-                              ' Brands = ' + brands +
-                              ' Locales = ' + locales;
+        const simInfoString = `Sim = ${simName
+                              } Version = ${version
+                              } Brands = ${brands
+                              } Locales = ${locales}`;
 
         if ( err ) {
           let shas = repos;
@@ -190,12 +190,12 @@ const queueDeploy = ( api, repos, simName, version, locales, brands, servers, em
           catch( e ) {
             // invalid JSON
           }
-          const errorMessage = 'Build failure: ' + err + '. ' + simInfoString + ' Shas = ' + JSON.stringify( shas );
+          const errorMessage = `Build failure: ${err}. ${simInfoString} Shas = ${JSON.stringify( shas )}`;
           winston.log( 'error', errorMessage );
           sendEmail( 'BUILD ERROR', errorMessage, email );
         }
         else {
-          winston.log( 'info', 'build for ' + simName + ' finished successfully' );
+          winston.log( 'info', `build for ${simName} finished successfully` );
           sendEmail( 'Build Succeeded', simInfoString, email, true );
         }
 
@@ -261,15 +261,15 @@ app.post( '/deploy-images', postQueueImageDeploy );
 
 // start the server
 app.listen( constants.LISTEN_PORT, () => {
-  winston.log( 'info', 'Listening on port ' + constants.LISTEN_PORT );
-  winston.log( 'info', 'Verbose mode: ' + verbose );
+  winston.log( 'info', `Listening on port ${constants.LISTEN_PORT}` );
+  winston.log( 'info', `Verbose mode: ${verbose}` );
 
   // log the SHA of perennial - this may make it easier to duplicate and track down problems
   try {
     const sha = childProcess.execSync( 'git rev-parse HEAD' );
-    winston.info( 'current SHA: ' + sha.toString() );
+    winston.info( `current SHA: ${sha.toString()}` );
   }
   catch( err ) {
-    winston.warn( 'unable to get SHA from git, err: ' + err );
+    winston.warn( `unable to get SHA from git, err: ${err}` );
   }
 } );

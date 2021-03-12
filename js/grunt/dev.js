@@ -56,7 +56,7 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
 
   const currentBranch = await getBranch( repo );
   if ( currentBranch !== branch ) {
-    grunt.fail.fatal( `${testType} deployment should be on the branch ${branch}, not: ` + ( currentBranch ? currentBranch : '(detached head)' ) );
+    grunt.fail.fatal( `${testType} deployment should be on the branch ${branch}, not: ${currentBranch ? currentBranch : '(detached head)'}` );
   }
 
   const previousVersion = await getRepoVersion( repo );
@@ -98,7 +98,7 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
 
   const versionString = version.toString();
   const simPath = buildLocal.devDeployPath + repo;
-  const versionPath = simPath + '/' + versionString;
+  const versionPath = `${simPath}/${versionString}`;
 
   const simPathExists = await devDirectoryExists( simPath );
   const versionPathExists = await devDirectoryExists( versionPath );

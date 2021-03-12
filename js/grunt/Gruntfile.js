@@ -102,7 +102,7 @@ module.exports = function( grunt ) {
       const buildServer = !!grunt.option( 'buildServer' );
 
       const repo = grunt.option( 'repo' );
-      const dependencies = grunt.file.readJSON( buildServer ? '../perennial/js/build-server/tmp/dependencies.json' : '../' + repo + '/dependencies.json' );
+      const dependencies = grunt.file.readJSON( buildServer ? '../perennial/js/build-server/tmp/dependencies.json' : `../${repo}/dependencies.json` );
       const includeNpmUpdate = !grunt.option( 'skipNpmUpdate' ) && !buildServer;
 
       await checkoutDependencies( repo, dependencies, includeNpmUpdate );

@@ -13,8 +13,8 @@ const writeFile = require( '../common/writeFile' );
  * @param version
  */
 module.exports = async function writePhetHtaccess( simName, version ) {
-  const metadataURL = constants.BUILD_SERVER_CONFIG.productionServerURL + '/services/metadata/1.2/simulations?' +
-                      'format=json&type=html&summary&include-unpublished=true&simulation=' + simName;
+  const metadataURL = `${constants.BUILD_SERVER_CONFIG.productionServerURL}/services/metadata/1.2/simulations?` +
+                      `format=json&type=html&summary&include-unpublished=true&simulation=${simName}`;
   const pass = constants.BUILD_SERVER_CONFIG.serverToken;
 
   return new Promise( ( resolve, reject ) => {
@@ -47,15 +47,15 @@ module.exports = async function writePhetHtaccess( simName, version ) {
 
       // We either got an error indicating that the simulation has not yet been deployed, or the requested version is later than the latest version
       // Update the .htaccess file that controls the /latest/ rewrite
-      const contents = 'RewriteEngine on\n' +
-                       'RewriteBase /sims/html/' + simName + '/\n' +
-                       'RewriteRule ^latest(.*) ' + version + '$1\n' +
+      const contents = `${'RewriteEngine on\n' +
+                       'RewriteBase /sims/html/'}${simName}/\n` +
+                       `RewriteRule ^latest(.*) ${version}$1\n` +
                        'Header set Access-Control-Allow-Origin "*"\n\n' +
                        'RewriteCond %{QUERY_STRING} =download\n' +
                        'RewriteRule ([^/]*)$ - [L,E=download:$1]\n' +
                        'Header onsuccess set Content-disposition "attachment; filename=%{download}e" env=download\n';
       try {
-        await writeFile( constants.HTML_SIMS_DIRECTORY + simName + '/.htaccess', contents );
+        await writeFile( `${constants.HTML_SIMS_DIRECTORY + simName}/.htaccess`, contents );
       }
       catch( err ) {
         reject( err );

@@ -86,7 +86,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
 
     const versionString = version.toString();
     const simPath = buildLocal.devDeployPath + repo;
-    const versionPath = simPath + '/' + versionString;
+    const versionPath = `${simPath}/${versionString}`;
 
     const versionPathExists = await devDirectoryExists( versionPath );
 

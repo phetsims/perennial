@@ -77,7 +77,7 @@ const getVersion = simData => `${simData.versionMajor}.${simData.versionMinor}`;
 const getBranch = simData => {
   let branch = `${simData.versionMajor}.${simData.versionMinor}`;
   if ( simData.versionSuffix.length ) {
-    branch += '-' + simData.versionSuffix; // additional dash required
+    branch += `-${simData.versionSuffix}`; // additional dash required
   }
   return branch;
 };
