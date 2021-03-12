@@ -79,7 +79,7 @@ const deployImages = async options => {
       try {
 
         // Get all published sims
-        request( 'https://phet.colorado.edu/services/metadata/1.2/simulations?format=json&summary&locale=en&type=html', async function( error, response, body ) {
+        request( 'https://phet.colorado.edu/services/metadata/1.2/simulations?format=json&summary&locale=en&type=html', async ( error, response, body ) => {
           if ( error ) {
             console.error( 'failed to fetch metadata request', error );
             reject( error );

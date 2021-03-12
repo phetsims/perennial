@@ -50,7 +50,7 @@ module.exports = async function( repo, author, options ) {
    * @returns {string}
    */
   function toTitle( simName ) {
-    const tmpString = simName.replace( /-(.)/g, function( match, group1 ) {
+    const tmpString = simName.replace( /-(.)/g, ( match, group1 ) => {
       return ' ' + group1.toUpperCase();
     } );
     return tmpString.substring( 0, 1 ).toUpperCase() + tmpString.substring( 1 );
@@ -80,7 +80,7 @@ module.exports = async function( repo, author, options ) {
   const yearToday = grunt.template.today( 'yyyy' );
 
   // Iterate over the file system and copy files, changing filenames and contents as we go.
-  grunt.file.recurse( '../simula-rasa', function( abspath, rootdir, subdir, filename ) {
+  grunt.file.recurse( '../simula-rasa', ( abspath, rootdir, subdir, filename ) => {
 
     // skip these files
     if ( abspath.indexOf( '../simula-rasa/README.md' ) === 0 ||

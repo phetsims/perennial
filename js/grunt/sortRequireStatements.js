@@ -49,14 +49,14 @@ module.exports = function( path ) {
       else {
 
         // Not a require statement, sort and flush any pending require statements then continue
-        accumulator = _.sortBy( accumulator, function( o ) {
+        accumulator = _.sortBy( accumulator, o => {
 
           // sort by the beginning of the line, including 'const X = require("PATH/dir/X")
           // case insensitive so that inherit and namespaces don't show up last
           return o.toLowerCase();
         } );
         let previous = null;
-        accumulator.forEach( function( a ) {
+        accumulator.forEach( a => {
 
           // Omit duplicate require statements
           if ( a !== previous ) {

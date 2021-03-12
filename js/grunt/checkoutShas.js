@@ -40,7 +40,7 @@ module.exports = function( repositoryName, toMaster, buildServer ) {
       //cp.exec('foocommand', { cwd: 'path/to/dir/' }, callback);
       //http://stackoverflow.com/questions/14026967/calling-child-process-exec-in-node-as-though-it-was-executed-in-a-specific-folde
       const command = 'git checkout ' + ( toMaster ? 'master' : dependencies[ property ].sha );
-      child_process.exec( command, { cwd: '../' + property }, function( error1, stdout1, stderr1 ) {
+      child_process.exec( command, { cwd: '../' + property }, ( error1, stdout1, stderr1 ) => {
         assert( !error1, 'error in ' + command + ' for repo ' + property );
         grunt.log.writeln( 'Finished checkout.' );
         grunt.log.writeln( stdout1 );

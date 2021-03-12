@@ -36,7 +36,7 @@ module.exports = async function notifyServer( options ) {
           pass: constants.BUILD_SERVER_CONFIG.serverToken,
           sendImmediately: true
         }
-      }, function( error, response, body ) {
+      }, ( error, response, body ) => {
         let errorMessage;
 
         if ( !error && response.statusCode === 200 ) {
@@ -78,7 +78,7 @@ module.exports = async function notifyServer( options ) {
           pass: constants.BUILD_SERVER_CONFIG.serverToken,
           sendImmediately: true
         }
-      }, function( error, response, body ) {
+      }, ( error, response, body ) => {
         let errorMessage;
 
         if ( error || response.statusCode < 200 || response.statusCode > 299 ) {

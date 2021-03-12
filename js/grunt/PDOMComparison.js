@@ -165,7 +165,7 @@ const launchSimAndGetPDOMText = async repo => {
       // TODO https://github.com/phetsims/perennial/issues/138
       // window.phet.sim.joist.frameEndedEmitter.addListener();
 
-      window.addEventListener( 'message', function( event ) {
+      window.addEventListener( 'message', event => {
         if ( event.data ) {
           try {
             const messageData = JSON.parse( event.data );

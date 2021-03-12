@@ -54,7 +54,7 @@ module.exports = function sendEmail( subject, text, emailParameter, emailParamet
         to: emailTo,
         subject: subject
       },
-      function( err, message ) {
+      ( err, message ) => {
         if ( err ) {
           winston.log( 'error', 'error when attempted to send email, err = ' + err );
         }

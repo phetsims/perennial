@@ -57,7 +57,7 @@ module.exports = async function( repo, version, branch, dependencies, options ) 
     winston.info( url );
     winston.info( JSON.stringify( requestObject ) );
 
-    request.post( { url: url, json: requestObject }, function( error, response, body ) {
+    request.post( { url: url, json: requestObject }, ( error, response, body ) => {
       if ( error ) {
         reject( new Error( `Build request failed with error ${error}.` ) );
       }

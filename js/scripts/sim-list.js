@@ -18,6 +18,6 @@ winston.default.transports.console.level = 'error';
 simMetadata( {
   summary: true,
   type: 'html'
-}, function( data ) {
+}, data => {
   console.log( data.projects.map( project => project.name.slice( project.name.indexOf( '/' ) + 1 ) ).join( '\n' ) );
 } );

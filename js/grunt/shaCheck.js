@@ -27,7 +27,7 @@ module.exports = async function( repo, sha ) {
     summary: true
   } );
 
-  const sims = data.projects.map( function( simData ) {
+  const sims = data.projects.map( simData => {
     return {
       name: simData.name.slice( simData.name.indexOf( '/' ) + 1 ),
       branch: simData.version.major + '.' + simData.version.minor
@@ -49,7 +49,7 @@ module.exports = async function( repo, sha ) {
   }
 
   console.log( '\nSims that include the commit in their tree: ' );
-  console.log( includedSims.map( function( sim ) { return sim.name; } ).join( '\n' ) );
+  console.log( includedSims.map( sim => sim.name ).join( '\n' ) );
   console.log( '\nSims that do NOT include the commit in their tree: ' );
-  console.log( excludedSims.map( function( sim ) { return sim.name; } ).join( '\n' ) );
+  console.log( excludedSims.map( sim => sim.name ).join( '\n' ) );
 };

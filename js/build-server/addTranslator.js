@@ -24,7 +24,7 @@ module.exports = async function addTranslator( locale, simName, translatorId ) {
     winston.log( 'info', 'URL for adding translator to credits = ' + addTranslatorURL );
 
     // send the request
-    request( addTranslatorURL, function( error, response ) {
+    request( addTranslatorURL, ( error, response ) => {
       if ( error ) {
         winston.log( 'error', 'error occurred when attempting to add translator credit info to DB: ' + error );
       }

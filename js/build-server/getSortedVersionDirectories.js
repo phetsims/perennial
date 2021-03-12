@@ -27,7 +27,7 @@ module.exports = async function getSortedVersionDirectories( path ) {
   }
 
   // filter out names that don't match the required format
-  versions = versions.filter( function( path ) {
+  versions = versions.filter( path => {
     const splitPath = path.split( '.' );
     if ( splitPath.length !== 3 ) {
       return false;
@@ -41,7 +41,7 @@ module.exports = async function getSortedVersionDirectories( path ) {
   } );
 
   // sort the names in numerical (not lexical) order
-  versions.sort( function( a, b ) {
+  versions.sort( ( a, b ) => {
     const aTokenized = a.split( '.' );
     const bTokenized = b.split( '.' );
     let result = 0;

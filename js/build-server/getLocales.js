@@ -10,7 +10,7 @@ const winston = require( 'winston' );
 
 async function getJsonFromXML( xmlString ) {
   return new Promise( ( resolve, reject ) => {
-    parseString( xmlString, function( error, json ) {
+    parseString( xmlString, ( error, json ) => {
       if ( error ) {
         reject( error );
       }
