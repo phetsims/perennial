@@ -26,7 +26,7 @@ module.exports = function( browser, targetURL ) {
 
     await page.exposeFunction( 'harness_moduleDone', context => {
       if ( context.failed ) {
-        const msg = 'Module Failed: ' + context.name + '\n' + testErrors.join( '\n' );
+        const msg = `Module Failed: ${context.name}\n${testErrors.join( '\n' )}`;
         moduleErrors.push( msg );
         testErrors = [];
       }
@@ -34,7 +34,7 @@ module.exports = function( browser, targetURL ) {
 
     await page.exposeFunction( 'harness_testDone', context => {
       if ( context.failed ) {
-        const msg = '  Test Failed: ' + context.name + assertionErrors.join( '    ' );
+        const msg = `  Test Failed: ${context.name}${assertionErrors.join( '    ' )}`;
         testErrors.push( msg );
         assertionErrors = [];
         process.stdout.write( 'F' );
@@ -49,11 +49,11 @@ module.exports = function( browser, targetURL ) {
 
       let msg = '\n    Assertion Failed:';
       if ( message ) {
-        msg += ' ' + message;
+        msg += ` ${message}`;
       }
 
       if ( source ) {
-        msg += '\n\n' + source;
+        msg += `\n\n${source}`;
       }
 
       assertionErrors.push( msg );
@@ -64,7 +64,7 @@ module.exports = function( browser, targetURL ) {
 
       if ( moduleErrors.length > 0 ) {
         for ( let idx = 0; idx < moduleErrors.length; idx++ ) {
-          console.error( moduleErrors[ idx ] + '\n' );
+          console.error( `${moduleErrors[ idx ]}\n` );
         }
       }
 
@@ -120,7 +120,7 @@ module.exports = function( browser, targetURL ) {
       } );
     }
     catch( e ) {
-      end( { ok: false, message: 'caught exception ' + e } );
+      end( { ok: false, message: `caught exception ${e}` } );
     }
   } );
 };
