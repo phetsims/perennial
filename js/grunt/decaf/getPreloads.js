@@ -13,7 +13,7 @@ module.exports = async url => {
 
   let runtimeResources = null;
 
-  return new Promise( async ( resolve, reject ) => {
+  return new Promise( async ( resolve, reject ) => { // eslint-disable-line no-async-promise-executor
 
     let receivedResources = false;
 
