@@ -23,7 +23,7 @@ const _ = require( 'lodash' ); // eslint-disable-line
 const parseArgs = require( 'minimist' ); // eslint-disable-line
 
 // set this process up with the appropriate permissions, value is in octal
-process.umask( parseInt( '0002', 8 ) );
+process.umask( 0o0002 );
 
 /**
  * Handle command line input
