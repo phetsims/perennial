@@ -40,7 +40,7 @@ tests.push( {
   priority: 100
 } );
 
-// phet brand builds
+// phet and phet-io brand builds
 [
   ...runnableRepos,
   'scenery',
@@ -170,6 +170,15 @@ phetioRepos.forEach( repo => {
     url: `phet-io-wrappers/mirror-inputs/?sim=${repo}&phetioDebug&fuzz`,
     testQueryParameters: 'duration=60000'
   } );
+
+  // phet-io wrappers tests for each PhET-iO Sim
+  [ false, true ].forEach( useAssert => {
+    tests.push( {
+      test: [ repo, 'phet-io-wrappers-tests', useAssert ? 'assert' : 'no-assert' ],
+      type: 'qunit-test',
+      url: `phet-io-wrappers/phet-io-wrappers-tests.html?sim=${repo}${useAssert ? '&phetioDebug' : ''}`
+    } );
+  } );
 } );
 
 // accessible tests
@@ -212,17 +221,6 @@ interactiveDescriptionRepos.forEach( repo => {
     brand: 'phet',
     buildDependencies: [ repo ],
     es5: true
-  } );
-} );
-
-// phet-io wrappers tests for each PhET-iO Sim
-phetioRepos.forEach( repo => {
-  [ false, true ].forEach( useAssert => {
-    tests.push( {
-      test: [ repo, 'phet-io-wrappers-tests', useAssert ? 'assert' : 'no-assert' ],
-      type: 'qunit-test',
-      url: `phet-io-wrappers/phet-io-wrappers-tests.html?sim=${repo}${useAssert ? '&phetioDebug' : ''}`
-    } );
   } );
 } );
 
