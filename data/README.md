@@ -5,7 +5,7 @@ NOTE: These should be regenerated whenever certain flags in package.json (for re
 active-repos is a list of all repositories that you should have checked out if doing common-code refactoring.
 
 active-runnables (auto-generated) is a list of all repositories that can be built with chipper and launched from an html file.
-d
+
 active-sims (auto-generated) is a list of all simulation repositories that can be built with chipper.  Similar to runnables, but doesn't include repos with test code like sun, scenery-phet, etc.
 
 interactive-description (auto-generated) is a list of all repositories that have been outfitted with interactive description like keyboard navigation. Sims in progress are also included in this list.  
