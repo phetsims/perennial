@@ -82,9 +82,9 @@ else {
           if ( usermap[ user ].hasOwnProperty( locale ) ) {
             usermap[ user ][ locale ].forEach( async repo => {
               const paramString = `simName=${repo
-                                   }&locale=${locale
-                                   }&userId=${user
-                                   }&authorizationCode=${translatorAuthCode}`;
+              }&locale=${locale
+              }&userId=${user
+              }&authorizationCode=${translatorAuthCode}`;
               requests.push( urlPath + paramString );
             } );
           }
