@@ -6,7 +6,7 @@ const constants = require( './constants' );
 const fs = require( 'graceful-fs' ); //eslint-disable-line
 const winston = require( 'winston' );
 const writeFile = require( '../common/writeFile' );
-const parseScreenNames = require( './parseScreenNames.js' );
+const parseScreenNames = require( './parseScreenNames' );
 
 /**
  * Create a [sim name].xml file in the live sim directory in htdocs. This file tells the website which
@@ -71,7 +71,7 @@ module.exports = async function( simName, version ) {
       finalXML = finalXML.concat( `<simulation name="${simName}" locale="${stringFile.locale}">\n` +
                                   `<title><![CDATA[${localizedSimTitle}]]></title>\n` );
       if ( screenNames[ simName ] ) {
-        
+        console.log( screenNames[ simName ] );
       }
       finalXML = finalXML.concat( '</simulation>\n' );
     }

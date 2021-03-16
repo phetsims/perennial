@@ -28,13 +28,13 @@ const parseScreenNamesFromSimulation = async ( project, page ) => {
     returnObject[ locale ] = screenNames;
   }
 
-  return returnObject
+  return returnObject;
 };
 
 const parseScreenNames = async () => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
-  const projects = ( await axios.get( 'https://phet.colorado.edu/services/metadata/1.3/simulations?format=json&type=html&summary&simulation=build-a-molecule' ) ).data.projects;
+  const projects = ( await axios.get( 'https://phet.colorado.edu/services/metadata/1.3/simulations?format=json&type=html&summary' ) ).data.projects;
 
   const screenNameObject = {};
 
@@ -45,6 +45,6 @@ const parseScreenNames = async () => {
 
   await browser.close();
   return screenNameObject;
-}
+};
 
 module.exports = parseScreenNames;
