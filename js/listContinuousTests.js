@@ -148,6 +148,14 @@ phetioRepos.forEach( repo => {
     queryParameters: 'ea&brand=phet-io&phetioStandalone&fuzz&memoryLimit=1000'
   } );
 
+  // Test for API compatibility
+  tests.push( {
+    test: [ repo, 'phet-io-api-compatibility', 'unbuilt' ],
+    type: 'sim-test',
+    url: `${repo}/${repo}_en.html`,
+    queryParameters: 'ea&brand=phet-io&phetioStandalone&phetioCreateArchetypes&phetioCompareAPI'
+  } );
+
   // fuzz test important wrappers
   tests.push( {
     test: [ repo, 'phet-io-studio-fuzz', 'unbuilt' ],
