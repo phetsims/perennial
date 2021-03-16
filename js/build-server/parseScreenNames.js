@@ -1,17 +1,14 @@
 // Copyright 2021, University of Colorado Boulder
 
 const axios = require( 'axios' );
-const perf_hooks = require( 'perf_hooks' );
 const puppeteer = require( 'puppeteer' );
 
-
-// TODO: reach out to jon RE: directional characters in strings
-
 const parseScreenNamesFromSimulation = async ( project, page ) => {
-  const t0 = perf_hooks.performance.now();
   const simulation = project.simulations[ 0 ];
   const simName = simulation.name;
   console.log( simName );
+  const returnObject = {};
+
   const locales = Object.keys( simulation.localizedSimulations );
   for ( let localeIndex = 0; localeIndex < locales.length; localeIndex++ ) {
     const locale = locales[ localeIndex ];
@@ -28,19 +25,26 @@ const parseScreenNamesFromSimulation = async ( project, page ) => {
         .filter( ( screenName, screenIndex ) => !( screenIndex === 0 && screenName === '\u202aHome\u202c' ) );
     } );
     console.log( locale, screenNames );
+    returnObject[ locale ] = screenNames;
   }
-  const t1 = perf_hooks.performance.now();
 
-  console.log( ( t1 - t0 ) / 1000 );
+  return returnObject
 };
 
-( async () => {
+const parseScreenNames = async () => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
   const projects = ( await axios.get( 'https://phet.colorado.edu/services/metadata/1.3/simulations?format=json&type=html&summary&simulation=build-a-molecule' ) ).data.projects;
 
+  const screenNameObject = {};
+
   for ( let projectIndex = 0; projectIndex < projects.length; projectIndex++ ) {
-    await parseScreenNamesFromSimulation( projects[ projectIndex ], page );
+    const project = projects[ projectIndex ];
+    screenNameObject[ project.simulations[ 0 ].name ] = await parseScreenNamesFromSimulation( projects[ projectIndex ], page );
   }
+
   await browser.close();
-} )();
+  return screenNameObject;
+}
+
+module.exports = parseScreenNames;

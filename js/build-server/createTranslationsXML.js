@@ -6,6 +6,7 @@ const constants = require( './constants' );
 const fs = require( 'graceful-fs' ); //eslint-disable-line
 const winston = require( 'winston' );
 const writeFile = require( '../common/writeFile' );
+const parseScreenNames = require( './parseScreenNames.js' );
 
 /**
  * Create a [sim name].xml file in the live sim directory in htdocs. This file tells the website which
@@ -56,6 +57,8 @@ module.exports = async function( simName, version ) {
                  '<project name="'}${simName}">\n` +
                  '<simulations>\n';
 
+  const screenNames = await parseScreenNames();
+
   for ( let j = 0; j < stringFiles.length; j++ ) {
     const stringFile = stringFiles[ j ];
     const languageJSON = ( stringFile.locale === constants.ENGLISH_LOCALE ) ? englishStrings :
@@ -66,8 +69,11 @@ module.exports = async function( simName, version ) {
     if ( fs.existsSync( simHTML ) ) {
       const localizedSimTitle = ( languageJSON[ simTitleKey ] ) ? languageJSON[ simTitleKey ].value : englishStrings[ simTitleKey ].value;
       finalXML = finalXML.concat( `<simulation name="${simName}" locale="${stringFile.locale}">\n` +
-                                  `<title><![CDATA[${localizedSimTitle}]]></title>\n` +
-                                  '</simulation>\n' );
+                                  `<title><![CDATA[${localizedSimTitle}]]></title>\n` );
+      if ( screenNames[ simName ] ) {
+        
+      }
+      finalXML = finalXML.concat( '</simulation>\n' );
     }
   }
 
