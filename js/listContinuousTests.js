@@ -15,6 +15,7 @@ const fs = require( 'fs' );
 
 const repos = getActiveRepos();
 const phetioRepos = getRepoList( 'phet-io' );
+const phetioAPIStableRepos = getRepoList( 'phet-io-api-stable' );
 const runnableRepos = getRepoList( 'active-runnables' );
 const interactiveDescriptionRepos = getRepoList( 'interactive-description' );
 const phetioNoState = getRepoList( 'phet-io-state-unsupported' );
@@ -148,8 +149,8 @@ phetioRepos.forEach( repo => {
     queryParameters: 'ea&brand=phet-io&phetioStandalone&fuzz&memoryLimit=1000'
   } );
 
-  // Test for API compatibility
-  tests.push( {
+  // Test for API compatibility, for sims that support it
+  phetioAPIStableRepos.includes( repo ) && tests.push( {
     test: [ repo, 'phet-io-api-compatibility', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
