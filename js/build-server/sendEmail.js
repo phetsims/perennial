@@ -60,8 +60,8 @@ module.exports = function sendEmail( subject, text, emailParameter, emailParamet
         }
         else {
           winston.log( 'info', `sent email to: ${message.header.to
-                               }, subject: ${mimelib.decodeMimeWord( message.header.subject )
-                               }, text: ${message.text}` );
+          }, subject: ${mimelib.decodeMimeWord( message.header.subject )
+          }, text: ${message.text}` );
         }
       }
     );

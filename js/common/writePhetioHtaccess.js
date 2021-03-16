@@ -116,8 +116,8 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
       // Write a file to add authentication to the top level index pages
       if ( phetioPackage.phet && phetioPackage.phet.addRootHTAccessFile ) {
         const passwordProtectIndexContents = `<FilesMatch "(index\\.\\w+|api\\.json)$">\n${
-                                              passwordProtectWrapperContents
-                                              }</FilesMatch>\n`;
+          passwordProtectWrapperContents
+        }</FilesMatch>\n`;
         await writeFile( rootHtaccessFullPath, passwordProtectIndexContents );
         if ( devVersionPath ) {
           await devScp( rootHtaccessFullPath, `${devVersionPath}/phet-io/${htaccessFilename}` );

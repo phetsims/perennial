@@ -17,8 +17,8 @@ module.exports = async function addTranslator( locale, simName, translatorId ) {
   return new Promise( resolve => {
     // create the URL
     const addTranslatorURL = `${constants.BUILD_SERVER_CONFIG.productionServerURL}/services/add-html-translator?simName=${simName
-                             }&locale=${locale}&userId=${translatorId}&authorizationCode=${
-                             constants.BUILD_SERVER_CONFIG.databaseAuthorizationCode}`;
+    }&locale=${locale}&userId=${translatorId}&authorizationCode=${
+      constants.BUILD_SERVER_CONFIG.databaseAuthorizationCode}`;
 
     // log the URL
     winston.log( 'info', `URL for adding translator to credits = ${addTranslatorURL}` );

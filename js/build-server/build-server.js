@@ -176,9 +176,9 @@ const queueDeploy = ( api, repos, simName, version, locales, brands, servers, em
         branch: branch
       }, err => {
         const simInfoString = `Sim = ${simName
-                              } Version = ${version
-                              } Brands = ${brands
-                              } Locales = ${locales}`;
+        } Version = ${version
+        } Brands = ${brands
+        } Locales = ${locales}`;
 
         if ( err ) {
           let shas = repos;

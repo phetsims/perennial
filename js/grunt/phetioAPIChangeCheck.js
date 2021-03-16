@@ -34,7 +34,7 @@ module.exports = async ( repo, version, onError = async () => {}, noninteractive
   const builtVersionAPIFile = `../${repo}/build/phet-io/${phetioAPIFileName}`;
 
   const metadataURL = `${buildLocal.productionServerURL
-                      }/services/metadata/phetio?name=${repo}&versionMajor=${version.major}&versionMinor=${version.minor}&latest=true`;
+  }/services/metadata/phetio?name=${repo}&versionMajor=${version.major}&versionMinor=${version.minor}&latest=true`;
   const versions = JSON.parse( await request( metadataURL ) );
 
   // if there is no previously published version for this minor, no API comparison is needed
