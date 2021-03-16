@@ -31,10 +31,11 @@ const parseScreenNamesFromSimulation = async ( project, page ) => {
   return returnObject;
 };
 
-const parseScreenNames = async () => {
+const parseScreenNames = async ( simulationName ) => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
-  const projects = ( await axios.get( 'https://phet.colorado.edu/services/metadata/1.3/simulations?format=json&type=html&summary' ) ).data.projects;
+  const url = `https://phet.colorado.edu/services/metadata/1.3/simulations?format=json&type=html&summary${simulationName ? `simulation=${simulationName}` : ''}`;
+  const projects = ( await axios.get( url ) ).data.projects;
 
   const screenNameObject = {};
 

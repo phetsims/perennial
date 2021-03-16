@@ -57,7 +57,7 @@ module.exports = async function( simName, version ) {
                  '<project name="'}${simName}">\n` +
                  '<simulations>\n';
 
-  const screenNames = await parseScreenNames();
+  const screenNames = await parseScreenNames( simName );
 
   for ( let j = 0; j < stringFiles.length; j++ ) {
     const stringFile = stringFiles[ j ];
@@ -70,8 +70,12 @@ module.exports = async function( simName, version ) {
       const localizedSimTitle = ( languageJSON[ simTitleKey ] ) ? languageJSON[ simTitleKey ].value : englishStrings[ simTitleKey ].value;
       finalXML = finalXML.concat( `<simulation name="${simName}" locale="${stringFile.locale}">\n` +
                                   `<title><![CDATA[${localizedSimTitle}]]></title>\n` );
-      if ( screenNames[ simName ] ) {
-        console.log( screenNames[ simName ] );
+      if ( screenNames && screenNames[ simName ] && screenNames[ simName ][ locale ] ) {
+        finalXML = finalXML.concat( '<screens>\n' );
+        screenNames[ simName ][ locale ].forEach( ( screenName, index ) => {
+          finalXML.concat( `<screenName position="${index + 1}"><![CDATA[${screenName}]]></screenName>\n` )
+        } );
+        finalXML = finalXML.concat( '</screens>\n' );
       }
       finalXML = finalXML.concat( '</simulation>\n' );
     }
