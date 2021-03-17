@@ -53,9 +53,7 @@ module.exports = async function( simName, version ) {
   }
 
   // create xml, making a simulation tag for each language
-  let finalXML = `${'<?xml version="1.0" encoding="utf-8" ?>\n' +
-                 '<project name="'}${simName}">\n` +
-                 '<simulations>\n';
+  let finalXML = `<?xml version="1.0" encoding="utf-8" ?>\n<project name="${simName}">\n<simulations>`;
 
   const screenNames = await parseScreenNames( simName );
 
@@ -73,7 +71,7 @@ module.exports = async function( simName, version ) {
       if ( screenNames && screenNames[ simName ] && screenNames[ simName ][ stringFile.locale ] ) {
         finalXML = finalXML.concat( '<screens>\n' );
         screenNames[ simName ][ stringFile.locale ].forEach( ( screenName, index ) => {
-          finalXML.concat( `<screenName position="${index + 1}"><![CDATA[${screenName}]]></screenName>\n` );
+          finalXML = finalXML.concat( `<screenName position="${index + 1}"><![CDATA[${screenName}]]></screenName>\n` );
         } );
         finalXML = finalXML.concat( '</screens>\n' );
       }
@@ -90,6 +88,6 @@ module.exports = async function( simName, version ) {
   catch( err ) {
     return Promise.reject( err );
   }
-  winston.log( 'info', `wrote XML file:\n${fs.readFileSync( xmlFilepath ).toString()}` );
+  winston.log( 'info', 'wrote XML file' );
   return Promise.resolve( simTitle );
 };

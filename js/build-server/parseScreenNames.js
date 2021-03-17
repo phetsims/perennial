@@ -6,7 +6,6 @@ const puppeteer = require( 'puppeteer' );
 const parseScreenNamesFromSimulation = async ( project, page ) => {
   const simulation = project.simulations[ 0 ];
   const simName = simulation.name;
-  console.log( simName );
   const returnObject = {};
 
   const locales = Object.keys( simulation.localizedSimulations );
@@ -24,7 +23,6 @@ const parseScreenNamesFromSimulation = async ( project, page ) => {
         .map( screen => screen.name || ( screen.nameProperty && screen.nameProperty.value ) )
         .filter( ( screenName, screenIndex ) => !( screenIndex === 0 && screenName === '\u202aHome\u202c' ) );
     } );
-    console.log( locale, screenNames );
     returnObject[ locale ] = screenNames;
   }
 
@@ -34,14 +32,13 @@ const parseScreenNamesFromSimulation = async ( project, page ) => {
 const parseScreenNames = async simulationName => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
-  const url = `https://phet.colorado.edu/services/metadata/1.3/simulations?format=json&type=html&summary${simulationName ? `simulation=${simulationName}` : ''}`;
+  const url = `https://phet.colorado.edu/services/metadata/1.3/simulations?format=json&type=html&summary${simulationName ? `&simulation=${simulationName}` : ''}`;
   const projects = ( await axios.get( url ) ).data.projects;
 
   const screenNameObject = {};
 
   for ( let projectIndex = 0; projectIndex < projects.length; projectIndex++ ) {
-    const project = projects[ projectIndex ];
-    screenNameObject[ project.simulations[ 0 ].name ] = await parseScreenNamesFromSimulation( projects[ projectIndex ], page );
+    screenNameObject[ simulationName ] = await parseScreenNamesFromSimulation( projects[ projectIndex ], page );
   }
 
   await browser.close();
