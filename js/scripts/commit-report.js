@@ -8,9 +8,12 @@ const fs = require( 'fs' );
  *
  * Output a formatted view of recent commits to help in writing a report
  *
- * Usage:
+ * USAGE:
  * cd directory-with-all-repos
  * node perennial/js/scripts/commit-report.js username > report.txt
+ *
+ * EXAMPLE:
+ * node perennial/js/scripts/commit-report.js samreid > report.txt
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */
