@@ -400,7 +400,7 @@ tests.push( {
 
 // two beakers and 2 burners
 tests.push( {
-  test: [ 'energy-forms-and-changes', 'fuzz', 'unbuilt', 'query-parameters' ],
+  test: [ 'energy-forms-and-changes', 'fuzz', 'unbuilt', 'query-parameters-2' ],
   type: 'sim-test',
   url: 'energy-forms-and-changes/energy-forms-and-changes_en.html',
   queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&screens=1&&elements=oliveOil,water&burners=2'
