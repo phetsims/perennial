@@ -27,7 +27,10 @@ module.exports = async function( simName, version ) {
       const firstUnderscoreIndex = filename.indexOf( '_' );
       const periodIndex = filename.indexOf( '.' );
       const locale = filename.substring( firstUnderscoreIndex + 1, periodIndex );
-      stringFiles.push( { name: filename, locale: locale } );
+      // Don't process English twice!
+      if ( locale !== constants.ENGLISH_LOCALE ) {
+        stringFiles.push( { name: filename, locale: locale } );
+      }
     }
   }
   catch( e ) {
