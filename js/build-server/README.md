@@ -1,12 +1,16 @@
 # build-server.js
 
-PhET build and deploy server. The server is designed to run on the same host as the production site (
-phet-server.int.colorado.edu).
+PhET build and deploy server.
+
+# Host
+
+The production version of the build server runs on **phet-server.int.colorado.edu**, the same host as the PhET production site.
+
+A test version of the server runs on **phet-server-dev.int.colorado.edu**.
 
 ## Starting and Stopping the Server
 
-To start, stop, or restart the build server on **phet-server.int.colorado.edu** (production) or
-**phet-server.int.colorado.edu** (test), run this command:
+To start, stop, or restart the build server, run this command:
 `sudo systemctl [start|stop|restart] build-server`
 
 To view the log:
