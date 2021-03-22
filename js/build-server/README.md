@@ -5,8 +5,8 @@ phet-server.int.colorado.edu).
 
 ## Starting and Stopping the Server
 
-To start, stop, or restart the build server on phet-server.int.colorado.edu (production) or
-phet-server.int.colorado.edu (test), run this command:
+To start, stop, or restart the build server on **phet-server.int.colorado.edu** (production) or
+**phet-server.int.colorado.edu** (test), run this command:
 `sudo systemctl [start|stop|restart] build-server`
 
 To view the log:
