@@ -4,7 +4,7 @@ PhET build and deploy server.
 
 # Host
 
-The production version of the build server runs on **phet-server.int.colorado.edu**, the same host as the PhET production site.
+The production version of the build server runs on **phet-server.int.colorado.edu**, the same host as the PhET production website.
 
 A test version of the server runs on **phet-server-dev.int.colorado.edu**.
 
