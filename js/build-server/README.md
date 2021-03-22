@@ -9,9 +9,10 @@ To start, stop, or restart the build server on phet-server.int.colorado.edu (pro
 phet-server.int.colorado.edu (test), run this command:
 `sudo systemctl [start|stop|restart] build-server`
 
-To view the logs, run the following command. A `-f` flag will tail the log. Pressing Shift+F will scroll to the end (
-navigation is less-like).
-`sudo journalctl -u build-server`
+To view the log:
+* `sudo journalctl -u build-server`
+* To tail the log, add a `-f` flag: `sudo journalctl -u build-server -f`
+* Pressing Shift+F will scroll to the end (navigation is `less`-like).
 
 To edit startup options, please see `/usr/lib/systemd/system/build-server.service`
 
