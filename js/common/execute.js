@@ -61,13 +61,21 @@ module.exports = function( cmd, args, cwd, options ) {
   }
 
   return new Promise( ( resolve, reject ) => {
-    const process = child_process.spawn( cmd, args, {
-      cwd: cwd
-    } );
-    winston.debug( `Running ${cmd} ${args.join( ' ' )} from ${cwd}` );
+
+    let rejectedByError = false;
 
     let stdout = ''; // to be appended to
     let stderr = '';
+
+    const process = child_process.spawn( cmd, args, {
+      cwd: cwd
+    } );
+
+    process.on( 'error', error => {
+      rejectedByError = true;
+      reject( new ExecuteError( cmd, args, cwd, stdout, stderr, -1 ) );
+    } );
+    winston.debug( `Running ${cmd} ${args.join( ' ' )} from ${cwd}` );
 
     process.stderr.on( 'data', data => {
       stderr += data;
@@ -82,15 +90,17 @@ module.exports = function( cmd, args, cwd, options ) {
       winston.debug( stderr && `stderr: ${stderr}` || 'stderr is empty.' );
       winston.debug( stdout && `stdout: ${stdout}` || 'stdout is empty.' );
 
-      if ( options.errors === 'resolve' ) {
-        resolve( { code: code, stdout: stdout, stderr: stderr, cwd: cwd } );
-      }
-      else {
-        if ( code !== 0 ) {
-          reject( new ExecuteError( cmd, args, cwd, stdout, stderr, code ) );
+      if ( !rejectedByError ) {
+        if ( options.errors === 'resolve' ) {
+          resolve( { code: code, stdout: stdout, stderr: stderr, cwd: cwd } );
         }
         else {
-          resolve( stdout );
+          if ( code !== 0 ) {
+            reject( new ExecuteError( cmd, args, cwd, stdout, stderr, code ) );
+          }
+          else {
+            resolve( stdout );
+          }
         }
       }
     } );
