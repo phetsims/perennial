@@ -58,7 +58,7 @@ module.exports = async function( simName, version ) {
   // create xml, making a simulation tag for each language
   let finalXML = `<?xml version="1.0" encoding="utf-8" ?>\n<project name="${simName}">\n<simulations>`;
 
-  const screenNames = await parseScreenNames( simName );
+  const screenNames = await parseScreenNames.parseScreenNames( simName, stringFiles.map( f => f.locale ) );
 
   for ( let j = 0; j < stringFiles.length; j++ ) {
     const stringFile = stringFiles[ j ];
@@ -71,9 +71,9 @@ module.exports = async function( simName, version ) {
       const localizedSimTitle = ( languageJSON[ simTitleKey ] ) ? languageJSON[ simTitleKey ].value : englishStrings[ simTitleKey ].value;
       finalXML = finalXML.concat( `<simulation name="${simName}" locale="${stringFile.locale}">\n` +
                                   `<title><![CDATA[${localizedSimTitle}]]></title>\n` );
-      if ( screenNames && screenNames[ simName ] && screenNames[ simName ][ stringFile.locale ] ) {
+      if ( screenNames && screenNames[ stringFile.locale ] ) {
         finalXML = finalXML.concat( '<screens>\n' );
-        screenNames[ simName ][ stringFile.locale ].forEach( ( screenName, index ) => {
+        screenNames[ stringFile.locale ].forEach( ( screenName, index ) => {
           finalXML = finalXML.concat( `<screenName position="${index + 1}"><![CDATA[${screenName}]]></screenName>\n` );
         } );
         finalXML = finalXML.concat( '</screens>\n' );
