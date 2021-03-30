@@ -3,18 +3,18 @@
 'use strict';
 
 const constants = require( './constants' );
-const email = require( 'emailjs/email' );
+const emailjs = require( 'emailjs' );
 const mimelib = require( 'mimelib' );
 const winston = require( 'winston' );
 
 // configure email server
-let emailServer;
+let emailClient;
 if ( constants.BUILD_SERVER_CONFIG.emailUsername && constants.BUILD_SERVER_CONFIG.emailPassword && constants.BUILD_SERVER_CONFIG.emailTo ) {
-  emailServer = email.server.connect( {
+  emailClient = new emailjs.SMTPClient( {
     user: constants.BUILD_SERVER_CONFIG.emailUsername,
     password: constants.BUILD_SERVER_CONFIG.emailPassword,
     host: constants.BUILD_SERVER_CONFIG.emailServer,
-    tls: true
+    ssl: true
   } );
 }
 else {
@@ -30,7 +30,7 @@ else {
  * @param emailParameterOnly - if true send the email only to the passed in email, not to the default list as well
  */
 module.exports = function sendEmail( subject, text, emailParameter, emailParameterOnly ) {
-  if ( emailServer ) {
+  if ( emailClient ) {
     let emailTo = constants.BUILD_SERVER_CONFIG.emailTo;
 
     if ( emailParameter ) {
@@ -48,7 +48,7 @@ module.exports = function sendEmail( subject, text, emailParameter, emailParamet
     }
 
     winston.log( 'info', 'attempting to send email' );
-    emailServer.send( {
+    emailClient.send( {
         text: text,
         from: 'PhET Build Server <phethelp@colorado.edu>',
         to: emailTo,
