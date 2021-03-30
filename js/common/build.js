@@ -12,6 +12,7 @@ const ChipperVersion = require( '../common/ChipperVersion' );
 const execute = require( '../common/execute' );
 const gruntCommand = require( '../common/gruntCommand' );
 const assert = require( 'assert' );
+const fs = require( 'fs' );
 const winston = require( 'winston' );
 
 /**
@@ -95,9 +96,12 @@ module.exports = async function( repo, options ) {
 
   const result = await execute( gruntCommand, args, `../${repo}` );
 
+  const packageObject = JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) );
+  const includesPhetio = packageObject.phet && packageObject.phet.supportedBrands && packageObject.phet.supportedBrands.includes( 'phet-io' );
+
   // Examine output to see if getDependencies (in chipper) notices any missing phet-io things.
   // Fail out if so. Detects that specific error message.
-  if ( brands.includes( 'phet-io' ) && result.includes( 'WARNING404' ) ) {
+  if ( includesPhetio && result.includes( 'WARNING404' ) ) {
     throw new Error( 'phet-io dependencies missing' );
   }
 

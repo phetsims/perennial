@@ -1,23 +1,33 @@
 # build-server.js
 
-PhET build and deploy server. The server is designed to run on the same host as the production site (
-phet-server.int.colorado.edu).
+PhET build and deploy server.
+
+# Host
+
+The production version of the build server runs on **phet-server.int.colorado.edu**, the same host as the PhET production website.
+
+A test version of the server runs on **phet-server-dev.int.colorado.edu**.
 
 ## Starting and Stopping the Server
 
-To start, stop, or restart the build server on phet-server.int.colorado.edu (production) or
-phet-server.int.colorado.edu (test), run this command:
+To start, stop, or restart the build server, run this command:
 `sudo systemctl [start|stop|restart] build-server`
-
-To view the logs, run the following command. A `-f` flag will tail the log. Pressing Shift+F will scroll to the end (
-navigation is less-like).
-`sudo journalctl -u build-server`
 
 To edit startup options, please see `/usr/lib/systemd/system/build-server.service`
 
 !!!DEPRECATED!!! - figaro has been decommisioned and simian is nearing end of life. To start, stop, or restart the build
 server on figaro or simian, run this command:
 `sudo /etc/init.d/build-server {{start|stop|restart}}`
+
+## Log Files
+
+To view the log:`sudo journalctl -u build-server`
+
+To tail the log: `sudo journalctl -u build-server -f`
+
+To tail a specific number of lines (e.g. 500): `sudo journalctl -u build-server -f -n 500`
+
+Pressing Shift+F will scroll to the end (navigation is `less`-like).
 
 ## Build Server Configuration
 
