@@ -218,7 +218,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       grunt.log.writeln( 'Make sure that the current level of instrumentation is represented here in the Instrumentation Status Spreadsheet:' );
       grunt.log.writeln( 'https://docs.google.com/spreadsheets/d/18_QNGuVtYtxOEKG9xRBs_PSQpyvzySF1Gk5puR-5Fv4/edit#gid=1881767354' );
       grunt.log.writeln( '' );
-      grunt.log.writeln( 'Make sure the sim is listed in perennial/data/phet-io-api-stable, if it has had a designed production release' );
+      grunt.log.writeln( 'Make sure the sim is listed in perennial/data/phet-io-api-stable, if it has had a designed production release, and update the checked in API file to match the published version.' );
       grunt.log.writeln( '' );
       grunt.log.writeln( 'If you are delivering this to a partner, update partners.md (phet-io/doc/partners.md) to show this delivery.' );
       grunt.log.writeln( 'Read the intro of the document to make sure that you format the entry correctly.' );
