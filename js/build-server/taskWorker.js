@@ -8,7 +8,7 @@ const constants = require( './constants' );
 const createTranslationsXML = require( './createTranslationsXML' );
 const devDeploy = require( './devDeploy' );
 const execute = require( '../common/execute' );
-const fs = require( 'graceful-fs' ); //eslint-disable-line
+const fs = require( 'fs' ); //eslint-disable-line
 const gitCheckout = require( '../common/gitCheckout' );
 const gitPull = require( '../common/gitPull' );
 const getLocales = require( './getLocales' );
@@ -165,35 +165,11 @@ async function taskWorker( options ) {
     winston.log( 'info', `building sim ${simName}` );
 
     // Create the temporary build dir, removing the existing dir if it exists.
-    await new Promise( ( resolve, reject ) => {
-      fs.mkdir( buildDir, async err => {
-        // If there is an error, try to remove the directory and contents and try again
-        if ( err ) {
-          try {
-            await execute( 'rm', [ '-rf', buildDir ], '.' );
-          }
-          catch( e ) {
-            reject( e );
-          }
-          fs.mkdir( buildDir, err => {
-            if ( err ) {
-              winston.error( 'Error creating new build dir: ' );
-              winston.error( err );
-              reject( err );
-            }
-            else {
-              winston.info( 'successfully created build dir' );
-              resolve();
-            }
-          } );
+    if ( await fs.promises.exists( buildDir ) ) {
+      await execute( 'rm', [ '-rf', buildDir ], '.' );
+    }
+    await fs.promises.mkdir( buildDir, { recursive: true } );
 
-        }
-        else {
-          winston.info( 'successfully created build dir' );
-          resolve();
-        }
-      } );
-    } );
 
     await writeFile( `${buildDir}/dependencies.json`, JSON.stringify( repos ) );
     winston.log( 'info', `wrote file ${buildDir}/dependencies.json` );
@@ -288,37 +264,19 @@ async function taskWorker( options ) {
           }
 
           // Copy steps - allow EEXIST errors but reject anything else
-          await new Promise( async ( resolve, reject ) => {
-            // If this is a deploy of 1.0.0, create the sim directory
-            if ( !fs.existsSync( targetSimDir ) ) {
-              winston.debug( `Creating sim dir: ${targetSimDir}` );
-              try {
-                await new Promise( ( resolve, reject ) => {
-                  fs.mkdir( targetSimDir, err => {
-                    if ( err && err.code !== 'EEXIST' ) {
-                      winston.debug( 'Failure creating sim dir' );
-                      reject( err );
-                    }
-                    winston.debug( 'Success creating sim dir' );
-                    resolve();
-                  } );
-                } );
-              }
-              catch( e ) {
-                reject( e );
-              }
+          winston.debug( `Creating version dir: ${targetVersionDir}` );
+          try {
+            await fs.promises.mkdir( targetVersionDir, { recursive: true } );
+            winston.debug( 'Success creating sim dir' );
+          }
+          catch( err ) {
+            if ( err.code !== 'EEXIST' ) {
+              winston.error( 'Failure creating version dir' );
+              winston.error( err );
+              throw err;
             }
-            // Create the version directory
-            winston.debug( `Creating version dir: ${targetVersionDir}` );
-            fs.mkdir( targetVersionDir, err => {
-              if ( err && err.code !== 'EEXIST' ) {
-                winston.debug( 'Failure creating version dir' );
-                reject( err );
-              }
-              winston.debug( 'Success creating sim dir' );
-              resolve();
-            } );
-          } );
+          }
+
           let sourceDir = `${simDir}/build`;
           if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
             sourceDir += `/${brand}`;
