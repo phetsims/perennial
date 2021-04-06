@@ -215,7 +215,9 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       grunt.log.writeln( 'If this is a version that will be used with students, then make sure to remove the password protection.' );
       grunt.log.writeln( 'See https://github.com/phetsims/phet-io/blob/master/doc/phet-io-security.md for details.' );
       grunt.log.writeln( '' );
-      grunt.log.writeln( 'Make sure that the current level of instrumentation is represented here in the Instrumentation Status Spreadsheet:' );
+      grunt.log.writeln( 'Make sure that the current level of instrumentation is represented here in the Instrumentation Status Spreadsheet.' );
+      grunt.log.writeln( 'On the spreadsheet, provide the version number like MAJOR.MINOR (without maintenance number)' );
+      grunt.log.writeln( 'so that maintenance releases will seamlessly upgrade:' );
       grunt.log.writeln( 'https://docs.google.com/spreadsheets/d/18_QNGuVtYtxOEKG9xRBs_PSQpyvzySF1Gk5puR-5Fv4/edit#gid=1881767354' );
       grunt.log.writeln( '' );
       grunt.log.writeln( 'Make sure the sim is listed in perennial/data/phet-io-api-stable, if it has had a designed production release, and update the checked in API file to match the published version.' );
