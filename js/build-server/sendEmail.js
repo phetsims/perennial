@@ -14,7 +14,7 @@ if ( constants.BUILD_SERVER_CONFIG.emailUsername && constants.BUILD_SERVER_CONFI
     user: constants.BUILD_SERVER_CONFIG.emailUsername,
     password: constants.BUILD_SERVER_CONFIG.emailPassword,
     host: constants.BUILD_SERVER_CONFIG.emailServer,
-    ssl: true
+    ssl: false
   } );
 }
 else {
