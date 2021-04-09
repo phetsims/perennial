@@ -165,7 +165,7 @@ async function taskWorker( options ) {
     winston.log( 'info', `building sim ${simName}` );
 
     // Create the temporary build dir, removing the existing dir if it exists.
-    if ( await fs.promises.exists( buildDir ) ) {
+    if ( await fs.existsSync( buildDir ) ) {
       await execute( 'rm', [ '-rf', buildDir ], '.' );
     }
     await fs.promises.mkdir( buildDir, { recursive: true } );
