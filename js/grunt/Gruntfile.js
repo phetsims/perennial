@@ -10,6 +10,7 @@
 
 const Maintenance = require( '../common/Maintenance' );
 const ReleaseBranch = require( '../common/ReleaseBranch' );
+const assertIsValidRepoName = require( '../common/assertIsValidRepoName' );
 const checkoutDependencies = require( '../common/checkoutDependencies' );
 const checkoutMaster = require( '../common/checkoutMaster' );
 const checkoutRelease = require( '../common/checkoutRelease' );
@@ -102,6 +103,8 @@ module.exports = function( grunt ) {
       const buildServer = !!grunt.option( 'buildServer' );
 
       const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
+
       const dependencies = grunt.file.readJSON( buildServer ? '../perennial/js/build-server/tmp/dependencies.json' : `../${repo}/dependencies.json` );
       const includeNpmUpdate = !grunt.option( 'skipNpmUpdate' ) && !buildServer;
 
@@ -117,7 +120,10 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'target' ), 'Requires specifying a branch/SHA with --target={{BRANCH}}' );
 
-      await checkoutTarget( grunt.option( 'repo' ), grunt.option( 'target' ), !grunt.option( 'skipNpmUpdate' ) );
+      const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
+
+      await checkoutTarget( repo, grunt.option( 'target' ), !grunt.option( 'skipNpmUpdate' ) );
     } ) );
 
   grunt.registerTask( 'checkout-release',
@@ -127,7 +133,10 @@ module.exports = function( grunt ) {
     wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
-      await checkoutRelease( grunt.option( 'repo' ), !grunt.option( 'skipNpmUpdate' ) );
+      const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
+
+      await checkoutRelease( repo, !grunt.option( 'skipNpmUpdate' ) );
     } ) );
 
   grunt.registerTask( 'checkout-timestamp',
@@ -139,7 +148,10 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'timestamp' ), 'Requires specifying a timestamp with --timestamp={{BRANCH}}' );
 
-      await checkoutTimestamp( grunt.option( 'repo' ), grunt.option( 'timestamp' ), !grunt.option( 'skipNpmUpdate' ) );
+      const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
+
+      await checkoutTimestamp( repo, grunt.option( 'timestamp' ), !grunt.option( 'skipNpmUpdate' ) );
     } ) );
 
   grunt.registerTask( 'checkout-master',
@@ -149,7 +161,10 @@ module.exports = function( grunt ) {
     wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
-      await checkoutMaster( grunt.option( 'repo' ), !grunt.option( 'skipNpmUpdate' ) );
+      const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
+
+      await checkoutMaster( repo, !grunt.option( 'skipNpmUpdate' ) );
     } ) );
 
   grunt.registerTask( 'checkout-master-all',
@@ -163,7 +178,10 @@ module.exports = function( grunt ) {
     '--repo : repository to check for the SHA\n' +
     '--sha : git SHA',
     wrapTask( async () => {
-      await shaCheck( grunt.option( 'repo' ), grunt.option( 'sha' ) );
+      const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
+
+      await shaCheck( repo, grunt.option( 'sha' ) );
     } ) );
 
   grunt.registerTask( 'print-phet-io-links',
@@ -176,8 +194,11 @@ module.exports = function( grunt ) {
     'Compare two sim versions\' pdom',
     wrapTask( async () => {
 
+      const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
+
       // Don't always require this, as we may have an older chipper checked out
-      await require( './PDOMComparison' )( grunt.option( 'repo' ), grunt.option( 'sha' ) );
+      await require( './PDOMComparison' )( repo, grunt.option( 'sha' ) );
     } ) );
 
   grunt.registerTask( 'update-gh-pages',
@@ -211,6 +232,7 @@ module.exports = function( grunt ) {
     '--repo : Only show branches for a specific repository',
     wrapTask( async () => {
       const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
 
       const branches = await ReleaseBranch.getMaintenanceBranches( filterRepo => !repo || filterRepo === repo );
 
@@ -226,7 +248,10 @@ module.exports = function( grunt ) {
     wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
-      await npmUpdate( grunt.option( 'repo' ) ).then( () => npmUpdate( 'chipper' ) );
+      const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
+
+      await npmUpdate( repo ).then( () => npmUpdate( 'chipper' ) );
     } ) );
 
   grunt.registerTask( 'create-release',
@@ -236,6 +261,8 @@ module.exports = function( grunt ) {
     '--message : An optional message that will be appended on version-change commits.',
     wrapTask( async () => {
       const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
+
       const branch = grunt.option( 'branch' );
       const message = grunt.option( 'message' );
       assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
@@ -252,6 +279,8 @@ module.exports = function( grunt ) {
     '--message : An optional message that will be appended on version-change commits.',
     wrapTask( async () => {
       const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
+
       const branch = grunt.option( 'branch' );
       const message = grunt.option( 'message' );
       assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
@@ -270,6 +299,8 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'shas' ), 'Requires specifying a comma-separated list of SHAs with --shas={{SHAS}}' );
 
       const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
+
       const shas = grunt.option( 'shas' ).split( ',' );
 
       await cherryPick( repo, shas );
@@ -293,7 +324,10 @@ module.exports = function( grunt ) {
     wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
-      await wrapper( grunt.option( 'repo' ), noninteractive, grunt.option( 'message' ) );
+      const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
+
+      await wrapper( repo, noninteractive, grunt.option( 'message' ) );
     } ) );
 
   grunt.registerTask( 'dev',
@@ -306,7 +340,10 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
-      await dev( grunt.option( 'repo' ), grunt.option( 'brands' ).split( ',' ), noninteractive, 'master', grunt.option( 'message' ) );
+      const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
+
+      await dev( repo, grunt.option( 'brands' ).split( ',' ), noninteractive, 'master', grunt.option( 'message' ) );
     } ) );
 
   grunt.registerTask( 'deploy-images',
@@ -329,6 +366,8 @@ module.exports = function( grunt ) {
     '--message : An optional message that will be appended on version-change commits.',
     wrapTask( async () => {
       const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
+
       const brands = grunt.option( 'brands' );
 
       assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
@@ -356,7 +395,10 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
-      await rc( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ), noninteractive, grunt.option( 'message' ) );
+      const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
+
+      await rc( repo, grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ), noninteractive, grunt.option( 'message' ) );
     } ) );
 
   grunt.registerTask( 'production',
@@ -371,7 +413,10 @@ module.exports = function( grunt ) {
       assert( grunt.option( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
-      await production( grunt.option( 'repo' ), grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ), noninteractive, grunt.option( 'message' ) );
+      const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
+
+      await production( repo, grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ), noninteractive, grunt.option( 'message' ) );
     } ) );
 
   grunt.registerTask( 'deploy-decaf',
@@ -399,11 +444,13 @@ module.exports = function( grunt ) {
     '--clean=true : (optional) deletes the repository directory if it exists',
     wrapTask( async () => {
       const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
+
       const author = grunt.option( 'author' );
       const title = grunt.option( 'title' );
       const clean = grunt.option( 'clean' );
 
-      assert( grunt.option( 'repo' ), 'Requires specifying a repository name with --repo={{REPO}}' );
+      assert( repo, 'Requires specifying a repository name with --repo={{REPO}}' );
       assert( grunt.option( 'author' ), 'Requires specifying a author with --author={{AUTHOR}}' );
 
       await createSim( repo, author, { title: title, clean: clean } );
@@ -452,9 +499,11 @@ module.exports = function( grunt ) {
 
   grunt.registerTask( 'maintenance-create-patch', 'Adds a patch to the maintenance process', wrapTask( async () => {
     const repo = grunt.option( 'repo' );
+    assertIsValidRepoName( repo );
+
     const message = grunt.option( 'message' );
 
-    assert( grunt.option( 'repo' ), 'Requires specifying a repo that will need to be patched with --repo={{REPO}}' );
+    assert( repo, 'Requires specifying a repo that will need to be patched with --repo={{REPO}}' );
     assert( grunt.option( 'message' ), 'Requires specifying a message (included with commits) with --message={{MESSAGE}}' );
 
     await Maintenance.createPatch( repo, message );
