@@ -39,7 +39,7 @@ module.exports = async function( repo, author, options ) {
     clean = false
   } = options || {};
 
-  assert( typeof repo === 'string' );
+  assert( typeof repo === 'string' && /^[a-z]+(-[a-z]+)*$/u.test( repo ), 'repo name should be composed of lower-case characters, optionally with dashes used as separators' );
   assert( typeof author === 'string' );
   assert( typeof title === 'string' );
   assert( typeof clean === 'boolean' );
