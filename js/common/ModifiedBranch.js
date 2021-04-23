@@ -299,7 +299,7 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
         }
         if ( this.brands.includes( 'phet-io' ) ) {
           linkSuffixes.push( ` phet-io](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}${phetioFolder}/${this.repo}${phetioSuffix}.html?${standaloneParams})` );
-          linkSuffixes.push( ` phet-io ${studioNameBeautified}](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}${phetioFolder}/wrappers/${studioName}${studioPathSuffix}` );
+          linkSuffixes.push( ` phet-io ${studioNameBeautified}](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}${phetioFolder}/wrappers/${studioName}${studioPathSuffix})` );
         }
       }
       else {
@@ -308,7 +308,7 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
         }
         if ( this.brands.includes( 'phet-io' ) ) {
           linkSuffixes.push( ` phet-io](https://phet-io.colorado.edu/sims/${this.repo}/${versionString}${phetioBrandSuffix}/${this.repo}${phetioSuffix}.html?${standaloneParams})` );
-          linkSuffixes.push( ` phet-io ${studioNameBeautified}](https://phet-io.colorado.edu/sims/${this.repo}/${versionString}${phetioBrandSuffix}/wrappers/${studioName}${studioPathSuffix}` );
+          linkSuffixes.push( ` phet-io ${studioNameBeautified}](https://phet-io.colorado.edu/sims/${this.repo}/${versionString}${phetioBrandSuffix}/wrappers/${studioName}${studioPathSuffix})` );
         }
       }
 
