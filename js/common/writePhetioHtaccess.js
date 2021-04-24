@@ -92,10 +92,14 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
   }
   else {
     try {
-      const passwordProtectWrapperContents = `${'AuthType Basic\n' +
-                                             'AuthName "PhET-iO Password Protected Area"\n' +
-                                             'AuthUserFile '}${authFilepath}\n` +
-                                             'Require valid-user\n';
+      const passwordProtectWrapperContents = `
+AuthType Basic
+AuthName "PhET-iO Password Protected Area"
+AuthUserFile ${authFilepath}
+<LimitExcept OPTIONS>
+  Require valid-user
+</LimitExcept>
+`;
 
       // Write a file to add authentication to subdirectories like wrappers/ or doc/
       for ( const subdir of PASSWORD_PROTECTED_SUB_DIRS ) {
