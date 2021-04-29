@@ -75,6 +75,10 @@ module.exports = async function() {
   writeList( 'unit-tests', phet => phet.generatedUnitTests );
   writeList( 'color-profiles', phet => phet.colorProfile );
   writeList( 'phet-io', phet => phet.runnable && phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) );
+  writeList( 'phet-io-api-stable', phet => {
+    return phet.runnable && phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) &&
+           phet[ 'phet-io' ] && phet[ 'phet-io' ].compareDesignedAPIChanges;
+  } );
 
   await gitAdd( 'perennial', 'data/interactive-description' );
   await gitAdd( 'perennial', 'data/active-runnables' );
