@@ -20,3 +20,5 @@ added to this list before 1.0 when its API starts to stabilize.
 
 phet-io-state-unsupported - A manually supported list of sims that do not support state, and shouldn't be tested as such. 
 Any sim in this list will not have its state wrapper fuzzed on CT.  
+
+typescript-repos - A manual list of sims that have a typescript branch for investigation of https://github.com/phetsims/tasks/issues/987
