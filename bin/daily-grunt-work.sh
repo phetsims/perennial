@@ -62,3 +62,14 @@ grunt update-copyright-dates # update SimVersion.js, this will only hit SimVersi
 git commit -am "Update chipper's SimVersion from daily grunt work"
 git push
 cd ..
+
+##########################################################################################################
+# Update responsible dev/designer markdown output
+
+node ./phet-info/sim-info/generateMarkdownOutput.mjs
+cd phet-info || exit
+git commit -am "Update responsible_dev markdown output from daily grunt work"
+git push
+cd ..
+
+##########################################################################################################
