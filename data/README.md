@@ -15,8 +15,9 @@ phet-io (auto-generated) is the list of all simulations that are instrumented wi
     [How to Instrument a PhET Simulation](https://github.com/phetsims/phet-io/blob/master/doc/how-to-instrument-a-phet-simulation-for-phet-io.md)
     for more information.
 
-phet-io-api-stable - Recently published sims that have had a designer involved with the API definition.  A sim can be 
-added to this list before 1.0 when its API starts to stabilize.
+phet-io-api-stable (auto-generated) is the list of sims that have had a designer involved with the API definition.  PhET-iO API changes within phetioDesigned elements. 
+will trigger a CT error. A sim can be added to this list before 1.0 is published, when its API starts to stabilize. Add `phet["phet-io"].compareDesignedAPIChanges:true` to a sim's `package.json` to be populated to this list.
+
 
 phet-io-state-unsupported - A manually supported list of sims that do not support state, and shouldn't be tested as such. 
 Any sim in this list will not have its state wrapper fuzzed on CT.  
