@@ -13,6 +13,8 @@ A test version of the server runs on **phet-server-dev.int.colorado.edu**.
 To start, stop, or restart the build server, run this command:
 `sudo systemctl [start|stop|restart] build-server`
 
+Starting the build-server runs the application that is currently checked out at `/data/share/phet/phet-repos/perennial`.  You must use the `phet-admin` account for all git operations on this repo, e.g. `sudo -u phet-admin git pull`.
+
 To edit startup options, please see `/usr/lib/systemd/system/build-server.service`
 
 ## Log Files
