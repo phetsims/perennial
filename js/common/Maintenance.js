@@ -785,12 +785,20 @@ module.exports = ( function() {
     /**
      * Deploys RC versions of the modified branches that need it.
      * @public
+     *
+     * @param {function(ModifiedBranch):Promise.<boolean>} [filter] - Optional filter, modified branches will be skipped
+     *                                                                if this resolves to false
      */
-    static async deployReleaseCandidates() {
+    static async deployReleaseCandidates( filter ) {
       const maintenance = Maintenance.load();
 
       for ( const modifiedBranch of maintenance.modifiedBranches ) {
         if ( !modifiedBranch.isReadyForReleaseCandidate || !modifiedBranch.releaseBranch.isReleased ) {
+          continue;
+        }
+
+        if ( filter && !( await filter( modifiedBranch ) ) ) {
+          console.log( `Skipping RC deploy for ${modifiedBranch.repo} ${modifiedBranch.branch}` );
           continue;
         }
 
@@ -816,12 +824,20 @@ module.exports = ( function() {
     /**
      * Deploys production versions of the modified branches that need it.
      * @public
+     *
+     * @param {function(ModifiedBranch):Promise.<boolean>} [filter] - Optional filter, modified branches will be skipped
+     *                                                                if this resolves to false
      */
-    static async deployProduction() {
+    static async deployProduction( filter ) {
       const maintenance = Maintenance.load();
 
       for ( const modifiedBranch of maintenance.modifiedBranches ) {
         if ( !modifiedBranch.isReadyForProduction || !modifiedBranch.releaseBranch.isReleased ) {
+          continue;
+        }
+
+        if ( filter && !( await filter( modifiedBranch ) ) ) {
+          console.log( `Skipping production deploy for ${modifiedBranch.repo} ${modifiedBranch.branch}` );
           continue;
         }
 

@@ -291,15 +291,16 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
       const phetSuffix = usesChipper2 ? '_phet' : '';
       const phetioSuffix = usesChipper2 ? '_all_phet-io' : '_en-phetio';
       const phetioBrandSuffix = usesChipper2 ? '' : '-phetio';
-      const studioPathSuffix = ( await this.usesPhetioStudioIndex() ) ? '' : `/${studioName}.html?sim=${this.repo}&${proxiesParams})`;
+      const studioPathSuffix = ( await this.usesPhetioStudioIndex() ) ? '' : `/${studioName}.html?sim=${this.repo}&${proxiesParams}`;
+      const phetioDevVersion = usesChipper2 ? versionString : versionString.split( '-' ).join( '-phetio' );
 
       if ( this.deployedVersion.testType === 'rc' ) {
         if ( this.brands.includes( 'phet' ) ) {
           linkSuffixes.push( `](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}${phetFolder}/${this.repo}_en${phetSuffix}.html)` );
         }
         if ( this.brands.includes( 'phet-io' ) ) {
-          linkSuffixes.push( ` phet-io](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}${phetioFolder}/${this.repo}${phetioSuffix}.html?${standaloneParams})` );
-          linkSuffixes.push( ` phet-io ${studioNameBeautified}](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}${phetioFolder}/wrappers/${studioName}${studioPathSuffix})` );
+          linkSuffixes.push( ` phet-io](https://phet-dev.colorado.edu/html/${this.repo}/${phetioDevVersion}${phetioFolder}/${this.repo}${phetioSuffix}.html?${standaloneParams})` );
+          linkSuffixes.push( ` phet-io ${studioNameBeautified}](https://phet-dev.colorado.edu/html/${this.repo}/${phetioDevVersion}${phetioFolder}/wrappers/${studioName}${studioPathSuffix})` );
         }
       }
       else {
