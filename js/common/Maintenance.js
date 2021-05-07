@@ -350,6 +350,27 @@ module.exports = ( function() {
     }
 
     /**
+     * Removes all patch SHAs for a particular patch.
+     * @public
+     *
+     * @param {string} patchName
+     * @returns {Promise}
+     */
+    static async removeAllPatchSHAs( patchName ) {
+      const maintenance = Maintenance.load();
+
+      const patch = maintenance.findPatch( patchName );
+
+      for ( const sha of patch.shas ) {
+        console.log( `Removing SHA ${sha} from patch ${patchName}` );
+      }
+
+      patch.shas = [];
+
+      maintenance.save();
+    }
+
+    /**
      * Adds a needed patch to a given modified branch.
      * @public
      *
