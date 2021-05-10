@@ -311,13 +311,18 @@ module.exports = ( function() {
      * @public
      *
      * @param {string} patchName
-     * @param {string} sha
+     * @param {string} [sha]
      * @returns {Promise}
      */
     static async addPatchSHA( patchName, sha ) {
       const maintenance = Maintenance.load();
 
       const patch = maintenance.findPatch( patchName );
+
+      if ( !sha ) {
+        sha = await gitRevParse( patch.repo, 'HEAD' );
+        console.log( `SHA not provided, detecting SHA: ${sha}` );
+      }
 
       patch.shas.push( sha );
 
@@ -603,6 +608,28 @@ module.exports = ( function() {
       await Maintenance.removeNeededPatches( patchName, async releaseBranch => {
         return await releaseBranch.includesSHA( patch.repo, sha );
       } );
+    }
+
+    /**
+     * Helper for adding patches based on specific patterns, e.g.:
+     * Maintenance.addNeededPatches( 'phetmarks', Maintenance.singleFileReleaseBranchFilter( '../phetmarks/js/phetmarks.js' ), content => content.includes( 'data/wrappers' ) );
+     * @public
+     *
+     * @param {string} file
+     * @param {function(string):boolean}
+     * @returns {function}
+     */
+    static singleFileReleaseBranchFilter( file, predicate ) {
+      return async releaseBranch => {
+        await releaseBranch.checkout( false );
+
+        if ( fs.existsSync( file ) ) {
+          const contents = fs.readFileSync( file, 'utf-8' );
+          return predicate( contents );
+        }
+
+        return false;
+      };
     }
 
     /**
