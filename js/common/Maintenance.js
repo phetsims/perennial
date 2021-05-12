@@ -121,13 +121,13 @@ module.exports = ( function() {
 
       for ( const releaseBranch of releaseBranches ) {
         if ( !filter || await filter( releaseBranch ) ) {
-          console.log( `Checking ${releaseBranch.repo} ${releaseBranch.branch}` );
+          console.log( `${releaseBranch.repo} ${releaseBranch.branch}` );
           for ( const line of await releaseBranch.getStatus() ) {
-            console.log( line );
+            console.log( `  ${line}` );
           }
         }
         else {
-          console.log( `Skipping ${releaseBranch.repo} ${releaseBranch.branch}` );
+          console.log( `${releaseBranch.repo} ${releaseBranch.branch} (skipping due to filter)` );
         }
       }
     }
