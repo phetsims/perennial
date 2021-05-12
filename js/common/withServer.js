@@ -15,23 +15,24 @@ const winston = require( 'winston' );
  * A simple webserver that will serve the git root on a specific port for the duration of an async callback
  * @public
  *
- * @param {number} port
- * @param {async function()} asyncCallback
+ * @param {async function(port:number)} asyncCallback
  * @param {string} [path]
  * @returns {Promise}
  */
-module.exports = function( port, asyncCallback, path = '..' ) {
+module.exports = function( asyncCallback, path = '..' ) {
   return new Promise( ( resolve, reject ) => {
     const app = express();
 
     app.use( express.static( path ) );
 
     // start the server
-    const server = app.listen( port, async () => {
+    const server = app.listen( 0, async () => {
+      const port = server.address().port;
+
       winston.debug( 'info', `Express listening on port ${port}` );
 
       try {
-        await asyncCallback();
+        await asyncCallback( port );
       }
       catch( e ) {
         reject( e );

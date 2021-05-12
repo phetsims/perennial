@@ -8,10 +8,9 @@
 
 'use strict';
 
-const assert = require( 'assert' );
+const build = require( './build' );
 const checkoutMaster = require( './checkoutMaster' );
 const checkoutTarget = require( './checkoutTarget' );
-const fs = require( 'fs' );
 const getActiveSims = require( './getActiveSims' );
 const getBranches = require( './getBranches' );
 const getDependencies = require( './getDependencies' );
@@ -20,8 +19,13 @@ const gitCheckout = require( './gitCheckout' );
 const gitIsAncestor = require( './gitIsAncestor' );
 const gitPull = require( './gitPull' );
 const gitRevParse = require( './gitRevParse' );
+const puppeteerLoads = require( './puppeteerLoads' );
 const simMetadata = require( './simMetadata' );
 const simPhetioMetadata = require( './simPhetioMetadata' );
+const withServer = require( './withServer' );
+const assert = require( 'assert' );
+const fs = require( 'fs' );
+const _ = require( 'lodash' ); // eslint-disable-line
 const winston = require( 'winston' );
 
 module.exports = ( function() {
@@ -169,12 +173,23 @@ module.exports = ( function() {
      * Returns a list of status messages of anything out-of-the-ordinary
      * @public
      *
+     * @param {Object} [options]
      * @returns {Promise.<Array.<string>>}
      */
-    async getStatus() {
+    async getStatus( options ) {
+      options = _.extend( { // eslint-disable-line
+        checkUnbuilt: true,
+        build: true,
+        checkBuilt: true
+      }, options );
+
+      if ( options.checkBuilt ) {
+        assert( options.build, 'checkBuilt requires build' );
+      }
+
       const results = [];
 
-      await checkoutTarget( this.repo, this.branch, false ); // don't npm update
+      await checkoutTarget( this.repo, this.branch, options.build );
 
       const dependencies = await getDependencies( this.repo );
       const dependencyNames = Object.keys( dependencies ).filter( key => {
@@ -218,7 +233,34 @@ module.exports = ( function() {
         }
       }
 
-      await checkoutMaster( this.repo, false ); // don't npm update
+      if ( options.checkUnbuilt ) {
+        try {
+          await withServer( async port => {
+            const error = await puppeteerLoads( `http://localhost:${port}/${this.repo}/${this.repo}_en.html?brand=phet&ea` );
+            if ( error ) {
+              results.push( `[WARNING] Unbuilt HTML failure: ${error}` );
+            }
+          } );
+        }
+        catch( e ) {
+          results.push( '[ERROR] Failure to check unbuilt HTML' );
+        }
+      }
+
+      if ( options.build ) {
+        try {
+          await build( this.repo, {
+            brands: this.brands
+          } );
+        }
+        catch( e ) {
+          results.push( `[ERROR] Failure to build: ${e}` );
+        }
+      }
+
+      // TODO: checkBuilt, we need URL detection, move those from ModifiedBranch to here
+
+      await checkoutMaster( this.repo, options.build );
 
       return results.map( line => `[${this.toString()}] ${line}` ); // tag with the repo name
     }

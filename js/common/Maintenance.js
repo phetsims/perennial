@@ -111,7 +111,7 @@ module.exports = ( function() {
      */
     static async checkBranchStatus( filter ) {
       for ( const repo of getActiveRepos() ) {
-        if ( !( await gitIsClean( repo ) ) ) {
+        if ( repo !== 'perennial' && !( await gitIsClean( repo ) ) ) {
           console.log( `Unclean repository: ${repo}, please resolve this and then run checkBranchStatus again` );
           return;
         }
