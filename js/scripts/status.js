@@ -12,7 +12,6 @@ const execute = require( '../common/execute' );
 const getActiveRepos = require( '../common/getActiveRepos' );
 const getBranch = require( '../common/getBranch' );
 const gitRevParse = require( '../common/gitRevParse' );
-const simMetadata = require( '../common/simMetadata' );
 const winston = require( 'winston' );
 
 winston.default.transports.console.level = 'error';
@@ -59,7 +58,7 @@ const getStatus = async repo => {
   }
 };
 
-( async() => {
+( async () => {
   await Promise.all( repos.map( repo => getStatus( repo ) ) );
   repos.forEach( repo => {
     process.stdout.write( data[ repo ] );
