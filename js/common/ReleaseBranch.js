@@ -183,7 +183,8 @@ module.exports = ( function() {
       options = _.extend( { // eslint-disable-line
         checkUnbuilt: true,
         build: true,
-        checkBuilt: true
+        checkBuilt: true,
+        checkPhetmarks: true
       }, options );
 
       if ( options.checkBuilt ) {
@@ -238,19 +239,26 @@ module.exports = ( function() {
         }
       }
 
-      if ( options.checkUnbuilt ) {
+      const checkURL = async ( name, relativeURL ) => {
         try {
           await withServer( async port => {
-            const url = `http://localhost:${port}/${this.repo}/${this.repo}_en.html?brand=phet&ea`;
+            const url = `http://localhost:${port}/${relativeURL}`;
             const error = await puppeteerLoads( url );
             if ( error ) {
-              results.push( `[WARNING] Unbuilt HTML failure for ${url}: ${error}` );
+              results.push( `[WARNING] ${name} failure for ${url}: ${error}` );
             }
           } );
         }
         catch( e ) {
-          results.push( '[ERROR] Failure to check unbuilt HTML' );
+          results.push( `[ERROR] Failure to check ${name}` );
         }
+      };
+
+      if ( options.checkUnbuilt ) {
+        await checkURL( 'Unbuilt HTML', `${this.repo}/${this.repo}_en.html?brand=phet&ea` );
+      }
+      if ( options.checkPhetmarks ) {
+        await checkURL( 'Phetmarks', 'phetmarks/index.html' );
       }
 
       if ( options.build ) {
@@ -265,21 +273,8 @@ module.exports = ( function() {
       }
 
       if ( options.checkBuilt ) {
-        try {
-          await withServer( async port => {
-            const url = `http://localhost:${port}/${this.repo}/build/${usesChipper2 ? 'phet/' : ''}${this.repo}_en${usesChipper2 ? '_phet' : ''}.html`;
-            const error = await puppeteerLoads( url );
-            if ( error ) {
-              results.push( `[WARNING] Built HTML failure for ${url}: ${error}` );
-            }
-          } );
-        }
-        catch( e ) {
-          results.push( '[ERROR] Failure to check built HTML' );
-        }
+        await checkURL( 'Built HTML', `${this.repo}/build/${usesChipper2 ? 'phet/' : ''}${this.repo}_en${usesChipper2 ? '_phet' : ''}.html` );
       }
-
-      // TODO: checkBuilt, we need URL detection, move those from ModifiedBranch to here
 
       await checkoutMaster( this.repo, options.build );
 

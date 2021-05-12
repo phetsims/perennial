@@ -10,11 +10,9 @@
 
 const assert = require( 'assert' );
 const checkoutDependencies = require( './checkoutDependencies' );
-const ChipperVersion = require( '../common/ChipperVersion' );
 const getDependencies = require( './getDependencies' );
 const gitCheckout = require( './gitCheckout' );
 const githubCreateIssue = require( './githubCreateIssue' );
-const gitIsAncestor = require( './gitIsAncestor' );
 const gitPull = require( './gitPull' );
 const Patch = require( './Patch' );
 const ReleaseBranch = require( './ReleaseBranch' );
