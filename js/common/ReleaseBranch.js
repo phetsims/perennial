@@ -20,7 +20,7 @@ const gitCheckout = require( './gitCheckout' );
 const gitIsAncestor = require( './gitIsAncestor' );
 const gitPull = require( './gitPull' );
 const gitRevParse = require( './gitRevParse' );
-const puppeteerLoads = require( './puppeteerLoads' );
+const puppeteerLoad = require( './puppeteerLoad' );
 const simMetadata = require( './simMetadata' );
 const simPhetioMetadata = require( './simPhetioMetadata' );
 const withServer = require( './withServer' );
@@ -243,7 +243,7 @@ module.exports = ( function() {
         try {
           await withServer( async port => {
             const url = `http://localhost:${port}/${relativeURL}`;
-            const error = await puppeteerLoads( url );
+            const error = await puppeteerLoad( url );
             if ( error ) {
               results.push( `[WARNING] ${name} failure for ${url}: ${error}` );
             }

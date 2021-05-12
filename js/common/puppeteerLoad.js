@@ -19,13 +19,15 @@ const winston = require( 'winston' );
  *
  * @param {string} url
  * @param {Object} [options]
- * @returns {Promise.<Error|null>} - Resolves with an error if available
+ * @returns {Promise.<Error|null|*>} - Resolves with an error if available, or the eval result/null if successful
  */
 module.exports = async function( url, options ) {
 
   options = _.extend( { // eslint-disable-line
 
     browser: null, // {puppeteer.Browser|null} - If provided, we'll use a persistent browser
+
+    evaluate: null, // {function|null}
 
     waitAfterLoad: 5000, // milliseconds
     allowedTimeToLoad: 40000 // milliseconds
@@ -45,7 +47,7 @@ module.exports = async function( url, options ) {
   page.on( 'load', async () => {
     loaded = true;
     await sleep( options.waitAfterLoad );
-    resolve( null );
+    resolve( options.evaluate && !page.isClosed() ? await page.evaluate( options.evaluate ) : null );
   } );
   page.on( 'error', msg => {
     winston.info( `puppeteer error: ${msg}` );
