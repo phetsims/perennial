@@ -744,11 +744,11 @@ module.exports = ( function() {
         }
 
         try {
-          const dependenciesJSONFile = `../${modifiedBranch.repo}/dependencies.json`;
-          const dependenciesJSON = JSON.parse( fs.readFileSync( dependenciesJSONFile, 'utf-8' ) );
-
           await checkoutTarget( modifiedBranch.repo, modifiedBranch.branch, false ); // npm update, since we'll build.
           console.log( `Checked out ${modifiedBranch.repo} ${modifiedBranch.branch}` );
+
+          const dependenciesJSONFile = `../${modifiedBranch.repo}/dependencies.json`;
+          const dependenciesJSON = JSON.parse( fs.readFileSync( dependenciesJSONFile, 'utf-8' ) );
 
           // Modify the "self" in the dependencies.json as expected
           dependenciesJSON[ modifiedBranch.repo ] = await gitRevParse( modifiedBranch.repo, modifiedBranch.branch );
