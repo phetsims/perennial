@@ -733,13 +733,21 @@ module.exports = ( function() {
     /**
      * Pushes local changes up to GitHub.
      * @public
+     *
+     * @param {function(ModifiedBranch):Promise.<boolean>} [filter] - Optional filter, modified branches will be skipped
+     *                                                                if this resolves to false
      */
-    static async updateDependencies() {
+    static async updateDependencies( filter ) {
       const maintenance = Maintenance.load();
 
       for ( const modifiedBranch of maintenance.modifiedBranches ) {
         const changedRepos = Object.keys( modifiedBranch.changedDependencies );
         if ( changedRepos.length === 0 ) {
+          continue;
+        }
+
+        if ( filter && !( await filter( modifiedBranch ) ) ) {
+          console.log( `Skipping dependency update for ${modifiedBranch.repo} ${modifiedBranch.branch}` );
           continue;
         }
 
