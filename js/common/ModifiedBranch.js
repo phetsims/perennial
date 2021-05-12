@@ -155,102 +155,6 @@ module.exports = ( function() {
     }
 
     /**
-     * Returns whether phet-io.standalone is the correct phet-io query parameter (otherwise it's the newer
-     * phetioStandalone).
-     * Looks for the presence of https://github.com/phetsims/chipper/commit/4814d6966c54f250b1c0f3909b71f2b9cfcc7665.
-     * @public
-     *
-     * @returns {Promise.<boolean>}
-     */
-    async usesOldPhetioStandalone() {
-      await gitCheckout( this.repo, this.branch );
-      const dependencies = await getDependencies( this.repo );
-      const sha = dependencies.chipper.sha;
-      await gitCheckout( this.repo, 'master' );
-
-      return !( await gitIsAncestor( 'chipper', '4814d6966c54f250b1c0f3909b71f2b9cfcc7665', sha ) );
-    }
-
-    /**
-     * Returns whether the relativeSimPath query parameter is used for wrappers (instead of launchLocalVersion).
-     * Looks for the presence of https://github.com/phetsims/phet-io/commit/e3fc26079358d86074358a6db3ebaf1af9725632
-     * @public
-     *
-     * @returns {Promise.<boolean>}
-     */
-    async usesRelativeSimPath() {
-      await gitCheckout( this.repo, this.branch );
-      const dependencies = await getDependencies( this.repo );
-
-      if ( !dependencies[ 'phet-io' ] ) {
-        return true; // Doesn't really matter now, does it?
-      }
-
-      const sha = dependencies[ 'phet-io' ].sha;
-      await gitCheckout( this.repo, 'master' );
-
-      return await gitIsAncestor( 'phet-io', 'e3fc26079358d86074358a6db3ebaf1af9725632', sha );
-    }
-
-    /**
-     * Returns whether phet-io Studio is being used instead of deprecated instance proxies wrapper.
-     * @public
-     *
-     * @returns {Promise.<boolean>}
-     */
-    async usesPhetioStudio() {
-      await gitCheckout( this.repo, this.branch );
-      const dependencies = await getDependencies( this.repo );
-
-      const sha = dependencies.chipper.sha;
-      await gitCheckout( this.repo, 'master' );
-
-      return await gitIsAncestor( 'chipper', '7375f6a57b5874b6bbf97a54c9a908f19f88d38f', sha );
-    }
-
-    /**
-     * Returns whether phet-io Studio top-level (index.html) is used instead of studio.html.
-     * @public
-     *
-     * @returns {Promise.<boolean>}
-     */
-    async usesPhetioStudioIndex() {
-      await gitCheckout( this.repo, this.branch );
-      const dependencies = await getDependencies( this.repo );
-
-      const dependency = dependencies[ 'phet-io-wrappers' ];
-      if ( !dependency ) {
-        return false;
-      }
-
-      const sha = dependency.sha;
-      await gitCheckout( this.repo, 'master' );
-
-      return await gitIsAncestor( 'phet-io-wrappers', '7ec1a04a70fb9707b381b8bcab3ad070815ef7fe', sha );
-    }
-
-    /**
-     * Returns whether an additional folder exists in the build directory of the sim based on the brand.
-     * @public
-     *
-     * @returns {Promise.<boolean>}
-     */
-    async usesChipper2() {
-      await gitCheckout( this.repo, this.branch );
-      const dependencies = await getDependencies( this.repo );
-      await gitCheckout( 'chipper', dependencies.chipper.sha );
-
-      const chipperVersion = ChipperVersion.getFromRepository();
-
-      const result = chipperVersion.major !== 0 || chipperVersion.minor !== 0;
-
-      await gitCheckout( this.repo, 'master' );
-      await gitCheckout( 'chipper', 'master' );
-
-      return result;
-    }
-
-    /**
      * Creates an issue to note that un-tested changes were patched into a branch, and should at some point be tested.
      * @public
      *
@@ -281,17 +185,17 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
       const linkSuffixes = [];
       const versionString = this.deployedVersion.toString();
 
-      const standaloneParams = ( await this.usesOldPhetioStandalone() ) ? 'phet-io.standalone' : 'phetioStandalone';
-      const proxiesParams = ( await this.usesRelativeSimPath() ) ? 'relativeSimPath' : 'launchLocalVersion';
-      const studioName = ( this.brands.includes( 'phet-io' ) && await this.usesPhetioStudio() ) ? 'studio' : 'instance-proxies';
+      const standaloneParams = ( await this.releaseBranch.usesOldPhetioStandalone() ) ? 'phet-io.standalone' : 'phetioStandalone';
+      const proxiesParams = ( await this.releaseBranch.usesRelativeSimPath() ) ? 'relativeSimPath' : 'launchLocalVersion';
+      const studioName = ( this.brands.includes( 'phet-io' ) && await this.releaseBranch.usesPhetioStudio() ) ? 'studio' : 'instance-proxies';
       const studioNameBeautified = studioName === 'studio' ? 'Studio' : 'Instance Proxies';
-      const usesChipper2 = await this.usesChipper2();
+      const usesChipper2 = await this.releaseBranch.usesChipper2();
       const phetFolder = usesChipper2 ? '/phet' : '';
       const phetioFolder = usesChipper2 ? '/phet-io' : '';
       const phetSuffix = usesChipper2 ? '_phet' : '';
       const phetioSuffix = usesChipper2 ? '_all_phet-io' : '_en-phetio';
       const phetioBrandSuffix = usesChipper2 ? '' : '-phetio';
-      const studioPathSuffix = ( await this.usesPhetioStudioIndex() ) ? '' : `/${studioName}.html?sim=${this.repo}&${proxiesParams}`;
+      const studioPathSuffix = ( await this.releaseBranch.usesPhetioStudioIndex() ) ? '' : `/${studioName}.html?sim=${this.repo}&${proxiesParams}`;
       const phetioDevVersion = usesChipper2 ? versionString : versionString.split( '-' ).join( '-phetio' );
 
       if ( this.deployedVersion.testType === 'rc' ) {

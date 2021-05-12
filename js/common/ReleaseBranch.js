@@ -8,6 +8,7 @@
 
 'use strict';
 
+const ChipperVersion = require( './ChipperVersion' );
 const build = require( './build' );
 const checkoutMaster = require( './checkoutMaster' );
 const checkoutTarget = require( './checkoutTarget' );
@@ -177,6 +178,8 @@ module.exports = ( function() {
      * @returns {Promise.<Array.<string>>}
      */
     async getStatus( options ) {
+      // TODO: fuzzing (see when different fuzz query parameters existed?)
+
       options = _.extend( { // eslint-disable-line
         checkUnbuilt: true,
         build: true,
@@ -188,6 +191,8 @@ module.exports = ( function() {
       }
 
       const results = [];
+
+      const usesChipper2 = await this.usesChipper2();
 
       await checkoutTarget( this.repo, this.branch, options.build );
 
@@ -236,9 +241,10 @@ module.exports = ( function() {
       if ( options.checkUnbuilt ) {
         try {
           await withServer( async port => {
-            const error = await puppeteerLoads( `http://localhost:${port}/${this.repo}/${this.repo}_en.html?brand=phet&ea` );
+            const url = `http://localhost:${port}/${this.repo}/${this.repo}_en.html?brand=phet&ea`;
+            const error = await puppeteerLoads( url );
             if ( error ) {
-              results.push( `[WARNING] Unbuilt HTML failure: ${error}` );
+              results.push( `[WARNING] Unbuilt HTML failure for ${url}: ${error}` );
             }
           } );
         }
@@ -258,11 +264,122 @@ module.exports = ( function() {
         }
       }
 
+      if ( options.checkBuilt ) {
+        try {
+          await withServer( async port => {
+            const url = `http://localhost:${port}/${this.repo}/build/${usesChipper2 ? 'phet/' : ''}${this.repo}_en${usesChipper2 ? '_phet' : ''}.html`;
+            const error = await puppeteerLoads( url );
+            if ( error ) {
+              results.push( `[WARNING] Built HTML failure for ${url}: ${error}` );
+            }
+          } );
+        }
+        catch( e ) {
+          results.push( '[ERROR] Failure to check built HTML' );
+        }
+      }
+
       // TODO: checkBuilt, we need URL detection, move those from ModifiedBranch to here
 
       await checkoutMaster( this.repo, options.build );
 
       return results.map( line => `[${this.toString()}] ${line}` ); // tag with the repo name
+    }
+
+    /**
+     * Returns whether phet-io.standalone is the correct phet-io query parameter (otherwise it's the newer
+     * phetioStandalone).
+     * Looks for the presence of https://github.com/phetsims/chipper/commit/4814d6966c54f250b1c0f3909b71f2b9cfcc7665.
+     * @public
+     *
+     * @returns {Promise.<boolean>}
+     */
+    async usesOldPhetioStandalone() {
+      await gitCheckout( this.repo, this.branch );
+      const dependencies = await getDependencies( this.repo );
+      const sha = dependencies.chipper.sha;
+      await gitCheckout( this.repo, 'master' );
+
+      return !( await gitIsAncestor( 'chipper', '4814d6966c54f250b1c0f3909b71f2b9cfcc7665', sha ) );
+    }
+
+    /**
+     * Returns whether the relativeSimPath query parameter is used for wrappers (instead of launchLocalVersion).
+     * Looks for the presence of https://github.com/phetsims/phet-io/commit/e3fc26079358d86074358a6db3ebaf1af9725632
+     * @public
+     *
+     * @returns {Promise.<boolean>}
+     */
+    async usesRelativeSimPath() {
+      await gitCheckout( this.repo, this.branch );
+      const dependencies = await getDependencies( this.repo );
+
+      if ( !dependencies[ 'phet-io' ] ) {
+        return true; // Doesn't really matter now, does it?
+      }
+
+      const sha = dependencies[ 'phet-io' ].sha;
+      await gitCheckout( this.repo, 'master' );
+
+      return await gitIsAncestor( 'phet-io', 'e3fc26079358d86074358a6db3ebaf1af9725632', sha );
+    }
+
+    /**
+     * Returns whether phet-io Studio is being used instead of deprecated instance proxies wrapper.
+     * @public
+     *
+     * @returns {Promise.<boolean>}
+     */
+    async usesPhetioStudio() {
+      await gitCheckout( this.repo, this.branch );
+      const dependencies = await getDependencies( this.repo );
+
+      const sha = dependencies.chipper.sha;
+      await gitCheckout( this.repo, 'master' );
+
+      return await gitIsAncestor( 'chipper', '7375f6a57b5874b6bbf97a54c9a908f19f88d38f', sha );
+    }
+
+    /**
+     * Returns whether phet-io Studio top-level (index.html) is used instead of studio.html.
+     * @public
+     *
+     * @returns {Promise.<boolean>}
+     */
+    async usesPhetioStudioIndex() {
+      await gitCheckout( this.repo, this.branch );
+      const dependencies = await getDependencies( this.repo );
+
+      const dependency = dependencies[ 'phet-io-wrappers' ];
+      if ( !dependency ) {
+        return false;
+      }
+
+      const sha = dependency.sha;
+      await gitCheckout( this.repo, 'master' );
+
+      return await gitIsAncestor( 'phet-io-wrappers', '7ec1a04a70fb9707b381b8bcab3ad070815ef7fe', sha );
+    }
+
+    /**
+     * Returns whether an additional folder exists in the build directory of the sim based on the brand.
+     * @public
+     *
+     * @returns {Promise.<boolean>}
+     */
+    async usesChipper2() {
+      await gitCheckout( this.repo, this.branch );
+      const dependencies = await getDependencies( this.repo );
+      await gitCheckout( 'chipper', dependencies.chipper.sha );
+
+      const chipperVersion = ChipperVersion.getFromRepository();
+
+      const result = chipperVersion.major !== 0 || chipperVersion.minor !== 0;
+
+      await gitCheckout( this.repo, 'master' );
+      await gitCheckout( 'chipper', 'master' );
+
+      return result;
     }
 
     /**
