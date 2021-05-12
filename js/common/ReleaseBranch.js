@@ -187,19 +187,19 @@ module.exports = ( function() {
           const currentCommit = await gitRevParse( this.repo, 'HEAD' );
           const previousCommit = await gitRevParse( this.repo, `${currentCommit}^` );
           if ( dependencies[ this.repo ].sha !== previousCommit ) {
-            results.push( 'Potential changes (dependency is not previous commit)' );
-            results.push( `${currentCommit} ${previousCommit} ${dependencies[ this.repo ].sha}` );
+            results.push( '[INFO] Potential changes (dependency is not previous commit)' );
+            results.push( `[INFO] ${currentCommit} ${previousCommit} ${dependencies[ this.repo ].sha}` );
           }
           if ( ( await getRepoVersion( this.repo ) ).testType === 'rc' && this.isReleased ) {
-            results.push( 'Release candidate version detected (see if there is a QA issue)' );
+            results.push( '[INFO] Release candidate version detected (see if there is a QA issue)' );
           }
         }
         catch( e ) {
-          results.push( `Failure to check current/previous commit: ${e.message}` );
+          results.push( `[ERROR] Failure to check current/previous commit: ${e.message}` );
         }
       }
       else {
-        results.push( 'Own repository not included in dependencies' );
+        results.push( '[WARNING] Own repository not included in dependencies' );
       }
 
       for ( const dependency of dependencyNames ) {
@@ -213,7 +213,7 @@ module.exports = ( function() {
           const expectedCommit = await gitRevParse( dependency, 'HEAD' );
 
           if ( currentCommit !== expectedCommit ) {
-            results.push( `Dependency mismatch for ${dependency} on branch ${potentialReleaseBranch}` );
+            results.push( `[WARNING] Dependency mismatch for ${dependency} on branch ${potentialReleaseBranch}` );
           }
         }
       }

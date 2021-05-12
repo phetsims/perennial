@@ -105,9 +105,11 @@ module.exports = ( function() {
      * Runs a number of checks through every release branch.
      * @public
      *
+     * @param {function(ReleaseBranch):Promise.<boolean>} [filter] - Optional filter, release branches will be skipped
+     *                                                               if this resolves to false
      * @returns {Promise}
      */
-    static async checkBranchStatus() {
+    static async checkBranchStatus( filter ) {
       for ( const repo of getActiveRepos() ) {
         if ( !( await gitIsClean( repo ) ) ) {
           console.log( `Unclean repository: ${repo}, please resolve this and then run checkBranchStatus again` );
@@ -118,9 +120,14 @@ module.exports = ( function() {
       const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
 
       for ( const releaseBranch of releaseBranches ) {
-        console.log( `Checking ${releaseBranch.repo} ${releaseBranch.branch}` );
-        for ( const line of await releaseBranch.getStatus() ) {
-          console.log( line );
+        if ( !filter || await filter( releaseBranch ) ) {
+          console.log( `Checking ${releaseBranch.repo} ${releaseBranch.branch}` );
+          for ( const line of await releaseBranch.getStatus() ) {
+            console.log( line );
+          }
+        }
+        else {
+          console.log( `Skipping ${releaseBranch.repo} ${releaseBranch.branch}` );
         }
       }
     }
