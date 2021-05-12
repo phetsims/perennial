@@ -759,7 +759,8 @@ module.exports = ( function() {
         }
 
         try {
-          await checkoutTarget( modifiedBranch.repo, modifiedBranch.branch, false ); // npm update, since we'll build.
+          // No NPM needed
+          await checkoutTarget( modifiedBranch.repo, modifiedBranch.branch, false );
           console.log( `Checked out ${modifiedBranch.repo} ${modifiedBranch.branch}` );
 
           const dependenciesJSONFile = `../${modifiedBranch.repo}/dependencies.json`;
@@ -818,7 +819,7 @@ module.exports = ( function() {
           modifiedBranch.pendingMessages = [];
           maintenance.save(); // save here in case a future failure would "revert" things
 
-          await checkoutMaster( modifiedBranch.repo, true ); // npm update back, so we don't leave the sim in a weird state
+          await checkoutMaster( modifiedBranch.repo, false );
         }
         catch( e ) {
           maintenance.save();
