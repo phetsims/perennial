@@ -31,8 +31,10 @@ module.exports = function( asyncCallback, path = '..' ) {
 
       winston.debug( 'info', `Express listening on port ${port}` );
 
+      let result;
+
       try {
-        await asyncCallback( port );
+        result = await asyncCallback( port );
       }
       catch( e ) {
         reject( e );
@@ -41,7 +43,7 @@ module.exports = function( asyncCallback, path = '..' ) {
       server.close( () => {
         winston.debug( 'info', `Express stopped listening on port ${port}` );
 
-        resolve();
+        resolve( result );
       } );
     } );
   } );
