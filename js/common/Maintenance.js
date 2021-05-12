@@ -759,7 +759,7 @@ module.exports = ( function() {
           const dependenciesJSON = JSON.parse( fs.readFileSync( dependenciesJSONFile, 'utf-8' ) );
 
           // Modify the "self" in the dependencies.json as expected
-          dependenciesJSON[ modifiedBranch.repo ] = await gitRevParse( modifiedBranch.repo, modifiedBranch.branch );
+          dependenciesJSON[ modifiedBranch.repo ].sha = await gitRevParse( modifiedBranch.repo, modifiedBranch.branch );
 
           for ( const dependency of changedRepos ) {
             const dependencyBranch = modifiedBranch.dependencyBranch;
