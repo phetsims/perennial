@@ -34,6 +34,8 @@ const getStatus = async repo => {
   const sha = await gitRevParse( repo, 'HEAD' );
   const status = await execute( 'git', [ 'status', '--porcelain' ], `../${repo}` );
 
+  let isGreen = false;
+
   if ( branch ) {
     // Safe method to get ahead/behind counts, see http://stackoverflow.com/questions/2969214/git-programmatically-know-by-how-much-the-branch-is-ahead-behind-a-remote-branc
 
@@ -46,7 +48,11 @@ const getStatus = async repo => {
     const behind = parseInt( counts.split( '\t' )[ 0 ], 10 );
     const ahead = parseInt( counts.split( '\t' )[ 1 ], 10 );
 
-    data[ repo ] += `${repo}${moveRight}${!status && branch === 'master' && ahead === 0 ? green : red}${branch}${reset}${ahead === 0 ? '' : ` ahead ${ahead}`}${behind === 0 ? '' : ` behind ${behind}`}\n`;
+    isGreen = !status && branch === 'master' && ahead === 0;
+
+    if ( !isGreen || process.argv.includes( '--all' ) ) {
+      data[ repo ] += `${repo}${moveRight}${isGreen ? green : red}${branch}${reset}${ahead === 0 ? '' : ` ahead ${ahead}`}${behind === 0 ? '' : ` behind ${behind}`}\n`;
+    }
   }
   else {
     // if no branch, print our SHA (detached head)
@@ -54,7 +60,9 @@ const getStatus = async repo => {
   }
 
   if ( status ) {
-    data[ repo ] += status + '\n';
+    if ( !isGreen || process.argv.includes( '--all' ) ) {
+      data[ repo ] += status + '\n';
+    }
   }
 };
 
