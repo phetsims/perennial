@@ -747,15 +747,18 @@ module.exports = ( function() {
           const dependenciesJSONFile = `../${modifiedBranch.repo}/dependencies.json`;
           const dependenciesJSON = JSON.parse( fs.readFileSync( dependenciesJSONFile, 'utf-8' ) );
 
-          await checkoutTarget( modifiedBranch.repo, modifiedBranch.branch, true ); // npm update, since we'll build.
+          await checkoutTarget( modifiedBranch.repo, modifiedBranch.branch, false ); // npm update, since we'll build.
           console.log( `Checked out ${modifiedBranch.repo} ${modifiedBranch.branch}` );
+
+          // Modify the "self" in the dependencies.json as expected
+          dependenciesJSON[ modifiedBranch.repo ] = await gitRevParse( modifiedBranch.repo, modifiedBranch.branch );
 
           for ( const dependency of changedRepos ) {
             const dependencyBranch = modifiedBranch.dependencyBranch;
             const branches = await getBranches( dependency );
             const sha = modifiedBranch.changedDependencies[ dependency ];
 
-            dependenciesJSON[ modifiedBranch.repo ].sha = sha;
+            dependenciesJSON[ dependency ].sha = sha;
 
             if ( branches.includes( dependencyBranch ) ) {
               console.log( `Branch ${dependencyBranch} already exists in ${dependency}` );
