@@ -8,31 +8,32 @@
 
 'use strict';
 
-const assert = require( 'assert' );
+const production = require( '../grunt/production' );
+const rc = require( '../grunt/rc' );
+const ChipperVersion = require( './ChipperVersion' );
+const ModifiedBranch = require( './ModifiedBranch' );
+const Patch = require( './Patch' );
+const ReleaseBranch = require( './ReleaseBranch' );
 const build = require( './build' );
 const checkoutMaster = require( './checkoutMaster' );
 const checkoutTarget = require( './checkoutTarget' );
-const ChipperVersion = require( './ChipperVersion' );
 const execute = require( './execute' );
-const fs = require( 'fs' );
 const getActiveRepos = require( './getActiveRepos' );
 const getBranches = require( './getBranches' );
 const getDependencies = require( './getDependencies' );
+const gitAdd = require( './gitAdd' );
 const gitCheckout = require( './gitCheckout' );
 const gitCherryPick = require( './gitCherryPick' );
+const gitCommit = require( './gitCommit' );
 const gitCreateBranch = require( './gitCreateBranch' );
 const gitIsClean = require( './gitIsClean' );
 const gitPull = require( './gitPull' );
 const gitPush = require( './gitPush' );
 const gitRevParse = require( './gitRevParse' );
-const ModifiedBranch = require( './ModifiedBranch' );
 const npmUpdate = require( './npmUpdate' );
-const Patch = require( './Patch' );
-const production = require( '../grunt/production' );
-const rc = require( '../grunt/rc' );
-const ReleaseBranch = require( './ReleaseBranch' );
+const assert = require( 'assert' );
+const fs = require( 'fs' );
 const repl = require( 'repl' );
-const updateDependenciesJSON = require( './updateDependenciesJSON' );
 const winston = require( 'winston' );
 
 // constants
@@ -743,6 +744,9 @@ module.exports = ( function() {
         }
 
         try {
+          const dependenciesJSONFile = `../${modifiedBranch.repo}/dependencies.json`;
+          const dependenciesJSON = JSON.parse( fs.readFileSync( dependenciesJSONFile, 'utf-8' ) );
+
           await checkoutTarget( modifiedBranch.repo, modifiedBranch.branch, true ); // npm update, since we'll build.
           console.log( `Checked out ${modifiedBranch.repo} ${modifiedBranch.branch}` );
 
@@ -750,6 +754,8 @@ module.exports = ( function() {
             const dependencyBranch = modifiedBranch.dependencyBranch;
             const branches = await getBranches( dependency );
             const sha = modifiedBranch.changedDependencies[ dependency ];
+
+            dependenciesJSON[ modifiedBranch.repo ].sha = sha;
 
             if ( branches.includes( dependencyBranch ) ) {
               console.log( `Branch ${dependencyBranch} already exists in ${dependency}` );
@@ -779,12 +785,11 @@ module.exports = ( function() {
             await npmUpdate( 'chipper' );
           }
 
-          console.log( await build( modifiedBranch.repo, {
-            brands: modifiedBranch.brands
-          } ) );
-
           const message = modifiedBranch.pendingMessages.join( ' and ' );
-          await updateDependenciesJSON( modifiedBranch.repo, modifiedBranch.brands, message, modifiedBranch.branch );
+          fs.writeFileSync( dependenciesJSONFile, JSON.stringify( dependenciesJSON, null, 2 ) );
+          await gitAdd( modifiedBranch.repo, 'dependencies.json' );
+          await gitCommit( modifiedBranch.repo, `updated dependencies.json for ${message}` );
+          await gitPush( modifiedBranch.repo, modifiedBranch.branch );
 
           // Move messages from pending to pushed
           for ( const message of modifiedBranch.pendingMessages ) {
