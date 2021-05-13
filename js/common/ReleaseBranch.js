@@ -382,6 +382,26 @@ module.exports = ( function() {
     }
 
     /**
+     * Runs a predicate function with the contents of a specific file's contents in the release branch (with false if
+     * it doesn't exist).
+     * @public
+     *
+     * @param {string} file
+     * @param {function(contents:string):boolean} predicate
+     * @returns {Promise.<boolean>}
+     */
+    async withFile( file, predicate ) {
+      await this.checkout( false );
+
+      if ( fs.existsSync( file ) ) {
+        const contents = fs.readFileSync( file, 'utf-8' );
+        return predicate( contents );
+      }
+
+      return false;
+    }
+
+    /**
      * Gets a list of ReleaseBranches which would be potential candidates for a maintenance release.
      * @public
      *
