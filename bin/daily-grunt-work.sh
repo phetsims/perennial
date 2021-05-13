@@ -73,3 +73,11 @@ git push
 cd ..
 
 ##########################################################################################################
+# Update perennial/data/ lists, must npm prune and update first see https://github.com/phetsims/perennial/issues/155
+
+cd perennial || exit
+npm prune && npm update
+grunt generate-data
+cd ..
+
+##########################################################################################################
