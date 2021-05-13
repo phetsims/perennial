@@ -239,11 +239,11 @@ module.exports = ( function() {
         }
       }
 
-      const checkURL = async ( name, relativeURL ) => {
+      const checkURL = async ( name, relativeURL, options ) => {
         try {
           await withServer( async port => {
             const url = `http://localhost:${port}/${relativeURL}`;
-            const error = await puppeteerLoad( url );
+            const error = await puppeteerLoad( url, options );
             if ( error ) {
               results.push( `[WARNING] ${name} failure for ${url}: ${error}` );
             }
@@ -255,7 +255,9 @@ module.exports = ( function() {
       };
 
       if ( options.checkUnbuilt ) {
-        await checkURL( 'Unbuilt HTML', `${this.repo}/${this.repo}_en.html?brand=phet&ea` );
+        await checkURL( 'Unbuilt HTML', `${this.repo}/${this.repo}_en.html?brand=phet&ea&fuzzMouse&fuzzTouch`, {
+          waitAfterLoad: 20000
+        } );
       }
       if ( options.checkPhetmarks ) {
         await checkURL( 'Phetmarks', 'phetmarks/index.html' );
@@ -273,7 +275,9 @@ module.exports = ( function() {
       }
 
       if ( options.checkBuilt ) {
-        await checkURL( 'Built HTML', `${this.repo}/build/${usesChipper2 ? 'phet/' : ''}${this.repo}_en${usesChipper2 ? '_phet' : ''}.html` );
+        await checkURL( 'Built HTML', `${this.repo}/build/${usesChipper2 ? 'phet/' : ''}${this.repo}_en${usesChipper2 ? '_phet' : ''}.html?fuzzMouse&fuzzTouch`, {
+          waitAfterLoad: 20000
+        } );
       }
 
       await checkoutMaster( this.repo, options.build );
