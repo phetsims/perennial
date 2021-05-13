@@ -77,6 +77,7 @@ module.exports = async function() {
   await gitAdd( 'perennial', 'data/unit-tests' );
   await gitAdd( 'perennial', 'data/color-profiles' );
   await gitAdd( 'perennial', 'data/phet-io' );
+  await gitAdd( 'perennial', 'data/phet-io-api-stable' );
 
   const hasChanges = !await gitIsClean( 'perennial' );
   if ( hasChanges ) {
