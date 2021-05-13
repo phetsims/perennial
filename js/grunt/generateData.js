@@ -3,28 +3,26 @@
 /**
  * Generates the lists under perennial/data/, and if there were changes, will commit and push.
  *
- * Ideally, this grunt task is never run itself, but instead from `/bin/generate-data.sh` from bayes.colorado.edu
- * under the phet-admin user from /data/share/phet/generate-data/perennial:
- * `pm2 start bin/generate-data.sh`
+ * This grunt task should be run manually by developers when a change has been made that would add or remove
+ * an entry from one of the perennial/data/ lists. But it will also be run as part of daily-grunt-work.sh
+ * to catch anything that was forgotten.
  *
- * The task will show up in output of `pm2 list` as "generate-data"
+ * This used to be run automatically by bayes whenever a relevant change was made, see
+ * https://github.com/phetsims/perennial/issues/66
  *
- * If you are curious about the state of this process, you can see logs with `pm2 logs generate-data`
- *
- * See https://github.com/phetsims/perennial/issues/66
+ * But we decided to change it to a manual step with a daily fallback, see
+ * https://github.com/phetsims/perennial/issues/213
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
 'use strict';
 
-const execute = require( '../common/execute' );
 const getActiveRepos = require( '../common/getActiveRepos' );
 const getBranch = require( '../common/getBranch' );
 const gitAdd = require( '../common/gitAdd' );
 const gitCommit = require( '../common/gitCommit' );
 const gitIsClean = require( '../common/gitIsClean' );
-const gitPull = require( '../common/gitPull' );
 const gitPush = require( '../common/gitPush' );
 const assert = require( 'assert' );
 const fs = require( 'fs' );
@@ -41,14 +39,7 @@ module.exports = async function() {
     grunt.fail.fatal( 'Data will only be generated if perennial is on master with no working-copy changes.' );
   }
 
-  // Make sure to clone anything we are missing
-  await execute( 'bash', [ 'perennial/bin/clone-missing-repos.sh' ], '..' );
-
   const activeRepos = getActiveRepos();
-
-  for ( const repo of activeRepos ) {
-    await gitPull( repo );
-  }
 
   function writeList( name, packageFilter ) {
     const repos = activeRepos.filter( repo => {
