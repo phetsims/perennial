@@ -18,9 +18,11 @@ const checkoutTarget = require( '../common/checkoutTarget' );
 const devDirectoryExists = require( '../common/devDirectoryExists' );
 const getDependencies = require( '../common/getDependencies' );
 const getRepoVersion = require( '../common/getRepoVersion' );
+const gitCheckout = require( '../common/gitCheckout' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
+const loadJSON = require( '../common/loadJSON' );
 const npmUpdate = require( '../common/npmUpdate' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
@@ -28,7 +30,6 @@ const vpnCheck = require( '../common/vpnCheck' );
 const createRelease = require( './createRelease' );
 const grunt = require( 'grunt' );
 const _ = require( 'lodash' ); // eslint-disable-line
-const loadJSON = require( '../common/loadJSON' );
 
 /**
  * Deploys an rc version after incrementing the test version number.
@@ -44,15 +45,6 @@ const loadJSON = require( '../common/loadJSON' );
 module.exports = async function( repo, branch, brands, noninteractive, message ) {
   SimVersion.ensureReleaseBranch( branch );
 
-  // PhET-iO simulations require validation for RCs. Error out if "phet.phet-io.validation=false" is in package.json.
-  if ( brands.includes( 'phet-io' ) ) {
-    const packageObject = await loadJSON( `../${repo}/package.json` );
-    if ( packageObject.phet[ 'phet-io' ] && packageObject.phet[ 'phet-io' ].hasOwnProperty( 'validation' ) &&
-         !packageObject.phet[ 'phet-io' ].validation ) {
-      throw new Error( 'PhET-iO simulations require validation for RCs' );
-    }
-  }
-
   if ( !( await vpnCheck() ) ) {
     grunt.fail.fatal( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server.int.colorado.edu' );
   }
@@ -60,6 +52,16 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
   const isClean = await gitIsClean( repo );
   if ( !isClean ) {
     throw new Error( `Unclean status in ${repo}, cannot create release branch` );
+  }
+
+  // PhET-iO simulations require validation for RCs. Error out if "phet.phet-io.validation=false" is in package.json.
+  await gitCheckout( repo, branch );
+  if ( brands.includes( 'phet-io' ) ) {
+    const packageObject = await loadJSON( `../${repo}/package.json` );
+    if ( packageObject.phet[ 'phet-io' ] && packageObject.phet[ 'phet-io' ].hasOwnProperty( 'validation' ) &&
+         !packageObject.phet[ 'phet-io' ].validation ) {
+      throw new Error( 'PhET-iO simulations require validation for RCs' );
+    }
   }
 
   if ( !( await hasRemoteBranch( repo, branch ) ) ) {
