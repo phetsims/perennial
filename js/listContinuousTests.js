@@ -315,7 +315,7 @@ unitTestRepos.forEach( repo => {
     urls: [
       'doc/',
       'doc/a-tour-of-scenery.html',
-      'doc/accessibility.html',
+      'doc/accessibility/accessibility.html',
       'doc/implementation-notes.html',
       'doc/user-input.html',
       'examples/',
