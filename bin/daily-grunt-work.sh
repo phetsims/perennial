@@ -4,9 +4,8 @@
 # This script is run daily on bayes, doing automatic grunt work to keep the project up
 # to date. Edit this script and commit to automatically add to the daily cron job.
 #
-# In order to run grunt from the cron job we need to provide the full path to it, even
-# though that generally isn't necessary when running grunt on bayes. At the time
-# of this writing, grunt is located at /usr/bin/grunt.
+# In order to run grunt from the cron job we need to provide the full path to it, and
+# the full path to node.
 #
 # Author: Michael Kauzmann
 #
@@ -25,7 +24,7 @@ echo "running daily grunt work. . ."
 cd perennial || exit
 git pull
 npm prune && npm update
-/usr/bin/grunt checkout-master-all
+/usr/local/bin/node /usr/bin/grunt checkout-master-all
 cd ..
 
 perennial/bin/clone-missing-repos.sh
@@ -34,13 +33,13 @@ perennial/bin/for-each.sh perennial/data/active-repos "npm prune && npm update"
 
 ###########################################################################################################
 # update-copyright-dates
-copyrightUpdateCommand="/usr/bin/grunt update-copyright-dates && git commit -am 'update copyright dates from daily grunt work' && git push"
+copyrightUpdateCommand="/usr/local/bin/node /usr/bin/grunt update-copyright-dates && git commit -am 'update copyright dates from daily grunt work' && git push"
 perennial/bin/for-each.sh perennial/data/active-repos "${copyrightUpdateCommand}"
 
 ###########################################################################################################
 # report third party
 cd chipper || exit
-/usr/bin/grunt report-third-party
+/usr/local/bin/node /usr/bin/grunt report-third-party
 cd ../sherpa || exit
 git pull
 echo "report third party done, potentially committing"
@@ -62,7 +61,7 @@ cd ..
 
 cp perennial/js/common/SimVersion.js chipper/js/
 cd chipper || exit
-/usr/bin/grunt update-copyright-dates # update SimVersion.js, this will only hit SimVersion.js since everything was updated above.
+/usr/local/bin/node /usr/bin/grunt update-copyright-dates # update SimVersion.js, this will only hit SimVersion.js since everything was updated above.
 git commit -am "Update chipper's SimVersion from daily grunt work"
 git push
 cd ..
@@ -80,7 +79,7 @@ cd ..
 # Update perennial/data/ lists, make sure to npm prune and update first see https://github.com/phetsims/perennial/issues/155
 
 cd perennial || exit
-/usr/bin/grunt generate-data
+/usr/local/bin/node /usr/bin/grunt generate-data
 cd ..
 
 ##########################################################################################################
