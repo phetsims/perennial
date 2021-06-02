@@ -17,9 +17,11 @@ const getBranches = require( './getBranches' );
 const getDependencies = require( './getDependencies' );
 const getRepoVersion = require( './getRepoVersion' );
 const gitCheckout = require( './gitCheckout' );
+const gitFirstDivergingCommit = require( './gitFirstDivergingCommit' );
 const gitIsAncestor = require( './gitIsAncestor' );
 const gitPull = require( './gitPull' );
 const gitRevParse = require( './gitRevParse' );
+const gitTimestamp = require( './gitTimestamp' );
 const puppeteerLoad = require( './puppeteerLoad' );
 const simMetadata = require( './simMetadata' );
 const simPhetioMetadata = require( './simPhetioMetadata' );
@@ -168,6 +170,26 @@ module.exports = ( function() {
       await checkoutMaster( this.repo, false ); // don't npm update
 
       return result;
+    }
+
+    /**
+     * The SHA at which this release branch's main repository diverged from master.
+     * @public
+     *
+     * @returns {Promise.<string>}
+     */
+    async getDivergingSHA() {
+      return await gitFirstDivergingCommit( this.repo, this.branch, 'master' );
+    }
+
+    /**
+     * The timestamp at which this release branch's main repository diverged from master.
+     * @public
+     *
+     * @returns {Promise.<number>}
+     */
+    async getDivergingTimestamp() {
+      return await gitTimestamp( this.repo, await this.getDivergingSHA() );
     }
 
     /**

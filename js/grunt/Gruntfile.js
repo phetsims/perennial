@@ -40,6 +40,7 @@ const rc = require( './rc' );
 const shaCheck = require( './shaCheck' );
 const wrapper = require( './wrapper' );
 const assert = require( 'assert' );
+const _ = require( 'lodash' ); // eslint-disable-line
 const winston = require( 'winston' );
 require( './checkNodeVersion' );
 
@@ -229,16 +230,37 @@ module.exports = function( grunt ) {
 
   grunt.registerTask( 'release-branch-list',
     'Prints out a list of all release branches that would need maintenance patches\n' +
-    '--repo : Only show branches for a specific repository',
+    '--repo : Only show branches for a specific repository\n' +
+    '--order=<ORDER> : alphabetical|date',
     wrapTask( async () => {
+      winston.default.transports.console.level = 'error';
+
       const repo = grunt.option( 'repo' );
-      assertIsValidRepoName( repo );
+      const order = grunt.option( 'order' ) || 'alphabetical';
+
+      if ( repo ) {
+        assertIsValidRepoName( repo );
+      }
+
+      assert( order === 'alphabetical' || order === 'date' );
 
       const branches = await ReleaseBranch.getMaintenanceBranches( filterRepo => !repo || filterRepo === repo );
 
-      console.log( '\nRelease branches:\n{repo} {branch} {brand[,brand]+}\n' );
+      let structures = [];
       for ( const branch of branches ) {
-        console.log( branch.toString() );
+        structures.push( {
+          branch: branch,
+          timestamp: await branch.getDivergingTimestamp()
+        } );
+      }
+
+      if ( order === 'date' ) {
+        structures = _.sortBy( structures, struct => struct.timestamp );
+      }
+
+      console.log( '\nRelease branches:\n{repo} {branch} {brand[,brand]+} {date}\n' );
+      for ( const struct of structures ) {
+        console.log( `${struct.branch.toString()} ${new Date( struct.timestamp ).toISOString().split( 'T' )[ 0 ]}` );
       }
     } ) );
 
