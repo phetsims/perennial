@@ -16,6 +16,7 @@ const assert = require( 'assert' );
  * @public
  *
  * @param {string} repo - The repository name
+ * @param {string} query
  * @returns {Promise.<string>} - Resolves to the SHA.
  */
 module.exports = function( repo, query ) {

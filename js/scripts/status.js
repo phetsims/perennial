@@ -8,10 +8,8 @@
 
 'use strict';
 
-const execute = require( '../common/execute' );
 const getActiveRepos = require( '../common/getActiveRepos' );
-const getBranch = require( '../common/getBranch' );
-const gitRevParse = require( '../common/gitRevParse' );
+const gitStatus = require( '../common/gitStatus' );
 const winston = require( 'winston' );
 
 winston.default.transports.console.level = 'error';
@@ -23,45 +21,29 @@ const green = '\u001b[32m';
 const reset = '\u001b[0m';
 
 const repos = getActiveRepos();
-
 const data = {};
 
 const getStatus = async repo => {
   data[ repo ] = '';
 
-  const symbolicRef = await execute( 'git', [ 'symbolic-ref', '-q', 'HEAD' ], `../${repo}` );
-  const branch = await getBranch( repo ); // might be empty string
-  const sha = await gitRevParse( repo, 'HEAD' );
-  const status = await execute( 'git', [ 'status', '--porcelain' ], `../${repo}` );
+  const status = await gitStatus( repo );
 
   let isGreen = false;
-
-  if ( branch ) {
-    // Safe method to get ahead/behind counts, see http://stackoverflow.com/questions/2969214/git-programmatically-know-by-how-much-the-branch-is-ahead-behind-a-remote-branc
-
-    // get the tracking-branch name
-    const trackingBranch = await execute( 'git', [ 'for-each-ref', '--format=\'%(upstream:short)\'', symbolicRef ], `../${repo}` );
-
-    // e.g. behind-count + '\t' + ahead-count
-    const counts = await execute( 'git', [ 'rev-list', '--left-right', '--count', `${trackingBranch}...HEAD` ], `../${repo}` );
-
-    const behind = parseInt( counts.split( '\t' )[ 0 ], 10 );
-    const ahead = parseInt( counts.split( '\t' )[ 1 ], 10 );
-
-    isGreen = !status && branch === 'master' && ahead === 0;
+  if ( status.branch ) {
+    isGreen = !status.status && status.branch === 'master' && status.ahead === 0;
 
     if ( !isGreen || process.argv.includes( '--all' ) ) {
-      data[ repo ] += `${repo}${moveRight}${isGreen ? green : red}${branch}${reset}${ahead === 0 ? '' : ` ahead ${ahead}`}${behind === 0 ? '' : ` behind ${behind}`}\n`;
+      data[ repo ] += `${repo}${moveRight}${isGreen ? green : red}${status.branch}${reset}${status.ahead === 0 ? '' : ` ahead ${status.ahead}`}${status.behind === 0 ? '' : ` behind ${status.behind}`}\n`;
     }
   }
   else {
     // if no branch, print our SHA (detached head)
-    data[ repo ] += `${repo}${moveRight}${red}${sha}${reset}\n`;
+    data[ repo ] += `${repo}${moveRight}${red}${status.sha}${reset}\n`;
   }
 
-  if ( status ) {
+  if ( status.status ) {
     if ( !isGreen || process.argv.includes( '--all' ) ) {
-      data[ repo ] += status + '\n';
+      data[ repo ] += status.status + '\n';
     }
   }
 };
