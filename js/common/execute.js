@@ -48,7 +48,7 @@ module.exports = function( cmd, args, cwd, options ) {
      * @param {number} code - exit code
      */
     constructor( cmd, args, cwd, stdout, stderr, code ) {
-      super( `${cmd} ${args.join( ' ' )} in ${cwd} failed with exit code ${code} and stdout:\n${stdout}` );
+      super( `${cmd} ${args.join( ' ' )} in ${cwd} failed with exit code ${code}${stdout ? `\nstdout:\n${stdout}` : ''}${stderr ? `\nstderr:\n${stderr}` : ''}` );
 
       // @public
       this.cmd = cmd;

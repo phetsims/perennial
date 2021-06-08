@@ -8,6 +8,7 @@
 
 'use strict';
 
+const cloneMissingRepos = require( '../common/cloneMissingRepos' );
 const getActiveRepos = require( '../common/getActiveRepos' );
 const gitCheckout = require( '../common/gitCheckout' );
 const gitPull = require( '../common/gitPull' );
@@ -59,6 +60,14 @@ const getStatus = async repo => {
 };
 
 ( async () => {
+  try {
+    await gitPull( 'perennial' );
+    await cloneMissingRepos();
+  }
+  catch( e ) {
+    console.log( `perennial/clone failed:\n${e}` );
+  }
+
   await Promise.all( repos.map( repo => getStatus( repo ) ) );
   repos.forEach( repo => {
     process.stdout.write( data[ repo ] );
