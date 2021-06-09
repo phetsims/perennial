@@ -1,7 +1,7 @@
 // Copyright 2019, University of Colorado Boulder
 
 /**
- * This file makes sure that phet-io APIs aren't changed in a breaking way between maintenance releases.
+ * This file makes sure that PhET-iO APIs aren't changed in a breaking way between maintenance releases.
  * This error check should only occur if:
  *   building phet-io brand
  *   not the first maintenance release for the minor version
@@ -57,7 +57,7 @@ module.exports = async ( repo, version, onError = async () => {}, noninteractive
   if ( !_.isEqual( latestDeployedVersionAPI, builtVersionAPI ) ) {
 
     // we don't want noninteractive build skating through this, so error out in that case.
-    if ( noninteractive || !await booleanPrompt( 'This version has a potentially breaking phet-io API change ' +
+    if ( noninteractive || !await booleanPrompt( 'This version has a potentially breaking PhET-iO API change ' +
                                                  'from the previous maintenance version. Are you sure you want to ' +
                                                  'continue with this production deployment?', noninteractive ) ) {
 
