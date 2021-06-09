@@ -18,7 +18,7 @@ const simPhetioMetadata = require( '../common/simPhetioMetadata' );
 
 module.exports = async () => {
 
-  // {Array.<Object>} get sim metadata via metadata api, here is an example of what an entry might look like:
+  // {Array.<Object>} get sim metadata via metadata API, here is an example of what an entry might look like:
   /*
   {
     "versionMaintenance": 12,

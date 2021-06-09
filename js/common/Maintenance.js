@@ -1011,7 +1011,7 @@ module.exports = ( function() {
           } );
         };
 
-        // Only autocomplete "public" api functions for Maintenance.
+        // Only autocomplete "public" API functions for Maintenance.
         // const nodeCompleter = session.completer;
         // session.completer = function( text, cb ) {
         //   nodeCompleter( text, ( _, [ completions, completed ] ) => {

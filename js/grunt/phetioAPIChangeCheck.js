@@ -1,11 +1,11 @@
 // Copyright 2019, University of Colorado Boulder
 
 /**
- * This file makes sure that phet-io apis aren't changed in a breaking way between maintenance releases.
+ * This file makes sure that phet-io APIs aren't changed in a breaking way between maintenance releases.
  * This error check should only occur if:
  *   building phet-io brand
  *   not the first maintenance release for the minor version
- *   supports json api files (so publications after 7/2019)
+ *   supports JSON API files (so publications after 7/2019)
  *
  * This code assumes that the built sim has already been created in the build directory.
  *
