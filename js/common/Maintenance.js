@@ -211,12 +211,12 @@ module.exports = ( function() {
      * Shows any required testing links for the simulations.
      * @public
      *
-     * @param {boolean} [includePatches]
+     * @param {function(ModifiedBranch):boolean} [filter] - Control which branches are shown
      */
-    static async listLinks( includePatches = false ) {
+    static async listLinks( filter = () => true ) {
       const maintenance = Maintenance.load();
 
-      const deployedBranches = maintenance.modifiedBranches.filter( modifiedBranch => !!modifiedBranch.deployedVersion );
+      const deployedBranches = maintenance.modifiedBranches.filter( modifiedBranch => !!modifiedBranch.deployedVersion && filter( modifiedBranch ) );
       const productionBranches = deployedBranches.filter( modifiedBranch => modifiedBranch.deployedVersion.testType === null );
       const releaseCandidateBranches = deployedBranches.filter( modifiedBranch => modifiedBranch.deployedVersion.testType === 'rc' );
 
