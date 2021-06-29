@@ -2,7 +2,6 @@
 // Adapted from https://github.com/davidtaylorhq/qunit-puppeteer which is distributed under the MIT License // eslint-disable-line
 /* eslint-enable */
 
-'use strict';
 
 module.exports = function( browser, targetURL ) {
 
