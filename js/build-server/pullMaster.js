@@ -11,7 +11,7 @@ const _ = require( 'lodash' ); // eslint-disable-line
 /**
  * pull master for every repo in dependencies.json (plus babel) to make sure everything is up to date
  */
-module.exports = async function pullMaster( repos ) {
+module.exports = async function pullMaster( repos ) { // eslint-disable-line consistent-return
   // so we don't have to modify the repos object
   const reposCopy = _.clone( repos );
 

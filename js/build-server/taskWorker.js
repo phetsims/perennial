@@ -38,7 +38,7 @@ const abortBuild = async err => {
 /**
  * Clean up after deploy. Checkout master for every repo and remove tmp dir.
  */
-const afterDeploy = async buildDir => {
+const afterDeploy = async buildDir => { // eslint-disable-line consistent-return
   try {
     await execute( 'grunt', [ 'checkout-master-all' ], constants.PERENNIAL );
     await execute( 'rm', [ '-rf', buildDir ], '.' );
