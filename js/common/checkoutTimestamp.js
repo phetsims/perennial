@@ -36,5 +36,5 @@ module.exports = async function( repo, timestamp, includeNpmUpdate ) {
     };
   }
 
-  return await checkoutDependencies( repo, timestampDependencies, includeNpmUpdate );
+  return checkoutDependencies( repo, timestampDependencies, includeNpmUpdate );
 };

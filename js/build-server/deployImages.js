@@ -72,7 +72,7 @@ const deployImages = async options => {
   }
 
   if ( options.simulation && options.version ) {
-    return await processSim( options.simulation, options.brands, options.version );
+    return processSim( options.simulation, options.brands, options.version );
   }
   else {
     return new Promise( ( resolve, reject ) => {

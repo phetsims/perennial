@@ -237,7 +237,7 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
         // This should exist hopefully
         dependencies[ key ].sha = this.changedDependencies[ key ];
       }
-      return await checkoutDependencies( this.repo, dependencies, includeNpmUpdate );
+      return checkoutDependencies( this.repo, dependencies, includeNpmUpdate );
     }
   }
 

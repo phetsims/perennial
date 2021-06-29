@@ -29,5 +29,5 @@ module.exports = async function( repo, target, includeNpmUpdate ) {
   await gitCheckout( repo, target );
   await gitPull( repo ); // Does this work for a SHA?
   const dependencies = await getDependencies( repo );
-  return await checkoutDependencies( repo, dependencies, includeNpmUpdate );
+  return checkoutDependencies( repo, dependencies, includeNpmUpdate );
 };
