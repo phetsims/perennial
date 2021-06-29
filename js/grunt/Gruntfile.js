@@ -6,7 +6,6 @@
  * without worrying about an older version of chipper being checked out.
  */
 
-'use strict';
 
 const Maintenance = require( '../common/Maintenance' );
 const ReleaseBranch = require( '../common/ReleaseBranch' );

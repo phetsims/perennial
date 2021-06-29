@@ -7,7 +7,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const getDependencies = require( '../common/getDependencies' );
 const gitCheckout = require( '../common/gitCheckout' );

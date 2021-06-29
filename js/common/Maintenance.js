@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const production = require( '../grunt/production' );
 const rc = require( '../grunt/rc' );
@@ -481,7 +480,7 @@ module.exports = ( function() {
       const patch = maintenance.findPatch( patchName );
 
       await Maintenance.addNeededPatches( patchName, async releaseBranch => {
-        return await releaseBranch.isMissingSHA( patch.repo, sha );
+        return releaseBranch.isMissingSHA( patch.repo, sha );
       } );
     }
 
@@ -497,7 +496,7 @@ module.exports = ( function() {
       const patch = maintenance.findPatch( patchName );
 
       await Maintenance.addNeededPatches( patchName, async releaseBranch => {
-        return await releaseBranch.includesSHA( patch.repo, sha );
+        return releaseBranch.includesSHA( patch.repo, sha );
       } );
     }
 
@@ -522,7 +521,7 @@ module.exports = ( function() {
         else {
           filename = `../${releaseBranch.repo}/build/${releaseBranch.repo}_en.html`;
         }
-        return await filter( releaseBranch, fs.readFileSync( filename, 'utf8' ) );
+        return filter( releaseBranch, fs.readFileSync( filename, 'utf8' ) );
       } );
     }
 
@@ -598,7 +597,7 @@ module.exports = ( function() {
       const patch = maintenance.findPatch( patchName );
 
       await Maintenance.removeNeededPatches( patchName, async releaseBranch => {
-        return await releaseBranch.isMissingSHA( patch.repo, sha );
+        return releaseBranch.isMissingSHA( patch.repo, sha );
       } );
     }
 
@@ -614,7 +613,7 @@ module.exports = ( function() {
       const patch = maintenance.findPatch( patchName );
 
       await Maintenance.removeNeededPatches( patchName, async releaseBranch => {
-        return await releaseBranch.includesSHA( patch.repo, sha );
+        return releaseBranch.includesSHA( patch.repo, sha );
       } );
     }
 

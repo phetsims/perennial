@@ -17,7 +17,6 @@
  * @author Taylor Want (PhET Interactive Simulations)
  */
 
-'use strict';
 
 const buildLocal = require( '../common/buildLocal' );
 const execute = require( '../common/execute' );
@@ -165,7 +164,7 @@ const launchSimAndGetPDOMText = async repo => {
       // TODO https://github.com/phetsims/perennial/issues/138
       // window.phet.sim.joist.frameEndedEmitter.addListener();
 
-      window.addEventListener( 'message', event => {
+      window.addEventListener( 'message', event => { // eslint-disable-line consistent-return
         if ( event.data ) {
           try {
             const messageData = JSON.parse( event.data );

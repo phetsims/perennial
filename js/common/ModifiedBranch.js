@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const assert = require( 'assert' );
 const checkoutDependencies = require( './checkoutDependencies' );
@@ -237,7 +236,7 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
         // This should exist hopefully
         dependencies[ key ].sha = this.changedDependencies[ key ];
       }
-      return await checkoutDependencies( this.repo, dependencies, includeNpmUpdate );
+      return checkoutDependencies( this.repo, dependencies, includeNpmUpdate );
     }
   }
 

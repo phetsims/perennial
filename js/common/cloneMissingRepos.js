@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const cloneRepo = require( './cloneRepo' );
 const getMissingRepos = require( './getMissingRepos' );

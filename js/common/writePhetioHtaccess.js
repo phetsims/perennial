@@ -1,6 +1,5 @@
 // Copyright 2017-2019, University of Colorado Boulder
 
-'use strict';
 
 const buildLocal = require( './buildLocal' );
 const devScp = require( '../common/devScp' );
@@ -22,7 +21,7 @@ const PASSWORD_PROTECTED_SUB_DIRS = [ 'wrappers', 'doc' ];
  * @param {string} [devVersionPath] - if provided, scp the htaccess files to here, relatively
 
  */
-module.exports = async function writePhetioHtaccess( passwordProtectPath, latestOption, devVersionPath ) {
+module.exports = async function writePhetioHtaccess( passwordProtectPath, latestOption, devVersionPath ) { // eslint-disable-line consistent-return
   const authFilepath = '/etc/httpd/conf/phet-io_pw';
 
   const isProductionDeploy = !!latestOption;
@@ -57,7 +56,7 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
       winston.error( `simName: ${latestOption.simName}` );
       winston.error( `version: ${latestOption.version}` );
       winston.error( `directory: ${latestOption.directory}` );
-      return Promise.reject( 'latestOption is missing one of the required parameters (simName, version, or directory)' );
+      return Promise.reject( new Error( 'latestOption is missing one of the required parameters (simName, version, or directory)' ) );
     }
   }
 

@@ -6,7 +6,6 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-'use strict';
 
 const assert = require( 'assert' );
 const execute = require( '../../common/execute' );

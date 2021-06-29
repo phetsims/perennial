@@ -5,7 +5,6 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-'use strict';
 
 const fs = require( 'fs' );
 

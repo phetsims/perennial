@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const checkoutTarget = require( './checkoutTarget' );
 const simMetadata = require( './simMetadata' );
@@ -33,5 +32,5 @@ module.exports = async function( repo, includeNpmUpdate ) {
 
   const branch = `${data.projects[ 0 ].version.major}.${data.projects[ 0 ].version.minor}`;
 
-  return await checkoutTarget( repo, branch, includeNpmUpdate );
+  return checkoutTarget( repo, branch, includeNpmUpdate );
 };

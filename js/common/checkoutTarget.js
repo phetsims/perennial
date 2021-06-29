@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const checkoutDependencies = require( './checkoutDependencies' );
 const getDependencies = require( './getDependencies' );
@@ -29,5 +28,5 @@ module.exports = async function( repo, target, includeNpmUpdate ) {
   await gitCheckout( repo, target );
   await gitPull( repo ); // Does this work for a SHA?
   const dependencies = await getDependencies( repo );
-  return await checkoutDependencies( repo, dependencies, includeNpmUpdate );
+  return checkoutDependencies( repo, dependencies, includeNpmUpdate );
 };

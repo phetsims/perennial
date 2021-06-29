@@ -1,6 +1,5 @@
 // Copyright 2017, University of Colorado Boulder
 
-'use strict';
 
 const constants = require( './constants' );
 const request = require( 'request' );
@@ -90,7 +89,7 @@ module.exports = async function notifyServer( options ) {
           }
           winston.log( 'error', errorMessage );
           sendEmail( 'PHET_IO DEPLOYMENT UPSERT FAILED', errorMessage, options.email );
-          return reject( 'PHET_IO DEPLOYMENT UPSERT FAILED' );
+          return reject( new Error( 'PHET_IO DEPLOYMENT UPSERT FAILED' ) );
         }
         else {
           const response = JSON.parse( body );
@@ -104,7 +103,7 @@ module.exports = async function notifyServer( options ) {
             }
             winston.log( 'error', errorMessage );
             sendEmail( 'SYNCHRONIZE FAILED', errorMessage, options.email );
-            return reject( 'PHET_IO DEPLOYMENT UPSERT FAILED' );
+            return reject( new Error( 'PHET_IO DEPLOYMENT UPSERT FAILED' ) );
           }
           else {
             winston.log( 'info', `request to upsert phetio deployment for ${options.simName} on ${constants.BUILD_SERVER_CONFIG.productionServerName} succeeded` );
@@ -116,6 +115,6 @@ module.exports = async function notifyServer( options ) {
     } );
   }
   else {
-    return Promise.reject( 'Called notifyServer for unsupported brand' );
+    return Promise.reject( new Error( 'Called notifyServer for unsupported brand' ) );
   }
 };

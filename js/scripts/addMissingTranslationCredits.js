@@ -6,7 +6,7 @@
  *
  *  @author Matt Pennington
  **/
-'use strict';
+
 
 const buildLocal = require( '../common/buildLocal' );
 const fetch = require( 'node-fetch' ); //eslint-disable-line

@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const ncp = require( 'ncp' );
 const winston = require( 'winston' );
@@ -26,7 +25,7 @@ module.exports = function( pathToCopy, location, options ) {
   return new Promise( ( resolve, reject ) => {
     ncp.ncp( pathToCopy, location, options, err => {
       if ( err ) {
-        reject( `copyDirectory error: ${err}` );
+        reject( new Error( `copyDirectory error: ${err}` ) );
       }
       else {
         resolve();

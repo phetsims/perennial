@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const SimVersion = require( '../common/SimVersion' );
 const booleanPrompt = require( '../common/booleanPrompt' );
@@ -54,6 +53,14 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     throw new Error( `Unclean status in ${repo}, cannot create release branch` );
   }
 
+  if ( !( await hasRemoteBranch( repo, branch ) ) ) {
+    if ( noninteractive || !await booleanPrompt( `Release branch ${branch} does not exist. Create it?`, false ) ) {
+      throw new Error( 'Aborted rc deployment due to non-existing branch' );
+    }
+
+    await createRelease( repo, branch );
+  }
+
   // PhET-iO simulations require validation for RCs. Error out if "phet.phet-io.validation=false" is in package.json.
   await gitCheckout( repo, branch );
   if ( brands.includes( 'phet-io' ) ) {
@@ -62,14 +69,6 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
          !packageObject.phet[ 'phet-io' ].validation ) {
       throw new Error( 'PhET-iO simulations require validation for RCs' );
     }
-  }
-
-  if ( !( await hasRemoteBranch( repo, branch ) ) ) {
-    if ( noninteractive || !await booleanPrompt( `Release branch ${branch} does not exist. Create it?`, false ) ) {
-      throw new Error( 'Aborted rc deployment due to non-existing branch' );
-    }
-
-    await createRelease( repo, branch );
   }
 
   await checkoutTarget( repo, branch, true ); // include npm update

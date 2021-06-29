@@ -13,7 +13,6 @@
  * @author Chris Klusendorf (PhET Interactive Simulations)
  */
 
-'use strict';
 
 const booleanPrompt = require( '../common/booleanPrompt' );
 const buildLocal = require( '../common/buildLocal' );

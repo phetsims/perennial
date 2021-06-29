@@ -9,7 +9,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const execute = require( './execute' );
 const gitAdd = require( './gitAdd' );

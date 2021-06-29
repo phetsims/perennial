@@ -1,6 +1,5 @@
 // Copyright 2017-2019, University of Colorado Boulder
 
-'use strict';
 
 const addTranslator = require( './addTranslator' );
 const ChipperVersion = require( '../common/ChipperVersion' );
@@ -32,13 +31,13 @@ const abortBuild = async err => {
   winston.log( 'error', `BUILD ABORTED! ${err}` );
   winston.log( 'info', 'build aborted: checking out master for every repo in case build shas are still checked out' );
   await execute( 'grunt', [ 'checkout-master-all' ], constants.PERENNIAL );
-  return Promise.reject( `Build aborted,${err}` );
+  return Promise.reject( new Error( `Build aborted, ${err}` ) );
 };
 
 /**
  * Clean up after deploy. Checkout master for every repo and remove tmp dir.
  */
-const afterDeploy = async buildDir => {
+const afterDeploy = async buildDir => { // eslint-disable-line consistent-return
   try {
     await execute( 'grunt', [ 'checkout-master-all' ], constants.PERENNIAL );
     await execute( 'rm', [ '-rf', buildDir ], '.' );

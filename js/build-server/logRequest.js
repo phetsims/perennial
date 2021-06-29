@@ -1,6 +1,5 @@
 // Copyright 2017, University of Colorado Boulder
 
-'use strict';
 
 module.exports = function logRequest( req, type, winston ) {
   // log the request, which is useful for debugging

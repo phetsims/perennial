@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const checkoutDependencies = require( './checkoutDependencies' );
 const getDependencies = require( './getDependencies' );
@@ -36,5 +35,5 @@ module.exports = async function( repo, timestamp, includeNpmUpdate ) {
     };
   }
 
-  return await checkoutDependencies( repo, timestampDependencies, includeNpmUpdate );
+  return checkoutDependencies( repo, timestampDependencies, includeNpmUpdate );
 };

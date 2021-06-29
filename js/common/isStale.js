@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const getRemoteBranchSHAs = require( './getRemoteBranchSHAs' );
 const gitRevParse = require( './gitRevParse' );

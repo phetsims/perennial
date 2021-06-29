@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const ChipperVersion = require( '../common/ChipperVersion' );
 const execute = require( '../common/execute' );

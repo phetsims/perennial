@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const loadJSON = require( './loadJSON' );
 const winston = require( 'winston' );

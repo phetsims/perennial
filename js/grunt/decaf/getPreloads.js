@@ -5,7 +5,6 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-'use strict';
 
 const puppeteer = require( 'puppeteer' );
 

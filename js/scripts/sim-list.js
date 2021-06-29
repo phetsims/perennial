@@ -9,7 +9,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const simMetadata = require( '../common/simMetadata' );
 const winston = require( 'winston' );

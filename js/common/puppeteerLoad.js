@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const sleep = require( './sleep' );
 const _ = require( 'lodash' ); // eslint-disable-line

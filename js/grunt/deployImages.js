@@ -9,7 +9,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 // modules
 const buildLocal = require( '../common/buildLocal' );

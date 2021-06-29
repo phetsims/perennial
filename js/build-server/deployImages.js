@@ -72,7 +72,7 @@ const deployImages = async options => {
   }
 
   if ( options.simulation && options.version ) {
-    return await processSim( options.simulation, options.brands, options.version );
+    return processSim( options.simulation, options.brands, options.version );
   }
   else {
     return new Promise( ( resolve, reject ) => {
@@ -86,7 +86,7 @@ const deployImages = async options => {
           }
           else if ( response.statusCode < 200 || response.statusCode > 299 ) {
             console.error( 'Bad Status while fetching metadata', response.statusCode );
-            reject( 'Bad Status while fetching metadata' );
+            reject( new Error( `Bad Status while fetching metadata: ${response.statusCode}` ) );
           }
           else {
             let projects;

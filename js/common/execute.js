@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const child_process = require( 'child_process' );
 const winston = require( 'winston' );

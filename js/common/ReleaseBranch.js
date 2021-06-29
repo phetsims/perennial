@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const ChipperVersion = require( './ChipperVersion' );
 const build = require( './build' );
@@ -179,7 +178,7 @@ module.exports = ( function() {
      * @returns {Promise.<string>}
      */
     async getDivergingSHA() {
-      return await gitFirstDivergingCommit( this.repo, this.branch, 'master' );
+      return gitFirstDivergingCommit( this.repo, this.branch, 'master' );
     }
 
     /**
@@ -189,7 +188,7 @@ module.exports = ( function() {
      * @returns {Promise.<number>}
      */
     async getDivergingTimestamp() {
-      return await gitTimestamp( this.repo, await this.getDivergingSHA() );
+      return gitTimestamp( this.repo, await this.getDivergingSHA() );
     }
 
     /**
@@ -342,7 +341,7 @@ module.exports = ( function() {
       const sha = dependencies[ 'phet-io' ].sha;
       await gitCheckout( this.repo, 'master' );
 
-      return await gitIsAncestor( 'phet-io', 'e3fc26079358d86074358a6db3ebaf1af9725632', sha );
+      return gitIsAncestor( 'phet-io', 'e3fc26079358d86074358a6db3ebaf1af9725632', sha );
     }
 
     /**
@@ -358,7 +357,7 @@ module.exports = ( function() {
       const sha = dependencies.chipper.sha;
       await gitCheckout( this.repo, 'master' );
 
-      return await gitIsAncestor( 'chipper', '7375f6a57b5874b6bbf97a54c9a908f19f88d38f', sha );
+      return gitIsAncestor( 'chipper', '7375f6a57b5874b6bbf97a54c9a908f19f88d38f', sha );
     }
 
     /**
@@ -379,7 +378,7 @@ module.exports = ( function() {
       const sha = dependency.sha;
       await gitCheckout( this.repo, 'master' );
 
-      return await gitIsAncestor( 'phet-io-wrappers', '7ec1a04a70fb9707b381b8bcab3ad070815ef7fe', sha );
+      return gitIsAncestor( 'phet-io-wrappers', '7ec1a04a70fb9707b381b8bcab3ad070815ef7fe', sha );
     }
 
     /**
