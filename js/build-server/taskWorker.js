@@ -32,7 +32,7 @@ const abortBuild = async err => {
   winston.log( 'error', `BUILD ABORTED! ${err}` );
   winston.log( 'info', 'build aborted: checking out master for every repo in case build shas are still checked out' );
   await execute( 'grunt', [ 'checkout-master-all' ], constants.PERENNIAL );
-  return Promise.reject( `Build aborted,${err}` );
+  return Promise.reject( new Error( `Build aborted, ${err}` ) );
 };
 
 /**

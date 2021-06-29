@@ -12,7 +12,7 @@ const _ = require( 'lodash' ); // eslint-disable-line
  * pull master for every repo in dependencies.json (plus babel) to make sure everything is up to date
  */
 module.exports = async function pullMaster( repos ) { // eslint-disable-line consistent-return
-  // so we don't have to modify the repos object
+                                                      // so we don't have to modify the repos object
   const reposCopy = _.clone( repos );
 
   if ( 'comment' in reposCopy ) {
@@ -27,7 +27,7 @@ module.exports = async function pullMaster( repos ) { // eslint-disable-line con
     await gitPull( 'babel' );
   }
   catch( error ) {
-    return Promise.reject( 'git checkout/pull failed in babel' );
+    return Promise.reject( new Error( 'git checkout/pull failed in babel' ) );
   }
 
   for ( const repoName in reposCopy ) {
@@ -38,7 +38,7 @@ module.exports = async function pullMaster( repos ) { // eslint-disable-line con
       await execute( 'git', [ 'checkout', 'master' ], repoDir );
     }
     catch( error ) {
-      return Promise.reject( `git checkout master failed in ${repoName}` );
+      return Promise.reject( new Error( `git checkout master failed in ${repoName}` ) );
     }
 
     try {
@@ -50,6 +50,6 @@ module.exports = async function pullMaster( repos ) { // eslint-disable-line con
   }
 
   if ( errors.length > 0 ) {
-    return Promise.reject( 'at least one repository failed to pull master' );
+    return Promise.reject( new Error( 'at least one repository failed to pull master' ) );
   }
 };

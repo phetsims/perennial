@@ -28,7 +28,7 @@ module.exports = function( repo, branch, timestamp ) {
   return execute( 'git', [ 'rev-list', '-1', `--before="${timestamp}"`, branch ], `../${repo}` ).then( stdout => {
     const sha = stdout.trim();
     if ( sha.length === 0 ) {
-      return Promise.reject( 'No matching SHA for timestamp' );
+      return Promise.reject( new Error( 'No matching SHA for timestamp' ) );
     }
     else {
       return Promise.resolve( sha );

@@ -24,7 +24,7 @@ module.exports = function( path ) {
   return new Promise( ( resolve, reject ) => {
     fs.mkdir( path, err => {
       if ( err ) {
-        reject( `createDirectory: ${err}` );
+        reject( new Error( `createDirectory: ${err}` ) );
       }
       else {
         resolve();

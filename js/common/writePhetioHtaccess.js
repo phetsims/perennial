@@ -57,7 +57,7 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
       winston.error( `simName: ${latestOption.simName}` );
       winston.error( `version: ${latestOption.version}` );
       winston.error( `directory: ${latestOption.directory}` );
-      return Promise.reject( 'latestOption is missing one of the required parameters (simName, version, or directory)' );
+      return Promise.reject( new Error( 'latestOption is missing one of the required parameters (simName, version, or directory)' ) );
     }
   }
 

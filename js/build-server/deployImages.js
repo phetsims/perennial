@@ -86,7 +86,7 @@ const deployImages = async options => {
           }
           else if ( response.statusCode < 200 || response.statusCode > 299 ) {
             console.error( 'Bad Status while fetching metadata', response.statusCode );
-            reject( 'Bad Status while fetching metadata' );
+            reject( new Error( `Bad Status while fetching metadata: ${response.statusCode}` ) );
           }
           else {
             let projects;

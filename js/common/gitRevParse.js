@@ -26,10 +26,10 @@ module.exports = function( repo, query ) {
   return execute( 'git', [ 'rev-parse', query ], `../${repo}` ).then( stdout => {
     const sha = stdout.trim();
     if ( sha.length === 0 ) {
-      return Promise.reject( 'No matching SHA' );
+      return Promise.reject( new Error( 'No matching SHA' ) );
     }
     else if ( sha.length > 40 ) {
-      return Promise.reject( 'Potentially multiple SHAs returned' );
+      return Promise.reject( new Error( 'Potentially multiple SHAs returned' ) );
     }
     else {
       return Promise.resolve( sha );
