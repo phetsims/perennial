@@ -1,6 +1,5 @@
 // Copyright 2017, University of Colorado Boulder
 
-'use strict';
 
 const constants = require( './constants' );
 const request = require( 'request' );

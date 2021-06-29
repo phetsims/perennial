@@ -1,7 +1,5 @@
 // Copyright 2017-2018, University of Colorado Boulder
 
-'use strict';
-
 
 const constants = require( './constants' );
 const devSsh = require( '../common/devSsh' );

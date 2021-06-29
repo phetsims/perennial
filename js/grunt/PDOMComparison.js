@@ -17,7 +17,6 @@
  * @author Taylor Want (PhET Interactive Simulations)
  */
 
-'use strict';
 
 const buildLocal = require( '../common/buildLocal' );
 const execute = require( '../common/execute' );

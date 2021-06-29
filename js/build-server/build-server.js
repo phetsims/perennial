@@ -8,7 +8,6 @@
  * @author Matt Pennington
  */
 
-'use strict';
 
 const constants = require( './constants' );
 const childProcess = require( 'child_process' ); // eslint-disable-line

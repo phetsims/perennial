@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const production = require( '../grunt/production' );
 const rc = require( '../grunt/rc' );

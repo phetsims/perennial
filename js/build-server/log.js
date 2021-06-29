@@ -1,6 +1,5 @@
 // Copyright 2017, University of Colorado Boulder
 
-'use strict';
 
 /**
  * Source: https://stackoverflow.com/a/17737613/2496827

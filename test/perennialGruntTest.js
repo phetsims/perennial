@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const execute = require( '../js/common/execute' );
 const getBranches = require( '../js/common/getBranches' );

@@ -6,7 +6,6 @@
  * @author Matt Pennington
  */
 
-'use strict';
 
 const fs = require( 'graceful-fs' ); //eslint-disable-line
 const getBuildServerConfig = require( './getBuildServerConfig' );

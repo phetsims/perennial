@@ -1,6 +1,5 @@
 // Copyright 2017-2019, University of Colorado Boulder
 
-'use strict';
 
 const addTranslator = require( './addTranslator' );
 const ChipperVersion = require( '../common/ChipperVersion' );

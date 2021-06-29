@@ -1,6 +1,5 @@
 // Copyright 2017-2019, University of Colorado Boulder
 
-'use strict';
 
 const buildLocal = require( './buildLocal' );
 const devScp = require( '../common/devScp' );

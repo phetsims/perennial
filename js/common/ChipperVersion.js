@@ -4,7 +4,6 @@
  * Handles chipper version information, see https://github.com/phetsims/perennial/issues/78.
  */
 
-'use strict';
 
 const assert = require( 'assert' );
 const fs = require( 'fs' );

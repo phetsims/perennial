@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const puppeteerLoad = require( './puppeteerLoad' );
 const _ = require( 'lodash' ); // eslint-disable-line

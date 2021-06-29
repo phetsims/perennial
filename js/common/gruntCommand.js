@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 // {string} - needs to be a slightly different command for Windows
 module.exports = /^win/.test( process.platform ) ? 'grunt.cmd' : 'grunt';

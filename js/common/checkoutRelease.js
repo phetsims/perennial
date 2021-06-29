@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const checkoutTarget = require( './checkoutTarget' );
 const simMetadata = require( './simMetadata' );

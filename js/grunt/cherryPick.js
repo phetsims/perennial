@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const gitCherryPick = require( '../common/gitCherryPick' );
 const grunt = require( 'grunt' );

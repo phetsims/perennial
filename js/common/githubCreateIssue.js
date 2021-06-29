@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-'use strict';
 
 const buildLocal = require( './buildLocal' );
 const Octokit = require( '@octokit/rest' ); // eslint-disable-line
