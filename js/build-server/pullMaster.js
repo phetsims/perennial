@@ -10,8 +10,9 @@ const _ = require( 'lodash' ); // eslint-disable-line
 /**
  * pull master for every repo in dependencies.json (plus babel) to make sure everything is up to date
  */
-module.exports = async function pullMaster( repos ) { // eslint-disable-line consistent-return
-                                                      // so we don't have to modify the repos object
+module.exports = async function pullMaster( repos ) {
+
+  // so we don't have to modify the repos object
   const reposCopy = _.clone( repos );
 
   if ( 'comment' in reposCopy ) {
@@ -50,5 +51,8 @@ module.exports = async function pullMaster( repos ) { // eslint-disable-line con
 
   if ( errors.length > 0 ) {
     return Promise.reject( new Error( 'at least one repository failed to pull master' ) );
+  }
+  else {
+    return Promise.resolve();
   }
 };

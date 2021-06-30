@@ -21,7 +21,7 @@ const PASSWORD_PROTECTED_SUB_DIRS = [ 'wrappers', 'doc' ];
  * @param {string} [devVersionPath] - if provided, scp the htaccess files to here, relatively
 
  */
-module.exports = async function writePhetioHtaccess( passwordProtectPath, latestOption, devVersionPath ) { // eslint-disable-line consistent-return
+module.exports = async function writePhetioHtaccess( passwordProtectPath, latestOption, devVersionPath ) {
   const authFilepath = '/etc/httpd/conf/phet-io_pw';
 
   const isProductionDeploy = !!latestOption;
@@ -133,4 +133,6 @@ AuthUserFile ${authFilepath}
       return Promise.reject( err );
     }
   }
+
+  return Promise.resolve();
 };
