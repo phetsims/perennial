@@ -52,7 +52,7 @@ module.exports = async ( repo, version, onError = async () => {}, noninteractive
   const builtVersionAPI = JSON.parse( grunt.file.read( builtVersionAPIFile ) );
 
   // This is a naive algorithm. Ideally we would only check for breaking changes.
-  // TODO: make this better with the output from https://github.com/phetsims/phet-io/issues/1523
+  // TODO: make this better with the output from https://github.com/phetsims/phet-io/issues/1733
   if ( !_.isEqual( latestDeployedVersionAPI, builtVersionAPI ) ) {
 
     // we don't want noninteractive build skating through this, so error out in that case.
