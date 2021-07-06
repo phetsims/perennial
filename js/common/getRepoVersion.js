@@ -7,7 +7,7 @@
  */
 
 
-const SimVersion = require( './SimVersion' );
+const SimVersion = require( '../dual/SimVersion' );
 const loadJSON = require( './loadJSON' );
 const winston = require( 'winston' );
 

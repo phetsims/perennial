@@ -7,7 +7,7 @@
  */
 
 
-const SimVersion = require( '../common/SimVersion' );
+const SimVersion = require( '../dual/SimVersion' );
 const booleanPrompt = require( '../common/booleanPrompt' );
 const build = require( '../common/build' );
 const buildLocal = require( '../common/buildLocal' );

@@ -54,9 +54,10 @@ git push
 cd ..
 
 ##########################################################################################################
-# copy PERENNIAL/SimVersion to chipper to keep them in sync, see https://github.com/phetsims/perennial/issues/111
+# copy files from perennial to chipper to keep them in sync, see https://github.com/phetsims/perennial/issues/111
+# and https://github.com/phetsims/chipper/issues/1018
 
-cp perennial/js/common/SimVersion.js chipper/js/
+cp -r perennial/js/chipper/ chipper/js/perennial/
 cd chipper || exit
 grunt update-copyright-dates # update SimVersion.js, this will only hit SimVersion.js since everything was updated above.
 git commit -am "Update chipper's SimVersion from daily grunt work"
