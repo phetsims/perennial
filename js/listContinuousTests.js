@@ -153,7 +153,8 @@ phetioRepos.forEach( repo => {
     test: [ repo, 'phet-io-api-compatibility', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'ea&brand=phet-io&phetioStandalone&phetioCompareAPI'
+    queryParameters: 'ea&brand=phet-io&phetioStandalone&phetioCompareAPI',
+    priority: 1.5 // more often than the average test
   } );
 
   // fuzz test important wrappers
