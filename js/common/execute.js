@@ -72,7 +72,14 @@ module.exports = function( cmd, args, cwd, options ) {
 
     process.on( 'error', error => {
       rejectedByError = true;
-      reject( new ExecuteError( cmd, args, cwd, stdout, stderr, -1 ) );
+
+      if ( options.errors === 'resolve' ) {
+        resolve( { code: 1, stdout: stdout, stderr: stderr, cwd: cwd, error: error } );
+      }
+      else {
+
+        reject( new ExecuteError( cmd, args, cwd, stdout, stderr, -1 ) );
+      }
     } );
     winston.debug( `Running ${cmd} ${args.join( ' ' )} from ${cwd}` );
 

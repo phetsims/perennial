@@ -40,12 +40,9 @@ const repos = contents.split( '\n' ).map( sim => sim.trim() );
     }
     else {
       console.log( '##', repo );
-      if ( o.stdout.trim().length > 0 ) {
-        console.log( o.stdout );
-      }
-      if ( o.stderr.trim().length > 0 ) {
-        console.log( o.stderr );
-      }
+      o.stdout.trim().length > 0 && console.log( o.stdout );
+      o.stderr.trim().length > 0 && console.log( o.stderr );
+      o.error && console.log( o.error );
     }
   }
 } )();
