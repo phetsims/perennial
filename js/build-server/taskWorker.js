@@ -14,7 +14,7 @@ const getLocales = require( './getLocales' );
 const notifyServer = require( './notifyServer' );
 const pullMaster = require( './pullMaster' );
 const rsync = require( 'rsync' );
-const SimVersion = require( '../common/SimVersion' );
+const SimVersion = require( '../dual/SimVersion' );
 const winston = require( 'winston' );
 const writeFile = require( '../common/writeFile' );
 const writePhetHtaccess = require( './writePhetHtaccess' );
@@ -37,7 +37,7 @@ const abortBuild = async err => {
 /**
  * Clean up after deploy. Checkout master for every repo and remove tmp dir.
  */
-const afterDeploy = async buildDir => { // eslint-disable-line consistent-return
+const afterDeploy = async buildDir => {
   try {
     await execute( 'grunt', [ 'checkout-master-all' ], constants.PERENNIAL );
     await execute( 'rm', [ '-rf', buildDir ], '.' );
@@ -45,6 +45,7 @@ const afterDeploy = async buildDir => { // eslint-disable-line consistent-return
   catch( err ) {
     return abortBuild( err );
   }
+  return Promise.resolve();
 };
 
 /**

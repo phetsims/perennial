@@ -30,11 +30,13 @@ perennial/bin/for-each.sh perennial/data/active-repos "npm prune && npm update"
 
 ###########################################################################################################
 # update-copyright-dates
+echo "copyright updates:"
 copyrightUpdateCommand="grunt update-copyright-dates && git commit -am 'update copyright dates from daily grunt work' && git push"
 perennial/bin/for-each.sh perennial/data/active-repos "${copyrightUpdateCommand}"
 
 ###########################################################################################################
 # report third party
+echo "third party report:"
 cd chipper || exit
 grunt report-third-party
 cd ../sherpa || exit
@@ -46,6 +48,7 @@ cd ..
 
 ###########################################################################################################
 # regenerate documentation
+echo "binder doc:"
 cd binder || exit
 npm prune && npm update
 npm run build
@@ -54,9 +57,10 @@ git push
 cd ..
 
 ##########################################################################################################
-# copy PERENNIAL/SimVersion to chipper to keep them in sync, see https://github.com/phetsims/perennial/issues/111
+# copy files from perennial to chipper to keep them in sync, see https://github.com/phetsims/perennial/issues/111
+# and https://github.com/phetsims/chipper/issues/1018
 
-cp perennial/js/common/SimVersion.js chipper/js/
+cp -r perennial/js/dual/ chipper/js/
 cd chipper || exit
 grunt update-copyright-dates # update SimVersion.js, this will only hit SimVersion.js since everything was updated above.
 git commit -am "Update chipper's SimVersion from daily grunt work"
@@ -65,7 +69,7 @@ cd ..
 
 ##########################################################################################################
 # Update responsible dev/designer markdown output
-
+echo "responsible dev markdown:"
 node ./phet-info/sim-info/generateMarkdownOutput.mjs
 cd phet-info || exit
 git commit -am "Update responsible_dev markdown output from daily grunt work"
@@ -74,9 +78,14 @@ cd ..
 
 ##########################################################################################################
 # Update perennial/data/ lists, make sure to npm prune and update first see https://github.com/phetsims/perennial/issues/155
-
+echo "generate data lists:"
 cd perennial || exit
 grunt generate-data
 cd ..
 
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+# Final clean up steps, just to be sure
+./perennial/bin/push-all.sh
 ##########################################################################################################

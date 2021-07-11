@@ -8,7 +8,7 @@ const puppeteer = require( 'puppeteer' );
  * @param {string} simName
  * @param {object} page - a puppeteer object
  * @param {string[]} locales - a list of locale codes
- * @returns {Promise<{}>}
+ * @returns {Promise.<{}>}
  */
 const parseScreenNamesFromSimulation = async ( simName, page, locales ) => {
   const returnObject = {};
