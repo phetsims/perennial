@@ -4,11 +4,13 @@
  * A simple webserver that will serve the git root on a specific port for the duration of an async callback
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
 
 const http = require( 'http' );
 const fs = require( 'fs' );
+const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
 const winston = require( 'winston' );
 
 /**
@@ -16,10 +18,14 @@ const winston = require( 'winston' );
  * @public
  *
  * @param {async function(port:number)} asyncCallback
- * @param {string} [path]
+ * @param {Object} [options]
  * @returns {Promise}
  */
-module.exports = function( asyncCallback, path = '..' ) {
+module.exports = function( asyncCallback, options ) {
+  options = _.merge( {
+    path: '../'
+  }, options );
+
   return new Promise( ( resolve, reject ) => {
 
 
@@ -28,7 +34,7 @@ module.exports = function( asyncCallback, path = '..' ) {
 
       // Trim query string
       const tail = req.url.indexOf( '?' ) >= 0 ? req.url.substring( 0, req.url.indexOf( '?' ) ) : req.url;
-      const fullPath = `${process.cwd()}/${path}${tail}`;
+      const fullPath = `${process.cwd()}/${options.path}${tail}`;
 
       // See https://gist.github.com/aolde/8104861
       const mimeTypes = {
