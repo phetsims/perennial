@@ -22,8 +22,10 @@ const winston = require( 'winston' );
  * @returns {Promise}
  */
 module.exports = function( asyncCallback, options ) {
+
   options = _.merge( {
-    path: '../'
+    path: '../',
+    port: 0 // 0 means it will find an open port
   }, options );
 
   return new Promise( ( resolve, reject ) => {
@@ -89,7 +91,6 @@ module.exports = function( asyncCallback, options ) {
       } );
     } );
 
-    // 0 means it will find an open port
-    server.listen( 0 );
+    server.listen( options.port );
   } );
 };
