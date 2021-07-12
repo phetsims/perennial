@@ -65,7 +65,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     throw new Error( 'Aborted production deployment' );
   }
 
-  if ( !await booleanPrompt( 'Are there no untested maintenance patches that need spot checks? (An issue would be created in the sim repo)', noninteractive ) ) {
+  if ( !await booleanPrompt( 'Have all maintenance patches that need spot checks been tested? (An issue would be created in the sim repo)', noninteractive ) ) {
     throw new Error( 'Aborted production deployment' );
   }
 
