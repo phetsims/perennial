@@ -39,13 +39,13 @@ NOTIFICATION_EMAILS=michael.kauzmann@colorado.edu
 
   ###########################################################################################################
   # update-copyright-dates
-  echo "copyright updates:"
+  echo "COPYRIGHT UPDATES:"
   copyrightUpdateCommand="grunt update-copyright-dates && git commit -am 'update copyright dates from daily grunt work' && git push"
   perennial/bin/for-each.sh perennial/data/active-repos "${copyrightUpdateCommand}"
 
   ###########################################################################################################
   # report third party
-  echo "third party report:"
+  echo "THIRD PARTY REPORT:"
   cd chipper || exit
   grunt report-third-party
   cd ../sherpa || exit
@@ -57,7 +57,7 @@ NOTIFICATION_EMAILS=michael.kauzmann@colorado.edu
 
   ###########################################################################################################
   # regenerate documentation
-  echo "binder doc:"
+  echo "BINDER DOC:"
   cd binder || exit
   npm prune && npm update
   npm run build
@@ -68,7 +68,7 @@ NOTIFICATION_EMAILS=michael.kauzmann@colorado.edu
   ##########################################################################################################
   # copy files from perennial to chipper to keep them in sync, see https://github.com/phetsims/perennial/issues/111
   # and https://github.com/phetsims/chipper/issues/1018
-
+  echo "COPY PERENNIAL FILES TO CHIPPER:"
   cp -R perennial/js/dual/. chipper/js/dual
   cd chipper || exit
   grunt update-copyright-dates # update SimVersion.js, this will only hit SimVersion.js since everything was updated above.
@@ -78,7 +78,7 @@ NOTIFICATION_EMAILS=michael.kauzmann@colorado.edu
 
   ##########################################################################################################
   # Update responsible dev/designer markdown output
-  echo "responsible dev markdown:"
+  echo "RESPONSIBLE DEV MARKDOWN:"
   node ./phet-info/sim-info/generateMarkdownOutput.mjs
   cd phet-info || exit
   git commit -am "Update responsible_dev markdown output from daily grunt work"
@@ -87,7 +87,7 @@ NOTIFICATION_EMAILS=michael.kauzmann@colorado.edu
 
   ##########################################################################################################
   # Update perennial/data/ lists, make sure to npm prune and update first see https://github.com/phetsims/perennial/issues/155
-  echo "generate data lists:"
+  echo "GENERATE DATA LISTS:"
   cd perennial || exit
   grunt generate-data
   cd ..
@@ -96,10 +96,11 @@ NOTIFICATION_EMAILS=michael.kauzmann@colorado.edu
   ##########################################################################################################
   ##########################################################################################################
   # Final clean up steps, just to be sure
+  echo "PUSH ALL CLEANUP:"
   ./perennial/bin/push-all.sh
   ##########################################################################################################
 
   ##########################################################################################################
   # No grunt work below this point.
   # Capture errors and email for them.
-} 2> >(date | mail -s "[Daily Grunt Work] Error during process" ${NOTIFICATION_EMAILS})
+} 2> >(date | mailx -s "[Daily Grunt Work] Error during process" ${NOTIFICATION_EMAILS})
