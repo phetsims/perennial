@@ -6,7 +6,7 @@
 #
 #
 # The cron job on bayes:
-# 1 3 * * * cd /data/share/phet/automated-grunt-work/perennial; git pull; ./bin/daily-grunt-work.sh > ~/daily-grunt-work.log 2> ~/daily-grunt-work-error.log
+# 1 3 * * * cd /data/share/phet/automated-grunt-work/perennial; git pull; ./bin/daily-grunt-work.sh > ~/daily-grunt-work.log
 #
 # Author: Michael Kauzmann
 #
@@ -103,4 +103,4 @@ NOTIFICATION_EMAILS=michael.kauzmann@colorado.edu
   ##########################################################################################################
   # No grunt work below this point.
   # Capture errors and email for them.
-} 2> >(date | mailx -s "[Daily Grunt Work] Error during process" ${NOTIFICATION_EMAILS})
+} 2> >(mailx -s "[Daily Grunt Work] Error during process" ${NOTIFICATION_EMAILS})
