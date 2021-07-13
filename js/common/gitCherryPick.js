@@ -7,7 +7,7 @@
  */
 
 
-const execute = require( './execute' );
+const execute = require( '../dual/execute' );
 const winston = require( 'winston' );
 
 /**

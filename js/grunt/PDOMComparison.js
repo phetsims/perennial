@@ -18,7 +18,7 @@
  */
 
 
-const execute = require( '../common/execute' );
+const execute = require( '../dual/execute' );
 const getActiveRepos = require( '../common/getActiveRepos' );
 const getDependencies = require( '../common/getDependencies' );
 const assert = require( 'assert' );

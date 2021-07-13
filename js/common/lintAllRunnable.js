@@ -7,7 +7,7 @@
  */
 
 
-const execute = require( '../common/execute' );
+const execute = require( '../dual/execute' );
 const gruntCommand = require( '../common/gruntCommand' );
 const winston = require( 'winston' );
 

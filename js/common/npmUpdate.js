@@ -7,7 +7,7 @@
  */
 
 
-const execute = require( './execute' );
+const execute = require( '../dual/execute' );
 const npmCommand = require( './npmCommand' );
 const winston = require( 'winston' );
 

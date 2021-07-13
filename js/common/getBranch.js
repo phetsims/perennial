@@ -7,7 +7,7 @@
  */
 
 
-const execute = require( './execute' );
+const execute = require( '../dual/execute' );
 
 /**
  * Returns the branch (if any) that the repository is on.
