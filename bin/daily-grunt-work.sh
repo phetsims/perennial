@@ -72,7 +72,7 @@ NOTIFICATION_EMAILS=michael.kauzmann@colorado.edu
   cp -R perennial/js/dual/. chipper/js/dual
   cd chipper || exit
   grunt update-copyright-dates # update SimVersion.js, this will only hit SimVersion.js since everything was updated above.
-  git commit -am "Update chipper's SimVersion from daily grunt work"
+  git commit -am "Copy perennial/dual to chipper/dual from daily grunt work"
   git push
   cd ..
 
