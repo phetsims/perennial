@@ -61,6 +61,7 @@ NOTIFICATION_EMAILS=michael.kauzmann@colorado.edu
   cd binder || exit
   npm prune && npm update
   npm run build
+  git add .
   git commit -am "Update binder doc from daily grunt work"
   git push
   cd ..
