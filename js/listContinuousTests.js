@@ -153,8 +153,7 @@ phetioRepos.forEach( repo => {
     test: [ repo, 'phet-io-api-compatibility', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    // TODO: replace 0 with 332211 again once https://github.com/phetsims/phet-io/issues/1799 is sorted out
-    queryParameters: 'ea&brand=phet-io&phetioStandalone&phetioCompareAPI&randomSeed=0', // NOTE: DUPLICATION ALERT: random seed must match that of API generation, see generatePhetioMacroAPI.js
+    queryParameters: 'ea&brand=phet-io&phetioStandalone&phetioCompareAPI&randomSeed=332211', // NOTE: DUPLICATION ALERT: random seed must match that of API generation, see generatePhetioMacroAPI.js
     priority: 1.5 // more often than the average test
   } );
 
