@@ -70,6 +70,9 @@ const deployImages = async options => {
     await gitPull( 'chipper' );
     await execute( 'npm', [ 'prune' ], chipperDir );
     await execute( 'npm', [ 'update' ], chipperDir );
+
+    await gitCheckout( 'annual', options.branch );
+    await gitPull( 'annual' );
     await execute( 'npm', [ 'prune' ], annualDir );
     await execute( 'npm', [ 'update' ], annualDir );
   }
