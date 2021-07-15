@@ -183,6 +183,8 @@ async function taskWorker( options ) {
     await execute( 'git', [ 'checkout', repos[ simName ].sha ], simDir );
     await execute( 'npm', [ 'prune' ], '../chipper' );
     await execute( 'npm', [ 'update' ], '../chipper' );
+    await execute( 'npm', [ 'prune' ], '../annual' );
+    await execute( 'npm', [ 'update' ], '../annual' );
     await execute( 'npm', [ 'prune' ], simDir );
     await execute( 'npm', [ 'update' ], simDir );
 

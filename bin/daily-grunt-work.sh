@@ -67,17 +67,6 @@ NOTIFICATION_EMAILS=michael.kauzmann@colorado.edu
   cd ..
 
   ##########################################################################################################
-  # copy files from perennial to chipper to keep them in sync, see https://github.com/phetsims/perennial/issues/111
-  # and https://github.com/phetsims/chipper/issues/1018
-  echo "COPY PERENNIAL FILES TO CHIPPER:"
-  cp -R perennial/js/dual/. chipper/js/dual
-  cd chipper || exit
-  grunt update-copyright-dates # update SimVersion.js, this will only hit SimVersion.js since everything was updated above.
-  git commit -am "Copy perennial/dual to chipper/dual from daily grunt work"
-  git push
-  cd ..
-
-  ##########################################################################################################
   # Update responsible dev/designer markdown output
   echo "RESPONSIBLE DEV MARKDOWN:"
   node ./phet-info/sim-info/generateMarkdownOutput.mjs
