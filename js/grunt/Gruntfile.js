@@ -264,7 +264,7 @@ module.exports = function( grunt ) {
     } ) );
 
   grunt.registerTask( 'npm-update',
-    'Runs npm update/prune for chipper, annual and the given repository\n' +
+    'Runs npm update/prune for both chipper and the given repository\n' +
     '--repo : The repository to update',
     wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
@@ -272,7 +272,7 @@ module.exports = function( grunt ) {
       const repo = grunt.option( 'repo' );
       assertIsValidRepoName( repo );
 
-      await npmUpdate( repo ).then( () => npmUpdate( 'chipper' ) ).then( () => npmUpdate( 'annual' ) );
+      await npmUpdate( repo ).then( () => npmUpdate( 'chipper' ) );
     } ) );
 
   grunt.registerTask( 'create-release',

@@ -43,11 +43,6 @@ fi
 for repo in ${missingRepos}
 do
   echo ${repo}
-
-  if [ ${repo} == "annual" ]; then
-    git clone https://github.com/phetsims/perennial.git annual
-  else
-    git clone https://github.com/phetsims/"${repo}".git
-  fi
+  git clone https://github.com/phetsims/"${repo}".git
   ( cd ${repo}; git init --template=../phet-info/git-template-dir )
 done
