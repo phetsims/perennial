@@ -70,8 +70,6 @@ async function taskWorker( options ) {
       await deployImages( options );
       await gitCheckout( 'chipper', 'master' );
       await gitPull( 'chipper' );
-      await gitCheckout( 'annual', 'master' );
-      await gitPull( 'annual' );
       winston.info( 'Deploy images completed successfully.' );
       return Promise.resolve();
     }

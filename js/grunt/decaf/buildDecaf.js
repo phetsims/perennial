@@ -120,7 +120,6 @@ module.exports = async function( project ) {
 
   const decafSHA = await gitRevParse( 'decaf', 'HEAD' );
   const chipperSHA = await gitRevParse( 'chipper', 'HEAD' );
-  const annualSHA = await gitRevParse( 'annual', 'HEAD' );
   const perennialSHA = await gitRevParse( 'perennial', 'HEAD' );
 
   const svnInfo = await execute( 'svn', [ 'info' ], `${trunkPath}` );
@@ -130,7 +129,6 @@ module.exports = async function( project ) {
     decaf: decafSHA,
     notes: 'The decaf sha is from before the version commit.',
     chipper: chipperSHA,
-    annual: annualSHA,
     perennial: perennialSHA,
     svnInfo: svnInfo
   };
