@@ -35,6 +35,5 @@ module.exports = async function( repo, includeNpmUpdate ) {
   if ( includeNpmUpdate ) {
     await npmUpdate( repo );
     await npmUpdate( 'chipper' );
-    await npmUpdate( 'annual' );
   }
 };

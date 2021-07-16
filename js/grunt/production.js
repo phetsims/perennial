@@ -120,7 +120,6 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     // Make sure our correct npm dependencies are set
     await npmUpdate( repo );
     await npmUpdate( 'chipper' );
-    await npmUpdate( 'annual' );
 
     // Update the README on the branch
     grunt.log.writeln( 'Updating branch README' );

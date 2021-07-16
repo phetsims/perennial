@@ -802,9 +802,6 @@ module.exports = ( function() {
           if ( changedRepos.includes( 'chipper' ) ) {
             await npmUpdate( 'chipper' );
           }
-          if ( changedRepos.includes( 'annual' ) ) {
-            await npmUpdate( 'annual' );
-          }
 
           const message = modifiedBranch.pendingMessages.join( ' and ' );
           fs.writeFileSync( dependenciesJSONFile, JSON.stringify( dependenciesJSON, null, 2 ) );
