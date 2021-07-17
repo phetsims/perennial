@@ -63,7 +63,9 @@ module.exports = async function() {
   writeList( 'active-runnables', phet => phet.runnable );
   writeList( 'active-sims', phet => phet.simulation );
   writeList( 'unit-tests', phet => phet.generatedUnitTests );
-  writeList( 'color-profiles', phet => phet.colorProfile );
+
+  // TODO: delete colorProfile when all sims are using colorProfiles, see https://github.com/phetsims/scenery-phet/issues/515
+  writeList( 'color-profiles', phet => !!( phet.colorProfiles || phet.colorProfile ) );
   writeList( 'phet-io', phet => phet.runnable && phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) );
   writeList( 'phet-io-api-stable', phet => {
     return phet.runnable && phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) &&
