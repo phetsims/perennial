@@ -59,7 +59,7 @@ module.exports = async function() {
     fs.writeFileSync( `data/${name}`, repos.join( os.EOL ) + os.EOL );
   }
 
-  writeList( 'interactive-description', phet => phet.features && phet.features.supportsInteractiveDescription );
+  writeList( 'interactive-description', phet => phet.simFeatures && phet.simFeatures.supportsInteractiveDescription );
   writeList( 'active-runnables', phet => phet.runnable );
   writeList( 'active-sims', phet => phet.simulation );
   writeList( 'unit-tests', phet => phet.generatedUnitTests );
