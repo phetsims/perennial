@@ -99,6 +99,8 @@ NOTIFICATION_EMAILS=michael.kauzmann@colorado.edu
   # Final clean up steps, just to be sure
   echo "PUSH ALL CLEANUP:"
   ./perennial/bin/push-all.sh
+
+  echo "DAILY GRUNT WORK COMPLETE"
   ##########################################################################################################
 
   ##########################################################################################################
