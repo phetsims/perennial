@@ -4,10 +4,13 @@
  * A simple webserver that will serve the git root on a specific port for the duration of an async callback
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
 
-const express = require( 'express' );
+const http = require( 'http' );
+const fs = require( 'fs' );
+const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
 const winston = require( 'winston' );
 
 /**
@@ -15,20 +18,62 @@ const winston = require( 'winston' );
  * @public
  *
  * @param {async function(port:number)} asyncCallback
- * @param {string} [path]
+ * @param {Object} [options]
  * @returns {Promise}
  */
-module.exports = function( asyncCallback, path = '..' ) {
+module.exports = function( asyncCallback, options ) {
+
+  options = _.merge( {
+    path: '../',
+    port: 0 // 0 means it will find an open port
+  }, options );
+
   return new Promise( ( resolve, reject ) => {
-    const app = express();
 
-    app.use( express.static( path ) );
 
-    // start the server
-    const server = app.listen( 0, async () => {
+    // Consider using https://github.com/cloudhead/node-static or reading https://nodejs.org/en/knowledge/HTTP/servers/how-to-serve-static-files/
+    const server = http.createServer( ( req, res ) => {
+
+      // Trim query string
+      const tail = req.url.indexOf( '?' ) >= 0 ? req.url.substring( 0, req.url.indexOf( '?' ) ) : req.url;
+      const fullPath = `${process.cwd()}/${options.path}${tail}`;
+
+      // See https://gist.github.com/aolde/8104861
+      const mimeTypes = {
+        html: 'text/html',
+        jpeg: 'image/jpeg',
+        jpg: 'image/jpeg',
+        png: 'image/png',
+        js: 'text/javascript',
+        css: 'text/css',
+        gif: 'image/gif',
+        mp3: 'audio/mpeg',
+        wav: 'audio/wav',
+
+        // needed to be added to support PhET sims.
+        svg: 'image/svg+xml',
+        json: 'application/json'
+      };
+      const fileExtension = fullPath.split( '.' ).pop();
+      const mimeType = mimeTypes[ fileExtension ];
+
+      if ( !mimeType ) {
+        throw new Error( `unsupported mime type, please add above: ${fileExtension}` );
+      }
+      fs.readFile( fullPath, ( err, data ) => {
+        if ( err ) {
+          res.writeHead( 404 );
+          res.end( JSON.stringify( err ) );
+        }
+        else {
+          res.writeHead( 200, { 'Content-Type': mimeType } );
+          res.end( data );
+        }
+      } );
+    } );
+    server.on( 'listening', async () => {
       const port = server.address().port;
-
-      winston.debug( 'info', `Express listening on port ${port}` );
+      winston.debug( 'info', `Server listening on port ${port}` );
 
       let result;
 
@@ -45,5 +90,7 @@ module.exports = function( asyncCallback, path = '..' ) {
         resolve( result );
       } );
     } );
+
+    server.listen( options.port );
   } );
 };

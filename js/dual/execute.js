@@ -3,6 +3,13 @@
 /**
  * Command execution wrapper (with common settings)
  *
+ **************************************************************
+ * IMPORTANT NOTE: This file is copied from PERENNIAL to CHIPPER frequently.
+ * If this is in CHIPPER, then it is AUTO GENERATED; do not edit, as it will be overwritten.
+ * If this is in PERENNIAL, make sure your changes are compatible with CHIPPER.
+ * See https://github.com/phetsims/perennial/issues/111 and https://github.com/phetsims/chipper/issues/1018
+ **************************************************************
+ *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
@@ -11,6 +18,7 @@ const child_process = require( 'child_process' );
 const winston = require( 'winston' );
 const _ = require( 'lodash' ); // eslint-disable-line
 const assert = require( 'assert' );
+const grunt = require( 'grunt' );
 
 /**
  * Executes a command, with specific arguments and in a specific directory (cwd).
@@ -85,9 +93,11 @@ module.exports = function( cmd, args, cwd, options ) {
 
     process.stderr.on( 'data', data => {
       stderr += data;
+      grunt.log.debug( `stderr: ${data}` );
     } );
     process.stdout.on( 'data', data => {
       stdout += data;
+      grunt.log.debug( `stdout: ${data}` );
     } );
 
     process.on( 'close', code => {

@@ -8,7 +8,7 @@
 
 
 const ChipperVersion = require( '../common/ChipperVersion' );
-const execute = require( '../common/execute' );
+const execute = require( '../dual/execute' );
 const gruntCommand = require( '../common/gruntCommand' );
 const assert = require( 'assert' );
 const fs = require( 'fs' );

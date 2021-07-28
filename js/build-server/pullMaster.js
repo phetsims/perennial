@@ -2,7 +2,7 @@
 
 
 const constants = require( './constants' );
-const execute = require( '../common/execute' );
+const execute = require( '../dual/execute' );
 const gitPull = require( '../common/gitPull' );
 const winston = require( 'winston' );
 const _ = require( 'lodash' ); // eslint-disable-line

@@ -59,11 +59,11 @@ module.exports = async function() {
     fs.writeFileSync( `data/${name}`, repos.join( os.EOL ) + os.EOL );
   }
 
-  writeList( 'interactive-description', phet => phet.features && phet.features.supportsInteractiveDescription );
+  writeList( 'interactive-description', phet => phet.simFeatures && phet.simFeatures.supportsInteractiveDescription );
   writeList( 'active-runnables', phet => phet.runnable );
   writeList( 'active-sims', phet => phet.simulation );
   writeList( 'unit-tests', phet => phet.generatedUnitTests );
-  writeList( 'color-profiles', phet => phet.colorProfile );
+
   writeList( 'phet-io', phet => phet.runnable && phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) );
   writeList( 'phet-io-api-stable', phet => {
     return phet.runnable && phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) &&
@@ -74,7 +74,6 @@ module.exports = async function() {
   await gitAdd( 'perennial', 'data/active-runnables' );
   await gitAdd( 'perennial', 'data/active-sims' );
   await gitAdd( 'perennial', 'data/unit-tests' );
-  await gitAdd( 'perennial', 'data/color-profiles' );
   await gitAdd( 'perennial', 'data/phet-io' );
   await gitAdd( 'perennial', 'data/phet-io-api-stable' );
 

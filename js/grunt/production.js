@@ -13,7 +13,7 @@ const build = require( '../common/build' );
 const buildServerRequest = require( '../common/buildServerRequest' );
 const checkoutMaster = require( '../common/checkoutMaster' );
 const checkoutTarget = require( '../common/checkoutTarget' );
-const execute = require( '../common/execute' );
+const execute = require( '../dual/execute' );
 const getDependencies = require( '../common/getDependencies' );
 const getRepoVersion = require( '../common/getRepoVersion' );
 const gitAdd = require( '../common/gitAdd' );
@@ -65,7 +65,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     throw new Error( 'Aborted production deployment' );
   }
 
-  if ( !await booleanPrompt( 'Are there no untested maintenance patches that need spot checks? (An issue would be created in the sim repo)', noninteractive ) ) {
+  if ( !await booleanPrompt( 'Have all maintenance patches that need spot checks been tested? (An issue would be created in the sim repo)', noninteractive ) ) {
     throw new Error( 'Aborted production deployment' );
   }
 
@@ -216,8 +216,10 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       grunt.log.writeln( '' );
       grunt.log.writeln( 'Make sure that the current level of instrumentation is represented here in the Instrumentation Status Spreadsheet.' );
       grunt.log.writeln( 'On the spreadsheet, provide the version number like MAJOR.MINOR (without maintenance number)' );
-      grunt.log.writeln( 'so that maintenance releases will seamlessly upgrade:' );
+      grunt.log.writeln( 'so that maintenance releases will seamlessly upgrade. *Update both the text and the link*' );
       grunt.log.writeln( 'https://docs.google.com/spreadsheets/d/18_QNGuVtYtxOEKG9xRBs_PSQpyvzySF1Gk5puR-5Fv4/edit#gid=1881767354' );
+      grunt.log.writeln( 'And check that the link in the public-facing document has the correct text and link:' );
+      grunt.log.writeln( 'https://docs.google.com/spreadsheets/u/1/d/e/2PACX-1vReSXUUxC63CQCKHIoO6qY4ycWrqgw8eaX25io3_r2hRmO3RbXuyNRRMz5J2C1c5mCN9nxumvrv6snj/pubhtml?gid=2141068918&single=true' );
       grunt.log.writeln( '' );
       grunt.log.writeln( 'Make sure the sim is listed in perennial/data/phet-io-api-stable, if it has had a designed production release, and update the checked in API file to match the published version.' );
       grunt.log.writeln( '' );

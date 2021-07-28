@@ -4,6 +4,10 @@
 # This script is run daily on bayes, doing automatic grunt work to keep the project up
 # to date. Edit this script and commit to automatically add to the daily cron job.
 #
+#
+# The cron job on bayes:
+# 1 3 * * * cd /data/share/phet/automated-grunt-work/perennial; git pull; ./bin/daily-grunt-work.sh >& ~/daily-grunt-work.log;
+#
 # Author: Michael Kauzmann
 #
 #=======================================================================================
@@ -17,6 +21,7 @@ workingDir=${binDir}/../..
 cd ${workingDir} || exit
 
 echo "running daily grunt work. . ."
+date
 
 cd perennial || exit
 git pull
@@ -30,13 +35,13 @@ perennial/bin/for-each.sh perennial/data/active-repos "npm prune && npm update"
 
 ###########################################################################################################
 # update-copyright-dates
-echo "copyright updates:"
+echo "COPYRIGHT UPDATES:"
 copyrightUpdateCommand="grunt update-copyright-dates && git commit -am 'update copyright dates from daily grunt work' && git push"
 perennial/bin/for-each.sh perennial/data/active-repos "${copyrightUpdateCommand}"
 
 ###########################################################################################################
 # report third party
-echo "third party report:"
+echo "THIRD PARTY REPORT:"
 cd chipper || exit
 grunt report-third-party
 cd ../sherpa || exit
@@ -48,10 +53,11 @@ cd ..
 
 ###########################################################################################################
 # regenerate documentation
-echo "binder doc:"
+echo "BINDER DOC:"
 cd binder || exit
 npm prune && npm update
 npm run build
+git add .
 git commit -am "Update binder doc from daily grunt work"
 git push
 cd ..
@@ -59,17 +65,17 @@ cd ..
 ##########################################################################################################
 # copy files from perennial to chipper to keep them in sync, see https://github.com/phetsims/perennial/issues/111
 # and https://github.com/phetsims/chipper/issues/1018
-
-cp -r perennial/js/dual/ chipper/js/
+echo "COPY PERENNIAL FILES TO CHIPPER:"
+cp -R perennial/js/dual/. chipper/js/dual
 cd chipper || exit
 grunt update-copyright-dates # update SimVersion.js, this will only hit SimVersion.js since everything was updated above.
-git commit -am "Update chipper's SimVersion from daily grunt work"
+git commit -am "Copy perennial/dual to chipper/dual from daily grunt work"
 git push
 cd ..
 
 ##########################################################################################################
 # Update responsible dev/designer markdown output
-echo "responsible dev markdown:"
+echo "RESPONSIBLE DEV MARKDOWN:"
 node ./phet-info/sim-info/generateMarkdownOutput.mjs
 cd phet-info || exit
 git commit -am "Update responsible_dev markdown output from daily grunt work"
@@ -78,7 +84,7 @@ cd ..
 
 ##########################################################################################################
 # Update perennial/data/ lists, make sure to npm prune and update first see https://github.com/phetsims/perennial/issues/155
-echo "generate data lists:"
+echo "GENERATE DATA LISTS:"
 cd perennial || exit
 grunt generate-data
 cd ..
@@ -86,6 +92,19 @@ cd ..
 ##########################################################################################################
 ##########################################################################################################
 ##########################################################################################################
-# Final clean up steps, just to be sure
-./perennial/bin/push-all.sh
 ##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+# No grunt work below this point.
+# Final clean up steps, just to be sure
+echo "PUSH ALL CLEANUP:"
+./perennial/bin/push-all.sh
+echo "DAILY GRUNT WORK COMPLETE"

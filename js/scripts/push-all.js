@@ -1,6 +1,6 @@
 // Copyright 2021, University of Colorado Boulder
 
-const execute = require( '../common/execute' );
+const execute = require( '../dual/execute' );
 const _ = require( 'lodash' ); // eslint-disable-line
 const fs = require( 'fs' );
 

@@ -21,7 +21,7 @@
 
 const _ = require( 'lodash' ); // eslint-disable-line
 const assert = require( 'assert' );
-const execute = require( '../common/execute' );
+const execute = require( '../dual/execute' );
 const grunt = require( 'grunt' );
 const gruntCommand = require( '../common/gruntCommand' );
 const npmUpdate = require( '../common/npmUpdate' );

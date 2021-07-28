@@ -18,8 +18,7 @@
  */
 
 
-const buildLocal = require( '../common/buildLocal' );
-const execute = require( '../common/execute' );
+const execute = require( '../dual/execute' );
 const getActiveRepos = require( '../common/getActiveRepos' );
 const getDependencies = require( '../common/getDependencies' );
 const assert = require( 'assert' );
@@ -28,6 +27,7 @@ const logger = require( 'html-differ/lib/logger' );
 const _ = require( 'lodash' ); // eslint-disable-line
 const puppeteer = require( 'puppeteer' );
 const winston = require( 'winston' );
+const withServer = require( '../common/withServer' );
 
 // constants
 const HtmlDiffer = htmlDiffer.HtmlDiffer;
@@ -40,6 +40,7 @@ module.exports = async ( repo, sha ) => {
 
   // get the current working copy PDOM
   const workingCopyPDOM = await launchSimAndGetPDOMText( repo );
+  assert( workingCopyPDOM, 'should be defined' );
 
   // keep track of the repos that will need to be unstashed. This is necessary to make sure we don't apply a stash that
   // this task didn't save to begin with,
@@ -73,6 +74,7 @@ module.exports = async ( repo, sha ) => {
     ignoreDuplicateAttributes: false
   } );
 
+  console.log( 'HTML Diff:' );
   const diff = htmlDiffer.diffHtml( workingCopyPDOM, oldShaPDOM );
 
   // TODO https://github.com/phetsims/perennial/issues/138 better interpretation of the diff that is output. Perhaps by looking at "diff" more manually, see https://www.npmjs.com/package/html-differ
@@ -145,58 +147,63 @@ const stashAll = async repos => {
  */
 const launchSimAndGetPDOMText = async repo => {
 
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
+  return withServer( async port => {
+    let pdoms = null;
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
 
-  page.on( 'console', msg => {
-    if ( msg.type() === 'error' ) {
-      console.error( 'PAGE ERROR:', msg.text() );
-    }
-    else {
-      console.log( 'PAGE LOG:', msg.text() );
-    }
-  } );
-
-  page.on( 'load', async () => {
-
-    const pdoms = await page.evaluate( async () => {
-
-      // TODO https://github.com/phetsims/perennial/issues/138
-      // window.phet.sim.joist.frameEndedEmitter.addListener();
-
-      window.addEventListener( 'message', event => {
-        if ( event.data ) {
-          try {
-            const messageData = JSON.parse( event.data );
-            if ( messageData.type === 'load' ) {
-              console.log( 'sim loaded' );
-              return phet.joist.display.pdomRootElement.outerHTML;
-            }
-          }
-          catch( e ) {
-
-            // message isn't what we wanted it to be, so ignore it
-            console.log( 'CAUGHT ERROR:', e.message );
-          }
-        }
-        return '';
-      } );
-      setTimeout( () => {
-        throw new Error( 'Load timeout' );
-      }, 20000 );
+    page.on( 'console', msg => {
+      if ( msg.type() === 'error' ) {
+        console.error( 'PAGE ERROR:', msg.text() );
+      }
+      else {
+        console.log( 'PAGE LOG:', msg.text() );
+      }
     } );
-    browser.close();
+
+    page.on( 'error', msg => { throw new Error( msg ); } );
+    page.on( 'pageerror', msg => { throw new Error( msg ); } );
+
+    try {
+      await page.goto( `http://localhost:${port}/${repo}/${repo}_en.html?brand=phet&postMessageOnLoad` );
+
+      pdoms = await page.evaluate( async () => {
+        return new Promise( ( resolve, reject ) => {
+
+
+          // TODO https://github.com/phetsims/perennial/issues/138
+          // window.phet.sim.joist.frameEndedEmitter.addListener();
+
+          window.addEventListener( 'message', event => {
+            if ( event.data ) {
+              try {
+                const messageData = JSON.parse( event.data );
+                if ( messageData.type === 'load' ) {
+                  console.log( 'sim loaded' );
+                  resolve( phet.joist.display.pdomRootElement.outerHTML );
+                }
+              }
+              catch( e ) {
+
+                // message isn't what we wanted it to be, so ignore it
+                console.log( 'CAUGHT ERROR:', e.message );
+              }
+            }
+            resolve( '' );
+          } );
+          setTimeout( () => {
+            throw new Error( 'Load timeout' );
+          }, 20000 );
+        } );
+      } );
+    }
+    catch( e ) {
+      throw new Error( e );
+    }
+    finally {
+      browser.close();
+    }
     return pdoms;
   } );
-
-  page.on( 'error', msg => { throw new Error( msg ); } );
-  page.on( 'pageerror', msg => { throw new Error( msg ); } );
-
-  try {
-    await page.goto( `${buildLocal.localTestingURL}${repo}/${repo}_en.html?brand=phet&postMessageOnLoad` );
-  }
-  catch( e ) {
-    browser.close();
-    throw new Error( e );
-  }
 };
+

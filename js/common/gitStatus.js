@@ -7,7 +7,7 @@
  */
 
 
-const execute = require( './execute' );
+const execute = require( '../dual/execute' );
 const getBranch = require( './getBranch' );
 const gitRevParse = require( './gitRevParse' );
 const assert = require( 'assert' );

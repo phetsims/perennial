@@ -10,7 +10,7 @@
 const SimVersion = require( '../dual/SimVersion' );
 const build = require( '../common/build' );
 const copyFile = require( '../common/copyFile' );
-const execute = require( '../common/execute' );
+const execute = require( '../dual/execute' );
 const getRepoVersion = require( '../common/getRepoVersion' );
 const gitAdd = require( '../common/gitAdd' );
 const gitCommit = require( '../common/gitCommit' );

@@ -7,7 +7,7 @@
  */
 
 
-const execute = require( './execute' );
+const execute = require( '../dual/execute' );
 const gitAdd = require( './gitAdd' );
 const gitCheckout = require( './gitCheckout' );
 const gitCommit = require( './gitCommit' );
