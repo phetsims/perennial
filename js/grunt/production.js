@@ -211,20 +211,14 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
 
     // phet-io nags from the checklist
     if ( brands.includes( 'phet-io' ) ) {
-      grunt.log.writeln( 'If this is a version that will be used with students, then make sure to remove the password protection.' );
-      grunt.log.writeln( 'See https://github.com/phetsims/phet-io/blob/master/doc/phet-io-security.md for details.' );
-      grunt.log.writeln( '' );
-      grunt.log.writeln( 'Make sure that the current level of instrumentation is represented here in the Instrumentation Status Spreadsheet.' );
-      grunt.log.writeln( 'On the spreadsheet, provide the version number like MAJOR.MINOR (without maintenance number)' );
-      grunt.log.writeln( 'so that maintenance releases will seamlessly upgrade. *Update both the text and the link*' );
-      grunt.log.writeln( 'https://docs.google.com/spreadsheets/d/18_QNGuVtYtxOEKG9xRBs_PSQpyvzySF1Gk5puR-5Fv4/edit#gid=1881767354' );
-      grunt.log.writeln( 'And check that the link in the public-facing document has the correct text and link:' );
-      grunt.log.writeln( 'https://docs.google.com/spreadsheets/u/1/d/e/2PACX-1vReSXUUxC63CQCKHIoO6qY4ycWrqgw8eaX25io3_r2hRmO3RbXuyNRRMz5J2C1c5mCN9nxumvrv6snj/pubhtml?gid=2141068918&single=true' );
-      grunt.log.writeln( '' );
-      grunt.log.writeln( 'Make sure the sim is listed in perennial/data/phet-io-api-stable, if it has had a designed production release, and update the checked in API file to match the published version.' );
-      grunt.log.writeln( '' );
-      grunt.log.writeln( 'If you are delivering this to a partner, update partners.md (phet-io/doc/partners.md) to show this delivery.' );
-      grunt.log.writeln( 'Read the intro of the document to make sure that you format the entry correctly.' );
+      const phetioLogText = `
+PhET-iO deploys involve a couple of extra steps after production. Please ensure the following are accomplished:
+1. Make sure the sim is listed in perennial/data/phet-io-api-stable, if it has had a designed production release, and update the checked in API file to match the published version.
+2. Create an issue in the phet-io repo and assign to @kathy-phet to update the main "PhET-iO Simulations" spreadsheet from this new publication. (https://docs.google.com/spreadsheets/d/18_QNGuVtYtxOEKG9xRBs_PSQpyvzySF1Gk5puR-5Fv4/edit#gid=1881767354)
+3. If you are delivering this version to a research partner, update partners.md (phet-io/doc/partners.md) to show this delivery. (Read the intro of the document to make sure that you format the entry correctly.)
+4. If this is a version that will be used with students, then make sure to remove the password protection, see https://github.com/phetsims/phet-io/blob/master/doc/phet-io-security.md for details. 
+      `;
+      grunt.log.writeln( phetioLogText );
     }
 
     return version;
