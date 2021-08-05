@@ -8,6 +8,7 @@ const gitPull = require( '../common/gitPull' );
 const request = require( 'request' );
 
 const chipperDir = '../chipper';
+const annualDir = '../annual';
 
 const processSim = async ( simulation, brands, version ) => {
 
@@ -69,6 +70,8 @@ const deployImages = async options => {
     await gitPull( 'chipper' );
     await execute( 'npm', [ 'prune' ], chipperDir );
     await execute( 'npm', [ 'update' ], chipperDir );
+    await execute( 'npm', [ 'prune' ], annualDir );
+    await execute( 'npm', [ 'update' ], annualDir );
   }
 
   if ( options.simulation && options.version ) {
