@@ -802,8 +802,8 @@ module.exports = ( function() {
           if ( changedRepos.includes( 'chipper' ) ) {
             await npmUpdate( 'chipper' );
           }
-          if ( changedRepos.includes( 'annual' ) ) {
-            await npmUpdate( 'annual' );
+          if ( changedRepos.includes( 'perennial-alias' ) ) {
+            await npmUpdate( 'perennial-alias' );
           }
 
           const message = modifiedBranch.pendingMessages.join( ' and ' );

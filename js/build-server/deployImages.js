@@ -8,7 +8,7 @@ const gitPull = require( '../common/gitPull' );
 const request = require( 'request' );
 
 const chipperDir = '../chipper';
-const annualDir = '../annual';
+const perennialAliasDir = '../perennial-alias';
 
 const processSim = async ( simulation, brands, version ) => {
 
@@ -71,10 +71,10 @@ const deployImages = async options => {
     await execute( 'npm', [ 'prune' ], chipperDir );
     await execute( 'npm', [ 'update' ], chipperDir );
 
-    await gitCheckout( 'annual', options.branch );
-    await gitPull( 'annual' );
-    await execute( 'npm', [ 'prune' ], annualDir );
-    await execute( 'npm', [ 'update' ], annualDir );
+    await gitCheckout( 'perennial-alias', options.branch );
+    await gitPull( 'perennial-alias' );
+    await execute( 'npm', [ 'prune' ], perennialAliasDir );
+    await execute( 'npm', [ 'update' ], perennialAliasDir );
   }
 
   if ( options.simulation && options.version ) {

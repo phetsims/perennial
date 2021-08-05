@@ -20,8 +20,8 @@ const winston = require( 'winston' );
 module.exports = function( repo ) {
   winston.info( `cloning ${repo}` );
 
-  if ( repo === 'annual' ) {
-    return execute( 'git', [ 'clone', 'https://github.com/phetsims/perennial.git', 'annual' ], '../' );
+  if ( repo === 'perennial-alias' ) {
+    return execute( 'git', [ 'clone', 'https://github.com/phetsims/perennial.git', 'perennial-alias' ], '../' );
   }
   else {
     return execute( 'git', [ 'clone', `https://github.com/phetsims/${repo}.git` ], '../' );
