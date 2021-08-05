@@ -70,6 +70,7 @@ module.exports = async function( repo, branch, message ) {
   // Update dependencies.json for the release branch
   await npmUpdate( repo );
   await npmUpdate( 'chipper' );
+  await npmUpdate( 'annual' );
   await build( repo, {
     brand: 'phet'
   } );
