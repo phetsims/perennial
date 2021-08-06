@@ -105,6 +105,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     // Make sure our correct npm dependencies are set
     await npmUpdate( repo );
     await npmUpdate( 'chipper' );
+    await npmUpdate( 'perennial-alias' );
 
     // No special options required here, as we send the main request to the build server
     grunt.log.writeln( await build( repo, {

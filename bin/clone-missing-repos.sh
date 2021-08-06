@@ -43,6 +43,11 @@ fi
 for repo in ${missingRepos}
 do
   echo ${repo}
-  git clone https://github.com/phetsims/"${repo}".git
+
+  if [ ${repo} == "perennial-alias" ]; then
+    git clone https://github.com/phetsims/perennial.git perennial-alias
+  else
+    git clone https://github.com/phetsims/"${repo}".git
+  fi
   ( cd ${repo}; git init --template=../phet-info/git-template-dir )
 done

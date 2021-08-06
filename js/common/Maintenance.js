@@ -802,6 +802,9 @@ module.exports = ( function() {
           if ( changedRepos.includes( 'chipper' ) ) {
             await npmUpdate( 'chipper' );
           }
+          if ( changedRepos.includes( 'perennial-alias' ) ) {
+            await npmUpdate( 'perennial-alias' );
+          }
 
           const message = modifiedBranch.pendingMessages.join( ' and ' );
           fs.writeFileSync( dependenciesJSONFile, JSON.stringify( dependenciesJSON, null, 2 ) );

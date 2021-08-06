@@ -113,6 +113,7 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
   // Make sure our correct npm dependencies are set
   await npmUpdate( repo );
   await npmUpdate( 'chipper' );
+  await npmUpdate( 'perennial-alias' );
 
   await setRepoVersion( repo, version, message );
   await updateHTMLVersion( repo );

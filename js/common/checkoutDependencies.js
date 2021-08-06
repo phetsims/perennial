@@ -44,6 +44,7 @@ module.exports = async function( repo, dependencies, includeNpmUpdate ) {
   if ( includeNpmUpdate ) {
     await npmUpdate( repo );
     await npmUpdate( 'chipper' );
+    await npmUpdate( 'perennial-alias' );
   }
 
   return checkedOutRepoNames;

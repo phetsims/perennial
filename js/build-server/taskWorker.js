@@ -70,6 +70,8 @@ async function taskWorker( options ) {
       await deployImages( options );
       await gitCheckout( 'chipper', 'master' );
       await gitPull( 'chipper' );
+      await gitCheckout( 'perennial-alias', 'master' );
+      await gitPull( 'perennial-alias' );
       winston.info( 'Deploy images completed successfully.' );
       return Promise.resolve();
     }
@@ -183,6 +185,8 @@ async function taskWorker( options ) {
     await execute( 'git', [ 'checkout', repos[ simName ].sha ], simDir );
     await execute( 'npm', [ 'prune' ], '../chipper' );
     await execute( 'npm', [ 'update' ], '../chipper' );
+    await execute( 'npm', [ 'prune' ], '../perennial-alias' );
+    await execute( 'npm', [ 'update' ], '../perennial-alias' );
     await execute( 'npm', [ 'prune' ], simDir );
     await execute( 'npm', [ 'update' ], simDir );
 
