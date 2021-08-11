@@ -190,17 +190,6 @@ module.exports = function( grunt ) {
       await printPhetioLinks();
     } ) );
 
-  grunt.registerTask( 'pdom-comparison',
-    'Compare two sim versions\' pdom',
-    wrapTask( async () => {
-
-      const repo = grunt.option( 'repo' );
-      assertIsValidRepoName( repo );
-
-      // Don't always require this, as we may have an older chipper checked out
-      await require( './PDOMComparison' )( repo, grunt.option( 'sha' ) );
-    } ) );
-
   grunt.registerTask( 'update-gh-pages',
     'Updates the gh-pages branches for various repos, including building of dot/kite/scenery',
     wrapTask( async () => {
