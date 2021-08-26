@@ -1,17 +1,27 @@
 // Copyright 2021, University of Colorado Boulder
 
 /**
- * Protect release branches, and master and main from being deleted
- * for all active repositories.
+ * Applies or updates branch protection rules for all active repos.
  *
- * TODO: Do not use yet.
+ * USAGE:
+ * node perennial/js/scripts/protect-branches-in-all-repos.js
  *
- * TODO: Still a work in progress, see https://github.com/phetsims/special-ops/issues/197
+ * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 
 const githubProtectBranches = require( '../common/githubProtectBranches' );
+const fs = require( 'fs' );
 
-// TODO: just for testing, presumably replace with active-repos
-const reposToProtect = [ 'john-travoltage', 'balloons-and-static-electricity' ];
+// cannot use getActiveRepos() from root
+const contents = fs.readFileSync( 'perennial/data/active-repos', 'utf8' ).trim();
+const activeRepos = contents.split( '\n' ).map( sim => sim.trim() );
 
-githubProtectBranches( reposToProtect );
+// perennial-alias is an exception, it is just a clone of the perennial repository
+if ( activeRepos.includes( 'perennial-alias' ) ) {
+  activeRepos.splice( activeRepos.indexOf( 'perennial-alias' ), 1 );
+}
+
+// so that execution doesn't finish until githubProtectBranches resolves
+( async () => {
+  await githubProtectBranches( activeRepos );
+} )();
