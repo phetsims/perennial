@@ -19,9 +19,7 @@ const fs = require( 'fs' );
  */
 const isRepoTypeScript = repo => {
   const packageObject = JSON.parse( fs.readFileSync( `../${repo}/package.json` ) );
-  const phet = packageObject.phet;
-  const typescript = phet.typescript === true;
-  return typescript;
+  return packageObject.hasOwnProperty( 'phet' ) && packageObject.phet.typescript === true;
 };
 
 // so that hook-pre-commit.js knows if it loaded a compatible version
