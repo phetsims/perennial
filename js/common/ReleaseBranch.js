@@ -178,6 +178,10 @@ module.exports = ( function() {
      * @returns {Promise.<string>}
      */
     async getDivergingSHA() {
+      await gitCheckout( this.repo, this.branch );
+      await gitPull( this.repo );
+      await gitCheckout( this.repo, 'master' );
+
       return gitFirstDivergingCommit( this.repo, this.branch, 'master' );
     }
 

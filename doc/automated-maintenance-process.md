@@ -1,21 +1,20 @@
-
 # Overview of the automated maintenance process
 
 ## Terminology
 
 - Release Branch: A specific "sim", "branch", "brands" combination that will be patched/deployed as one unit. Sometimes
   this term will be used to refer specifically to the branch itself (ignoring the brands), and sometimes the brands will
-  be assumed. A "published/production" release branch is one that has had a production deployment before, and is
-  usually in contrast with an "RC" release branch (one that is unpublished, but is out for testing in a release
-  candidate QA issue).
+  be assumed. A "published/production" release branch is one that has had a production deployment before, and is usually
+  in contrast with an "RC" release branch (one that is unpublished, but is out for testing in a release candidate QA
+  issue).
 - Patch: A logical change to a specific repository that needs to be made. Sometimes changes for an issue will result in
   multiple "patches" if it affects multiple repositories.
 - Patch SHA: A particular git SHA that can be cherry-picked to a patch's repo. Usually a patch will have multiple SHAs,
   and the patch will be "applied" by trying to cherry-pick those SHAs into different versions of the repo for multiple
   release branches.
 - Needed patch: A reference noting that a certain release branch will need a patch for a given (common) repository.
-- Common repo: Generally for any simulation, a common repo is any repository that is a dependency (not the sim
-  itself. Notably for simulations like molecule-shapes-basics, it has a "common repo" molecule-shapes that it depends on
+- Common repo: Generally for any simulation, a common repo is any repository that is a dependency (not the sim itself.
+  Notably for simulations like molecule-shapes-basics, it has a "common repo" molecule-shapes that it depends on
   (even though molecule-shapes is a simulation repo in its own right). How molecule-shapes will be handled (in the
   context of molecule-shapes-basics) acts exactly as a normal common repo.
 - Common repo branch: a branch on a common repo that is explicitly for storing the SHA of a version of it needed for a
@@ -45,9 +44,9 @@ It's good to understand how release branches work for most of this process. A re
 simulation-branch pair, e.g. `molarity` and `1.2` (thus there is a branch named `1.2` in the sim repo `molarity`).
 
 The release branch's latest version is stored in the `package.json` (on the branch). This version is used for
-auto-incrementing the version numbers. Release branches should NOT currently have anything like `dev` versions, and
-will either show an `rc` version or will have no test type (e.g. `1.2.3` or `1.2.3-rc.2`). If the version shows that
-a production version (e.g. `1.2.3`) was last released, the process will bump the maintenance version (e.g. to `1.2.4`),
+auto-incrementing the version numbers. Release branches should NOT currently have anything like `dev` versions, and will
+either show an `rc` version or will have no test type (e.g. `1.2.3` or `1.2.3-rc.2`). If the version shows that a
+production version (e.g. `1.2.3`) was last released, the process will bump the maintenance version (e.g. to `1.2.4`),
 and will be a series of RC versions before a production version (e.g. `1.2.4-rc.1`, `1.2.4-rc.2`, ..., `1.2.4` ).
 The release branches should always have a RC version deployed between production versions (for at least brief testing).
 
@@ -78,8 +77,8 @@ those operations will handle all relevant brands at the same time.
 
 While generally not necessary, you can manually create a `ReleaseBranch` object (for tracking it in maintenance) with
 `new ReleaseBranch( repo, branch, brands )`, e.g. `new ReleaseBranch( 'molarity', '1.2', [ 'phet' ] )`. For many
-purposes, it can also be helpful to use the async function `ReleaseBranch.getMaintenanceBranches()` to get a list of
-ALL release branches that are marked for maintenance (NOTE that it returns a Promise).
+purposes, it can also be helpful to use the async function `ReleaseBranch.getMaintenanceBranches()` to get a list of ALL
+release branches that are marked for maintenance (NOTE that it returns a Promise).
 
 ## General procedure
 
@@ -87,7 +86,9 @@ NOTE: This is an outline. Details for each step will be listed below in this doc
 
 Before starting, ensure you have a clean working copy, and:
 
-0. This process can take a lot of time, all the while taking over every repo checked out. It may be nice to use separate device besides your primary development environment. Or checkout a separate clone of phet repos, and use them for this process so that you can still develop while the MR process is occurring.
+0. This process can take a lot of time, all the while taking over every repo checked out. It may be nice to use separate
+   device besides your primary development environment. Or checkout a separate clone of phet repos, and use them for
+   this process so that you can still develop while the MR process is occurring.
 1. Run `Maintenance.checkBranchStatus()` to see if any commits have snuck into release branches that are unanticipated.
 2. Communicate with the team about maintenance releases for release branches. If there are release branches that are
    unpublished, they'll need to manually include the fixes. From this point on (until complete), you should be the only
@@ -101,7 +102,8 @@ complications):
    will need to be patched? (Even if the patch on master was only for 1 repository, other repos might also need to be
    changed if your change depends on newer features). If it exists, having a SHA that does "all" of the changes is nice.
    What types of release branches do you anticipate needing changes?
-5. Create patches for each repo that needs to change, e.g. `Maintenance.createPatch( '{{REPO}}', '{{ISSUE_URL}}', '{{OPTIONAL_PATCH_NAME}}' )`.
+5. Create patches for each repo that needs to change,
+   e.g. `Maintenance.createPatch( '{{REPO}}', '{{ISSUE_URL}}', '{{OPTIONAL_PATCH_NAME}}' )`.
 6. Mark which release branches need which patches. For simple cases, this can just be something like
    `Maintenance.addNeededPatchesAfter( '{{REPO}}', '{{SHA}}' )`, but things can be added dynamically or through filters.
 
@@ -112,13 +114,13 @@ skip to step 9 (adding the patch SHA).
 8. Make the changes to the repos that need changes, commit them, and record the SHAs.
 9. Call `Maintenance.addPatchSHA( '{{REPO}}', '{{SHA}}' )` for every SHA.
 10. Apply the cherry-picked SHAs to see if there are any more remaining release branches that need the patch:
-   `Maintenance.applyPatches()`. NOTE: The commits are still ONLY LOCAL. This is very fast, but the changes have not
-   been made to the remote release branch until the updateDependencies task below.
+    `Maintenance.applyPatches()`. NOTE: The commits are still ONLY LOCAL. This is very fast, but the changes have not
+    been made to the remote release branch until the updateDependencies task below.
 
 Once that is done (or when you want to make the changes permanent on the server):
 
-11. Run `Maintenance.updateDependencies()` (takes a while) which builds the release branches, integrates the commits
-   and patches, creates/updates branches where necessary, etc.
+11. Run `Maintenance.updateDependencies()` (takes a while) which builds the release branches, integrates the commits and
+    patches, creates/updates branches where necessary, etc.
 
 Once that is done for every issue, then generally RCs are deployed with `Maintenance.deployReleaseCandidates()`, a list
 for QA is generated with `Maintenance.listLinks()`, and an RC testing issue is created. If phet-io sims are involved,
@@ -130,11 +132,11 @@ verify that the production deploys completed successfully.
 Below will be detailed information about all of the general steps, and all of the related commands. Usually running
 `Maintenance.list()` often to see the current state is recommended.
 
-[firefox-google-analytics-maintenance-example.md](https://github.com/phetsims/special-ops/blob/master/doc/firefox-google-analytics-maintenance-example.md) shows an example of
-this general setup being followed (two issues, one simple and one complicated).
+[firefox-google-analytics-maintenance-example.md](https://github.com/phetsims/special-ops/blob/master/doc/firefox-google-analytics-maintenance-example.md)
+shows an example of this general setup being followed (two issues, one simple and one complicated).
 
-Also note that if there are multiple required changes to a specific repository, it is best to make all of the changes
-at once.
+Also note that if there are multiple required changes to a specific repository, it is best to make all of the changes at
+once.
 
 ## .maintenance.json
 
@@ -259,15 +261,15 @@ Due to complications like our linting process (or in general any situation where
 and work, but another place and fail), you may want to pre-emptively split the maintenance process into sections where
 the cherry-pick will always result in a valid simulation. "Splitting" here means acting like you have multiple different
 patches that affect disjoint groups of sims. For example, you would create a patch for all sims WITHOUT the copyright
-restriction mentioned above and complete it, THEN create a patch for all sims WITH the restriction. More detail will
-be below.
+restriction mentioned above and complete it, THEN create a patch for all sims WITH the restriction. More detail will be
+below.
 
 ## #5: Create a patch: `Maintenance.createPatch( repo, message, [patchName] )`
 
 This should be called for each repository that will need to have code changes (generally common repos). For the message,
-it should almost always include the issue URL used for tracking the maintenance release, and can also contain
-additional information if desired. It will be included in commit messages, QA reports, etc.  Here is a real-life
-example:
+it should almost always include the issue URL used for tracking the maintenance release, and can also contain additional
+information if desired. It will be included in commit messages, QA reports, etc. Here is a real-life example:
+
 ```
  Maintenance.createPatch( "vibe", "https://github.com/phetsims/vibe/issues/39" )
 ```
@@ -284,10 +286,10 @@ Running `Maintenance.list()` afterwards should show the patch in maintenance sta
 ## #6: Adding "needed patches"
 
 Now that the patch references are in the system, you'll want to mark which release branches need which patches.
-Sometimes this can be simple (add all release branches, or add release branches that don't include commit X), but
-it can also be much more complicated (e.g. build each release branch and determine if it has an issue by inspecting the
-output). The process provides a range of methods for these cases, including both simple/general commands for most
-usages, but fine-grained control otherwise.
+Sometimes this can be simple (add all release branches, or add release branches that don't include commit X), but it can
+also be much more complicated (e.g. build each release branch and determine if it has an issue by inspecting the output)
+. The process provides a range of methods for these cases, including both simple/general commands for most usages, but
+fine-grained control otherwise.
 
 When a release branch is marked as needing a patch, it will show up in the `Maintenance.list()`, e.g.:
 
@@ -300,6 +302,7 @@ states-of-matter 1.1 phet
     john-travoltage 1.5 phet
     states-of-matter 1.1 phet
 ```
+
 shows the two release branches both need the joist patch in the example above.
 
 Most commands below will scan website metadata (both for phet and phet-io brands) to determine the list of release
@@ -320,13 +323,13 @@ easier to add "all" sims and remove ones that are not needed, and this makes it 
 
 ### Adding ALL needed patches
 
-`Maintenance.addAllNeededPatches( patchName )` will add all release branches as needing a patch, which is helpful if
-you just fixed something in master (every sim is guaranteed to NOT have the change).
+`Maintenance.addAllNeededPatches( patchName )` will add all release branches as needing a patch, which is helpful if you
+just fixed something in master (every sim is guaranteed to NOT have the change).
 
 ### Adding/removing filtered needed patches based on a SHA
 
-If you have a specific SHA that is a fix (included in some release branches), you can add/remove simulations that do
-NOT have the fix with `Maintenance.addNeededPatchesBefore( patchName, sha )` and
+If you have a specific SHA that is a fix (included in some release branches), you can add/remove simulations that do NOT
+have the fix with `Maintenance.addNeededPatchesBefore( patchName, sha )` and
 `Maintenance.removeNeededPatchesBefore( patchName, sha )`. This will add/remove release branches that do NOT have the
 specific SHA in their history. Note that this may not pick up "related" shas (if it was cherry-picked, or someone
 rewrote the commit).
@@ -338,13 +341,14 @@ exact opposite set of release branches (ones that have the SHA in their history)
 
 ### Adding/removing filtered needed patches with a predicate function
 
-For more complicated cases (and as the internal implementation used by many of the above commands), you can specify
-an asynchronous predicate function (returns a Promise that will resolve as a boolean) to either
+For more complicated cases (and as the internal implementation used by many of the above commands), you can specify an
+asynchronous predicate function (returns a Promise that will resolve as a boolean) to either
 `Maintenance.addNeededPatches( patchName, filter )` or `Maintenance.removeNeededPatches( patchName, filter )`. This will
 apply the add/remove operation to release branches where `filter( releaseBranch )` returns a Promise that resolves as
 truthy.
 
 An example of using this power would be the following (used for determining if a string is in a certain source file):
+
 ```
 const fs = require( 'fs' );
 
@@ -368,8 +372,8 @@ A helper function for building the release branch and comparing the output is pr
 ## #7: Checking out a "modified" release branch
 
 NOTE: If you have a commit SHA that you'll want to apply, you can skip to step 9 below (adding the patch SHA). Steps 7
-and 8 are for creating the SHAs necessary. Steps 7-10 will be looped until there are no more release branches that
-need patches.
+and 8 are for creating the SHAs necessary. Steps 7-10 will be looped until there are no more release branches that need
+patches.
 
 Instead of using `checkout-shas`, or other chipper/perennial commands to check out a branch during this process, it's
 recommended that you use `Maintenance.checkoutBranch( repo, branch )`. Since we don't update the actual
@@ -380,14 +384,14 @@ SHAs needed for cherry picking from it.
 
 ## #8: Create and record "fix" commits
 
-Once you have a specific release branch checked out, you'll want to create the commits to fix the patch or patches.
-This can be done by attempting to cherry-pick a SHA (and fixing after the failed merge), or can be done manually by
-going to all of the affected repositories, making the code changes necessary, and committing it.
+Once you have a specific release branch checked out, you'll want to create the commits to fix the patch or patches. This
+can be done by attempting to cherry-pick a SHA (and fixing after the failed merge), or can be done manually by going to
+all of the affected repositories, making the code changes necessary, and committing it.
 
 NOTE: Do NOT push these commits. Just record the SHA for each of them for the next step. Until the update dependencies
 step, these commits will be stored only locally on your checked-out copy. This is way faster in general, so that the
-developer can patch all of the sims quickly, and then let the build/commit/etc. process do all of the slower tasks
-in one batch.
+developer can patch all of the sims quickly, and then let the build/commit/etc. process do all of the slower tasks in
+one batch.
 
 ## #9: Add the patch SHAs: `Maintenance.addPatchSHA( patchName, sha )`
 
@@ -402,6 +406,7 @@ associated patch SHAs (via cherry-pick) until one is successful.
 
 When the cherry-pick works for a release branch, it will print out something like the following (in addition to removing
 the "needed patch"):
+
 ```
 Checked out phetcommon SHA for area-model-multiplication 1.0
 Cherry-pick success for 9fd76b31b1663de55cac2f67283d9a2063d820a9, result is b0c963278cef99e3268a5573823e23d882f12a6e
@@ -432,6 +437,14 @@ will include the SHAs.
 
 NOTE: It is ideal to keep the computer that this is running on "awake", so the process is not interrupted!
 https://support.apple.com/kb/PH25222?locale=en_US may be helpful for this.
+
+There is an uncommon subset of maintenance releases in which you want to update branches, but you don't need to publish
+the change to production deploys. Most often this is because the bug fix is not important enough to warrant the QA and
+publication cost. In this case, technically this step (updating dependencies) is all you need to get to. That said, it
+is still recommended continuing on to deploy RC versions. The reason is so that the next maintenance release process
+doesn't get more complicated when these "dangling commits" get noted in `Maintenance.checkBranchStatus()`, and then have
+to be tracked down as "acceptable" before proceeding (decision noted
+in https://github.com/phetsims/scenery/issues/1271#issuecomment-911960613).
 
 ## #12: Notify for unpublished RC branches
 
@@ -472,20 +485,20 @@ The automated maintenance process makes this way more convenient than patching 4
 maintenance release was essentially typing:
 
 ```js
-maintenance> Maintenance.reset()
-maintenance> Maintenance.createPatch( 'area-model-common', 'https://github.com/phetsims/area-model-common/issues/172' );
+maintenance > Maintenance.reset()
+maintenance > Maintenance.createPatch( 'area-model-common', 'https://github.com/phetsims/area-model-common/issues/172' );
 // Created patch for area-model-common with message: https://github.com/phetsims/area-model-common/issues/172
-maintenance> Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( 'area-model-algebra', '1.1', [ 'phet' ] ), 'area-model-common' );
+maintenance > Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( 'area-model-algebra', '1.1', [ 'phet' ] ), 'area-model-common' );
 // Added patch area-model-common as needed for area-model-algebra 1.1
-maintenance> Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( 'area-model-decimals', '1.1', [ 'phet' ] ), 'area-model-common' );
+maintenance > Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( 'area-model-decimals', '1.1', [ 'phet' ] ), 'area-model-common' );
 // Added patch area-model-common as needed for area-model-decimals 1.1
-maintenance> Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( 'area-model-introduction', '1.1', [ 'phet' ] ), 'area-model-common' );
+maintenance > Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( 'area-model-introduction', '1.1', [ 'phet' ] ), 'area-model-common' );
 // Added patch area-model-common as needed for area-model-introduction 1.1
-maintenance> Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( 'area-model-multiplication', '1.1', [ 'phet' ] ), 'area-model-common' );
+maintenance > Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( 'area-model-multiplication', '1.1', [ 'phet' ] ), 'area-model-common' );
 // Added patch area-model-common as needed for area-model-multiplication 1.1
-maintenance> Maintenance.addPatchSHA( 'area-model-common', '81283b1e97fae5cd760f69d7a47284c603214697' );
+maintenance > Maintenance.addPatchSHA( 'area-model-common', '81283b1e97fae5cd760f69d7a47284c603214697' );
 // Added SHA 81283b1e97fae5cd760f69d7a47284c603214697 to patch area-model-common
-maintenance> Maintenance.list();
+maintenance > Maintenance.list();
 /*
 area-model-algebra 1.1 phet
   needs: area-model-common
@@ -502,7 +515,7 @@ area-model-multiplication 1.1 phet
     area-model-introduction 1.1 phet
     area-model-multiplication 1.1 phet
 */
-maintenance> Maintenance.applyPatches();
+maintenance > Maintenance.applyPatches();
 /*
 Checked out area-model-common SHA for area-model-algebra 1.1
 Cherry-pick success for 81283b1e97fae5cd760f69d7a47284c603214697, result is 1f66b1367629b6f8e6da61ce6c93f35c5ff35775
@@ -514,7 +527,7 @@ Checked out area-model-common SHA for area-model-multiplication 1.1
 Cherry-pick success for 81283b1e97fae5cd760f69d7a47284c603214697, result is 1f66b1367629b6f8e6da61ce6c93f35c5ff35775
 4 patches applied
 */
-maintenance> Maintenance.updateDependencies();
+maintenance > Maintenance.updateDependencies();
 // It pushes all of the dependency changes to the release branches, taking a number of minutes
 ```
 
