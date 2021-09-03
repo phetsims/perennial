@@ -20,6 +20,30 @@ const _ = require( 'lodash' ); // eslint-disable-line
 const assert = require( 'assert' );
 const grunt = require( 'grunt' );
 
+class ExecuteError extends Error {
+  /**
+   * @param {string} cmd
+   * @param {Array.<string>} args
+   * @param {string} cwd
+   * @param {string} stdout
+   * @param {string} stderr
+   * @param {number} code - exit code
+   * @param {number} time - ms
+   */
+  constructor( cmd, args, cwd, stdout, stderr, code, time ) {
+    super( `${cmd} ${args.join( ' ' )} in ${cwd} failed with exit code ${code}${stdout ? `\nstdout:\n${stdout}` : ''}${stderr ? `\nstderr:\n${stderr}` : ''}` );
+
+    // @public
+    this.cmd = cmd;
+    this.args = args;
+    this.cwd = cwd;
+    this.stdout = stdout;
+    this.stderr = stderr;
+    this.code = code;
+    this.time = time;
+  }
+}
+
 /**
  * Executes a command, with specific arguments and in a specific directory (cwd).
  * @public
@@ -36,6 +60,8 @@ const grunt = require( 'grunt' );
  */
 module.exports = function( cmd, args, cwd, options ) {
 
+  const startTime = Date.now();
+
   options = _.extend( { // eslint-disable-line
 
     // {'reject'|'resolve'} - whether errors should be rejected or resolved.  If errors are resolved, then an object
@@ -44,28 +70,6 @@ module.exports = function( cmd, args, cwd, options ) {
     errors: 'reject'
   }, options );
   assert( options.errors === 'reject' || options.errors === 'resolve', 'Errors must reject or resolve' );
-
-  class ExecuteError extends Error {
-    /**
-     * @param {string} cmd
-     * @param {Array.<string>} args
-     * @param {string} cwd
-     * @param {string} stdout
-     * @param {string} stderr
-     * @param {number} code - exit code
-     */
-    constructor( cmd, args, cwd, stdout, stderr, code ) {
-      super( `${cmd} ${args.join( ' ' )} in ${cwd} failed with exit code ${code}${stdout ? `\nstdout:\n${stdout}` : ''}${stderr ? `\nstderr:\n${stderr}` : ''}` );
-
-      // @public
-      this.cmd = cmd;
-      this.args = args;
-      this.cwd = cwd;
-      this.stdout = stdout;
-      this.stderr = stderr;
-      this.code = code;
-    }
-  }
 
   return new Promise( ( resolve, reject ) => {
 
@@ -82,11 +86,11 @@ module.exports = function( cmd, args, cwd, options ) {
       rejectedByError = true;
 
       if ( options.errors === 'resolve' ) {
-        resolve( { code: 1, stdout: stdout, stderr: stderr, cwd: cwd, error: error } );
+        resolve( { code: 1, stdout: stdout, stderr: stderr, cwd: cwd, error: error, time: Date.now() - startTime } );
       }
       else {
 
-        reject( new ExecuteError( cmd, args, cwd, stdout, stderr, -1 ) );
+        reject( new ExecuteError( cmd, args, cwd, stdout, stderr, -1, Date.now() - startTime ) );
       }
     } );
     winston.debug( `Running ${cmd} ${args.join( ' ' )} from ${cwd}` );
@@ -108,11 +112,11 @@ module.exports = function( cmd, args, cwd, options ) {
 
       if ( !rejectedByError ) {
         if ( options.errors === 'resolve' ) {
-          resolve( { code: code, stdout: stdout, stderr: stderr, cwd: cwd } );
+          resolve( { code: code, stdout: stdout, stderr: stderr, cwd: cwd, time: Date.now() - startTime } );
         }
         else {
           if ( code !== 0 ) {
-            reject( new ExecuteError( cmd, args, cwd, stdout, stderr, code ) );
+            reject( new ExecuteError( cmd, args, cwd, stdout, stderr, code, Date.now() - startTime ) );
           }
           else {
             resolve( stdout );
