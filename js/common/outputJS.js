@@ -1,7 +1,7 @@
 // Copyright 2017, University of Colorado Boulder
 
 /**
- * Runs `grunt output-js-all`
+ * Runs `grunt output-js`
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  * @author Sam Reid (PhET Interactive Simulations)
@@ -13,22 +13,25 @@ const winston = require( 'winston' );
 const ChipperVersion = require( '../common/ChipperVersion' );
 
 /**
- * Builds a repository.
+ * Outputs JS for a directory
  * @public
  *
- * @returns {Promise.<Object>} - The stdout of the build
+ * @returns {Promise.<Object>} - The results of the build, see execute with resolve
  */
-module.exports = async function( repo ) {
+module.exports = async function( cwd ) {
 
-  winston.info( 'running outputJSAll' );
+  winston.info( 'running outputJS' );
 
   const chipperVersion = ChipperVersion.getFromRepository();
 
   if ( chipperVersion.outputJS ) {
-    winston.info( 'running grunt output-js-all' );
-    await execute( gruntCommand, [ 'output-js-all' ] );
+    winston.info( 'running grunt output-js' );
+    return execute( gruntCommand, [ 'output-js' ], cwd, {
+      errors: 'resolve'
+    } );
   }
   else {
     winston.info( 'outputJS not detected, skipping...' );
+    return Promise.all( [] );
   }
 };
