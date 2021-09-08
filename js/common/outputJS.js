@@ -16,6 +16,7 @@ const ChipperVersion = require( '../common/ChipperVersion' );
  * Outputs JS for a directory
  * @public
  *
+ * @param {string} cwd
  * @returns {Promise.<Object>} - The results of the build, see execute with resolve
  */
 module.exports = async function( cwd ) {
