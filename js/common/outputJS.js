@@ -16,7 +16,7 @@ const ChipperVersion = require( '../common/ChipperVersion' );
  * Outputs JS for a directory
  * @public
  *
- * @returns {Promise.<Object>} - The results of the build, see execute with resolve
+ * @returns {Promise}
  */
 module.exports = async function( cwd ) {
 
@@ -26,12 +26,9 @@ module.exports = async function( cwd ) {
 
   if ( chipperVersion.outputJS ) {
     winston.info( 'running grunt output-js' );
-    return execute( gruntCommand, [ 'output-js' ], cwd, {
-      errors: 'resolve'
-    } );
+    await execute( gruntCommand, [ 'output-js' ], cwd );
   }
   else {
     winston.info( 'outputJS not detected, skipping...' );
-    return Promise.all( [] );
   }
 };
