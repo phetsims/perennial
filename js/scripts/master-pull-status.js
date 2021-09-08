@@ -12,6 +12,7 @@ const getActiveRepos = require( '../common/getActiveRepos' );
 const gitCheckout = require( '../common/gitCheckout' );
 const gitPull = require( '../common/gitPull' );
 const gitStatus = require( '../common/gitStatus' );
+const npmUpdate = require( '../common/npmUpdate' );
 const winston = require( 'winston' );
 
 winston.default.transports.console.level = 'error';
@@ -68,6 +69,11 @@ const getStatus = async repo => {
   }
 
   await Promise.all( repos.map( repo => getStatus( repo ) ) );
+
+  await npmUpdate( 'chipper' );
+  await npmUpdate( 'perennial' );
+  await npmUpdate( 'perennial-alias' );
+
   repos.forEach( repo => {
     process.stdout.write( data[ repo ] );
   } );
