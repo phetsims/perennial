@@ -13,36 +13,11 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const child_process = require( 'child_process' );
 const winston = require( 'winston' );
 const _ = require( 'lodash' ); // eslint-disable-line
 const assert = require( 'assert' );
 const grunt = require( 'grunt' );
-
-class ExecuteError extends Error {
-  /**
-   * @param {string} cmd
-   * @param {Array.<string>} args
-   * @param {string} cwd
-   * @param {string} stdout
-   * @param {string} stderr
-   * @param {number} code - exit code
-   * @param {number} time - ms
-   */
-  constructor( cmd, args, cwd, stdout, stderr, code, time ) {
-    super( `${cmd} ${args.join( ' ' )} in ${cwd} failed with exit code ${code}${stdout ? `\nstdout:\n${stdout}` : ''}${stderr ? `\nstderr:\n${stderr}` : ''}` );
-
-    // @public
-    this.cmd = cmd;
-    this.args = args;
-    this.cwd = cwd;
-    this.stdout = stdout;
-    this.stderr = stderr;
-    this.code = code;
-    this.time = time;
-  }
-}
 
 /**
  * Executes a command, with specific arguments and in a specific directory (cwd).
@@ -126,3 +101,28 @@ module.exports = function( cmd, args, cwd, options ) {
     } );
   } );
 };
+
+class ExecuteError extends Error {
+
+  /**
+   * @param {string} cmd
+   * @param {Array.<string>} args
+   * @param {string} cwd
+   * @param {string} stdout
+   * @param {string} stderr
+   * @param {number} code - exit code
+   * @param {number} time - ms
+   */
+  constructor( cmd, args, cwd, stdout, stderr, code, time ) {
+    super( `${cmd} ${args.join( ' ' )} in ${cwd} failed with exit code ${code}${stdout ? `\nstdout:\n${stdout}` : ''}${stderr ? `\nstderr:\n${stderr}` : ''}` );
+
+    // @public
+    this.cmd = cmd;
+    this.args = args;
+    this.cwd = cwd;
+    this.stdout = stdout;
+    this.stderr = stderr;
+    this.code = code;
+    this.time = time;
+  }
+}
