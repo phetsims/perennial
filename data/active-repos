@@ -119,7 +119,6 @@ pendulum-lab
 perennial
 ph-scale
 ph-scale-basics
-phet-android-app
 phet-core
 phet-info
 phet-io
@@ -132,7 +131,6 @@ phet-io-wrapper-haptics
 phet-io-wrapper-hookes-law-energy
 phet-io-wrapper-lab-book
 phet-io-wrappers
-phet-ios-app
 phetcommon
 phetmarks
 plinko-probability
@@ -152,7 +150,6 @@ sherpa
 shred
 simula-rasa
 skiffle
-smithers
 states-of-matter
 states-of-matter-basics
 studio
