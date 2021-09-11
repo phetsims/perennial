@@ -16,9 +16,9 @@ module.exports = ( function() {
    * @param {number} major - The major part of the version (the 3 in 3.1.2)
    * @param {number} minor - The minor part of the version (the 1 in 3.1.2)
    * @param {number} maintenance - The maintenance part of the version (the 2 in 3.1.2)
-   * @param {boolean} outputJS - Flag that indicates whether grunt suppports the commands `output-js` and `output-js-all`
+   * @param {boolean} chipperSupportsOutputJSGruntTasks - Flag that indicates whether grunt suppports the family of commands `output-js` `output-js-project` and `output-js-all`
    */
-  function ChipperVersion( major, minor, maintenance, outputJS ) {
+  function ChipperVersion( major, minor, maintenance, chipperSupportsOutputJSGruntTasks ) {
 
     assert( typeof major === 'number' && major >= 0 && major % 1 === 0, 'major version should be a non-negative integer' );
     assert( typeof minor === 'number' && minor >= 0 && minor % 1 === 0, 'minor version should be a non-negative integer' );
@@ -28,7 +28,7 @@ module.exports = ( function() {
     this.major = major;
     this.minor = minor;
     this.maintenance = maintenance;
-    this.outputJS = outputJS;
+    this.chipperSupportsOutputJSGruntTasks = chipperSupportsOutputJSGruntTasks;
   }
 
   // Can't rely on inherit existing
@@ -66,9 +66,9 @@ module.exports = ( function() {
     const major = parseInt( matches[ 1 ], 10 );
     const minor = parseInt( matches[ 2 ], 10 );
     const maintenance = parseInt( matches[ 3 ], 10 );
-    const outputJS = packageJSON.phet && packageJSON.phet.outputJS;
+    const chipperSupportsOutputJSGruntTasks = packageJSON.phet && packageJSON.phet.chipperSupportsOutputJSGruntTasks;
 
-    return new ChipperVersion( major, minor, maintenance, outputJS );
+    return new ChipperVersion( major, minor, maintenance, chipperSupportsOutputJSGruntTasks );
   };
 
   return ChipperVersion;

@@ -8,28 +8,44 @@
  */
 
 const execute = require( '../dual/execute' );
+const fs = require( 'fs' );
 const gruntCommand = require( '../common/gruntCommand' );
 const winston = require( 'winston' );
 const ChipperVersion = require( '../common/ChipperVersion' );
+const loadJSON = require( '../common/loadJSON' );
 
 /**
  * Outputs JS for a directory
  * @public
  *
- * @param {string} cwd
+ * @param {string} repo
  * @returns {Promise}
  */
-module.exports = async function( cwd ) {
+module.exports = async function( repo ) {
 
   winston.info( 'running outputJS' );
 
   const chipperVersion = ChipperVersion.getFromRepository();
 
-  if ( chipperVersion.outputJS ) {
-    winston.info( 'running grunt output-js' );
-    await execute( gruntCommand, [ 'output-js' ], cwd );
+  let ranOutputJS = false;
+
+  // Not every version of chipper has the output-js task family.  Only proceed if it exists in this version of chipper.
+  if ( chipperVersion.chipperSupportsOutputJSGruntTasks ) {
+
+    const packageFilePath = `../${repo}/package.json`;
+    const exists = fs.existsSync( packageFilePath );
+    if ( exists ) {
+      const packageObject = await loadJSON( packageFilePath );
+
+      // Not every repo supports the output-js task, only proceed if it is supported
+      if ( packageObject.phet && packageObject.phet.supportsOutputJS ) {
+        winston.info( 'running grunt output-js' );
+        await execute( gruntCommand, [ 'output-js' ], `../${repo}` );
+        ranOutputJS = true;
+      }
+    }
   }
-  else {
+  if ( !ranOutputJS ) {
     winston.info( 'outputJS not detected, skipping...' );
   }
 };
