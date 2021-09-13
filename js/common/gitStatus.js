@@ -9,6 +9,7 @@
 
 const execute = require( '../dual/execute' );
 const getBranch = require( './getBranch' );
+const getRemoteBranchSHAs = require( './getRemoteBranchSHAs' );
 const gitRevParse = require( './gitRevParse' );
 const assert = require( 'assert' );
 
@@ -24,6 +25,9 @@ module.exports = async function( repo ) {
 
   const result = {};
 
+  // This is needed to get the below `git rev-list` with ${u} to actually compare with the remote state.
+  await execute( 'git', [ 'remote', 'update' ], `../${repo}` );
+
   result.symbolicRef = await execute( 'git', [ 'symbolic-ref', '-q', 'HEAD' ], `../${repo}` );
   result.branch = await getBranch( repo ); // might be empty string
   result.sha = await gitRevParse( repo, 'HEAD' );
@@ -31,6 +35,8 @@ module.exports = async function( repo ) {
 
   if ( result.branch ) {
     // Safe method to get ahead/behind counts, see http://stackoverflow.com/questions/2969214/git-programmatically-know-by-how-much-the-branch-is-ahead-behind-a-remote-branc
+
+    result.remoteSHA = ( await getRemoteBranchSHAs( repo ) )[ result.branch ];
 
     // get the tracking-branch name
     result.trackingBranch = await execute( 'git', [ 'for-each-ref', '--format=\'%(upstream:short)\'', result.symbolicRef ], `../${repo}` );
@@ -40,6 +46,11 @@ module.exports = async function( repo ) {
 
     result.behind = parseInt( counts.split( '\t' )[ 0 ], 10 );
     result.ahead = parseInt( counts.split( '\t' )[ 1 ], 10 );
+    result.remoteDifferent = result.remoteSHA !== result.sha;
+
+    if ( result.remoteDifferent ) {
+      assert( result.behind > 0 || result.ahead > 0, 'We should be ahead or behind commits if our remote SHA is different than our HEAD' );
+    }
   }
 
   return result;
