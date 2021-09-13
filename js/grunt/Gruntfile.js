@@ -327,7 +327,7 @@ module.exports = function( grunt ) {
     }
 
     // Forward to chipper, supporting all of the options
-    grunt.log.writeln( await execute( gruntCommand, [ 'lint', ...tail ], '../chipper' ) );
+    grunt.log.writeln( ( await execute( gruntCommand, [ 'lint', ...tail ], '../chipper', { errors: 'resolve' } ) ).stdout );
   } ) );
 
   grunt.registerTask( 'wrapper',
