@@ -36,7 +36,7 @@ module.exports = async function( repo ) {
     result.trackingBranch = await execute( 'git', [ 'for-each-ref', '--format=\'%(upstream:short)\'', result.symbolicRef ], `../${repo}` );
 
     // e.g. behind-count + '\t' + ahead-count
-    const counts = await execute( 'git', [ 'rev-list', '--left-right', '--count', `${result.trackingBranch}...HEAD` ], `../${repo}` );
+    const counts = await execute( 'git', [ 'rev-list', '--left-right', '--count', `${result.trackingBranch}@{u}...HEAD` ], `../${repo}` );
 
     result.behind = parseInt( counts.split( '\t' )[ 0 ], 10 );
     result.ahead = parseInt( counts.split( '\t' )[ 1 ], 10 );
