@@ -131,16 +131,16 @@ module.exports = ( function() {
     async includesSHA( repo, sha ) {
       let result = false;
 
-      await checkoutTarget( this.repo, this.branch, false ); // don't npm update
+      await gitCheckout( this.repo, this.branch );
 
       const dependencies = await getDependencies( this.repo );
 
       if ( dependencies[ repo ] ) {
-        const currentSHA = await gitRevParse( repo, 'HEAD' );
+        const currentSHA = dependencies[ repo ].sha;
         result = sha === currentSHA || await gitIsAncestor( repo, sha, currentSHA );
       }
 
-      await checkoutMaster( this.repo, false ); // don't npm update
+      await gitCheckout( this.repo, 'master' );
 
       return result;
     }
@@ -157,16 +157,16 @@ module.exports = ( function() {
     async isMissingSHA( repo, sha ) {
       let result = false;
 
-      await checkoutTarget( this.repo, this.branch, false ); // don't npm update
+      await gitCheckout( this.repo, this.branch );
 
       const dependencies = await getDependencies( this.repo );
 
       if ( dependencies[ repo ] ) {
-        const currentSHA = await gitRevParse( repo, 'HEAD' );
+        const currentSHA = dependencies[ repo ].sha;
         result = sha !== currentSHA && !( await gitIsAncestor( repo, sha, currentSHA ) );
       }
 
-      await checkoutMaster( this.repo, false ); // don't npm update
+      await gitCheckout( this.repo, 'master' );
 
       return result;
     }
