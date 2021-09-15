@@ -214,10 +214,8 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     if ( brands.includes( 'phet-io' ) ) {
       const phetioLogText = `
 PhET-iO deploys involve a couple of extra steps after production. Please ensure the following are accomplished:
-1. Make sure the sim is listed in perennial/data/phet-io-api-stable, if it has had a designed production release, and update the checked in API file to match the published version.
+1. Make sure the sim is listed in perennial/data/phet-io-api-stable if it has had a designed production release, and update the checked in API file to match the published version.
 2. Create an issue in the phet-io repo and assign to @kathy-phet to update the main "PhET-iO Simulations" spreadsheet from this new publication. (https://docs.google.com/spreadsheets/d/18_QNGuVtYtxOEKG9xRBs_PSQpyvzySF1Gk5puR-5Fv4/edit#gid=1881767354)
-3. If you are delivering this version to a research partner, update partners.md (phet-io/doc/partners.md) to show this delivery. (Read the intro of the document to make sure that you format the entry correctly.)
-4. If this is a version that will be used with students, then make sure to remove the password protection, see https://github.com/phetsims/phet-io/blob/master/doc/phet-io-security.md for details. 
       `;
       grunt.log.writeln( phetioLogText );
     }
