@@ -91,13 +91,20 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
   }
   else {
     try {
-      const passwordProtectWrapperContents = `
+      const basePasswordProtectContents = `
 AuthType Basic
 AuthName "PhET-iO Password Protected Area"
 AuthUserFile ${authFilepath}
 <LimitExcept OPTIONS>
   Require valid-user
 </LimitExcept>
+`;
+
+      const passwordProtectWrapperContents = `${basePasswordProtectContents}\n
+          
+# Uncomment these lines to support public access to this wrappers directory
+# Satisfy Any
+# Allow from all
 `;
 
       // Write a file to add authentication to subdirectories like wrappers/ or doc/
@@ -119,7 +126,7 @@ AuthUserFile ${authFilepath}
       // Write a file to add authentication to the top level index pages
       if ( phetioPackage.phet && phetioPackage.phet.addRootHTAccessFile ) {
         const passwordProtectIndexContents = `<FilesMatch "(index\\.\\w+|api\\.json)$">\n${
-          passwordProtectWrapperContents
+          basePasswordProtectContents
         }</FilesMatch>\n`;
         await writeFile( rootHtaccessFullPath, passwordProtectIndexContents );
         if ( devVersionPath ) {
