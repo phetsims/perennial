@@ -15,7 +15,7 @@ const githubCreateIssue = require( './githubCreateIssue' );
 const gitPull = require( './gitPull' );
 const Patch = require( './Patch' );
 const ReleaseBranch = require( './ReleaseBranch' );
-const SimVersion = require( '../dual/SimVersion' );
+const SimVersion = require( '../common/SimVersion' );
 
 module.exports = ( function() {
 

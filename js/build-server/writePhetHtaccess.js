@@ -3,7 +3,7 @@
 
 const constants = require( './constants' );
 const request = require( 'request' );
-const SimVersion = require( '../dual/SimVersion' );
+const SimVersion = require( '../common/SimVersion' );
 const writeFile = require( '../common/writeFile' );
 
 /**
