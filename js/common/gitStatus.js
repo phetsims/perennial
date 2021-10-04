@@ -7,7 +7,7 @@
  */
 
 
-const execute = require( '../dual/execute' );
+const execute = require( '../common/execute' );
 const getBranch = require( './getBranch' );
 const getRemoteBranchSHAs = require( './getRemoteBranchSHAs' );
 const gitRevParse = require( './gitRevParse' );

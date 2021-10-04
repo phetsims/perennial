@@ -7,7 +7,7 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-const execute = require( '../dual/execute' );
+const execute = require( '../common/execute' );
 const fs = require( 'fs' );
 const gruntCommand = require( '../common/gruntCommand' );
 const winston = require( 'winston' );

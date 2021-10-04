@@ -8,7 +8,7 @@
 
 
 const assert = require( 'assert' );
-const execute = require( '../../dual/execute' );
+const execute = require( '../../common/execute' );
 const copyFile = require( '../../common/copyFile' );
 const getPreloads = require( './getPreloads' );
 const SimVersion = require( '../../dual/SimVersion' );
