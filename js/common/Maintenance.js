@@ -688,6 +688,7 @@ module.exports = ( function() {
             else {
               // Look up the SHA to check out
               await gitCheckout( repo, branch );
+              await gitPull( repo );
               const dependencies = await getDependencies( repo );
               const sha = dependencies[ patchRepo ].sha;
               await gitCheckout( repo, 'master' );
