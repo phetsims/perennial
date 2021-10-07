@@ -9,8 +9,8 @@
 
 const buildLocal = require( '../common/buildLocal' );
 const assert = require( 'assert' );
-const request = require( 'request' );
 const winston = require( 'winston' );
+const axios = require( 'axios' );
 
 /**
  * Sends a request to the build server.
@@ -24,51 +24,48 @@ const winston = require( 'winston' );
  * @returns {Promise} - No resolved value
  */
 module.exports = async function( repo, version, branch, dependencies, options ) {
-  return new Promise( ( resolve, reject ) => {
 
-    const {
-      locales = '*',
-      brands = [ 'phet', 'phet-io' ],
-      servers = [ 'dev' ] // {Array.<string>}, currently 'dev' and 'production' are supported
-    } = options || {};
+  const {
+    locales = '*',
+    brands = [ 'phet', 'phet-io' ],
+    servers = [ 'dev' ] // {Array.<string>}, currently 'dev' and 'production' are supported
+  } = options || {};
 
-    winston.info( `sending build request for ${repo} ${version.toString()} with dependencies: ${JSON.stringify( dependencies )}` );
+  winston.info( `sending build request for ${repo} ${version.toString()} with dependencies: ${JSON.stringify( dependencies )}` );
 
-    servers.forEach( server => assert( [ 'dev', 'production' ].includes( server ), `Unknown server: ${server}` ) );
+  servers.forEach( server => assert( [ 'dev', 'production' ].includes( server ), `Unknown server: ${server}` ) );
 
-    const requestObject = {
-      api: '2.0',
-      dependencies: JSON.stringify( dependencies ),
-      simName: repo,
-      version: version.toString(),
-      locales: locales,
-      servers: servers,
-      brands: brands,
-      branch: branch,
-      authorizationCode: buildLocal.buildServerAuthorizationCode
-    };
-    if ( buildLocal.buildServerNotifyEmail ) {
-      requestObject.email = buildLocal.buildServerNotifyEmail;
-    }
+  const requestObject = {
+    api: '2.0',
+    dependencies: JSON.stringify( dependencies ),
+    simName: repo,
+    version: version.toString(),
+    locales: locales,
+    servers: servers,
+    brands: brands,
+    branch: branch,
+    authorizationCode: buildLocal.buildServerAuthorizationCode
+  };
+  if ( buildLocal.buildServerNotifyEmail ) {
+    requestObject.email = buildLocal.buildServerNotifyEmail;
+  }
 
-    const url = `${buildLocal.productionServerURL}/deploy-html-simulation`;
+  const url = `${buildLocal.productionServerURL}/deploy-html-simulation`;
 
-    winston.info( url );
-    winston.info( JSON.stringify( requestObject ) );
+  winston.info( url );
+  winston.info( JSON.stringify( requestObject ) );
 
-    request.post( { url: url, json: requestObject }, ( error, response, body ) => {
-      if ( error ) {
-        reject( new Error( `Build request failed with error ${error}.` ) );
-      }
-      else if ( response.statusCode !== 200 && response.statusCode !== 202 ) {
-        reject( new Error( `Build request failed with status code ${response.statusCode}.` ) );
-      }
-      else {
-        winston.info( 'Build request sent successfully' );
-        resolve();
-      }
-    } );
-
-    winston.info( `request sent: ${url}` );
-  } );
+  let response;
+  try {
+    response = await axios( { method: 'POST', url: url, data: requestObject } );
+  }
+  catch( error ) {
+    throw new Error( `Build request failed with error ${error}.` );
+  }
+  if ( response.status !== 200 && response.status !== 202 ) {
+    throw new Error( `Build request failed with error ${response.status}.` );
+  }
+  else {
+    winston.info( 'Build request sent successfully' );
+  }
 };

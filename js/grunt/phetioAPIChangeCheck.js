@@ -13,13 +13,12 @@
  * @author Chris Klusendorf (PhET Interactive Simulations)
  */
 
-
 const booleanPrompt = require( '../common/booleanPrompt' );
 const buildLocal = require( '../common/buildLocal' );
 const assert = require( 'assert' );
 const grunt = require( 'grunt' );
 const _ = require( 'lodash' ); // eslint-disable-line
-const request = require( 'request-promise-native' ); //eslint-disable-line
+const axios = require( 'axios' );
 
 /**
  * @param {string} repo
@@ -34,7 +33,7 @@ module.exports = async ( repo, version, onError = async () => {}, noninteractive
 
   const metadataURL = `${buildLocal.productionServerURL
   }/services/metadata/phetio?name=${repo}&versionMajor=${version.major}&versionMinor=${version.minor}&latest=true`;
-  const versions = JSON.parse( await request( metadataURL ) );
+  const versions = ( await axios( metadataURL ) ).data;
 
   // if there is no previously published version for this minor, no API comparison is needed
   // if an API file doesn't exist for this phet-io version, then no API comparison is needed
@@ -47,7 +46,7 @@ module.exports = async ( repo, version, onError = async () => {}, noninteractive
   const latestVersionString = `${latestVersion.versionMajor}.${latestVersion.versionMinor}.${latestVersion.versionMaintenance}`;
 
   const latestDeployedURL = `https://phet-io.colorado.edu/sims/${repo}/${latestVersionString}/${phetioAPIFileName}`;
-  const latestDeployedVersionAPI = JSON.parse( await request( latestDeployedURL ) );
+  const latestDeployedVersionAPI = ( await axios( latestDeployedURL ) ).data;
 
   const builtVersionAPI = JSON.parse( grunt.file.read( builtVersionAPIFile ) );
 

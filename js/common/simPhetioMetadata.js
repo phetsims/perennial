@@ -6,10 +6,9 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const _ = require( 'lodash' ); // eslint-disable-line
-const request = require( 'request' );
 const winston = require( 'winston' );
+const axios = require( 'axios' );
 
 /**
  * Returns metadata from the production website.
@@ -18,30 +17,33 @@ const winston = require( 'winston' );
  * @param {Object} [options]
  * @returns {Promise.<Object>} - Resolves with metadata object
  */
-module.exports = function( options ) {
-  return new Promise( ( resolve, reject ) => {
-    options = _.extend( {
-      active: null, // {boolean|null} - If set, will only include active branches
-      latest: null // {boolean|null} - If set, will only include active branches
-    }, options );
+module.exports = async function( options ) {
+  options = _.extend( {
+    active: null, // {boolean|null} - If set, will only include active branches
+    latest: null // {boolean|null} - If set, will only include active branches
+  }, options );
 
-    let metadataURL = 'https://phet.colorado.edu/services/metadata/phetio?';
-    if ( options.active !== null ) {
-      metadataURL += `&active=${options.active}`;
-    }
-    if ( options.latest !== null ) {
-      metadataURL += `&latest=${options.latest}`;
-    }
+  let metadataURL = 'https://phet.colorado.edu/services/metadata/phetio?';
+  if ( options.active !== null ) {
+    metadataURL += `&active=${options.active}`;
+  }
+  if ( options.latest !== null ) {
+    metadataURL += `&latest=${options.latest}`;
+  }
 
-    winston.info( `getting phet-io metadata request with ${metadataURL}` );
+  winston.info( `getting phet-io metadata request with ${metadataURL}` );
+  let response;
+  try {
+    response = await axios( metadataURL );
+  }
+  catch( e ) {
+    throw new Error( `metadata request failed with ${e}` );
+  }
 
-    request( metadataURL, ( requestError, requestResponse, requestBody ) => {
-      if ( requestError || requestResponse.statusCode !== 200 ) {
-        reject( new Error( `metadata request failed with ${requestResponse.statusCode}: ${requestError}` ) );
-      }
-      else {
-        resolve( JSON.parse( requestBody ) );
-      }
-    } );
-  } );
+  if ( response.status !== 200 ) {
+    throw new Error( `metadata request failed with status ${response.status} ${response}` );
+  }
+  else {
+    return response.data;
+  }
 };

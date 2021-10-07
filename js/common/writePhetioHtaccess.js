@@ -1,12 +1,11 @@
 // Copyright 2017-2019, University of Colorado Boulder
 
-
 const buildLocal = require( './buildLocal' );
 const devScp = require( '../common/devScp' );
 const fs = require( 'graceful-fs' ); //eslint-disable-line
-const request = require( 'request-promise-native' ); //eslint-disable-line
 const winston = require( 'winston' );
 const writeFile = require( './writeFile' );
+const axios = require( 'axios' );
 
 // A list of directories directly nested under the phet-io build output folder that should be password protected. Slashes
 // added later.
@@ -34,7 +33,7 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
       const redirectFilepath = `${latestOption.directory + latestOption.simName}/.htaccess`;
       let latestRedirectContents = 'RewriteEngine on\n' +
                                    `RewriteBase /sims/${latestOption.simName}/\n`;
-      const versions = JSON.parse( await request( `${buildLocal.productionServerURL}/services/metadata/phetio?name=${latestOption.simName}&latest=true` ) );
+      const versions = ( await axios( `${buildLocal.productionServerURL}/services/metadata/phetio?name=${latestOption.simName}&latest=true` ) ).data;
       for ( const v of versions ) {
         // Add a trailing slash to /sims/sim-name/x.y
         latestRedirectContents += `RewriteRule ^${v.versionMajor}.${v.versionMinor}$ ${v.versionMajor}.${v.versionMinor}/ [R=301,L]\n`;
