@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const ChipperVersion = require( '../common/ChipperVersion' );
+const ChipperVersion = require( './ChipperVersion' );
 const copyFile = require( './copyFile' );
 const gitAdd = require( './gitAdd' );
 const gitCommit = require( './gitCommit' );

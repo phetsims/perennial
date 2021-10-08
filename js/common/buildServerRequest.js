@@ -6,10 +6,10 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const buildLocal = require( '../common/buildLocal' );
+const buildLocal = require( './buildLocal' );
 const assert = require( 'assert' );
-const winston = require( 'winston' );
 const axios = require( 'axios' );
+const winston = require( 'winston' );
 
 /**
  * Sends a request to the build server.

@@ -7,10 +7,10 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-const ChipperVersion = require( '../common/ChipperVersion' );
-const gruntCommand = require( '../common/gruntCommand' );
-const loadJSON = require( '../common/loadJSON' );
+const ChipperVersion = require( './ChipperVersion' );
 const execute = require( './execute' );
+const gruntCommand = require( './gruntCommand' );
+const loadJSON = require( './loadJSON' );
 const fs = require( 'fs' );
 const winston = require( 'winston' );
 

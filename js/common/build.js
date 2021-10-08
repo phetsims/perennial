@@ -6,9 +6,9 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const ChipperVersion = require( '../common/ChipperVersion' );
-const gruntCommand = require( '../common/gruntCommand' );
+const ChipperVersion = require( './ChipperVersion' );
 const execute = require( './execute' );
+const gruntCommand = require( './gruntCommand' );
 const assert = require( 'assert' );
 const fs = require( 'fs' );
 const winston = require( 'winston' );

@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const SimVersion = require( '../common/SimVersion' );
+const SimVersion = require( './SimVersion' );
 const loadJSON = require( './loadJSON' );
 const winston = require( 'winston' );
 
