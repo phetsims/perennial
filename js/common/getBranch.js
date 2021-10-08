@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( '../common/execute' );
+const execute = require( './execute' );
 
 /**
  * Returns the branch (if any) that the repository is on.

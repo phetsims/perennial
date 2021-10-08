@@ -7,12 +7,12 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-const execute = require( '../common/execute' );
-const fs = require( 'fs' );
-const gruntCommand = require( '../common/gruntCommand' );
-const winston = require( 'winston' );
 const ChipperVersion = require( '../common/ChipperVersion' );
+const gruntCommand = require( '../common/gruntCommand' );
 const loadJSON = require( '../common/loadJSON' );
+const execute = require( './execute' );
+const fs = require( 'fs' );
+const winston = require( 'winston' );
 
 /**
  * Outputs JS for a directory
