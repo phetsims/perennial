@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const execute = require( '../common/execute' );
 const getBranch = require( './getBranch' );
 const getRemoteBranchSHAs = require( './getRemoteBranchSHAs' );

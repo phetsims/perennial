@@ -11,7 +11,6 @@
  * TODO https://github.com/phetsims/tasks/issues/942 This is a "quick" version which could benefit from documentation, better command line hygiene, more options, etc.
  */
 
-
 const { exec } = require( 'child_process' ); // eslint-disable-line
 
 exec( 'git rev-list master', ( error, stdout, stderr ) => {

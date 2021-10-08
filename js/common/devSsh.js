@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const buildLocal = require( './buildLocal' );
 const ssh = require( './ssh' );
 

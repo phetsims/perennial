@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const ChipperVersion = require( './ChipperVersion' );
 const build = require( './build' );
 const checkoutMaster = require( './checkoutMaster' );

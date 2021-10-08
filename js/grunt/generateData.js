@@ -16,7 +16,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const getActiveRepos = require( '../common/getActiveRepos' );
 const getBranch = require( '../common/getBranch' );
 const gitAdd = require( '../common/gitAdd' );

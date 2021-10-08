@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const ChipperVersion = require( '../common/ChipperVersion' );
 const execute = require( '../common/execute' );
 const gruntCommand = require( '../common/gruntCommand' );

@@ -6,7 +6,6 @@
  * without worrying about an older version of chipper being checked out.
  */
 
-
 const Maintenance = require( '../common/Maintenance' );
 const ReleaseBranch = require( '../common/ReleaseBranch' );
 const assertIsValidRepoName = require( '../common/assertIsValidRepoName' );

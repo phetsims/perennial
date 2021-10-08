@@ -6,7 +6,6 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-
 // constants
 const NODE_VERSION_STRING_PARTS = process.version.replace( 'v', '' ).split( '.' );
 const NODE_MAJOR_VERSION = parseInt( NODE_VERSION_STRING_PARTS[ 0 ], 10 );

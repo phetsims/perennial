@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const production = require( '../grunt/production' );
 const rc = require( '../grunt/rc' );
 const ChipperVersion = require( './ChipperVersion' );

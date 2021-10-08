@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 /**
  * Sleeps for a certain number of milliseconds
  * @public

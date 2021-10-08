@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const SimVersion = require( '../common/SimVersion' );
 const build = require( '../common/build' );
 const copyFile = require( '../common/copyFile' );

@@ -7,7 +7,6 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-
 const http = require( 'http' );
 const fs = require( 'fs' );
 const _ = require( 'lodash' ); // eslint-disable-line require-statement-match

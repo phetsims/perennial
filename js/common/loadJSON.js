@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const fs = require( 'fs' );
 const winston = require( 'winston' );
 

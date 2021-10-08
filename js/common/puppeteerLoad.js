@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const sleep = require( './sleep' );
 const _ = require( 'lodash' ); // eslint-disable-line
 const puppeteer = require( 'puppeteer' );

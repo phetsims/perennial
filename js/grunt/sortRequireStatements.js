@@ -6,7 +6,6 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-
 // 3rd-party packages
 const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
 const grunt = require( 'grunt' );

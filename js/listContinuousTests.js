@@ -7,7 +7,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const getActiveRepos = require( './common/getActiveRepos' );
 const getRepoList = require( './common/getRepoList' );
 const fs = require( 'fs' );

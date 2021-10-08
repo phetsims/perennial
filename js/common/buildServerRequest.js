@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const buildLocal = require( '../common/buildLocal' );
 const assert = require( 'assert' );
 const winston = require( 'winston' );

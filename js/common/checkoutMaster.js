@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const getDependencies = require( './getDependencies' );
 const gitCheckout = require( './gitCheckout' );
 const npmUpdate = require( './npmUpdate' );

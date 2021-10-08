@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const buildLocal = require( './buildLocal' );
 const Octokit = require( '@octokit/rest' ); // eslint-disable-line
 const _ = require( 'lodash' ); // eslint-disable-line

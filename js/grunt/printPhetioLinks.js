@@ -8,7 +8,6 @@
  * @author Chris Klusendorf (PhET Interactive Simulations)
  */
 
-
 const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
 const getDependencies = require( '../common/getDependencies' );
 const gitCheckout = require( '../common/gitCheckout' );

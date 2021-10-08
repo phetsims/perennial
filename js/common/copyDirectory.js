@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const ncp = require( 'ncp' );
 const winston = require( 'winston' );
 

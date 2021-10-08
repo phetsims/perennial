@@ -18,7 +18,6 @@
  * @author Chris Malley (PixelZoom, Inc.)
  */
 
-
 const _ = require( 'lodash' ); // eslint-disable-line
 const assert = require( 'assert' );
 const execute = require( '../common/execute' );

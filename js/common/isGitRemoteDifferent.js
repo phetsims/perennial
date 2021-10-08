@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const assert = require( 'assert' );
 const getBranch = require( './getBranch' );
 const getRemoteBranchSHAs = require( './getRemoteBranchSHAs' );

@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const getActiveRepos = require( '../common/getActiveRepos' );
 const gitStatus = require( '../common/gitStatus' );
 const winston = require( 'winston' );

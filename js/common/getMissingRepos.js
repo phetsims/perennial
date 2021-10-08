@@ -6,7 +6,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const getRepoList = require( './getRepoList' );
 const fs = require( 'fs' );
 
