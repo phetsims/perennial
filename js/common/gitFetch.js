@@ -1,7 +1,7 @@
-// Copyright 2017, University of Colorado Boulder
+// Copyright 2021, University of Colorado Boulder
 
 /**
- * git pull
+ * git fetch
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
@@ -10,7 +10,7 @@ const execute = require( '../common/execute' );
 const winston = require( 'winston' );
 
 /**
- * Executes git pull
+ * Executes git fetch
  * @public
  *
  * @param {string} repo - The repository name
@@ -18,7 +18,7 @@ const winston = require( 'winston' );
  * @rejects {ExecuteError}
  */
 module.exports = function( repo ) {
-  winston.info( `git pull on ${repo}` );
+  winston.info( `git fetch on ${repo}` );
 
-  return execute( 'git', [ 'pull' ], `../${repo}` );
+  return execute( 'git', [ 'fetch' ], `../${repo}` );
 };

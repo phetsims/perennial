@@ -6,8 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
-const gitCheckout = require( './gitCheckout' );
+const gitFetchCheckout = require( './gitFetchCheckout' );
 const npmUpdate = require( './npmUpdate' );
 const winston = require( 'winston' );
 
@@ -38,7 +37,7 @@ module.exports = async function( repo, dependencies, includeNpmUpdate ) {
       throw new Error( `Missing sha for ${dependencyRepoName} in ${repo}` );
     }
 
-    await gitCheckout( dependencyRepoName, sha );
+    await gitFetchCheckout( dependencyRepoName, sha );
   }
 
   if ( includeNpmUpdate ) {
