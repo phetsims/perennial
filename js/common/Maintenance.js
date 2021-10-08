@@ -29,7 +29,6 @@ const gitIsClean = require( './gitIsClean' );
 const gitPull = require( './gitPull' );
 const gitPush = require( './gitPush' );
 const gitRevParse = require( './gitRevParse' );
-const npmUpdate = require( './npmUpdate' );
 const assert = require( 'assert' );
 const fs = require( 'fs' );
 const repl = require( 'repl' );
@@ -798,13 +797,6 @@ module.exports = ( function() {
             delete modifiedBranch.changedDependencies[ dependency ];
             modifiedBranch.deployedVersion = null;
             maintenance.save(); // save here in case a future failure would "revert" things
-          }
-
-          if ( changedRepos.includes( 'chipper' ) ) {
-            await npmUpdate( 'chipper' );
-          }
-          if ( changedRepos.includes( 'perennial-alias' ) ) {
-            await npmUpdate( 'perennial-alias' );
           }
 
           const message = modifiedBranch.pendingMessages.join( ' and ' );
