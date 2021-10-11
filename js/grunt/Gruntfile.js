@@ -4,12 +4,21 @@
  * Grunt configuration file for tasks that have no dependencies on other repos.
  * In particular, grunt checkout-shas and grunt checkout-master can be run from here
  * without worrying about an older version of chipper being checked out.
+ *
+ * In general when possible, modules are imported lazily in their task
+ * declaration to save on overall load time of this file. The pattern is to require all modules needed at the top of the
+ * grunt task registration. If a module is used in multiple tasks, it is best to lazily require in each
+ * task.
  */
 
+///////////////////////////
+// NOTE: to improve performance, the vast majority of modules are lazily imported in task registrations. Even duplicating
+// require statements improves the load time of this file noticeably. For details, see https://github.com/phetsims/chipper/issues/1107
 const assertIsValidRepoName = require( '../common/assertIsValidRepoName' );
 const assert = require( 'assert' );
 const _ = require( 'lodash' ); // eslint-disable-line
 require( './checkNodeVersion' );
+///////////////////////////
 
 module.exports = function( grunt ) {
 
