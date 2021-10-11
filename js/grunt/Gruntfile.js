@@ -6,45 +6,16 @@
  * without worrying about an older version of chipper being checked out.
  */
 
-const Maintenance = require( '../common/Maintenance' );
-const ReleaseBranch = require( '../common/ReleaseBranch' );
 const assertIsValidRepoName = require( '../common/assertIsValidRepoName' );
-const checkoutDependencies = require( '../common/checkoutDependencies' );
-const checkoutMaster = require( '../common/checkoutMaster' );
-const checkoutRelease = require( '../common/checkoutRelease' );
-const checkoutTarget = require( '../common/checkoutTarget' );
-const checkoutTimestamp = require( '../common/checkoutTimestamp' );
-const cloneMissingRepos = require( '../common/cloneMissingRepos' );
-const execute = require( '../common/execute' );
-const getBranch = require( '../common/getBranch' );
-const getDataFile = require( '../common/getDataFile' );
-const gruntCommand = require( '../common/gruntCommand' );
-const npmUpdate = require( '../common/npmUpdate' );
-const simMetadata = require( '../common/simMetadata' );
-const updateGithubPages = require( '../common/updateGithubPages' );
-const checkoutMasterAll = require( './checkoutMasterAll' );
-const cherryPick = require( './cherryPick' );
-const createOneOff = require( './createOneOff' );
-const createRelease = require( './createRelease' );
-const createSim = require( './createSim' );
-const buildDecaf = require( './decaf/buildDecaf' );
-const deployDecaf = require( './decaf/deployDecaf' );
-const deployImages = require( './deployImages' );
-const dev = require( './dev' );
-const generateData = require( './generateData' );
-const printPhetioLinks = require( './printPhetioLinks' );
-const production = require( './production' );
-const rc = require( './rc' );
-const shaCheck = require( './shaCheck' );
-const wrapper = require( './wrapper' );
 const assert = require( 'assert' );
 const _ = require( 'lodash' ); // eslint-disable-line
-const winston = require( 'winston' );
 require( './checkNodeVersion' );
 
 module.exports = function( grunt ) {
 
   if ( grunt.option( 'debug' ) ) {
+    const winston = require( 'winston' );
+
     winston.default.transports.console.level = 'debug';
   }
 
@@ -99,6 +70,8 @@ module.exports = function( grunt ) {
     wrapTask( async () => {
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
+      const checkoutDependencies = require( '../common/checkoutDependencies' );
+
       const buildServer = !!grunt.option( 'buildServer' );
 
       const repo = grunt.option( 'repo' );
@@ -116,11 +89,14 @@ module.exports = function( grunt ) {
     '--target : the branch/SHA to check out\n' +
     '--skipNpmUpdate : If provided, will prevent the usual npm update',
     wrapTask( async () => {
-      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+      const repo = grunt.option( 'repo' );
+
+      assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'target' ), 'Requires specifying a branch/SHA with --target={{BRANCH}}' );
 
-      const repo = grunt.option( 'repo' );
       assertIsValidRepoName( repo );
+
+      const checkoutTarget = require( '../common/checkoutTarget' );
 
       await checkoutTarget( repo, grunt.option( 'target' ), !grunt.option( 'skipNpmUpdate' ) );
     } ) );
@@ -130,9 +106,11 @@ module.exports = function( grunt ) {
     '--repo : repository name where package.json should be read from\n' +
     '--skipNpmUpdate : If provided, will prevent the usual npm update',
     wrapTask( async () => {
-      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+      const checkoutRelease = require( '../common/checkoutRelease' );
 
       const repo = grunt.option( 'repo' );
+
+      assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assertIsValidRepoName( repo );
 
       await checkoutRelease( repo, !grunt.option( 'skipNpmUpdate' ) );
@@ -144,11 +122,14 @@ module.exports = function( grunt ) {
     '--timestamp : the timestamp to check things out for, e.g. --timestamp="Jan 08 2018"\n' +
     '--skipNpmUpdate : If provided, will prevent the usual npm update',
     wrapTask( async () => {
-      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+      const repo = grunt.option( 'repo' );
+
+      assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'timestamp' ), 'Requires specifying a timestamp with --timestamp={{BRANCH}}' );
 
-      const repo = grunt.option( 'repo' );
       assertIsValidRepoName( repo );
+
+      const checkoutTimestamp = require( '../common/checkoutTimestamp' );
 
       await checkoutTimestamp( repo, grunt.option( 'timestamp' ), !grunt.option( 'skipNpmUpdate' ) );
     } ) );
@@ -158,9 +139,12 @@ module.exports = function( grunt ) {
     '--repo : repository name where package.json should be read from\n' +
     '--skipNpmUpdate : If provided, will prevent the usual npm update',
     wrapTask( async () => {
-      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
-
       const repo = grunt.option( 'repo' );
+
+      assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+
+      const checkoutMaster = require( '../common/checkoutMaster' );
+
       assertIsValidRepoName( repo );
 
       await checkoutMaster( repo, !grunt.option( 'skipNpmUpdate' ) );
@@ -169,6 +153,8 @@ module.exports = function( grunt ) {
   grunt.registerTask( 'checkout-master-all',
     'Check out master branch for all repos in git root',
     wrapTask( async () => {
+      const checkoutMasterAll = require( './checkoutMasterAll' );
+
       checkoutMasterAll();
     } ) );
 
@@ -180,18 +166,23 @@ module.exports = function( grunt ) {
       const repo = grunt.option( 'repo' );
       assertIsValidRepoName( repo );
 
+      const shaCheck = require( './shaCheck' );
+
       await shaCheck( repo, grunt.option( 'sha' ) );
     } ) );
 
   grunt.registerTask( 'print-phet-io-links',
     'Print the current list of all phet-io sims\' links',
     wrapTask( async () => {
+      const printPhetioLinks = require( './printPhetioLinks' );
       await printPhetioLinks();
     } ) );
 
   grunt.registerTask( 'update-gh-pages',
     'Updates the gh-pages branches for various repos, including building of dot/kite/scenery',
     wrapTask( async () => {
+      const updateGithubPages = require( '../common/updateGithubPages' );
+
       await updateGithubPages();
     } ) );
 
@@ -199,6 +190,9 @@ module.exports = function( grunt ) {
     'Prints out a list of live production HTML sims to stderr (can be filtered from other stdout output)\n' +
     '--versions : Outputs the sim version after its name.',
     wrapTask( async () => {
+      const simMetadata = require( '../common/simMetadata' );
+      const winston = require( 'winston' );
+
       winston.default.transports.console.level = 'error';
       const data = await simMetadata( {
         summary: true,
@@ -220,6 +214,9 @@ module.exports = function( grunt ) {
     '--repo : Only show branches for a specific repository\n' +
     '--order=<ORDER> : alphabetical|date',
     wrapTask( async () => {
+      const ReleaseBranch = require( '../common/ReleaseBranch' );
+      const winston = require( 'winston' );
+
       winston.default.transports.console.level = 'error';
 
       const repo = grunt.option( 'repo' );
@@ -255,9 +252,11 @@ module.exports = function( grunt ) {
     'Runs npm update/prune for chipper, perennial-alias and the given repository\n' +
     '--repo : The repository to update',
     wrapTask( async () => {
-      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+      const npmUpdate = require( '../common/npmUpdate' );
 
       const repo = grunt.option( 'repo' );
+      assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+
       assertIsValidRepoName( repo );
 
       await npmUpdate( repo ).then( () => npmUpdate( 'chipper' ) ).then( () => npmUpdate( 'perennial-alias' ) );
@@ -269,6 +268,8 @@ module.exports = function( grunt ) {
     '--branch : The branch name, which should be {{MAJOR}}.{{MINOR}}, e.g. 1.0\n' +
     '--message : An optional message that will be appended on version-change commits.',
     wrapTask( async () => {
+      const createRelease = require( './createRelease' );
+
       const repo = grunt.option( 'repo' );
       assertIsValidRepoName( repo );
 
@@ -287,6 +288,8 @@ module.exports = function( grunt ) {
     '--branch : The branch/one-off name, which should be anything without dashes or periods\n' +
     '--message : An optional message that will be appended on version-change commits.',
     wrapTask( async () => {
+      const createOneOff = require( './createOneOff' );
+
       const repo = grunt.option( 'repo' );
       assertIsValidRepoName( repo );
 
@@ -304,10 +307,13 @@ module.exports = function( grunt ) {
     '--repo : The repository to cherry-pick on\n' +
     '--shas : Comma-separated list of SHAs to try',
     wrapTask( async () => {
-      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
-      assert( grunt.option( 'shas' ), 'Requires specifying a comma-separated list of SHAs with --shas={{SHAS}}' );
+      const cherryPick = require( './cherryPick' );
 
       const repo = grunt.option( 'repo' );
+
+      assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+      assert( grunt.option( 'shas' ), 'Requires specifying a comma-separated list of SHAs with --shas={{SHAS}}' );
+
       assertIsValidRepoName( repo );
 
       const shas = grunt.option( 'shas' ).split( ',' );
@@ -316,6 +322,8 @@ module.exports = function( grunt ) {
     } ) );
 
   grunt.registerTask( 'lint', 'Lints this repository only', wrapTask( async () => {
+    const execute = require( '../common/execute' );
+    const gruntCommand = require( '../common/gruntCommand' );
 
     const index = process.argv.indexOf( 'lint' );
     assert && assert( index >= 0, 'lint command does not appear' );
@@ -340,6 +348,8 @@ module.exports = function( grunt ) {
       const repo = grunt.option( 'repo' );
       assertIsValidRepoName( repo );
 
+      const wrapper = require( './wrapper' );
+
       await wrapper( repo, noninteractive, grunt.option( 'message' ) );
     } ) );
 
@@ -350,6 +360,7 @@ module.exports = function( grunt ) {
     '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out\n' +
     '--message : An optional message that will be appended on version-change commits.',
     wrapTask( async () => {
+      const dev = require( './dev' );
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
@@ -364,6 +375,8 @@ module.exports = function( grunt ) {
     '--branch : The chipper branch to use for image generation\n' +
     '--brands : A comma-separated list of brand names to deploy, currently only phet supported',
     wrapTask( async () => {
+      const deployImages = require( './deployImages' );
+
       const brands = grunt.option( 'brands' ) || 'phet';
       const branch = grunt.option( 'branch' ) || 'master';
 
@@ -378,6 +391,10 @@ module.exports = function( grunt ) {
     '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out\n' +
     '--message : An optional message that will be appended on version-change commits.',
     wrapTask( async () => {
+
+      const getBranch = require( '../common/getBranch' );
+      const dev = require( './dev' );
+
       const repo = grunt.option( 'repo' );
       assertIsValidRepoName( repo );
 
@@ -411,6 +428,8 @@ module.exports = function( grunt ) {
       const repo = grunt.option( 'repo' );
       assertIsValidRepoName( repo );
 
+      const rc = require( './rc' );
+
       await rc( repo, grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ), noninteractive, grunt.option( 'message' ) );
     } ) );
 
@@ -422,6 +441,8 @@ module.exports = function( grunt ) {
     '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out\n' +
     '--message : An optional message that will be appended on version-change commits.',
     wrapTask( async () => {
+      const production = require( './production' );
+
       assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( grunt.option( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
@@ -436,6 +457,8 @@ module.exports = function( grunt ) {
     'Deploys a decaf version of the simulation\n' +
     '--project : The name of the project to deploy',
     wrapTask( async () => {
+      const deployDecaf = require( './decaf/deployDecaf' );
+
       assert( grunt.option( 'project' ), 'Requires specifying a repository with --project={{PROJECT}}' );
       assert( grunt.option( 'dev' ) || grunt.option( 'production' ), 'Requires at least one of --dev or --production' );
       await deployDecaf( grunt.option( 'project' ), !!grunt.option( 'dev' ), !!grunt.option( 'production' ) );
@@ -445,6 +468,8 @@ module.exports = function( grunt ) {
     'Builds a decaf version of the simulation\n' +
     '--project : The name of the project to deploy',
     wrapTask( async () => {
+      const buildDecaf = require( './decaf/buildDecaf' );
+
       assert( grunt.option( 'project' ), 'Requires specifying a repository with --project={{PROJECT}}' );
       await buildDecaf( grunt.option( 'project' ), grunt.option( 'preloadResources' ) );
     } ) );
@@ -456,6 +481,8 @@ module.exports = function( grunt ) {
     '--title="string" : (optional) the simulation title\n' +
     '--clean=true : (optional) deletes the repository directory if it exists',
     wrapTask( async () => {
+      const createSim = require( './createSim' );
+
       const repo = grunt.option( 'repo' );
       assertIsValidRepoName( repo );
 
@@ -470,6 +497,7 @@ module.exports = function( grunt ) {
     } ) );
 
   grunt.registerTask( 'lint-everything', 'lint all js files for all repos', wrapTask( async () => {
+    const getDataFile = require( '../common/getDataFile' );
 
     // --disable-eslint-cache disables the cache, useful for developing rules
     const cache = !grunt.option( 'disable-eslint-cache' );
@@ -489,28 +517,39 @@ module.exports = function( grunt ) {
   } ) );
 
   grunt.registerTask( 'generate-data', 'Generates the lists under perennial/data/, and if there were changes, will commit and push.', wrapTask( async () => {
+    const generateData = require( './generateData' );
     await generateData( grunt );
   } ) );
 
   grunt.registerTask( 'clone-missing-repos', 'Clones missing repos', wrapTask( async () => {
+    const cloneMissingRepos = require( '../common/cloneMissingRepos' );
+
     await cloneMissingRepos();
   } ) );
 
   grunt.registerTask( 'maintenance', 'Starts a maintenance REPL', wrapTask( async () => {
+    const Maintenance = require( '../common/Maintenance' );
+
     await Maintenance.startREPL();
   } ) );
 
   grunt.registerTask( 'maintenance-check-branch-status', 'Reports out on release branch statuses', wrapTask( async () => {
+    const Maintenance = require( '../common/Maintenance' );
+    const winston = require( 'winston' );
+
     winston.default.transports.console.level = 'error';
 
     await Maintenance.checkBranchStatus();
   } ) );
 
   grunt.registerTask( 'maintenance-list', 'Lists out the current maintenance process state', wrapTask( async () => {
+    const Maintenance = require( '../common/Maintenance' );
     await Maintenance.list();
   } ) );
 
   grunt.registerTask( 'maintenance-create-patch', 'Adds a patch to the maintenance process', wrapTask( async () => {
+    const Maintenance = require( '../common/Maintenance' );
+
     const repo = grunt.option( 'repo' );
     assertIsValidRepoName( repo );
 
