@@ -6,7 +6,7 @@ const gitPull = require( '../common/gitPull' );
 const constants = require( './constants' );
 const fs = require( 'fs' );
 const axios = require( 'axios' );
-const checkoutMasterAll = require( '../common/checkoutMasterAll' );
+const checkoutMasterAll = require( '../grunt/checkoutMasterAll.js' );
 
 const chipperDir = '../chipper';
 const perennialAliasDir = '../perennial-alias';
@@ -16,7 +16,7 @@ const processSim = async ( simulation, brands, version ) => {
   const repoDir = `../${simulation}`;
 
   // Get master
-  await checkoutMasterAll();
+  await execute( 'grunt', [ 'checkout-master-all' ], './' );
   await gitPull( simulation );
 
   let brandsArray;
