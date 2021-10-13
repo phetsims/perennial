@@ -6,7 +6,6 @@ const gitPull = require( '../common/gitPull' );
 const constants = require( './constants' );
 const fs = require( 'fs' );
 const axios = require( 'axios' );
-const checkoutMasterAll = require( '../grunt/checkoutMasterAll.js' );
 
 const chipperDir = '../chipper';
 const perennialAliasDir = '../perennial-alias';

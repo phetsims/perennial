@@ -162,7 +162,7 @@ module.exports = function( grunt ) {
   grunt.registerTask( 'checkout-master-all',
     'Check out master branch for all repos in git root',
     wrapTask( async () => {
-      const checkoutMasterAll = require( './checkoutMasterAll.js' );
+      const checkoutMasterAll = require( './checkoutMasterAll' );
 
       checkoutMasterAll();
     } ) );
