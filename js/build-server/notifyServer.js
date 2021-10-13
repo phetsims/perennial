@@ -44,10 +44,10 @@ module.exports = async function notifyServer( options ) {
     let errorMessage;
 
     if ( response.status === 200 ) {
-      const syncResponse = response.data;
+      const data = response.data;
 
-      if ( !syncResponse.success ) {
-        errorMessage = `request to synchronize project ${project} on ${constants.BUILD_SERVER_CONFIG.productionServerName} failed with message: ${syncResponse.error}`;
+      if ( !data.success ) {
+        errorMessage = `request to synchronize project ${project} on ${constants.BUILD_SERVER_CONFIG.productionServerName} failed with message: ${data.error}`;
         winston.log( 'error', errorMessage );
         sendEmail( 'SYNCHRONIZE FAILED', errorMessage, options.email );
       }
@@ -81,7 +81,7 @@ module.exports = async function notifyServer( options ) {
           username: 'token',
           password: constants.BUILD_SERVER_CONFIG.serverToken,
         }
-      } )
+      } );
     }
     catch( e ) {
       throw new Error( e );
@@ -100,11 +100,11 @@ module.exports = async function notifyServer( options ) {
       return reject( new Error( 'PHET_IO DEPLOYMENT UPSERT FAILED' ) );
     }
     else {
-      const response = response.data;
+      const data = response.data;
 
-      if ( !response.success ) {
+      if ( !data.success ) {
         try {
-          errorMessage = response.data.error;
+          errorMessage = data.error;
         }
         catch( e ) {
           errorMessage = 'request to upsert phetio deployment failed';
