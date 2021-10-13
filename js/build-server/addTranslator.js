@@ -21,7 +21,7 @@ module.exports = async function addTranslator( locale, simName, translatorId ) {
 
   // send the request
   try {
-    let response = await axios( addTranslatorURL );
+    const response = await axios( addTranslatorURL );
     winston.log( 'info', `request to add translator credit info returned code: ${response.status}` );
   }
   catch( error ) {

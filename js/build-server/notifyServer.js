@@ -34,9 +34,9 @@ module.exports = async function notifyServer( options ) {
         url: url,
         auth: {
           username: 'token',
-          password: constants.BUILD_SERVER_CONFIG.serverToken,
+          password: constants.BUILD_SERVER_CONFIG.serverToken
         }
-      } )
+      } );
     }
     catch( e ) {
       throw new Error( e );
@@ -60,8 +60,6 @@ module.exports = async function notifyServer( options ) {
       winston.log( 'error', errorMessage );
       sendEmail( 'SYNCHRONIZE FAILED', errorMessage, options.email );
     }
-
-    return;
   }
   else if ( options.brand === constants.PHET_IO_BRAND ) {
     const url = `${constants.BUILD_SERVER_CONFIG.productionServerURL}/services/metadata/phetio` +
@@ -79,7 +77,7 @@ module.exports = async function notifyServer( options ) {
         method: 'POST',
         auth: {
           username: 'token',
-          password: constants.BUILD_SERVER_CONFIG.serverToken,
+          password: constants.BUILD_SERVER_CONFIG.serverToken
         }
       } );
     }
@@ -97,7 +95,7 @@ module.exports = async function notifyServer( options ) {
       }
       winston.log( 'error', errorMessage );
       sendEmail( 'PHET_IO DEPLOYMENT UPSERT FAILED', errorMessage, options.email );
-      return reject( new Error( 'PHET_IO DEPLOYMENT UPSERT FAILED' ) );
+      throw new Error( 'PHET_IO DEPLOYMENT UPSERT FAILED' );
     }
     else {
       const data = response.data;
@@ -122,4 +120,4 @@ module.exports = async function notifyServer( options ) {
   else {
     throw new Error( 'Called notifyServer for unsupported brand' );
   }
-}
+};

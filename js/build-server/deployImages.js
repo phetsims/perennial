@@ -79,7 +79,7 @@ const deployImages = async options => {
   }
 
   if ( options.simulation && options.version ) {
-    return processSim( options.simulation, options.brands, options.version );
+    await processSim( options.simulation, options.brands, options.version );
   }
   else {
 
@@ -111,6 +111,6 @@ const deployImages = async options => {
       }
     }
   }
-}
+};
 
 module.exports = deployImages;

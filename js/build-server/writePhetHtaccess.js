@@ -22,7 +22,7 @@ module.exports = async function writePhetHtaccess( simName, version ) {
         username: 'token',
         password: pass
       }
-    } )
+    } );
   }
   catch( e ) {
     throw new Error( e );
@@ -54,4 +54,4 @@ module.exports = async function writePhetHtaccess( simName, version ) {
                    'RewriteRule ([^/]*)$ - [L,E=download:$1]\n' +
                    'Header onsuccess set Content-disposition "attachment; filename=%{download}e" env=download\n';
   await writeFile( `${constants.HTML_SIMS_DIRECTORY + simName}/.htaccess`, contents );
-}
+};
