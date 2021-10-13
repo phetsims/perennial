@@ -19,7 +19,7 @@ const axios = require( 'axios' );
  * @param {string} brands - CSV
  * @returns {Promise} - No resolved value
  */
-module.exports = async function( branch, brands ) {
+const deployImages = async function( branch, brands ) {
   const requestObject = {
     brands: brands || 'phet',
     branch: branch || 'master',
@@ -52,3 +52,5 @@ module.exports = async function( branch, brands ) {
     winston.info( 'Image deploy request sent successfully.  If additional alternative images were deployed, go to the main admin page and trigger a recount.' );
   }
 };
+
+module.exports = deployImages;
