@@ -1,5 +1,4 @@
 acid-base-solutions
-perennial-alias
 aqua
 area-builder
 area-model-algebra
@@ -117,6 +116,7 @@ ohms-law
 optics-lab
 pendulum-lab
 perennial
+perennial-alias
 ph-scale
 ph-scale-basics
 phet-core
