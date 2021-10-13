@@ -1,12 +1,12 @@
 // Copyright 2020, University of Colorado Boulder
 
-const checkoutMaster = require( '../common/checkoutMaster' );
 const execute = require( '../common/execute' );
 const gitCheckout = require( '../common/gitCheckout' );
 const gitPull = require( '../common/gitPull' );
 const constants = require( './constants' );
 const fs = require( 'fs' );
 const axios = require( 'axios' );
+const checkoutMasterAll = require( '../common/checkoutMasterAll' );
 
 const chipperDir = '../chipper';
 const perennialAliasDir = '../perennial-alias';
@@ -16,7 +16,7 @@ const processSim = async ( simulation, brands, version ) => {
   const repoDir = `../${simulation}`;
 
   // Get master
-  await checkoutMaster( simulation, true );
+  await checkoutMasterAll();
   await gitPull( simulation );
 
   let brandsArray;
