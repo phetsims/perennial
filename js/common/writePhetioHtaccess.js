@@ -101,7 +101,7 @@ AuthUserFile ${authFilepath}
 
       const passwordProtectWrapperContents = `${basePasswordProtectContents}\n
           
-# Uncomment these lines to support public access to this wrappers directory
+# Uncomment these lines to support public access to this "wrappers/" directory
 # Satisfy Any
 # Allow from all
 `;
@@ -126,7 +126,12 @@ AuthUserFile ${authFilepath}
       if ( phetioPackage.phet && phetioPackage.phet.addRootHTAccessFile ) {
         const passwordProtectIndexContents = `<FilesMatch "(index\\.\\w+|api\\.json)$">\n${
           basePasswordProtectContents
-        }</FilesMatch>\n`;
+        }</FilesMatch>
+                        
+# Uncomment these lines to support public access to all resources in this version (including wrappers)
+# Satisfy Any
+# Allow from all
+`;
         await writeFile( rootHtaccessFullPath, passwordProtectIndexContents );
         if ( devVersionPath ) {
           await devScp( rootHtaccessFullPath, `${devVersionPath}/phet-io/${htaccessFilename}` );
