@@ -6,6 +6,7 @@ const gitPull = require( '../common/gitPull' );
 const constants = require( './constants' );
 const fs = require( 'fs' );
 const axios = require( 'axios' );
+const assert = require( 'assert' );
 
 const chipperDir = '../chipper';
 const perennialAliasDir = '../perennial-alias';
@@ -66,6 +67,7 @@ const processSim = async ( simulation, brands, version ) => {
 const deployImages = async options => {
   console.log( `deploying images with branch ${options.branch}, brands ${options.brands}` );
   if ( options.branch ) {
+    assert( options.branch === 'master', 'deployImages should be run on master branch' );
     await gitCheckout( 'chipper', options.branch );
     await gitPull( 'chipper' );
     await execute( 'npm', [ 'prune' ], chipperDir );

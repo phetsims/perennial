@@ -380,16 +380,11 @@ module.exports = function( grunt ) {
     } ) );
 
   grunt.registerTask( 'deploy-images',
-    'Rebuilds all images for all sims\n' +
-    '--branch : The chipper branch to use for image generation\n' +
-    '--brands : A comma-separated list of brand names to deploy, currently only phet supported',
+    'Rebuilds all images for all sims',
+
     wrapTask( async () => {
       const deployImages = require( './deployImages' );
-
-      const brands = grunt.option( 'brands' ) || 'phet';
-      const branch = grunt.option( 'branch' ) || 'master';
-
-      await deployImages( branch, brands );
+      await deployImages();
     } ) );
 
   grunt.registerTask( 'one-off',
