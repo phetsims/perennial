@@ -173,9 +173,9 @@ phetioRepos.forEach( repo => {
   } );
 
   tests.push( {
-    test: [ repo, 'phet-io-mirror-inputs-fuzz', 'unbuilt' ],
+    test: [ repo, 'phet-io-input-record-and-playback-fuzz', 'unbuilt' ],
     type: 'wrapper-test',
-    url: `phet-io-wrappers/mirror-inputs/?sim=${repo}&phetioDebug&fuzz`,
+    url: `phet-io-wrappers/input-record-and-playback/?sim=${repo}&phetioDebug&fuzz`,
     testQueryParameters: 'duration=60000'
   } );
 
