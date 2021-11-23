@@ -48,6 +48,7 @@ module.exports = function( asyncCallback, options ) {
         gif: 'image/gif',
         mp3: 'audio/mpeg',
         wav: 'audio/wav',
+        'active-runnables': 'text/plain',
 
         // needed to be added to support PhET sims.
         svg: 'image/svg+xml',
