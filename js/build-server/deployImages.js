@@ -4,6 +4,7 @@ const execute = require( '../common/execute' );
 const gitCheckout = require( '../common/gitCheckout' );
 const gitPull = require( '../common/gitPull' );
 const constants = require( './constants' );
+const child_process = require( 'child_process' );
 const fs = require( 'fs' );
 const axios = require( 'axios' );
 const assert = require( 'assert' );
@@ -16,8 +17,9 @@ const processSim = async ( simulation, brands, version ) => {
   const repoDir = `../${simulation}`;
 
   // Get master
-  await execute( 'grunt', [ 'checkout-master-all' ], './' );
-  await gitPull( simulation );
+  console.log( 'running `git checkout master && git pull`' );
+  child_process.execSync( 'git checkout master && git pull', { cwd: repoDir } );
+  console.log( 'finished running `git checkout master && git pull`' );
 
   let brandsArray;
   let brandsString;
