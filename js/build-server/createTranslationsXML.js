@@ -46,11 +46,7 @@ module.exports = async function( simName, version ) {
   }
 
   const simTitleKey = `${simName}.title`; // all sims must have a key of this form
-  let simTitle;
-  if ( englishStrings[ simTitleKey ] ) {
-    simTitle = englishStrings[ simTitleKey ].value;
-  }
-  else {
+  if ( !englishStrings[ simTitleKey ] ) {
     throw new Error( 'No key for sim title' );
   }
 

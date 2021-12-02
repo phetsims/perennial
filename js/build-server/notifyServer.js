@@ -43,7 +43,7 @@ module.exports = async function notifyServer( options ) {
     }
     let errorMessage;
 
-    if ( response.status >= 200 && response.status <=299 ) {
+    if ( response.status >= 200 && response.status <= 299 ) {
       const data = response.data;
 
       if ( !data.success ) {
