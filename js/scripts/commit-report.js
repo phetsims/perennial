@@ -27,6 +27,8 @@ const fs = require( 'fs' );
   }
   else {
 
+    const outputtedLines = [];
+
     // current timestamp in milliseconds
     const d = new Date( Date.now() );
     const day = d.getDate();
@@ -54,6 +56,8 @@ const fs = require( 'fs' );
 
     // Report results
     for ( let i = 0; i < a.length; i++ ) {
+
+      let outputtedRepo = false;
       const repo = repos[ i ];
       const o = out[ i ];
 
@@ -63,7 +67,7 @@ const fs = require( 'fs' );
 
       const stdout = o.stdout.trim();
       if ( stdout.length > 0 || o.stderr.trim().length > 0 ) {
-        console.log( repo );
+
 
         const lines = stdout.split( '\n' );
         lines.forEach( line => {
@@ -89,9 +93,19 @@ const fs = require( 'fs' );
             line = line.substring( 'nn hours ago '.length );
           }
 
-          console.log( line );
+          if ( !outputtedLines.find( x => x === line ) && !line.startsWith( 'Merge branch \'master\' of' ) ) {
+
+            if ( !outputtedRepo ) {
+              console.log();
+              console.log( repo );
+              outputtedRepo = true;
+            }
+            console.log( line );
+            outputtedLines.push( line );
+          }
+
         } );
-        console.log();
+
       }
     }
   }
