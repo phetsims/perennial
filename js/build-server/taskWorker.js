@@ -227,6 +227,11 @@ async function taskWorker( options ) {
       await devDeploy( simDir, simName, version, chipperVersion, brands );
     }
 
+    const localesArray = typeof ( locales ) === 'string' ? locales.split( ',' ) : locales;
+
+    // if this build request comes from rosetta it will have a userId field and only one locale
+    const isTranslationRequest = userId && localesArray.length === 1 && localesArray[ 0 ] !== '*';
+
     if ( servers.indexOf( constants.PRODUCTION_SERVER ) >= 0 ) {
       winston.info( 'deploying to production' );
       let targetVersionDir;
@@ -318,9 +323,8 @@ async function taskWorker( options ) {
               locales: locales
             } );
 
-            // if this build request comes from rosetta it will have a userId field and only one locale
-            const localesArray = typeof ( locales ) === 'string' ? locales.split( ',' ) : locales;
-            if ( userId && localesArray.length === 1 && localesArray[ 0 ] !== '*' ) {
+
+            if ( isTranslationRequest ) {
               await addTranslator( localesArray[ 0 ], simName, userId );
             }
           }
@@ -352,12 +356,14 @@ async function taskWorker( options ) {
         }
       }
 
-      await deployImages( {
-        branch: 'master', // chipper branch, always deploy images from master
-        simulation: options.simName,
-        brands: options.brands,
-        version: options.version
-      } );
+      if ( !isTranslationRequest ) {
+        await deployImages( {
+          branch: 'master', // chipper branch, always deploy images from master
+          simulation: options.simName,
+          brands: options.brands,
+          version: options.version
+        } );
+      }
     }
   }
   catch( err ) {
