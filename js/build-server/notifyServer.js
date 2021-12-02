@@ -43,7 +43,7 @@ module.exports = async function notifyServer( options ) {
     }
     let errorMessage;
 
-    if ( response.status === 200 ) {
+    if ( response.status >= 200 && response.status <= 299 ) {
       const data = response.data;
 
       if ( !data.success ) {
@@ -56,7 +56,7 @@ module.exports = async function notifyServer( options ) {
       }
     }
     else {
-      errorMessage = 'request to synchronize project errored or returned a non 200 status code';
+      errorMessage = 'request to synchronize project errored or returned a non 2XX status code';
       winston.log( 'error', errorMessage );
       sendEmail( 'SYNCHRONIZE FAILED', errorMessage, options.email );
     }

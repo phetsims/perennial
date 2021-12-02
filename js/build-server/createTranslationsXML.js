@@ -42,16 +42,12 @@ module.exports = async function( simName, version ) {
     englishStrings = JSON.parse( fs.readFileSync( `../${simName}/${englishStringsFile}`, { encoding: 'utf-8' } ) );
   }
   catch( e ) {
-    return Promise.reject( new Error( 'English strings file not found' ) );
+    throw new Error( 'English strings file not found' );
   }
 
   const simTitleKey = `${simName}.title`; // all sims must have a key of this form
-  let simTitle;
-  if ( englishStrings[ simTitleKey ] ) {
-    simTitle = englishStrings[ simTitleKey ].value;
-  }
-  else {
-    return Promise.reject( new Error( 'No key for sim title' ) );
+  if ( !englishStrings[ simTitleKey ] ) {
+    throw new Error( 'No key for sim title' );
   }
 
   // create xml, making a simulation tag for each language
@@ -88,8 +84,8 @@ module.exports = async function( simName, version ) {
     await writeFile( xmlFilepath, finalXML );
   }
   catch( err ) {
-    return Promise.reject( err );
+    console.error( 'Error writing xml file', err );
+    throw err;
   }
   winston.log( 'info', 'wrote XML file' );
-  return Promise.resolve( simTitle );
 };
