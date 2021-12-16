@@ -387,6 +387,15 @@ tests.push( {
   queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&showSoluteAmount&concentrationMeterUnits=percent&beakerUnits=milliliters'
 } );
 
+tests.push( {
+  test: [ 'circuit-construction-kit-ac', 'fuzz', 'unbuilt', 'query-parameters' ],
+  type: 'sim-test',
+  url: 'circuit-construction-kit-ac/circuit-construction-kit-ac_en.html',
+
+  // Public query parameters that cannot be triggered from options within the sim
+  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&showCurrent&addRealBulbs&moreWires&moreInductors'
+} );
+
 // energy forms and changes
 
 // four blocks and one burner
