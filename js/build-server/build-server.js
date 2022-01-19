@@ -229,19 +229,29 @@ const postQueueImageDeploy = ( req, res ) => {
   const branch = req.body[ constants.BRANCH_KEY ] || 'master';
   const brands = req.body[ constants.BRANDS_KEY ] || 'phet';
   const email = req.body[ constants.EMAIL_KEY ] || null;
+  const simulation = req.body[ constants.SIM_NAME_KEY ] || null;
+  const version = req.body[ constants.VERSION_KEY ] || null;
   const emailBodyText = 'Not implemented';
 
-  taskQueue.push( { deployImages: true, branch: branch, brands: brands }, err => {
-    if ( err ) {
-      const errorMessage = `Image deploy failure: ${err}`;
-      winston.log( 'error', errorMessage );
-      sendEmail( 'IMAGE DEPLOY ERROR', errorMessage, email );
-    }
-    else {
-      winston.log( 'info', 'Image deploy finished successfully' );
-      sendEmail( 'Image deploy succeeded', emailBodyText, email, true );
-    }
-  } );
+  taskQueue.push(
+    {
+      deployImages: true,
+      branch: branch,
+      brands: brands,
+      simulation: simulation,
+      version: version
+    },
+    err => {
+      if ( err ) {
+        const errorMessage = `Image deploy failure: ${err}`;
+        winston.log( 'error', errorMessage );
+        sendEmail( 'IMAGE DEPLOY ERROR', errorMessage, email );
+      }
+      else {
+        winston.log( 'info', 'Image deploy finished successfully' );
+        sendEmail( 'Image deploy succeeded', emailBodyText, email, true );
+      }
+    } );
 
   res.status( 202 );
   res.send( 'build process initiated, check logs for details' );

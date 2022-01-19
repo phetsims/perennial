@@ -380,11 +380,15 @@ module.exports = function( grunt ) {
     } ) );
 
   grunt.registerTask( 'deploy-images',
-    'Rebuilds all images for all sims',
+    'Rebuilds all images\n' +
+    '--simulation : Optional. If present, only the given simulation will receive images from master. If absent, all sims' +
+    'will receive images from master.',
 
     wrapTask( async () => {
+      console.log( grunt.option( 'simulation' ) );
+      const simulation = grunt.option( 'simulation' ) || null;
       const deployImages = require( './deployImages' );
-      await deployImages();
+      await deployImages( { simulation: simulation } );
     } ) );
 
   grunt.registerTask( 'one-off',

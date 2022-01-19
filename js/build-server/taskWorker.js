@@ -82,6 +82,8 @@ async function taskWorker( options ) {
     }
 
   }
+
+
   try {
     //-------------------------------------------------------------------------------------
     // Parse and validate parameters
