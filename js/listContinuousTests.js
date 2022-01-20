@@ -18,6 +18,7 @@ const runnableRepos = getRepoList( 'active-runnables' );
 const interactiveDescriptionRepos = getRepoList( 'interactive-description' );
 const phetioNoState = getRepoList( 'phet-io-state-unsupported' );
 const unitTestRepos = getRepoList( 'unit-tests' );
+const voicingRepos = getRepoList( 'voicing' );
 
 /**
  * {Array.<Object>} test
@@ -189,7 +190,6 @@ phetioRepos.forEach( repo => {
   } );
 } );
 
-// accessible tests
 interactiveDescriptionRepos.forEach( repo => {
   tests.push( {
     test: [ repo, 'interactive-description-fuzz', 'unbuilt' ],
@@ -229,6 +229,23 @@ interactiveDescriptionRepos.forEach( repo => {
     brand: 'phet',
     buildDependencies: [ repo ],
     es5: true
+  } );
+} );
+
+voicingRepos.forEach( repo => {
+  tests.push( {
+    test: [ repo, 'voicing-fuzz', 'unbuilt' ],
+    type: 'sim-test',
+    url: `${repo}/${repo}_en.html`,
+    queryParameters: 'brand=phet&ea&fuzz&voicingInitiallyEnabled&memoryLimit=1000',
+    testQueryParameters: 'duration=40000'
+  } );
+  tests.push( {
+    test: [ repo, 'voicing-fuzzBoard', 'unbuilt' ],
+    type: 'sim-test',
+    url: `${repo}/${repo}_en.html`,
+    queryParameters: 'brand=phet&ea&fuzzBoard&voicingInitiallyEnabled&memoryLimit=1000',
+    testQueryParameters: 'duration=40000'
   } );
 } );
 
