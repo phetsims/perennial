@@ -59,10 +59,10 @@ module.exports = async function() {
   }
 
   writeList( 'interactive-description', phet => phet.simFeatures && phet.simFeatures.supportsInteractiveDescription );
+  writeList( 'voicing', phet => phet.simFeatures && phet.simFeatures.supportsVoicing );
   writeList( 'active-runnables', phet => phet.runnable );
   writeList( 'active-sims', phet => phet.simulation );
   writeList( 'unit-tests', phet => phet.generatedUnitTests );
-
   writeList( 'phet-io', phet => phet.runnable && phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) );
   writeList( 'phet-io-api-stable', phet => {
     return phet.runnable && phet.supportedBrands && phet.supportedBrands.includes( 'phet-io' ) &&
@@ -70,6 +70,7 @@ module.exports = async function() {
   } );
 
   await gitAdd( 'perennial', 'data/interactive-description' );
+  await gitAdd( 'perennial', 'data/voicing' );
   await gitAdd( 'perennial', 'data/active-runnables' );
   await gitAdd( 'perennial', 'data/active-sims' );
   await gitAdd( 'perennial', 'data/unit-tests' );
