@@ -45,7 +45,7 @@ const fs = require( 'fs' );
     const repos = contents.split( '\n' ).map( sim => sim.trim() );
 
     // git --no-pager log --all --remotes --since=7.days --author=$1 --pretty=format:"%an %ad %s" --date=relative
-    const gitArgs = [ '--no-pager', 'log', '--all', '--remotes', '--since=7.days', `--author=${username}`, '--pretty=format:"%an %ad %s"', '--date=relative' ];
+    const gitArgs = [ '--no-pager', 'log', '--all', '--remotes', '--since=7.days', '--pretty=format:"%an %ad %s"', '--date=relative' ];
 
     const a = repos.map( repo => execute( 'git', gitArgs, `${repo}`, {
 
@@ -77,33 +77,32 @@ const fs = require( 'fs' );
 
           if ( line.startsWith( username ) ) {
             line = line.substring( username.length ).trim();
-          }
 
-          const tokens = line.split( ' ' );
-          const number = parseInt( tokens[ 0 ], 10 );
-          const time = tokens[ 1 ];
+            const tokens = line.split( ' ' );
+            const number = parseInt( tokens[ 0 ], 10 );
+            const time = tokens[ 1 ];
 
-          if ( time === 'days' && number <= 7 ) {
-            line = line.substring( 'n days ago '.length );
-          }
-          if ( time === 'hours' && number <= 9 ) {
-            line = line.substring( 'n hours ago '.length );
-          }
-          if ( time === 'hours' && number >= 10 && number <= 99 ) {
-            line = line.substring( 'nn hours ago '.length );
-          }
-
-          if ( !outputtedLines.find( x => x === line ) && !line.startsWith( 'Merge branch \'master\' of' ) ) {
-
-            if ( !outputtedRepo ) {
-              console.log();
-              console.log( repo );
-              outputtedRepo = true;
+            if ( time === 'days' && number <= 7 ) {
+              line = line.substring( 'n days ago '.length );
             }
-            console.log( line );
-            outputtedLines.push( line );
-          }
+            if ( time === 'hours' && number <= 9 ) {
+              line = line.substring( 'n hours ago '.length );
+            }
+            if ( time === 'hours' && number >= 10 && number <= 99 ) {
+              line = line.substring( 'nn hours ago '.length );
+            }
 
+            if ( !outputtedLines.find( x => x === line ) && !line.startsWith( 'Merge branch \'master\' of' ) ) {
+
+              if ( !outputtedRepo ) {
+                console.log();
+                console.log( repo );
+                outputtedRepo = true;
+              }
+              console.log( line );
+              outputtedLines.push( line );
+            }
+          }
         } );
 
       }
