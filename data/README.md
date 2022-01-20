@@ -25,3 +25,6 @@ sim's `package.json` to be populated to this list.
 
 phet-io-state-unsupported - A manually supported list of sims that do not support state, and shouldn't be tested as
 such. Any sim in this list will not have its state wrapper fuzzed on CT.
+
+voicing (auto-generated) is the list of all simulations that have the voicing feature. This is noted in package json "
+phetFeatures.supportsVoicing".
