@@ -48,14 +48,17 @@ module.exports = function( asyncCallback, options ) {
         gif: 'image/gif',
         mp3: 'audio/mpeg',
         wav: 'audio/wav',
-        'active-runnables': 'text/plain',
 
         // needed to be added to support PhET sims.
         svg: 'image/svg+xml',
         json: 'application/json'
       };
       const fileExtension = fullPath.split( '.' ).pop();
-      const mimeType = mimeTypes[ fileExtension ];
+      let mimeType = mimeTypes[ fileExtension ];
+
+      if ( !mimeType && fullPath.includes( 'active-runnables' ) ) {
+        mimeType = 'text/plain';
+      }
 
       if ( !mimeType ) {
         throw new Error( `unsupported mime type, please add above: ${fileExtension}` );
