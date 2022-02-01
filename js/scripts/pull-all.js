@@ -32,7 +32,9 @@ const repos = contents.split( '\n' ).map( sim => sim.trim() );
     const repo = repos[ i ];
     const o = out[ i ];
 
-    if ( o.code === 0 && o.stderr === '' && ( o.stdout.includes( 'up to date' ) ) ) {
+    if ( o.code === 0 && o.stderr === '' && ( o.stdout === 'Already up to date.\nCurrent branch master is up to date.\n' ||
+                                              o.stdout === 'Already up to date.\n' ||
+                                              o.stdout === 'Current branch master is up to date.\n' ) ) {
 
       // nothing to do
     }
