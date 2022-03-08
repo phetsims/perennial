@@ -81,7 +81,7 @@ runnableRepos.forEach( repo => {
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
     queryParameters: 'brand=phet&ea&fuzz&fuzzBoard&memoryLimit=1000',
-    testQueryParameters: 'duration=40000',
+    testQueryParameters: 'duration=40000'
   } );
 
   tests.push( {
