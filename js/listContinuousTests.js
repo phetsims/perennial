@@ -77,14 +77,6 @@ runnableRepos.forEach( repo => {
   } );
 
   tests.push( {
-    test: [ repo, 'fuzz-fuzzBoard-combo', 'unbuilt' ],
-    type: 'sim-test',
-    url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzz&fuzzBoard&memoryLimit=1000',
-    testQueryParameters: 'duration=40000'
-  } );
-
-  tests.push( {
     test: [ repo, 'xss-fuzz' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
@@ -217,6 +209,14 @@ interactiveDescriptionRepos.forEach( repo => {
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
     queryParameters: 'brand=phet&ea&fuzz&supportsInteractiveDescription=true&memoryLimit=1000',
+    testQueryParameters: 'duration=40000'
+  } );
+
+  tests.push( {
+    test: [ repo, 'interactive-description-fuzz-fuzzBoard-combo', 'unbuilt' ],
+    type: 'sim-test',
+    url: `${repo}/${repo}_en.html`,
+    queryParameters: 'brand=phet&ea&supportsInteractiveDescription=true&fuzz&fuzzBoard&memoryLimit=1000',
     testQueryParameters: 'duration=40000'
   } );
 
