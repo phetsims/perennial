@@ -189,7 +189,7 @@ phetioRepos.forEach( repo => {
   tests.push( {
     test: [ repo, 'phet-io-input-record-and-playback-fuzzBoard', 'unbuilt' ],
     type: 'wrapper-test',
-    url: `phet-io-wrappers/input-record-and-playback/?sim=${repo}&phetioDebug&fuzzBoard`,
+    url: `phet-io-wrappers/input-record-and-playback/?sim=${repo}&phetioDebug&fuzzBoard&supportsInteractiveDescription=true`,
     testQueryParameters: 'duration=40000'
   } );
 
