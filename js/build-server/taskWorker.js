@@ -184,7 +184,7 @@ async function taskWorker( options ) {
       await execute( 'npm', [ 'update' ], constants.PERENNIAL );
     }
     catch( error ) {
-      console.log( 'npm error', error.stderr );
+      console.log( 'npm error', JSON.stringify( error ) );
       throw error;
     }
 
