@@ -181,11 +181,13 @@ async function taskWorker( options ) {
     await execute( 'git', [ 'pull' ], constants.PERENNIAL );
     try {
       await execute( 'npm', [ 'prune' ], constants.PERENNIAL );
+      await execute( 'npm', [ 'update' ], constants.PERENNIAL );
     }
     catch( error ) {
-      console.log( error.stderr )
+      console.log( 'npm error', error.stderr );
+      throw error;
     }
-    await execute( 'npm', [ 'update' ], constants.PERENNIAL );
+
     await execute( './perennial/bin/clone-missing-repos.sh', [], '..' );
     await pullMaster( repos );
     await execute( 'grunt', [ 'checkout-shas', '--buildServer=true', `--repo=${simName}` ], constants.PERENNIAL );
