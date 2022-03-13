@@ -179,7 +179,12 @@ async function taskWorker( options ) {
     winston.log( 'info', `wrote file ${buildDir}/dependencies.json` );
 
     await execute( 'git', [ 'pull' ], constants.PERENNIAL );
-    await execute( 'npm', [ 'prune' ], constants.PERENNIAL );
+    try {
+      await execute( 'npm', [ 'prune' ], constants.PERENNIAL );
+    }
+    catch( error ) {
+      console.log( error.stderr )
+    }
     await execute( 'npm', [ 'update' ], constants.PERENNIAL );
     await execute( './perennial/bin/clone-missing-repos.sh', [], '..' );
     await pullMaster( repos );
