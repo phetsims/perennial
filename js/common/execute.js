@@ -66,10 +66,12 @@ module.exports = function( cmd, args, cwd, options ) {
     process.stderr.on( 'data', data => {
       stderr += data;
       grunt.log.debug( `stderr: ${data}` );
+      winston.debug( `stderr: ${data}` );
     } );
     process.stdout.on( 'data', data => {
       stdout += data;
       grunt.log.debug( `stdout: ${data}` );
+      winston.debug( `stdout: ${data}` );
     } );
 
     process.on( 'close', code => {

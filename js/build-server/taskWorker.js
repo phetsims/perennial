@@ -20,6 +20,7 @@ const writeFile = require( '../common/writeFile' );
 const writePhetHtaccess = require( './writePhetHtaccess' );
 const writePhetioHtaccess = require( '../common/writePhetioHtaccess' );
 const deployImages = require( './deployImages' );
+const child_process = require( 'child_process' );
 
 const buildDir = './js/build-server/tmp';
 
@@ -179,15 +180,9 @@ async function taskWorker( options ) {
     winston.log( 'info', `wrote file ${buildDir}/dependencies.json` );
 
     await execute( 'git', [ 'pull' ], constants.PERENNIAL );
-    try {
-      await execute( 'npm', [ 'prune' ], constants.PERENNIAL );
-      await execute( 'npm', [ 'update' ], constants.PERENNIAL );
-    }
-    catch( error ) {
-      console.log( 'npm error', JSON.stringify( error ) );
-      throw error;
-    }
-
+    // await execute( 'npm', [ 'prune' ], constants.PERENNIAL );
+    await child_process.execSync( 'npm', [ 'prune' ], constants.PERENNIAL );
+    await execute( 'npm', [ 'update' ], constants.PERENNIAL );
     await execute( './perennial/bin/clone-missing-repos.sh', [], '..' );
     await pullMaster( repos );
     await execute( 'grunt', [ 'checkout-shas', '--buildServer=true', `--repo=${simName}` ], constants.PERENNIAL );
