@@ -4,7 +4,7 @@ PhET build and deploy server.
 
 # Host
 
-The production version of the build server runs on **phet-server.int.colorado.edu**, the same host as the PhET production website.
+The production version of the build server runs on **phet-server2.int.colorado.edu**, the same host as the PhET production website.
 
 A test version of the server runs on **phet-server-dev.int.colorado.edu**.
 
@@ -29,7 +29,7 @@ Pressing Shift+F will scroll to the end (navigation is `less`-like).
 
 ## Build Server Configuration
 
-The "dev server" is currently `bayes.colorado.edu`. The "production server" is currently `phet-server.colorado.edu`
+The "dev server" is currently `bayes.colorado.edu`. The "production server" is currently `phet-server2.colorado.edu`
 
 All of the phet repos live on the production and dev servers under /data/share/phet/phet-repos. The build server lives
 in perennial: `/data/share/phet/phet-repos/perennial/js/build-server`.

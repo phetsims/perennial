@@ -89,7 +89,7 @@ const queueDeployApiVersion1 = ( req, res, key ) => {
 
   // TODO https://github.com/phetsims/perennial/issues/167 determine if this comment needs updating for chipper 1.0 deploys
   // For RC deploys, only send to the dev server.  For production deploys, the local build will send to the dev server so the build-server
-  // only sends to the production server (phet-server).
+  // only sends to the production server (phet-server2).
   const servers = ( option === 'rc' ) ? [ constants.DEV_SERVER ] : [ constants.PRODUCTION_SERVER ];
   const brands = version.indexOf( 'phetio' ) < 0 ? [ constants.PHET_BRAND ] : [ constants.PHET_IO_BRAND ];
 

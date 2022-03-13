@@ -44,7 +44,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
   SimVersion.ensureReleaseBranch( branch );
 
   if ( !( await vpnCheck() ) ) {
-    grunt.fail.fatal( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server.int.colorado.edu' );
+    grunt.fail.fatal( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
   }
 
   const isClean = await gitIsClean( repo );

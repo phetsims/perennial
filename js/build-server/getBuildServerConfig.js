@@ -16,7 +16,7 @@ const assert = require( 'assert' );
  * Optional:
  * {string} devDeployServer - name of the dev server, defaults to 'bayes.colorado.edu'
  * {string} devDeployPath - path on dev server to deploy to, defaults to '/data/web/htdocs/dev/html/'
- * {string} productionServerName - production server name, defaults to 'phet-server.int.colorado.edu', can be over-ridden to dev server for testing
+ * {string} productionServerName - production server name, defaults to 'phet-server2.int.colorado.edu', can be over-ridden to dev server for testing
  * {string} productionServerURL - production server url, defaults to 'https://phet.colorado.edu', can be over-ridden to 'https://phet-dev.colorado.edu'
  *
  * Include these fields in build-local.json to enable sending emails from build-server on build failure.
@@ -64,7 +64,7 @@ function getDeployConfig( fs ) {
     htmlSimsDirectory: buildLocalJSON.htmlSimsDirectory,
     phetioSimsDirectory: buildLocalJSON.phetioSimsDirectory,
     pgConnectionString: buildLocalJSON.pgConnectionString,
-    productionServerName: buildLocalJSON.productionServerName || 'phet-server.int.colorado.edu',
+    productionServerName: buildLocalJSON.productionServerName || 'phet-server2.int.colorado.edu',
     productionServerURL: buildLocalJSON.productionServerURL || 'https://phet.colorado.edu',
     serverToken: buildLocalJSON.serverToken,
     verbose: buildLocalJSON.verbose || buildLocalJSON.verbose === 'true'

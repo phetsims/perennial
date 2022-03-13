@@ -49,7 +49,7 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
   }
 
   if ( !( await vpnCheck() ) ) {
-    grunt.fail.fatal( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server.int.colorado.edu' );
+    grunt.fail.fatal( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
   }
 
   const currentBranch = await getBranch( repo );
