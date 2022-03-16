@@ -28,13 +28,15 @@ module.exports = async function( url, options ) {
     evaluate: null, // {function|null}
 
     waitAfterLoad: 5000, // milliseconds
-    allowedTimeToLoad: 40000 // milliseconds
+    allowedTimeToLoad: 40000, // milliseconds
+    puppeteerTimeout: 30000 // milliseconds
   }, options );
 
   const hasBrowser = !!options.browser;
   const browser = hasBrowser ? options.browser : await puppeteer.launch();
 
   const page = await browser.newPage();
+  await page.setDefaultNavigationTimeout( options.puppeteerTimeout );
 
   let resolve;
   let loaded = false;
@@ -63,7 +65,9 @@ module.exports = async function( url, options ) {
     }
   } )();
 
-  await page.goto( url );
+  await page.goto( url, {
+    timeout: options.puppeteerTimeout
+  } );
   const result = await promise;
   await page.close();
 
