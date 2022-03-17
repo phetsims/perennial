@@ -171,28 +171,6 @@ phetioRepos.forEach( repo => {
     url: `phet-io-wrappers/state/?sim=${repo}&phetioDebug&fuzz`
   } );
 
-  // Fuzz mirror inputs
-  tests.indexOf( repo ) === -1 && tests.push( {
-    test: [ repo, 'phet-io-mirror-inputs-fuzz', 'unbuilt' ],
-    type: 'wrapper-test',
-    url: `phet-io-wrappers/mirror-inputs/?sim=${repo}&phetioDebug&fuzz`,
-    testQueryParameters: 'duration=40000'
-  } );
-
-  tests.push( {
-    test: [ repo, 'phet-io-input-record-and-playback-fuzz', 'unbuilt' ],
-    type: 'wrapper-test',
-    url: `phet-io-wrappers/input-record-and-playback/?sim=${repo}&phetioDebug&fuzz`,
-    testQueryParameters: 'duration=40000'
-  } );
-
-  tests.push( {
-    test: [ repo, 'phet-io-input-record-and-playback-fuzzBoard', 'unbuilt' ],
-    type: 'wrapper-test',
-    url: `phet-io-wrappers/input-record-and-playback/?sim=${repo}&phetioDebug&fuzzBoard&supportsInteractiveDescription=true`,
-    testQueryParameters: 'duration=40000'
-  } );
-
   // phet-io wrappers tests for each PhET-iO Sim
   [ false, true ].forEach( useAssert => {
     tests.push( {
