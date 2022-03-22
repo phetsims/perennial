@@ -467,7 +467,7 @@ tests.push( {
 
 // Workaround for deficiencies in fuzz coverage.
 // Fuzz both screens with 'Arrow' as the only ComboBox choice.
-// See https://github.com/phetsims/geometric-optics/issues/397
+// See https://github.com/phetsims/geometric-optics/issues/397 and https://github.com/phetsims/aqua/issues/136
 tests.push( {
   test: [ 'geometric-optics', 'fuzz', 'unbuilt', 'fuzzArrow' ],
   type: 'sim-test',
@@ -477,7 +477,7 @@ tests.push( {
 
 // Workaround for deficiencies in fuzz coverage.
 // Fuzz the Lens screen with 'Light' as the only ComboBox choice. (Light is not a choice in the Mirror screen.)
-// See https://github.com/phetsims/geometric-optics/issues/397
+// See https://github.com/phetsims/geometric-optics/issues/397 and https://github.com/phetsims/aqua/issues/136
 tests.push( {
   test: [ 'geometric-optics', 'fuzz', 'unbuilt', 'fuzzLight' ],
   type: 'sim-test',
