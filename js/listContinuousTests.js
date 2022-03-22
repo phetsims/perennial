@@ -472,7 +472,7 @@ tests.push( {
   test: [ 'geometric-optics', 'fuzz', 'unbuilt', 'fuzzArrow' ],
   type: 'sim-test',
   url: 'geometric-optics/geometric-optics_en.html',
-  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&fuzzScene=arrow'
+  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&scene=arrow'
 } );
 
 // Workaround for deficiencies in fuzz coverage.
@@ -482,7 +482,7 @@ tests.push( {
   test: [ 'geometric-optics', 'fuzz', 'unbuilt', 'fuzzLight' ],
   type: 'sim-test',
   url: 'geometric-optics/geometric-optics_en.html',
-  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&screens=1&fuzzScene=light'
+  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&screens=1&scene=light'
 } );
 
 console.log( JSON.stringify( tests, null, 2 ) );
