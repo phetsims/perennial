@@ -56,9 +56,7 @@ module.exports = function sendEmail( subject, text, emailParameter, emailParamet
       ( err, message ) => {
         if ( err ) {
           let errorString = typeof err === 'string' ? err : JSON.stringify( err );
-          if ( errorString.includes( constants.BUILD_SERVER_CONFIG.emailPassword ) ) {
-            errorString = "possible bad password, error redacted"
-          }
+          errorString = errorString.replace( constants.BUILD_SERVER_CONFIG.emailPassword, '***PASSWORD REDACTED***' );
           winston.log( 'error', `error when attempted to send email, err = ${errorString}` );
         }
         else {
