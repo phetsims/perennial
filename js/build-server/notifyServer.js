@@ -47,12 +47,12 @@ module.exports = async function notifyServer( options ) {
       const data = response.data;
 
       if ( !data.success ) {
-        errorMessage = `request to synchronize project ${project} on ${constants.BUILD_SERVER_CONFIG.productionServerName} failed with message: ${data.error}`;
+        errorMessage = `request to synchronize project ${project} on ${constants.BUILD_SERVER_CONFIG.productionServerURL} failed with message: ${data.error}`;
         winston.log( 'error', errorMessage );
         sendEmail( 'SYNCHRONIZE FAILED', errorMessage, options.email );
       }
       else {
-        winston.log( 'info', `request to synchronize project ${project} on ${constants.BUILD_SERVER_CONFIG.productionServerName} succeeded` );
+        winston.log( 'info', `request to synchronize project ${project} on ${constants.BUILD_SERVER_CONFIG.productionServerURL} succeeded` );
       }
     }
     else {
@@ -112,7 +112,7 @@ module.exports = async function notifyServer( options ) {
         throw new Error( 'PHET_IO DEPLOYMENT UPSERT FAILED' );
       }
       else {
-        winston.log( 'info', `request to upsert phetio deployment for ${options.simName} on ${constants.BUILD_SERVER_CONFIG.productionServerName} succeeded` );
+        winston.log( 'info', `request to upsert phetio deployment for ${options.simName} on ${constants.BUILD_SERVER_CONFIG.productionServerURL} succeeded` );
       }
     }
 
