@@ -182,9 +182,10 @@ This is essentially a pretty-printed version of what is in your `.maintenance.js
 
 It is assumed that your `~/.phet/build.json` file will be properly configured so that simulations can be deployed. The
 standard developer guide instructions to set this up should be done before beginning the maintenance process. Notably,
-it is important that `npm config set save false` should be applied, so that package files are not changed during npm
-operations used by the maintenance process. In addition, it is helpful to set up build server notifications (with
-`buildServerNotifyEmail` in `~/.phet/build.json`) so that any failed deployments can be flagged.
+it is important that `npm config set save false` and `npm config set package-lock false` should be applied, 
+so that package files are not changed during npm operations used by the maintenance process. In addition, it is helpful 
+to set up build server notifications (with `buildServerNotifyEmail` in `~/.phet/build.json`) so that any failed 
+deployments can be flagged.
 
 # General maintenance steps
 
