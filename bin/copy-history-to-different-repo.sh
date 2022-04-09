@@ -5,6 +5,9 @@
 # Implementation based on the highest voted answer in
 # http://stackoverflow.com/questions/1365541/how-to-move-files-from-one-git-repo-to-another-not-a-clone-preserving-history
 #
+# NOTE: This strategy does not work well when files have been renamed.  In that case, you may wish to use a strategy
+# NOTE: Like the one described in https://github.com/phetsims/vegas/issues/101#issuecomment-1093659193
+#
 # Usage:
 # 1. cd into the directory of the source repository
 # 2. copy-history-to-different-repo.sh FILE_OR_DIRECTORY DESTINATION_REPOSITORY
