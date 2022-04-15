@@ -7,6 +7,7 @@
 #
 # NOTE: This strategy does not work well when files have been renamed.  In that case, you may wish to use a strategy
 # NOTE: Like the one described in https://github.com/phetsims/vegas/issues/101#issuecomment-1093659193
+# NOTE: See copy-history-to-different-repo.js
 #
 # Usage:
 # 1. cd into the directory of the source repository
