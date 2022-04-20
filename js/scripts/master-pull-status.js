@@ -77,4 +77,6 @@ const getStatus = async repo => {
   repos.forEach( repo => {
     process.stdout.write( data[ repo ] );
   } );
+
+  console.log( 'done' );
 } )();
