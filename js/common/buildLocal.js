@@ -50,6 +50,16 @@ module.exports = {
       'phet-info/github-labels.' );
     return buildLocalObject.developerGithubUsername;
   },
+  get slackBotToken() {
+    assert( buildLocalObject.slackBotToken,
+      'The slackBotToken field of build-local.json is required for CT Slack integration' );
+    return buildLocalObject.slackBotToken;
+  },
+  get slackSigningSecret() {
+    assert( buildLocalObject.slackSigningSecret,
+      'The slackSigningSecret field of build-local.json is required for CT Slack integration' );
+    return buildLocalObject.slackSigningSecret;
+  },
 
   // Wrappers are now deployed to the dev location (for convenience)
   devDeployServer: buildLocalObject.devDeployServer || 'bayes.colorado.edu',
