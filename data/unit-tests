@@ -13,6 +13,7 @@ joist
 kite
 phet-core
 phet-io
+phet-io-sim-specific
 phet-io-wrappers
 phetcommon
 query-string-machine
