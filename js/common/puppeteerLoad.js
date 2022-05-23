@@ -29,11 +29,17 @@ module.exports = async function( url, options ) {
 
     waitAfterLoad: 5000, // milliseconds
     allowedTimeToLoad: 40000, // milliseconds
-    puppeteerTimeout: 30000 // milliseconds
+    puppeteerTimeout: 30000, // milliseconds
+
+    // you really don't want to set this to false, this is for testing in https://github.com/phetsims/aqua/issues/144
+    sandbox: true
   }, options );
 
+  const launchOptions = options.sandbox ? {} : {
+    args: [ '--no-sandbox', '--disable-setuid-sandbox' ]
+  };
   const hasBrowser = !!options.browser;
-  const browser = hasBrowser ? options.browser : await puppeteer.launch();
+  const browser = hasBrowser ? options.browser : await puppeteer.launch( launchOptions );
 
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout( options.puppeteerTimeout );
