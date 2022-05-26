@@ -44,18 +44,13 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
       latestRedirectContents += 'RewriteCond %{QUERY_STRING} =download\n' +
                                 'RewriteRule ([^/]*)$ - [L,E=download:$1]\n' +
                                 'Header onsuccess set Content-disposition "attachment; filename=%{download}e" env=download\n';
-      try {
-        await writeFile( redirectFilepath, latestRedirectContents );
-      }
-      catch( err ) {
-        return Promise.reject( err );
-      }
+      await writeFile( redirectFilepath, latestRedirectContents );
     }
     else {
       winston.error( `simName: ${latestOption.simName}` );
       winston.error( `version: ${latestOption.version}` );
       winston.error( `directory: ${latestOption.directory}` );
-      return Promise.reject( new Error( 'latestOption is missing one of the required parameters (simName, version, or directory)' ) );
+      throw new Error( 'latestOption is missing one of the required parameters (simName, version, or directory)' );
     }
   }
 
@@ -141,9 +136,7 @@ AuthUserFile ${authFilepath}
     }
     catch( err ) {
       winston.debug( 'phetio authentication htaccess not written' );
-      return Promise.reject( err );
+      throw err;
     }
   }
-
-  return Promise.resolve();
 };

@@ -27,7 +27,8 @@ module.exports = async function pullMaster( repos ) {
     await gitPull( 'babel' );
   }
   catch( error ) {
-    return Promise.reject( new Error( 'git checkout/pull failed in babel' ) );
+    console.error( error );
+    throw new Error( 'git checkout/pull failed in babel' );
   }
 
   for ( const repoName in reposCopy ) {
@@ -38,7 +39,8 @@ module.exports = async function pullMaster( repos ) {
       await execute( 'git', [ 'checkout', 'master' ], repoDir );
     }
     catch( error ) {
-      return Promise.reject( new Error( `git checkout master failed in ${repoName}` ) );
+      console.error( error );
+      throw new Error( `git checkout master failed in ${repoName}` );
     }
 
     try {
@@ -50,9 +52,6 @@ module.exports = async function pullMaster( repos ) {
   }
 
   if ( errors.length > 0 ) {
-    return Promise.reject( new Error( 'at least one repository failed to pull master' ) );
-  }
-  else {
-    return Promise.resolve();
+    throw new Error( 'at least one repository failed to pull master' );
   }
 };
