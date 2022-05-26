@@ -31,7 +31,7 @@ const abortBuild = async err => {
   winston.log( 'error', `BUILD ABORTED! ${err}` );
   winston.log( 'info', 'build aborted: checking out master for every repo in case build shas are still checked out' );
   await execute( 'grunt', [ 'checkout-master-all' ], constants.PERENNIAL );
-  return Promise.reject( new Error( `Build aborted, ${err}` ) );
+  throw new Error( `Build aborted, ${err}` );
 };
 
 /**
@@ -43,9 +43,8 @@ const afterDeploy = async buildDir => {
     await execute( 'rm', [ '-rf', buildDir ], '.' );
   }
   catch( err ) {
-    return abortBuild( err );
+    await abortBuild( err );
   }
-  return Promise.resolve();
 };
 
 /**
@@ -73,12 +72,12 @@ async function taskWorker( options ) {
       await gitCheckout( 'perennial-alias', 'master' );
       await gitPull( 'perennial-alias' );
       winston.info( 'Deploy images completed successfully.' );
-      return Promise.resolve();
+      return;
     }
     catch( e ) {
       winston.error( e );
       winston.error( 'Deploy images failed. See previous logs for details.' );
-      return Promise.reject( e );
+      throw e;
     }
 
   }
@@ -118,29 +117,29 @@ async function taskWorker( options ) {
 
         // make sure all keys in repos object are valid sim names
         if ( !simNameRegex.test( key ) ) {
-          return abortBuild( `invalid simName in repos: ${simName}` );
+          await abortBuild( `invalid simName in repos: ${simName}` );
         }
 
         const value = repos[ key ];
         if ( key === 'comment' ) {
           if ( typeof value !== 'string' ) {
-            return abortBuild( 'invalid comment in repos: should be a string' );
+            await abortBuild( 'invalid comment in repos: should be a string' );
           }
         }
         else if ( value instanceof Object && value.hasOwnProperty( 'sha' ) ) {
           if ( !/^[a-f0-9]{40}$/.test( value.sha ) ) {
-            return abortBuild( `invalid sha in repos. key: ${key} value: ${value} sha: ${value.sha}` );
+            await abortBuild( `invalid sha in repos. key: ${key} value: ${value} sha: ${value.sha}` );
           }
         }
         else {
-          return abortBuild( `invalid item in repos. key: ${key} value: ${value}` );
+          await abortBuild( `invalid item in repos. key: ${key} value: ${value}` );
         }
       }
     }
 
     // validate simName
     if ( !simNameRegex.test( simName ) ) {
-      return abortBuild( `invalid simName ${simName}` );
+      await abortBuild( `invalid simName ${simName}` );
     }
 
     // Infer brand from version string and keep unstripped version for phet-io
@@ -161,7 +160,7 @@ async function taskWorker( options ) {
         winston.log( 'info', `detecting version number: ${version}` );
       }
       else {
-        return abortBuild( `invalid version number: ${version}` );
+        await abortBuild( `invalid version number: ${version}` );
       }
     }
 
@@ -169,7 +168,7 @@ async function taskWorker( options ) {
     winston.log( 'info', `building sim ${simName}` );
 
     // Create the temporary build dir, removing the existing dir if it exists.
-    if ( await fs.existsSync( buildDir ) ) {
+    if ( fs.existsSync( buildDir ) ) {
       await execute( 'rm', [ '-rf', buildDir ], '.' );
     }
     await fs.promises.mkdir( buildDir, { recursive: true } );
@@ -213,7 +212,7 @@ async function taskWorker( options ) {
       await execute( 'grunt', args, simDir );
     }
     else {
-      return abortBuild( 'Unsupported chipper version' );
+      await abortBuild( 'Unsupported chipper version' );
     }
 
     winston.debug( `deploying to servers: ${JSON.stringify( servers )}` );
@@ -369,10 +368,10 @@ async function taskWorker( options ) {
     }
   }
   catch( err ) {
-    return abortBuild( err );
+    await abortBuild( err );
   }
 
-  return afterDeploy();
+  await afterDeploy();
 }
 
 module.exports = ( task, taskCallback ) => {
