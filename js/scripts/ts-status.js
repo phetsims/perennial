@@ -74,8 +74,8 @@ const tableData = {};
 repos.forEach( repo => {
   const jsResult = child_process.execSync( 'find . -name \'*.js\' | xargs wc -l', { cwd: `${repo}/js` } );
   const tsResult = child_process.execSync( 'find . -name \'*.ts\' | xargs wc -l', { cwd: `${repo}/js` } );
-  const tsIgnoreResult = child_process.spawnSync( 'grep -r -c -w @ts-ignore', { cwd: `${repo}/js`, shell: true } );
-  const privateResult = child_process.spawnSync( 'grep -r -c -w @private', { cwd: `${repo}/js`, shell: true } );
+  const tsIgnoreResult = child_process.spawnSync( 'grep -r -c --include="*.ts" -w @ts-ignore', { cwd: `${repo}/js`, shell: true } );
+  const privateResult = child_process.spawnSync( 'grep -r -c --include="*.ts" -w @private', { cwd: `${repo}/js`, shell: true } );
 
   const tsCount = formatCodeCount( tsResult.toString() );
   const jsCount = formatCodeCount( jsResult.toString() );
