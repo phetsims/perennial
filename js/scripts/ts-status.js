@@ -57,9 +57,7 @@ const formatWordCount = result => {
   const instances = result.split( /\r?\n/ ).map( string => Number( string.slice( -1 ) ) );
   let count = 0;
   instances.forEach( instance => {
-    if ( instance ) {
-      count += instance;
-    }
+    instance && ( count += instance );
   } );
   return count;
 };
