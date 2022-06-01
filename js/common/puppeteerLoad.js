@@ -55,8 +55,8 @@ module.exports = async function( url, options ) {
     resolve( new Error( error ) );
   } );
   page.on( 'pageerror', error => {
-    winston.info( `puppeteer pageerror: ${error}` );
     if ( options.resolvePageErrors ) {
+      winston.info( `puppeteer pageerror: ${error}` );
       resolve( new Error( error ) );
     }
   } );
