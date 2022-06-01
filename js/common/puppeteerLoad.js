@@ -27,6 +27,7 @@ module.exports = async function( url, options ) {
 
     evaluate: null, // {function|null}
 
+    resolvePageErrors: true, // resolve when the page errors
     waitAfterLoad: 5000, // milliseconds
     allowedTimeToLoad: 40000, // milliseconds
     puppeteerTimeout: 30000 // milliseconds
@@ -49,13 +50,15 @@ module.exports = async function( url, options ) {
     await sleep( options.waitAfterLoad );
     resolve( options.evaluate && !page.isClosed() ? await page.evaluate( options.evaluate ) : null );
   } );
-  page.on( 'error', msg => {
-    winston.info( `puppeteer error: ${msg}` );
-    resolve( new Error( msg ) );
+  page.on( 'error', error => {
+    winston.info( `puppeteer error: ${error}` );
+    resolve( new Error( error ) );
   } );
-  page.on( 'pageerror', msg => {
-    winston.info( `puppeteer pageerror: ${msg}` );
-    resolve( new Error( msg ) );
+  page.on( 'pageerror', error => {
+    winston.info( `puppeteer pageerror: ${error}` );
+    if ( options.resolvePageErrors ) {
+      resolve( new Error( error ) );
+    }
   } );
   ( async () => {
     await sleep( options.allowedTimeToLoad );
