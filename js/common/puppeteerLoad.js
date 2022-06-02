@@ -23,6 +23,9 @@ module.exports = async function( url, options ) {
 
   options = _.extend( { // eslint-disable-line
 
+    // See https://github.com/puppeteer/puppeteer/blob/v14.1.1/docs/api.md#puppeteerlaunchoptions
+    launchOptions: {},
+
     browser: null, // {puppeteer.Browser|null} - If provided, we'll use a persistent browser
 
     evaluate: null, // {function|null}
@@ -34,7 +37,7 @@ module.exports = async function( url, options ) {
   }, options );
 
   const hasBrowser = !!options.browser;
-  const browser = hasBrowser ? options.browser : await puppeteer.launch();
+  const browser = hasBrowser ? options.browser : await puppeteer.launch( options.launchOptions );
 
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout( options.puppeteerTimeout );
