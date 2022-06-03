@@ -41,7 +41,6 @@ const repos = [
 const jsHeader = 'JS';
 const tsHeader = 'TS';
 const tsIgnoreHeader = '"@ts-ignore"';
-const privateHeader = '"@private"';
 const completeHeader = '% Complete';
 
 // filter and parse stdout to return lines of code count in each repo
@@ -83,19 +82,16 @@ repos.forEach( repo => {
   const jsResult = child_process.execSync( 'find . -name \'*.js\' | xargs wc -l', { cwd: `${repo}/js` } );
   const tsResult = child_process.execSync( 'find . -name \'*.ts\' | xargs wc -l', { cwd: `${repo}/js` } );
   const tsIgnoreResult = child_process.spawnSync( 'grep -r -c --include="*.ts" -w @ts-ignore', { cwd: `${repo}/js`, shell: true } );
-  const privateResult = child_process.spawnSync( 'grep -r -c --include="*.ts" -w @private', { cwd: `${repo}/js`, shell: true } );
 
   const tsCount = formatCodeCount( tsResult.toString() );
   const jsCount = formatCodeCount( jsResult.toString() );
   const tsIgnoreCount = formatWordCount( tsIgnoreResult.stdout.toString() );
-  const privateCount = formatWordCount( privateResult.stdout.toString() );
 
   tableData[ repo ] = {
     [ jsHeader ]: jsCount,
     [ tsHeader ]: tsCount,
     [ completeHeader ]: percent( tsCount, tsCount + jsCount ),
-    [ tsIgnoreHeader ]: tsIgnoreCount,
-    [ privateHeader ]: privateCount
+    [ tsIgnoreHeader ]: tsIgnoreCount
   };
 } );
 
@@ -110,7 +106,6 @@ repos.forEach( repo => {
 let totalJS = 0;
 let totalTS = 0;
 let totalTSIgnore = 0;
-let totalPrivate = 0;
 
 Object.keys( tableData ).forEach( repo => {
   const row = tableData[ repo ];
@@ -118,12 +113,10 @@ Object.keys( tableData ).forEach( repo => {
   totalJS += row[ jsHeader ];
   totalTS += row[ tsHeader ];
   totalTSIgnore += row[ tsIgnoreHeader ];
-  totalPrivate += row[ privateHeader ];
 } );
 
 const summary = `\n --------- SUMMARY ----------
  Total ${tsIgnoreHeader}: ${totalTSIgnore}
- Total ${privateHeader}: ${totalPrivate}
  Total ${jsHeader}: ${totalJS}
  Total ${tsHeader}: ${totalTS}
  ${completeHeader}: ${percent( totalTS, totalTS + totalJS )}%
