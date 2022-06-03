@@ -19,7 +19,7 @@
     "mimelib": "~0.2.19",
     "minimist": "^1.1.1",
     "ncp": "^2.0.0",
-    "puppeteer": "^5.4.1",
+    "puppeteer": "^13.5.2",
     "qunit": "~2.10.0",
     "rimraf": "^2.5.4",
     "rsync": "^0.6.1",
