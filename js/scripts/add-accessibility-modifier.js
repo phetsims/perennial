@@ -25,7 +25,6 @@ const fs = require( 'fs' );
   const filename = args[ 0 ];
   const modifier = args[ 1 ];
 
-  // Don't use getActiveRepos() since it cannot be run from the root
   const report = fs.readFileSync( filename, 'utf8' ).trim();
   const lines = report.split( '\n' ).map( sim => sim.trim() );
 
