@@ -512,6 +512,7 @@ module.exports = function( grunt ) {
     const activeRepos = getDataFile( 'active-repos' );
     const fix = grunt.option( 'fix' );
     const format = grunt.option( 'format' );
+    const chipAway = grunt.option( 'chip-away' );
 
     // Don't always require this, as we may have an older chipper checked out.  Also make sure it is the promise-based lint.
     const lint = require( '../../../chipper/js/grunt/lint' );
@@ -519,7 +520,8 @@ module.exports = function( grunt ) {
       await lint( activeRepos.map( repo => `../${repo}` ), {
         cache: cache,
         fix: fix,
-        format: format
+        format: format,
+        chipAway: chipAway
       } );
     }
   } ) );
