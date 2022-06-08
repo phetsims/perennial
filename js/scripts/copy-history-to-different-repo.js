@@ -4,7 +4,10 @@ const execute = require( '../common/execute' );
 const booleanPrompt = require( '../common/booleanPrompt' );
 
 /**
- * Copy the history of a file or directory to a different repo.
+ * Copy the history of a file or directory to a different repo. This process requires the command `git filter-repo`.
+ * It is recommended by the git documentation as an improvement over `git filter-branch`.
+ * https://git-scm.com/docs/git-filter-branch#_warning.  I used `git --exec-path` to see the path for auxiliary git
+ * commands.  On my platform it was `/Library/Developer/CommandLineTools/usr/libexec/git-core`
  *
  * NOTE: This is a new script that hasn't been fully vetted or tested on Windows.
  *
