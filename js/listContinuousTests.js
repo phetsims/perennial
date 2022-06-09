@@ -161,14 +161,14 @@ phetioRepos.forEach( repo => {
   tests.push( {
     test: [ repo, 'phet-io-studio-fuzz', 'unbuilt' ],
     type: 'wrapper-test',
-    url: `studio/?sim=${repo}&fuzz`
+    url: `studio/?sim=${repo}&phetioWrapperDebug=true&fuzz`
   } );
 
   // only test state on phet-io sims that support it
   phetioNoState.indexOf( repo ) === -1 && tests.push( {
     test: [ repo, 'phet-io-state-fuzz', 'unbuilt' ],
     type: 'wrapper-test',
-    url: `phet-io-wrappers/state/?sim=${repo}&phetioDebug=true&fuzz`
+    url: `phet-io-wrappers/state/?sim=${repo}&phetioDebug=true&phetioWrapperDebug=true&fuzz`
   } );
 
   // phet-io wrappers tests for each PhET-iO Sim
@@ -176,7 +176,7 @@ phetioRepos.forEach( repo => {
     tests.push( {
       test: [ repo, 'phet-io-wrappers-tests', useAssert ? 'assert' : 'no-assert' ],
       type: 'qunit-test',
-      url: `phet-io-wrappers/phet-io-wrappers-tests.html?sim=${repo}${useAssert ? '&phetioDebug=true' : ''}`
+      url: `phet-io-wrappers/phet-io-wrappers-tests.html?sim=${repo}${useAssert ? '&phetioDebug=true&phetioWrapperDebug=true' : ''}`
     } );
   } );
 } );
