@@ -2,7 +2,7 @@
 /**
  *
  * The tsc-status script runs through relevant common code repos and counts the lines of code written in javascript
- * and typescript. Provides data on conversion status, as well as occurrences of @ts-ignore, and @private.
+ * and typescript. Provides data on conversion status, as well as occurrences of @ts-ignore.
  *
  * Run from sims root directory
  * USAGE:
@@ -13,6 +13,8 @@
  */
 
 const child_process = require( 'child_process' );
+// eslint-disable-next-line require-statement-match
+const _ = require( 'lodash' );
 
 const repos = [
   'axon',
@@ -56,21 +58,13 @@ const formatCodeCount = result => {
 
 // filter and parse stdout to return word count in each repo
 const formatWordCount = result => {
-  //REVIEW: We usually use Number.parseInt or the parseInt global to cast things to a number (though this might work
-  //REVIEW: better, so please let me know if we should update what we usually do)
   const instances = result.split( /\r?\n/ ).map( string => Number( string.slice( -1 ) ) );
-  //REVIEW: return _.sum( instances ) --- since it seems like instances is an array of JUST numbers? Not sure why
-  //REVIEW: there is the `instance &&` check. If needed, `return _.sum( instances.filter( _.identity ) )`
-  let count = 0;
-  instances.forEach( instance => {
-    instance && ( count += instance );
-  } );
+  const count = _.sum( instances );
   return count;
 };
 
 const percent = ( numerator, denominator ) => {
-  //REVIEW: For this type of thing, I'd use Math.floor (so that it truly needs to be 100% to be shown as 100%)
-  return Math.round( ( numerator / denominator ) * 100 );
+  return Math.floor( ( numerator / denominator ) * 100 );
 };
 
 const tableData = {};
@@ -95,25 +89,10 @@ repos.forEach( repo => {
   };
 } );
 
-//REVIEW: Consider using lodash instead of the iteration:
-// const _ = require( 'lodash' ); // above
-// const rows = Object.values( tableData );
-// const totalJS = _.sumBy( rows, jsHeader );
-// const totalTS = _.sumBy( rows, tsHeader );
-// const totalTSIgnore = _.sumBy( rows, tsIgnoreHeader );
-// const totalPrivate = _.sumBy( rows, privateHeader );
-
-let totalJS = 0;
-let totalTS = 0;
-let totalTSIgnore = 0;
-
-Object.keys( tableData ).forEach( repo => {
-  const row = tableData[ repo ];
-
-  totalJS += row[ jsHeader ];
-  totalTS += row[ tsHeader ];
-  totalTSIgnore += row[ tsIgnoreHeader ];
-} );
+const rows = Object.values( tableData );
+const totalJS = _.sumBy( rows, jsHeader );
+const totalTS = _.sumBy( rows, tsHeader );
+const totalTSIgnore = _.sumBy( rows, tsIgnoreHeader );
 
 const summary = `\n --------- SUMMARY ----------
  Total ${tsIgnoreHeader}: ${totalTSIgnore}
