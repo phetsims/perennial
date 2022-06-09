@@ -53,14 +53,14 @@ module.exports = async function( url, options ) {
     await sleep( options.waitAfterLoad );
     resolve( options.evaluate && !page.isClosed() ? await page.evaluate( options.evaluate ) : null );
   } );
-  page.on( 'error', error => {
-    winston.info( `puppeteer error: ${error}` );
-    resolve( new Error( error ) );
+  page.on( 'error', message => {
+    winston.info( `puppeteer error: ${message}` );
+    resolve( new Error( message ) );
   } );
-  page.on( 'pageerror', error => {
+  page.on( 'pageerror', message => {
     if ( options.resolvePageErrors ) {
-      winston.info( `puppeteer pageerror: ${error}` );
-      resolve( new Error( error ) );
+      winston.info( `puppeteer pageerror: ${message}` );
+      resolve( new Error( message ) );
     }
   } );
   ( async () => {
