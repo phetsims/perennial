@@ -12,10 +12,11 @@
  * @author Marla Schulz (PhET Interactive Simulations)
  */
 
-const child_process = require( 'child_process' );
 // eslint-disable-next-line require-statement-match
 const _ = require( 'lodash' );
+const fs = require( 'fs' );
 
+// The repositories the script will iterate through to produce data
 const repos = [
   'axon',
   'brand',
@@ -40,55 +41,94 @@ const repos = [
   'vegas'
 ];
 
+// Table headers. Begin here to add another data point.
 const jsHeader = 'JS';
 const tsHeader = 'TS';
 const tsIgnoreHeader = '"@ts-ignore"';
 const completeHeader = '% Complete';
-
-// filter and parse stdout to return lines of code count in each repo
-const formatCodeCount = result => {
-  //REVIEW: This is a lot of complexity to read the output from a shell command
-  //REVIEW: Also, `find . -name '*.js' | xargs cat | wc -l` would concatenate the files together and give you the
-  //REVIEW: output in a single line (and result.trim() to get rid of the newlines around it)
-  const filteredResult = result.split( /\r?\n/ ).filter( string => string );
-  const linesOfCode = filteredResult && filteredResult.pop();
-  const linesOfCodeFormatted = linesOfCode ? linesOfCode.split( ' ' ).filter( string => string ).shift() : '0';
-  return Number( linesOfCodeFormatted );
-};
-
-// filter and parse stdout to return word count in each repo
-const formatWordCount = result => {
-  const instances = result.split( /\r?\n/ ).map( string => Number( string.slice( -1 ) ) );
-  const count = _.sum( instances );
-  return count;
-};
+const tableData = {};
 
 const percent = ( numerator, denominator ) => {
   return Math.floor( ( numerator / denominator ) * 100 );
 };
 
-const tableData = {};
+// Counts by every line of text in a file vs `wc -l` which counts by every newline.
+// Therefore, `wc -l` is inaccurate by at least 1 line per file.
+const countLines = path => {
+  const text = fs.readFileSync( path, 'utf8' );
+  const textLines = text.trim().split( /\r?\n/ );
+  const lineCount = textLines.length;
+  return lineCount;
+};
+
+// Uses `.include` to check if word is present in line and then ups word count by 1.
+// Does not count multiple uses of same word in one line. For those types of scenarios,
+// this function is inaccurate.
+const countWord = ( path, word ) => {
+  const occurrence = [];
+  const text = fs.readFileSync( path, 'utf8' );
+  const textLines = text.trim().split( /\r?\n/ );
+  textLines.forEach( line => {
+    if ( line.includes( word ) ) {
+      occurrence.push( word );
+    }
+  } );
+  const wordCount = occurrence.length;
+  return wordCount;
+};
+
+// recursively navigates each repository to find relevant javascript and typescript files
+const captureData = ( repo, tableData ) => {
+  let tsCount = 0;
+  let jsCount = 0;
+  let tsIgnoreCount = 0;
+
+  const startPath = `./${repo}`;
+  const entries = fs.readdirSync( startPath );
+
+  entries.forEach( file => {
+    const path = `${startPath}/${file}`;
+
+    if ( fs.statSync( path ).isDirectory() ) {
+      captureData( path, tableData );
+    }
+    else if ( file.match( /\.js$/ ) ) {
+      const fileCount = countLines( path );
+      jsCount += fileCount;
+    }
+    else if ( file.match( /\.ts$/ ) ) {
+      const fileCount = countLines( path );
+      tsCount += fileCount;
+      const fileTSIgnoreCount = countWord( path, '@ts-ignore' );
+      tsIgnoreCount += fileTSIgnoreCount;
+    }
+  } );
+
+  // Adds count to respective key in nested repo object.
+  tableData[ jsHeader ] += jsCount;
+  tableData[ tsHeader ] += tsCount;
+  tableData[ tsIgnoreHeader ] += tsIgnoreCount;
+};
 
 // iterate through list of common code repos to fill out data
 repos.forEach( repo => {
-  //REVIEW: Recommend potentially async/await style code with loading files in as a string (as long as it doesn't kill
-  //REVIEW: performance. Collaboration on that sounds good!
-  const jsResult = child_process.execSync( 'find . -name \'*.js\' | xargs wc -l', { cwd: `${repo}/js` } );
-  const tsResult = child_process.execSync( 'find . -name \'*.ts\' | xargs wc -l', { cwd: `${repo}/js` } );
-  const tsIgnoreResult = child_process.spawnSync( 'grep -r -c --include="*.ts" -w @ts-ignore', { cwd: `${repo}/js`, shell: true } );
 
-  const tsCount = formatCodeCount( tsResult.toString() );
-  const jsCount = formatCodeCount( jsResult.toString() );
-  const tsIgnoreCount = formatWordCount( tsIgnoreResult.stdout.toString() );
-
+  // Sets baseline for nested repo object. New data point baselines should be added here.
   tableData[ repo ] = {
-    [ jsHeader ]: jsCount,
-    [ tsHeader ]: tsCount,
-    [ completeHeader ]: percent( tsCount, tsCount + jsCount ),
-    [ tsIgnoreHeader ]: tsIgnoreCount
+    [ jsHeader ]: 0,
+    [ tsHeader ]: 0,
+    [ completeHeader ]: 0,
+    [ tsIgnoreHeader ]: 0
   };
+  const repoData = tableData[ repo ];
+
+  captureData( repo + '/js', repoData );
+
+  repoData[ completeHeader ] = percent( repoData.TS, repoData.TS + repoData.JS );
 } );
 
+
+// calculates total sum across all provided repos
 const rows = Object.values( tableData );
 const totalJS = _.sumBy( rows, jsHeader );
 const totalTS = _.sumBy( rows, tsHeader );
