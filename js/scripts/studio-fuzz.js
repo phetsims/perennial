@@ -23,7 +23,21 @@ const withServer = require( '../common/withServer' );
         const error = await puppeteerLoad( url, {
           waitAfterLoad: 10000,
           allowedTimeToLoad: 120000,
-          puppeteerTimeout: 120000
+          puppeteerTimeout: 120000,
+          launchOptions: {
+
+            // With this flag, temp files are written to /tmp/ on bayes, which caused https://github.com/phetsims/aqua/issues/145
+            // /dev/shm/ is much bigger
+            ignoreDefaultArgs: [ '--disable-dev-shm-usage' ],
+
+            // Command line arguments passed to the chrome instance,
+            args: [
+              '--enable-precise-memory-info',
+
+              // To prevent filling up `/tmp`, see https://github.com/phetsims/aqua/issues/145
+              `--user-data-dir=${process.cwd()}/../tmp/puppeteerUserData/`
+            ]
+          }
         } );
         if ( error ) {
           studioFuzz = error;
