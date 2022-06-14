@@ -45,11 +45,11 @@ module.exports = async function getSortedVersionDirectories( path ) {
     const bTokenized = b.split( '.' );
     let result = 0;
     for ( let i = 0; i < aTokenized.length; i++ ) {
-      if ( parseInt( aTokenized[ i ], 10 ) < parseInt( bTokenized[ i ], 10 ) ) {
+      if ( Number( aTokenized[ i ] ) < Number( bTokenized[ i ] ) ) {
         result = -1;
         break;
       }
-      else if ( parseInt( aTokenized[ i ], 10 ) > parseInt( bTokenized[ i ], 10 ) ) {
+      else if ( Number( aTokenized[ i ] ) > Number( bTokenized[ i ] ) ) {
         result = 1;
         break;
       }
