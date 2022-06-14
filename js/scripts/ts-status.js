@@ -57,8 +57,7 @@ const percent = ( numerator, denominator ) => {
 const countLines = path => {
   const text = fs.readFileSync( path, 'utf8' );
   const textLines = text.trim().split( /\r?\n/ );
-  const lineCount = textLines.length;
-  return lineCount;
+  return textLines.length;
 };
 
 // Uses `.include` to check if word is present in line and then ups word count by 1.
@@ -73,34 +72,29 @@ const countWord = ( path, word ) => {
       occurrence.push( word );
     }
   } );
-  const wordCount = occurrence.length;
-  return wordCount;
+  return occurrence.length;
 };
 
 // recursively navigates each repository to find relevant javascript and typescript files
-const captureData = ( repo, tableData ) => {
+const captureData = ( path, tableData ) => {
   let tsCount = 0;
   let jsCount = 0;
   let tsIgnoreCount = 0;
 
-  const startPath = `./${repo}`;
-  const entries = fs.readdirSync( startPath );
+  const entries = fs.readdirSync( path );
 
   entries.forEach( file => {
-    const path = `${startPath}/${file}`;
+    const newPath = `${path}/${file}`;
 
-    if ( fs.statSync( path ).isDirectory() ) {
-      captureData( path, tableData );
+    if ( fs.statSync( newPath ).isDirectory() ) {
+      captureData( newPath, tableData );
     }
     else if ( file.match( /\.js$/ ) ) {
-      const fileCount = countLines( path );
-      jsCount += fileCount;
+      jsCount += countLines( newPath );
     }
     else if ( file.match( /\.ts$/ ) ) {
-      const fileCount = countLines( path );
-      tsCount += fileCount;
-      const fileTSIgnoreCount = countWord( path, '@ts-ignore' );
-      tsIgnoreCount += fileTSIgnoreCount;
+      tsCount += countLines( newPath );
+      tsIgnoreCount += countWord( newPath, '@ts-ignore' );
     }
   } );
 
@@ -122,7 +116,7 @@ repos.forEach( repo => {
   };
   const repoData = tableData[ repo ];
 
-  captureData( repo + '/js', repoData );
+  captureData( `./${repo}/js`, repoData );
 
   repoData[ completeHeader ] = percent( repoData.TS, repoData.TS + repoData.JS );
 } );
