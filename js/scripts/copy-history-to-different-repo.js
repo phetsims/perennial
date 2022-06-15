@@ -4,12 +4,26 @@ const execute = require( '../common/execute' );
 const booleanPrompt = require( '../common/booleanPrompt' );
 
 /**
- * Copy the history of a file or directory to a different repo. This process requires the command `git filter-repo`.
- * It is recommended by the git documentation as an improvement over `git filter-branch`.
- * https://git-scm.com/docs/git-filter-branch#_warning.  I used `git --exec-path` to see the path for auxiliary git
- * commands.  On my platform it was `/Library/Developer/CommandLineTools/usr/libexec/git-core`
+ * Copy the history of a file or directory to a different repo.
  *
- * NOTE: This is a new script that hasn't been fully vetted or tested on Windows.
+ * ### REQUIREMENT: `git filter-repo`############################################
+ * ###
+ * ### This process requires the command `git filter-repo`, which is recommended by the git documentation as an improvement
+ * ### over `git filter-branch`, https://git-scm.com/docs/git-filter-branch#_warning. I used `git --exec-path` to see the
+ * ### path for auxiliary git commands.
+ * ###
+ * ### On my mac it was `/Library/Developer/CommandLineTools/usr/libexec/git-core`
+ * ### On my win it was `/C/Program\ Files/Git/mingw64/libexec/git-core`
+ * ###
+ * ### Installing `git filter-repo` on Windows consisted of these steps:
+ * ### 1. Install python and confirm it is in the path and works from the command line
+ * ### 2. Copy the raw contents of https://github.com/newren/git-filter-repo/blob/main/git-filter-repo into a file "git-filter-repo" in the --exec-path
+ * ### 3. If your system uses "python" instead of "python3", change that in the 1st line of the file.
+ * ### 4. Test using "git filter-repo", if it is installed correctly it will say something like: "No arguments specified"
+ * ###
+ * ### More instructions about installing are listed here:
+ * ### https://github.com/newren/git-filter-repo#how-do-i-install-it
+ * ##############################################################################
  *
  * USAGE:
  * node perennial/js/scripts/copy-history-to-different-repo source-path destination-repo
