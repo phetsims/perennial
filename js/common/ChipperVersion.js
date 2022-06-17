@@ -63,9 +63,9 @@ module.exports = ( function() {
       throw new Error( `could not parse chipper version: ${versionString}` );
     }
 
-    const major = parseInt( matches[ 1 ], 10 );
-    const minor = parseInt( matches[ 2 ], 10 );
-    const maintenance = parseInt( matches[ 3 ], 10 );
+    const major = Number( matches[ 1 ] );
+    const minor = Number( matches[ 2 ] );
+    const maintenance = Number( matches[ 3 ] );
     const chipperSupportsOutputJSGruntTasks = packageJSON.phet && packageJSON.phet.chipperSupportsOutputJSGruntTasks;
 
     return new ChipperVersion( major, minor, maintenance, chipperSupportsOutputJSGruntTasks );

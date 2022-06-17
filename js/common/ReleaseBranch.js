@@ -482,8 +482,8 @@ module.exports = ( function() {
           const match = branch.match( /^(\d+)\.(\d+)$/ );
 
           if ( match ) {
-            const major = parseInt( match[ 1 ], 10 );
-            const minor = parseInt( match[ 2 ], 10 );
+            const major = Number( match[ 1 ] );
+            const minor = Number( match[ 2 ] );
 
             const projectMetadata = simMetadataResult.projects.find( project => project.name === `html/${repo}` ) || null;
             const productionVersion = projectMetadata ? projectMetadata.version : null;

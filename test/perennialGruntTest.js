@@ -18,7 +18,7 @@ async function getLikelyNextBranch( repo, incrementMajor, incrementMinor ) {
   let currentMajor = 0;
   let currentMinor = 0;
   ( await getBranches( repo ) ).filter( branch => /^\d+\.\d+$/.test( branch ) ).forEach( branch => {
-    const [ major, minor ] = branch.split( '.' ).map( str => parseInt( str, 10 ) );
+    const [ major, minor ] = branch.split( '.' ).map( str => Number( str ) );
     if ( major > currentMajor || ( major === currentMajor && minor > currentMinor ) ) {
       currentMajor = major;
       currentMinor = minor;

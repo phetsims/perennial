@@ -189,11 +189,11 @@ const assert = typeof module !== 'undefined' ? require( 'assert' ) : window && w
         throw new Error( `could not parse version: ${versionString}` );
       }
 
-      const major = parseInt( matches[ 1 ], 10 );
-      const minor = parseInt( matches[ 2 ], 10 );
-      const maintenance = parseInt( matches[ 3 ], 10 );
+      const major = Number( matches[ 1 ] );
+      const minor = Number( matches[ 2 ] );
+      const maintenance = Number( matches[ 3 ] );
       const testType = matches[ 6 ];
-      const testNumber = matches[ 7 ] === undefined ? matches[ 7 ] : parseInt( matches[ 7 ], 10 );
+      const testNumber = matches[ 7 ] === undefined ? matches[ 7 ] : Number( matches[ 7 ] );
 
       return new SimVersion( major, minor, maintenance, {
         testType: testType,
@@ -213,8 +213,8 @@ const assert = typeof module !== 'undefined' ? require( 'assert' ) : window && w
       const bits = branch.split( '.' );
       assert && assert( bits.length === 2, `Bad branch, should be {{MAJOR}}.{{MINOR}}, had: ${branch}` );
 
-      const major = parseInt( branch.split( '.' )[ 0 ], 10 );
-      const minor = parseInt( branch.split( '.' )[ 1 ], 10 );
+      const major = Number( branch.split( '.' )[ 0 ] );
+      const minor = Number( branch.split( '.' )[ 1 ] );
 
       return new SimVersion( major, minor, 0 );
     }

@@ -36,8 +36,8 @@ const fs = require( 'fs' );
     else if ( line.includes( 'error' ) && line.endsWith( '@typescript-eslint/explicit-member-accessibility' ) ) {
       const substring = line.substring( 0, line.indexOf( 'error' ) );
       const terms = substring.trim().split( ':' );
-      const lineNumber = parseInt( terms[ 0 ], 10 );
-      const column = parseInt( terms[ 1 ], 10 );
+      const lineNumber = Number( terms[ 0 ] );
+      const column = Number( terms[ 1 ] );
 
       console.log( currentFile, lineNumber, column );
 

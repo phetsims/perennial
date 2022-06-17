@@ -79,7 +79,7 @@ const fs = require( 'fs' );
             line = line.substring( username.length ).trim();
 
             const tokens = line.split( ' ' );
-            const number = parseInt( tokens[ 0 ], 10 );
+            const number = Number( tokens[ 0 ] );
             const time = tokens[ 1 ];
 
             if ( time === 'days' && number <= 7 ) {
