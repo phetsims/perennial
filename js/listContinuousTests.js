@@ -463,26 +463,4 @@ tests.push( {
   queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&autoFill=false'
 } );
 
-// geometric-optics
-
-// Workaround for deficiencies in fuzz coverage.
-// Fuzz both screens with 'Arrow' as the only ComboBox choice.
-// See https://github.com/phetsims/geometric-optics/issues/397 and https://github.com/phetsims/aqua/issues/136
-tests.push( {
-  test: [ 'geometric-optics', 'fuzz', 'unbuilt', 'fuzzArrow' ],
-  type: 'sim-test',
-  url: 'geometric-optics/geometric-optics_en.html',
-  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&scene=arrow'
-} );
-
-// Workaround for deficiencies in fuzz coverage.
-// Fuzz the Lens screen with 'Light' as the only ComboBox choice. (Light is not a choice in the Mirror screen.)
-// See https://github.com/phetsims/geometric-optics/issues/397 and https://github.com/phetsims/aqua/issues/136
-tests.push( {
-  test: [ 'geometric-optics', 'fuzz', 'unbuilt', 'fuzzLight' ],
-  type: 'sim-test',
-  url: 'geometric-optics/geometric-optics_en.html',
-  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&screens=1&scene=light'
-} );
-
 console.log( JSON.stringify( tests, null, 2 ) );
