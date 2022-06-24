@@ -392,10 +392,10 @@ Object.keys( commonQueryParameters ).forEach( name => {
 } );
 
 //----------------------------------------------------------------------------------------------------------------------
-// Sim-specific query parameter tests
+// Additional sim-specific tests
 //----------------------------------------------------------------------------------------------------------------------
 
-// beers-law-lab
+// beers-law-lab: test various query parameter
 tests.push( {
   test: [ 'beers-law-lab', 'fuzz', 'unbuilt', 'query-parameters' ],
   type: 'sim-test',
@@ -403,6 +403,7 @@ tests.push( {
   queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&showSoluteAmount&concentrationMeterUnits=percent&beakerUnits=milliliters'
 } );
 
+// circuit-construction-kit-ac: test various query parameter
 tests.push( {
   test: [ 'circuit-construction-kit-ac', 'fuzz', 'unbuilt', 'query-parameters' ],
   type: 'sim-test',
@@ -412,9 +413,7 @@ tests.push( {
   queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&showCurrent&addRealBulbs&moreWires&moreInductors'
 } );
 
-// energy forms and changes
-
-// four blocks and one burner
+// energy forms and changes: four blocks and one burner
 tests.push( {
   test: [ 'energy-forms-and-changes', 'fuzz', 'unbuilt', 'query-parameters' ],
   type: 'sim-test',
@@ -422,7 +421,7 @@ tests.push( {
   queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&screens=1&elements=iron,brick,iron,brick&burners=1'
 } );
 
-// two beakers and 2 burners
+// energy forms and changes: two beakers and 2 burners
 tests.push( {
   test: [ 'energy-forms-and-changes', 'fuzz', 'unbuilt', 'query-parameters-2' ],
   type: 'sim-test',
@@ -430,7 +429,7 @@ tests.push( {
   queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&screens=1&&elements=oliveOil,water&burners=2'
 } );
 
-// gas-properties
+// gas-properties: test pressureNoise query parameter
 tests.push( {
   test: [ 'gas-properties', 'fuzz', 'unbuilt', 'query-parameters' ],
   type: 'sim-test',
@@ -438,8 +437,7 @@ tests.push( {
   queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&pressureNoise=false'
 } );
 
-// natural-selection
-
+// natural-selection: test various query parameters
 tests.push( {
   test: [ 'natural-selection', 'fuzz', 'unbuilt', 'query-parameters' ],
   type: 'sim-test',
@@ -447,7 +445,7 @@ tests.push( {
   queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&allelesVisible=false&introMutations=F&introPopulation=10Ff&labMutations=FeT&labPopulation=2FFeett,2ffEEtt,2ffeeTT'
 } );
 
-// To have one test where the generation clock is running faster, and more things are liable to happen
+// natural-selection: To have one test where the generation clock is running faster, and more things are liable to happen
 tests.push( {
   test: [ 'natural-selection', 'fuzz', 'unbuilt', 'secondsPerGeneration' ],
   type: 'sim-test',
@@ -455,7 +453,7 @@ tests.push( {
   queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&secondsPerGeneration=1'
 } );
 
-// ph-scale
+// ph-scale: test the autofill query parameter
 tests.push( {
   test: [ 'ph-scale', 'autofill-fuzz', 'unbuilt', 'query-parameters' ],
   type: 'sim-test',
