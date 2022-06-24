@@ -395,7 +395,7 @@ Object.keys( commonQueryParameters ).forEach( name => {
 // Additional sim-specific tests
 //----------------------------------------------------------------------------------------------------------------------
 
-// beers-law-lab: test various query parameter
+// beers-law-lab: test various query parameters
 tests.push( {
   test: [ 'beers-law-lab', 'fuzz', 'unbuilt', 'query-parameters' ],
   type: 'sim-test',
@@ -403,7 +403,7 @@ tests.push( {
   queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&showSoluteAmount&concentrationMeterUnits=percent&beakerUnits=milliliters'
 } );
 
-// circuit-construction-kit-ac: test various query parameter
+// circuit-construction-kit-ac: test various query parameters
 tests.push( {
   test: [ 'circuit-construction-kit-ac', 'fuzz', 'unbuilt', 'query-parameters' ],
   type: 'sim-test',
@@ -445,7 +445,7 @@ tests.push( {
   queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&allelesVisible=false&introMutations=F&introPopulation=10Ff&labMutations=FeT&labPopulation=2FFeett,2ffEEtt,2ffeeTT'
 } );
 
-// natural-selection: To have one test where the generation clock is running faster, and more things are liable to happen
+// natural-selection: run the generation clock faster, so that more things are liable to happen
 tests.push( {
   test: [ 'natural-selection', 'fuzz', 'unbuilt', 'secondsPerGeneration' ],
   type: 'sim-test',
