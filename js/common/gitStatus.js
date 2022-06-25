@@ -43,8 +43,8 @@ module.exports = async function( repo ) {
     // e.g. behind-count + '\t' + ahead-count
     const counts = await execute( 'git', [ 'rev-list', '--left-right', '--count', `${result.trackingBranch}@{u}...HEAD` ], `../${repo}` );
 
-    result.behind = parseInt( counts.split( '\t' )[ 0 ], 10 );
-    result.ahead = parseInt( counts.split( '\t' )[ 1 ], 10 );
+    result.behind = Number( counts.split( '\t' )[ 0 ] );
+    result.ahead = Number( counts.split( '\t' )[ 1 ] );
     result.remoteDifferent = result.remoteSHA !== result.sha;
 
     if ( result.remoteDifferent ) {
