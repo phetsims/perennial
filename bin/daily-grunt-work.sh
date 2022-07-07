@@ -33,6 +33,10 @@ perennial/bin/clone-missing-repos.sh
 perennial/bin/pull-all.sh -p
 perennial/bin/for-each.sh perennial/data/active-repos "npm prune && npm update"
 
+cd chipper || exit
+node js/scripts/transpile.js
+cd ..
+
 ###########################################################################################################
 # update-copyright-dates
 echo "COPYRIGHT UPDATES:"
