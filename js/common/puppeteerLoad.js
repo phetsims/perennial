@@ -36,8 +36,8 @@ module.exports = async function( url, options ) {
     puppeteerTimeout: 30000 // milliseconds
   }, options );
 
-  const hasBrowser = !!options.browser;
-  const browser = hasBrowser ? options.browser : await puppeteer.launch( options.launchOptions );
+  const ownsBrowser = !options.browser;
+  const browser = ownsBrowser ? await puppeteer.launch( options.launchOptions ) : options.browser;
 
   const page = await browser.newPage();
   await page.setDefaultNavigationTimeout( options.puppeteerTimeout );
@@ -77,7 +77,8 @@ module.exports = async function( url, options ) {
   const result = await promise;
   await page.close();
 
-  if ( hasBrowser ) {
+  // If we created a temporary browser, close it
+  if ( ownsBrowser ) {
     await browser.close();
   }
 
