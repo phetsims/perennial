@@ -8,5 +8,6 @@ node_modules/
 *.sublime-workspace
 .eslintcache
 build-server.log
+lintreport.txt
 js/build-server/tmp*
 .maintenance.json
