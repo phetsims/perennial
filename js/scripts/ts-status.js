@@ -25,6 +25,7 @@ const repos = [
   'joist',
   'kite',
   'mobius',
+  'nitroglycerin',
   'perennial',
   'phet-core',
   'phet-io',
