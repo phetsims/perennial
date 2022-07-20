@@ -33,10 +33,10 @@ const repos = [
   'phetmarks',
   'scenery',
   'scenery-phet',
-  'shred',
   'sun',
   'tambo',
   'tandem',
+  'tappi',
   'twixt',
   'utterance-queue',
   'vegas'
