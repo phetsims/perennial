@@ -331,19 +331,20 @@ module.exports = function( grunt ) {
     } ) );
 
   grunt.registerTask( 'lint', 'Lints this repository only', wrapTask( async () => {
-    const execute = require( '../common/execute' );
-    const gruntCommand = require( '../common/gruntCommand' );
 
-    const index = process.argv.indexOf( 'lint' );
-    assert && assert( index >= 0, 'lint command does not appear' );
-    const tail = process.argv.slice( index + 1 );
+    // --disable-eslint-cache disables the cache, useful for developing rules
+    const cache = !grunt.option( 'disable-eslint-cache' );
+    const fix = grunt.option( 'fix' );
+    const format = grunt.option( 'format' );
+    const chipAway = grunt.option( 'chip-away' );
 
-    if ( !grunt.option( 'patterns' ) ) {
-      tail.push( '--patterns=../perennial' );
-    }
-
-    // Forward to chipper, supporting all of the options
-    grunt.log.writeln( ( await execute( gruntCommand, [ 'lint', ...tail ], '../chipper', { errors: 'resolve' } ) ).stdout );
+    // Don't always require this, as we may have an older chipper checked out.  Also make sure it is the promise-based lint.
+    await require( './lint' )( [ 'perennial' ], {
+      cache: cache,
+      fix: fix,
+      format: format,
+      chipAway: chipAway
+    } );
   } ) );
 
   grunt.registerTask( 'wrapper',
@@ -515,15 +516,12 @@ module.exports = function( grunt ) {
     const chipAway = grunt.option( 'chip-away' );
 
     // Don't always require this, as we may have an older chipper checked out.  Also make sure it is the promise-based lint.
-    const lint = require( '../../../chipper/js/grunt/lint' );
-    if ( lint.chipperAPIVersion === 'promisesPerRepo1' ) {
-      await lint( activeRepos, {
-        cache: cache,
-        fix: fix,
-        format: format,
-        chipAway: chipAway
-      } );
-    }
+    await require( './lint' )( activeRepos, {
+      cache: cache,
+      fix: fix,
+      format: format,
+      chipAway: chipAway
+    } );
   } ) );
 
   grunt.registerTask( 'generate-data', 'Generates the lists under perennial/data/, and if there were changes, will commit and push.', wrapTask( async () => {
