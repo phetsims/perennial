@@ -516,7 +516,7 @@ module.exports = function( grunt ) {
 
     // Don't always require this, as we may have an older chipper checked out.  Also make sure it is the promise-based lint.
     const lint = require( '../../../chipper/js/grunt/lint' );
-    if ( lint.chipperAPIVersion === 'promises1' ) {
+    if ( lint.chipperAPIVersion === 'promisesPerRepo1' ) {
       await lint( activeRepos, {
         cache: cache,
         fix: fix,
