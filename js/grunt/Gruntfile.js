@@ -530,25 +530,6 @@ module.exports = function( grunt ) {
       } );
     } ) );
 
-
-  grunt.registerTask( 'lint-everything-implementation', 'lint js files. Options:\n--repos: the repos to lint, comma separated',
-    wrapTask( async () => {
-      const repos = grunt.option( 'repos' );
-
-      assert( repos, 'repos must be required' );
-
-      // Don't always require this, as we may have an older chipper checked out.  Also make sure it is the promise-based lint.
-      // Use perennial-alias to support chipper calling lint from older checkouts
-      await require( '../../../perennial-alias/js/grunt/lint' )( repos.split( ',' ), {
-
-        // --disable-eslint-cache disables the cache, useful for developing rules
-        cache: !grunt.option( 'disable-eslint-cache' ),
-        fix: grunt.option( 'fix' ),
-        format: grunt.option( 'format' ),
-        chipAway: grunt.option( 'chip-away' )
-      } );
-    } ) );
-
   grunt.registerTask( 'lint-everything', 'lint all js files for all repos', () => {
     const getDataFile = require( '../common/getDataFile' );
     const activeRepos = getDataFile( 'active-repos' );
