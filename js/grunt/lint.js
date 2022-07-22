@@ -45,6 +45,7 @@ const lintOneRepo = async ( repo, options ) => {
 
   options = _.extend( {
     cache: true,
+    format: false,
     fix: false
   }, options );
 
@@ -86,6 +87,18 @@ const lintOneRepo = async ( repo, options ) => {
 };
 
 /**
+ * Format the result objects into a display string to easily see the problems.
+ * @param results - see ESlint.lintFiles
+ * @returns {Promise<string>} - the formatted results
+ */
+const formatResults = async results => {
+
+  // No need to have the same ESLint just to format
+  const formatter = await new ESLint().loadFormatter( 'stylish' );
+  return formatter.format( results );
+};
+
+/**
  * Lints the specified repositories.
  * @public
  *
@@ -100,7 +113,8 @@ const lint = async ( repos, options ) => {
     format: false, // append an extra set of rules for formatting code.
     fix: false, // whether fixes should be written to disk
     chipAway: false, // returns responsible dev info for easier chipping.
-    showProgressBar: true
+    showProgressBar: true,
+    silent: false // no console logging, just return the results
   }, options );
 
   // filter out all unlintable repos. An unlintable repo is one that has no `js` in it, so it will fail when trying to
@@ -115,8 +129,7 @@ const lint = async ( repos, options ) => {
     const results = await lintOneRepo( repos[ i ], {
       cache: options.cache,
       format: options.format,
-      chipAway: false, // silence individual repo reporting
-      silent: true // silence individual repo reporting
+      fix: options.fix
     } );
 
     // MK found that results are unique to a file, so this seemed safe and was working well.
@@ -137,20 +150,42 @@ const lint = async ( repos, options ) => {
   // Output results on errors.
   if ( totalWarnings + totalErrors > 0 ) {
 
-    // No need to have the same ESLint just to format
-    const formatter = await new ESLint().loadFormatter( 'stylish' );
-    const resultText = formatter.format( allResults );
-    console.log( resultText );
+
+    !options.silent && console.log( await formatResults( allResults ) );
 
     // The chip-away option provides a quick and easy method to assign devs to their respective repositories.
     // Check ./chipAway.js for more information.
-    if ( options.chipAway ) {
-      const message = chipAway( allResults );
-      console.log( 'Results from chipAway: \n' + message );
-    }
+    options.chipAway && !options.silent && console.log( 'Results from chipAway: \n', chipAway( allResults ) );
   }
 
   return allResults;
 };
+
+// Function that takes linting results and returns a formatted string of the errors (if any)
+lint.formatResults = formatResults;
+
+// Mark the version so that the pre-commit hook will only try to use the promise-based API + repos (instead of patterns),
+// this means it won't run lint precommit hook on SHAs before the promise-based API
+lint.APIVersion = 'promisesPerRepo1';
+
+// Support running from the command line, but you must tell it so, it will only run if you supply --repos (comma separated).
+( async () => {
+  if ( process.argv.includes( '--lintFromCommandLine' ) ) {
+    for ( let i = 0; i < process.argv.length; i++ ) {
+      const arg = process.argv[ i ];
+      if ( arg.startsWith( '--repos=' ) ) {
+        const repos = arg.split( '=' )[ 1 ].split( ',' );
+        const results = await lint( repos, {
+          cache: true,
+          showProgressBar: false,
+          silent: true
+        } );
+
+        // This must be the only thing printed to the console for pre-commit hooks
+        console.log( JSON.stringify( results ) );
+      }
+    }
+  }
+} )();
 
 module.exports = lint;
