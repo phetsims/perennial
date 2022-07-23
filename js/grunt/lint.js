@@ -153,4 +153,8 @@ const lint = async ( repos, options ) => {
   return allResults;
 };
 
+// Mark the version so that the pre-commit hook will only try to use the promise-based API, this means
+// it won't run lint precommit hook on SHAs before the promise-based API
+lint.chipperAPIVersion = 'promisesPerRepo1';
+
 module.exports = lint;
