@@ -526,7 +526,12 @@ module.exports = function( grunt ) {
         showProgressBar: showProgressBar
       } );
 
-      if ( results.length > 0 ) {
+      // TODO: https://github.com/phetsims/chipper/issues/1286 this is duplicated in a few places
+      const totalWarnings = _.sum( results.map( result => result.warningCount ) );
+      const totalErrors = _.sum( results.map( result => result.errorCount ) );
+
+      // Output results on errors.
+      if ( totalWarnings + totalErrors > 0 ) {
         grunt.fail.fatal( 'Lint failed' );
       }
     }
