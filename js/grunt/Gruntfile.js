@@ -518,7 +518,7 @@ module.exports = function( grunt ) {
     // Don't always require this, as we may have an older chipper checked out.  Also make sure it is the promise-based lint.
     const lint = require( '../../../chipper/js/grunt/lint' );
     if ( lint.chipperAPIVersion === 'promisesPerRepo1' ) {
-      const results = await lint( activeRepos, {
+      const lintReturnValue = await lint( activeRepos, {
         cache: cache,
         fix: fix,
         format: format,
@@ -526,12 +526,8 @@ module.exports = function( grunt ) {
         showProgressBar: showProgressBar
       } );
 
-      // TODO: https://github.com/phetsims/chipper/issues/1286 this is duplicated in a few places
-      const totalWarnings = _.sum( results.map( result => result.warningCount ) );
-      const totalErrors = _.sum( results.map( result => result.errorCount ) );
-
       // Output results on errors.
-      if ( totalWarnings + totalErrors > 0 ) {
+      if ( !lintReturnValue.ok ) {
         grunt.fail.fatal( 'Lint failed' );
       }
     }
