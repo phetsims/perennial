@@ -330,6 +330,23 @@ module.exports = function( grunt ) {
       await cherryPick( repo, shas );
     } ) );
 
+  grunt.registerTask( 'lint', 'Lints this repository only', wrapTask( async () => {
+
+    // --disable-eslint-cache disables the cache, useful for developing rules
+    const cache = !grunt.option( 'disable-eslint-cache' );
+    const fix = grunt.option( 'fix' );
+    const format = grunt.option( 'format' );
+    const chipAway = grunt.option( 'chip-away' );
+
+    // Don't always require this, as we may have an older chipper checked out.  Also make sure it is the promise-based lint.
+    await require( './lint' )( [ 'perennial' ], {
+      cache: cache,
+      fix: fix,
+      format: format,
+      chipAway: chipAway
+    } );
+  } ) );
+
   grunt.registerTask( 'wrapper',
     'Deploys a phet-io wrapper\n' +
     '--repo : The name of the wrapper repository to deploy\n' +
@@ -488,114 +505,24 @@ module.exports = function( grunt ) {
       await createSim( repo, author, { title: title, clean: clean } );
     } ) );
 
-  grunt.registerTask( 'lint',
-    `lint js files. Options:
---repo: the repo to lint    
---disable-eslint-cache: cache will not be read or written
---fix: autofixable changes will be written to disk
---format: Append an additional set of rules for formatting
---type-info: Include rules for TypeScript that use type checking. Slows down eslint significantly.
---patterns: comma-separated list of directory/file patterns. Default: repo where the command was run.
---chip-away: output a list of responsible devs for each repo with lint problems`,
-    wrapTask( async () => {
-      const repo = grunt.option( 'repo' ) || 'perennial';
-
-      // Don't always require this, as we may have an older chipper checked out.  Also make sure it is the promise-based lint.
-      // Use perennial-alias to support chipper calling lint from older checkouts
-      await require( '../../../perennial-alias/js/grunt/lint' )( [ repo ], {
-
-        // --disable-eslint-cache disables the cache, useful for developing rules
-        cache: !grunt.option( 'disable-eslint-cache' ),
-        fix: grunt.option( 'fix' ),
-        format: grunt.option( 'format' ),
-        chipAway: grunt.option( 'chip-away' )
-      } );
-    } ) );
-
-  grunt.registerTask( 'lint-all', 'lint js files. Options:\n--repos: the repos to lint, comma separated',
-    wrapTask( async () => {
-      const repos = grunt.option( 'repos' );
-
-      assert( repos, 'repos must be required' );
-
-      // Don't always require this, as we may have an older chipper checked out.  Also make sure it is the promise-based lint.
-      // Use perennial-alias to support chipper calling lint from older checkouts
-      await require( '../../../perennial-alias/js/grunt/lint' )( repos.split( ',' ), {
-
-        // --disable-eslint-cache disables the cache, useful for developing rules
-        cache: !grunt.option( 'disable-eslint-cache' ),
-        fix: grunt.option( 'fix' ),
-        format: grunt.option( 'format' ),
-        chipAway: grunt.option( 'chip-away' )
-      } );
-    } ) );
-
-
-  grunt.registerTask( 'lint-everything-implementation', 'lint js files. Options:\n--repos: the repos to lint, comma separated',
-    wrapTask( async () => {
-      const repos = grunt.option( 'repos' );
-
-      assert( repos, 'repos must be required' );
-
-      // Don't always require this, as we may have an older chipper checked out.  Also make sure it is the promise-based lint.
-      // Use perennial-alias to support chipper calling lint from older checkouts
-      await require( '../../../perennial-alias/js/grunt/lint' )( repos.split( ',' ), {
-
-        // --disable-eslint-cache disables the cache, useful for developing rules
-        cache: !grunt.option( 'disable-eslint-cache' ),
-        fix: grunt.option( 'fix' ),
-        format: grunt.option( 'format' ),
-        chipAway: grunt.option( 'chip-away' )
-      } );
-    } ) );
-
-  grunt.registerTask( 'lint-everything', 'lint all js files for all repos', () => {
+  grunt.registerTask( 'lint-everything', 'lint all js files for all repos', wrapTask( async () => {
     const getDataFile = require( '../common/getDataFile' );
+
+    // --disable-eslint-cache disables the cache, useful for developing rules
+    const cache = !grunt.option( 'disable-eslint-cache' );
     const activeRepos = getDataFile( 'active-repos' );
+    const fix = grunt.option( 'fix' );
+    const format = grunt.option( 'format' );
+    const chipAway = grunt.option( 'chip-away' );
 
-    // in perennial-alias
-    if ( process.cwd().endsWith( 'perennial-alias' ) ) {
-
-      ( wrapTask( async () => {
-        // Don't always require this, as we may have an older chipper checked out.  Also make sure it is the promise-based lint.
-        await require( './lint' )( activeRepos, {
-
-          // --disable-eslint-cache disables the cache, useful for developing rules
-          cache: !grunt.option( 'disable-eslint-cache' ),
-          fix: grunt.option( 'fix' ),
-          format: grunt.option( 'format' ),
-          chipAway: grunt.option( 'chip-away' )
-        } );
-
-      } ) )();
-    }
-
-    // Kick it from perennial to perennial-alias to keep the same lint caching
-    else {
-      const child_process = require( 'child_process' );
-
-      const done = grunt.task.current.async();
-
-      const args = [ ...process.argv.slice( 2 ) ];
-      const argsString = args.map( arg => `"${arg}"` ).join( ' ' );
-      const spawned = child_process.spawn( /^win/.test( process.platform ) ? 'grunt.cmd' : 'grunt', args, {
-        cwd: '../perennial-alias'
-      } );
-
-      spawned.stderr.on( 'data', data => grunt.log.error( data.toString() ) );
-      spawned.stdout.on( 'data', data => grunt.log.write( data.toString() ) );
-      process.stdin.pipe( spawned.stdin );
-
-      spawned.on( 'close', code => {
-        if ( code !== 0 ) {
-          throw new Error( `grunt lint-everything  ${argsString} failed with code ${code}` );
-        }
-        else {
-          done();
-        }
-      } );
-    }
-  } );
+    // Don't always require this, as we may have an older chipper checked out.  Also make sure it is the promise-based lint.
+    await require( './lint' )( activeRepos, {
+      cache: cache,
+      fix: fix,
+      format: format,
+      chipAway: chipAway
+    } );
+  } ) );
 
   grunt.registerTask( 'generate-data', 'Generates the lists under perennial/data/, and if there were changes, will commit and push.', wrapTask( async () => {
     const generateData = require( './generateData' );
