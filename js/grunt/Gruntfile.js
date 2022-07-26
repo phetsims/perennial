@@ -513,7 +513,7 @@ module.exports = function( grunt ) {
     const fix = grunt.option( 'fix' );
     const format = grunt.option( 'format' );
     const chipAway = grunt.option( 'chip-away' );
-    const showProgressBar = !!grunt.option( 'show-progress-bar' );
+    const showProgressBar = !grunt.option( 'hide-progress-bar' );
 
     // Don't always require this, as we may have an older chipper checked out.  Also make sure it is the promise-based lint.
     const lint = require( '../../../chipper/js/grunt/lint' );
