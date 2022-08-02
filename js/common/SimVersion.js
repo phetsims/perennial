@@ -39,10 +39,10 @@
 
 /* eslint-env browser, node */
 
-// To support loading in Node.js and the browser
-const assert = typeof module !== 'undefined' ? require( 'assert' ) : window && window.assert;
+( function( global ) {
 
-( function( global, assert ) {
+  // To support loading in Node.js and the browser
+  const assert = typeof module !== 'undefined' ? require( 'assert' ) : global && global.assert;
 
   const SimVersion = class {
     /**
@@ -244,6 +244,6 @@ const assert = typeof module !== 'undefined' ? require( 'assert' ) : window && w
     window.phet.preloads.chipper = window.phet.preloads.chipper || {};
     window.phet.preloads.chipper.SimVersion = SimVersion;
   }
-} )( ( 1, eval )( 'this' ), assert ); // eslint-disable-line no-eval
+} )( ( 1, eval )( 'this' ) ); // eslint-disable-line no-eval
 // Indirect eval usage done since babel likes to wrap things in strict mode.
 // See http://perfectionkills.com/unnecessarily-comprehensive-look-into-a-rather-insignificant-issue-of-global-objects-creation/#ecmascript_5_strict_mode
