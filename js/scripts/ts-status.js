@@ -33,6 +33,7 @@ const repos = [
   'phetmarks',
   'scenery',
   'scenery-phet',
+  'studio',
   'sun',
   'tambo',
   'tandem',
