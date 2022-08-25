@@ -81,7 +81,7 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
   }
 
   // Ensure we don't try to request an unsupported brand
-  const supportedBrands = grunt.file.readJSON( `../${repo}/package.json` ).phet.supportedBrands;
+  const supportedBrands = grunt.file.readJSON( `../${repo}/package.json` ).phet.supportedBrands || [];
   brands.forEach( brand => assert( supportedBrands.includes( brand ), `Brand ${brand} not included in ${repo}'s supported brands: ${supportedBrands.join( ',' )}` ) );
 
   // Ensure that the repository and its dependencies pass lint before continuing.
