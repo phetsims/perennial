@@ -10,27 +10,32 @@
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */
-const text = Deno.readTextFileSync( './lintreport.txt' );
+( () => {
 
-const lines = text.split( '\n' );
-let keys = [];
-lines.forEach( line => {
-  if ( line.includes( '@typescript-eslint/' ) ) {
-    const key = line.substring( line.indexOf( '@typescript-eslint/' ) );
-    if ( !keys.includes( key ) ) {
-      keys.push( key );
-    }
-  }
-} );
-console.log( keys );
-keys = keys.sort();
+  const text: string = Deno.readTextFileSync( './lintreport.txt' );
 
-keys.forEach( key => {
-  let count = 0;
+  const lines: string[] = text.split( '\n' );
+  let keys: string[] = [];
   lines.forEach( line => {
-    if ( line.includes( key ) ) {
-      count++;
+    if ( line.includes( '@typescript-eslint/' ) ) {
+      const key = line.substring( line.indexOf( '@typescript-eslint/' ) );
+      if ( !keys.includes( key ) ) {
+        keys.push( key );
+      }
     }
   } );
-  console.log( key, count );
-} );
+  console.log( keys );
+  keys = keys.sort();
+
+  keys.forEach( key => {
+    let count = 0;
+    lines.forEach( line => {
+      if ( line.includes( key ) ) {
+        count++;
+      }
+    } );
+    console.log( key, count );
+  } );
+} )();
+
+export {};
