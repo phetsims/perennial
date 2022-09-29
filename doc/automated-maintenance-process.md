@@ -105,7 +105,7 @@ complications):
 5. Create patches for each repo that needs to change,
    e.g. `Maintenance.createPatch( '{{REPO}}', '{{ISSUE_URL}}', '{{OPTIONAL_PATCH_NAME}}' )`.
 6. Mark which release branches need which patches. For simple cases, this can just be something like
-   `Maintenance.addNeededPatchesAfter( '{{REPO}}', '{{SHA}}' )`, but things can be added dynamically or through filters.
+   `Maintenance.addNeededPatchesAfter( '{{PATCH_NAME}}', '{{SHA}}' )`, but things can be added dynamically or through filters.
 
 Then loop the following until no more release branches need patches. NOTE: If you have a "fix" commit SHA, feel free to
 skip to step 9 (adding the patch SHA).
