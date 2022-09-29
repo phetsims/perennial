@@ -112,7 +112,7 @@ skip to step 9 (adding the patch SHA).
 
 7. Pick a release branch that needs a patch and check it out: `Maintenance.checkoutBranch( '{{REPO}}', '{{BRANCH}}' )`
 8. Make the changes to the repos that need changes, commit them, and record the SHAs.
-9. Call `Maintenance.addPatchSHA( '{{REPO}}', '{{SHA}}' )` for every SHA.
+9. Call `Maintenance.addPatchSHA( '{{PATCH_NAME}}', '{{SHA}}' )` for every SHA.
 10. Apply the cherry-picked SHAs to see if there are any more remaining release branches that need the patch:
     `Maintenance.applyPatches()`. NOTE: The commits are still ONLY LOCAL. This is very fast, but the changes have not
     been made to the remote release branch until the updateDependencies task below.
