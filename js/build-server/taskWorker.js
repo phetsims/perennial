@@ -1,7 +1,6 @@
 // Copyright 2017-2019, University of Colorado Boulder
 
 
-const addTranslator = require( './addTranslator' );
 const ChipperVersion = require( '../common/ChipperVersion' );
 const constants = require( './constants' );
 const createTranslationsXML = require( './createTranslationsXML' );
