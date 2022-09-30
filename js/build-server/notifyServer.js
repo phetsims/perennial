@@ -14,6 +14,7 @@ const axios = require( 'axios' );
  *  @property {string} email
  *  @property {string} brand
  *  @property {string} locales
+ *  @property {number} translatorId
  *  @property {Object} [phetioOptions]
  *    @property {SimVersion} version
  *    @property {string} branch
@@ -26,7 +27,11 @@ module.exports = async function notifyServer( options ) {
     let url = `${constants.BUILD_SERVER_CONFIG.productionServerURL}/services/synchronize-project?projectName=${project}`;
     if ( options.locales && options.locales !== '*' && options.locales !== 'en' && options.locales.indexOf( ',' ) < 0 ) {
       url += `&locale=${options.locales}`;
+      if ( options.translatorId ) {
+        url += `&translator=${options.translatorId}`;
+      }
     }
+
 
     let response;
     try {

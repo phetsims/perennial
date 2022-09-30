@@ -321,13 +321,9 @@ async function taskWorker( options ) {
               simName: simName,
               email: email,
               brand: brand,
-              locales: locales
+              locales: locales,
+              translatorId: isTranslationRequest ? userId : undefined
             } );
-
-
-            if ( isTranslationRequest ) {
-              await addTranslator( localesArray[ 0 ], simName, userId );
-            }
           }
           else if ( brand === constants.PHET_IO_BRAND ) {
             const suffix = originalVersion.split( '-' ).length >= 2 ? originalVersion.split( '-' )[ 1 ] :
