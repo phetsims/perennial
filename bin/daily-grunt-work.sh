@@ -31,7 +31,7 @@ cd ..
 
 perennial/bin/clone-missing-repos.sh
 perennial/bin/pull-all.sh -p
-perennial/bin/for-each.sh perennial/data/active-repos "npm prune && npm update"
+perennial/bin/for-each.sh perennial/data/active-repos "npm prune && npm update; git stash"
 
 cd chipper || exit
 node js/scripts/transpile.js
@@ -40,7 +40,7 @@ cd ..
 ###########################################################################################################
 # update-copyright-dates
 echo "COPYRIGHT UPDATES:"
-copyrightUpdateCommand="grunt update-copyright-dates && git commit -am 'update copyright dates from daily grunt work' && git push"
+copyrightUpdateCommand="grunt update-copyright-dates && git commit -am 'update copyright dates from daily grunt work' --no-verify && git push"
 perennial/bin/for-each.sh perennial/data/active-repos "${copyrightUpdateCommand}"
 
 ###########################################################################################################
@@ -51,7 +51,7 @@ grunt report-third-party
 cd ../sherpa || exit
 git pull
 echo "report third party done, potentially committing"
-git commit -am "Update third-party-licenses from daily grunt work"
+git commit -am "Update third-party-licenses from daily grunt work" --no-verify
 git push
 cd ..
 
@@ -62,7 +62,7 @@ cd binder || exit
 npm prune && npm update
 npm run build
 git add .
-git commit -am "Update binder doc from daily grunt work"
+git commit -am "Update binder doc from daily grunt work" --no-verify
 git push
 cd ..
 
@@ -71,7 +71,7 @@ cd ..
 echo "RESPONSIBLE DEV MARKDOWN:"
 node ./phet-info/sim-info/generateMarkdownOutput.mjs
 cd phet-info || exit
-git commit -am "Update responsible_dev markdown output from daily grunt work"
+git commit -am "Update responsible_dev markdown output from daily grunt work" --no-verify
 git push
 cd ..
 
@@ -87,7 +87,7 @@ cd ..
 echo "GENERATE DEVELOPMENT STRINGS:"
 perennial/bin/for-each.sh perennial/data/active-repos grunt generate-development-strings
 cd babel || exit
-git commit -am "Update development strings from daily grunt work"
+git commit -am "Update development strings from daily grunt work" --no-verify
 git push
 cd ..
 
