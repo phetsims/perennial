@@ -30,7 +30,9 @@ grunt checkout-master-all
 cd ..
 
 perennial/bin/clone-missing-repos.sh
-perennial/bin/pull-all.sh -p
+node perennial/js/scripts/pull-all.js
+node perennial/js/scripts/push-all.js
+
 perennial/bin/for-each.sh perennial/data/active-repos "npm prune && npm update; git stash"
 
 cd chipper || exit
