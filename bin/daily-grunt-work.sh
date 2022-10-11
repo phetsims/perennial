@@ -110,6 +110,7 @@ cd ..
 # No grunt work below this point.
 # Final clean up steps, just to be sure
 echo "PUSH ALL CLEANUP:"
-./perennial/bin/push-all.sh
+node perennial/js/scripts/pull-all.js
+node perennial/js/scripts/push-all.js
 date
 echo "DAILY GRUNT WORK COMPLETE"
