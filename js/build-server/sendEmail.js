@@ -49,7 +49,7 @@ module.exports = function sendEmail( subject, text, emailParameter, emailParamet
     winston.log( 'info', 'attempting to send email' );
     emailClient.send( {
         text: text,
-        from: 'PhET Build Server <phethelp@colorado.edu>',
+        from: 'PhET Mail <phetmail@colorado.edu>',
         to: emailTo,
         subject: subject
       },
