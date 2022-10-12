@@ -57,7 +57,7 @@ function getDeployConfig( fs ) {
     devDeployServer: buildLocalJSON.devDeployServer || 'bayes.colorado.edu',
     devUsername: buildLocalJSON.devUsername,
     emailPassword: buildLocalJSON.emailPassword,
-    emailServer: buildLocalJSON.emailServer || 'smtp.colorado.edu',
+    emailServer: buildLocalJSON.emailServer || 'smtp.office365.com',
     emailTo: buildLocalJSON.emailTo,
     emailUsername: buildLocalJSON.emailUsername,
     htmlSimsDirectory: buildLocalJSON.htmlSimsDirectory,
