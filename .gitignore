@@ -11,3 +11,4 @@ build-server.log
 lintreport.txt
 js/build-server/tmp*
 .maintenance.json
+logs/
