@@ -12,8 +12,7 @@
  * @author Chris Klusendorf (PhET Interactive Simulations)
  */
 
-
-// eslint-disable-next-line require-statement-match
+ 
 const fs = require( 'fs' );
 const childProcess = require( 'child_process' ); // eslint-disable-line require-statement-match
 

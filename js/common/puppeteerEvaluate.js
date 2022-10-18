@@ -19,7 +19,7 @@ const _ = require( 'lodash' ); // eslint-disable-line
  * @returns {Promise.<*>} - Will reject if there's an error
  */
 module.exports = async function( url, evaluate, options ) {
-  options = _.extend( { // eslint-disable-line
+  options = _.extend( {
     evaluate: evaluate
   }, options );
 

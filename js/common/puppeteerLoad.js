@@ -21,7 +21,7 @@ const winston = require( 'winston' );
  */
 module.exports = async function( url, options ) {
 
-  options = _.extend( { // eslint-disable-line
+  options = _.extend( {
 
     // See https://github.com/puppeteer/puppeteer/blob/v14.1.1/docs/api.md#puppeteerlaunchoptions
     launchOptions: {},

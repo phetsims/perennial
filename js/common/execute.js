@@ -30,7 +30,7 @@ module.exports = function( cmd, args, cwd, options ) {
 
   const startTime = Date.now();
 
-  options = _.extend( { // eslint-disable-line
+  options = _.extend( {
 
     // {'reject'|'resolve'} - whether errors should be rejected or resolved.  If errors are resolved, then an object
     //                      - of the form {code:number,stdout:string,stderr:string} is returned. 'resolve' allows usage

@@ -204,7 +204,7 @@ module.exports = ( function() {
     async getStatus( options ) {
       // TODO: fuzzing (see when different fuzz query parameters existed?)
 
-      options = _.extend( { // eslint-disable-line
+      options = _.extend( {
         checkUnbuilt: true,
         build: true,
         checkBuilt: true,
