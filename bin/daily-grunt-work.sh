@@ -57,17 +57,6 @@ git commit -am "Update third-party-licenses from daily grunt work" --no-verify
 git push
 cd ..
 
-###########################################################################################################
-# regenerate documentation
-echo "BINDER DOC:"
-cd binder || exit
-npm prune && npm update
-npm run build
-git add .
-git commit -am "Update binder doc from daily grunt work" --no-verify
-git push
-cd ..
-
 ##########################################################################################################
 # Update responsible dev/designer markdown output
 echo "RESPONSIBLE DEV MARKDOWN:"
@@ -104,6 +93,18 @@ cd ..
 ##########################################################################################################
 ##########################################################################################################
 ##########################################################################################################
+###########################################################################################################
+# regenerate documentation
+# Binder is less important, and it also has been known to have a hard failure (rarely). So put it towards the end.
+echo "BINDER DOC:"
+cd binder || exit
+npm prune && npm update
+npm run build
+git add .
+git commit -am "Update binder doc from daily grunt work" --no-verify
+git push
+cd ..
+
 ##########################################################################################################
 ##########################################################################################################
 ##########################################################################################################
