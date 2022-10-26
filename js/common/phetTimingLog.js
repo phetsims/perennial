@@ -41,8 +41,8 @@ catch( e ) {
 // Log to perennial-alias if running a perennial-alias task, or perennial if running a perennial task.
 const logPath = path.resolve( logDir, 'phet-timing-log.txt' );
 
-// Create file if it doesn't exist, and append to it
-const stream = fs.createWriteStream( logPath, { flags: 'a' } );
+// WriteStream for appending data.  Created lazily.  Closed on each top-level pop so we can guarantee flush.
+let stream = null;
 
 // Depth of nesting.  -1 means not yet started.  0 means top-level.
 let depth = -1;
@@ -50,9 +50,13 @@ let depth = -1;
 const indent = depth => '  '.repeat( depth );
 
 const push = taskName => {
+  assert( !taskName.includes( ':' ), 'task name cannot include :, it was ' + taskName );
+
   depth++;
 
-  assert( !taskName.includes( ':' ), 'task name cannot include :, it was ' + taskName );
+  if ( stream === null ) {
+    stream = fs.createWriteStream( logPath, { flags: 'a' } );
+  }
   if ( depth === 0 ) {
     const time = new Date().toLocaleString( 'en-US', { timeZone: 'America/Denver' } );
     stream.write( `<!-- ${time} -->\n` );
@@ -69,7 +73,15 @@ const pop = ( taskName, startTime ) => {
   stream.write( `${indent( depth )}</${taskName}> <!-- ${endTime - startTime}ms -->\n` );
 
   if ( depth === 0 ) {
-    stream.write( '\n' );
+    stream.write( '\n', () => {
+
+      // Guaranteed flushing the buffer.  Without this, we end up with partial/truncated output.
+      stream.close( () => {
+
+        // Flag the stream as needing to be recreated next time we want to write to the buffer
+        stream = null;
+      } );
+    } );
   }
 
   depth--;
