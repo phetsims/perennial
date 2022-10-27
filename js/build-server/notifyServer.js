@@ -28,7 +28,7 @@ module.exports = async function notifyServer( options ) {
     if ( options.locales && options.locales !== '*' && options.locales !== 'en' && options.locales.indexOf( ',' ) < 0 ) {
       url += `&locale=${options.locales}`;
       if ( options.translatorId ) {
-        url += `&translator=${options.translatorId}`;
+        url += `&translatorId=${options.translatorId}`;
       }
     }
 
