@@ -77,22 +77,16 @@ module.exports = async function( url, options ) {
       timeout: options.puppeteerTimeout
     } );
     const result = await promise;
-    await page.close();
+    !page.isClosed() && await page.close();
 
     // If we created a temporary browser, close it
-    if ( ownsBrowser ) {
-      await browser.close();
-    }
+    ownsBrowser && await browser.close();
     return result;
   }
 
   catch( e ) {
     page && !page.isClosed() && await page.close();
-
-    // If we created a temporary browser, close it
-    if ( ownsBrowser ) {
-      await browser.close();
-    }
+    ownsBrowser && await browser.close();
     return e;
   }
 };
