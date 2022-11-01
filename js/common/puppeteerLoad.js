@@ -78,7 +78,7 @@ module.exports = async function( url, options ) {
     } );
     const result = await promise;
     !page.isClosed() && await page.close();
-
+    
     // If we created a temporary browser, close it
     ownsBrowser && await browser.close();
     return result;
