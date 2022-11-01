@@ -39,48 +39,60 @@ module.exports = async function( url, options ) {
   const ownsBrowser = !options.browser;
   const browser = ownsBrowser ? await puppeteer.launch( options.launchOptions ) : options.browser;
 
-  const page = await browser.newPage();
-  await page.setDefaultNavigationTimeout( options.puppeteerTimeout );
+  let page;
+  try {
+    page = await browser.newPage();
+    await page.setDefaultNavigationTimeout( options.puppeteerTimeout );
 
-  let resolve;
-  let loaded = false;
-  const promise = new Promise( ( res, rej ) => {
-    resolve = res;
-  } );
+    let resolve;
+    let loaded = false;
+    const promise = new Promise( ( res, rej ) => {
+      resolve = res;
+    } );
 
-  page.on( 'load', async () => {
-    loaded = true;
-    await sleep( options.waitAfterLoad );
-    resolve( options.evaluate && !page.isClosed() ? await page.evaluate( options.evaluate ) : null );
-  } );
-  page.on( 'error', message => {
-    winston.info( `puppeteer error: ${message}` );
-    resolve( new Error( message ) );
-  } );
-  page.on( 'pageerror', message => {
-    if ( options.resolvePageErrors ) {
-      winston.info( `puppeteer pageerror: ${message}` );
+    page.on( 'load', async () => {
+      loaded = true;
+      await sleep( options.waitAfterLoad );
+      resolve( options.evaluate && !page.isClosed() ? await page.evaluate( options.evaluate ) : null );
+    } );
+    page.on( 'error', message => {
+      winston.info( `puppeteer error: ${message}` );
       resolve( new Error( message ) );
-    }
-  } );
-  ( async () => {
-    await sleep( options.allowedTimeToLoad );
-    if ( !loaded ) {
-      winston.info( 'puppeteer not loaded' );
-      resolve( new Error( `Did not load in ${options.allowedTimeToLoad}` ) );
-    }
-  } )();
+    } );
+    page.on( 'pageerror', message => {
+      if ( options.resolvePageErrors ) {
+        winston.info( `puppeteer pageerror: ${message}` );
+        resolve( new Error( message ) );
+      }
+    } );
+    ( async () => {
+      await sleep( options.allowedTimeToLoad );
+      if ( !loaded ) {
+        winston.info( 'puppeteer not loaded' );
+        resolve( new Error( `Did not load in ${options.allowedTimeToLoad}` ) );
+      }
+    } )();
 
-  await page.goto( url, {
-    timeout: options.puppeteerTimeout
-  } );
-  const result = await promise;
-  await page.close();
+    await page.goto( url, {
+      timeout: options.puppeteerTimeout
+    } );
+    const result = await promise;
+    await page.close();
 
-  // If we created a temporary browser, close it
-  if ( ownsBrowser ) {
-    await browser.close();
+    // If we created a temporary browser, close it
+    if ( ownsBrowser ) {
+      await browser.close();
+    }
+    return result;
   }
 
-  return result;
+  catch( e ) {
+    page && !page.isClosed() && await page.close();
+
+    // If we created a temporary browser, close it
+    if ( ownsBrowser ) {
+      await browser.close();
+    }
+    return e;
+  }
 };
