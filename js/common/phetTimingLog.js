@@ -49,7 +49,7 @@ let depth = -1;
 
 const indent = depth => '  '.repeat( depth );
 
-const push = taskName => {
+const push = ( taskName, options = null ) => {
   assert( !taskName.includes( ':' ), 'task name cannot include :, it was ' + taskName );
 
   depth++;
@@ -61,16 +61,16 @@ const push = taskName => {
     const time = new Date().toLocaleString( 'en-US', { timeZone: 'America/Denver' } );
     stream.write( `<!-- ${time} -->\n` );
   }
-  stream.write( `${indent( depth )}<${taskName}>\n` );
+  stream.write( `${indent( options && options.hasOwnProperty( 'depth' ) ? options.depth : depth )}<${taskName}>\n` );
 
   const startTime = Date.now();
   return startTime;
 };
 
-const pop = ( taskName, startTime ) => {
+const pop = ( taskName, startTime, options = null ) => {
   const endTime = Date.now();
 
-  stream.write( `${indent( depth )}</${taskName}> <!-- ${endTime - startTime}ms -->\n` );
+  stream.write( `${indent( options && options.hasOwnProperty( 'depth' ) ? options.depth : depth )}</${taskName}> <!-- ${endTime - startTime}ms -->\n` );
 
   if ( depth === 0 ) {
     stream.write( '\n', () => {
@@ -108,10 +108,10 @@ const phetTimingLog = {
    * @param {()=>Promise<T>} task
    * @returns {Promise<T>}
    */
-  async startAsync( taskName, task ) {
-    const startTime = push( taskName );
+  async startAsync( taskName, task, options ) {
+    const startTime = push( taskName, options );
     const result = await task();
-    pop( taskName, startTime );
+    pop( taskName, startTime, options );
     return result;
   },
 
