@@ -52,6 +52,7 @@ const dependencies2 = loadDependenciesForProject( project2 );
 const allKeys = [ ...Object.keys( dependencies1 ), ...Object.keys( dependencies2 ) ].filter( repo => repo !== 'comment' );
 
 const issues = new Set();
+let commitCount = 0;
 
 // Iterate over the keys they have in common
 allKeys.forEach( repo => {
@@ -94,6 +95,10 @@ allKeys.forEach( repo => {
 
           issues.add( url );
         }
+
+        if ( line.trim().length > 0 ) {
+          commitCount++;
+        }
       } );
     }
   }
@@ -106,3 +111,5 @@ allKeys.forEach( repo => {
 
 console.log( 'Discovered issues' );
 console.log( Array.from( issues ).sort().join( '\n' ) );
+
+console.log( `${commitCount} commits referenced ${issues.size} separate issues` );
