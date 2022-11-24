@@ -18,7 +18,7 @@
     "mimelib": "~0.2.19",
     "minimist": "^1.1.1",
     "ncp": "^2.0.0",
-    "puppeteer": "^5.4.1",
+    "puppeteer": "^19.2.2",
     "qunit": "~2.10.0",
     "request": "^2.55.0",
     "request-promise-native": "^1.0.5",
