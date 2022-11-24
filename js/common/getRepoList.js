@@ -17,7 +17,7 @@ const fs = require( 'fs' );
  * @returns {Array.<string>}
  */
 module.exports = function( name ) {
-  const contents = fs.readFileSync( `../perennial/data/${name}`, 'utf8' ).trim();
+  const contents = fs.readFileSync( `../perennial-alias/data/${name}`, 'utf8' ).trim();
 
   // Trim will remove any spaces and carriage returns if they are present.
   return contents.split( '\n' ).map( sim => sim.trim() );
