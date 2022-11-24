@@ -907,6 +907,59 @@ module.exports = ( function() {
     }
 
     /**
+     * @public
+     */
+    static async updateCheckouts() {
+      console.log( 'Updating checkouts' );
+
+      const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
+      for ( const releaseBranch of releaseBranches ) {
+        console.log( `Updating ${releaseBranch}` );
+
+        await releaseBranch.updateCheckout();
+        await releaseBranch.transpile();
+        try {
+          await releaseBranch.build();
+        }
+        catch( e ) {
+          console.log( `failed to build ${releaseBranch.toString()} ${e}` );
+        }
+      }
+    }
+
+    /**
+     * @public
+     */
+    static async checkUnbuiltCheckouts() {
+      console.log( 'Checking unbuilt checkouts' );
+
+      const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
+      for ( const releaseBranch of releaseBranches ) {
+        console.log( releaseBranch.toString() );
+        const unbuiltResult = await releaseBranch.checkUnbuilt();
+        if ( unbuiltResult ) {
+          console.log( unbuiltResult );
+        }
+      }
+    }
+
+    /**
+     * @public
+     */
+    static async checkBuiltCheckouts() {
+      console.log( 'Checking built checkouts' );
+
+      const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
+      for ( const releaseBranch of releaseBranches ) {
+        console.log( releaseBranch.toString() );
+        const builtResult = await releaseBranch.checkBuilt();
+        if ( builtResult ) {
+          console.log( builtResult );
+        }
+      }
+    }
+
+    /**
      * Convert into a plain JS object meant for JSON serialization.
      * @public
      *

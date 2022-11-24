@@ -10,16 +10,22 @@ const ChipperVersion = require( './ChipperVersion' );
 const build = require( './build' );
 const checkoutMaster = require( './checkoutMaster' );
 const checkoutTarget = require( './checkoutTarget' );
+const createDirectory = require( './createDirectory' );
+const execute = require( './execute' );
 const getActiveSims = require( './getActiveSims' );
 const getBranches = require( './getBranches' );
+const getBuildArguments = require( './getBuildArguments' );
 const getDependencies = require( './getDependencies' );
 const getRepoVersion = require( './getRepoVersion' );
 const gitCheckout = require( './gitCheckout' );
+const gitFetch = require( './gitFetch' );
 const gitFirstDivergingCommit = require( './gitFirstDivergingCommit' );
 const gitIsAncestor = require( './gitIsAncestor' );
 const gitPull = require( './gitPull' );
 const gitRevParse = require( './gitRevParse' );
 const gitTimestamp = require( './gitTimestamp' );
+const gruntCommand = require( './gruntCommand' );
+const npmCommand = require( './npmCommand' );
 const puppeteerLoad = require( './puppeteerLoad' );
 const simMetadata = require( './simMetadata' );
 const simPhetioMetadata = require( './simPhetioMetadata' );
@@ -30,6 +36,8 @@ const _ = require( 'lodash' ); // eslint-disable-line
 const winston = require( 'winston' );
 
 module.exports = ( function() {
+
+  const MAINTENANCE_DIRECTORY = '../.maintenance';
 
   class ReleaseBranch {
     /**
@@ -106,6 +114,163 @@ module.exports = ( function() {
      */
     toString() {
       return `${this.repo} ${this.branch} ${this.brands.join( ',' )}${this.isReleased ? '' : ' (unpublished)'}`;
+    }
+
+    /**
+     * @public
+     *
+     * @param repo {string}
+     * @param branch {string}
+     * @returns {string}
+     */
+    static getCheckoutDirectory( repo, branch ) {
+      return `${MAINTENANCE_DIRECTORY}/${repo}-${branch}`;
+    }
+
+    /**
+     * @public
+     */
+    async updateCheckout() {
+      winston.info( `updating checkout for ${this.toString()}` );
+
+      await gitFetch( this.repo );
+      await gitCheckout( this.repo, this.branch );
+      await gitPull( this.repo );
+      const dependencies = await getDependencies( this.repo );
+      await gitCheckout( this.repo, 'master' );
+
+      if ( !fs.existsSync( MAINTENANCE_DIRECTORY ) ) {
+        winston.info( `creating directory ${MAINTENANCE_DIRECTORY}` );
+        await createDirectory( MAINTENANCE_DIRECTORY );
+      }
+      const checkoutDirectory = ReleaseBranch.getCheckoutDirectory( this.repo, this.branch );
+      if ( !fs.existsSync( checkoutDirectory ) ) {
+        winston.info( `creating directory ${checkoutDirectory}` );
+        await createDirectory( checkoutDirectory );
+      }
+
+      dependencies.babel = { sha: 'master', branch: 'master' };
+
+      const dependencyRepos = Object.keys( dependencies ).filter( repo => repo !== 'comment' );
+
+      await Promise.all( dependencyRepos.map( async repo => {
+        const repoPwd = `${checkoutDirectory}/${repo}`;
+
+        if ( !fs.existsSync( `${checkoutDirectory}/${repo}` ) ) {
+          winston.info( `cloning repo ${repo} in ${checkoutDirectory}` );
+          if ( repo === 'perennial-alias' ) {
+            await execute( 'git', [ 'clone', 'https://github.com/phetsims/perennial.git', repo ], `${checkoutDirectory}` );
+          }
+          else {
+            await execute( 'git', [ 'clone', `https://github.com/phetsims/${repo}.git` ], `${checkoutDirectory}` );
+          }
+        }
+        else {
+          await execute( 'git', [ 'fetch' ], repoPwd );
+        }
+
+        await execute( 'git', [ 'checkout', dependencies[ repo ].sha ], repoPwd );
+
+        if ( repo === 'chipper' || repo === 'perennial-alias' || repo === this.repo ) {
+          winston.info( `npm ${repo} in ${checkoutDirectory}` );
+          await execute( npmCommand, [ 'prune' ], repoPwd );
+          await execute( npmCommand, [ 'update' ], repoPwd );
+        }
+      } ) );
+    }
+
+    /**
+     * @public
+     */
+    async build() {
+      const checkoutDirectory = ReleaseBranch.getCheckoutDirectory( this.repo, this.branch );
+      const repoDirectory = `${checkoutDirectory}/${this.repo}`;
+
+      const chipperVersion = ChipperVersion.getFromPackageJSON(
+        JSON.parse( fs.readFileSync( `${checkoutDirectory}/chipper/package.json`, 'utf8' ) )
+      );
+
+      const args = getBuildArguments( chipperVersion, {
+        brands: this.brands,
+        allHTML: true,
+        debugHTML: true
+      } );
+
+      winston.info( `building ${checkoutDirectory} with grunt ${args.join( ' ' )}` );
+      await execute( gruntCommand, args, repoDirectory );
+    }
+
+    /**
+     * @public
+     */
+    async transpile() {
+      const checkoutDirectory = ReleaseBranch.getCheckoutDirectory( this.repo, this.branch );
+      const repoDirectory = `${checkoutDirectory}/${this.repo}`;
+
+      winston.info( `transpiling ${checkoutDirectory}` );
+
+      // We might not be able to run this command!
+      await execute( gruntCommand, [ 'output-js-project' ], repoDirectory, {
+        errors: 'resolve'
+      } );
+    }
+
+    /**
+     * @public
+     *
+     * @returns {Promise<string|null>} - Error string, or null if no error
+     */
+    async checkUnbuilt() {
+      try {
+        let result = null;
+
+        await withServer( async port => {
+          const url = `http://localhost:${port}/${this.repo}/${this.repo}_en.html?brand=phet&ea&fuzzMouse&fuzzTouch`;
+          const error = await puppeteerLoad( url, {
+            waitAfterLoad: 20000
+          } );
+          if ( error ) {
+            result = `Failure for ${url}: ${error}`;
+          }
+        }, {
+          path: ReleaseBranch.getCheckoutDirectory( this.repo, this.branch )
+        } );
+
+        return result;
+      }
+      catch( e ) {
+        return `[ERROR] Failure to check: ${e}`;
+      }
+    }
+
+    /**
+     * @public
+     *
+     * @returns {Promise<string|null>} - Error string, or null if no error
+     */
+    async checkBuilt() {
+      try {
+        const usesChipper2 = await this.usesChipper2();
+
+        let result = null;
+
+        await withServer( async port => {
+          const url = `http://localhost:${port}/${this.repo}/build/${usesChipper2 ? 'phet/' : ''}${this.repo}_en${usesChipper2 ? '_phet' : ''}.html?fuzzMouse&fuzzTouch`;
+          const error = await puppeteerLoad( url, {
+            waitAfterLoad: 20000
+          } );
+          if ( error ) {
+            result = `Failure for ${url}: ${error}`;
+          }
+        }, {
+          path: ReleaseBranch.getCheckoutDirectory( this.repo, this.branch )
+        } );
+
+        return result;
+      }
+      catch( e ) {
+        return `[ERROR] Failure to check: ${e}`;
+      }
     }
 
     /**
@@ -274,7 +439,7 @@ module.exports = ( function() {
           } );
         }
         catch( e ) {
-          results.push( `[ERROR] Failure to check ${name}` );
+          results.push( `[ERROR] Failure to check ${name} ${e}` );
         }
       };
 
@@ -307,6 +472,21 @@ module.exports = ( function() {
       await checkoutMaster( this.repo, options.build );
 
       return results.map( line => `[${this.toString()}] ${line}` ); // tag with the repo name
+    }
+
+    /**
+     * Returns whether the sim is compatible with ES6 features
+     * @public
+     *
+     * @returns {Promise<boolean>}
+     */
+    async usesES6() {
+      await gitCheckout( this.repo, this.branch );
+      const dependencies = await getDependencies( this.repo );
+      const sha = dependencies.chipper.sha;
+      await gitCheckout( this.repo, 'master' );
+
+      return gitIsAncestor( 'chipper', '80b4ad62cd8f2057b844f18d3c00cf5c0c89ed8d', sha );
     }
 
     /**

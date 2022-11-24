@@ -46,15 +46,7 @@ module.exports = ( function() {
     }
   };
 
-  /**
-   * Returns the chipper version of the currently-checked-out chipper repository.
-   * @public
-   *
-   * @returns {ChipperVersion}
-   */
-  ChipperVersion.getFromRepository = function() {
-
-    const packageJSON = JSON.parse( fs.readFileSync( '../chipper/package.json', 'utf8' ) );
+  ChipperVersion.getFromPackageJSON = function( packageJSON ) {
     const versionString = packageJSON.version;
 
     const matches = versionString.match( /(\d+)\.(\d+)\.(\d+)/ );
@@ -69,6 +61,18 @@ module.exports = ( function() {
     const chipperSupportsOutputJSGruntTasks = packageJSON.phet && packageJSON.phet.chipperSupportsOutputJSGruntTasks;
 
     return new ChipperVersion( major, minor, maintenance, chipperSupportsOutputJSGruntTasks );
+  };
+
+  /**
+   * Returns the chipper version of the currently-checked-out chipper repository.
+   * @public
+   *
+   * @returns {ChipperVersion}
+   */
+  ChipperVersion.getFromRepository = function() {
+    return ChipperVersion.getFromPackageJSON(
+      JSON.parse( fs.readFileSync( '../chipper/package.json', 'utf8' ) )
+    );
   };
 
   return ChipperVersion;
