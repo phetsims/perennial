@@ -490,6 +490,29 @@ module.exports = ( function() {
     }
 
     /**
+     * Returns whether this sim uses initialize-globals based query parameters
+     * @public
+     *
+     * If true:
+     *   phet.chipper.queryParameters.WHATEVER
+     *   AND it needs to be in the schema
+     *
+     * If false:
+     *   phet.chipper.getQueryParameter( 'WHATEVER' )
+     *   FLAGS should use !!phet.chipper.getQueryParameter( 'WHATEVER' )
+     *
+     * @returns {Promise<boolean>}
+     */
+    async usesInitializeGlobalsQueryParameters() {
+      await gitCheckout( this.repo, this.branch );
+      const dependencies = await getDependencies( this.repo );
+      const sha = dependencies.chipper.sha;
+      await gitCheckout( this.repo, 'master' );
+
+      return gitIsAncestor( 'chipper', 'e454f88ff51d1e3fabdb3a076d7407a2a9e9133c', sha );
+    }
+
+    /**
      * Returns whether phet-io.standalone is the correct phet-io query parameter (otherwise it's the newer
      * phetioStandalone).
      * Looks for the presence of https://github.com/phetsims/chipper/commit/4814d6966c54f250b1c0f3909b71f2b9cfcc7665.
