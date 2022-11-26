@@ -226,7 +226,7 @@
      * @param {string} branch - e.g. '1.0'
      */
     static ensureReleaseBranch( branch ) {
-      const version = SimVersion.fromBranch( branch );
+      const version = SimVersion.fromBranch( branch.split( '-' )[ 0 ] );
       assert && assert( version.major > 0, 'Major version for a branch should be greater than zero' );
       assert && assert( version.minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
     }
