@@ -28,6 +28,8 @@ const buildDir = './js/build-server/tmp';
  */
 const abortBuild = async err => {
   winston.log( 'error', `BUILD ABORTED! ${err}` );
+  err.stack && winston.log( 'error', err.stack );
+
   winston.log( 'info', 'build aborted: checking out master for every repo in case build shas are still checked out' );
   await execute( 'grunt', [ 'checkout-master-all' ], constants.PERENNIAL );
   throw new Error( `Build aborted, ${err}` );
