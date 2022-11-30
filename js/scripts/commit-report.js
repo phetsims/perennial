@@ -39,6 +39,8 @@ const fs = require( 'fs' );
     console.log();
 
     console.log( 'Highlights' );
+    console.log( '' );
+    console.log( 'Pose Hours: ' );
 
     // Don't use getActiveRepos() since it cannot be run from the root
     const contents = fs.readFileSync( 'perennial/data/active-repos', 'utf8' ).trim();
