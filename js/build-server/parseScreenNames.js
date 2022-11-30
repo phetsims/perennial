@@ -2,6 +2,7 @@
 
 const axios = require( 'axios' );
 const puppeteer = require( 'puppeteer' );
+const winston = require( 'winston' );
 
 /**
  *
@@ -15,18 +16,32 @@ const parseScreenNamesFromSimulation = async ( simName, page, locales ) => {
 
   for ( let localeIndex = 0; localeIndex < locales.length; localeIndex++ ) {
     const locale = locales[ localeIndex ];
-
-    const s = `https://phet.colorado.edu/sims/html/${simName}/latest/${simName}_all.html?locale=${locale}`;
-    await page.goto( s );
-    await page.waitForFunction( 'phet' );
-    await page.waitForFunction( 'phet.joist' );
-    await page.waitForFunction( 'phet.joist.sim' );
-    await page.waitForFunction( 'phet.joist.sim.screens' );
-    returnObject[ locale ] = await page.evaluate( () => {
-      return phet.joist.sim.screens
-        .map( screen => screen.name || ( screen.nameProperty && screen.nameProperty.value ) )
-        .filter( ( screenName, screenIndex ) => !( screenIndex === 0 && screenName === '\u202aHome\u202c' ) );
-    } );
+    let errorStatus = 'start';
+    try {
+      const s = `https://phet.colorado.edu/sims/html/${simName}/latest/${simName}_all.html?locale=${locale}`;
+      await page.goto( s );
+      errorStatus = 'page.goto';
+      await page.waitForFunction( 'phet' );
+      errorStatus = 'waitForFunction phet';
+      await page.waitForFunction( 'phet.joist' );
+      errorStatus = 'waitForFunction phet.joist';
+      await page.waitForFunction( 'phet.joist.sim' );
+      errorStatus = 'waitForFunction phet.joist.sim';
+      await page.waitForFunction( 'phet.joist.sim.screens' );
+      errorStatus = 'waitForFunction phet.joist.sim.screens';
+      returnObject[ locale ] = await page.evaluate( () => {
+        return phet.joist.sim.screens
+          .map( screen => screen.name || ( screen.nameProperty && screen.nameProperty.value ) )
+          .filter( ( screenName, screenIndex ) => !( screenIndex === 0 && screenName === '\u202aHome\u202c' ) );
+      } );
+      errorStatus = 'evaluate';
+    }
+    catch( e ) {
+      winston.log( 'error', `Could not parse screen names from sim: ${e}` );
+      winston.log( 'error', `Stop status: ${errorStatus}` );
+      e.stack && winston.log( 'error', e.stack );
+      throw e;
+    }
   }
 
   return returnObject;
