@@ -441,7 +441,30 @@ module.exports = function( grunt ) {
     } ) );
 
   grunt.registerTask( 'production',
-    'Deploys a production version of the simulation\n' +
+    'Marks a simulation as published, and deploys a production version of the simulation\n' +
+    '--repo : The name of the wrapper repository to deploy\n' +
+    '--branch : The release branch name (e.g. "1.7") that should be used for deployment\n' +
+    '--brands : A comma-separated list of brand names to deploy\n' +
+    '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out\n' +
+    '--message : An optional message that will be appended on version-change commits.',
+    wrapTask( async () => {
+      const production = require( './production' );
+      const markSimAsPublished = require( '../common/markSimAsPublished' );
+
+      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+      assert( grunt.option( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
+      assert( grunt.option( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
+
+      const repo = grunt.option( 'repo' );
+      assertIsValidRepoName( repo );
+
+      await markSimAsPublished( repo );
+
+      await production( repo, grunt.option( 'branch' ), grunt.option( 'brands' ).split( ',' ), noninteractive, grunt.option( 'message' ) );
+    } ) );
+
+  grunt.registerTask( 'prototype',
+    'Deploys a production (prototype) version of the simulation\n' +
     '--repo : The name of the wrapper repository to deploy\n' +
     '--branch : The release branch name (e.g. "1.7") that should be used for deployment\n' +
     '--brands : A comma-separated list of brand names to deploy\n' +

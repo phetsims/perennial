@@ -22,6 +22,7 @@ const gitPush = require( '../common/gitPush' );
 const grunt = require( 'grunt' );
 const gruntCommand = require( '../common/gruntCommand' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
+const isPublished = require( '../common/isPublished' );
 const npmUpdate = require( '../common/npmUpdate' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 const simMetadata = require( '../common/simMetadata' );
@@ -67,6 +68,8 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
   if ( !await booleanPrompt( 'Have all maintenance patches that need spot checks been tested? (An issue would be created in the sim repo)', noninteractive ) ) {
     throw new Error( 'Aborted production deployment' );
   }
+
+  const published = await isPublished( repo );
 
   await checkoutTarget( repo, branch, true ); // include npm update
 
@@ -121,26 +124,28 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     await npmUpdate( 'perennial-alias' );
 
     // Update the README on the branch
-    grunt.log.writeln( 'Updating branch README' );
-    try {
-      await execute( gruntCommand, [ 'published-README' ], `../${repo}` );
-    }
-    catch( e ) {
-      grunt.log.writeln( 'published-README error, may not exist, will try generate-published-README' );
+    if ( published ) {
+      grunt.log.writeln( 'Updating branch README' );
       try {
-        await execute( gruntCommand, [ 'generate-published-README' ], `../${repo}` );
+        await execute( gruntCommand, [ 'published-README' ], `../${repo}` );
       }
       catch( e ) {
-        grunt.log.writeln( 'No published README generation found' );
+        grunt.log.writeln( 'published-README error, may not exist, will try generate-published-README' );
+        try {
+          await execute( gruntCommand, [ 'generate-published-README' ], `../${repo}` );
+        }
+        catch( e ) {
+          grunt.log.writeln( 'No published README generation found' );
+        }
       }
-    }
-    await gitAdd( repo, 'README.md' );
-    try {
-      await gitCommit( repo, `Generated published README.md as part of a production deploy for ${versionString}` );
-      await gitPush( repo, branch );
-    }
-    catch( e ) {
-      grunt.log.writeln( 'Production README is already up-to-date' );
+      await gitAdd( repo, 'README.md' );
+      try {
+        await gitCommit( repo, `Generated published README.md as part of a production deploy for ${versionString}` );
+        await gitPush( repo, branch );
+      }
+      catch( e ) {
+        grunt.log.writeln( 'Production README is already up-to-date' );
+      }
     }
 
     // No special options required here, as we send the main request to the build server
@@ -196,15 +201,17 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       grunt.log.writeln( 'After testing, let the simulation lead know it has been deployed, so they can edit metadata on the website' );
 
       // Update the README on master
-      grunt.log.writeln( 'Updating master README' );
-      await execute( gruntCommand, [ 'published-README' ], `../${repo}` );
-      await gitAdd( repo, 'README.md' );
-      try {
-        await gitCommit( repo, `Generated published README.md as part of a production deploy for ${versionString}` );
-        await gitPush( repo, 'master' );
-      }
-      catch( e ) {
-        grunt.log.writeln( 'Production README is already up-to-date' );
+      if ( published ) {
+        grunt.log.writeln( 'Updating master README' );
+        await execute( gruntCommand, [ 'published-README' ], `../${repo}` );
+        await gitAdd( repo, 'README.md' );
+        try {
+          await gitCommit( repo, `Generated published README.md as part of a production deploy for ${versionString}` );
+          await gitPush( repo, 'master' );
+        }
+        catch( e ) {
+          grunt.log.writeln( 'Production README is already up-to-date' );
+        }
       }
     }
 
