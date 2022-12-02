@@ -48,7 +48,7 @@ module.exports = function sendEmail( subject, text, emailParameter, emailParamet
 
     winston.log( 'info', 'attempting to send email' );
     emailClient.send( {
-        text: text,
+        text: text.replace( /([^\r])\n/g, '$1\r\n' ), // Replace LF with CRLF, bare line feeds are rejected by some email clients
         from: 'PhET Mail <phetmail@colorado.edu>',
         to: emailTo,
         subject: subject
