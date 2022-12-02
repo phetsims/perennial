@@ -21,9 +21,7 @@ const simMetadata = require( '../common/simMetadata' );
  * @returns {Promise}
  */
 module.exports = async function( repo, sha ) {
-  const data = await simMetadata( {
-    summary: true
-  } );
+  const data = await simMetadata();
 
   const sims = data.projects.map( simData => {
     return {

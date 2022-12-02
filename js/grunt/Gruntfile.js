@@ -204,7 +204,6 @@ module.exports = function( grunt ) {
 
       winston.default.transports.console.level = 'error';
       const data = await simMetadata( {
-        summary: true,
         type: 'html'
       } );
       console.error( data.projects.map( project => {

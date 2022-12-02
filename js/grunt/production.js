@@ -92,7 +92,6 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     }
 
     const isFirstVersion = !( await simMetadata( {
-      summary: true,
       simulation: repo
     } ).projects );
 

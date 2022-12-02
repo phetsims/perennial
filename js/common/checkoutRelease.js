@@ -23,7 +23,6 @@ module.exports = async function( repo, includeNpmUpdate ) {
   winston.info( `checking out release for ${repo}` );
 
   const data = await simMetadata( {
-    summary: true,
     simulation: repo
   } );
 

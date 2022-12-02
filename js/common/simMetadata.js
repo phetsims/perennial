@@ -19,15 +19,19 @@ const axios = require( 'axios' );
  */
 module.exports = async function( options ) {
   options = _.extend( {
-    summary: false, // {boolean} - If set, will include a reduced amount of data for every included simulation
+    summary: true, // {boolean} - If set, will include a reduced amount of data for every included simulation
     type: 'html', // {string|null} - If provided (html/java/flash), will limit results to a specific type of simulation
     locale: null, // {string|null} - If provided, will limit results to a specific locale
-    simulation: null // {string|null} - If provided, will limit to a specific simulation simulation
+    simulation: null, // {string|null} - If provided, will limit to a specific simulation simulation
+    includePrototypes: true // {boolean} - If set, will include prototypes
   }, options );
 
-  let metadataURL = 'https://phet.colorado.edu/services/metadata/1.0/simulations?format=json';
+  let metadataURL = 'https://phet.colorado.edu/services/metadata/1.3/simulations?format=json';
   if ( options.summary ) {
     metadataURL += '&summary';
+  }
+  if ( options.includePrototypes ) {
+    metadataURL += '&includePrototypes';
   }
   if ( options.type ) {
     metadataURL += `&type=${options.type}`;

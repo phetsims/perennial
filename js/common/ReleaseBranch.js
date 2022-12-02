@@ -640,7 +640,6 @@ module.exports = ( function() {
       winston.debug( 'retrieving available sim branches' );
 
       const simMetadataResult = await simMetadata( {
-        summary: true,
         type: 'html'
       } );
 
