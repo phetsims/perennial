@@ -29,6 +29,7 @@ module.exports = async function( url, options ) {
     browser: null, // {puppeteer.Browser|null} - If provided, we'll use a persistent browser
 
     evaluate: null, // {function|null}
+    waitForFunction: null, // {string|null}
 
     resolvePageErrors: true, // resolve when the page errors
     waitAfterLoad: 5000, // milliseconds
@@ -37,22 +38,31 @@ module.exports = async function( url, options ) {
   }, options );
 
   const ownsBrowser = !options.browser;
-  const browser = ownsBrowser ? await puppeteer.launch( options.launchOptions ) : options.browser;
 
+  let browser;
   let page;
+
   try {
+    browser = options.browser || await puppeteer.launch( options.launchOptions );
+
     page = await browser.newPage();
     await page.setDefaultNavigationTimeout( options.puppeteerTimeout );
 
     let resolve;
     let loaded = false;
-    const promise = new Promise( ( res, rej ) => {
+    const promise = new Promise( res => {
       resolve = res;
     } );
 
     page.on( 'load', async () => {
       loaded = true;
       await sleep( options.waitAfterLoad );
+      if ( options.waitForFunction ) {
+        await page.waitForFunction( options.waitForFunction, {
+          polling: 100, // default is every animation frame
+          timeout: options.puppeteerTimeout
+        } );
+      }
       resolve( options.evaluate && !page.isClosed() ? await page.evaluate( options.evaluate ) : null );
     } );
     page.on( 'error', message => {
@@ -78,7 +88,7 @@ module.exports = async function( url, options ) {
     } );
     const result = await promise;
     !page.isClosed() && await page.close();
-    
+
     // If we created a temporary browser, close it
     ownsBrowser && await browser.close();
     return result;
