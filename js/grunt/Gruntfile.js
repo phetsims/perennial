@@ -535,6 +535,7 @@ module.exports = function( grunt ) {
     const fix = grunt.option( 'fix' );
     const format = grunt.option( 'format' );
     const chipAway = grunt.option( 'chip-away' );
+    const disableWithComment = grunt.option( 'disable-with-comment' );
     const showProgressBar = !grunt.option( 'hide-progress-bar' );
 
     // Don't always require this, as we may have an older chipper checked out.  Also make sure it is the promise-based lint.
@@ -545,6 +546,7 @@ module.exports = function( grunt ) {
         fix: fix,
         format: format,
         chipAway: chipAway,
+        disableWithComment: disableWithComment,
         showProgressBar: showProgressBar
       } );
 
