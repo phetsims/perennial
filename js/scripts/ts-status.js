@@ -2,7 +2,7 @@
 /**
  *
  * The tsc-status script runs through relevant common code repos and counts the lines of code written in javascript
- * and typescript. Provides data on conversion status, as well as occurrences of @ts-ignore.
+ * and typescript. Provides data on conversion status, as well as occurrences of @ts-expect-error.
  *
  * Run from sims root directory
  * USAGE:
@@ -46,7 +46,7 @@ const repos = [
 // Table headers. Begin here to add another data point.
 const jsHeader = 'JS';
 const tsHeader = 'TS';
-const tsIgnoreHeader = '"@ts-ignore"';
+const tsIgnoreHeader = '"@ts-expect-error"';
 const completeHeader = '% Complete';
 const tableData = {};
 
@@ -96,7 +96,7 @@ const captureData = ( path, tableData ) => {
     }
     else if ( file.match( /\.ts$/ ) ) {
       tsCount += countLines( newPath );
-      tsIgnoreCount += countWord( newPath, '@ts-ignore' );
+      tsIgnoreCount += countWord( newPath, '@ts-expect-error' );
     }
   } );
 
