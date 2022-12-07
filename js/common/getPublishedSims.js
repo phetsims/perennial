@@ -8,7 +8,7 @@
 
 const simMetadata = require( './simMetadata' );
 const simPhetioMetadata = require( './simPhetioMetadata' );
-const _ = require( 'lodash' ); // eslint-disable-line
+const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
 
 /**
  * Returns a list of simulation repos that have been published (does NOT include prototypes)

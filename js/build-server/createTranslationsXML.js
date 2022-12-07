@@ -2,7 +2,7 @@
 
 
 const constants = require( './constants' );
-const fs = require( 'graceful-fs' ); //eslint-disable-line
+const fs = require( 'graceful-fs' ); // eslint-disable-line require-statement-match
 const winston = require( 'winston' );
 const writeFile = require( '../common/writeFile' );
 const parseScreenNames = require( './parseScreenNames' );

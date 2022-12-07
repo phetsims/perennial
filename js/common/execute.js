@@ -8,7 +8,7 @@
 
 const child_process = require( 'child_process' );
 const winston = require( 'winston' );
-const _ = require( 'lodash' ); // eslint-disable-line
+const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
 const assert = require( 'assert' );
 const grunt = require( 'grunt' );
 

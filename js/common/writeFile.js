@@ -1,6 +1,6 @@
 // Copyright 2017-2018, University of Colorado Boulder
 
-const fs = require( 'graceful-fs' ); // eslint-disable-line
+const fs = require( 'graceful-fs' ); // eslint-disable-line require-statement-match
 const winston = require( 'winston' );
 
 module.exports = async function( filepath, contents ) {

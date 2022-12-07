@@ -10,16 +10,16 @@
 
 
 const constants = require( './constants' );
-const childProcess = require( 'child_process' ); // eslint-disable-line
-const winston = require( './log.js' ); // eslint-disable-line
+const childProcess = require( 'child_process' ); // eslint-disable-line require-statement-match
+const winston = require( './log.js' ); // eslint-disable-line require-statement-match
 const logRequest = require( './logRequest' );
 const sendEmail = require( './sendEmail' );
 const taskWorker = require( './taskWorker' );
 const async = require( 'async' );
 const bodyParser = require( 'body-parser' ); // eslint-disable-line require-statement-match
 const express = require( 'express' );
-const _ = require( 'lodash' ); // eslint-disable-line
-const parseArgs = require( 'minimist' ); // eslint-disable-line
+const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
+const parseArgs = require( 'minimist' ); // eslint-disable-line require-statement-match
 
 // set this process up with the appropriate permissions, value is in octal
 process.umask( 0o0002 );

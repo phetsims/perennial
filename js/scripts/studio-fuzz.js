@@ -12,7 +12,7 @@ const withServer = require( '../common/withServer' );
 
 ( async () => {
 
-  while ( true ) { // eslint-disable-line
+  while ( true ) { // eslint-disable-line no-constant-condition
     let studioFuzz = null;
 
     console.log( 'starting new fuzz' );

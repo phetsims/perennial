@@ -8,7 +8,7 @@
  **/
 
 const buildLocal = require( '../common/buildLocal' );
-const fetch = require( 'node-fetch' ); //eslint-disable-line
+const fetch = require( 'node-fetch' ); // eslint-disable-line require-statement-match
 const fs = require( 'fs' );
 
 const translatorAuthCode = buildLocal.translatorAuthCode;

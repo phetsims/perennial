@@ -17,7 +17,7 @@ const booleanPrompt = require( '../common/booleanPrompt' );
 const buildLocal = require( '../common/buildLocal' );
 const assert = require( 'assert' );
 const grunt = require( 'grunt' );
-const _ = require( 'lodash' ); // eslint-disable-line
+const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
 const axios = require( 'axios' );
 
 /**

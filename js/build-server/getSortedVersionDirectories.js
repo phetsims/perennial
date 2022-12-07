@@ -1,7 +1,7 @@
 // Copyright 2017, University of Colorado Boulder
 
 
-const fs = require( 'graceful-fs' ); //eslint-disable-line
+const fs = require( 'graceful-fs' ); // eslint-disable-line require-statement-match
 
 /**
  * Define a helper function that will get a list of the PhET-style version directories at the given path.  The

@@ -4,7 +4,7 @@
  * This grunt task checks out master for all sims. Useful in some cases where different shas with conflicting dependencies are checked out.
  */
 
-const _ = require( 'lodash' ); // eslint-disable-line
+const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
 const child_process = require( 'child_process' );
 const grunt = require( 'grunt' );
 

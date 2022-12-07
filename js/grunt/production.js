@@ -28,7 +28,7 @@ const setRepoVersion = require( '../common/setRepoVersion' );
 const simMetadata = require( '../common/simMetadata' );
 const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
 const vpnCheck = require( '../common/vpnCheck' );
-const _ = require( 'lodash' ); // eslint-disable-line
+const _ = require( 'lodash' ); // eslint-disable-line require-statement-match, no-unused-vars
 
 /**
  * Deploys a production version after incrementing the test version number.

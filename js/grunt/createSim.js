@@ -18,7 +18,7 @@
  * @author Chris Malley (PixelZoom, Inc.)
  */
 
-const _ = require( 'lodash' ); // eslint-disable-line
+const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
 const assert = require( 'assert' );
 const execute = require( '../common/execute' );
 const grunt = require( 'grunt' );

@@ -32,7 +32,7 @@ const simPhetioMetadata = require( './simPhetioMetadata' );
 const withServer = require( './withServer' );
 const assert = require( 'assert' );
 const fs = require( 'fs' );
-const _ = require( 'lodash' ); // eslint-disable-line
+const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
 const winston = require( 'winston' );
 
 module.exports = ( function() {

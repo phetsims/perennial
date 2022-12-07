@@ -7,7 +7,7 @@
  */
 
 
-const fs = require( 'graceful-fs' ); //eslint-disable-line
+const fs = require( 'graceful-fs' ); // eslint-disable-line require-statement-match
 const getBuildServerConfig = require( './getBuildServerConfig' );
 
 const BUILD_SERVER_CONFIG = getBuildServerConfig( fs );
