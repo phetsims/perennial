@@ -3,53 +3,56 @@
 const axios = require( 'axios' );
 const puppeteer = require( 'puppeteer' );
 const winston = require( 'winston' );
+const assert = require( 'assert' );
+const puppeteerLoad = require( '../common/puppeteerLoad' );
 
 /**
- *
  * @param {string} simName
- * @param {object} page - a puppeteer object
  * @param {string[]} locales - a list of locale codes
  * @returns {Promise.<{}>}
  */
-const parseScreenNamesFromSimulation = async ( simName, page, locales ) => {
+const parseScreenNamesFromSimulation = async ( simName, locales ) => {
+
+  const browser = await puppeteer.launch();
+
   const returnObject = {};
 
   for ( let localeIndex = 0; localeIndex < locales.length; localeIndex++ ) {
     const locale = locales[ localeIndex ];
-    let errorStatus = 'start';
     try {
-      const s = `https://phet.colorado.edu/sims/html/${simName}/latest/${simName}_all.html?locale=${locale}`;
-      await page.goto( s );
-      errorStatus = 'page.goto';
-      await page.waitForFunction( 'phet' );
-      errorStatus = 'waitForFunction phet';
-      await page.waitForFunction( 'phet.joist' );
-      errorStatus = 'waitForFunction phet.joist';
-      await page.waitForFunction( 'phet.joist.sim' );
-      errorStatus = 'waitForFunction phet.joist.sim';
-      await page.waitForFunction( 'phet.joist.sim.screens' );
-      errorStatus = 'waitForFunction phet.joist.sim.screens';
-      returnObject[ locale ] = await page.evaluate( () => {
-        return phet.joist.sim.screens
-          .map( screen => screen.name || ( screen.nameProperty && screen.nameProperty.value ) )
-          .filter( ( screenName, screenIndex ) => !( screenIndex === 0 && screenName === '\u202aHome\u202c' ) );
+      const url = `https://phet.colorado.edu/sims/html/${simName}/latest/${simName}_all.html?locale=${locale}`;
+      const result = await puppeteerLoad( url, {
+        waitForFunction: 'phet.joist.sim.screens',
+        browser: browser,
+        evaluate: () => {
+          return phet.joist.sim.screens
+            .map( screen => screen.name || ( screen.nameProperty && screen.nameProperty.value ) )
+            .filter( ( screenName, screenIndex ) => !( screenIndex === 0 && screenName === '\u202aHome\u202c' ) );
+        }
       } );
-      errorStatus = 'evaluate';
+
+      if ( result instanceof Error ) {
+        throw result;
+      }
+      assert( result !== null, 'must be a list of screen names, not null' );
+
+      returnObject[ locale ] = result;
     }
     catch( e ) {
       winston.log( 'error', `Could not parse screen names from sim: ${e}` );
-      winston.log( 'error', `Stop status: ${errorStatus}` );
       e.stack && winston.log( 'error', e.stack );
+      browser && await browser.close();
+
       throw e;
     }
   }
+
+  await browser.close();
 
   return returnObject;
 };
 
 const parseScreenNamesAllSimulations = async () => {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
   const url = 'https://phet.colorado.edu/services/metadata/1.3/simulations?format=json&type=html&summary';
   const projects = ( await axios.get( url ) ).data.projects;
 
@@ -60,25 +63,13 @@ const parseScreenNamesAllSimulations = async () => {
     const simulation = project.simulations[ 0 ];
     const simName = simulation.name;
     const locales = Object.keys( simulation.localizedSimulations );
-    screenNameObject[ simName ] = await parseScreenNamesFromSimulation( simName, page, locales );
+    screenNameObject[ simName ] = await parseScreenNamesFromSimulation( simName, locales );
   }
 
-  await browser.close();
-  return screenNameObject;
-};
-
-const parseScreenNames = async ( simName, locales ) => {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-
-  const screenNameObject = await parseScreenNamesFromSimulation( simName, page, locales );
-
-
-  await browser.close();
   return screenNameObject;
 };
 
 module.exports = {
-  parseScreenNames: parseScreenNames,
+  parseScreenNames: async ( simName, locales ) => parseScreenNamesFromSimulation( simName, locales ),
   parseScreenNamesAllSimulations: parseScreenNamesAllSimulations
 };
