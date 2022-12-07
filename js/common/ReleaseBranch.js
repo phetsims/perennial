@@ -222,21 +222,19 @@ module.exports = ( function() {
      */
     async checkUnbuilt() {
       try {
-        let result = null;
-
-        await withServer( async port => {
+        return await withServer( async port => {
           const url = `http://localhost:${port}/${this.repo}/${this.repo}_en.html?brand=phet&ea&fuzzMouse&fuzzTouch`;
-          const error = await puppeteerLoad( url, {
-            waitAfterLoad: 20000
-          } );
-          if ( error ) {
-            result = `Failure for ${url}: ${error}`;
+          try {
+            return await puppeteerLoad( url, {
+              waitAfterLoad: 20000
+            } );
+          }
+          catch( e ) {
+            return `Failure for ${url}: ${e}`;
           }
         }, {
           path: ReleaseBranch.getCheckoutDirectory( this.repo, this.branch )
         } );
-
-        return result;
       }
       catch( e ) {
         return `[ERROR] Failure to check: ${e}`;
@@ -252,21 +250,19 @@ module.exports = ( function() {
       try {
         const usesChipper2 = await this.usesChipper2();
 
-        let result = null;
-
-        await withServer( async port => {
+        return await withServer( async port => {
           const url = `http://localhost:${port}/${this.repo}/build/${usesChipper2 ? 'phet/' : ''}${this.repo}_en${usesChipper2 ? '_phet' : ''}.html?fuzzMouse&fuzzTouch`;
-          const error = await puppeteerLoad( url, {
-            waitAfterLoad: 20000
-          } );
-          if ( error ) {
-            result = `Failure for ${url}: ${error}`;
+          try {
+            return puppeteerLoad( url, {
+              waitAfterLoad: 20000
+            } );
+          }
+          catch( error ) {
+            return `Failure for ${url}: ${error}`;
           }
         }, {
           path: ReleaseBranch.getCheckoutDirectory( this.repo, this.branch )
         } );
-
-        return result;
       }
       catch( e ) {
         return `[ERROR] Failure to check: ${e}`;
@@ -432,8 +428,10 @@ module.exports = ( function() {
         try {
           await withServer( async port => {
             const url = `http://localhost:${port}/${relativeURL}`;
-            const error = await puppeteerLoad( url, options );
-            if ( error ) {
+            try {
+              await puppeteerLoad( url, options );
+            }
+            catch( error ) {
               results.push( `[WARNING] ${name} failure for ${url}: ${error}` );
             }
           } );

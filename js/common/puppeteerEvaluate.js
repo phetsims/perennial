@@ -23,11 +23,5 @@ module.exports = async function( url, evaluate, options ) {
     evaluate: evaluate
   }, options );
 
-  const result = await puppeteerLoad( url, options );
-
-  if ( result instanceof Error ) {
-    throw result;
-  }
-
-  return result;
+  return puppeteerLoad( url, options );
 };

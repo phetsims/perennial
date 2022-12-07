@@ -30,10 +30,6 @@ const parseScreenNamesFromSimulation = async ( simName, locales ) => {
             .filter( ( screenName, screenIndex ) => !( screenIndex === 0 && screenName === '\u202aHome\u202c' ) );
         }
       } );
-
-      if ( result instanceof Error ) {
-        throw result;
-      }
       assert( result !== null, 'must be a list of screen names, not null' );
 
       returnObject[ locale ] = result;

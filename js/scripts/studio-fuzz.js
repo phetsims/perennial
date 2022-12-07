@@ -20,7 +20,7 @@ const withServer = require( '../common/withServer' );
     try {
       await withServer( async port => {
         const url = `http://localhost:${port}/studio/index.html?sim=states-of-matter&phetioElementsDisplay=all&fuzz`;
-        const error = await puppeteerLoad( url, {
+        await puppeteerLoad( url, {
           waitAfterLoad: 10000,
           allowedTimeToLoad: 120000,
           puppeteerTimeout: 120000,
@@ -39,9 +39,6 @@ const withServer = require( '../common/withServer' );
             ]
           }
         } );
-        if ( error ) {
-          studioFuzz = error;
-        }
       } );
     }
     catch( e ) {
@@ -50,5 +47,4 @@ const withServer = require( '../common/withServer' );
 
     console.log( studioFuzz );
   }
-
 } )();

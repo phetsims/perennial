@@ -1,7 +1,7 @@
-// Copyright 2017, University of Colorado Boulder
+// Copyright 2017-2022, University of Colorado Boulder
 
 /**
- * Uses puppeteer to see whether a page loads without an error
+ * Uses puppeteer to see whether a page loads without an error. Throws errors it receives
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
@@ -15,9 +15,11 @@ const winston = require( 'winston' );
  * Uses puppeteer to see whether a page loads without an error
  * @public
  *
+ * Rejects if encountering an error loading the page OR (with option provided within the puppeteer page itself).
+ *
  * @param {string} url
  * @param {Object} [options]
- * @returns {Promise.<Error|null|*>} - Resolves with an error if available, or the eval result/null if successful
+ * @returns {Promise.<null|*>} - , or the eval result/null if successful
  */
 module.exports = async function( url, options ) {
 
@@ -31,7 +33,7 @@ module.exports = async function( url, options ) {
     evaluate: null, // {function|null}
     waitForFunction: null, // {string|null}
 
-    resolvePageErrors: true, // resolve when the page errors
+    rejectPageErrors: true, // resolve when the page errors
     waitAfterLoad: 5000, // milliseconds
     allowedTimeToLoad: 40000, // milliseconds
     puppeteerTimeout: 30000 // milliseconds
@@ -48,12 +50,15 @@ module.exports = async function( url, options ) {
     page = await browser.newPage();
     await page.setDefaultNavigationTimeout( options.puppeteerTimeout );
 
+    // promote for use outside the closure
     let resolve;
-    let loaded = false;
-    const promise = new Promise( res => {
+    let reject;
+    const promise = new Promise( ( res, rej ) => {
       resolve = res;
+      reject = rej;
     } );
 
+    let loaded = false;
     page.on( 'load', async () => {
       loaded = true;
       await sleep( options.waitAfterLoad );
@@ -67,22 +72,21 @@ module.exports = async function( url, options ) {
     } );
     page.on( 'error', message => {
       winston.info( `puppeteer error: ${message}` );
-      resolve( new Error( message ) );
+      reject( new Error( message ) );
     } );
     page.on( 'pageerror', message => {
-      if ( options.resolvePageErrors ) {
+      if ( options.rejectPageErrors ) {
         winston.info( `puppeteer pageerror: ${message}` );
-        resolve( new Error( message ) );
+        reject( new Error( message ) );
       }
     } );
     ( async () => {
       await sleep( options.allowedTimeToLoad );
       if ( !loaded ) {
         winston.info( 'puppeteer not loaded' );
-        resolve( new Error( `Did not load in ${options.allowedTimeToLoad}` ) );
+        reject( new Error( `Did not load in ${options.allowedTimeToLoad}` ) );
       }
     } )();
-
     await page.goto( url, {
       timeout: options.puppeteerTimeout
     } );
@@ -91,12 +95,13 @@ module.exports = async function( url, options ) {
 
     // If we created a temporary browser, close it
     ownsBrowser && await browser.close();
+
     return result;
   }
 
   catch( e ) {
     page && !page.isClosed() && await page.close();
     ownsBrowser && await browser.close();
-    return e;
+    throw e;
   }
 };
