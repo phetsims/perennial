@@ -19,7 +19,7 @@ const winston = require( 'winston' );
  *
  * @param {string} url
  * @param {Object} [options]
- * @returns {Promise.<null|*>} - , or the eval result/null if successful
+ * @returns {Promise.<null|*>} - The eval result/null
  */
 module.exports = async function( url, options ) {
 
@@ -33,7 +33,7 @@ module.exports = async function( url, options ) {
     evaluate: null, // {function|null}
     waitForFunction: null, // {string|null}
 
-    rejectPageErrors: true, // resolve when the page errors
+    rejectPageErrors: true, // reject when the page errors
     waitAfterLoad: 5000, // milliseconds
     allowedTimeToLoad: 40000, // milliseconds
     puppeteerTimeout: 30000 // milliseconds
