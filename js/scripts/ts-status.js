@@ -46,7 +46,7 @@ const repos = [
 // Table headers. Begin here to add another data point.
 const jsHeader = 'JS';
 const tsHeader = 'TS';
-const tsIgnoreHeader = '"@ts-expect-error"';
+const tsExpectErrorHeader = '"@ts-expect-error"';
 const completeHeader = '% Complete';
 const tableData = {};
 
@@ -81,7 +81,7 @@ const countWord = ( path, word ) => {
 const captureData = ( path, tableData ) => {
   let tsCount = 0;
   let jsCount = 0;
-  let tsIgnoreCount = 0;
+  let tsExpectErrorCount = 0;
 
   const entries = fs.readdirSync( path );
 
@@ -96,14 +96,14 @@ const captureData = ( path, tableData ) => {
     }
     else if ( file.match( /\.ts$/ ) ) {
       tsCount += countLines( newPath );
-      tsIgnoreCount += countWord( newPath, '@ts-expect-error' );
+      tsExpectErrorCount += countWord( newPath, '@ts-expect-error' );
     }
   } );
 
   // Adds count to respective key in nested repo object.
   tableData[ jsHeader ] += jsCount;
   tableData[ tsHeader ] += tsCount;
-  tableData[ tsIgnoreHeader ] += tsIgnoreCount;
+  tableData[ tsExpectErrorHeader ] += tsExpectErrorCount;
 };
 
 // iterate through list of common code repos to fill out data
@@ -114,7 +114,7 @@ repos.forEach( repo => {
     [ jsHeader ]: 0,
     [ tsHeader ]: 0,
     [ completeHeader ]: 0,
-    [ tsIgnoreHeader ]: 0
+    [ tsExpectErrorHeader ]: 0
   };
   const repoData = tableData[ repo ];
 
@@ -128,10 +128,10 @@ repos.forEach( repo => {
 const rows = Object.values( tableData );
 const totalJS = _.sumBy( rows, jsHeader );
 const totalTS = _.sumBy( rows, tsHeader );
-const totalTSIgnore = _.sumBy( rows, tsIgnoreHeader );
+const totalTSExpectError = _.sumBy( rows, tsExpectErrorHeader );
 
 const summary = `\n --------- SUMMARY ----------
- Total ${tsIgnoreHeader}: ${totalTSIgnore}
+ Total ${tsExpectErrorHeader}: ${totalTSExpectError}
  Total ${jsHeader}: ${totalJS}
  Total ${tsHeader}: ${totalTS}
  ${completeHeader}: ${percent( totalTS, totalTS + totalJS )}%
