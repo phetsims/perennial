@@ -908,53 +908,68 @@ module.exports = ( function() {
 
     /**
      * @public
+     *
+     * @param {function(ReleaseBranch):Promise.<boolean>} [filter] - Optional filter, release branches will be skipped
+     *                                                               if this resolves to false
      */
-    static async updateCheckouts() {
+    static async updateCheckouts( filter ) {
       console.log( 'Updating checkouts' );
 
       const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
       for ( const releaseBranch of releaseBranches ) {
-        console.log( `Updating ${releaseBranch}` );
+        if ( !filter || await filter( releaseBranch ) ) {
+          console.log( `Updating ${releaseBranch}` );
 
-        await releaseBranch.updateCheckout();
-        await releaseBranch.transpile();
-        try {
-          await releaseBranch.build();
-        }
-        catch( e ) {
-          console.log( `failed to build ${releaseBranch.toString()} ${e}` );
+          await releaseBranch.updateCheckout();
+          await releaseBranch.transpile();
+          try {
+            await releaseBranch.build();
+          }
+          catch( e ) {
+            console.log( `failed to build ${releaseBranch.toString()} ${e}` );
+          }
         }
       }
     }
 
     /**
      * @public
+     *
+     * @param {function(ReleaseBranch):Promise.<boolean>} [filter] - Optional filter, release branches will be skipped
+     *                                                               if this resolves to false
      */
-    static async checkUnbuiltCheckouts() {
+    static async checkUnbuiltCheckouts( filter ) {
       console.log( 'Checking unbuilt checkouts' );
 
       const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
       for ( const releaseBranch of releaseBranches ) {
-        console.log( releaseBranch.toString() );
-        const unbuiltResult = await releaseBranch.checkUnbuilt();
-        if ( unbuiltResult ) {
-          console.log( unbuiltResult );
+        if ( !filter || await filter( releaseBranch ) ) {
+          console.log( releaseBranch.toString() );
+          const unbuiltResult = await releaseBranch.checkUnbuilt();
+          if ( unbuiltResult ) {
+            console.log( unbuiltResult );
+          }
         }
       }
     }
 
     /**
      * @public
+     *
+     * @param {function(ReleaseBranch):Promise.<boolean>} [filter] - Optional filter, release branches will be skipped
+     *                                                               if this resolves to false
      */
-    static async checkBuiltCheckouts() {
+    static async checkBuiltCheckouts( filter ) {
       console.log( 'Checking built checkouts' );
 
       const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
       for ( const releaseBranch of releaseBranches ) {
-        console.log( releaseBranch.toString() );
-        const builtResult = await releaseBranch.checkBuilt();
-        if ( builtResult ) {
-          console.log( builtResult );
+        if ( !filter || await filter( releaseBranch ) ) {
+          console.log( releaseBranch.toString() );
+          const builtResult = await releaseBranch.checkBuilt();
+          if ( builtResult ) {
+            console.log( builtResult );
+          }
         }
       }
     }
