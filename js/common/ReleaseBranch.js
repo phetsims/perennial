@@ -631,10 +631,11 @@ module.exports = ( function() {
      * @public
      *
      * @param {function} filterRepo - Passed {string} repo, return false if it should be excluded.
+     * @param {function} checkUnreleasedBranches - If false, will skip checking for unreleased branches. This checking needs all repos checked out
      * @returns {Promise.<Array.<ReleaseBranch>>}
      * @rejects {ExecuteError}
      */
-    static async getMaintenanceBranches( filterRepo = () => true ) {
+    static async getMaintenanceBranches( filterRepo = () => true, checkUnreleasedBranches = true ) {
       winston.debug( 'retrieving available sim branches' );
 
       const simMetadataResult = await simMetadata( {
@@ -664,46 +665,48 @@ module.exports = ( function() {
 
       // Unreleased branches
       const unreleasedBranches = [];
-      for ( const repo of activeSimRepos.filter( filterRepo ) ) {
-        // Exclude explicitly excluded repos
-        if ( JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) ).phet.ignoreForAutomatedMaintenanceReleases ) {
-          continue;
-        }
-
-        const branches = await getBranches( repo );
-
-        for ( const branch of branches ) {
-          // We aren't unreleased if we're included in either phet or phet-io metadata.
-          // See https://github.com/phetsims/balancing-act/issues/118
-          if ( phetBranches.concat( phetioBranches ).filter( releaseBranch => releaseBranch.repo === repo && releaseBranch.branch === branch ).length ) {
+      if ( !checkUnreleasedBranches ) {
+        for ( const repo of activeSimRepos.filter( filterRepo ) ) {
+          // Exclude explicitly excluded repos
+          if ( JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) ).phet.ignoreForAutomatedMaintenanceReleases ) {
             continue;
           }
 
-          const match = branch.match( /^(\d+)\.(\d+)$/ );
+          const branches = await getBranches( repo );
 
-          if ( match ) {
-            const major = Number( match[ 1 ] );
-            const minor = Number( match[ 2 ] );
+          for ( const branch of branches ) {
+            // We aren't unreleased if we're included in either phet or phet-io metadata.
+            // See https://github.com/phetsims/balancing-act/issues/118
+            if ( phetBranches.concat( phetioBranches ).filter( releaseBranch => releaseBranch.repo === repo && releaseBranch.branch === branch ).length ) {
+              continue;
+            }
 
-            const projectMetadata = simMetadataResult.projects.find( project => project.name === `html/${repo}` ) || null;
-            const productionVersion = projectMetadata ? projectMetadata.version : null;
+            const match = branch.match( /^(\d+)\.(\d+)$/ );
 
-            if ( !productionVersion ||
-                 major > productionVersion.major ||
-                 ( major === productionVersion.major && minor > productionVersion.minor ) ) {
+            if ( match ) {
+              const major = Number( match[ 1 ] );
+              const minor = Number( match[ 2 ] );
 
-              // Do a checkout so we can determine supported brands
-              await gitCheckout( repo, branch );
-              const packageObject = JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) );
-              const includesPhetio = packageObject.phet && packageObject.phet.supportedBrands && packageObject.phet.supportedBrands.includes( 'phet-io' );
-              await gitCheckout( repo, 'master' );
+              const projectMetadata = simMetadataResult.projects.find( project => project.name === `html/${repo}` ) || null;
+              const productionVersion = projectMetadata ? projectMetadata.version : null;
 
-              const brands = [
-                'phet',
-                ...( includesPhetio ? [ 'phet-io' ] : [] )
-              ];
+              if ( !productionVersion ||
+                   major > productionVersion.major ||
+                   ( major === productionVersion.major && minor > productionVersion.minor ) ) {
 
-              unreleasedBranches.push( new ReleaseBranch( repo, branch, brands, false ) );
+                // Do a checkout so we can determine supported brands
+                await gitCheckout( repo, branch );
+                const packageObject = JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) );
+                const includesPhetio = packageObject.phet && packageObject.phet.supportedBrands && packageObject.phet.supportedBrands.includes( 'phet-io' );
+                await gitCheckout( repo, 'master' );
+
+                const brands = [
+                  'phet',
+                  ...( includesPhetio ? [ 'phet-io' ] : [] )
+                ];
+
+                unreleasedBranches.push( new ReleaseBranch( repo, branch, brands, false ) );
+              }
             }
           }
         }
