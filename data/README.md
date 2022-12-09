@@ -14,7 +14,7 @@ interactive-description (auto-generated) is a list of all repositories that have
 description like keyboard navigation. Sims in progress are also included in this list.
 
 phet-io (auto-generated) is the list of all simulations that are instrumented with PhET-iO features. This list is
-automatically fuzz tested and is used by phetmarks to dictate which sims have wrapper links. See the 
+automatically fuzz tested and is used by phetmarks to dictate which sims have wrapper links. See the
 [PhET-iO Instrumentation Technical Guide](https://github.com/phetsims/phet-io/blob/master/doc/phet-io-instrumentation-technical-guide.md)
 for more information.
 
@@ -23,8 +23,11 @@ PhET-iO API changes within phetioDesigned elements. will trigger a CT error. A s
 is published, when its API starts to stabilize. Add `phet["phet-io"].compareDesignedAPIChanges:true` to a
 sim's `package.json` to be populated to this list.
 
-phet-io-state-unsupported - A manually supported list of sims that do not support state, and shouldn't be tested as
+phet-io-state-unsupported (manually maintained) - A manually supported list of sims that do not support state, and
+shouldn't be tested as
 such. Any sim in this list will not have its state wrapper fuzzed on CT.
 
 voicing (auto-generated) is the list of all simulations that have the voicing feature. This is noted in package json "
 phetFeatures.supportsVoicing".
+
+wrappers (manually maintained) - list of "wrapper suite" wrappers that are published with every PhET-iO build.
