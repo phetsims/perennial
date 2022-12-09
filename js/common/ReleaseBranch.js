@@ -665,7 +665,7 @@ module.exports = ( function() {
 
       // Unreleased branches
       const unreleasedBranches = [];
-      if ( !checkUnreleasedBranches ) {
+      if ( checkUnreleasedBranches ) {
         for ( const repo of activeSimRepos.filter( filterRepo ) ) {
           // Exclude explicitly excluded repos
           if ( JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) ).phet.ignoreForAutomatedMaintenanceReleases ) {
