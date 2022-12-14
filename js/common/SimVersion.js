@@ -161,6 +161,26 @@
     }
 
     /**
+     * Returns true if the specified version is strictly after this version
+     * @param {SimVersion} version
+     * @returns {boolean}
+     * @public
+     */
+    isAfter( version ) {
+      return this.compareNumber( version ) === 1;
+    }
+
+    /**
+     * Returns true if the specified version matches or comes before this version.
+     * @param version
+     * @returns {boolean}
+     * @public
+     */
+    isBeforeOrEqualTo( version ) {
+      return this.compareNumber( version ) <= 0;
+    }
+
+    /**
      * Returns the string form of the version.
      * @public
      *
