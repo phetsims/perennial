@@ -151,7 +151,7 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
   const versionURL = `https://phet-dev.colorado.edu/html/${repo}/${versionString}`;
 
   if ( brands.includes( 'phet' ) ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_en_phet.html` );
+    grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_all_phet.html` );
   }
   if ( brands.includes( 'phet-io' ) ) {
     grunt.log.writeln( `Deployed: ${versionURL}/phet-io/` );
