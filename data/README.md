@@ -10,6 +10,8 @@ file.
 active-sims (auto-generated) is a list of all simulation repositories that can be built with chipper. Similar to
 runnables, but doesn't include repos with test code like sun, scenery-phet, etc.
 
+carousel-dynamic - List of repos branched for https://github.com/phetsims/sun/issues/814
+
 interactive-description (auto-generated) is a list of all repositories that have been outfitted with interactive
 description like keyboard navigation. Sims in progress are also included in this list.
 
