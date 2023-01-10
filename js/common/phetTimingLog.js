@@ -49,6 +49,13 @@ let depth = -1;
 
 const indent = depth => '  '.repeat( depth );
 
+const getDate = () => new Date().toLocaleString( 'en-US', { timeZone: 'America/Denver' } );
+
+/**
+ * @param {string} taskName
+ * @param {{depth:number}} [options]
+ * @returns {number} - time of the start
+ */
 const push = ( taskName, options = null ) => {
   assert( !taskName.includes( ':' ), 'task name cannot include :, it was ' + taskName );
 
@@ -57,22 +64,35 @@ const push = ( taskName, options = null ) => {
   if ( stream === null ) {
     stream = fs.createWriteStream( logPath, { flags: 'a' } );
   }
-  if ( depth === 0 ) {
-    const time = new Date().toLocaleString( 'en-US', { timeZone: 'America/Denver' } );
-    stream.write( `<!-- ${time} -->\n` );
-  }
-  stream.write( `${indent( options && options.hasOwnProperty( 'depth' ) ? options.depth : depth )}<${taskName}>\n` );
 
-  const startTime = Date.now();
-  return startTime;
+  // only write a start tag for depth of 0, nested content is just printed upon completion
+  if ( depth === 0 ) {
+
+    const indentSpace = indent( options && options.hasOwnProperty( 'depth' ) ? options.depth : depth );
+
+    // Add date attribute to all that are in depth 0
+    stream.write( `${indentSpace}<${taskName} date="${getDate()}">\n` );
+  }
+
+  return Date.now();
 };
 
+/**
+ * @param {string} taskName
+ * @param {string} startTime
+ * @param {{depth:number}} [options]
+ */
 const pop = ( taskName, startTime, options = null ) => {
   const endTime = Date.now();
 
-  stream.write( `${indent( options && options.hasOwnProperty( 'depth' ) ? options.depth : depth )}</${taskName}> <!-- ${endTime - startTime}ms -->\n` );
+  const isTopLevel = depth === 0;
 
-  if ( depth === 0 ) {
+  const indentSpacing = indent( options && options.hasOwnProperty( 'depth' ) ? options.depth : depth );
+  const startSlash = isTopLevel ? '/' : ''; // end tag for depth 0
+  const endSlash = isTopLevel ? '' : '/'; // tag is a solo tag when depth is not 0
+  stream.write( `${indentSpacing}<${startSlash}${taskName} time="${endTime - startTime}ms"${endSlash}>\n` );
+
+  if ( isTopLevel ) {
     stream.write( '\n', () => {
 
       // Guaranteed flushing the buffer.  Without this, we end up with partial/truncated output.
