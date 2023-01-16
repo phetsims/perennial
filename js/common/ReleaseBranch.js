@@ -363,7 +363,7 @@ module.exports = ( function() {
      * @returns {Promise.<Array.<string>>}
      */
     async getStatus( options ) {
-      // TODO: fuzzing (see when different fuzz query parameters existed?)
+      // TODO: fuzzing (see when different fuzz query parameters existed?), https://github.com/phetsims/perennial/issues/300
 
       options = _.extend( {
         checkUnbuilt: true,
