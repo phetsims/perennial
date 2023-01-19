@@ -94,32 +94,35 @@ Before starting, ensure you have a clean working copy, and:
    unpublished, they'll need to manually include the fixes. From this point on (until complete), you should be the only
    person touching the release branches.
 3. Run `Maintenance.reset()` to clear the maintenance state in preparation for the process.
+4. Make sure to check on the active PhET-iO Deploy Status on phet.colorado.edu to ensure that the right PhET-iO sims are
+   included in this maintenance release.
 
 Generally for each issue that should be fixed, the following outline should be used (there are exceptions for
 complications):
 
-4. Learn about the change being applied, and try to anticipate what types of changes will be needed. What repositories
+5. Learn about the change being applied, and try to anticipate what types of changes will be needed. What repositories
    will need to be patched? (Even if the patch on master was only for 1 repository, other repos might also need to be
    changed if your change depends on newer features). If it exists, having a SHA that does "all" of the changes is nice.
    What types of release branches do you anticipate needing changes?
-5. Create patches for each repo that needs to change,
+6. Create patches for each repo that needs to change,
    e.g. `Maintenance.createPatch( '{{REPO}}', '{{ISSUE_URL}}', '{{OPTIONAL_PATCH_NAME}}' )`.
-6. Mark which release branches need which patches. For simple cases, this can just be something like
-   `Maintenance.addNeededPatchesAfter( '{{PATCH_NAME}}', '{{SHA}}' )`, but things can be added dynamically or through filters.
+7. Mark which release branches need which patches. For simple cases, this can just be something like
+   `Maintenance.addNeededPatchesAfter( '{{PATCH_NAME}}', '{{SHA}}' )`, but things can be added dynamically or through
+   filters.
 
 Then loop the following until no more release branches need patches. NOTE: If you have a "fix" commit SHA, feel free to
 skip to step 9 (adding the patch SHA).
 
-7. Pick a release branch that needs a patch and check it out: `Maintenance.checkoutBranch( '{{REPO}}', '{{BRANCH}}' )`
-8. Make the changes to the repos that need changes, commit them, and record the SHAs.
-9. Call `Maintenance.addPatchSHA( '{{PATCH_NAME}}', '{{SHA}}' )` for every SHA.
-10. Apply the cherry-picked SHAs to see if there are any more remaining release branches that need the patch:
+8. Pick a release branch that needs a patch and check it out: `Maintenance.checkoutBranch( '{{REPO}}', '{{BRANCH}}' )`
+9. Make the changes to the repos that need changes, commit them, and record the SHAs.
+10. Call `Maintenance.addPatchSHA( '{{PATCH_NAME}}', '{{SHA}}' )` for every SHA.
+11. Apply the cherry-picked SHAs to see if there are any more remaining release branches that need the patch:
     `Maintenance.applyPatches()`. NOTE: The commits are still ONLY LOCAL. This is very fast, but the changes have not
     been made to the remote release branch until the updateDependencies task below.
 
 Once that is done (or when you want to make the changes permanent on the server):
 
-11. Run `Maintenance.updateDependencies()` (takes a while) which builds the release branches, integrates the commits and
+12. Run `Maintenance.updateDependencies()` (takes a while) which builds the release branches, integrates the commits and
     patches, creates/updates branches where necessary, etc.
 
 Once that is done for every issue, then generally RCs are deployed with `Maintenance.deployReleaseCandidates()`, a list
@@ -182,9 +185,9 @@ This is essentially a pretty-printed version of what is in your `.maintenance.js
 
 It is assumed that your `~/.phet/build.json` file will be properly configured so that simulations can be deployed. The
 standard developer guide instructions to set this up should be done before beginning the maintenance process. Notably,
-it is important that `npm config set save false` and `npm config set package-lock false` should be applied, 
-so that package files are not changed during npm operations used by the maintenance process. In addition, it is helpful 
-to set up build server notifications (with `buildServerNotifyEmail` in `~/.phet/build.json`) so that any failed 
+it is important that `npm config set save false` and `npm config set package-lock false` should be applied,
+so that package files are not changed during npm operations used by the maintenance process. In addition, it is helpful
+to set up build server notifications (with `buildServerNotifyEmail` in `~/.phet/build.json`) so that any failed
 deployments can be flagged.
 
 # General maintenance steps

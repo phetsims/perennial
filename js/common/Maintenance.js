@@ -95,6 +95,8 @@ module.exports = ( function() {
      * .maintenance.json. Generally this should be done before any new maintenance release.
      */
     static reset() {
+      console.log( 'Make sure to check on the active PhET-iO Deploy Status on phet.colorado.edu to ensure that the ' +
+                   'right PhET-iO sims are included in this maintenance release.' );
       new Maintenance().save();
     }
 
