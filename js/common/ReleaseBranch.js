@@ -128,6 +128,50 @@ module.exports = ( function() {
     }
 
     /**
+     * Returns the maintenance directory, for things that want to use it directly.
+     * @public
+     *
+     * @returns {string}
+     */
+    static getMaintenanceDirectory() {
+      return MAINTENANCE_DIRECTORY;
+    }
+
+    /**
+     * Returns the path (relative to the repo) to the built phet-brand HTML file
+     * @public
+     *
+     * @returns {Promise<string>}
+     */
+    async getLocalPhetBuiltHTMLPath() {
+      const usesChipper2 = await this.usesChipper2();
+
+      return `build/${usesChipper2 ? 'phet/' : ''}${this.repo}_en${usesChipper2 ? '_phet' : ''}.html`;
+    }
+
+    /**
+     * Returns the path (relative to the repo) to the built phet-io-brand HTML file
+     * @public
+     *
+     * @returns {Promise<string>}
+     */
+    async getLocalPhetIOBuiltHTMLPath() {
+      const usesChipper2 = await this.usesChipper2();
+
+      return `build/${usesChipper2 ? 'phet-io/' : ''}${this.repo}${usesChipper2 ? '_all_phet-io' : '_en-phetio'}.html`;
+    }
+
+    /**
+     * Returns the query parameter to use for activating phet-io standalone mode
+     * @public
+     *
+     * @returns {Promise<string>}
+     */
+    async getPhetioStandaloneQueryParameter() {
+      return ( await this.usesOldPhetioStandalone() ) ? 'phet-io.standalone' : 'phetioStandalone';
+    }
+
+    /**
      * @public
      */
     async updateCheckout() {

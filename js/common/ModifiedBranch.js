@@ -181,7 +181,7 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
       const linkSuffixes = [];
       const versionString = this.deployedVersion.toString();
 
-      const standaloneParams = ( await this.releaseBranch.usesOldPhetioStandalone() ) ? 'phet-io.standalone' : 'phetioStandalone';
+      const standaloneParams = await this.releaseBranch.getPhetioStandaloneQueryParameter();
       const proxiesParams = ( await this.releaseBranch.usesRelativeSimPath() ) ? 'relativeSimPath' : 'launchLocalVersion';
       const studioName = ( this.brands.includes( 'phet-io' ) && await this.releaseBranch.usesPhetioStudio() ) ? 'studio' : 'instance-proxies';
       const studioNameBeautified = studioName === 'studio' ? 'Studio' : 'Instance Proxies';
