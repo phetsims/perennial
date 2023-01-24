@@ -9,4 +9,5 @@ phet-io-wrappers/record
 phet-io-wrappers/playback
 phet-io-wrappers/screenshot
 phet-io-wrappers/state
+phet-io-wrappers/version-migration
 studio
