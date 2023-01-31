@@ -56,7 +56,7 @@ module.exports = function( asyncCallback, options ) {
       const fileExtension = fullPath.split( '.' ).pop();
       let mimeType = mimeTypes[ fileExtension ];
 
-      if ( !mimeType && fullPath.includes( 'active-runnables' ) ) {
+      if ( !mimeType && ( fullPath.includes( 'active-runnables' ) || fullPath.includes( 'active-repos' ) ) ) {
         mimeType = 'text/plain';
       }
 
