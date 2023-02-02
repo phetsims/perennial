@@ -977,6 +977,33 @@ module.exports = ( function() {
     }
 
     /**
+     * Redeploys production versions of all release branches (or those matching a specific filter
+     * @public
+     *
+     * NOTE: This does not use the current maintenance state!
+     *
+     * @param {string} message - Generally an issue to reference
+     * @param {function(ReleaseBranch):Promise.<boolean>} [filter] - Optional filter, release branches will be skipped
+     *                                                                if this resolves to false
+     */
+    static async redeployAllProduction( message, filter ) {
+      // Ignore unreleased branches!
+      const releaseBranches = await ReleaseBranch.getMaintenanceBranches( () => true, false );
+
+      for ( const releaseBranch of releaseBranches ) {
+        if ( filter && !( await filter( releaseBranch ) ) ) {
+          continue;
+        }
+
+        console.log( releaseBranch.toString() );
+        await rc( releaseBranch.repo, releaseBranch.branch, releaseBranch.brands, true, message );
+        await production( releaseBranch.repo, releaseBranch.branch, releaseBranch.brands, true, message );
+      }
+
+      console.log( 'Finished redeploying' );
+    }
+
+    /**
      * Convert into a plain JS object meant for JSON serialization.
      * @public
      *
