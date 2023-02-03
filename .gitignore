@@ -12,3 +12,4 @@ lintreport.txt
 js/build-server/tmp*
 .maintenance.json
 logs/
+.build-server-queue

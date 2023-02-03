@@ -20,6 +20,7 @@ const bodyParser = require( 'body-parser' ); // eslint-disable-line require-stat
 const express = require( 'express' );
 const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
 const parseArgs = require( 'minimist' ); // eslint-disable-line require-statement-match
+const persistentQueue = require( './persistentQueue.js' );
 
 // set this process up with the appropriate permissions, value is in octal
 process.umask( 0o0002 );
@@ -161,7 +162,7 @@ const queueDeploy = ( api, repos, simName, version, locales, brands, servers, em
     }
     else {
       winston.log( 'info', `queuing build for ${simName} ${version}` );
-      taskQueue.push( {
+      const task = {
         api: api,
         repos: repos,
         simName: simName,
@@ -173,7 +174,9 @@ const queueDeploy = ( api, repos, simName, version, locales, brands, servers, em
         userId: userId,
         res: res,
         branch: branch
-      }, err => {
+      };
+      persistentQueue.addTask( task );
+      taskQueue.push( task, err => {
         const simInfoString = `Sim = ${simName
         } Version = ${version
         } Brands = ${brands
@@ -280,5 +283,17 @@ app.listen( constants.LISTEN_PORT, () => {
   }
   catch( err ) {
     winston.warn( `unable to get SHA from git, err: ${err}` );
+  }
+
+  // Recreate queue
+  try {
+    const queue = persistentQueue.getQueue();
+    for ( let task of queue ) {
+      console.log( 'Resuming task from persistent queue: ', task );
+      taskQueue.push( task );
+    }
+  }
+  catch( e ) {
+    console.error( 'could not resume queue' );
   }
 } );

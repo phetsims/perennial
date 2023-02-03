@@ -19,6 +19,7 @@ const writeFile = require( '../common/writeFile' );
 const writePhetHtaccess = require( './writePhetHtaccess' );
 const writePhetioHtaccess = require( '../common/writePhetioHtaccess' );
 const deployImages = require( './deployImages' );
+const persistentQueue = require( './persistentQueue.js' );
 
 const buildDir = './js/build-server/tmp';
 
@@ -51,7 +52,6 @@ const afterDeploy = async buildDir => {
 /**
  * taskQueue ensures that only one build/deploy process will be happening at the same time.  The main build/deploy logic is here.
  *
- * @param {Object}
  * @property {JSON} repos
  * @property {String} api
  * @property {String} locales - comma separated list of locale codes
@@ -63,8 +63,10 @@ const afterDeploy = async buildDir => {
  * @property {String} translatorId - rosetta user id for adding translators to the website
  * @property {String} res - express response object
  * @property {winston} winston - logger
+ * @param options
  */
 async function taskWorker( options ) {
+  persistentQueue.removeTask( options );
   if ( options.deployImages ) {
     try {
       await deployImages( options );
