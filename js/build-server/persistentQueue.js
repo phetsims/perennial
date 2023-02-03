@@ -1,12 +1,14 @@
 // Copyright 2023, University of Colorado Boulder
 
 const fs = require( 'fs' );
+const _ = require( 'lodash' );
 
 const getQueue = () => {
   try {
     const queue = JSON.parse( fs.readFileSync( '.build-server-queue' ).toString() );
     if ( !Array.isArray( queue ) ) {
-      console.error( 'Queue not retrievable, returning blank queue', e );
+      console.error( 'Queue is not an array, found this instead', JSON.stringify( queue ) );
+      console.error( 'Returning a blank queue' );
       return [];
     }
     else {
@@ -20,7 +22,7 @@ const getQueue = () => {
 };
 
 const saveQueue = queue => {
-  fs.writeFileSync( JSON.stringify( queue ) );
+  fs.writeFileSync( '.build-server-queue', JSON.stringify( queue ) );
 };
 
 const addTask = task => {
@@ -31,7 +33,7 @@ const addTask = task => {
 
 const removeTask = task => {
   const queue = getQueue();
-  const taskIndex = queue.findIndex( t => _.equals( t, task ) );
+  const taskIndex = queue.findIndex( t => _.isEqual( t, task ) );
   queue.splice( taskIndex, 1 );
   saveQueue( queue );
 };
