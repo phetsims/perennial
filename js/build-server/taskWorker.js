@@ -19,7 +19,7 @@ const writeFile = require( '../common/writeFile' );
 const writePhetHtaccess = require( './writePhetHtaccess' );
 const writePhetioHtaccess = require( '../common/writePhetioHtaccess' );
 const deployImages = require( './deployImages' );
-const persistentQueue = require( './persistentQueue.js' );
+const persistentQueue = require( './persistentQueue' );
 
 const buildDir = './js/build-server/tmp';
 

@@ -1,7 +1,7 @@
 // Copyright 2023, University of Colorado Boulder
 
 const fs = require( 'fs' );
-const _ = require( 'lodash' );
+const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
 
 const getQueue = () => {
   try {
@@ -41,5 +41,5 @@ const removeTask = task => {
 module.exports = {
   addTask: addTask,
   removeTask: removeTask,
-  getQueue: getQueue,
+  getQueue: getQueue
 };

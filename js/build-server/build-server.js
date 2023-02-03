@@ -20,7 +20,7 @@ const bodyParser = require( 'body-parser' ); // eslint-disable-line require-stat
 const express = require( 'express' );
 const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
 const parseArgs = require( 'minimist' ); // eslint-disable-line require-statement-match
-const persistentQueue = require( './persistentQueue.js' );
+const persistentQueue = require( './persistentQueue' );
 
 // set this process up with the appropriate permissions, value is in octal
 process.umask( 0o0002 );
@@ -288,7 +288,7 @@ app.listen( constants.LISTEN_PORT, () => {
   // Recreate queue
   try {
     const queue = persistentQueue.getQueue();
-    for ( let task of queue ) {
+    for ( const task of queue ) {
       console.log( 'Resuming task from persistent queue: ', task );
       taskQueue.push( task );
     }
