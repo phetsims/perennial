@@ -25,15 +25,28 @@ const saveQueue = queue => {
   fs.writeFileSync( '.build-server-queue', JSON.stringify( queue ) );
 };
 
+const formatTask = task => ( {
+  api: task.api,
+  repos: task.repos,
+  simName: task.simName,
+  version: task.version,
+  locales: task.locales,
+  servers: task.servers,
+  brands: task.brands,
+  email: task.email,
+  userId: task.userId,
+  branch: task.branch
+} );
+
 const addTask = task => {
   const queue = getQueue();
-  queue.push( task );
+  queue.push( formatTask( task ) );
   saveQueue( queue );
 };
 
 const removeTask = task => {
   const queue = getQueue();
-  const taskIndex = queue.findIndex( t => _.isEqual( t, task ) );
+  const taskIndex = queue.findIndex( t => _.isEqual( t, formatTask( task ) ) );
   queue.splice( taskIndex, 1 );
   saveQueue( queue );
 };

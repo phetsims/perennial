@@ -172,11 +172,10 @@ const queueDeploy = ( api, repos, simName, version, locales, brands, servers, em
         brands: brands,
         email: email,
         userId: userId,
-        res: res,
         branch: branch
       };
       persistentQueue.addTask( task );
-      taskQueue.push( task, err => {
+      taskQueue.push( { ...task, res: res }, err => {
         const simInfoString = `Sim = ${simName
         } Version = ${version
         } Brands = ${brands
