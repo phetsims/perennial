@@ -175,34 +175,7 @@ const queueDeploy = ( api, repos, simName, version, locales, brands, servers, em
         branch: branch
       };
       persistentQueue.addTask( task );
-      taskQueue.push( { ...task, res: res }, err => {
-        const simInfoString = `Sim = ${simName
-        } Version = ${version
-        } Brands = ${brands
-        } Locales = ${locales}`;
-
-        if ( err ) {
-          let shas = repos;
-
-          // try to format the JSON nicely for the email, but don't worry if it is invalid JSON
-          try {
-            shas = JSON.stringify( JSON.parse( shas ), null, 2 );
-          }
-          catch( e ) {
-            // invalid JSON
-          }
-          const errorMessage = `Build failure: ${err}. ${simInfoString} Shas = ${JSON.stringify( shas )}`;
-          winston.log( 'error', errorMessage );
-          sendEmail( 'BUILD ERROR', errorMessage, email );
-        }
-        else {
-          winston.log( 'info', `build for ${simName} finished successfully` );
-          sendEmail( 'Build Succeeded', simInfoString, email, true );
-        }
-
-        // reset email parameter to null after build finishes or errors, since this email address may be different on every build
-        email = null;
-      } );
+      taskQueue.push( task, buildCallback( task ) );
 
       res.status( api === '1.0' ? 200 : 202 );
       res.send( 'build process initiated, check logs for details' );
@@ -214,6 +187,34 @@ const queueDeploy = ( api, repos, simName, version, locales, brands, servers, em
     res.status( 400 );
     res.send( errorString );
   }
+};
+
+const buildCallback = task => {
+  return err => {
+    const simInfoString = `Sim = ${task.simName
+    } Version = ${task.version
+    } Brands = ${task.brands
+    } Locales = ${task.locales}`;
+
+    if ( err ) {
+      let shas = task.repos;
+
+      // try to format the JSON nicely for the email, but don't worry if it is invalid JSON
+      try {
+        shas = JSON.stringify( JSON.parse( shas ), null, 2 );
+      }
+      catch( e ) {
+        // invalid JSON
+      }
+      const errorMessage = `Build failure: ${err}. ${simInfoString} Shas = ${JSON.stringify( shas )}`;
+      winston.log( 'error', errorMessage );
+      sendEmail( 'BUILD ERROR', errorMessage, task.email );
+    }
+    else {
+      winston.log( 'info', `build for ${task.simName} finished successfully` );
+      sendEmail( 'Build Succeeded', simInfoString, task.email, true );
+    }
+  };
 };
 
 const postQueueImageDeploy = ( req, res ) => {
@@ -289,7 +290,7 @@ app.listen( constants.LISTEN_PORT, () => {
     const queue = persistentQueue.getQueue();
     for ( const task of queue ) {
       console.log( 'Resuming task from persistent queue: ', task );
-      taskQueue.push( task );
+      taskQueue.push( task, buildCallback( task ) );
     }
   }
   catch( e ) {

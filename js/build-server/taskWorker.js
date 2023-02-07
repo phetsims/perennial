@@ -61,11 +61,10 @@ const afterDeploy = async buildDir => {
  * @property {string[]} brands - deployment brands
  * @property {String} email - used for sending notifications about success/failure
  * @property {String} translatorId - rosetta user id for adding translators to the website
- * @property {String} res - express response object
  * @property {winston} winston - logger
  * @param options
  */
-async function taskWorker( options ) {
+async function runTask( options ) {
   persistentQueue.removeTask( options );
   if ( options.deployImages ) {
     try {
@@ -373,8 +372,8 @@ async function taskWorker( options ) {
   await afterDeploy();
 }
 
-module.exports = ( task, taskCallback ) => {
-  taskWorker( task )
+module.exports = function taskWorker( task, taskCallback ) {
+  runTask( task )
     .then( () => {
         taskCallback();
       }

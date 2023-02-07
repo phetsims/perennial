@@ -2,18 +2,22 @@
 
 
 const constants = require( './constants' );
-const emailjs = require( 'emailjs' );
-const mimelib = require( 'mimelib' );
 const winston = require( 'winston' );
+import nodemailer from 'nodemailer';
 
 // configure email server
-let emailClient;
+let transporter;
 if ( constants.BUILD_SERVER_CONFIG.emailUsername && constants.BUILD_SERVER_CONFIG.emailPassword && constants.BUILD_SERVER_CONFIG.emailTo ) {
-  emailClient = new emailjs.SMTPClient( {
-    user: constants.BUILD_SERVER_CONFIG.emailUsername,
-    password: constants.BUILD_SERVER_CONFIG.emailPassword,
-    host: constants.BUILD_SERVER_CONFIG.emailServer,
-    tls: true
+  transporter = nodemailer.createTransport( {
+    auth: {
+      user: constants.BUILD_SERVER_CONFIG.emailUsername,
+      pass: constants.BUILD_SERVER_CONFIG.emailServer,
+      host: 'smtp.office365.com',
+      port: 587,
+      tls: {
+        ciphers: 'SSLv3'
+      }
+    }
   } );
 }
 else {
@@ -28,8 +32,8 @@ else {
  * @param emailParameter - recipient defined per request
  * @param emailParameterOnly - if true send the email only to the passed in email, not to the default list as well
  */
-module.exports = function sendEmail( subject, text, emailParameter, emailParameterOnly ) {
-  if ( emailClient ) {
+module.exports = async function sendEmail( subject, text, emailParameter, emailParameterOnly ) {
+  if ( transporter ) {
     let emailTo = constants.BUILD_SERVER_CONFIG.emailTo;
 
     if ( emailParameter ) {
@@ -46,25 +50,20 @@ module.exports = function sendEmail( subject, text, emailParameter, emailParamet
       return;
     }
 
-    winston.log( 'info', 'attempting to send email' );
-    emailClient.send( {
-        text: text.replace( /([^\r])\n/g, '$1\r\n' ), // Replace LF with CRLF, bare line feeds are rejected by some email clients
-        from: 'PhET Mail <phetmail@colorado.edu>',
+    try {
+      const emailResult = await transporter.sendMail( {
+        from: `"PhET Mail" <${constants.BUILD_SERVER_CONFIG.emailUsername}>`,
         to: emailTo,
-        subject: subject
-      },
-      ( err, message ) => {
-        if ( err ) {
-          let errorString = typeof err === 'string' ? err : JSON.stringify( err );
-          errorString = errorString.replace( constants.BUILD_SERVER_CONFIG.emailPassword, '***PASSWORD REDACTED***' );
-          winston.log( 'error', `error when attempted to send email, err = ${errorString}` );
-        }
-        else {
-          winston.log( 'info', `sent email to: ${message.header.to
-          }, subject: ${mimelib.decodeMimeWord( message.header.subject )
-          }, text: ${message.text}` );
-        }
-      }
-    );
+        subject: subject,
+        text: text.replace( /([^\r])\n/g, '$1\r\n' ) // Replace LF with CRLF, bare line feeds are rejected by some email clients,
+      } );
+
+      winston.info( `sent email: ${emailTo}, ${subject}, ${emailResult.messageId}, ${emailResult.response}` );
+    }
+    catch( err ) {
+      let errorString = typeof err === 'string' ? err : JSON.stringify( err );
+      errorString = errorString.replace( constants.BUILD_SERVER_CONFIG.emailPassword, '***PASSWORD REDACTED***' );
+      winston.error( `error when attempted to send email, err = ${errorString}` );
+    }
   }
 };
