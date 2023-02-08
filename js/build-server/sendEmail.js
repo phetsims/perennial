@@ -3,7 +3,7 @@
 
 const constants = require( './constants' );
 const winston = require( 'winston' );
-import nodemailer from 'nodemailer';
+const nodemailer = require( 'nodemailer' );
 
 // configure email server
 let transporter;
