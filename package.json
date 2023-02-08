@@ -30,5 +30,8 @@
   },
   "eslintConfig": {
     "extends": "../chipper/eslint/node_eslintrc.js"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.1"
   }
 }
