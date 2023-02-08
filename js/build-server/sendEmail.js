@@ -11,12 +11,12 @@ if ( constants.BUILD_SERVER_CONFIG.emailUsername && constants.BUILD_SERVER_CONFI
   transporter = nodemailer.createTransport( {
     auth: {
       user: constants.BUILD_SERVER_CONFIG.emailUsername,
-      pass: constants.BUILD_SERVER_CONFIG.emailServer,
-      host: 'smtp.office365.com',
-      port: 587,
-      tls: {
-        ciphers: 'SSLv3'
-      }
+      pass: constants.BUILD_SERVER_CONFIG.emailServer
+    },
+    host: 'smtp.office365.com',
+    port: 587,
+    tls: {
+      ciphers: 'SSLv3'
     }
   } );
 }
