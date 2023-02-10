@@ -37,6 +37,7 @@ const winston = require( 'winston' );
 
 module.exports = ( function() {
 
+  //REVIEW: Rename to 'release-branches'
   const MAINTENANCE_DIRECTORY = '../.maintenance';
 
   class ReleaseBranch {
@@ -177,11 +178,15 @@ module.exports = ( function() {
     async updateCheckout() {
       winston.info( `updating checkout for ${this.toString()}` );
 
+      //REVIEW: We can avoid thrashing our main copy here (or needing it) by using the maintenance directory checkout
+      //REVIEW: for the repo. We'll somehow have to get it cloned first (worth it?)
       await gitFetch( this.repo );
       await gitCheckout( this.repo, this.branch );
       await gitPull( this.repo );
       const dependencies = await getDependencies( this.repo );
       await gitCheckout( this.repo, 'master' );
+
+      //REVIEW: make this more parallelizable (NPM and main copy thrashing)
 
       if ( !fs.existsSync( MAINTENANCE_DIRECTORY ) ) {
         winston.info( `creating directory ${MAINTENANCE_DIRECTORY}` );
