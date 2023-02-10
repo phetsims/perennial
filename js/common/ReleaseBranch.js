@@ -222,6 +222,8 @@ module.exports = ( function() {
 
         if ( repo === 'chipper' || repo === 'perennial-alias' || repo === this.repo ) {
           winston.info( `npm ${repo} in ${checkoutDirectory}` );
+
+          //REVIEW: Allow these to lock and be parallelized safely
           await execute( npmCommand, [ 'prune' ], repoPwd );
           await execute( npmCommand, [ 'update' ], repoPwd );
         }
