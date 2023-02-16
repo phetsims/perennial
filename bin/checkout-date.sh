@@ -2,13 +2,14 @@
 #=======================================================================================
 #
 # Reverts working copy to a specified date by checking out last SHA before a date
-# for all active-repos except perennial. Please note that all repos will be in
-# detached HEAD state after running this. Specific repos can be kept at master with
-# comma separated option -master. Will error out if there are any working copy changes
-# in repos to checkout. Dates can be of formats supported by git, including RFC 2822,
-# ISO 8601, and also the following:
+# for all active-repos except perennial. Repos will be in detached HEAD state. Specific
+# repos can be kept at master with comma separated option -master. Will error out if
+# there are any working copy changes.
+#
+# Does NOT update npm modules after checking out at date.
+#
+# Dates can be of formats supported by git, including RFC 2822, ISO 8601, and also the following:
 # `YYYY.MM.DD`, `MM/DD/YYYY` and `DD.MM.YYYY`
-# 
 # see https://github.com/git/git/blob/master/Documentation/date-formats.txt
 # 
 # Usage:
