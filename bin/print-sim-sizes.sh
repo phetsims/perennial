@@ -14,7 +14,7 @@
 #   default: {'%Y-%m-%d %H:%M:%S', size in bytes}
 #   mathematica: '{DateObject[{%Y, %m, %d, %H, %M, %S}], size_in_bytes}'
 # 
-# Usage: ./print-sim-sizes.sh -s since_date -u until_date -f format resistance-in-a-wire
+# Usage: perennial/bin/print-sim-sizes.sh -s "Feb 13 2023" -u "Feb 14 2023" resistance-in-a-wire
 # 
 # Author: Jesse Greenberg
 # 
@@ -79,39 +79,26 @@ for dep in "${dependencies[@]}"; do
       cd ..
 
       # revert working copy to date of sha
-      perennial/bin/checkout-date.sh $shaDate >/dev/null 2>&1
-
-      # npm prune and update in sim
-      cd "$sim"
-      npm prune >/dev/null 2>&1
-      npm update >/dev/null 2>&1
-      cd ..
-
-      # npm prune and update in chipper
-      cd chipper
-      npm prune >/dev/null 2>&1
-      npm update >/dev/null 2>&1
+      cd perennial
+      grunt checkout-timestamp --repo="$sim" --timestamp="$shaDate"
       cd ..
 
       # build the sim
       cd "$sim" 
-      grunt >/dev/null 2>&1
+      grunt
 
       # get the size
       if [ -d build ]; then
-        cd build
-        if [ -f "$sim"_en.html ]; then
-          echo {"$printDate", `du -b "$sim"_en.html | cut -f1`}
+        cd build/phet/
+        if [ -f "$sim"_en_phet.html ]; then
+          echo {"$printDate", `du -b "$sim"_en_phet.html | cut -f1`}
         else
-        echo {"$printDate", 0} "$sim"_en.html
+        echo {"$printDate", 0} "$sim"_en_phet.html
         fi
-        cd ..
+        cd ../..
       else
-        echo {"$printDate", 0} "$sim"_en.html 
+        echo {"$printDate", 0} "$sim"_en_phet.html
       fi
-
-      # remove build directory so we don't get its size if next build fails
-      rm -rf build
 
       cd ..
       echo
