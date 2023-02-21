@@ -337,8 +337,8 @@ module.exports = function( grunt ) {
     assert && assert( index >= 0, 'lint command does not appear' );
     const tail = process.argv.slice( index + 1 );
 
-    if ( !grunt.option( 'patterns' ) ) {
-      tail.push( '--patterns=../perennial' );
+    if ( !grunt.option( 'repos' ) ) {
+      tail.push( '--repos=perennial' );
     }
 
     // Forward to chipper, supporting all of the options
