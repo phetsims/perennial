@@ -58,7 +58,8 @@ tests.push( {
 
 // lints
 repos.forEach( repo => {
-  if ( fs.existsSync( `../${repo}/Gruntfile.js` ) ) {
+  // Rosetta specifies the lint task a bit differently, see https://github.com/phetsims/rosetta/issues/366
+  if ( fs.existsSync( `../${repo}/Gruntfile.js` ) || repo === 'rosetta' ) {
     tests.push( {
       test: [ repo, 'lint' ],
       type: 'lint',
