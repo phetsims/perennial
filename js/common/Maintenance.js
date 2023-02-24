@@ -18,6 +18,7 @@ const checkoutTarget = require( './checkoutTarget' );
 const execute = require( './execute' );
 const getActiveRepos = require( './getActiveRepos' );
 const getBranches = require( './getBranches' );
+const getBranchMap = require( './getBranchMap' );
 const getDependencies = require( './getDependencies' );
 const gitAdd = require( './gitAdd' );
 const gitCheckout = require( './gitCheckout' );
@@ -118,10 +119,19 @@ module.exports = ( function() {
 
       const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
 
+      // Set up a cache of branchMaps so that we don't make multiple requests
+      const branchMaps = {};
+      const getBranchMapAsyncCallback = async repo => {
+        if ( !branchMaps[ repo ] ) {
+          branchMaps[ repo ] = await getBranchMap( repo );
+        }
+        return branchMaps[ repo ];
+      };
+
       for ( const releaseBranch of releaseBranches ) {
         if ( !filter || await filter( releaseBranch ) ) {
           console.log( `${releaseBranch.repo} ${releaseBranch.branch}` );
-          for ( const line of await releaseBranch.getStatus() ) {
+          for ( const line of await releaseBranch.getStatus( getBranchMapAsyncCallback ) ) {
             console.log( `  ${line}` );
           }
         }

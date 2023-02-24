@@ -7,16 +7,17 @@
  */
 
 const ChipperVersion = require( './ChipperVersion' );
-const build = require( './build' );
-const checkoutMaster = require( './checkoutMaster' );
 const checkoutTarget = require( './checkoutTarget' );
 const createDirectory = require( './createDirectory' );
 const execute = require( './execute' );
 const getActiveSims = require( './getActiveSims' );
+const getBranchDependencies = require( './getBranchDependencies' );
 const getBranches = require( './getBranches' );
 const getBuildArguments = require( './getBuildArguments' );
 const getDependencies = require( './getDependencies' );
-const getRepoVersion = require( './getRepoVersion' );
+const getBranchMap = require( './getBranchMap' );
+const getBranchVersion = require( './getBranchVersion' );
+const getGitFile = require( './getGitFile' );
 const gitCheckout = require( './gitCheckout' );
 const gitFetch = require( './gitFetch' );
 const gitFirstDivergingCommit = require( './gitFirstDivergingCommit' );
@@ -32,7 +33,6 @@ const simPhetioMetadata = require( './simPhetioMetadata' );
 const withServer = require( './withServer' );
 const assert = require( 'assert' );
 const fs = require( 'fs' );
-const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
 const winston = require( 'winston' );
 
 module.exports = ( function() {
@@ -407,33 +407,35 @@ module.exports = ( function() {
     }
 
     /**
+     * Returns the dependencies.json for this release branch
+     * @public
+     *
+     * @returns {Promise}
+     */
+    async getDependencies() {
+      return getBranchDependencies( this.repo, this.branch );
+    }
+
+    /**
+     * Returns the SimVersion for this release branch
+     * @public
+     *
+     * @returns {Promise<SimVersion>}
+     */
+    async getSimVersion() {
+      return getBranchVersion( this.repo, this.branch );
+    }
+
+    /**
      * Returns a list of status messages of anything out-of-the-ordinary
      * @public
      *
-     * @param {Object} [options]
      * @returns {Promise.<Array.<string>>}
      */
-    async getStatus( options ) {
-      // TODO: fuzzing (see when different fuzz query parameters existed?), https://github.com/phetsims/perennial/issues/300
-
-      options = _.extend( {
-        checkUnbuilt: true,
-        build: true,
-        checkBuilt: true,
-        checkPhetmarks: true
-      }, options );
-
-      if ( options.checkBuilt ) {
-        assert( options.build, 'checkBuilt requires build' );
-      }
-
+    async getStatus( getBranchMapAsyncCallback = getBranchMap ) {
       const results = [];
 
-      const usesChipper2 = await this.usesChipper2();
-
-      await checkoutTarget( this.repo, this.branch, options.build );
-
-      const dependencies = await getDependencies( this.repo );
+      const dependencies = await this.getDependencies();
       const dependencyNames = Object.keys( dependencies ).filter( key => {
         return key !== 'comment' && key !== this.repo;
       } );
@@ -442,12 +444,12 @@ module.exports = ( function() {
       if ( dependencies[ this.repo ] ) {
         try {
           const currentCommit = await gitRevParse( this.repo, 'HEAD' );
-          const previousCommit = await gitRevParse( this.repo, `${currentCommit}^` );
+          const previousCommit = await gitRevParse( this.repo, 'HEAD^' );
           if ( dependencies[ this.repo ].sha !== previousCommit ) {
             results.push( '[INFO] Potential changes (dependency is not previous commit)' );
             results.push( `[INFO] ${currentCommit} ${previousCommit} ${dependencies[ this.repo ].sha}` );
           }
-          if ( ( await getRepoVersion( this.repo ) ).testType === 'rc' && this.isReleased ) {
+          if ( ( await this.getSimVersion() ).testType === 'rc' && this.isReleased ) {
             results.push( '[INFO] Release candidate version detected (see if there is a QA issue)' );
           }
         }
@@ -461,66 +463,16 @@ module.exports = ( function() {
 
       for ( const dependency of dependencyNames ) {
         const potentialReleaseBranch = `${this.repo}-${this.branch}`;
-        const branches = await getBranches( dependency );
+        const branchMap = await getBranchMapAsyncCallback( dependency );
 
-        if ( branches.includes( potentialReleaseBranch ) ) {
-          const currentCommit = await gitRevParse( dependency, 'HEAD' );
-          await gitCheckout( dependency, potentialReleaseBranch );
-          await gitPull( dependency );
-          const expectedCommit = await gitRevParse( dependency, 'HEAD' );
-
-          if ( currentCommit !== expectedCommit ) {
+        if ( Object.keys( branchMap ).includes( potentialReleaseBranch ) ) {
+          if ( dependencies[ dependency ].sha !== branchMap[ potentialReleaseBranch ] ) {
             results.push( `[WARNING] Dependency mismatch for ${dependency} on branch ${potentialReleaseBranch}` );
           }
         }
       }
 
-      const checkURL = async ( name, relativeURL, options ) => {
-        try {
-          await withServer( async port => {
-            const url = `http://localhost:${port}/${relativeURL}`;
-            try {
-              await puppeteerLoad( url, options );
-            }
-            catch( error ) {
-              results.push( `[WARNING] ${name} failure for ${url}: ${error}` );
-            }
-          } );
-        }
-        catch( e ) {
-          results.push( `[ERROR] Failure to check ${name} ${e}` );
-        }
-      };
-
-      if ( options.checkUnbuilt ) {
-        await checkURL( 'Unbuilt HTML', `${this.repo}/${this.repo}_en.html?brand=phet&ea&fuzzMouse&fuzzTouch`, {
-          waitAfterLoad: 20000
-        } );
-      }
-      if ( options.checkPhetmarks ) {
-        await checkURL( 'Phetmarks', 'phetmarks/index.html' );
-      }
-
-      if ( options.build ) {
-        try {
-          await build( this.repo, {
-            brands: this.brands
-          } );
-        }
-        catch( e ) {
-          results.push( `[ERROR] Failure to build: ${e}` );
-        }
-      }
-
-      if ( options.checkBuilt ) {
-        await checkURL( 'Built HTML', `${this.repo}/build/${usesChipper2 ? 'phet/' : ''}${this.repo}_en${usesChipper2 ? '_phet' : ''}.html?fuzzMouse&fuzzTouch`, {
-          waitAfterLoad: 20000
-        } );
-      }
-
-      await checkoutMaster( this.repo, options.build );
-
-      return results.map( line => `[${this.toString()}] ${line}` ); // tag with the repo name
+      return results;
     }
 
     /**
@@ -746,10 +698,8 @@ module.exports = ( function() {
                    ( major === productionVersion.major && minor > productionVersion.minor ) ) {
 
                 // Do a checkout so we can determine supported brands
-                await gitCheckout( repo, branch );
-                const packageObject = JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) );
+                const packageObject = JSON.parse( await getGitFile( repo, branch, 'package.json' ) );
                 const includesPhetio = packageObject.phet && packageObject.phet.supportedBrands && packageObject.phet.supportedBrands.includes( 'phet-io' );
-                await gitCheckout( repo, 'master' );
 
                 const brands = [
                   'phet',
