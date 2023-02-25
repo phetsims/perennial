@@ -18,6 +18,8 @@ const gitCreateBranch = require( './gitCreateBranch' );
 const gitPush = require( './gitPush' );
 const gitRevParse = require( './gitRevParse' );
 const winston = require( 'winston' );
+const buildLocal = require( './buildLocal' );
+const Octokit = require( '@octokit/rest' ); // eslint-disable-line require-statement-match
 
 /**
  * Does some branch changes so that a releaseBranch's dependency SHA matches a named branch
@@ -48,6 +50,40 @@ module.exports = async function( repo, branch, commonRepo ) {
     throw new Error( 'We do not have a working SHA' );
   }
 
+  const octokit = new Octokit( {
+    auth: buildLocal.developerGithubAccessToken
+  } );
+
+  const canForcePush = ( await octokit.request( `GET /repos/phetsims/${commonRepo}/branches/${commonBranch}/protection`, {
+    owner: 'phetsims',
+    repo: commonRepo,
+    branch: commonBranch,
+    headers: {
+      'X-GitHub-Api-Version': '2022-11-28'
+    }
+  } ) ).data.allow_force_pushes.enabled;
+
+  const protectionSettings = {
+    owner: 'phetsims',
+    repo: commonRepo,
+    branch: commonBranch,
+    required_status_checks: null,
+    enforce_admins: null,
+    required_pull_request_reviews: null,
+    restrictions: null,
+    allow_force_pushes: false,
+    allow_deletions: false,
+    headers: {
+      'X-GitHub-Api-Version': '2022-11-28'
+    }
+  };
+
+  if ( !canForcePush ) {
+    winston.info( 'Disabling force push prevention' );
+    protectionSettings.allow_force_pushes = true;
+    await octokit.request( `PUT /repos/phetsims/${commonRepo}/branches/${commonBranch}/protection`, protectionSettings );
+  }
+
   // Set up 'old' branch, in order to save history
   await gitCheckout( commonRepo, commonBranch );
   winston.info( `Creating ${commonOldBranch} in ${commonRepo} with ${await gitRevParse( commonRepo, 'HEAD' )}` );
@@ -59,4 +95,10 @@ module.exports = async function( repo, branch, commonRepo ) {
   winston.info( `Moving ${commonBranch} in ${commonRepo} to ${sha}` );
   await execute( 'git', [ 'reset', '--hard', sha ], `../${commonRepo}` );
   await execute( 'git', [ 'push', '-f', '-u', 'origin', commonBranch ], `../${commonRepo}` );
+
+  if ( !canForcePush ) {
+    winston.info( 'Enabling force push prevention' );
+    protectionSettings.allow_force_pushes = false;
+    await octokit.request( `PUT /repos/phetsims/${commonRepo}/branches/${commonBranch}/protection`, protectionSettings );
+  }
 };
