@@ -317,23 +317,34 @@ unitTestRepos.forEach( repo => {
   {
     repo: 'dot',
     urls: [
+      'index.html',
       'doc/',
       'examples/',
-      'examples/convex-hull-2.html'
+      'examples/convex-hull-2.html',
+      'tests/'
     ]
   },
   {
     repo: 'kite',
-    urls: []
+    urls: [
+      'index.html',
+      'doc/',
+      'examples/',
+      'tests/'
+    ]
   },
   {
     repo: 'scenery',
     urls: [
+      'index.html',
       'doc/',
       'doc/a-tour-of-scenery.html',
       'doc/accessibility/accessibility.html',
       'doc/implementation-notes.html',
       'doc/user-input.html',
+      'doc/layout.html',
+      'doc/accessibility/accessibility.html',
+      'doc/accessibility/voicing.html',
       'examples/',
       'examples/cursors.html',
       'examples/hello-world.html',
@@ -344,8 +355,22 @@ unitTestRepos.forEach( repo => {
       'examples/nodes.html',
       'examples/shapes.html',
       'examples/sprites.html',
+      'examples/accessibility-shapes.html',
+      'examples/accessibility-button.html',
+      'examples/accessibility-animation.html',
+      'examples/accessibility-listeners.html',
+      'examples/accessibility-updating-pdom.html',
+      'examples/accessibility-slider.html',
       // 'examples/webglnode.html', // currently disabled, since it fails without webgl
+      'tests/',
+      'tests/sandbox.html',
       'tests/text-bounds-comparison.html'
+    ]
+  },
+  {
+    repo: 'phet-lib',
+    urls: [
+      'doc/layout-exemplars.html'
     ]
   }
 ].forEach( ( { repo, urls } ) => {
@@ -357,7 +382,6 @@ unitTestRepos.forEach( repo => {
       priority: 5, // When these are built, it should be really quick to test
 
       brand: 'phet',
-      buildDependencies: [ repo ],
       es5: true
     } );
   } );
