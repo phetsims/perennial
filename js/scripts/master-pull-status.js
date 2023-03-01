@@ -10,7 +10,8 @@
 const cloneMissingRepos = require( '../common/cloneMissingRepos' );
 const getActiveRepos = require( '../common/getActiveRepos' );
 const gitCheckout = require( '../common/gitCheckout' );
-const gitPull = require( '../common/gitPull' );
+const gitIsClean = require( '../common/gitIsClean' );
+const gitPullRebase = require( '../common/gitPullRebase' );
 const gitStatus = require( '../common/gitStatus' );
 const npmUpdate = require( '../common/npmUpdate' );
 const winston = require( 'winston' );
@@ -30,28 +31,34 @@ const getStatus = async repo => {
   data[ repo ] = '';
 
   try {
-    await gitCheckout( repo, 'master' );
-    await gitPull( repo );
+    const isClean = await gitIsClean( repo );
+    if ( isClean ) {
+      await gitCheckout( repo, 'master' );
+      await gitPullRebase( repo );
 
-    const status = await gitStatus( repo );
+      const status = await gitStatus( repo );
 
-    let isGreen = false;
-    if ( status.branch ) {
-      isGreen = !status.status && status.branch === 'master' && status.ahead === 0;
+      let isGreen = false;
+      if ( status.branch ) {
+        isGreen = !status.status && status.branch === 'master' && status.ahead === 0;
 
-      if ( !isGreen || process.argv.includes( '--all' ) ) {
-        data[ repo ] += `${repo}${moveRight}${isGreen ? green : red}${status.branch}${reset}${status.ahead === 0 ? '' : ` ahead ${status.ahead}`}${status.behind === 0 ? '' : ` behind ${status.behind}`}\n`;
+        if ( !isGreen || process.argv.includes( '--all' ) ) {
+          data[ repo ] += `${repo}${moveRight}${isGreen ? green : red}${status.branch}${reset}${status.ahead === 0 ? '' : ` ahead ${status.ahead}`}${status.behind === 0 ? '' : ` behind ${status.behind}`}\n`;
+        }
+      }
+      else {
+        // if no branch, print our SHA (detached head)
+        data[ repo ] += `${repo}${moveRight}${red}${status.sha}${reset}\n`;
+      }
+
+      if ( status.status ) {
+        if ( !isGreen || process.argv.includes( '--all' ) ) {
+          data[ repo ] += status.status + '\n';
+        }
       }
     }
     else {
-      // if no branch, print our SHA (detached head)
-      data[ repo ] += `${repo}${moveRight}${red}${status.sha}${reset}\n`;
-    }
-
-    if ( status.status ) {
-      if ( !isGreen || process.argv.includes( '--all' ) ) {
-        data[ repo ] += status.status + '\n';
-      }
+      data[ repo ] += `${repo}${moveRight}${red}[DIRTY]${reset}\n`;
     }
   }
   catch( e ) {
@@ -61,7 +68,7 @@ const getStatus = async repo => {
 
 ( async () => {
   try {
-    await gitPull( 'perennial' );
+    await gitPullRebase( 'perennial' );
     await cloneMissingRepos();
   }
   catch( e ) {
