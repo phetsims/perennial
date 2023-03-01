@@ -70,6 +70,8 @@ const getStatus = async repo => {
 
   await Promise.all( repos.map( repo => getStatus( repo ) ) );
 
+  console.log( 'pulled' );
+
   await npmUpdate( 'chipper' );
   await npmUpdate( 'perennial' );
   await npmUpdate( 'perennial-alias' );
