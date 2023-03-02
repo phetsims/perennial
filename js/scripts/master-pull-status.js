@@ -37,6 +37,13 @@ const getStatus = async repo => {
       await gitCheckout( repo, 'master' );
       await gitPullRebase( repo );
     }
+    else if ( repo === 'perennial' ) {
+      console.log( `${red}perennial is not clean, skipping pull${reset}` );
+    }
+
+    if ( repo === 'perennial' ) {
+      await cloneMissingRepos();
+    }
 
     const symbolicRef = ( await execute( 'git', [ 'symbolic-ref', '-q', 'HEAD' ], `../${repo}` ) ).trim();
     const branch = symbolicRef.replace( 'refs/heads/', '' ); // might be empty string
@@ -69,19 +76,6 @@ const getStatus = async repo => {
 };
 
 ( async () => {
-  try {
-    if ( await gitIsClean( 'perennial' ) ) {
-      await gitPullRebase( 'perennial' );
-    }
-    else {
-      console.log( `${red}perennial is not clean, skipping pull${reset}` );
-    }
-    await cloneMissingRepos();
-  }
-  catch( e ) {
-    console.log( `perennial/clone failed:\n${e}` );
-  }
-
   await Promise.all( repos.map( repo => getStatus( repo ) ) );
 
   repos.forEach( repo => {
