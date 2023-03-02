@@ -279,6 +279,9 @@ unitTestRepos.forEach( repo => {
     repo: 'dot',
     urls: [
       '', // the root URL
+      'doc/',
+      'examples/',
+      'examples/convex-hull-2.html',
       'tests/',
       'tests/playground.html'
     ]
@@ -287,6 +290,9 @@ unitTestRepos.forEach( repo => {
     repo: 'kite',
     urls: [
       '', // the root URL
+      'doc/',
+      'examples/',
+      'tests/',
       'tests/playground.html',
       'tests/visual-shape-test.html'
     ]
@@ -295,48 +301,6 @@ unitTestRepos.forEach( repo => {
     repo: 'scenery',
     urls: [
       '', // the root URL
-      'tests/',
-      'tests/playground.html',
-      'tests/renderer-comparison.html?renderers=canvas,svg,dom',
-      'tests/text-quality-test.html'
-    ]
-  }
-].forEach( ( { repo, urls } ) => {
-  urls.forEach( pageloadRelativeURL => {
-    tests.push( {
-      test: [ repo, 'pageload', `/${pageloadRelativeURL}` ],
-      type: 'pageload-test',
-      url: `${repo}/${pageloadRelativeURL}`,
-      priority: 4 // Fast to test, so test them more
-    } );
-  } );
-} );
-
-// Page-load tests (built)
-[
-  {
-    repo: 'dot',
-    urls: [
-      'index.html',
-      'doc/',
-      'examples/',
-      'examples/convex-hull-2.html',
-      'tests/'
-    ]
-  },
-  {
-    repo: 'kite',
-    urls: [
-      'index.html',
-      'doc/',
-      'examples/',
-      'tests/'
-    ]
-  },
-  {
-    repo: 'scenery',
-    urls: [
-      'index.html',
       'doc/',
       'doc/a-tour-of-scenery.html',
       'doc/accessibility/accessibility.html',
@@ -362,8 +326,39 @@ unitTestRepos.forEach( repo => {
       'examples/accessibility-slider.html',
       // 'examples/webglnode.html', // currently disabled, since it fails without webgl
       'tests/',
+      'tests/playground.html',
+      'tests/renderer-comparison.html?renderers=canvas,svg,dom',
       'tests/sandbox.html',
-      'tests/text-bounds-comparison.html'
+      'tests/text-bounds-comparison.html',
+      'tests/text-quality-test.html'
+    ]
+  }
+].forEach( ( { repo, urls } ) => {
+  urls.forEach( pageloadRelativeURL => {
+    tests.push( {
+      test: [ repo, 'pageload', `/${pageloadRelativeURL}` ],
+      type: 'pageload-test',
+      url: `${repo}/${pageloadRelativeURL}`,
+      priority: 4 // Fast to test, so test them more
+    } );
+  } );
+} );
+
+// Page-load tests (built)
+[
+  {
+    repo: 'kite',
+    urls: [
+      'index.html',
+      'doc/',
+      'examples/',
+      'tests/'
+    ]
+  },
+  {
+    repo: 'scenery',
+    urls: [
+
     ]
   },
   {
