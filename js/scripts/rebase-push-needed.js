@@ -1,7 +1,7 @@
 // Copyright 2021, University of Colorado Boulder
 
 /**
- * Checks status for repos, and prints it out to the console
+ * Rebases and pushes repos that are ahead of origin, with consolidated status/error output.
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
