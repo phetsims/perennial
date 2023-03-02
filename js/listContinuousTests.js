@@ -343,7 +343,6 @@ unitTestRepos.forEach( repo => {
       'doc/implementation-notes.html',
       'doc/user-input.html',
       'doc/layout.html',
-      'doc/accessibility/accessibility.html',
       'doc/accessibility/voicing.html',
       'examples/',
       'examples/cursors.html',
