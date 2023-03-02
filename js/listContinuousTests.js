@@ -332,34 +332,6 @@ unitTestRepos.forEach( repo => {
       'tests/text-bounds-comparison.html',
       'tests/text-quality-test.html'
     ]
-  }
-].forEach( ( { repo, urls } ) => {
-  urls.forEach( pageloadRelativeURL => {
-    tests.push( {
-      test: [ repo, 'pageload', `/${pageloadRelativeURL}` ],
-      type: 'pageload-test',
-      url: `${repo}/${pageloadRelativeURL}`,
-      priority: 4 // Fast to test, so test them more
-    } );
-  } );
-} );
-
-// Page-load tests (built)
-[
-  {
-    repo: 'kite',
-    urls: [
-      'index.html',
-      'doc/',
-      'examples/',
-      'tests/'
-    ]
-  },
-  {
-    repo: 'scenery',
-    urls: [
-
-    ]
   },
   {
     repo: 'phet-lib',
@@ -373,13 +345,27 @@ unitTestRepos.forEach( repo => {
       test: [ repo, 'pageload', `/${pageloadRelativeURL}` ],
       type: 'pageload-test',
       url: `${repo}/${pageloadRelativeURL}`,
-      priority: 5, // When these are built, it should be really quick to test
-
-      brand: 'phet',
-      es5: true
+      priority: 4 // Fast to test, so test them more
     } );
   } );
 } );
+
+// // Page-load tests (built)
+// [
+//
+// ].forEach( ( { repo, urls } ) => {
+//   urls.forEach( pageloadRelativeURL => {
+//     tests.push( {
+//       test: [ repo, 'pageload', `/${pageloadRelativeURL}` ],
+//       type: 'pageload-test',
+//       url: `${repo}/${pageloadRelativeURL}`,
+//       priority: 5, // When these are built, it should be really quick to test
+//
+//       brand: 'phet',
+//       es5: true
+//     } );
+//   } );
+// } );
 
 //----------------------------------------------------------------------------------------------------------------------
 // Public query parameter tests
