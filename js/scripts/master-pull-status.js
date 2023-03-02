@@ -33,8 +33,7 @@ const getStatus = async repo => {
   data[ repo ] = '';
 
   try {
-    const isClean = await gitIsClean( repo );
-    if ( isClean ) {
+    if ( await gitIsClean( repo ) ) {
       await gitCheckout( repo, 'master' );
       await gitPullRebase( repo );
     }
@@ -71,7 +70,12 @@ const getStatus = async repo => {
 
 ( async () => {
   try {
-    await gitPullRebase( 'perennial' );
+    if ( await gitIsClean( 'perennial' ) ) {
+      await gitPullRebase( 'perennial' );
+    }
+    else {
+      console.log( `${red}perennial is not clean, skipping pull${reset}` );
+    }
     await cloneMissingRepos();
   }
   catch( e ) {
@@ -84,11 +88,11 @@ const getStatus = async repo => {
     process.stdout.write( data[ repo ] );
   } );
 
-  console.log( `${_.every( repos, repo => !data[ repo ].length ) ? green : red}---===] finished pulls [===---${reset}\n` );
+  console.log( `${_.every( repos, repo => !data[ repo ].length ) ? green : red}-----=====] finished pulls [=====-----${reset}\n` );
 
   await npmUpdate( 'chipper' );
   await npmUpdate( 'perennial' );
   await npmUpdate( 'perennial-alias' );
 
-  console.log( `${_.every( repos, repo => !data[ repo ].length ) ? green : red}---===] finished npm [===---${reset}\n` );
+  console.log( `${_.every( repos, repo => !data[ repo ].length ) ? green : red}-----=====] finished npm [=====-----${reset}\n` );
 } )();
