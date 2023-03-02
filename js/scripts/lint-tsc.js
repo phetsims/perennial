@@ -23,22 +23,6 @@ const reset = '\u001b[0m';
   let lintResults = null;
   let tscResults = null;
 
-  const runLint = async () => {
-    lintResults = await execute( gruntCommand, [ 'lint-everything' ], '../perennial', {
-      errors: 'resolve'
-    } );
-  };
-
-  const runTsc = async () => {
-    tscResults = await execute( '../../node_modules/typescript/bin/tsc', [], '../chipper/tsconfig/all', {
-      errors: 'resolve'
-    } );
-  };
-
-  await Promise.all( [ runLint(), runTsc() ] );
-
-  const allOK = lintResults.code === 0 && tscResults.code === 0;
-
   const outputResult = ( name, results ) => {
     if ( results.code === 0 ) {
       console.log( `${green}${name} OK${reset}` );
@@ -55,8 +39,21 @@ const reset = '\u001b[0m';
     }
   };
 
-  outputResult( 'lint', lintResults );
-  outputResult( 'tsc', tscResults );
+  const runLint = async () => {
+    lintResults = await execute( gruntCommand, [ 'lint-everything' ], '../perennial', {
+      errors: 'resolve'
+    } );
+    outputResult( 'lint', lintResults );
+  };
 
-  console.log( `\n${allOK ? green : red}-----=====] finished [=====-----${reset}\n` );
+  const runTsc = async () => {
+    tscResults = await execute( '../../node_modules/typescript/bin/tsc', [], '../chipper/tsconfig/all', {
+      errors: 'resolve'
+    } );
+    outputResult( 'tsc', tscResults );
+  };
+
+  await Promise.all( [ runLint(), runTsc() ] );
+
+  console.log( `\n${lintResults.code === 0 && tscResults.code === 0 ? green : red}-----=====] finished [=====-----${reset}\n` );
 } )();
