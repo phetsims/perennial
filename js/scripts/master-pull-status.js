@@ -8,18 +8,20 @@
 
 
 const cloneMissingRepos = require( '../common/cloneMissingRepos' );
+const execute = require( '../common/execute' );
 const getActiveRepos = require( '../common/getActiveRepos' );
 const gitCheckout = require( '../common/gitCheckout' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPullRebase = require( '../common/gitPullRebase' );
-const gitStatus = require( '../common/gitStatus' );
+const gitRevParse = require( '../common/gitRevParse' );
 const npmUpdate = require( '../common/npmUpdate' );
 const winston = require( 'winston' );
+const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
 
 winston.default.transports.console.level = 'error';
 
 // ANSI escape sequences to move to the right (in the same line) or to apply or reset colors
-const moveRight = '\u001b[42G';
+const moveRight = ' \u001b[42G';
 const red = '\u001b[31m';
 const green = '\u001b[32m';
 const reset = '\u001b[0m';
@@ -35,30 +37,31 @@ const getStatus = async repo => {
     if ( isClean ) {
       await gitCheckout( repo, 'master' );
       await gitPullRebase( repo );
+    }
 
-      const status = await gitStatus( repo );
+    const symbolicRef = ( await execute( 'git', [ 'symbolic-ref', '-q', 'HEAD' ], `../${repo}` ) ).trim();
+    const branch = symbolicRef.replace( 'refs/heads/', '' ); // might be empty string
+    const sha = await gitRevParse( repo, 'HEAD' );
+    const status = await execute( 'git', [ 'status', '--porcelain' ], `../${repo}` );
+    const track = branch ? ( await execute( 'git', [ 'for-each-ref', '--format=%(push:track,nobracket)', symbolicRef ], `../${repo}` ) ).trim() : '';
 
-      let isGreen = false;
-      if ( status.branch ) {
-        isGreen = !status.status && status.branch === 'master' && status.ahead === 0;
+    let isGreen = false;
+    if ( branch ) {
+      isGreen = !status && branch === 'master' && !track.length;
 
-        if ( !isGreen || process.argv.includes( '--all' ) ) {
-          data[ repo ] += `${repo}${moveRight}${isGreen ? green : red}${status.branch}${reset}${status.ahead === 0 ? '' : ` ahead ${status.ahead}`}${status.behind === 0 ? '' : ` behind ${status.behind}`}\n`;
-        }
-      }
-      else {
-        // if no branch, print our SHA (detached head)
-        data[ repo ] += `${repo}${moveRight}${red}${status.sha}${reset}\n`;
-      }
-
-      if ( status.status ) {
-        if ( !isGreen || process.argv.includes( '--all' ) ) {
-          data[ repo ] += status.status + '\n';
-        }
+      if ( !isGreen || process.argv.includes( '--all' ) ) {
+        data[ repo ] += `${repo}${moveRight}${isGreen ? green : red}${branch}${reset} ${track}\n`;
       }
     }
     else {
-      data[ repo ] += `${repo}${moveRight}${red}[DIRTY]${reset}\n`;
+      // if no branch, print our SHA (detached head)
+      data[ repo ] += `${repo}${moveRight}${red}${sha}${reset}\n`;
+    }
+
+    if ( status ) {
+      if ( !isGreen || process.argv.includes( '--all' ) ) {
+        data[ repo ] += status + '\n';
+      }
     }
   }
   catch( e ) {
@@ -77,15 +80,15 @@ const getStatus = async repo => {
 
   await Promise.all( repos.map( repo => getStatus( repo ) ) );
 
-  console.log( 'pulled' );
+  repos.forEach( repo => {
+    process.stdout.write( data[ repo ] );
+  } );
+
+  console.log( `${_.every( repos, repo => !data[ repo ].length ) ? green : red}---===] finished pulls [===---${reset}\n` );
 
   await npmUpdate( 'chipper' );
   await npmUpdate( 'perennial' );
   await npmUpdate( 'perennial-alias' );
 
-  repos.forEach( repo => {
-    process.stdout.write( data[ repo ] );
-  } );
-
-  console.log( 'done' );
+  console.log( `${_.every( repos, repo => !data[ repo ].length ) ? green : red}---===] finished npm [===---${reset}\n` );
 } )();
