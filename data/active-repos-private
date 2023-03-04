@@ -1,6 +1,8 @@
 installer-builder
 interaction-dashboard
 phet-io
+phet-io-client-guides
+phet-io-sim-specific
 phet-io-test-sim
 phet-io-website
 phet-io-wrapper-classroom-activity
@@ -9,6 +11,8 @@ phet-io-wrapper-hookes-law-energy
 phet-io-wrapper-lab-book
 phet-io-wrappers
 phet-ios-app
+phettest
 smithers
 studio
 weddell
+yotta
