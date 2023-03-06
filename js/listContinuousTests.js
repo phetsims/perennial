@@ -387,9 +387,9 @@ const commonQueryParameters = {
 Object.keys( commonQueryParameters ).forEach( name => {
   const queryString = commonQueryParameters[ name ];
 
-  // randomly picked multi-screen sim
+  // randomly picked multi-screen sim to test query parameters (hence calling it a joist test)
   tests.push( {
-    test: [ 'acid-base-solutions', 'fuzz', 'unbuilt', 'query-parameters', name ],
+    test: [ 'joist', 'fuzz', 'unbuilt', 'query-parameters', name ],
     type: 'sim-test',
     url: 'acid-base-solutions/acid-base-solutions_en.html',
     queryParameters: queryString
