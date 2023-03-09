@@ -274,6 +274,7 @@ module.exports = function( grunt ) {
     'Creates a new release branch for a given simulation\n' +
     '--repo : The repository to add the release branch to\n' +
     '--branch : The branch name, which should be {{MAJOR}}.{{MINOR}}, e.g. 1.0\n' +
+    '--brands : The supported brands for the release, comma separated. Defaults to --brands=phet\n' +
     '--message : An optional message that will be appended on version-change commits.',
     wrapTask( async () => {
       const createRelease = require( './createRelease' );
@@ -283,11 +284,12 @@ module.exports = function( grunt ) {
 
       const branch = grunt.option( 'branch' );
       const message = grunt.option( 'message' );
+      const brands = grunt.option( 'brands' ) || 'phet,phet-io';
       assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
       assert( branch, 'Requires specifying a branch with --branch={{BRANCH}}' );
       assert( branch.split( '.' ).length === 2, 'Branch should be {{MAJOR}}.{{MINOR}}' );
 
-      await createRelease( repo, branch, message );
+      await createRelease( repo, branch, brands.split( ',' ), message );
     } ) );
 
   grunt.registerTask( 'create-one-off',

@@ -19,6 +19,7 @@ const gitPush = require( '../common/gitPush' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
 const setRepoVersion = require( '../common/setRepoVersion' );
+const setRepoSupportedBrands = require( '../common/setRepoSupportedBrands' );
 const updateHTMLVersion = require( '../common/updateHTMLVersion' );
 const assert = require( 'assert' );
 const grunt = require( 'grunt' );
@@ -30,14 +31,17 @@ const winston = require( 'winston' );
  *
  * @param {string} repo - The repository name
  * @param {string} branch - The branch to create (should be {{MAJOR}}.{{MINOR}})
- * @param {string} [message] - Optional message to append to the version-increment commit.
+ * @param {string[]} brands - the supported brands in the release
+ * @param {string} [message] - Optional message to append to the brands/version-increment commit.
  * @returns {Promise}
  */
-module.exports = async function( repo, branch, message ) {
+module.exports = async function createRelease( repo, branch, brands, message ) {
   const major = Number( branch.split( '.' )[ 0 ] );
   const minor = Number( branch.split( '.' )[ 1 ] );
   assert( major > 0, 'Major version for a branch should be greater than zero' );
   assert( minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
+
+  assert( Array.isArray( brands ), 'supported brands required' );
 
   const currentBranch = await getBranch( repo );
   if ( currentBranch !== 'master' ) {
@@ -63,6 +67,7 @@ module.exports = async function( repo, branch, message ) {
 
   // Create the branch, update the version info
   await gitCreateBranch( repo, branch );
+  await setRepoSupportedBrands( repo, brands );
   await setRepoVersion( repo, newVersion, message );
   await gitPush( repo, branch );
 

@@ -57,7 +57,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       throw new Error( 'Aborted rc deployment due to non-existing branch' );
     }
 
-    await createRelease( repo, branch );
+    await createRelease( repo, branch, brands );
   }
 
   // PhET-iO simulations require validation for RCs. Error out if "phet.phet-io.validation=false" is in package.json.
