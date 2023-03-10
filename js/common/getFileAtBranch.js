@@ -7,6 +7,7 @@
  */
 
 const getGitFile = require( './getGitFile' );
+const createLocalBranchFromRemote = require( './createLocalBranchFromRemote' );
 
 /**
  * Gets the dependencies.json from a given branch of a repo
@@ -19,6 +20,18 @@ const getGitFile = require( './getGitFile' );
  * @rejects {ExecuteError}
  */
 module.exports = async function getFileAtBranch( repo, branch, filename ) {
-  // TODO will need error handling
-  return getGitFile( repo, branch, filename );
+
+  try {
+    return await getGitFile( repo, branch, filename );
+  }
+  catch( e ) {
+    if ( e.message.includes( 'invalid object name' ) && e.message.includes( branch ) ) {
+
+      await createLocalBranchFromRemote( repo, branch );
+      return getGitFile( repo, branch, filename );
+    }
+    else {
+      throw e;
+    }
+  }
 };
