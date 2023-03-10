@@ -6,10 +6,10 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-
 const cloneMissingRepos = require( '../common/cloneMissingRepos' );
 const execute = require( '../common/execute' );
 const getActiveRepos = require( '../common/getActiveRepos' );
+const getBranches = require( '../common/getBranches' );
 const gitCheckout = require( '../common/gitCheckout' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPullRebase = require( '../common/gitPullRebase' );
@@ -29,13 +29,32 @@ const reset = '\u001b[0m';
 const repos = getActiveRepos();
 const data = {};
 
+// If this is provided, we'll track ALL remote branches, check them out, and pull them (with rebase)
+const allBranches = process.argv.includes( '--allBranches' );
+
 const getStatus = async repo => {
   data[ repo ] = '';
 
   try {
     if ( await gitIsClean( repo ) ) {
-      await gitCheckout( repo, 'master' );
-      await gitPullRebase( repo );
+      if ( allBranches ) {
+        const branches = await getBranches( repo );
+        for ( const branch of branches ) {
+          // Only track the remote branch if it hasn't been tracked yet
+          if ( ( await execute( 'git', [ 'rev-parse', '--verify', branch ], `../${repo}`, { errors: 'resolve' } ) ).code !== 0 ) {
+            await execute( 'git', [ 'branch', '--track', branch, `origin/${branch}` ], `../${repo}` );
+          }
+          await gitCheckout( repo, branch );
+          await gitPullRebase( repo );
+        }
+
+        // Go back to master
+        await gitCheckout( repo, 'master' );
+      }
+      else {
+        await gitCheckout( repo, 'master' );
+        await gitPullRebase( repo );
+      }
     }
     else if ( repo === 'perennial' ) {
       console.log( `${red}perennial is not clean, skipping pull${reset}` );
