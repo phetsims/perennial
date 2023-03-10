@@ -105,7 +105,7 @@ module.exports = ( function() {
      * Runs a number of checks through every release branch.
      * @public
      *
-     * @param {function(ReleaseBranch):Promise.<boolean>} [filter] - Optional filter, release branches will be skipped
+     * @param {function(repo:string):Promise.<boolean>} [filter] - Optional filter, release branches will be skipped
      *                                                               if this resolves to false
      * @returns {Promise}
      */
@@ -117,7 +117,7 @@ module.exports = ( function() {
         }
       }
 
-      const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
+      const releaseBranches = await ReleaseBranch.getMaintenanceBranches( filter );
 
       // Set up a cache of branchMaps so that we don't make multiple requests
       const branchMaps = {};
@@ -129,7 +129,7 @@ module.exports = ( function() {
       };
 
       for ( const releaseBranch of releaseBranches ) {
-        if ( !filter || await filter( releaseBranch ) ) {
+        if ( !filter || await filter( releaseBranch.repo ) ) {
           console.log( `${releaseBranch.repo} ${releaseBranch.branch}` );
           for ( const line of await releaseBranch.getStatus( getBranchMapAsyncCallback ) ) {
             console.log( `  ${line}` );
