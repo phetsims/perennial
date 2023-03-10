@@ -44,12 +44,11 @@ const getStatus = async repo => {
           if ( ( await execute( 'git', [ 'rev-parse', '--verify', branch ], `../${repo}`, { errors: 'resolve' } ) ).code !== 0 ) {
             await execute( 'git', [ 'branch', '--track', branch, `origin/${branch}` ], `../${repo}` );
           }
-          await gitCheckout( repo, branch );
-          await gitPullRebase( repo );
         }
 
         // Go back to master
         await gitCheckout( repo, 'master' );
+        await execute( 'git', [ 'pull', '--all', '--rebase' ], `../${repo}` );
       }
       else {
         await gitCheckout( repo, 'master' );
