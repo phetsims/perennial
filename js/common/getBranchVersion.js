@@ -7,7 +7,7 @@
  */
 
 const SimVersion = require( './SimVersion' );
-const getGitFile = require( './getGitFile' );
+const getFileAtBranch = require( './getFileAtBranch' );
 const winston = require( 'winston' );
 
 /**
@@ -21,5 +21,5 @@ const winston = require( 'winston' );
 module.exports = async function( repo, branch ) {
   winston.debug( `Reading version from package.json for ${repo}` );
 
-  return SimVersion.parse( JSON.parse( await getGitFile( repo, branch, 'package.json' ) ).version );
+  return SimVersion.parse( JSON.parse( await getFileAtBranch( repo, branch, 'package.json' ) ).version );
 };

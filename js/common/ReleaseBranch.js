@@ -17,7 +17,7 @@ const getBuildArguments = require( './getBuildArguments' );
 const getDependencies = require( './getDependencies' );
 const getBranchMap = require( './getBranchMap' );
 const getBranchVersion = require( './getBranchVersion' );
-const getGitFile = require( './getGitFile' );
+const getFileAtBranch = require( './getFileAtBranch' );
 const gitCheckout = require( './gitCheckout' );
 const gitFetch = require( './gitFetch' );
 const gitFirstDivergingCommit = require( './gitFirstDivergingCommit' );
@@ -698,7 +698,7 @@ module.exports = ( function() {
                    ( major === productionVersion.major && minor > productionVersion.minor ) ) {
 
                 // Do a checkout so we can determine supported brands
-                const packageObject = JSON.parse( await getGitFile( repo, branch, 'package.json' ) );
+                const packageObject = JSON.parse( await getFileAtBranch( repo, branch, 'package.json' ) );
                 const includesPhetio = packageObject.phet && packageObject.phet.supportedBrands && packageObject.phet.supportedBrands.includes( 'phet-io' );
 
                 const brands = [

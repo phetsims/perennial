@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const getFileAtBranch = require( './getFileAtBranch' );
+const getGitFile = require( './getGitFile' );
 
 /**
  * Gets the dependencies.json from a given branch of a repo
@@ -14,9 +14,11 @@ const getFileAtBranch = require( './getFileAtBranch' );
  *
  * @param {string} repo - The repository name
  * @param {string} branch - The branch name
- * @returns {Promise} - Resolves to the dependencies.json content
+ * @param {string} filename - The file name
+ * @returns {Promise} - Resolves to the file contents
  * @rejects {ExecuteError}
  */
-module.exports = async function( repo, branch ) {
-  return JSON.parse( await getFileAtBranch( repo, branch, 'dependencies.json' ) );
+module.exports = async function getFileAtBranch( repo, branch, filename ) {
+  // TODO will need error handling
+  return getGitFile( repo, branch, filename );
 };
