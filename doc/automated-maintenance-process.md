@@ -200,7 +200,9 @@ time it was released. If it detects any anomalies, it will be printed out. If th
 of being included in the release, it's best to investigate its status.
 
 For example, in a recent maintenance release, I had made commits on release branches that updated README.md which were
-not released, so things showed up as:
+not released, so things showed up as. Please note that this will almost always show up for the release branch that has
+been published because updating the dependencies for the branch you are on will result in a more recent commit sha at 
+the tip of the branch.
 
 ```
 Checking acid-base-solutions 1.2
