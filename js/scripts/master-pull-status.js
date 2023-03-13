@@ -45,7 +45,16 @@ const getStatus = async repo => {
             await execute( 'git', [ 'branch', '--track', branch, `origin/${branch}` ], `../${repo}` );
           }
           await gitCheckout( repo, branch );
-          await gitPullRebase( repo );
+
+          try {
+            await gitPullRebase( repo );
+          }
+          catch( e ) {
+
+            // Likely there is no tracking info set up on the local branch
+            await execute( 'git', [ 'branch', `--set-upstream-to=origin/${branch}`, branch ], `../${repo}` );
+            await gitPullRebase( repo );
+          }
         }
 
         // Go back to master
