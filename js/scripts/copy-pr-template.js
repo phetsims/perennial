@@ -10,6 +10,8 @@
 
 import { execSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync } from 'node:fs';
+
+// eslint-disable-next-line default-import-match-filename
 import coreCommonRepos from './core-common-repos.js';
 import { join, dirname } from 'node:path';
 import { cwd, chdir } from 'node:process';
@@ -17,7 +19,7 @@ import { cwd, chdir } from 'node:process';
 const pathToPrTemplate = join( cwd(), 'community', '.github', 'pull_request_template.md' );
 
 for ( const repo of coreCommonRepos ) {
-  const dest = join( cwd(), repo, '.github', 'pull_request_template.md' )
+  const dest = join( cwd(), repo, '.github', 'pull_request_template.md' );
   const destDir = dirname( dest );
   const destDirDoesNotExist = !existsSync( destDir );
   if ( destDirDoesNotExist ) {
@@ -30,7 +32,7 @@ for ( const repo of coreCommonRepos ) {
     'git pull origin master',
     'git add .github',
     `git commit --message ${commitMessage} --no-verify`,
-    'git push origin master',
+    'git push origin master'
   ];
   for ( const command of commands ) {
     console.log( `executing command: ${command}` );
