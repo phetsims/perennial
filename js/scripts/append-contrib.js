@@ -1,5 +1,8 @@
 // Copyright 2023, University of Colorado Boulder
 
+/* eslint-disable default-import-match-filename */
+
+
 /**
  * Append a note about contributing and a link to the contributing
  * doc in this repo to core common repos then commit. This script
@@ -30,7 +33,7 @@ for ( const repo of coreCommonRepos ) {
     'git pull origin master',
     'git add README.md',
     `git commit --message ${commitMessage} --no-verify`,
-    'git push origin master',
+    'git push origin master'
   ];
   for ( const command of commands ) {
     console.log( `executing command: ${command}` );
