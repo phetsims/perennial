@@ -443,8 +443,8 @@ module.exports = ( function() {
       // Check our own dependency
       if ( dependencies[ this.repo ] ) {
         try {
-          const currentCommit = await gitRevParse( this.repo, 'HEAD' );
-          const previousCommit = await gitRevParse( this.repo, 'HEAD^' );
+          const currentCommit = await gitRevParse( this.repo, this.branch );
+          const previousCommit = await gitRevParse( this.repo, `${currentCommit}^` );
           if ( dependencies[ this.repo ].sha !== previousCommit ) {
             results.push( '[INFO] Potential changes (dependency is not previous commit)' );
             results.push( `[INFO] ${currentCommit} ${previousCommit} ${dependencies[ this.repo ].sha}` );
