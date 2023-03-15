@@ -17,6 +17,7 @@ const getBranch = require( '../common/getBranch' );
 const getRemoteBranchSHAs = require( '../common/getRemoteBranchSHAs' );
 const getRepoVersion = require( '../common/getRepoVersion' );
 const gitIsClean = require( '../common/gitIsClean' );
+const getDependencyRepos = require( '../common/getDependencyRepos' );
 const gitPush = require( '../common/gitPush' );
 const gitRevParse = require( '../common/gitRevParse' );
 const lintAllRunnable = require( '../common/lintAllRunnable' );
@@ -68,9 +69,13 @@ module.exports = async function( repo, brands, noninteractive, branch, message )
     }
   }
 
-  const isClean = await gitIsClean( repo );
-  if ( !isClean ) {
-    throw new Error( `Unclean status in ${repo}, cannot deploy` );
+  const dependencies = await getDependencyRepos( repo );
+  for ( let i = 0; i < dependencies.length; i++ ) {
+    const dependency = dependencies[ i ];
+    const isClean = await gitIsClean( dependency );
+    if ( !isClean ) {
+      throw new Error( `Unclean status in ${dependency}, cannot deploy` );
+    }
   }
 
   const currentSHA = await gitRevParse( repo, 'HEAD' );

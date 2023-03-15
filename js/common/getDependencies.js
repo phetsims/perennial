@@ -16,7 +16,7 @@ const winston = require( 'winston' );
  * @param {string} repo - The repository name
  * @returns {Promise} - Resolves to the dependencies.json content
  */
-module.exports = function( repo ) {
+module.exports = function getDependencies( repo ) {
   winston.info( `getting dependencies.json for ${repo}` );
 
   return loadJSON( `../${repo}/dependencies.json` );
