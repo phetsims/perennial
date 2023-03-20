@@ -74,7 +74,8 @@ runnableRepos.forEach( repo => {
     test: [ repo, 'fuzz', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000'
+    queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000',
+    testQueryParameters: 'duration=90000' // This is the most important test, let's get some good coverage!
   } );
 
   tests.push( {
@@ -82,7 +83,7 @@ runnableRepos.forEach( repo => {
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
     queryParameters: 'brand=phet&ea&fuzz&stringTest=xss&memoryLimit=1000',
-    testQueryParameters: 'duration=40000',
+    testQueryParameters: 'duration=10000',
     priority: 0.3
   } );
 
