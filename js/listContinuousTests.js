@@ -95,6 +95,14 @@ runnableRepos.forEach( repo => {
   } );
 
   tests.push( {
+    test: [ repo, 'fuzz', 'unbuilt', 'shuffleListeners' ],
+    type: 'sim-test',
+    url: `${repo}/${repo}_en.html`,
+    queryParameters: 'brand=phet&ea&fuzz&shuffleListeners&memoryLimit=1000',
+    priority: 0.3
+  } );
+
+  tests.push( {
     test: [ repo, 'multitouch-fuzz', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
