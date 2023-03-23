@@ -475,4 +475,20 @@ tests.push( {
   queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&autoFill=false'
 } );
 
+// number-play: test the second language preference
+tests.push( {
+  test: [ 'number-play', 'second-language-fuzz', 'unbuilt', 'query-parameters' ],
+  type: 'sim-test',
+  url: 'number-play/number-play_en.html',
+  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&locales=*&secondLocale=es'
+} );
+
+// number-compare: test the second language preference
+tests.push( {
+  test: [ 'number-compare', 'second-language-fuzz', 'unbuilt', 'query-parameters' ],
+  type: 'sim-test',
+  url: 'number-compare/number-compare_en.html',
+  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&locales=*&secondLocale=es'
+} );
+
 console.log( JSON.stringify( tests, null, 2 ) );
