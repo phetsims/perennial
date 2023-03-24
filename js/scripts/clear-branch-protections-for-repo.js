@@ -1,6 +1,6 @@
 // Copyright 2023, University of Colorado Boulder
 
-const githubProtectBranches = require( '../common/githubProtectBranches' );
+const protectGithubBranches = require( '../common/protectGithubBranches' );
 
 /**
  * Remove branch protection rules for the provided repo so that master, main, and release CAN be modified.
@@ -26,6 +26,6 @@ if ( !repo ) {
 }
 else {
   ( async () => {
-    await githubProtectBranches.githubClearBranchProtections( [ repo ] );
+    await protectGithubBranches.clearBranchProtections( [ repo ] );
   } )();
 }

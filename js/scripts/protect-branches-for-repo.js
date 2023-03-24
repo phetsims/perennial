@@ -1,6 +1,6 @@
 // Copyright 2021, University of Colorado Boulder
 
-const githubProtectBranches = require( '../common/githubProtectBranches' );
+const protectGithubBranches = require( '../common/protectGithubBranches' );
 
 /**
  * Set branch protection rules for the provided repo so that master, main, and release branches cannot be deleted.
@@ -23,6 +23,6 @@ if ( !repo ) {
 }
 else {
   ( async () => {
-    await githubProtectBranches.githubProtectBranches( [ repo ] );
+    await protectGithubBranches.protectBranches( [ repo ] );
   } )();
 }

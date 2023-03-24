@@ -11,7 +11,11 @@
  * If rules for the protected patterns already exist they will be deleted and replaced so they can be easily updated.
  *
  * USAGE:
- * githubProtectBranches( [ "my-first-repo", "my-second-repo" ] );
+ * protectGithubBranches.protectBranches( [ "my-first-repo", "my-second-repo" ] );
+ *
+ * of
+ *
+ * protectGithubBranches.clearBranchProtections( [ "my-first-repo", "my-second-repo" ] );
  *
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
@@ -265,7 +269,7 @@ async function sendPromisedHttpsRequest( queryData, handle ) {
 /**
  * Clear protections for the branches that PhET wants to protect.
  */
-async function githubClearBranchProtections( repositories ) {
+async function clearBranchProtections( repositories ) {
   for ( const repositoryName of repositories ) {
     for ( const namePattern of BRANCH_NAME_PATTERNS ) {
       try {
@@ -282,11 +286,11 @@ async function githubClearBranchProtections( repositories ) {
 /**
  * Apply branch protection rules to prodcution branches (master, main, release branches).
  */
-async function githubProtectBranches( repositories ) {
+async function protectBranches( repositories ) {
 
   // if the rule for the protected branch already exists, delete it - we assume that running this again means we
   // want to update rules for each namePattern
-  await githubClearBranchProtections( repositories );
+  await clearBranchProtections( repositories );
 
   for ( const repositoryName of repositories ) {
 
@@ -309,6 +313,6 @@ async function githubProtectBranches( repositories ) {
 }
 
 module.exports = {
-  githubProtectBranches: githubProtectBranches,
-  githubClearBranchProtections: githubClearBranchProtections
+  protectBranches: protectBranches,
+  clearBranchProtections: clearBranchProtections
 };

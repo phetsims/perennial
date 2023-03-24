@@ -9,7 +9,7 @@
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 
-const githubProtectBranches = require( '../common/githubProtectBranches' );
+const protectGithubBranches = require( '../common/protectGithubBranches' );
 const fs = require( 'fs' );
 
 // cannot use getActiveRepos() from root
@@ -23,5 +23,5 @@ if ( activeRepos.includes( 'perennial-alias' ) ) {
 
 // so that execution doesn't finish until githubProtectBranches resolves
 ( async () => {
-  await githubProtectBranches( activeRepos );
+  await protectGithubBranches.protectBranches( activeRepos );
 } )();
