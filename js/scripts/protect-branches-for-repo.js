@@ -1,5 +1,7 @@
 // Copyright 2021, University of Colorado Boulder
 
+const githubProtectBranches = require( '../common/githubProtectBranches' );
+
 /**
  * Set branch protection rules for the provided repo so that master, main, and release branches cannot be deleted.
  *
@@ -12,7 +14,6 @@
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 
-const githubProtectBranches = require( '../common/githubProtectBranches' );
 
 const args = process.argv.slice( 2 );
 const repo = args[ 0 ];
@@ -22,6 +23,6 @@ if ( !repo ) {
 }
 else {
   ( async () => {
-    await githubProtectBranches( [ repo ] );
+    await githubProtectBranches.githubProtectBranches( [ repo ] );
   } )();
 }

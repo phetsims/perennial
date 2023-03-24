@@ -262,8 +262,32 @@ async function sendPromisedHttpsRequest( queryData, handle ) {
   } );
 }
 
+/**
+ * Clear protections for the branches that PhET wants to protect.
+ */
+async function githubClearBranchProtections( repositories ) {
+  for ( const repositoryName of repositories ) {
+    for ( const namePattern of BRANCH_NAME_PATTERNS ) {
+      try {
+        const branchProtectionRules = await getExistingBranchProtectionRules( repositoryName );
+        await deleteMatchingProtectionRules( branchProtectionRules, namePattern, repositoryName );
+      }
+      catch( error ) {
+        console.log( `Error clearing github protection rule ${namePattern} for ${repositoryName}` );
+      }
+    }
+  }
+}
 
-module.exports = async function( repositories ) {
+/**
+ * Apply branch protection rules to prodcution branches (master, main, release branches).
+ */
+async function githubProtectBranches( repositories ) {
+
+  // if the rule for the protected branch already exists, delete it - we assume that running this again means we
+  // want to update rules for each namePattern
+  await githubClearBranchProtections( repositories );
+
   for ( const repositoryName of repositories ) {
 
     // get the unique ID for each repository
@@ -271,11 +295,7 @@ module.exports = async function( repositories ) {
 
     for ( const namePattern of BRANCH_NAME_PATTERNS ) {
 
-      // if the rule for the protected branch already exists, delete it - we assume that running this again means we
-      // want to update rules for each namePattern
       try {
-        const branchProtectionRules = await getExistingBranchProtectionRules( repositoryName );
-        await deleteMatchingProtectionRules( branchProtectionRules, namePattern, repositoryName );
         await writeProtectionRule( repositoryId, namePattern );
         console.log( `${namePattern} protection rule set for ${repositoryName}` );
       }
@@ -286,4 +306,9 @@ module.exports = async function( repositories ) {
       }
     }
   }
+}
+
+module.exports = {
+  githubProtectBranches: githubProtectBranches,
+  githubClearBranchProtections: githubClearBranchProtections
 };
