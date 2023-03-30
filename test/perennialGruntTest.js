@@ -82,7 +82,7 @@ qunit.test( 'Major bump, RC/Production', async assert => {
   const branch = await getLikelyNextBranch( 'bumper', true, false );
 
   // We can't create the branch interactively (for maintenance releases), so we do so here
-  await execute( gruntCommand, [ 'create-release', '--repo=bumper', `--branch=${branch}` ], '.' );
+  await execute( gruntCommand, [ 'create-release', '--repo=bumper', `--branch=${branch}`, '--brands=phet,phet-io' ], '.' );
 
   // should be rc.1 and maintenance:0 (phet,phet-io)
   await execute( gruntCommand, [ 'rc', '--repo=bumper', '--brands=phet,phet-io', `--branch=${branch}`, '--noninteractive' ], '.' );
