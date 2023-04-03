@@ -96,10 +96,10 @@ runnableRepos.forEach( repo => {
   } );
 
   tests.push( {
-    test: [ repo, 'fuzz', 'unbuilt', 'shuffleListeners' ],
+    test: [ repo, 'fuzz', 'unbuilt', 'listenerOrderRandom' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzz&shuffleListeners&memoryLimit=1000',
+    queryParameters: 'brand=phet&ea&fuzz&listenerOrder=random&memoryLimit=1000',
     priority: 0.3
   } );
 
