@@ -102,15 +102,11 @@ const booleanPrompt = require( '../common/booleanPrompt' );
   const unpushedCommits = await execute( 'git', 'log origin/master..master'.split( ' ' ), `./${targetRepo}` );
   console.log( unpushedCommits );
 
-
-  if ( !await booleanPrompt( `Merged into target repo ${targetRepo}.  Please inspect files/history and see if ready for push.`, false ) ) {
-    console.log( 'Aborted' );
-    console.log( `Please delete the temporary cloned repo: rm -rf ${historyCopyRepo}` );
-    return;
-  }
-  console.log( `That's great news.  The next steps are all manual anyways though:
+  console.log(
+    `Merged into target repo ${targetRepo}. The remaining steps are manual:   
+* Inspect the merged repo ${targetRepo} files and history and see if the result looks good.
 * Delete the temporary cloned repo: rm -rf ${historyCopyRepo}
-* Update the namespace and registry statement, if we are still using that.
+* Update the namespace and registry statement, if appropriate.
 * Move the file to the desired directory.
 * Type check, lint and test the new code.
 * If the history, file, type checks and lint all seem good, git push the changes. (otherwise re-clone).
