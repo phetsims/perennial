@@ -30,6 +30,7 @@ const booleanPrompt = require( '../common/booleanPrompt' );
  *
  * EXAMPLE:
  * node perennial/js/scripts/copy-history-to-different-repo center-and-variability/js/common/view/QuestionBar.ts scenery-phet
+ * node perennial/js/scripts/copy-history-to-different-repo counting-common/js/ number-suite-common
  *
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Chris Klusendorf (PhET Interactive Simulations)
@@ -84,7 +85,8 @@ const booleanPrompt = require( '../common/booleanPrompt' );
 
   console.log( filterResults );
 
-  if ( !await booleanPrompt( `Please inspect the filtered repo ${historyCopyRepo} to make sure it is ready for merging. It should include all detected files:\n\n${filenameArray.join( '\n' )}\nWant to merge into ${targetRepo}?`, false ) ) {
+  if ( !await booleanPrompt( `Please inspect the filtered repo ${historyCopyRepo} to make sure it is ready for 
+  merging. It should include all detected files:\n\n${filenameArray.join( '\n' )}\nWant to merge into ${targetRepo}?`, false ) ) {
     console.log( 'Aborted' );
     return;
   }
