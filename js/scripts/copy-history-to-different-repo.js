@@ -17,7 +17,7 @@ const booleanPrompt = require( '../common/booleanPrompt' );
  * ###
  * ### Installing `git filter-repo` on Windows consisted of these steps:
  * ### 1. Install python and confirm it is in the path and works from the command line
- * ### 2. Copy the raw contents of https://github.com/newren/git-filter-repo/blob/main/git-filter-repo into a file "git-filter-repo" in the --exec-path
+ * ### 2. Copy the raw contents of https://github.com/newren/git-filter-repo/blob/main/git-filter-repo into a file "git-filter-repo" in the --exec-path (it is easiest to write a file to you desktop and then click and drag the file into the admin-protected directory
  * ### 3. If your system uses "python" instead of "python3", change that in the 1st line of the file.
  * ### 4. Test using "git filter-repo", if it is installed correctly it will say something like: "No arguments specified"
  * ###
