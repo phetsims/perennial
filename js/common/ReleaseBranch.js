@@ -706,7 +706,9 @@ module.exports = ( function() {
                   ...( includesPhetio ? [ 'phet-io' ] : [] )
                 ];
 
-                unreleasedBranches.push( new ReleaseBranch( repo, branch, brands, false ) );
+                if ( !packageObject.phet.ignoreForAutomatedMaintenanceReleases ) {
+                  unreleasedBranches.push( new ReleaseBranch( repo, branch, brands, false ) );
+                }
               }
             }
           }
