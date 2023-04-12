@@ -1138,7 +1138,10 @@ module.exports = ( function() {
         } );
 
         session.context.Maintenance = Maintenance;
+        session.context.m = Maintenance;
+        session.context.M = Maintenance;
         session.context.ReleaseBranch = ReleaseBranch;
+        session.context.rb = ReleaseBranch;
 
         session.on( 'exit', resolve );
       } );

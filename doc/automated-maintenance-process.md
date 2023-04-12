@@ -36,7 +36,8 @@ It will open a prompt with `maintenance>` (to let you know you are in the mainte
 
 This exposes a few additional global objects, such as `Maintenance` and `ReleaseBranch` (a helper object). It also
 exposes a global boolean `verbose` (default false), such that if it is set to true (`verbose = true;`) then it will
-display more information (particularly for debugging issues).
+display more information (particularly for debugging issues). There are also shortcut globals for convenience. `m` and 
+`M` will also point to the `Maintenance` class, as will `rb` for `ReleaseBranch`.
 
 ## Release branches
 
