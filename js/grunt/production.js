@@ -189,7 +189,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     await checkoutMaster( repo, true );
 
     if ( brands.includes( 'phet' ) ) {
-      grunt.log.writeln( `Deployed: https://phet.colorado.edu/sims/html/${repo}/latest/${repo}_en.html` );
+      grunt.log.writeln( `Deployed: https://phet.colorado.edu/sims/html/${repo}/latest/${repo}_all.html` );
     }
     if ( brands.includes( 'phet-io' ) ) {
       grunt.log.writeln( `Deployed: https://phet-io.colorado.edu/sims/${repo}/${versionString}/` );
