@@ -42,6 +42,7 @@ module.exports = async function createRelease( repo, branch, brands, message ) {
   assert( minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
 
   assert( Array.isArray( brands ), 'supported brands required' );
+  assert( brands.length >= 1, 'must have a supported brand' );
 
   const currentBranch = await getBranch( repo );
   if ( currentBranch !== 'master' ) {
@@ -76,7 +77,7 @@ module.exports = async function createRelease( repo, branch, brands, message ) {
   await npmUpdate( 'chipper' );
   await npmUpdate( 'perennial-alias' );
   await build( repo, {
-    brand: 'phet'
+    brand: brands[ 0 ]
   } );
   await copyFile( `../${repo}/build/phet/dependencies.json`, `../${repo}/dependencies.json` );
   await gitAdd( repo, 'dependencies.json' );
