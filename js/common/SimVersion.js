@@ -165,12 +165,27 @@
      * @param {SimVersion} version
      */
     compareNumber( version ) {
-      if ( this.major < version.major ) { return -1; }
-      if ( this.major > version.major ) { return 1; }
-      if ( this.minor < version.minor ) { return -1; }
-      if ( this.minor > version.minor ) { return 1; }
-      if ( this.maintenance < version.maintenance ) { return -1; }
-      if ( this.maintenance > version.maintenance ) { return 1; }
+      return SimVersion.comparator( this, version );
+    }
+
+    /**
+     * Compares versions in standard "comparator" static format, returning -1 if the first parameter SimVersion is
+     * before the second parameter SimVersion in version-string, 0 if equal, or 1 if the first parameter SimVersion is
+     * after.
+     * @public
+     *
+     * This function only compares major/minor/maintenance, leaving other details to the client.
+     *
+     * @param {SimVersion} a
+     * @param {SimVersion} b
+     */
+    static comparator( a, b ) {
+      if ( a.major < b.major ) { return -1; }
+      if ( a.major > b.major ) { return 1; }
+      if ( a.minor < b.minor ) { return -1; }
+      if ( a.minor > b.minor ) { return 1; }
+      if ( a.maintenance < b.maintenance ) { return -1; }
+      if ( a.maintenance > b.maintenance ) { return 1; }
       return 0; // equal
     }
 

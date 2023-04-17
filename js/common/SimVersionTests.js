@@ -44,7 +44,7 @@ qunit.test( 'SimVersion Basics', async assert => {
     new SimVersion( 3, 0, 0 )
   ];
 
-  versions.sort( ( a, b ) => a.compareNumber( b ) );
+  versions.sort( SimVersion.comparator );
   testVersion( versions[ 0 ], 1, 5, 6, 'another sorted first' );
   testVersion( versions[ 1 ], 2, 2, 2, 'another sorted second' );
   testVersion( versions[ 2 ], 3, 0, 0, 'another sorted third' );
