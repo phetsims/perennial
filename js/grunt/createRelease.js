@@ -76,10 +76,12 @@ module.exports = async function createRelease( repo, branch, brands, message ) {
   await npmUpdate( repo );
   await npmUpdate( 'chipper' );
   await npmUpdate( 'perennial-alias' );
+
+  const brand = brands[ 0 ];
   await build( repo, {
-    brands: [ brands[ 0 ] ]
+    brands: [ brand ]
   } );
-  await copyFile( `../${repo}/build/phet/dependencies.json`, `../${repo}/dependencies.json` );
+  await copyFile( `../${repo}/build/${brand}/dependencies.json`, `../${repo}/dependencies.json` );
   await gitAdd( repo, 'dependencies.json' );
   await gitCommit( repo, `updated dependencies.json for version ${newVersion.toString()}` );
   await gitPush( repo, branch );
