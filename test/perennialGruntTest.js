@@ -35,7 +35,7 @@ async function getLikelyNextBranch( repo, incrementMajor, incrementMinor ) {
 
 qunit.test( 'Checkout target', async assert => {
   assert.timeout( 120000 );
-  await execute( gruntCommand, [ 'checkout-target', '--repo=chains', '--target=1.9' ], '.' );
+  await execute( gruntCommand, [ 'checkout-target', '--repo=chains', '--target=1.42' ], '.' );
   await execute( gruntCommand, [ 'checkout-master', '--repo=chains' ], '.' );
   assert.expect( 0 );
 } );
