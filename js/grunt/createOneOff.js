@@ -57,7 +57,7 @@ module.exports = async function( repo, branch, message ) {
   await npmUpdate( 'chipper' );
   await npmUpdate( 'perennial-alias' );
   await build( repo, {
-    brand: 'phet'
+    brands: [ 'phet' ]
   } );
   await copyFile( `../${repo}/build/phet/dependencies.json`, `../${repo}/dependencies.json` );
   await gitAdd( repo, 'dependencies.json' );
