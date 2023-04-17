@@ -48,12 +48,26 @@
     /**
      * @constructor
      *
-     * @param {number} major - The major part of the version (the 3 in 3.1.2)
-     * @param {number} minor - The minor part of the version (the 1 in 3.1.2)
-     * @param {number} maintenance - The maintenance part of the version (the 2 in 3.1.2)
+     * @param {number|string} major - The major part of the version (the 3 in 3.1.2)
+     * @param {number|string} minor - The minor part of the version (the 1 in 3.1.2)
+     * @param {number|string} maintenance - The maintenance part of the version (the 2 in 3.1.2)
      * @param {Object} [options]
      */
-    constructor( major, minor, maintenance, options ) {
+    constructor( major, minor, maintenance, options = {} ) {
+
+      if ( typeof major === 'string' ) {
+        major = Number( major );
+      }
+      if ( typeof minor === 'string' ) {
+        minor = Number( minor );
+      }
+      if ( typeof maintenance === 'string' ) {
+        maintenance = Number( maintenance );
+      }
+      if ( typeof options.testNumber === 'string' ) {
+        options.testNumber = Number( options.testNumber );
+      }
+
       const {
         // {string|null} - If provided, indicates the time at which the sim file was built
         buildTimestamp = null,
@@ -61,9 +75,9 @@
         // {string|null} - The test name, e.g. the 'rc' in rc.1. Also can be the one-off version name, if provided.
         testType = null,
 
-        // {number|null} - The test number, e.g. the 1 in rc.1
+        // {number|string|null} - The test number, e.g. the 1 in rc.1
         testNumber = null
-      } = options || {};
+      } = options;
 
       assert && assert( typeof major === 'number' && major >= 0 && major % 1 === 0, 'major version should be a non-negative integer' );
       assert && assert( typeof minor === 'number' && minor >= 0 && minor % 1 === 0, 'minor version should be a non-negative integer' );

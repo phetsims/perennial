@@ -49,5 +49,25 @@ qunit.test( 'SimVersion Basics', async assert => {
   testVersion( versions[ 1 ], 2, 2, 2, 'another sorted second' );
   testVersion( versions[ 2 ], 3, 0, 0, 'another sorted third' );
 
+  assert.throws( () => {
+    return SimVersion( '1fdsaf', '2fdsaf', '3fdsa' );
+  }, 'letters as version, boo' );
+
+  assert.throws( () => {
+    return SimVersion( 'fdsaf1fdsaf', 'fdsaf2fdsaf', 'fdsa3fdsa' );
+  }, 'letters as version, boo two' );
+
+  assert.throws( () => {
+    return SimVersion( true, false, true );
+  }, 'letters as version, boo' );
+
+  const mySimVersion = new SimVersion( '1', '2', '3', {
+    testType: 'rc',
+    testNumber: '1'
+  } );
+  testVersion( mySimVersion, 1, 2, 3, 'basic constructor' );
+  assert.ok( mySimVersion.testNumber === 1, 'testNumber number cast check' );
+  assert.ok( mySimVersion.toString() === '1.2.3-rc.1', 'as string' );
+
 } );
 
