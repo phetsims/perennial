@@ -36,8 +36,7 @@ It will open a prompt with `maintenance>` (to let you know you are in the mainte
 
 This exposes a few additional global objects, such as `Maintenance` and `ReleaseBranch` (a helper object). It also
 exposes a global boolean `verbose` (default false), such that if it is set to true (`verbose = true;`) then it will
-display more information (particularly for debugging issues). There are also shortcut globals for convenience. `m` and 
-`M` will also point to the `Maintenance` class, as will `rb` for `ReleaseBranch`.
+display more information (particularly for debugging issues).
 
 ## Release branches
 
@@ -85,45 +84,45 @@ release branches that are marked for maintenance (NOTE that it returns a Promise
 
 NOTE: This is an outline. Details for each step will be listed below in this document.
 
-Before starting, ensure you have a clean working copy, and:
+Before starting:
 
-0. This process can take a lot of time, all the while taking over every repo checked out. It may be nice to use separate
+0. Ensure you have a clean working copy.
+1. This process can take a lot of time, all the while taking over every repo checked out. It may be nice to use separate
    device besides your primary development environment. Or checkout a separate clone of phet repos, and use them for
    this process so that you can still develop while the MR process is occurring.
-1. Run `Maintenance.checkBranchStatus()` to see if any commits have snuck into release branches that are unanticipated.
-2. Communicate with the team about maintenance releases for release branches. If there are release branches that are
+2. cd to perennial and run `node js/scripts/master-pull-status.js --allBranches`. This will ensure that every branch for
+   every ReleaseBranch is pulled (including dependency branches). 
+3. Run `Maintenance.checkBranchStatus()` to see if any commits have snuck into release branches that are unanticipated. 
+4. Communicate with the team about maintenance releases for release branches. If there are release branches that are
    unpublished, they'll need to manually include the fixes. From this point on (until complete), you should be the only
-   person touching the release branches.
-3. Run `Maintenance.reset()` to clear the maintenance state in preparation for the process.
-4. Make sure to check on the active PhET-iO Deploy Status on phet.colorado.edu to ensure that the right PhET-iO sims are
-   included in this maintenance release.
+   person touching the release branches. 
+5. Run `Maintenance.reset()` to clear the maintenance state in preparation for the process.
 
 Generally for each issue that should be fixed, the following outline should be used (there are exceptions for
 complications):
 
-5. Learn about the change being applied, and try to anticipate what types of changes will be needed. What repositories
+4. Learn about the change being applied, and try to anticipate what types of changes will be needed. What repositories
    will need to be patched? (Even if the patch on master was only for 1 repository, other repos might also need to be
    changed if your change depends on newer features). If it exists, having a SHA that does "all" of the changes is nice.
    What types of release branches do you anticipate needing changes?
-6. Create patches for each repo that needs to change,
+5. Create patches for each repo that needs to change,
    e.g. `Maintenance.createPatch( '{{REPO}}', '{{ISSUE_URL}}', '{{OPTIONAL_PATCH_NAME}}' )`.
-7. Mark which release branches need which patches. For simple cases, this can just be something like
-   `Maintenance.addNeededPatchesAfter( '{{PATCH_NAME}}', '{{SHA}}' )`, but things can be added dynamically or through
-   filters.
+6. Mark which release branches need which patches. For simple cases, this can just be something like
+   `Maintenance.addNeededPatchesAfter( '{{REPO}}', '{{SHA}}' )`, but things can be added dynamically or through filters.
 
 Then loop the following until no more release branches need patches. NOTE: If you have a "fix" commit SHA, feel free to
 skip to step 9 (adding the patch SHA).
 
-8. Pick a release branch that needs a patch and check it out: `Maintenance.checkoutBranch( '{{REPO}}', '{{BRANCH}}' )`
-9. Make the changes to the repos that need changes, commit them, and record the SHAs.
-10. Call `Maintenance.addPatchSHA( '{{PATCH_NAME}}', '{{SHA}}' )` for every SHA.
-11. Apply the cherry-picked SHAs to see if there are any more remaining release branches that need the patch:
+7. Pick a release branch that needs a patch and check it out: `Maintenance.checkoutBranch( '{{REPO}}', '{{BRANCH}}' )`
+8. Make the changes to the repos that need changes, commit them, and record the SHAs.
+9. Call `Maintenance.addPatchSHA( '{{REPO}}', '{{SHA}}' )` for every SHA.
+10. Apply the cherry-picked SHAs to see if there are any more remaining release branches that need the patch:
     `Maintenance.applyPatches()`. NOTE: The commits are still ONLY LOCAL. This is very fast, but the changes have not
     been made to the remote release branch until the updateDependencies task below.
 
 Once that is done (or when you want to make the changes permanent on the server):
 
-12. Run `Maintenance.updateDependencies()` (takes a while) which builds the release branches, integrates the commits and
+11. Run `Maintenance.updateDependencies()` (takes a while) which builds the release branches, integrates the commits and
     patches, creates/updates branches where necessary, etc.
 
 Once that is done for every issue, then generally RCs are deployed with `Maintenance.deployReleaseCandidates()`, a list
