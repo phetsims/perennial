@@ -77,7 +77,7 @@ those operations will handle all relevant brands at the same time.
 
 While generally not necessary, you can manually create a `ReleaseBranch` object (for tracking it in maintenance) with
 `new ReleaseBranch( repo, branch, brands )`, e.g. `new ReleaseBranch( 'molarity', '1.2', [ 'phet' ] )`. For many
-purposes, it can also be helpful to use the async function `ReleaseBranch.getMaintenanceBranches()` to get a list of ALL
+purposes, it can also be helpful to use the async function `Maintenance.getMaintenanceBranches()` to get a list of ALL
 release branches that are marked for maintenance (NOTE that it returns a Promise).
 
 ## General procedure
@@ -310,7 +310,7 @@ shows the two release branches both need the joist patch in the example above.
 
 Most commands below will scan website metadata (both for phet and phet-io brands) to determine the list of release
 branches available. If you need more control, it's possible to grab a reference to
-`ReleaseBranch.getMaintenanceBranches()`, or to manually constructor your own `ReleaseBranch` objects.
+`Maintenance.getMaintenanceBranches()`, or to manually constructor your own `ReleaseBranch` objects.
 
 ### Manually adding/removing needed patches
 
@@ -318,7 +318,7 @@ branches available. If you need more control, it's possible to grab a reference 
 the website metadata) as needing a patch for the given `patchName` (in the above example, `joist`). If you need to
 manually specify brands, or add release branches that are outside of the normal system,
 `Maintenance.addNeededPatchReleaseBranch( releaseBranch, patchName )` will take a `ReleaseBranch` object that you can
-manually create, or could get from `ReleaseBranch.getMaintenanceBranches()` if you are using the REPL to enumerate what
+manually create, or could get from `Maintenance.getMaintenanceBranches()` if you are using the REPL to enumerate what
 will need a maintenance release.
 
 `Maintenance.removeNeededPatch( repo, branch, patchName )` will do the corresponding manual removal. Sometimes it's

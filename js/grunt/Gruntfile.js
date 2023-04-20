@@ -222,7 +222,7 @@ module.exports = function( grunt ) {
     '--repo : Only show branches for a specific repository\n' +
     '--order=<ORDER> : alphabetical|date',
     wrapTask( async () => {
-      const ReleaseBranch = require( '../common/ReleaseBranch' );
+      const Maintenance = require( '../common/Maintenance' );
       const winston = require( 'winston' );
 
       winston.default.transports.console.level = 'error';
@@ -236,7 +236,7 @@ module.exports = function( grunt ) {
 
       assert( order === 'alphabetical' || order === 'date' );
 
-      const branches = await ReleaseBranch.getMaintenanceBranches( filterRepo => !repo || filterRepo === repo );
+      const branches = await Maintenance.getMaintenanceBranches( filterRepo => !repo || filterRepo === repo );
 
       let structures = [];
       for ( const branch of branches ) {

@@ -630,22 +630,22 @@ module.exports = ( function() {
     }
 
     /**
-     * Gets a list of ReleaseBranches which would be potential candidates for a maintenance release.
-     * @public
+     * Gets a list of ReleaseBranches which would be potential candidates for a maintenance release. This includes:
+     * - All published phet brand release branches (from metadata)
+     * - All published phet-io brand release branches (from metadata)
+     * - All unpublished local release branches
      *
-     * @param {function} filterRepo - Passed {string} repo, return false if it should be excluded.
-     * @param {function} checkUnreleasedBranches - If false, will skip checking for unreleased branches. This checking needs all repos checked out
-     * @returns {Promise.<Array.<ReleaseBranch>>}
+     * @public
+     * @returns {Promise.<ReleaseBranch[]>}
      * @rejects {ExecuteError}
      */
-    static async getMaintenanceBranches( filterRepo = () => true, checkUnreleasedBranches = true ) {
+    static async getAllMaintenanceBranches() {
       winston.debug( 'retrieving available sim branches' );
 
+      console.log( 'loading phet brand ReleaseBranches' );
       const simMetadataResult = await simMetadata( {
         type: 'html'
       } );
-
-      const activeSimRepos = getActiveSims();
 
       // Released phet branches
       const phetBranches = simMetadataResult.projects.map( simData => {
@@ -654,7 +654,7 @@ module.exports = ( function() {
         return new ReleaseBranch( repo, branch, [ 'phet' ], true );
       } );
 
-      // Released phet-io branches
+      console.log( 'loading phet-io brand ReleaseBranches' );
       const phetioBranches = ( await simPhetioMetadata( {
         active: true,
         latest: true
@@ -666,62 +666,62 @@ module.exports = ( function() {
         return new ReleaseBranch( simData.name, branch, [ 'phet-io' ], true );
       } );
 
-      // Unreleased branches
+      console.log( 'loading unreleased ReleaseBranches' );
       const unreleasedBranches = [];
-      if ( checkUnreleasedBranches ) {
-        for ( const repo of activeSimRepos.filter( filterRepo ) ) {
-          // Exclude explicitly excluded repos
-          if ( JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) ).phet.ignoreForAutomatedMaintenanceReleases ) {
+      for ( const repo of getActiveSims() ) {
+
+        // Exclude explicitly excluded repos
+        if ( JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) ).phet.ignoreForAutomatedMaintenanceReleases ) {
+          continue;
+        }
+
+        const branches = await getBranches( repo );
+        const releasedBranches = phetBranches.concat( phetioBranches );
+
+        for ( const branch of branches ) {
+          // We aren't unreleased if we're included in either phet or phet-io metadata.
+          // See https://github.com/phetsims/balancing-act/issues/118
+          if ( releasedBranches.filter( releaseBranch => releaseBranch.repo === repo && releaseBranch.branch === branch ).length ) {
             continue;
           }
 
-          const branches = await getBranches( repo );
+          const match = branch.match( /^(\d+)\.(\d+)$/ );
 
-          for ( const branch of branches ) {
-            // We aren't unreleased if we're included in either phet or phet-io metadata.
-            // See https://github.com/phetsims/balancing-act/issues/118
-            if ( phetBranches.concat( phetioBranches ).filter( releaseBranch => releaseBranch.repo === repo && releaseBranch.branch === branch ).length ) {
-              continue;
-            }
+          if ( match ) {
+            const major = Number( match[ 1 ] );
+            const minor = Number( match[ 2 ] );
 
-            const match = branch.match( /^(\d+)\.(\d+)$/ );
+            // Assumption that there is no phet-io brand sim that isn't also released with phet brand
+            const projectMetadata = simMetadataResult.projects.find( project => project.name === `html/${repo}` ) || null;
+            const productionVersion = projectMetadata ? projectMetadata.version : null;
 
-            if ( match ) {
-              const major = Number( match[ 1 ] );
-              const minor = Number( match[ 2 ] );
+            if ( !productionVersion ||
+                 major > productionVersion.major ||
+                 ( major === productionVersion.major && minor > productionVersion.minor ) ) {
 
-              const projectMetadata = simMetadataResult.projects.find( project => project.name === `html/${repo}` ) || null;
-              const productionVersion = projectMetadata ? projectMetadata.version : null;
+              // Do a checkout so we can determine supported brands
+              const packageObject = JSON.parse( await getFileAtBranch( repo, branch, 'package.json' ) );
+              const includesPhetio = packageObject.phet && packageObject.phet.supportedBrands && packageObject.phet.supportedBrands.includes( 'phet-io' );
 
-              if ( !productionVersion ||
-                   major > productionVersion.major ||
-                   ( major === productionVersion.major && minor > productionVersion.minor ) ) {
+              const brands = [
+                'phet', // Assumption that there is no phet-io brand sim that isn't also released with phet brand
+                ...( includesPhetio ? [ 'phet-io' ] : [] )
+              ];
 
-                // Do a checkout so we can determine supported brands
-                const packageObject = JSON.parse( await getFileAtBranch( repo, branch, 'package.json' ) );
-                const includesPhetio = packageObject.phet && packageObject.phet.supportedBrands && packageObject.phet.supportedBrands.includes( 'phet-io' );
-
-                const brands = [
-                  'phet',
-                  ...( includesPhetio ? [ 'phet-io' ] : [] )
-                ];
-
-                if ( !packageObject.phet.ignoreForAutomatedMaintenanceReleases ) {
-                  unreleasedBranches.push( new ReleaseBranch( repo, branch, brands, false ) );
-                }
+              if ( !packageObject.phet.ignoreForAutomatedMaintenanceReleases ) {
+                unreleasedBranches.push( new ReleaseBranch( repo, branch, brands, false ) );
               }
             }
           }
         }
       }
 
-      return ReleaseBranch.combineLists( [ ...phetBranches, ...phetioBranches, ...unreleasedBranches ] ).filter( releaseBranch => {
-        return filterRepo( releaseBranch.repo );
-      } );
+      return ReleaseBranch.combineLists( [ ...phetBranches, ...phetioBranches, ...unreleasedBranches ] );
     }
 
     /**
-     * Combines multiple matching ReleaseBranches into one where appropriate, and sorts.
+     * Combines multiple matching ReleaseBranches into one where appropriate, and sorts. For example, two ReleaseBranches
+     * of the same repo but for different brands are combined into a single ReleaseBranch with multiple brands.
      * @public
      *
      * @param {Array.<ReleaseBranch>} simBranches

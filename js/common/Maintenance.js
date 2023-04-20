@@ -65,7 +65,15 @@ const MAINTENANCE_FILE = '.maintenance.json';
 //   'removePatchSHA',
 //   'reset',
 //   'updateDependencies'
+//   'getAllMaintenanceBranches'
 // ];
+
+/**
+ * @typedef SerializedMaintenance - see Maintenance.serialize()
+ * @property {Array.<Object>} patches
+ * @property {Array.<Object>} modifiedBranches
+ * @property {Array.<Object>} allReleaseBranches
+ */
 
 module.exports = ( function() {
 
@@ -76,8 +84,9 @@ module.exports = ( function() {
      *
      * @param {Array.<Patch>} [patches]
      * @param {Array.<ModifiedBranch>} [modifiedBranches]
+     * @param  {Array.<ReleaseBranch>} [allReleaseBranches]
      */
-    constructor( patches = [], modifiedBranches = [] ) {
+    constructor( patches = [], modifiedBranches = [], allReleaseBranches = [] ) {
       assert( Array.isArray( patches ) );
       patches.forEach( patch => assert( patch instanceof Patch ) );
       assert( Array.isArray( modifiedBranches ) );
@@ -88,6 +97,9 @@ module.exports = ( function() {
 
       // @public {Array.<ModifiedBranch>}
       this.modifiedBranches = modifiedBranches;
+
+      // @public {Array.<ReleaseBranch>}
+      this.allReleaseBranches = allReleaseBranches;
     }
 
     /**
@@ -119,7 +131,7 @@ module.exports = ( function() {
         }
       }
 
-      const releaseBranches = await ReleaseBranch.getMaintenanceBranches( filter );
+      const releaseBranches = await Maintenance.getMaintenanceBranches( filter );
 
       // Set up a cache of branchMaps so that we don't make multiple requests
       const branchMaps = {};
@@ -148,7 +160,7 @@ module.exports = ( function() {
      * @public
      */
     static async buildAll() {
-      const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
+      const releaseBranches = await Maintenance.getMaintenanceBranches();
 
       const failed = [];
 
@@ -182,6 +194,10 @@ module.exports = ( function() {
      */
     static async list() {
       const maintenance = Maintenance.load();
+
+      if ( maintenance.allReleaseBranches.length > 0 ) {
+        console.log( `${maintenance.allReleaseBranches.length} ReleaseBranches loaded` );
+      }
 
       for ( const modifiedBranch of maintenance.modifiedBranches ) {
         console.log( `${modifiedBranch.repo} ${modifiedBranch.branch} ${modifiedBranch.brands.join( ',' )}${modifiedBranch.releaseBranch.isReleased ? '' : ' (unreleased)'}` );
@@ -446,7 +462,7 @@ module.exports = ( function() {
       const maintenance = Maintenance.load();
 
       const patch = maintenance.findPatch( patchName );
-      const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
+      const releaseBranches = await Maintenance.getMaintenanceBranches();
 
       for ( const releaseBranch of releaseBranches ) {
         const needsPatch = await filter( releaseBranch );
@@ -941,7 +957,7 @@ module.exports = ( function() {
     static async updateCheckouts( filter ) {
       console.log( 'Updating checkouts' );
 
-      const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
+      const releaseBranches = await Maintenance.getMaintenanceBranches();
       for ( const releaseBranch of releaseBranches ) {
         if ( !filter || await filter( releaseBranch ) ) {
           console.log( `Updating ${releaseBranch}` );
@@ -967,7 +983,7 @@ module.exports = ( function() {
     static async checkUnbuiltCheckouts( filter ) {
       console.log( 'Checking unbuilt checkouts' );
 
-      const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
+      const releaseBranches = await Maintenance.getMaintenanceBranches();
       for ( const releaseBranch of releaseBranches ) {
         if ( !filter || await filter( releaseBranch ) ) {
           console.log( releaseBranch.toString() );
@@ -988,7 +1004,7 @@ module.exports = ( function() {
     static async checkBuiltCheckouts( filter ) {
       console.log( 'Checking built checkouts' );
 
-      const releaseBranches = await ReleaseBranch.getMaintenanceBranches();
+      const releaseBranches = await Maintenance.getMaintenanceBranches();
       for ( const releaseBranch of releaseBranches ) {
         if ( !filter || await filter( releaseBranch ) ) {
           console.log( releaseBranch.toString() );
@@ -1012,7 +1028,7 @@ module.exports = ( function() {
      */
     static async redeployAllProduction( message, filter ) {
       // Ignore unreleased branches!
-      const releaseBranches = await ReleaseBranch.getMaintenanceBranches( () => true, false );
+      const releaseBranches = await Maintenance.getMaintenanceBranches( () => true, false );
 
       for ( const releaseBranch of releaseBranches ) {
         if ( filter && !( await filter( releaseBranch ) ) ) {
@@ -1028,15 +1044,59 @@ module.exports = ( function() {
     }
 
     /**
+     * @public
+     * TODO: remove the second param? https://github.com/phetsims/perennial/issues/318
+     * @param {function(repo:string):boolean} filterRepo - return false if the ReleaseBranch should be excluded.
+     * @param {function} checkUnreleasedBranches - If false, will skip checking for unreleased branches. This checking needs all repos checked out
+     * @returns {Promise.<Array.<ReleaseBranch>>}
+     * @rejects {ExecuteError}
+     */
+    static async getMaintenanceBranches( filterRepo = () => true, checkUnreleasedBranches = true ) {
+      const releaseBranches = await Maintenance.loadAllMaintenanceBranches();
+
+      return releaseBranches.filter( releaseBranch => {
+        if ( !checkUnreleasedBranches && !releaseBranch.isReleased ) {
+          return false;
+        }
+        // TODO: pass in the whole releaseBranch, not just the repo string, https://github.com/phetsims/perennial/issues/318
+        return filterRepo( releaseBranch.repo );
+      } );
+    }
+
+    /**
+     * Loads every potential ReleaseBranch (published phet and phet-io brands, as well as unreleased branches), and
+     * saves it to the maintenance state.
+     * @private
+     * @returns {Promise<ReleaseBranch[]>}
+     */
+    static async loadAllMaintenanceBranches() {
+      const maintenance = Maintenance.load();
+
+      let releaseBranches = null;
+      if ( maintenance.allReleaseBranches.length > 0 ) {
+        releaseBranches = maintenance.allReleaseBranches.map( releaseBranchData => ReleaseBranch.deserialize( releaseBranchData ) );
+      }
+      else {
+        // cache miss
+        releaseBranches = await ReleaseBranch.getAllMaintenanceBranches();
+        maintenance.allReleaseBranches = releaseBranches;
+        maintenance.save();
+      }
+
+      return releaseBranches;
+    }
+
+    /**
      * Convert into a plain JS object meant for JSON serialization.
      * @public
      *
-     * @returns {{patches:Array.<Object>, modifiedBranches:Array.<Object>}} - see Patch.serialize() and ModifiedBranch.serialize()
+     * @returns {SerializedMaintenance} - see Patch.serialize() and ModifiedBranch.serialize()
      */
     serialize() {
       return {
         patches: this.patches.map( patch => patch.serialize() ),
-        modifiedBranches: this.modifiedBranches.map( modifiedBranch => modifiedBranch.serialize() )
+        modifiedBranches: this.modifiedBranches.map( modifiedBranch => modifiedBranch.serialize() ),
+        allReleaseBranches: this.allReleaseBranches.map( releaseBranch => releaseBranch.serialize() )
       };
     }
 
@@ -1044,10 +1104,10 @@ module.exports = ( function() {
      * Takes a serialized form of the Maintenance and returns an actual instance.
      * @public
      *
-     * @param {{patches:Array.<Object>, modifiedBranches:Array.<Object>}} - see Maintenance.serialize()
+     * @param {SerializedMaintenance} - see Maintenance.serialize()
      * @returns {Maintenance}
      */
-    static deserialize( { patches, modifiedBranches } ) {
+    static deserialize( { patches, modifiedBranches, allReleaseBranches } ) {
       // Pass in patch references to branch deserialization
       const deserializedPatches = patches.map( Patch.deserialize );
       modifiedBranches = modifiedBranches.map( modifiedBranch => ModifiedBranch.deserialize( modifiedBranch, deserializedPatches ) );
@@ -1060,7 +1120,9 @@ module.exports = ( function() {
         }
         return 0;
       } );
-      return new Maintenance( deserializedPatches, modifiedBranches );
+      const deserializedReleaseBranches = allReleaseBranches.map( releaseBranch => ReleaseBranch.deserialize( releaseBranch ) );
+
+      return new Maintenance( deserializedPatches, modifiedBranches, deserializedReleaseBranches );
     }
 
     /**
@@ -1192,7 +1254,7 @@ module.exports = ( function() {
         if ( errorIfMissing ) {
           throw new Error( `Could not find a tracked modified branch for ${repo} ${branch}` );
         }
-        releaseBranches = releaseBranches || await ReleaseBranch.getMaintenanceBranches( testRepo => testRepo === repo );
+        releaseBranches = releaseBranches || await Maintenance.getMaintenanceBranches( testRepo => testRepo === repo );
         const releaseBranch = releaseBranches.find( release => release.repo === repo && release.branch === branch );
         assert( releaseBranch, `Could not find a release branch for repo=${repo} branch=${branch}` );
 
