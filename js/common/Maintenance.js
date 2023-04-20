@@ -1066,13 +1066,14 @@ module.exports = ( function() {
      * Loads every potential ReleaseBranch (published phet and phet-io brands, as well as unreleased branches), and
      * saves it to the maintenance state.
      * @private
+     * @param {boolean} forceCacheBreak=false - true if you want to force a recalculation of all ReleaseBranches
      * @returns {Promise<ReleaseBranch[]>}
      */
-    static async loadAllMaintenanceBranches() {
+    static async loadAllMaintenanceBranches( forceCacheBreak = false ) {
       const maintenance = Maintenance.load();
 
       let releaseBranches = null;
-      if ( maintenance.allReleaseBranches.length > 0 ) {
+      if ( maintenance.allReleaseBranches.length > 0 && !forceCacheBreak ) {
         releaseBranches = maintenance.allReleaseBranches.map( releaseBranchData => ReleaseBranch.deserialize( releaseBranchData ) );
       }
       else {
