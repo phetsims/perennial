@@ -119,7 +119,7 @@ module.exports = ( function() {
      * Runs a number of checks through every release branch.
      * @public
      *
-     * @param {function(repo:string):Promise.<boolean>} [filter] - Optional filter, release branches will be skipped
+     * @param {function(ReleaseBranch):Promise.<boolean>} [filter] - Optional filter, release branches will be skipped
      *                                                               if this resolves to false
      * @returns {Promise}
      */
@@ -143,7 +143,7 @@ module.exports = ( function() {
       };
 
       for ( const releaseBranch of releaseBranches ) {
-        if ( !filter || await filter( releaseBranch.repo ) ) {
+        if ( !filter || await filter( releaseBranch ) ) {
           console.log( `${releaseBranch.repo} ${releaseBranch.branch}` );
           for ( const line of await releaseBranch.getStatus( getBranchMapAsyncCallback ) ) {
             console.log( `  ${line}` );
@@ -1046,7 +1046,7 @@ module.exports = ( function() {
     /**
      * @public
      * TODO: remove the second param? https://github.com/phetsims/perennial/issues/318
-     * @param {function(repo:string):boolean} filterRepo - return false if the ReleaseBranch should be excluded.
+     * @param {function(ReleaseBranch):boolean} filterRepo - return false if the ReleaseBranch should be excluded.
      * @param {function} checkUnreleasedBranches - If false, will skip checking for unreleased branches. This checking needs all repos checked out
      * @returns {Promise.<Array.<ReleaseBranch>>}
      * @rejects {ExecuteError}
@@ -1058,8 +1058,7 @@ module.exports = ( function() {
         if ( !checkUnreleasedBranches && !releaseBranch.isReleased ) {
           return false;
         }
-        // TODO: pass in the whole releaseBranch, not just the repo string, https://github.com/phetsims/perennial/issues/318
-        return filterRepo( releaseBranch.repo );
+        return filterRepo( releaseBranch );
       } );
     }
 
