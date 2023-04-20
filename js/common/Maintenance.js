@@ -33,6 +33,8 @@ const assert = require( 'assert' );
 const fs = require( 'fs' );
 const repl = require( 'repl' );
 const winston = require( 'winston' );
+const gruntCommand = require( './gruntCommand' );
+const chipperSupportsOutputJSGruntTasks = require( './chipperSupportsOutputJSGruntTasks' );
 
 // constants
 const MAINTENANCE_FILE = '.maintenance.json';
@@ -655,12 +657,22 @@ module.exports = ( function() {
      *
      * @param {string} repo
      * @param {string} branch
+     * @param {boolean} outputJS=false - if true, once checked out this will also run `grunt output-js-project`
      */
-    static async checkoutBranch( repo, branch ) {
+    static async checkoutBranch( repo, branch, outputJS = false ) {
       const maintenance = Maintenance.load();
 
       const modifiedBranch = await maintenance.ensureModifiedBranch( repo, branch, true );
       await modifiedBranch.checkout();
+
+      if ( outputJS && chipperSupportsOutputJSGruntTasks() ) {
+        console.log( 'Running output-js-project' );
+
+        // We might not be able to run this command!
+        await execute( gruntCommand, [ 'output-js-project' ], `../${repo}`, {
+          errors: 'resolve'
+        } );
+      }
 
       // No need to save, shouldn't be changing things
       console.log( `Checked out ${repo} ${branch}` );
@@ -853,6 +865,8 @@ module.exports = ( function() {
         if ( !modifiedBranch.isReadyForReleaseCandidate || !modifiedBranch.releaseBranch.isReleased ) {
           continue;
         }
+
+        console.log( '================================================' );
 
         if ( filter && !( await filter( modifiedBranch ) ) ) {
           console.log( `Skipping RC deploy for ${modifiedBranch.repo} ${modifiedBranch.branch}` );

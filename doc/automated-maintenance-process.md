@@ -84,19 +84,16 @@ release branches that are marked for maintenance (NOTE that it returns a Promise
 
 NOTE: This is an outline. Details for each step will be listed below in this document.
 
-Before starting:
+Before starting, ensure you have a clean working copy, and:
 
-0. Ensure you have a clean working copy.
-1. This process can take a lot of time, all the while taking over every repo checked out. It may be nice to use separate
+0. This process can take a lot of time, all the while taking over every repo checked out. It may be nice to use separate
    device besides your primary development environment. Or checkout a separate clone of phet repos, and use them for
    this process so that you can still develop while the MR process is occurring.
-2. cd to perennial and run `node js/scripts/master-pull-status.js --allBranches`. This will ensure that every branch for
-   every ReleaseBranch is pulled (including dependency branches). 
-3. Run `Maintenance.checkBranchStatus()` to see if any commits have snuck into release branches that are unanticipated. 
-4. Communicate with the team about maintenance releases for release branches. If there are release branches that are
+1. Run `Maintenance.checkBranchStatus()` to see if any commits have snuck into release branches that are unanticipated.
+2. Communicate with the team about maintenance releases for release branches. If there are release branches that are
    unpublished, they'll need to manually include the fixes. From this point on (until complete), you should be the only
-   person touching the release branches. 
-5. Run `Maintenance.reset()` to clear the maintenance state in preparation for the process.
+   person touching the release branches.
+3. Run `Maintenance.reset()` to clear the maintenance state in preparation for the process.
 
 Generally for each issue that should be fixed, the following outline should be used (there are exceptions for
 complications):
@@ -108,14 +105,16 @@ complications):
 5. Create patches for each repo that needs to change,
    e.g. `Maintenance.createPatch( '{{REPO}}', '{{ISSUE_URL}}', '{{OPTIONAL_PATCH_NAME}}' )`.
 6. Mark which release branches need which patches. For simple cases, this can just be something like
-   `Maintenance.addNeededPatchesAfter( '{{REPO}}', '{{SHA}}' )`, but things can be added dynamically or through filters.
+   `Maintenance.addNeededPatchesAfter( '{{PATCH_NAME}}', '{{SHA}}' )`, but things can be added dynamically or through
+   filters.
 
 Then loop the following until no more release branches need patches. NOTE: If you have a "fix" commit SHA, feel free to
 skip to step 9 (adding the patch SHA).
 
-7. Pick a release branch that needs a patch and check it out: `Maintenance.checkoutBranch( '{{REPO}}', '{{BRANCH}}' )`
+7. Pick a release branch that needs a patch and check it
+   out: `Maintenance.checkoutBranch( '{{REPO}}', '{{BRANCH}}', OUTPUT_JS=false' )`
 8. Make the changes to the repos that need changes, commit them, and record the SHAs.
-9. Call `Maintenance.addPatchSHA( '{{REPO}}', '{{SHA}}' )` for every SHA.
+9. Call `Maintenance.addPatchSHA( '{{PATCH_NAME}}', '{{SHA}}' )` for every SHA.
 10. Apply the cherry-picked SHAs to see if there are any more remaining release branches that need the patch:
     `Maintenance.applyPatches()`. NOTE: The commits are still ONLY LOCAL. This is very fast, but the changes have not
     been made to the remote release branch until the updateDependencies task below.
@@ -380,7 +379,7 @@ and 8 are for creating the SHAs necessary. Steps 7-10 will be looped until there
 patches.
 
 Instead of using `checkout-shas`, or other chipper/perennial commands to check out a branch during this process, it's
-recommended that you use `Maintenance.checkoutBranch( repo, branch )`. Since we don't update the actual
+recommended that you use `Maintenance.checkoutBranch( repo, branch, outputJS=false )`. Since we don't update the actual
 `dependencies.json` files until later in the process, the "normal" commands would not check out the proper code.
 
 Usually when you have a list of release branches that need to be patched, just pick one and check it out, and get the

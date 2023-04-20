@@ -7,7 +7,7 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-const ChipperVersion = require( './ChipperVersion' );
+const chipperSupportsOutputJSGruntTasks = require( './chipperSupportsOutputJSGruntTasks' );
 const execute = require( './execute' );
 const gruntCommand = require( './gruntCommand' );
 const winston = require( 'winston' );
@@ -22,12 +22,10 @@ module.exports = async function() {
 
   winston.info( 'running outputJSAll' );
 
-  const chipperVersion = ChipperVersion.getFromRepository();
-
   let ranOutputJS = false;
 
   // Not every version of chipper has the output-js task family.  Only proceed if it exists in this version of chipper.
-  if ( chipperVersion.chipperSupportsOutputJSGruntTasks ) {
+  if ( chipperSupportsOutputJSGruntTasks() ) {
 
     // Not every repo supports the output-js task, only proceed if it is supported
     winston.info( 'running grunt output-js' );
