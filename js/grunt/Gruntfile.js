@@ -349,22 +349,6 @@ module.exports = function( grunt ) {
     grunt.log.writeln( ( await execute( gruntCommand, [ 'lint', ...tail ], '../chipper', { errors: 'resolve' } ) ).stdout );
   } ) );
 
-  grunt.registerTask( 'wrapper',
-    'Deploys a phet-io wrapper\n' +
-    '--repo : The name of the wrapper repository to deploy\n' +
-    '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out\n' +
-    '--message : An optional message that will be appended on version-change commits.',
-    wrapTask( async () => {
-      assert( grunt.option( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
-
-      const repo = grunt.option( 'repo' );
-      assertIsValidRepoName( repo );
-
-      const wrapper = require( './wrapper' );
-
-      await wrapper( repo, noninteractive, grunt.option( 'message' ) );
-    } ) );
-
   grunt.registerTask( 'dev',
     'Deploys a dev version of the simulation\n' +
     '--repo : The name of the repository to deploy\n' +
@@ -426,7 +410,7 @@ module.exports = function( grunt ) {
 
   grunt.registerTask( 'rc',
     'Deploys an rc version of the simulation\n' +
-    '--repo : The name of the wrapper repository to deploy\n' +
+    '--repo : The name of the repository to deploy\n' +
     '--branch : The release branch name (e.g. "1.7") that should be used for deployment\n' +
     '--brands : A comma-separated list of brand names to deploy\n' +
     '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out\n' +
@@ -446,7 +430,7 @@ module.exports = function( grunt ) {
 
   grunt.registerTask( 'production',
     'Marks a simulation as published, and deploys a production version of the simulation\n' +
-    '--repo : The name of the wrapper repository to deploy\n' +
+    '--repo : The name of the repository to deploy\n' +
     '--branch : The release branch name (e.g. "1.7") that should be used for deployment\n' +
     '--brands : A comma-separated list of brand names to deploy\n' +
     '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out\n' +
@@ -469,7 +453,7 @@ module.exports = function( grunt ) {
 
   grunt.registerTask( 'prototype',
     'Deploys a production (prototype) version of the simulation\n' +
-    '--repo : The name of the wrapper repository to deploy\n' +
+    '--repo : The name of the repository to deploy\n' +
     '--branch : The release branch name (e.g. "1.7") that should be used for deployment\n' +
     '--brands : A comma-separated list of brand names to deploy\n' +
     '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out\n' +
