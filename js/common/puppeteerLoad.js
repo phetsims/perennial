@@ -59,6 +59,13 @@ module.exports = async function( url, options ) {
     } );
 
     let loaded = false;
+    page.on( 'response', async response => {
+
+      // 200 and 300 class status are most likely fine here
+      if ( response.status() >= 400 ) {
+        winston.info( `400 or greater status is likely an error: ${response.status()}` );
+      }
+    } );
     page.on( 'load', async () => {
       loaded = true;
       await sleep( options.waitAfterLoad );
