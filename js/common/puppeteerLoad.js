@@ -62,8 +62,8 @@ module.exports = async function( url, options ) {
     page.on( 'response', async response => {
 
       // 200 and 300 class status are most likely fine here
-      if ( response.status() >= 400 ) {
-        winston.info( `400 or greater status is likely an error: ${response.status()}` );
+      if ( response.url() === url && response.status() >= 400 ) {
+        winston.info( `Could not load from status: ${response.status()}` );
       }
     } );
     page.on( 'load', async () => {
