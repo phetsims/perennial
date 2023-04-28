@@ -9,10 +9,10 @@
  */
 
 const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
-const getDependencies = require( '../common/getDependencies' );
-const gitCheckout = require( '../common/gitCheckout' );
-const gitIsAncestor = require( '../common/gitIsAncestor' );
-const simPhetioMetadata = require( '../common/simPhetioMetadata' );
+const getDependencies = require( './getDependencies' );
+const gitCheckout = require( './gitCheckout' );
+const gitIsAncestor = require( './gitIsAncestor' );
+const simPhetioMetadata = require( './simPhetioMetadata' );
 
 module.exports = async () => {
 
