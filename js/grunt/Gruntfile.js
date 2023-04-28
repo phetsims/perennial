@@ -183,8 +183,11 @@ module.exports = function( grunt ) {
   grunt.registerTask( 'print-phet-io-links',
     'Print the current list of all phet-io sims\' links',
     wrapTask( async () => {
-      const printPhetioLinks = require( './printPhetioLinks' );
-      await printPhetioLinks();
+      const getPhetioLinks = require( './getPhetioLinks' );
+      const phetioLinks = await getPhetioLinks();
+
+      console.log( 'Latest Links:' );
+      console.log( `\n${phetioLinks.join( '\n' )}` );
     } ) );
 
   grunt.registerTask( 'update-gh-pages',

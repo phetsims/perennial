@@ -48,8 +48,7 @@ module.exports = async () => {
     phetioLinks.push( `https://phet-io.colorado.edu/sims/${simData.name}/${getVersion( simData )}/${useTopLevelIndex ? '' : 'wrappers/index/'}` );
   }
 
-  console.log( 'Latest Links:' );
-  console.log( `\n${phetioLinks.join( '\n' )}` );
+  return phetioLinks
 };
 
 /**
