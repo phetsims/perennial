@@ -7,7 +7,7 @@
  */
 
 const puppeteerLoad = require( './puppeteerLoad' );
-const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
+const _ = require( 'lodash' );
 
 /**
  * Uses puppeteer to load a page, evaluate some Javascript, and then returns the result

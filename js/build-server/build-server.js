@@ -18,7 +18,7 @@ const taskWorker = require( './taskWorker' );
 const async = require( 'async' );
 const bodyParser = require( 'body-parser' ); // eslint-disable-line require-statement-match
 const express = require( 'express' );
-const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
+const _ = require( 'lodash' );
 const parseArgs = require( 'minimist' ); // eslint-disable-line require-statement-match
 const persistentQueue = require( './persistentQueue' );
 

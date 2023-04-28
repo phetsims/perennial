@@ -16,7 +16,7 @@
 // require statements improves the load time of this file noticeably. For details, see https://github.com/phetsims/chipper/issues/1107
 const assertIsValidRepoName = require( '../common/assertIsValidRepoName' );
 const assert = require( 'assert' );
-const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
+const _ = require( 'lodash' );
 require( './checkNodeVersion' );
 ///////////////////////////
 

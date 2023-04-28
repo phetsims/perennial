@@ -5,7 +5,7 @@ const constants = require( './constants' );
 const execute = require( '../common/execute' );
 const gitPull = require( '../common/gitPull' );
 const winston = require( 'winston' );
-const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
+const _ = require( 'lodash' );
 
 /**
  * pull master for every repo in dependencies.json (plus babel) to make sure everything is up to date

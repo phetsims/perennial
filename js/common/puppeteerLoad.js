@@ -7,7 +7,7 @@
  */
 
 const sleep = require( './sleep' );
-const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
+const _ = require( 'lodash' );
 const puppeteer = require( 'puppeteer' );
 const winston = require( 'winston' );
 

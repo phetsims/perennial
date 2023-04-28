@@ -1,7 +1,7 @@
 // Copyright 2023, University of Colorado Boulder
 
 const fs = require( 'fs' );
-const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
+const _ = require( 'lodash' );
 
 const getQueue = () => {
   try {

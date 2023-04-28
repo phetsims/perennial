@@ -16,7 +16,7 @@ const gitPullRebase = require( '../common/gitPullRebase' );
 const gitRevParse = require( '../common/gitRevParse' );
 const npmUpdate = require( '../common/npmUpdate' );
 const winston = require( 'winston' );
-const _ = require( 'lodash' ); // eslint-disable-line require-statement-match
+const _ = require( 'lodash' );
 
 winston.default.transports.console.level = 'error';
 

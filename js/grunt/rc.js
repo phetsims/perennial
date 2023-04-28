@@ -27,7 +27,7 @@ const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
 const vpnCheck = require( '../common/vpnCheck' );
 const createRelease = require( './createRelease' );
 const grunt = require( 'grunt' );
-const _ = require( 'lodash' ); // eslint-disable-line require-statement-match, no-unused-vars
+const _ = require( 'lodash' ); // eslint-disable-line no-unused-vars
 
 /**
  * Deploys an rc version after incrementing the test version number.

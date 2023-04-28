@@ -12,7 +12,6 @@
  * @author Marla Schulz (PhET Interactive Simulations)
  */
 
-// eslint-disable-next-line require-statement-match
 const _ = require( 'lodash' );
 const fs = require( 'fs' );
 

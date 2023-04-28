@@ -29,7 +29,7 @@ const vpnCheck = require( '../common/vpnCheck' );
 const writePhetioHtaccess = require( '../common/writePhetioHtaccess' );
 const assert = require( 'assert' );
 const grunt = require( 'grunt' );
-const _ = require( 'lodash' ); // eslint-disable-line require-statement-match, no-unused-vars
+const _ = require( 'lodash' ); // eslint-disable-line no-unused-vars
 
 /**
  * Deploys a dev version after incrementing the test version number.
