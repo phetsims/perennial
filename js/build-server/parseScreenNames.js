@@ -13,7 +13,11 @@ const puppeteerLoad = require( '../common/puppeteerLoad' );
  */
 const parseScreenNamesFromSimulation = async ( simName, locales ) => {
 
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch( {
+    args: [
+      '--disable-gpu'
+    ]
+  } );
 
   const returnObject = {};
 

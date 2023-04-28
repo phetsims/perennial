@@ -23,10 +23,14 @@ const winston = require( 'winston' );
  */
 module.exports = async function( url, options ) {
 
-  options = _.extend( {
+  options = _.merge( {
 
     // See https://github.com/puppeteer/puppeteer/blob/v14.1.1/docs/api.md#puppeteerlaunchoptions
-    launchOptions: {},
+    launchOptions: {
+      args: [
+        '--disable-gpu'
+      ]
+    },
 
     browser: null, // {puppeteer.Browser|null} - If provided, we'll use a persistent browser
 
