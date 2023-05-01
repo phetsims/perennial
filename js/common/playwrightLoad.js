@@ -8,7 +8,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-const puppeteerLoad = require( './puppeteerLoad' );
+const browserPageLoad = require( './browserPageLoad' );
 const playwright = require( 'playwright' );
 const _ = require( 'lodash' );
 
@@ -18,12 +18,12 @@ const _ = require( 'lodash' );
  * Rejects if encountering an error loading the page OR (with option provided within the puppeteer page itself).
  *
  * @param {string} url
- * @param {Object} [options] - see puppeteerLoad
+ * @param {Object} [options] - see browserPageLoad
  * @returns {Promise.<null|*>} - The eval result/null
  */
 module.exports = async function( url, options ) {
   options = _.merge( {
     testingBrowserCreator: playwright.firefox
   }, options );
-  return puppeteerLoad( options.testingBrowserCreator, url, options );
+  return browserPageLoad( options.testingBrowserCreator, url, options );
 };
