@@ -23,6 +23,7 @@
     "minimist": "~1.2.8",
     "ncp": "~2.0.0",
     "puppeteer": "~19.2.2",
+    "playwright": "~1.33.0",
     "qunit": "~2.10.0",
     "rimraf": "~2.5.4",
     "rsync": "~0.6.1",

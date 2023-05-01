@@ -8,7 +8,6 @@
 
 const sleep = require( './sleep' );
 const _ = require( 'lodash' );
-const puppeteer = require( 'puppeteer' );
 const winston = require( 'winston' );
 
 /**
@@ -17,15 +16,17 @@ const winston = require( 'winston' );
  *
  * Rejects if encountering an error loading the page OR (with option provided within the puppeteer page itself).
  *
+ * @param {Browser} browserCreator - either `puppeteer` or a specific Browser from playright
  * @param {string} url
  * @param {Object} [options]
  * @returns {Promise.<null|*>} - The eval result/null
  */
-module.exports = async function( url, options ) {
+module.exports = async function( browserCreator, url, options ) {
 
   options = _.merge( {
 
     // See https://github.com/puppeteer/puppeteer/blob/v14.1.1/docs/api.md#puppeteerlaunchoptions
+    // Make sure to provide options that work with your browserCreator (playwright or puppeteer)
     launchOptions: {
       args: [
         '--disable-gpu'
@@ -40,7 +41,7 @@ module.exports = async function( url, options ) {
     rejectPageErrors: true, // reject when the page errors
     waitAfterLoad: 5000, // milliseconds
     allowedTimeToLoad: 40000, // milliseconds
-    puppeteerTimeout: 30000 // milliseconds
+    gotoTimeout: 30000 // milliseconds
   }, options );
 
   const ownsBrowser = !options.browser;
@@ -49,10 +50,10 @@ module.exports = async function( url, options ) {
   let page;
 
   try {
-    browser = options.browser || await puppeteer.launch( options.launchOptions );
+    browser = options.browser || await browserCreator.launch( options.launchOptions );
 
     page = await browser.newPage();
-    await page.setDefaultNavigationTimeout( options.puppeteerTimeout );
+    await page.setDefaultNavigationTimeout( options.gotoTimeout );
 
     // promote for use outside the closure
     let resolve;
@@ -76,7 +77,7 @@ module.exports = async function( url, options ) {
       if ( options.waitForFunction ) {
         await page.waitForFunction( options.waitForFunction, {
           polling: 100, // default is every animation frame
-          timeout: options.puppeteerTimeout
+          timeout: options.gotoTimeout
         } );
       }
       resolve( options.evaluate && !page.isClosed() ? await page.evaluate( options.evaluate ) : null );
@@ -99,7 +100,7 @@ module.exports = async function( url, options ) {
       }
     } )();
     await page.goto( url, {
-      timeout: options.puppeteerTimeout
+      timeout: options.gotoTimeout
     } );
     const result = await promise;
     !page.isClosed() && await page.close();

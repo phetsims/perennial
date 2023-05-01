@@ -23,7 +23,7 @@ const withServer = require( '../common/withServer' );
         await puppeteerLoad( url, {
           waitAfterLoad: 10000,
           allowedTimeToLoad: 120000,
-          puppeteerTimeout: 120000,
+          gotoTimeout: 120000,
           launchOptions: {
 
             // With this flag, temp files are written to /tmp/ on bayes, which caused https://github.com/phetsims/aqua/issues/145
