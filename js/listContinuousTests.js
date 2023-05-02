@@ -74,7 +74,7 @@ runnableRepos.forEach( repo => {
     test: [ repo, 'fuzz', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000',
+    queryParameters: 'brand=phet&ea&fuzz',
     testQueryParameters: 'duration=90000' // This is the most important test, let's get some good coverage!
   } );
 
@@ -82,7 +82,7 @@ runnableRepos.forEach( repo => {
     test: [ repo, 'xss-fuzz' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzz&stringTest=xss&memoryLimit=1000',
+    queryParameters: 'brand=phet&ea&fuzz&stringTest=xss',
     testQueryParameters: 'duration=10000',
     priority: 0.3
   } );
@@ -91,7 +91,7 @@ runnableRepos.forEach( repo => {
     test: [ repo, 'fuzz', 'unbuilt', 'assertSlow' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&eall&fuzz&memoryLimit=1000',
+    queryParameters: 'brand=phet&eall&fuzz',
     priority: 0.001
   } );
 
@@ -99,7 +99,7 @@ runnableRepos.forEach( repo => {
     test: [ repo, 'fuzz', 'unbuilt', 'listenerOrderRandom' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzz&listenerOrder=random&memoryLimit=1000',
+    queryParameters: 'brand=phet&ea&fuzz&listenerOrder=random',
     priority: 0.3
   } );
 
@@ -107,14 +107,14 @@ runnableRepos.forEach( repo => {
     test: [ repo, 'multitouch-fuzz', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzz&fuzzPointers=2&memoryLimit=1000&supportsPanAndZoom=false'
+    queryParameters: 'brand=phet&ea&fuzz&fuzzPointers=2&supportsPanAndZoom=false'
   } );
 
   tests.push( {
     test: [ repo, 'pan-and-zoom-fuzz', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzz&fuzzPointers=2&memoryLimit=1000&supportsPanAndZoom=true',
+    queryParameters: 'brand=phet&ea&fuzz&fuzzPointers=2&supportsPanAndZoom=true',
     priority: 0.5 // test this when there isn't other work to be done
   } );
 
@@ -122,7 +122,7 @@ runnableRepos.forEach( repo => {
     test: [ repo, 'fuzz', 'built' ],
     type: 'sim-test',
     url: `${repo}/build/phet/${repo}_en_phet.html`,
-    queryParameters: 'fuzz&memoryLimit=1000',
+    queryParameters: 'fuzz',
     testQueryParameters: 'duration=80000',
 
     // We want to elevate the priority so that we get a more even balance (we can't test these until they are built,
@@ -139,7 +139,7 @@ runnableRepos.forEach( repo => {
       test: [ repo, 'fuzz', 'built-phet-io' ],
       type: 'sim-test',
       url: `${repo}/build/phet-io/${repo}_all_phet-io.html`,
-      queryParameters: 'fuzz&memoryLimit=1000&phetioStandalone',
+      queryParameters: 'fuzz&phetioStandalone',
       testQueryParameters: 'duration=80000',
 
       brand: 'phet-io',
@@ -155,7 +155,7 @@ phetioRepos.forEach( repo => {
     test: [ repo, 'phet-io-fuzz', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'ea&brand=phet-io&phetioStandalone&fuzz&memoryLimit=1000'
+    queryParameters: 'ea&brand=phet-io&phetioStandalone&fuzz'
   } );
 
   // Test for API compatibility, for sims that support it
@@ -196,7 +196,7 @@ interactiveDescriptionRepos.forEach( repo => {
     test: [ repo, 'interactive-description-fuzz', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzz&supportsInteractiveDescription=true&memoryLimit=1000',
+    queryParameters: 'brand=phet&ea&fuzz&supportsInteractiveDescription=true',
     testQueryParameters: 'duration=40000'
   } );
 
@@ -204,7 +204,7 @@ interactiveDescriptionRepos.forEach( repo => {
     test: [ repo, 'interactive-description-fuzz-fuzzBoard-combo', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&supportsInteractiveDescription=true&fuzz&fuzzBoard&memoryLimit=1000',
+    queryParameters: 'brand=phet&ea&supportsInteractiveDescription=true&fuzz&fuzzBoard',
     testQueryParameters: 'duration=40000'
   } );
 
@@ -212,7 +212,7 @@ interactiveDescriptionRepos.forEach( repo => {
     test: [ repo, 'interactive-description-fuzzBoard', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzzBoard&supportsInteractiveDescription=true&memoryLimit=1000',
+    queryParameters: 'brand=phet&ea&fuzzBoard&supportsInteractiveDescription=true',
     testQueryParameters: 'duration=40000'
   } );
 
@@ -220,7 +220,7 @@ interactiveDescriptionRepos.forEach( repo => {
     test: [ repo, 'interactive-description-fuzz', 'built' ],
     type: 'sim-test',
     url: `${repo}/build/phet/${repo}_en_phet.html`,
-    queryParameters: 'fuzz&supportsInteractiveDescription=true&memoryLimit=1000',
+    queryParameters: 'fuzz&supportsInteractiveDescription=true',
     testQueryParameters: 'duration=40000',
 
     brand: 'phet',
@@ -232,7 +232,7 @@ interactiveDescriptionRepos.forEach( repo => {
     test: [ repo, 'interactive-description-fuzzBoard', 'built' ],
     type: 'sim-test',
     url: `${repo}/build/phet/${repo}_en_phet.html`,
-    queryParameters: 'fuzzBoard&supportsInteractiveDescription=true&memoryLimit=1000',
+    queryParameters: 'fuzzBoard&supportsInteractiveDescription=true',
     testQueryParameters: 'duration=40000',
 
     brand: 'phet',
@@ -246,14 +246,14 @@ voicingRepos.forEach( repo => {
     test: [ repo, 'voicing-fuzz', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzz&voicingInitiallyEnabled&memoryLimit=1000',
+    queryParameters: 'brand=phet&ea&fuzz&voicingInitiallyEnabled',
     testQueryParameters: 'duration=40000'
   } );
   tests.push( {
     test: [ repo, 'voicing-fuzzBoard', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzzBoard&voicingInitiallyEnabled&memoryLimit=1000',
+    queryParameters: 'brand=phet&ea&fuzzBoard&voicingInitiallyEnabled',
     testQueryParameters: 'duration=40000'
   } );
 } );
@@ -382,16 +382,16 @@ unitTestRepos.forEach( repo => {
 
 // test non-default public query parameter values to make sure there are no obvious problems.
 const commonQueryParameters = {
-  allowLinksFalse: 'brand=phet&fuzz&memoryLimit=1000&ea&allowLinks=false',
-  screens1: 'brand=phet&fuzz&memoryLimit=1000&ea&screens=1',
-  screens21: 'brand=phet&fuzz&memoryLimit=1000&ea&screens=2,1',
-  screens21NoHome: 'brand=phet&fuzz&memoryLimit=1000&ea&screens=2,1&homeScreen=false',
-  initialScreen2NoHome: 'brand=phet&fuzz&memoryLimit=1000&ea&initialScreen=2&homeScreen=false',
-  initialScreen2: 'brand=phet&fuzz&memoryLimit=1000&ea&initialScreen=2',
+  allowLinksFalse: 'brand=phet&fuzz&ea&allowLinks=false',
+  screens1: 'brand=phet&fuzz&ea&screens=1',
+  screens21: 'brand=phet&fuzz&ea&screens=2,1',
+  screens21NoHome: 'brand=phet&fuzz&ea&screens=2,1&homeScreen=false',
+  initialScreen2NoHome: 'brand=phet&fuzz&ea&initialScreen=2&homeScreen=false',
+  initialScreen2: 'brand=phet&fuzz&ea&initialScreen=2',
 
   // Purposefully use incorrect syntax to make sure it is caught correctly without crashing
-  screensVerbose: 'brand=phet&fuzz&memoryLimit=1000&ea&screens=Screen1,Screen2',
-  screensOther: 'brand=phet&fuzz&memoryLimit=1000&ea&screens=1.1,Screen2'
+  screensVerbose: 'brand=phet&fuzz&ea&screens=Screen1,Screen2',
+  screensOther: 'brand=phet&fuzz&ea&screens=1.1,Screen2'
 };
 Object.keys( commonQueryParameters ).forEach( name => {
   const queryString = commonQueryParameters[ name ];
@@ -414,7 +414,7 @@ tests.push( {
   test: [ 'beers-law-lab', 'fuzz', 'unbuilt', 'query-parameters' ],
   type: 'sim-test',
   url: 'beers-law-lab/beers-law-lab_en.html',
-  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&showSoluteAmount&concentrationMeterUnits=percent&beakerUnits=milliliters'
+  queryParameters: 'brand=phet&ea&fuzz&showSoluteAmount&concentrationMeterUnits=percent&beakerUnits=milliliters'
 } );
 
 // circuit-construction-kit-ac: test various query parameters
@@ -424,7 +424,7 @@ tests.push( {
   url: 'circuit-construction-kit-ac/circuit-construction-kit-ac_en.html',
 
   // Public query parameters that cannot be triggered from options within the sim
-  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&showCurrent&addRealBulbs&moreWires&moreInductors'
+  queryParameters: 'brand=phet&ea&fuzz&showCurrent&addRealBulbs&moreWires&moreInductors'
 } );
 
 // energy forms and changes: four blocks and one burner
@@ -432,7 +432,7 @@ tests.push( {
   test: [ 'energy-forms-and-changes', 'fuzz', 'unbuilt', 'query-parameters' ],
   type: 'sim-test',
   url: 'energy-forms-and-changes/energy-forms-and-changes_en.html',
-  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&screens=1&elements=iron,brick,iron,brick&burners=1'
+  queryParameters: 'brand=phet&ea&fuzz&screens=1&elements=iron,brick,iron,brick&burners=1'
 } );
 
 // energy forms and changes: two beakers and 2 burners
@@ -440,7 +440,7 @@ tests.push( {
   test: [ 'energy-forms-and-changes', 'fuzz', 'unbuilt', 'query-parameters-2' ],
   type: 'sim-test',
   url: 'energy-forms-and-changes/energy-forms-and-changes_en.html',
-  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&screens=1&&elements=oliveOil,water&burners=2'
+  queryParameters: 'brand=phet&ea&fuzz&screens=1&&elements=oliveOil,water&burners=2'
 } );
 
 // gas-properties: test pressureNoise query parameter
@@ -448,7 +448,7 @@ tests.push( {
   test: [ 'gas-properties', 'fuzz', 'unbuilt', 'query-parameters' ],
   type: 'sim-test',
   url: 'gas-properties/gas-properties_en.html',
-  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&pressureNoise=false'
+  queryParameters: 'brand=phet&ea&fuzz&pressureNoise=false'
 } );
 
 // natural-selection: test various query parameters
@@ -456,7 +456,7 @@ tests.push( {
   test: [ 'natural-selection', 'fuzz', 'unbuilt', 'query-parameters' ],
   type: 'sim-test',
   url: 'natural-selection/natural-selection_en.html',
-  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&allelesVisible=false&introMutations=F&introPopulation=10Ff&labMutations=FeT&labPopulation=2FFeett,2ffEEtt,2ffeeTT'
+  queryParameters: 'brand=phet&ea&fuzz&allelesVisible=false&introMutations=F&introPopulation=10Ff&labMutations=FeT&labPopulation=2FFeett,2ffEEtt,2ffeeTT'
 } );
 
 // natural-selection: run the generation clock faster, so that more things are liable to happen
@@ -464,7 +464,7 @@ tests.push( {
   test: [ 'natural-selection', 'fuzz', 'unbuilt', 'secondsPerGeneration' ],
   type: 'sim-test',
   url: 'natural-selection/natural-selection_en.html',
-  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&secondsPerGeneration=1'
+  queryParameters: 'brand=phet&ea&fuzz&secondsPerGeneration=1'
 } );
 
 // ph-scale: test the autofill query parameter
@@ -472,7 +472,7 @@ tests.push( {
   test: [ 'ph-scale', 'autofill-fuzz', 'unbuilt', 'query-parameters' ],
   type: 'sim-test',
   url: 'ph-scale/ph-scale_en.html',
-  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&autoFill=false'
+  queryParameters: 'brand=phet&ea&fuzz&autoFill=false'
 } );
 
 // number-play: test the second language preference
@@ -480,7 +480,7 @@ tests.push( {
   test: [ 'number-play', 'second-language-fuzz', 'unbuilt', 'query-parameters' ],
   type: 'sim-test',
   url: 'number-play/number-play_en.html',
-  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&locales=*&secondLocale=es'
+  queryParameters: 'brand=phet&ea&fuzz&locales=*&secondLocale=es'
 } );
 
 // number-compare: test the second language preference
@@ -488,7 +488,7 @@ tests.push( {
   test: [ 'number-compare', 'second-language-fuzz', 'unbuilt', 'query-parameters' ],
   type: 'sim-test',
   url: 'number-compare/number-compare_en.html',
-  queryParameters: 'brand=phet&ea&fuzz&memoryLimit=1000&locales=*&secondLocale=es'
+  queryParameters: 'brand=phet&ea&fuzz&locales=*&secondLocale=es'
 } );
 
 console.log( JSON.stringify( tests, null, 2 ) );
