@@ -41,7 +41,10 @@ module.exports = async function( browserCreator, url, options ) {
     rejectPageErrors: true, // reject when the page errors
     waitAfterLoad: 5000, // milliseconds
     allowedTimeToLoad: 40000, // milliseconds
-    gotoTimeout: 30000 // milliseconds
+    gotoTimeout: 30000, // milliseconds
+
+    logConsoleOutput: false, // if true, this process will log all messages that come from page.on( 'console' )
+    logger: winston.info // pass in `console.log` if you are running in a context that doesn't use winston
   }, options );
 
   const ownsBrowser = !options.browser;
@@ -68,9 +71,11 @@ module.exports = async function( browserCreator, url, options ) {
 
       // 200 and 300 class status are most likely fine here
       if ( response.url() === url && response.status() >= 400 ) {
-        winston.info( `Could not load from status: ${response.status()}` );
+        options.logger( `Could not load from status: ${response.status()}` );
       }
     } );
+    options.logConsoleOutput && page.on( 'console', msg => console.log( msg.text() ) );
+
     page.on( 'load', async () => {
       loaded = true;
       await sleep( options.waitAfterLoad );
@@ -83,19 +88,19 @@ module.exports = async function( browserCreator, url, options ) {
       resolve( options.evaluate && !page.isClosed() ? await page.evaluate( options.evaluate ) : null );
     } );
     page.on( 'error', message => {
-      winston.info( `puppeteer error: ${message}` );
+      options.logger( `puppeteer error: ${message}` );
       reject( new Error( message ) );
     } );
     page.on( 'pageerror', message => {
       if ( options.rejectPageErrors ) {
-        winston.info( `puppeteer pageerror: ${message}` );
+        options.logger( `puppeteer pageerror: ${message}` );
         reject( new Error( message ) );
       }
     } );
     ( async () => {
       await sleep( options.allowedTimeToLoad );
       if ( !loaded ) {
-        winston.info( 'puppeteer not loaded' );
+        options.logger( 'puppeteer not loaded' );
         reject( new Error( `Did not load in ${options.allowedTimeToLoad}` ) );
       }
     } )();
