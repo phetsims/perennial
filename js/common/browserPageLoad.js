@@ -44,6 +44,7 @@ module.exports = async function( browserCreator, url, options ) {
     gotoTimeout: 30000, // milliseconds
 
     logConsoleOutput: false, // if true, this process will log all messages that come from page.on( 'console' )
+    logNavigation: false, // if true, this process will log all messages that come from page.on( 'frame*' )
     logger: winston.info // pass in `console.log` if you are running in a context that doesn't use winston
   }, options );
 
@@ -97,6 +98,17 @@ module.exports = async function( browserCreator, url, options ) {
         reject( new Error( message ) );
       }
     } );
+    if ( options.logNavigation ) {
+      page.on( 'frameattached', async frame => {
+        options.logger( 'attached', frame.url() );
+      } );
+      page.on( 'framedetached', async frame => {
+        options.logger( 'detached', frame.url() );
+      } );
+      page.on( 'framenavigated', async frame => {
+        options.logger( 'navigated', frame.url() );
+      } );
+    }
     ( async () => {
       await sleep( options.allowedTimeToLoad );
       if ( !loaded ) {
