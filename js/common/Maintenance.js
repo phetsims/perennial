@@ -1048,11 +1048,12 @@ module.exports = ( function() {
      * TODO: remove the second param? https://github.com/phetsims/perennial/issues/318
      * @param {function(ReleaseBranch):boolean} filterRepo - return false if the ReleaseBranch should be excluded.
      * @param {function} checkUnreleasedBranches - If false, will skip checking for unreleased branches. This checking needs all repos checked out
+     * @param {boolean} forceCacheBreak=false - true if you want to force a recalculation of all ReleaseBranches
      * @returns {Promise.<Array.<ReleaseBranch>>}
      * @rejects {ExecuteError}
      */
-    static async getMaintenanceBranches( filterRepo = () => true, checkUnreleasedBranches = true ) {
-      const releaseBranches = await Maintenance.loadAllMaintenanceBranches();
+    static async getMaintenanceBranches( filterRepo = () => true, checkUnreleasedBranches = true, forceCacheBreak = false ) {
+      const releaseBranches = await Maintenance.loadAllMaintenanceBranches( forceCacheBreak );
 
       return releaseBranches.filter( releaseBranch => {
         if ( !checkUnreleasedBranches && !releaseBranch.isReleased ) {
@@ -1065,7 +1066,10 @@ module.exports = ( function() {
     /**
      * Loads every potential ReleaseBranch (published phet and phet-io brands, as well as unreleased branches), and
      * saves it to the maintenance state.
-     * @private
+     * @public
+     *
+     * Call this with true to break the cache and force a recalculation of all ReleaseBranches
+     *
      * @param {boolean} forceCacheBreak=false - true if you want to force a recalculation of all ReleaseBranches
      * @returns {Promise<ReleaseBranch[]>}
      */

@@ -239,7 +239,7 @@ module.exports = function( grunt ) {
 
       assert( order === 'alphabetical' || order === 'date' );
 
-      const branches = await Maintenance.getMaintenanceBranches( filterRepo => !repo || filterRepo === repo );
+      const branches = await Maintenance.getMaintenanceBranches( filterRepo => !repo || filterRepo === repo, true, true );
 
       let structures = [];
       for ( const branch of branches ) {
