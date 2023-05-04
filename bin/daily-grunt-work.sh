@@ -74,6 +74,13 @@ grunt generate-data
 cd ..
 
 ##########################################################################################################
+# Update perennial/data/ lists, make sure to npm prune and update first see https://github.com/phetsims/perennial/issues/155
+echo "REOPEN ISSUES LINKED IN TODOS:"
+cd perennial || exit
+grunt reopen-issues-from-todos
+cd ..
+
+##########################################################################################################
 
 echo "GENERATE DEVELOPMENT STRINGS:"
 perennial/bin/for-each.sh perennial/data/active-repos grunt generate-development-strings
