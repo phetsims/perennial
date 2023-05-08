@@ -8,6 +8,10 @@ const Octokit = require( '@octokit/rest' ); // eslint-disable-line require-state
 const execute = require( '../common/execute' );
 const buildLocal = require( '../common/buildLocal' );
 const gruntCommand = require( '../common/gruntCommand' );
+const createDirectory = require( '../common/createDirectory' );
+
+const CHIPPER_DIST = '../chipper/dist';
+
 
 /**
  * This script is meant to ensure that all todos pointing to a github issue are pointing to open issues.
@@ -26,6 +30,9 @@ module.exports = async function reopenIssuesFromTODOs() {
   // with all todo issues.
   process.env.saveTODOIssues = true;
 
+  if ( !fs.existsSync( CHIPPER_DIST ) ) {
+    await createDirectory( CHIPPER_DIST );
+  }
   fs.writeFileSync( '../chipper/dist/issuesFromTODOs.txt', '' );
 
   console.log( 'grunt lint-everything started' );
