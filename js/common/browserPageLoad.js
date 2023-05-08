@@ -129,8 +129,9 @@ module.exports = async function( browserCreator, url, options ) {
   }
 
   catch( e ) {
+    options.logger( e );
     page && !page.isClosed() && await page.close();
-    ownsBrowser && await browser.close();
+    ownsBrowser && browser && await browser.close();
     throw e;
   }
 };
