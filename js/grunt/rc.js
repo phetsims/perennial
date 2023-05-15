@@ -144,6 +144,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     }
 
     grunt.log.writeln( 'Please wait for the build-server to complete the deployment, and then test!' );
+    grunt.log.writeln( `To view the current build status, visit ${buildLocal.productionServerURL}/deploy-status` );
 
     return version;
   }

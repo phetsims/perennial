@@ -28,7 +28,7 @@ const setRepoVersion = require( '../common/setRepoVersion' );
 const simMetadata = require( '../common/simMetadata' );
 const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
 const vpnCheck = require( '../common/vpnCheck' );
-const _ = require( 'lodash' ); // eslint-disable-line no-unused-vars
+const buildLocal = require( '../common/buildLocal' );
 
 /**
  * Deploys a production version after incrementing the test version number.
@@ -196,6 +196,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     }
 
     grunt.log.writeln( 'Please wait for the build-server to complete the deployment, and then test!' );
+    grunt.log.writeln( `To view the current build status, visit ${buildLocal.productionServerURL}/deploy-status` );
 
     if ( isFirstVersion && brands.includes( 'phet' ) ) {
       grunt.log.writeln( 'After testing, let the simulation lead know it has been deployed, so they can edit metadata on the website' );
