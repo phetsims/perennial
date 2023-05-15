@@ -15,6 +15,7 @@ html
   body
     h1 Build Server Status
     p Report Time: #{currentTime}
+    p Please note that this status report is not feature complete and may not always be correct. There is currently no handling for builds that error or otherwise fail to complete correctly. This report is a snapshot and should be refreshed manually to determine the latest status. Please report any problems or feature suggestions as a Github issue in the perennial repo.
     h2 Current Build
     if currentTask
       +buildView(currentTask)
@@ -24,8 +25,7 @@ html
     if builds.length > 0
       ol
         each build in builds
-           li
-             +buildView(build)
+          li
+            +buildView(build)
     else
       p Queue is empty.
-
