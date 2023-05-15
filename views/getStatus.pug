@@ -21,7 +21,7 @@ html
     else
       p No build is in progress.
     h2 Current Queue
-    if builds
+    if builds.length > 0
       ol
         each build in builds
            li
