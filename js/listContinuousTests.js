@@ -186,7 +186,8 @@ phetioRepos.forEach( repo => {
     tests.push( {
       test: [ repo, 'phet-io-wrappers-tests', useAssert ? 'assert' : 'no-assert' ],
       type: 'qunit-test',
-      url: `phet-io-wrappers/phet-io-wrappers-tests.html?sim=${repo}${useAssert ? '&phetioDebug=true&phetioWrapperDebug=true' : ''}`
+      url: `phet-io-wrappers/phet-io-wrappers-tests.html?sim=${repo}${useAssert ? '&phetioDebug=true&phetioWrapperDebug=true' : ''}`,
+      testQueryParameters: 'duration=600000' // phet-io-wrapper tests load the sim >5 times
     } );
   } );
 } );
