@@ -65,7 +65,7 @@ const afterDeploy = async buildDir => {
  * @param options
  */
 async function runTask( options ) {
-  persistentQueue.removeTask( options );
+  persistentQueue.startTask( options );
   if ( options.deployImages ) {
     try {
       await deployImages( options );

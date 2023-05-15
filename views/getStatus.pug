@@ -1,0 +1,31 @@
+mixin buildView( build )
+  h3 #{build.simName} #{build.version}
+  if build.startTime
+    p Build Start Time: #{build.startTime}
+  p Enqueue Time: #{build.enqueueTime}
+  p Locales: #{build.locales}
+  p Servers: #{build.servers}
+  p Brands: #{build.brands}
+  p Email: #{build.email}
+
+html
+  head
+    title Build Server Status
+    link(rel="shortcut icon" href="https://phet.colorado.edu/favicon.ico")
+  body
+    h1 Build Server Status
+    p Report Time: #{currentTime}
+    h2 Build in progress
+      if currentTask
+        +buildView(currentTask)
+      else
+        p No build is in progress.
+    h2 Current Queue
+    if builds
+      ol
+        each build in builds
+           li
+             +buildView(build)
+    else
+      p Queue is empty.
+

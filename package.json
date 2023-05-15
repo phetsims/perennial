@@ -22,8 +22,8 @@
     "mimelib": "~0.2.19",
     "minimist": "~1.2.8",
     "ncp": "~2.0.0",
-    "puppeteer": "~19.2.2",
     "playwright": "~1.33.0",
+    "puppeteer": "~19.2.2",
     "qunit": "~2.10.0",
     "rimraf": "~2.5.4",
     "rsync": "~0.6.1",
@@ -36,6 +36,7 @@
     "extends": "../chipper/eslint/node_eslintrc.js"
   },
   "dependencies": {
-    "nodemailer": "^6.9.1"
+    "nodemailer": "^6.9.1",
+    "pug": "^3.0.2"
   }
 }

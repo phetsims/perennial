@@ -3,21 +3,24 @@
 const fs = require( 'fs' );
 const _ = require( 'lodash' );
 
+const createNewQueue = () => ( { queue: [], currentTask: null } );
+
 const getQueue = () => {
   try {
-    const queue = JSON.parse( fs.readFileSync( '.build-server-queue' ).toString() );
-    if ( !Array.isArray( queue ) ) {
-      console.error( 'Queue is not an array, found this instead', JSON.stringify( queue ) );
+    const buildStatus = JSON.parse( fs.readFileSync( '.build-server-queue' ).toString() );
+
+    if ( !Array.isArray( buildStatus.queue ) ) {
+      console.error( 'Queue is not an array, found this instead', JSON.stringify( buildStatus.queue ) );
       console.error( 'Returning a blank queue' );
-      return [];
+      return createNewQueue();
     }
     else {
-      return queue;
+      return buildStatus;
     }
   }
   catch( e ) {
     console.error( 'Queue not retrievable, returning blank queue', e );
-    return [];
+    return createNewQueue();
   }
 };
 
@@ -35,24 +38,35 @@ const formatTask = task => ( {
   brands: task.brands,
   email: task.email,
   userId: task.userId,
-  branch: task.branch
+  branch: task.branch,
+  enqueueTime: task.enqueueTime
 } );
 
 const addTask = task => {
-  const queue = getQueue();
-  queue.push( formatTask( task ) );
-  saveQueue( queue );
+  const buildStatus = getQueue();
+  task.enqueueTime = new Date().toString();
+  buildStatus.queue.push( formatTask( task ) );
+  saveQueue( buildStatus );
 };
 
-const removeTask = task => {
-  const queue = getQueue();
-  const taskIndex = queue.findIndex( t => _.isEqual( t, formatTask( task ) ) );
-  queue.splice( taskIndex, 1 );
-  saveQueue( queue );
+const startTask = task => {
+  const buildStatus = getQueue();
+  const taskIndex = buildStatus.queue.findIndex( t => _.isEqual( t, formatTask( task ) ) );
+  buildStatus.queue.splice( taskIndex, 1 );
+  buildStatus.currentTask = task;
+  buildStatus.currentTask.startTime = new Date().toString();
+  saveQueue( buildStatus );
+};
+
+const finishTask = () => {
+  const buildStatus = getQueue();
+  buildStatus.currentTask = null;
+  saveQueue( buildStatus );
 };
 
 module.exports = {
   addTask: addTask,
-  removeTask: removeTask,
+  startTask: startTask,
+  finishTask: finishTask,
   getQueue: getQueue
 };

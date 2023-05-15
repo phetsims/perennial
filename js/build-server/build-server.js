@@ -21,6 +21,7 @@ const express = require( 'express' );
 const _ = require( 'lodash' );
 const parseArgs = require( 'minimist' ); // eslint-disable-line require-statement-match
 const persistentQueue = require( './persistentQueue' );
+const getStatus = require( './getStatus' );
 
 // set this process up with the appropriate permissions, value is in octal
 process.umask( 0o0002 );
@@ -212,6 +213,7 @@ const buildCallback = task => {
     }
     else {
       winston.log( 'info', `build for ${task.simName} finished successfully` );
+      persistentQueue.finishTask();
       sendEmail( 'Build Succeeded', simInfoString, task.email, true );
     }
   };
@@ -271,6 +273,10 @@ app.get( '/deploy-html-simulation', getQueueDeploy );
 app.post( '/deploy-html-simulation', postQueueDeploy );
 app.post( '/deploy-images', postQueueImageDeploy );
 
+app.set( 'views', './views' );
+app.set( 'view engine', 'pug' );
+app.get( '/deploy-status', getStatus );
+
 // start the server
 app.listen( constants.LISTEN_PORT, () => {
   winston.log( 'info', `Listening on port ${constants.LISTEN_PORT}` );
@@ -287,7 +293,7 @@ app.listen( constants.LISTEN_PORT, () => {
 
   // Recreate queue
   try {
-    const queue = persistentQueue.getQueue();
+    const queue = persistentQueue.getQueue().queue;
     for ( const task of queue ) {
       console.log( 'Resuming task from persistent queue: ', task );
       taskQueue.push( task, buildCallback( task ) );
