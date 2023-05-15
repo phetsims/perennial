@@ -15,11 +15,11 @@ html
   body
     h1 Build Server Status
     p Report Time: #{currentTime}
-    h2 Build in progress
-      if currentTask
-        +buildView(currentTask)
-      else
-        p No build is in progress.
+    h2 Current Build
+    if currentTask
+      +buildView(currentTask)
+    else
+      p No build is in progress.
     h2 Current Queue
     if builds
       ol
