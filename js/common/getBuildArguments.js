@@ -25,8 +25,10 @@ module.exports = function( chipperVersion, options ) {
     uglify = true,
     mangle = true,
     lint = true,
+    clean = true,
     thumbnails = false,
-    twitterCard = false
+    twitterCard = false,
+    buildForServer = false
   } = options || {};
 
   const args = [];
@@ -37,8 +39,15 @@ module.exports = function( chipperVersion, options ) {
     if ( lint ) {
       args.push( 'lint-all' );
     }
-    args.push( 'clean' );
-    args.push( 'build' );
+    if ( clean ) {
+      args.push( 'clean' );
+    }
+    if ( buildForServer ) {
+      args.push( 'build-for-server' );
+    }
+    else {
+      args.push( 'build' );
+    }
     if ( thumbnails ) {
       args.push( 'generate-thumbnails' );
     }

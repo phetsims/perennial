@@ -6,21 +6,24 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const gitCheckoutDirectory = require( './gitCheckoutDirectory' );
+const execute = require( './execute' );
 const assert = require( 'assert' );
+const winston = require( 'winston' );
 
 /**
  * Executes git checkout
  * @public
  *
- * @param {string} repo - The repository name
  * @param {string} target - The SHA/branch/whatnot to check out
+ * @param {string} directory - The working cwd directory
  * @returns {Promise.<string>} - Stdout
  * @rejects {ExecuteError}
  */
-module.exports = async function( repo, target ) {
-  assert( typeof repo === 'string' );
+module.exports = function( target, directory ) {
   assert( typeof target === 'string' );
+  assert( typeof directory === 'string' );
 
-  await gitCheckoutDirectory( target, `../${repo}` );
+  winston.info( `git checkout ${target} in ${directory}` );
+
+  return execute( 'git', [ 'checkout', target ], directory );
 };

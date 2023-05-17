@@ -30,6 +30,7 @@ const gitPull = require( './gitPull' );
 const gitPush = require( './gitPush' );
 const gitRevParse = require( './gitRevParse' );
 const assert = require( 'assert' );
+const asyncq = require( 'async-q' ); // eslint-disable-line require-statement-match
 const fs = require( 'fs' );
 const repl = require( 'repl' );
 const winston = require( 'winston' );
@@ -955,14 +956,18 @@ module.exports = ( function() {
      *                                                               if this resolves to false
      */
     static async updateCheckouts( filter ) {
-      console.log( 'Updating checkouts' );
+      const concurrent = 5;
+
+      console.log( `Updating checkouts (running in parallel with ${concurrent} threads)` );
 
       const releaseBranches = await Maintenance.getMaintenanceBranches();
-      for ( const releaseBranch of releaseBranches ) {
-        if ( !filter || await filter( releaseBranch ) ) {
-          console.log( `Updating ${releaseBranch}` );
 
+      const asyncFunctions = releaseBranches.map( releaseBranch => ( async () => {
+        if ( !filter || await filter( releaseBranch ) ) {
+
+          console.log( releaseBranch.toString() );
           await releaseBranch.updateCheckout();
+
           await releaseBranch.transpile();
           try {
             await releaseBranch.build();
@@ -971,7 +976,11 @@ module.exports = ( function() {
             console.log( `failed to build ${releaseBranch.toString()} ${e}` );
           }
         }
-      }
+      } ) );
+
+      await asyncq.parallelLimit( asyncFunctions, concurrent );
+
+      console.log( 'Done' );
     }
 
     /**

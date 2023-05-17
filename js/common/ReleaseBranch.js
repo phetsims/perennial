@@ -6,6 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
+const buildLocal = require( './buildLocal' );
 const ChipperVersion = require( './ChipperVersion' );
 const checkoutTarget = require( './checkoutTarget' );
 const createDirectory = require( './createDirectory' );
@@ -19,14 +20,17 @@ const getBranchMap = require( './getBranchMap' );
 const getBranchVersion = require( './getBranchVersion' );
 const getFileAtBranch = require( './getFileAtBranch' );
 const gitCheckout = require( './gitCheckout' );
-const gitFetch = require( './gitFetch' );
+const gitCheckoutDirectory = require( './gitCheckoutDirectory' );
+const gitCloneDirectory = require( './gitCloneDirectory' );
 const gitFirstDivergingCommit = require( './gitFirstDivergingCommit' );
 const gitIsAncestor = require( './gitIsAncestor' );
 const gitPull = require( './gitPull' );
+const gitPullDirectory = require( './gitPullDirectory' );
 const gitRevParse = require( './gitRevParse' );
 const gitTimestamp = require( './gitTimestamp' );
 const gruntCommand = require( './gruntCommand' );
-const npmCommand = require( './npmCommand' );
+const loadJSON = require( './loadJSON' );
+const npmUpdateDirectory = require( './npmUpdateDirectory' );
 const puppeteerLoad = require( './puppeteerLoad' );
 const simMetadata = require( './simMetadata' );
 const simPhetioMetadata = require( './simPhetioMetadata' );
@@ -34,11 +38,11 @@ const withServer = require( './withServer' );
 const assert = require( 'assert' );
 const fs = require( 'fs' );
 const winston = require( 'winston' );
+const _ = require( 'lodash' );
 
 module.exports = ( function() {
 
-  //REVIEW: Rename to 'release-branches'
-  const MAINTENANCE_DIRECTORY = '../.maintenance';
+  const MAINTENANCE_DIRECTORY = '../release-branches';
 
   class ReleaseBranch {
     /**
@@ -174,19 +178,22 @@ module.exports = ( function() {
 
     /**
      * @public
+     *
+     * @returns {ChipperVersion}
+     */
+    getChipperVersion() {
+      const checkoutDirectory = ReleaseBranch.getCheckoutDirectory( this.repo, this.branch );
+
+      return ChipperVersion.getFromPackageJSON(
+        JSON.parse( fs.readFileSync( `${checkoutDirectory}/chipper/package.json`, 'utf8' ) )
+      );
+    }
+
+    /**
+     * @public
      */
     async updateCheckout() {
       winston.info( `updating checkout for ${this.toString()}` );
-
-      //REVIEW: We can avoid thrashing our main copy here (or needing it) by using the maintenance directory checkout
-      //REVIEW: for the repo. We'll somehow have to get it cloned first (worth it?)
-      await gitFetch( this.repo );
-      await gitCheckout( this.repo, this.branch );
-      await gitPull( this.repo );
-      const dependencies = await getDependencies( this.repo );
-      await gitCheckout( this.repo, 'master' );
-
-      //REVIEW: make this more parallelizable (NPM and main copy thrashing)
 
       if ( !fs.existsSync( MAINTENANCE_DIRECTORY ) ) {
         winston.info( `creating directory ${MAINTENANCE_DIRECTORY}` );
@@ -198,54 +205,55 @@ module.exports = ( function() {
         await createDirectory( checkoutDirectory );
       }
 
-      dependencies.babel = { sha: 'master', branch: 'master' };
+      const cloneOrFetch = async repo => {
+        const repoPwd = `${checkoutDirectory}/${repo}`;
+
+        if ( !fs.existsSync( `${checkoutDirectory}/${repo}` ) ) {
+          await gitCloneDirectory( repo, checkoutDirectory );
+        }
+        else {
+          await execute( 'git', [ 'fetch' ], repoPwd );
+        }
+      };
+
+      await cloneOrFetch( this.repo );
+      await gitCheckoutDirectory( this.branch, `${checkoutDirectory}/${this.repo}` );
+      await gitPullDirectory( `${checkoutDirectory}/${this.repo}` );
+      const dependencies = await loadJSON( `${checkoutDirectory}/${this.repo}/dependencies.json` );
+
+      dependencies.babel = { sha: buildLocal.babelBranch, branch: buildLocal.babelBranch };
 
       const dependencyRepos = Object.keys( dependencies ).filter( repo => repo !== 'comment' );
 
       await Promise.all( dependencyRepos.map( async repo => {
         const repoPwd = `${checkoutDirectory}/${repo}`;
 
-        if ( !fs.existsSync( `${checkoutDirectory}/${repo}` ) ) {
-          winston.info( `cloning repo ${repo} in ${checkoutDirectory}` );
-          if ( repo === 'perennial-alias' ) {
-            await execute( 'git', [ 'clone', 'https://github.com/phetsims/perennial.git', repo ], `${checkoutDirectory}` );
-          }
-          else {
-            await execute( 'git', [ 'clone', `https://github.com/phetsims/${repo}.git` ], `${checkoutDirectory}` );
-          }
-        }
-        else {
-          await execute( 'git', [ 'fetch' ], repoPwd );
-        }
+        await cloneOrFetch( repo );
 
-        await execute( 'git', [ 'checkout', dependencies[ repo ].sha ], repoPwd );
+        await gitCheckoutDirectory( dependencies[ repo ].sha, repoPwd );
 
         if ( repo === 'chipper' || repo === 'perennial-alias' || repo === this.repo ) {
           winston.info( `npm ${repo} in ${checkoutDirectory}` );
 
-          //REVIEW: Allow these to lock and be parallelized safely
-          await execute( npmCommand, [ 'prune' ], repoPwd );
-          await execute( npmCommand, [ 'update' ], repoPwd );
+          await npmUpdateDirectory( repoPwd );
         }
       } ) );
     }
 
     /**
      * @public
+     *
+     * @param {Object} [options] - optional parameters for getBuildArguments
      */
-    async build() {
+    async build( options ) {
       const checkoutDirectory = ReleaseBranch.getCheckoutDirectory( this.repo, this.branch );
       const repoDirectory = `${checkoutDirectory}/${this.repo}`;
 
-      const chipperVersion = ChipperVersion.getFromPackageJSON(
-        JSON.parse( fs.readFileSync( `${checkoutDirectory}/chipper/package.json`, 'utf8' ) )
-      );
-
-      const args = getBuildArguments( chipperVersion, {
+      const args = getBuildArguments( this.getChipperVersion(), _.merge( {
         brands: this.brands,
         allHTML: true,
         debugHTML: true
-      } );
+      }, options ) );
 
       winston.info( `building ${checkoutDirectory} with grunt ${args.join( ' ' )}` );
       await execute( gruntCommand, args, repoDirectory );

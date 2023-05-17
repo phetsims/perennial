@@ -6,9 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( './execute' );
-const npmCommand = require( './npmCommand' );
-const winston = require( 'winston' );
+const npmUpdateDirectory = require( './npmUpdateDirectory' );
 
 /**
  * Executes an effective "npm update" (with pruning because it's required).
@@ -18,8 +16,5 @@ const winston = require( 'winston' );
  * @returns {Promise}
  */
 module.exports = async function( repo ) {
-  winston.info( `npm update on ${repo}` );
-
-  await execute( npmCommand, [ 'prune' ], `../${repo}` );
-  await execute( npmCommand, [ 'update' ], `../${repo}` );
+  await npmUpdateDirectory( `../${repo}` );
 };

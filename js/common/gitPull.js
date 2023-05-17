@@ -6,8 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( './execute' );
-const winston = require( 'winston' );
+const gitPullDirectory = require( './gitPullDirectory' );
 
 /**
  * Executes git pull
@@ -17,8 +16,6 @@ const winston = require( 'winston' );
  * @returns {Promise.<string>} - Stdout
  * @rejects {ExecuteError}
  */
-module.exports = function( repo ) {
-  winston.info( `git pull on ${repo}` );
-
-  return execute( 'git', [ 'pull' ], `../${repo}` );
+module.exports = async function( repo ) {
+  await gitPullDirectory( `../${repo}` );
 };
