@@ -20,7 +20,7 @@ binDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 workingDir=${binDir}/../..
 cd ${workingDir} || exit
 
-echo "running daily grunt work. . ."
+echo "TASK - running daily grunt work. . ."
 date
 
 cd perennial || exit
@@ -41,25 +41,25 @@ cd ..
 
 ###########################################################################################################
 # update-copyright-dates
-echo "COPYRIGHT UPDATES:"
+echo "TASK - COPYRIGHT UPDATES:"
 copyrightUpdateCommand="grunt update-copyright-dates && git commit -am 'update copyright dates from daily grunt work' --no-verify && git push"
 perennial/bin/for-each.sh perennial/data/active-repos "${copyrightUpdateCommand}"
 
 ###########################################################################################################
 # report third party
-echo "THIRD PARTY REPORT:"
+echo "TASK - THIRD PARTY REPORT:"
 cd chipper || exit
 grunt report-third-party
 cd ../sherpa || exit
 git pull
-echo "report third party done, potentially committing"
+echo "TASK - report third party done, potentially committing"
 git commit -am "Update third-party-licenses from daily grunt work" --no-verify
 git push
 cd ..
 
 ##########################################################################################################
 # Update responsible dev/designer markdown output
-echo "RESPONSIBLE DEV MARKDOWN:"
+echo "TASK - RESPONSIBLE DEV MARKDOWN:"
 node ./phet-info/sim-info/generateMarkdownOutput.mjs
 cd phet-info || exit
 git commit -am "Update responsible_dev markdown output from daily grunt work" --no-verify
@@ -68,21 +68,21 @@ cd ..
 
 ##########################################################################################################
 # Update perennial/data/ lists, make sure to npm prune and update first see https://github.com/phetsims/perennial/issues/155
-echo "GENERATE DATA LISTS:"
+echo "TASK - GENERATE DATA LISTS:"
 cd perennial || exit
 grunt generate-data
 cd ..
 
 ##########################################################################################################
 # Update perennial/data/ lists, make sure to npm prune and update first see https://github.com/phetsims/perennial/issues/155
-echo "REOPEN ISSUES LINKED IN TODOS:"
+echo "TASK - REOPEN ISSUES LINKED IN TODOS:"
 cd perennial || exit
 grunt reopen-issues-from-todos
 cd ..
 
 ##########################################################################################################
 
-echo "GENERATE DEVELOPMENT STRINGS:"
+echo "TASK - GENERATE DEVELOPMENT STRINGS:"
 perennial/bin/for-each.sh perennial/data/active-repos grunt generate-development-strings
 cd babel || exit
 git add ./_generated_development_strings # cover newly created files
@@ -92,7 +92,7 @@ cd ..
 
 ##########################################################################################################
 
-echo "BUILD SKIFFLE:"
+echo "TASK - BUILD SKIFFLE:"
 cd skiffle || exit
 grunt
 git commit -am "Update skiffle build from daily grunt work" --no-verify
@@ -101,7 +101,7 @@ cd ..
 
 ##########################################################################################################
 
-echo "PUBLISH LATEST PHET_IO LINKS:"
+echo "TASK - PUBLISH LATEST PHET_IO LINKS:"
 cd perennial || exit
 node js/scripts/publish-phet-io-latest-links.js /data/web/htdocs/dev/phet-io/latest
 cd ..
@@ -120,7 +120,7 @@ cd ..
 ###########################################################################################################
 # regenerate documentation
 # Binder is less important, and it also has been known to have a hard failure (rarely). So put it towards the end.
-echo "BINDER DOC:"
+echo "TASK - BINDER DOC:"
 cd binder || exit
 npm prune && npm update
 npm run build
@@ -134,8 +134,8 @@ cd ..
 ##########################################################################################################
 # No grunt work below this point.
 # Final clean up steps, just to be sure
-echo "PUSH ALL CLEANUP:"
+echo "TASK - PUSH ALL CLEANUP:"
 node perennial/js/scripts/pull-all.js
 node perennial/js/scripts/push-all.js
 date
-echo "DAILY GRUNT WORK COMPLETE"
+echo "TASK - DAILY GRUNT WORK COMPLETE"
