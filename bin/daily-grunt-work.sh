@@ -20,7 +20,7 @@ binDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 workingDir=${binDir}/../..
 cd ${workingDir} || exit
 
-echo "TASK - running daily grunt work. . ."
+echo "running daily grunt work. . ."
 date
 
 cd perennial || exit
