@@ -492,4 +492,12 @@ tests.push( {
   queryParameters: 'brand=phet&ea&fuzz&locales=*&secondLocale=es'
 } );
 
+// quadrilateral: tests the public query parameters for configurations that cannot be changed during runtime
+tests.push( {
+  test: [ 'quadrilateral', 'fuzz', 'unbuilt', 'query-parameters' ],
+  type: 'sim-test',
+  url: 'quadrilateral/quadrilateral_en.html',
+  queryParameters: 'brand=phet&ea&fuzz&inheritTrapezoidSound&reducedStepSize'
+} );
+
 console.log( JSON.stringify( tests, null, 2 ) );
