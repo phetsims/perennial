@@ -159,16 +159,17 @@ async function runTask( options ) {
     winston.debug( `Deploying to servers: ${JSON.stringify( servers )}` );
 
     const simDir = ReleaseBranch.getCheckoutDirectory( simName, branch );
+    let sourceDir = `${simDir}/${simName}/build`;
 
     if ( servers.indexOf( constants.DEV_SERVER ) >= 0 ) {
       winston.info( 'deploying to dev' );
       if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
         const htaccessLocation = ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) ?
-                                 `${simDir}/build/phet-io` :
-                                 `${simDir}/build`;
+                                 `${sourceDir}/phet-io` :
+                                 `${sourceDir}`;
         await writePhetioHtaccess( htaccessLocation );
       }
-      await devDeploy( simDir, simName, version, chipperVersion, brands );
+      await devDeploy( simDir, simName, version, chipperVersion, brands, sourceDir );
     }
 
     const localesArray = typeof ( locales ) === 'string' ? locales.split( ',' ) : locales;
@@ -185,7 +186,6 @@ async function runTask( options ) {
         if ( brands.hasOwnProperty( i ) ) {
           const brand = brands[ i ];
           winston.info( `deploying brand: ${brand}` );
-          let sourceDir = `${simDir}/${simName}/build`;
           // Pre-copy steps
           if ( brand === constants.PHET_BRAND ) {
             targetSimDir = constants.HTML_SIMS_DIRECTORY + simName;
@@ -304,7 +304,7 @@ async function runTask( options ) {
         } );
       }
     }
-    await afterDeploy( `${simDir}/build` );
+    await afterDeploy( `${sourceDir}` );
   }
   catch( err ) {
     await abortBuild( err );
