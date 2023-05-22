@@ -146,6 +146,7 @@ async function runTask( options ) {
       await abortBuild( 'Unsupported chipper version' );
     }
 
+    winston.debug( `Building arguments, locales = ${locales}` );
     const buildArguments = getBuildArguments( chipperVersion, {
       clean: false,
       locales: locales,
@@ -153,6 +154,7 @@ async function runTask( options ) {
       lint: false,
       allHTML: !( chipperVersion.major === 0 && chipperVersion.minor === 0 && brands[ 0 ] !== constants.PHET_BRAND )
     } );
+    winston.debug( `Arguments built, buildArguments = ${buildArguments}` );
     await releaseBranch.build( buildArguments );
     winston.debug( 'Build finished.' );
 
