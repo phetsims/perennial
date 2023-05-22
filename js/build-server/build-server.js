@@ -87,7 +87,7 @@ const queueDeployApiVersion1 = ( req, res, key ) => {
   const email = decodeURIComponent( req[ key ][ constants.EMAIL_KEY ] ) || null;
   const translatorId = decodeURIComponent( req[ key ][ constants.USER_ID_KEY ] ) || null;
   const authorizationKey = decodeURIComponent( req[ key ][ constants.AUTHORIZATION_KEY ] );
-  const branch = decodeURIComponent( req[ key ][ constants.BRANCH_KEY ] );
+  const branch = decodeURIComponent( req[ key ][ constants.BRANCH_KEY ] ) || repos[ simName ].branch;
 
   // TODO https://github.com/phetsims/perennial/issues/167 determine if this comment needs updating for chipper 1.0 deploys
   // For RC deploys, only send to the dev server.  For production deploys, the local build will send to the dev server so the build-server

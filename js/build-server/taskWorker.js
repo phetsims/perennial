@@ -1,7 +1,6 @@
 // Copyright 2017-2019, University of Colorado Boulder
 
 
-const ChipperVersion = require( '../common/ChipperVersion' );
 const constants = require( './constants' );
 const createTranslationsXML = require( './createTranslationsXML' );
 const devDeploy = require( './devDeploy' );
@@ -11,17 +10,16 @@ const gitCheckout = require( '../common/gitCheckout' );
 const gitPull = require( '../common/gitPull' );
 const getLocales = require( './getLocales' );
 const notifyServer = require( './notifyServer' );
-const pullMaster = require( './pullMaster' );
 const rsync = require( 'rsync' );
 const SimVersion = require( '../common/SimVersion' );
 const winston = require( 'winston' );
-const writeFile = require( '../common/writeFile' );
 const writePhetHtaccess = require( './writePhetHtaccess' );
 const writePhetioHtaccess = require( '../common/writePhetioHtaccess' );
 const deployImages = require( './deployImages' );
 const persistentQueue = require( './persistentQueue' );
-
-const buildDir = './js/build-server/tmp';
+const ReleaseBranch = require( '../common/ReleaseBranch' );
+const getBuildArguments = require( '../common/getBuildArguments' );
+const loadJSON = require( '../common/loadJSON' );
 
 /**
  * checkout master everywhere and abort build with err
@@ -41,7 +39,6 @@ const abortBuild = async err => {
  */
 const afterDeploy = async buildDir => {
   try {
-    await execute( 'grunt', [ 'checkout-master-all' ], constants.PERENNIAL );
     await execute( 'rm', [ '-rf', buildDir ], '.' );
   }
   catch( err ) {
@@ -90,7 +87,6 @@ async function runTask( options ) {
     // Parse and validate parameters
     //-------------------------------------------------------------------------------------
     const api = options.api;
-    const repos = options.repos;
     let locales = options.locales;
     const simName = options.simName;
     let version = options.version;
@@ -98,48 +94,18 @@ async function runTask( options ) {
     const brands = options.brands;
     const servers = options.servers;
     const userId = options.userId;
-    let branch = options.branch;
+    const branch = options.branch;
 
     if ( userId ) {
       winston.log( 'info', `setting userId = ${userId}` );
     }
 
-    const simNameRegex = /^[a-z-]+$/;
-
-    winston.debug( JSON.stringify( repos ) );
-
     if ( branch === null ) {
-      branch = repos[ simName ].branch;
-    }
-
-    // make sure the repos passed in validates
-    for ( const key in repos ) {
-      if ( repos.hasOwnProperty( key ) ) {
-        winston.log( 'info', `Validating repo: ${key}` );
-
-        // make sure all keys in repos object are valid sim names
-        if ( !simNameRegex.test( key ) ) {
-          await abortBuild( `invalid simName in repos: ${simName}` );
-        }
-
-        const value = repos[ key ];
-        if ( key === 'comment' ) {
-          if ( typeof value !== 'string' ) {
-            await abortBuild( 'invalid comment in repos: should be a string' );
-          }
-        }
-        else if ( value instanceof Object && value.hasOwnProperty( 'sha' ) ) {
-          if ( !/^[a-f0-9]{40}$/.test( value.sha ) ) {
-            await abortBuild( `invalid sha in repos. key: ${key} value: ${value} sha: ${value.sha}` );
-          }
-        }
-        else {
-          await abortBuild( `invalid item in repos. key: ${key} value: ${value}` );
-        }
-      }
+      await abortBuild( 'Branch must be provided.' );
     }
 
     // validate simName
+    const simNameRegex = /^[a-z-]+$/;
     if ( !simNameRegex.test( simName ) ) {
       await abortBuild( `invalid simName ${simName}` );
     }
@@ -166,58 +132,33 @@ async function runTask( options ) {
       }
     }
 
-    const simDir = `../${simName}`;
-    winston.log( 'info', `building sim ${simName}` );
-
-    // Create the temporary build dir, removing the existing dir if it exists.
-    if ( fs.existsSync( buildDir ) ) {
-      await execute( 'rm', [ '-rf', buildDir ], '.' );
-    }
-    await fs.promises.mkdir( buildDir, { recursive: true } );
-
-
-    await writeFile( `${buildDir}/dependencies.json`, JSON.stringify( repos ) );
-    winston.log( 'info', `wrote file ${buildDir}/dependencies.json` );
-
-    await execute( 'git', [ 'pull' ], constants.PERENNIAL );
-    await execute( 'npm', [ 'prune' ], constants.PERENNIAL );
-    await execute( 'npm', [ 'update' ], constants.PERENNIAL );
-    await execute( './perennial/bin/clone-missing-repos.sh', [], '..' );
-    await pullMaster( repos );
-    await execute( 'grunt', [ 'checkout-shas', '--buildServer=true', `--repo=${simName}` ], constants.PERENNIAL );
-    await execute( 'git', [ 'checkout', repos[ simName ].sha ], simDir );
-    await execute( 'npm', [ 'prune' ], '../chipper' );
-    await execute( 'npm', [ 'update' ], '../chipper' );
-    await execute( 'npm', [ 'prune' ], '../perennial-alias' );
-    await execute( 'npm', [ 'update' ], '../perennial-alias' );
-    await execute( 'npm', [ 'prune' ], simDir );
-    await execute( 'npm', [ 'update' ], simDir );
-
     if ( api === '1.0' ) {
       locales = await getLocales( locales, simName );
     }
 
-    const brandLocales = ( brands.indexOf( constants.PHET_BRAND ) >= 0 ) ? locales : 'en';
-    winston.log( 'info', `building for brands: ${brands} version: ${version}` );
+    // Git pull, git checkout, npm prune & update, etc. in parallel directory
+    const releaseBranch = new ReleaseBranch( simName, branch, brands, true );
+    await releaseBranch.updateCheckout();
 
-    const chipperVersion = ChipperVersion.getFromRepository();
+    const chipperVersion = releaseBranch.getChipperVersion();
     winston.debug( `Chipper version detected: ${chipperVersion.toString()}` );
-
-    if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
-      await execute( 'grunt', [ '--allHTML', '--debugHTML', `--brands=${brands.join( ',' )}`, `--locales=${brandLocales}` ], simDir );
-    }
-    else if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ) {
-      const args = [ 'build-for-server', `--brand=${brands[ 0 ]}`, `--locales=${brandLocales}` ];
-      if ( brands[ 0 ] === constants.PHET_BRAND ) {
-        args.push( '--allHTML' );
-      }
-      await execute( 'grunt', args, simDir );
-    }
-    else {
+    if ( !( chipperVersion.major === 2 && chipperVersion.minor === 0 ) && !( chipperVersion.major === 0 && chipperVersion.minor === 0 ) ) {
       await abortBuild( 'Unsupported chipper version' );
     }
 
-    winston.debug( `deploying to servers: ${JSON.stringify( servers )}` );
+    const buildArguments = getBuildArguments( chipperVersion, {
+      clean: false,
+      locales: locales,
+      buildForServer: true,
+      lint: false,
+      allHTML: !( chipperVersion.major === 0 && chipperVersion.minor === 0 && brands[ 0 ] !== constants.PHET_BRAND )
+    } );
+    await releaseBranch.build( buildArguments );
+    winston.debug( 'Build finished.' );
+
+    winston.debug( `Deploying to servers: ${JSON.stringify( servers )}` );
+
+    const simDir = ReleaseBranch.getCheckoutDirectory( simName, branch );
 
     if ( servers.indexOf( constants.DEV_SERVER ) >= 0 ) {
       winston.info( 'deploying to dev' );
@@ -331,7 +272,7 @@ async function runTask( options ) {
             const suffix = originalVersion.split( '-' ).length >= 2 ? originalVersion.split( '-' )[ 1 ] :
                            ( chipperVersion.major < 2 ? 'phetio' : '' );
             const parsedVersion = SimVersion.parse( version, '' );
-            const simPackage = JSON.parse( fs.readFileSync( `${simDir}/package.json` ) );
+            const simPackage = await loadJSON( `${simDir}/package.json` );
             const ignoreForAutomatedMaintenanceReleases = !!( simPackage && simPackage.phet && simPackage.phet.ignoreForAutomatedMaintenanceReleases );
             await notifyServer( {
               simName: simName,
@@ -364,12 +305,11 @@ async function runTask( options ) {
         } );
       }
     }
+    await afterDeploy( `${simDir}/build` );
   }
   catch( err ) {
     await abortBuild( err );
   }
-
-  await afterDeploy();
 }
 
 module.exports = function taskWorker( task, taskCallback ) {
