@@ -230,7 +230,7 @@ async function runTask( options ) {
             }
           }
 
-          let sourceDir = `${simDir}/build`;
+          let sourceDir = `${simDir}/${simName}/build`;
           if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
             sourceDir += `/${brand}`;
           }

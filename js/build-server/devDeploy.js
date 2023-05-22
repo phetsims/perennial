@@ -21,7 +21,7 @@ const host = constants.BUILD_SERVER_CONFIG.devDeployServer;
  *
  * @returns {Promise}
  */
-module.exports = async function( simDir, simName, version, chipperVersion, brands ) {
+module.exports = async function devDeploy( simDir, simName, version, chipperVersion, brands ) {
   const simDirectory = constants.BUILD_SERVER_CONFIG.devDeployPath + simName;
   let versionDirectory = version;
 
@@ -35,7 +35,7 @@ module.exports = async function( simDir, simName, version, chipperVersion, brand
 
     // mkdir first in case it doesn't exist already
     await devSsh( `mkdir -p ${simVersionDirectory}` );
-    const buildDir = `${simDir}/build`;
+    const buildDir = `${simDir}/${simName}/build`;
 
     // copy the files
     if ( brands.includes( constants.PHET_BRAND ) ) {
