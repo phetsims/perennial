@@ -18,7 +18,6 @@ const writePhetioHtaccess = require( '../common/writePhetioHtaccess' );
 const deployImages = require( './deployImages' );
 const persistentQueue = require( './persistentQueue' );
 const ReleaseBranch = require( '../common/ReleaseBranch' );
-const getBuildArguments = require( '../common/getBuildArguments' );
 const loadJSON = require( '../common/loadJSON' );
 
 /**
@@ -146,16 +145,13 @@ async function runTask( options ) {
       await abortBuild( 'Unsupported chipper version' );
     }
 
-    winston.debug( `Building arguments, locales = ${locales}` );
-    const buildArguments = getBuildArguments( chipperVersion, {
+    await releaseBranch.build( {
       clean: false,
       locales: locales,
       buildForServer: true,
       lint: false,
       allHTML: !( chipperVersion.major === 0 && chipperVersion.minor === 0 && brands[ 0 ] !== constants.PHET_BRAND )
     } );
-    winston.debug( `Arguments built, buildArguments = ${buildArguments}` );
-    await releaseBranch.build( buildArguments );
     winston.debug( 'Build finished.' );
 
     winston.debug( `Deploying to servers: ${JSON.stringify( servers )}` );
