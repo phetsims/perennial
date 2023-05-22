@@ -185,7 +185,7 @@ async function runTask( options ) {
         if ( brands.hasOwnProperty( i ) ) {
           const brand = brands[ i ];
           winston.info( `deploying brand: ${brand}` );
-
+          let sourceDir = `${simDir}/${simName}/build`;
           // Pre-copy steps
           if ( brand === constants.PHET_BRAND ) {
             targetSimDir = constants.HTML_SIMS_DIRECTORY + simName;
@@ -193,13 +193,13 @@ async function runTask( options ) {
 
             if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
               // Remove _phet from all filenames in the phet directory
-              const files = fs.readdirSync( `${simDir}/build/phet` );
+              const files = fs.readdirSync( `${sourceDir}/phet` );
               for ( const i in files ) {
                 if ( files.hasOwnProperty( i ) ) {
                   const filename = files[ i ];
                   if ( filename.indexOf( '_phet' ) >= 0 ) {
                     const newFilename = filename.replace( '_phet', '' );
-                    await execute( 'mv', [ filename, newFilename ], `${simDir}/build/phet` );
+                    await execute( 'mv', [ filename, newFilename ], `${sourceDir}/phet` );
                   }
                 }
               }
@@ -230,7 +230,6 @@ async function runTask( options ) {
             }
           }
 
-          let sourceDir = `${simDir}/${simName}/build`;
           if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
             sourceDir += `/${brand}`;
           }
