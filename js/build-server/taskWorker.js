@@ -77,7 +77,6 @@ async function runTask( options ) {
       winston.error( 'Deploy images failed. See previous logs for details.' );
       throw e;
     }
-
   }
 
 
@@ -156,18 +155,19 @@ async function runTask( options ) {
 
     winston.debug( `Deploying to servers: ${JSON.stringify( servers )}` );
 
-    const simDir = ReleaseBranch.getCheckoutDirectory( simName, branch );
-    let sourceDir = `${simDir}/${simName}/build`;
+    const checkoutDir = ReleaseBranch.getCheckoutDirectory( simName, branch );
+    const simRepoDir = `${checkoutDir}/${simName}`;
+    let buildDir = `${simRepoDir}/build`;
 
     if ( servers.indexOf( constants.DEV_SERVER ) >= 0 ) {
       winston.info( 'deploying to dev' );
       if ( brands.indexOf( constants.PHET_IO_BRAND ) >= 0 ) {
         const htaccessLocation = ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) ?
-                                 `${sourceDir}/phet-io` :
-                                 `${sourceDir}`;
+                                 `${buildDir}/phet-io` :
+                                 buildDir;
         await writePhetioHtaccess( htaccessLocation );
       }
-      await devDeploy( simDir, simName, version, chipperVersion, brands, sourceDir );
+      await devDeploy( checkoutDir, simName, version, chipperVersion, brands, buildDir );
     }
 
     const localesArray = typeof ( locales ) === 'string' ? locales.split( ',' ) : locales;
@@ -191,13 +191,14 @@ async function runTask( options ) {
 
             if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
               // Remove _phet from all filenames in the phet directory
-              const files = fs.readdirSync( `${sourceDir}/phet` );
+              const phetBuildDir = `${buildDir}/phet`;
+              const files = fs.readdirSync( phetBuildDir );
               for ( const i in files ) {
                 if ( files.hasOwnProperty( i ) ) {
                   const filename = files[ i ];
                   if ( filename.indexOf( '_phet' ) >= 0 ) {
                     const newFilename = filename.replace( '_phet', '' );
-                    await execute( 'mv', [ filename, newFilename ], `${sourceDir}/phet` );
+                    await execute( 'mv', [ filename, newFilename ], phetBuildDir );
                   }
                 }
               }
@@ -229,15 +230,15 @@ async function runTask( options ) {
           }
 
           if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
-            sourceDir += `/${brand}`;
+            buildDir += `/${brand}`;
           }
           await new Promise( ( resolve, reject ) => {
-            winston.debug( `Copying recursive ${sourceDir} to ${targetVersionDir}` );
+            winston.debug( `Copying recursive ${buildDir} to ${targetVersionDir}` );
             new rsync()
               .flags( 'razpO' )
               .set( 'no-perms' )
               .set( 'exclude', '.rsync-filter' )
-              .source( `${sourceDir}/` )
+              .source( `${buildDir}/` )
               .destination( targetVersionDir )
               .output( stdout => { winston.debug( stdout.toString() ); },
                 stderr => { winston.error( stderr.toString() ); } )
@@ -269,7 +270,7 @@ async function runTask( options ) {
             const suffix = originalVersion.split( '-' ).length >= 2 ? originalVersion.split( '-' )[ 1 ] :
                            ( chipperVersion.major < 2 ? 'phetio' : '' );
             const parsedVersion = SimVersion.parse( version, '' );
-            const simPackage = await loadJSON( `${simDir}/package.json` );
+            const simPackage = await loadJSON( `${simRepoDir}/package.json` );
             const ignoreForAutomatedMaintenanceReleases = !!( simPackage && simPackage.phet && simPackage.phet.ignoreForAutomatedMaintenanceReleases );
             await notifyServer( {
               simName: simName,
@@ -302,7 +303,7 @@ async function runTask( options ) {
         } );
       }
     }
-    await afterDeploy( `${sourceDir}` );
+    await afterDeploy( `${buildDir}` );
   }
   catch( err ) {
     await abortBuild( err );
