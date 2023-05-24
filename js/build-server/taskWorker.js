@@ -21,20 +21,18 @@ const ReleaseBranch = require( '../common/ReleaseBranch' );
 const loadJSON = require( '../common/loadJSON' );
 
 /**
- * checkout master everywhere and abort build with err
+ * Abort build with err
  * @param {String|Error} err - error logged and sent via email
  */
 const abortBuild = async err => {
   winston.log( 'error', `BUILD ABORTED! ${err}` );
   err.stack && winston.log( 'error', err.stack );
 
-  winston.log( 'info', 'build aborted: checking out master for every repo in case build shas are still checked out' );
-  await execute( 'grunt', [ 'checkout-master-all' ], constants.PERENNIAL );
   throw new Error( `Build aborted, ${err}` );
 };
 
 /**
- * Clean up after deploy. Checkout master for every repo and remove tmp dir.
+ * Clean up after deploy. Remove tmp dir.
  */
 const afterDeploy = async buildDir => {
   try {
@@ -92,7 +90,7 @@ async function runTask( options ) {
     const brands = options.brands;
     const servers = options.servers;
     const userId = options.userId;
-    const branch = options.branch;
+    const branch = options.branch || version.match( /^(\d+\.\d+)/ )[ 0 ];
 
     if ( userId ) {
       winston.log( 'info', `setting userId = ${userId}` );
