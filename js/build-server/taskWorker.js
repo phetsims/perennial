@@ -155,7 +155,7 @@ async function runTask( options ) {
 
     const checkoutDir = ReleaseBranch.getCheckoutDirectory( simName, branch );
     const simRepoDir = `${checkoutDir}/${simName}`;
-    let buildDir = `${simRepoDir}/build`;
+    const buildDir = `${simRepoDir}/build`;
 
     if ( servers.indexOf( constants.DEV_SERVER ) >= 0 ) {
       winston.info( 'deploying to dev' );
@@ -226,17 +226,17 @@ async function runTask( options ) {
               throw err;
             }
           }
-
+          let sourceDir = buildDir;
           if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
-            buildDir += `/${brand}`;
+            sourceDir += `/${brand}`;
           }
           await new Promise( ( resolve, reject ) => {
-            winston.debug( `Copying recursive ${buildDir} to ${targetVersionDir}` );
+            winston.debug( `Copying recursive ${sourceDir} to ${targetVersionDir}` );
             new rsync()
               .flags( 'razpO' )
               .set( 'no-perms' )
               .set( 'exclude', '.rsync-filter' )
-              .source( `${buildDir}/` )
+              .source( `${sourceDir}/` )
               .destination( targetVersionDir )
               .output( stdout => { winston.debug( stdout.toString() ); },
                 stderr => { winston.error( stderr.toString() ); } )
