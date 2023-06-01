@@ -20,6 +20,12 @@ const phetioNoState = getRepoList( 'phet-io-state-unsupported' );
 const unitTestRepos = getRepoList( 'unit-tests' );
 const voicingRepos = getRepoList( 'voicing' );
 
+// repos to not test multitouch fuzzing
+const REPOS_EXCLUDED_FROM_MULTITOUCH_FUZZING = [
+  'number-compare',
+  'number-play'
+];
+
 /**
  * {Array.<Object>} test
  * {string} type
@@ -103,20 +109,23 @@ runnableRepos.forEach( repo => {
     priority: 0.3
   } );
 
-  tests.push( {
-    test: [ repo, 'multitouch-fuzz', 'unbuilt' ],
-    type: 'sim-test',
-    url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzz&fuzzPointers=2&supportsPanAndZoom=false'
-  } );
+  // don't test select repos for fuzzPointers=2
+  if ( !REPOS_EXCLUDED_FROM_MULTITOUCH_FUZZING.includes( repo ) ) {
+    tests.push( {
+      test: [ repo, 'multitouch-fuzz', 'unbuilt' ],
+      type: 'sim-test',
+      url: `${repo}/${repo}_en.html`,
+      queryParameters: 'brand=phet&ea&fuzz&fuzzPointers=2&supportsPanAndZoom=false'
+    } );
 
-  tests.push( {
-    test: [ repo, 'pan-and-zoom-fuzz', 'unbuilt' ],
-    type: 'sim-test',
-    url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzz&fuzzPointers=2&supportsPanAndZoom=true',
-    priority: 0.5 // test this when there isn't other work to be done
-  } );
+    tests.push( {
+      test: [ repo, 'pan-and-zoom-fuzz', 'unbuilt' ],
+      type: 'sim-test',
+      url: `${repo}/${repo}_en.html`,
+      queryParameters: 'brand=phet&ea&fuzz&fuzzPointers=2&supportsPanAndZoom=true',
+      priority: 0.5 // test this when there isn't other work to be done
+    } );
+  }
 
   tests.push( {
     test: [ repo, 'fuzz', 'built' ],
