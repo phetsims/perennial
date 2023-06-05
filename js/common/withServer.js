@@ -51,7 +51,8 @@ module.exports = function( asyncCallback, options ) {
 
         // needed to be added to support PhET sims.
         svg: 'image/svg+xml',
-        json: 'application/json'
+        json: 'application/json',
+        ico: 'image/x-icon'
       };
       const fileExtension = fullPath.split( '.' ).pop();
       let mimeType = mimeTypes[ fileExtension ];
