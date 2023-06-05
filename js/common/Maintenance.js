@@ -460,10 +460,13 @@ module.exports = ( function() {
      * @param {function(ReleaseBranch):Promise.<boolean>} filter
      */
     static async addNeededPatches( patchName, filter ) {
+
+      // getMaintenanceBranches needs to cache its branches and maintenance.save() them, so do it before loading
+      // Maintenance for this function.
+      const releaseBranches = await Maintenance.getMaintenanceBranches();
       const maintenance = Maintenance.load();
 
       const patch = maintenance.findPatch( patchName );
-      const releaseBranches = await Maintenance.getMaintenanceBranches();
 
       for ( const releaseBranch of releaseBranches ) {
         const needsPatch = await filter( releaseBranch );
@@ -1053,6 +1056,9 @@ module.exports = ( function() {
     }
 
     /**
+     * The prototype copy of Maintenance.getMaintenanceBranches(), in which we will mutate the class's allReleaseBranches
+     * to ensure there is no save/load order dependency problems.
+     *
      * @public
      * TODO: remove the second param? https://github.com/phetsims/perennial/issues/318
      * @param {function(ReleaseBranch):boolean} filterRepo - return false if the ReleaseBranch should be excluded.
@@ -1061,8 +1067,23 @@ module.exports = ( function() {
      * @returns {Promise.<Array.<ReleaseBranch>>}
      * @rejects {ExecuteError}
      */
-    static async getMaintenanceBranches( filterRepo = () => true, checkUnreleasedBranches = true, forceCacheBreak = false ) {
-      const releaseBranches = await Maintenance.loadAllMaintenanceBranches( forceCacheBreak );
+    async getMaintenanceBranches( filterRepo = () => true, checkUnreleasedBranches = true, forceCacheBreak = false ) {
+      return Maintenance.getMaintenanceBranches( filterRepo, checkUnreleasedBranches, forceCacheBreak, this );
+    }
+
+    /**
+     * @public
+     * TODO: remove the second param? https://github.com/phetsims/perennial/issues/318
+     * @param {function(ReleaseBranch):boolean} filterRepo - return false if the ReleaseBranch should be excluded.
+     * @param {function} checkUnreleasedBranches - If false, will skip checking for unreleased branches. This checking needs all repos checked out
+     * @param {boolean} forceCacheBreak=false - true if you want to force a recalculation of all ReleaseBranches
+     @param {Maintenance} maintenance=Maintenance.load() - by default load from saved file the current maintenance instance.
+     * @returns {Promise.<Array.<ReleaseBranch>>}
+     * @rejects {ExecuteError}
+     */
+    static async getMaintenanceBranches( filterRepo = () => true, checkUnreleasedBranches = true,
+                                         forceCacheBreak = false, maintenance = Maintenance.load() ) {
+      const releaseBranches = await Maintenance.loadAllMaintenanceBranches( forceCacheBreak, maintenance );
 
       return releaseBranches.filter( releaseBranch => {
         if ( !checkUnreleasedBranches && !releaseBranch.isReleased ) {
@@ -1080,10 +1101,9 @@ module.exports = ( function() {
      * Call this with true to break the cache and force a recalculation of all ReleaseBranches
      *
      * @param {boolean} forceCacheBreak=false - true if you want to force a recalculation of all ReleaseBranches
-     * @returns {Promise<ReleaseBranch[]>}
+     * @param {Maintenance} maintenance=Maintenance.load() - by default load from saved file the current maintenance instance.     * @returns {Promise<ReleaseBranch[]>}
      */
-    static async loadAllMaintenanceBranches( forceCacheBreak = false ) {
-      const maintenance = Maintenance.load();
+    static async loadAllMaintenanceBranches( forceCacheBreak = false, maintenance = Maintenance.load() ) {
 
       let releaseBranches = null;
       if ( maintenance.allReleaseBranches.length > 0 && !forceCacheBreak ) {
@@ -1267,7 +1287,9 @@ module.exports = ( function() {
         if ( errorIfMissing ) {
           throw new Error( `Could not find a tracked modified branch for ${repo} ${branch}` );
         }
-        releaseBranches = releaseBranches || await Maintenance.getMaintenanceBranches( releaseBranch => releaseBranch.repo === repo );
+
+        // Use the instance version of getMaintenanceBranches to make sure that this Maintenance instance is updated with new ReleaseBranches.
+        releaseBranches = releaseBranches || await this.getMaintenanceBranches( releaseBranch => releaseBranch.repo === repo );
         const releaseBranch = releaseBranches.find( release => release.repo === repo && release.branch === branch );
         assert( releaseBranch, `Could not find a release branch for repo=${repo} branch=${branch}` );
 
