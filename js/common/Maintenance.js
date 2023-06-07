@@ -1060,7 +1060,6 @@ module.exports = ( function() {
      * to ensure there is no save/load order dependency problems.
      *
      * @public
-     * TODO: remove the second param? https://github.com/phetsims/perennial/issues/318
      * @param {function(ReleaseBranch):boolean} filterRepo - return false if the ReleaseBranch should be excluded.
      * @param {function} checkUnreleasedBranches - If false, will skip checking for unreleased branches. This checking needs all repos checked out
      * @param {boolean} forceCacheBreak=false - true if you want to force a recalculation of all ReleaseBranches
@@ -1073,7 +1072,6 @@ module.exports = ( function() {
 
     /**
      * @public
-     * TODO: remove the second param? https://github.com/phetsims/perennial/issues/318
      * @param {function(ReleaseBranch):boolean} filterRepo - return false if the ReleaseBranch should be excluded.
      * @param {function} checkUnreleasedBranches - If false, will skip checking for unreleased branches. This checking needs all repos checked out
      * @param {boolean} forceCacheBreak=false - true if you want to force a recalculation of all ReleaseBranches
