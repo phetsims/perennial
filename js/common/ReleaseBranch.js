@@ -7,7 +7,9 @@
  */
 
 const buildLocal = require( './buildLocal' );
+const buildServerRequest = require( './buildServerRequest' );
 const ChipperVersion = require( './ChipperVersion' );
+const checkoutMaster = require( './checkoutMaster' );
 const checkoutTarget = require( './checkoutTarget' );
 const createDirectory = require( './createDirectory' );
 const execute = require( './execute' );
@@ -19,6 +21,7 @@ const getDependencies = require( './getDependencies' );
 const getBranchMap = require( './getBranchMap' );
 const getBranchVersion = require( './getBranchVersion' );
 const getFileAtBranch = require( './getFileAtBranch' );
+const getRepoVersion = require( './getRepoVersion' );
 const gitCheckout = require( './gitCheckout' );
 const gitCheckoutDirectory = require( './gitCheckoutDirectory' );
 const gitCloneDirectory = require( './gitCloneDirectory' );
@@ -641,6 +644,30 @@ module.exports = ( function() {
       }
 
       return false;
+    }
+
+    /**
+     * Re-runs a production deploy for a specific branch.
+     * @public
+     */
+    async redeployProduction( locales = '*' ) {
+      if ( this.isReleased ) {
+        await checkoutTarget( this.repo, this.branch, false );
+
+        const version = await getRepoVersion( this.repo );
+        const dependencies = await getDependencies( this.repo );
+
+        await checkoutMaster( this.repo, false );
+
+        await buildServerRequest( this.repo, version, this.branch, dependencies, {
+          locales: locales,
+          brands: this.brands,
+          servers: [ 'production' ]
+        } );
+      }
+      else {
+        throw new Error( 'Should not redeploy a non-released branch' );
+      }
     }
 
     /**
