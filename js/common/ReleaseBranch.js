@@ -232,6 +232,12 @@ module.exports = ( function() {
 
         await gitCheckoutDirectory( dependencies[ repo ].sha, repoPwd );
 
+        // Pull babel, since we don't give it a specific SHA (just a branch),
+        // see https://github.com/phetsims/perennial/issues/326
+        if ( repo === 'babel' ) {
+          await gitPullDirectory( repoPwd );
+        }
+
         if ( repo === 'chipper' || repo === 'perennial-alias' || repo === this.repo ) {
           winston.info( `npm ${repo} in ${checkoutDirectory}` );
 
