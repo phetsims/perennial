@@ -27,6 +27,10 @@ To tail a specific number of lines (e.g. 500): `sudo journalctl -u build-server 
 
 Pressing Shift+F will scroll to the end (navigation is `less`-like).
 
+## Checking Deploy Status
+
+Visit https://phet.colorado.edu/deploy-status, it will show the current build and deploy queue/status. Refresh as needed
+
 ## Build Server Configuration
 
 The "dev server" is currently `bayes.colorado.edu`. The "production server" is currently `phet-server2.colorado.edu`
