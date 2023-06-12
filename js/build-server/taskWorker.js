@@ -255,7 +255,7 @@ async function runTask( options ) {
           // Post-copy steps
           if ( brand === constants.PHET_BRAND ) {
             await writePhetHtaccess( simName, version );
-            await createTranslationsXML( simName, version );
+            await createTranslationsXML( simName, version, checkoutDir );
             await notifyServer( {
               simName: simName,
               email: email,

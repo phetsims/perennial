@@ -12,15 +12,16 @@ const parseScreenNames = require( './parseScreenNames' );
  * translations exist for a given sim. It is used by the "synchronize" method in Project.java in the website code.
  * @param simName
  * @param version
+ * @param checkoutDir
  */
-module.exports = async function( simName, version ) {
-  const rootdir = `../babel/${simName}`;
+module.exports = async function( simName, version, checkoutDir ) {
+  const translatedStringFilesDir = `${checkoutDir}/babel/${simName}`;
   const englishStringsFile = `${simName}-strings_en.json`;
   const stringFiles = [ { name: englishStringsFile, locale: constants.ENGLISH_LOCALE } ];
 
   // pull all the string filenames and locales from babel and store in stringFiles array
   try {
-    const files = fs.readdirSync( rootdir );
+    const files = fs.readdirSync( translatedStringFilesDir );
     for ( let i = 0; i < files.length; i++ ) {
       const filename = files[ i ];
       const firstUnderscoreIndex = filename.indexOf( '_' );
@@ -39,7 +40,7 @@ module.exports = async function( simName, version ) {
   // try opening the english strings file so we can read the english strings
   let englishStrings;
   try {
-    englishStrings = JSON.parse( fs.readFileSync( `../${simName}/${englishStringsFile}`, { encoding: 'utf-8' } ) );
+    englishStrings = JSON.parse( fs.readFileSync( `${checkoutDir}/${simName}/${englishStringsFile}`, { encoding: 'utf-8' } ) );
   }
   catch( e ) {
     throw new Error( 'English strings file not found' );
@@ -58,7 +59,7 @@ module.exports = async function( simName, version ) {
   for ( let j = 0; j < stringFiles.length; j++ ) {
     const stringFile = stringFiles[ j ];
     const languageJSON = ( stringFile.locale === constants.ENGLISH_LOCALE ) ? englishStrings :
-                         JSON.parse( fs.readFileSync( `../babel/${simName}/${stringFile.name}`, { encoding: 'utf-8' } ) );
+                         JSON.parse( fs.readFileSync( `${translatedStringFilesDir}/${stringFile.name}`, { encoding: 'utf-8' } ) );
 
     const simHTML = `${constants.HTML_SIMS_DIRECTORY + simName}/${version}/${simName}_${stringFile.locale}.html`;
 
