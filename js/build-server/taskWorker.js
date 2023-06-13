@@ -286,7 +286,8 @@ async function runTask( options ) {
             await writePhetioHtaccess( targetVersionDir, {
               simName: simName,
               version: originalVersion,
-              directory: constants.PHET_IO_SIMS_DIRECTORY
+              directory: constants.PHET_IO_SIMS_DIRECTORY,
+              checkoutDir: checkoutDir
             } );
           }
         }
