@@ -78,9 +78,10 @@ AuthUserFile ${authFilepath}
 </LimitExcept>
 `;
 
-    const passwordProtectWrapperContents = `${basePasswordProtectContents}\n
-          
-# Uncomment these lines to support public access to this "wrappers/" directory
+    const passwordProtectWrapperContents = `${basePasswordProtectContents}
+
+# Editing these directly is not supported and will be overwritten by maintenance releases. Please change by modifying 
+# the sim's package.json allowPublicAccess flag followed by a re-deploy.
 ${commentSymbol} Satisfy Any
 ${commentSymbol} Allow from all
 `;
@@ -107,7 +108,8 @@ ${commentSymbol} Allow from all
         basePasswordProtectContents
       }</FilesMatch>
                         
-# Uncomment these lines to support public access to all resources in this version (including wrappers)
+# Editing these directly is not supported and will be overwritten by maintenance releases. Please change by modifying 
+# the sim's package.json allowPublicAccess flag followed by a re-deploy.
 ${commentSymbol} Satisfy Any
 ${commentSymbol} Allow from all
 `;
