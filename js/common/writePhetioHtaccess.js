@@ -104,7 +104,7 @@ ${commentSymbol} Allow from all
 
     // Write a file to add authentication to the top level index pages
     if ( phetioPackage.phet && phetioPackage.phet.addRootHTAccessFile ) {
-      const passwordProtectIndexContents = `<FilesMatch "(index\\.\\w+|api\\.json)$">\n${
+      const passwordProtectIndexContents = `<FilesMatch "(index\\.\\w+)$">\n${
         basePasswordProtectContents
       }</FilesMatch>
                         
