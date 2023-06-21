@@ -38,7 +38,7 @@ const parseScreenNamesAllSimulations = async () => {
     const simName = simulation.name;
     const locales = Object.keys( simulation.localizedSimulations );
     await gitCheckout( simName, `${project.version.major}.${project.version.minor}` );
-    screenNameObject[ simName ] = await parseScreenNamesFromSimulation( simName, locales, '..');
+    screenNameObject[ simName ] = await parseScreenNamesFromSimulation( simName, locales, '..' );
     await gitCheckout( simName, 'master' );
   }
 
