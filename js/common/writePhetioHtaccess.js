@@ -14,16 +14,24 @@ const PASSWORD_PROTECTED_SUB_DIRS = [ 'wrappers', 'doc' ];
 /**
  * Writes the htaccess file to password protect the exclusive content for phet-io sims
  * @param {string} passwordProtectPath - deployment location, with no trailing slash
- * @param {{simName:string, version:string, directory:string, checkoutDir: string}|null} [latestOption]
- *      if provided, then we are publishing to production. We then write the /latest/ redirect .htaccess file.
+ * @param {
+ *  {
+ *    [simName]:string,
+ *    [version]:string,
+ *    [directory]:string,
+ *    checkoutDir: string,
+ *    isProductionDeploy: boolean
+ *  } | null } [latestOption]
+ *      if isProductionDeploy is true, then we are publishing to production. We then write the /latest/ redirect .htaccess file.
  *      This is only to be used for production deploys by the build-server. directory is the write destination.
  *      checkoutDir is where the release branch repos live locally.
+ *      simName, version, and directory are required if isProductionDeploy is true
  * @param {string} [devVersionPath] - if provided, scp the htaccess files to here, relatively
  */
 module.exports = async function writePhetioHtaccess( passwordProtectPath, latestOption, devVersionPath ) {
   const authFilepath = '/etc/httpd/conf/phet-io_pw';
 
-  const isProductionDeploy = !!latestOption;
+  const isProductionDeploy = latestOption?.isProductionDeploy;
 
   // This option is for production deploys by the build-server
   // If we are provided a simName and version then write a .htaccess file to redirect
@@ -100,7 +108,7 @@ ${commentSymbol} Allow from all
       }
     }
 
-    const phetioParentDir = isProductionDeploy ? latestOption.checkoutDir : '..';
+    const phetioParentDir = latestOption.checkoutDir || '..';
     const phetioPackage = JSON.parse( fs.readFileSync( `${phetioParentDir}/phet-io/package.json` ) );
 
     // Write a file to add authentication to the top level index pages

@@ -156,7 +156,10 @@ async function runTask( options ) {
         const htaccessLocation = ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) ?
                                  `${buildDir}/phet-io` :
                                  buildDir;
-        await writePhetioHtaccess( htaccessLocation );
+        await writePhetioHtaccess( htaccessLocation, {
+          checkoutDir: checkoutDir,
+          isProductionDeploy: false
+        } );
       }
       await devDeploy( checkoutDir, simName, version, chipperVersion, brands, buildDir );
     }
@@ -280,7 +283,8 @@ async function runTask( options ) {
               simName: simName,
               version: originalVersion,
               directory: constants.PHET_IO_SIMS_DIRECTORY,
-              checkoutDir: checkoutDir
+              checkoutDir: checkoutDir,
+              isProductionDeploy: true
             } );
           }
         }
