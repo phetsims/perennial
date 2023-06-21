@@ -100,7 +100,8 @@ ${commentSymbol} Allow from all
       }
     }
 
-    const phetioPackage = JSON.parse( fs.readFileSync( '../phet-io/package.json' ) );
+    const phetioParentDir = isProductionDeploy ? latestOption.checkoutDir : '..';
+    const phetioPackage = JSON.parse( fs.readFileSync( `${phetioParentDir}/phet-io/package.json` ) );
 
     // Write a file to add authentication to the top level index pages
     if ( phetioPackage.phet && phetioPackage.phet.addRootHTAccessFile ) {
