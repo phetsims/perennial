@@ -510,11 +510,10 @@ tests.push( {
 } );
 
 tests.push( {
-  test: [ 'molecule-polarity', 'migration', '1.2', 'master' ],
+  test: [ 'molecule-polarity', 'migration', '1.2->master' ],
   type: 'wrapper-test',
   url: 'phet-io-wrapper/migration/index.html',
-  queryParameters: 'sim=molecule-polarity&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=1.2&migrationRate=2000',
-  testQueryParameters: 'duration=20000&failIfNoLoad'
+  queryParameters: 'sim=molecule-polarity&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=1.2&migrationRate=1000&silent'
 } );
 
 console.log( JSON.stringify( tests, null, 2 ) );
