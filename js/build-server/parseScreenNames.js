@@ -1,7 +1,7 @@
 // Copyright 2021, University of Colorado Boulder
 
 const axios = require( 'axios' );
-const getFullStringMap = require( '../common/getFullStringMap' );
+const getFullStringMap = require( './getFullStringMap' );
 const loadJSON = require( '../common/loadJSON' );
 const gitCheckout = require( '../common/gitCheckout' );
 
@@ -10,12 +10,13 @@ const gitCheckout = require( '../common/gitCheckout' );
  *
  * @param {string} simName
  * @param {string[]} locales - a list of locale codes
+ * @param {string} checkoutDir
  * @returns {Promise.<{}>}
  */
-const parseScreenNamesFromSimulation = async ( simName, locales ) => {
+const parseScreenNamesFromSimulation = async ( simName, locales, checkoutDir ) => {
 
-  const stringMap = await getFullStringMap( simName );
-  const packageObject = await loadJSON( `../${simName}/package.json` );
+  const stringMap = await getFullStringMap( simName, checkoutDir );
+  const packageObject = await loadJSON( `${checkoutDir}/${simName}/package.json` );
   const screenNameKeys = packageObject.phet.screenNameKeys || [];
 
   const result = {};
@@ -37,7 +38,7 @@ const parseScreenNamesAllSimulations = async () => {
     const simName = simulation.name;
     const locales = Object.keys( simulation.localizedSimulations );
     await gitCheckout( simName, `${project.version.major}.${project.version.minor}` );
-    screenNameObject[ simName ] = await parseScreenNamesFromSimulation( simName, locales );
+    screenNameObject[ simName ] = await parseScreenNamesFromSimulation( simName, locales, '..');
     await gitCheckout( simName, 'master' );
   }
 
@@ -45,6 +46,6 @@ const parseScreenNamesAllSimulations = async () => {
 };
 
 module.exports = {
-  parseScreenNames: async ( simName, locales ) => parseScreenNamesFromSimulation( simName, locales ),
+  parseScreenNames: async ( simName, locales, checkoutDir ) => parseScreenNamesFromSimulation( simName, locales, checkoutDir ),
   parseScreenNamesAllSimulations: parseScreenNamesAllSimulations
 };

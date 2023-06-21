@@ -54,7 +54,7 @@ module.exports = async function( simName, version, checkoutDir ) {
   // create xml, making a simulation tag for each language
   let finalXML = `<?xml version="1.0" encoding="utf-8" ?>\n<project name="${simName}">\n<simulations>`;
 
-  const screenNames = await parseScreenNames.parseScreenNames( simName, stringFiles.map( f => f.locale ) );
+  const screenNames = await parseScreenNames.parseScreenNames( simName, stringFiles.map( f => f.locale ), checkoutDir );
 
   for ( let j = 0; j < stringFiles.length; j++ ) {
     const stringFile = stringFiles[ j ];

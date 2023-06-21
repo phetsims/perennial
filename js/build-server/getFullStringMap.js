@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const getDependencyRepos = require( './getDependencyRepos' );
+const getDependencyRepos = require( '../common/getDependencyRepos' );
 const getRepoStringMap = require( './getRepoStringMap' );
 
 /**
@@ -14,14 +14,15 @@ const getRepoStringMap = require( './getRepoStringMap' );
  * @public
  *
  * @param {string} repo - The repository name
+ * @param {string} checkoutDir
  * @returns {Promise.<stringMap[ stringKey ][ locale ]>}
  */
-module.exports = async function( repo ) {
+module.exports = async function getFullStringMap( repo, checkoutDir ) {
 
   let result = {};
 
-  for ( const dependencyRepo of await getDependencyRepos( repo ) ) {
-    result = { ...result, ...await getRepoStringMap( dependencyRepo ) };
+  for ( const dependencyRepo of await getDependencyRepos( repo, { cwd: checkoutDir } ) ) {
+    result = { ...result, ...await getRepoStringMap( dependencyRepo, checkoutDir ) };
   }
 
   return result;

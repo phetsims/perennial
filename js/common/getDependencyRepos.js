@@ -14,11 +14,14 @@ const winston = require( 'winston' );
  * @public
  *
  * @param {string} repo - The repository name
+ * @param {Object} [options]
  * @returns {Promise} - Resolves to the list of repos in the dependencies.json of the provided repo
  */
-module.exports = async function getDependencyRepos( repo ) {
+module.exports = async function getDependencyRepos( repo, options ) {
   winston.info( `getting dependencies.json for ${repo}` );
 
-  const json = await loadJSON( `../${repo}/dependencies.json` );
+  const { cwd = '..' } = options || {};
+
+  const json = await loadJSON( `${cwd}/${repo}/dependencies.json` );
   return Object.keys( json ).filter( key => key !== 'comment' );
 };
