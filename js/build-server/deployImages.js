@@ -5,7 +5,6 @@ const gitCheckoutDirectory = require( '../common/gitCheckoutDirectory' );
 const gitCloneOrFetchDirectory = require( '../common/gitCloneOrFetchDirectory' );
 const gitPullDirectory = require( '../common/gitPullDirectory' );
 const constants = require( './constants' );
-const child_process = require( 'child_process' );
 const fs = require( 'fs' );
 const axios = require( 'axios' );
 
@@ -18,9 +17,9 @@ const processSim = async ( simulation, brands, version ) => {
   const repoDir = `${imagesReposDir}/${simulation}`;
 
   // Get master
-  console.log( 'running `git checkout master && git pull`' );
-  child_process.execSync( 'git checkout master && git pull', { cwd: repoDir } );
-  console.log( 'finished running `git checkout master && git pull`' );
+  await gitCloneOrFetchDirectory( simulation, imagesReposDir );
+  await gitCheckoutDirectory( 'master', repoDir );
+  await gitPullDirectory( repoDir );
 
   let brandsArray;
   let brandsString;
