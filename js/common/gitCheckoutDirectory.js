@@ -19,7 +19,7 @@ const winston = require( 'winston' );
  * @returns {Promise.<string>} - Stdout
  * @rejects {ExecuteError}
  */
-module.exports = function( target, directory ) {
+module.exports = function gitCheckoutDirectory( target, directory ) {
   assert( typeof target === 'string' );
   assert( typeof directory === 'string' );
 

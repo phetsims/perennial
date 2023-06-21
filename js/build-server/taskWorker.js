@@ -6,8 +6,6 @@ const createTranslationsXML = require( './createTranslationsXML' );
 const devDeploy = require( './devDeploy' );
 const execute = require( '../common/execute' );
 const fs = require( 'fs' );
-const gitCheckout = require( '../common/gitCheckout' );
-const gitPull = require( '../common/gitPull' );
 const getLocales = require( './getLocales' );
 const notifyServer = require( './notifyServer' );
 const rsync = require( 'rsync' );
@@ -63,11 +61,6 @@ async function runTask( options ) {
   if ( options.deployImages ) {
     try {
       await deployImages( options );
-      await gitCheckout( 'chipper', 'master' );
-      await gitPull( 'chipper' );
-      await gitCheckout( 'perennial-alias', 'master' );
-      await gitPull( 'perennial-alias' );
-      winston.info( 'Deploy images completed successfully.' );
       return;
     }
     catch( e ) {
@@ -295,7 +288,6 @@ async function runTask( options ) {
 
       if ( !isTranslationRequest ) {
         await deployImages( {
-          branch: 'master', // chipper branch, always deploy images from master
           simulation: options.simName,
           brands: options.brands,
           version: options.version

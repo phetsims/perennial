@@ -1,20 +1,21 @@
 // Copyright 2020, University of Colorado Boulder
 
 const execute = require( '../common/execute' );
-const gitCheckout = require( '../common/gitCheckout' );
-const gitPull = require( '../common/gitPull' );
+const gitCheckoutDirectory = require( '../common/gitCheckoutDirectory' );
+const gitCloneOrFetchDirectory = require( '../common/gitCloneOrFetchDirectory' );
+const gitPullDirectory = require( '../common/gitPullDirectory' );
 const constants = require( './constants' );
 const child_process = require( 'child_process' );
 const fs = require( 'fs' );
 const axios = require( 'axios' );
-const assert = require( 'assert' );
 
-const chipperDir = '../chipper';
-const perennialAliasDir = '../perennial-alias';
+const imagesReposDir = '../images-repos';
+const chipperDir = `${imagesReposDir}/chipper`;
+const perennialAliasDir = `${imagesReposDir}/perennial-alias`;
 
 const processSim = async ( simulation, brands, version ) => {
 
-  const repoDir = `../${simulation}`;
+  const repoDir = `${imagesReposDir}/${simulation}`;
 
   // Get master
   console.log( 'running `git checkout master && git pull`' );
@@ -61,25 +62,28 @@ const processSim = async ( simulation, brands, version ) => {
     }
   }
 };
+
+const updateRepoDir = async ( repo, dir ) => {
+  await gitCloneOrFetchDirectory( repo, imagesReposDir );
+  await gitCheckoutDirectory( 'master', dir );
+  await gitPullDirectory( dir );
+  await execute( 'npm', [ 'prune' ], dir );
+  await execute( 'npm', [ 'update' ], dir );
+};
+
 /**
  * This task deploys all image assets from the master branch to the latest version of all published sims.
  *
  * @param options
  */
 const deployImages = async options => {
-  console.log( `deploying images with branch ${options.branch}, brands ${options.brands}` );
-  if ( options.branch ) {
-    assert( options.branch === 'master', 'deployImages should be run on master branch' );
-    await gitCheckout( 'chipper', options.branch );
-    await gitPull( 'chipper' );
-    await execute( 'npm', [ 'prune' ], chipperDir );
-    await execute( 'npm', [ 'update' ], chipperDir );
-
-    await gitCheckout( 'perennial-alias', options.branch );
-    await gitPull( 'perennial-alias' );
-    await execute( 'npm', [ 'prune' ], perennialAliasDir );
-    await execute( 'npm', [ 'update' ], perennialAliasDir );
+  console.log( `deploying images with brands ${options.brands}` );
+  if ( !fs.existsSync( imagesReposDir ) ) {
+    await execute( 'mkdir', [ imagesReposDir ], '.' );
   }
+
+  await updateRepoDir( 'chipper', chipperDir );
+  await updateRepoDir( 'perennial-alias', perennialAliasDir );
 
   if ( options.simulation && options.version ) {
     await processSim( options.simulation, options.brands, options.version );

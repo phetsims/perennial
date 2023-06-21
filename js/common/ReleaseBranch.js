@@ -24,7 +24,7 @@ const getFileAtBranch = require( './getFileAtBranch' );
 const getRepoVersion = require( './getRepoVersion' );
 const gitCheckout = require( './gitCheckout' );
 const gitCheckoutDirectory = require( './gitCheckoutDirectory' );
-const gitCloneDirectory = require( './gitCloneDirectory' );
+const gitCloneOrFetchDirectory = require( './gitCloneOrFetchDirectory' );
 const gitFirstDivergingCommit = require( './gitFirstDivergingCommit' );
 const gitIsAncestor = require( './gitIsAncestor' );
 const gitPull = require( './gitPull' );
@@ -208,18 +208,7 @@ module.exports = ( function() {
         await createDirectory( checkoutDirectory );
       }
 
-      const cloneOrFetch = async repo => {
-        const repoPwd = `${checkoutDirectory}/${repo}`;
-
-        if ( !fs.existsSync( `${checkoutDirectory}/${repo}` ) ) {
-          await gitCloneDirectory( repo, checkoutDirectory );
-        }
-        else {
-          await execute( 'git', [ 'fetch' ], repoPwd );
-        }
-      };
-
-      await cloneOrFetch( this.repo );
+      await gitCloneOrFetchDirectory( this.repo, checkoutDirectory );
       await gitCheckoutDirectory( this.branch, `${checkoutDirectory}/${this.repo}` );
       await gitPullDirectory( `${checkoutDirectory}/${this.repo}` );
       const dependencies = await loadJSON( `${checkoutDirectory}/${this.repo}/dependencies.json` );
@@ -231,7 +220,7 @@ module.exports = ( function() {
       await Promise.all( dependencyRepos.map( async repo => {
         const repoPwd = `${checkoutDirectory}/${repo}`;
 
-        await cloneOrFetch( repo );
+        await gitCloneOrFetchDirectory( repo, checkoutDirectory );
 
         await gitCheckoutDirectory( dependencies[ repo ].sha, repoPwd );
 
