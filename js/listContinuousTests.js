@@ -513,7 +513,8 @@ tests.push( {
   test: [ 'molecule-polarity', 'migration', '1.2->master' ],
   type: 'wrapper-test',
   url: 'phet-io-wrappers/migration/?sim=molecule-polarity&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=1.2&migrationRate=1000&silent',
-  priority: 100  // Just while we are initially testing in, https://github.com/phetsims/phet-io/issues/1944
+  priority: 100,  // Just while we are initially testing in, https://github.com/phetsims/phet-io/issues/1944
+  testQueryParameters: 'failIfNoLoad' // Just while we are initially testing in, https://github.com/phetsims/phet-io/issues/1944
 } );
 
 console.log( JSON.stringify( tests, null, 2 ) );
