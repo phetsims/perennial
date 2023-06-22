@@ -512,7 +512,7 @@ tests.push( {
 tests.push( {
   test: [ 'molecule-polarity', 'migration', '1.2->master' ],
   type: 'wrapper-test',
-  url: 'phet-io-wrapper/migration/index.html',
+  url: 'phet-io-wrappers/migration/index.html',
   queryParameters: 'sim=molecule-polarity&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=1.2&migrationRate=1000&silent'
 } );
 
