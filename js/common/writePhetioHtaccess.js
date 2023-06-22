@@ -37,7 +37,7 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
   // If we are provided a simName and version then write a .htaccess file to redirect
   // https://phet-io.colorado.edu/sims/{{sim-name}}/{{major}}.{{minor}} to https://phet-io.colorado.edu/sims/{{sim-name}}/{{major}}.{{minor}}.{{latest}}{{[-suffix]}}
   if ( isProductionDeploy ) {
-    if ( latestOption.simName && latestOption.version && latestOption.directory ) {
+    if ( latestOption.simName && latestOption.version && latestOption.directory && latestOption.checkoutDir ) {
       const redirectFilepath = `${latestOption.directory + latestOption.simName}/.htaccess`;
       let latestRedirectContents = 'RewriteEngine on\n' +
                                    `RewriteBase /sims/${latestOption.simName}/\n`;
@@ -58,7 +58,8 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
       winston.error( `simName: ${latestOption.simName}` );
       winston.error( `version: ${latestOption.version}` );
       winston.error( `directory: ${latestOption.directory}` );
-      throw new Error( 'latestOption is missing one of the required parameters (simName, version, or directory)' );
+      winston.error( `checkoutDir: ${latestOption.checkoutDir}` );
+      throw new Error( 'latestOption is missing one of the required parameters (simName, version, directory, or checkoutDir)' );
     }
   }
 
@@ -108,7 +109,7 @@ ${commentSymbol} Allow from all
       }
     }
 
-    const phetioParentDir = latestOption.checkoutDir || '..';
+    const phetioParentDir = latestOption?.checkoutDir || '..';
     const phetioPackage = JSON.parse( fs.readFileSync( `${phetioParentDir}/phet-io/package.json` ) );
 
     // Write a file to add authentication to the top level index pages
