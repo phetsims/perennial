@@ -20,7 +20,7 @@ const axios = require( 'axios' );
 module.exports = async function( options ) {
   options = _.extend( {
     active: null, // {boolean|null} - If set, will only include active branches
-    latest: null // {boolean|null} - If set, will only include active branches
+    latest: null // {boolean|null} - If set, will only include latest branches
   }, options );
 
   let metadataURL = 'https://phet.colorado.edu/services/metadata/phetio?';
