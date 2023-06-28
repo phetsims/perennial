@@ -415,6 +415,24 @@ Object.keys( commonQueryParameters ).forEach( name => {
   } );
 } );
 
+/////////////////////////////////////////////////////
+// PhET-iO migration testing
+[
+  [ 'molecule-polarity', '1.2' ],
+  [ 'graphing-quadratics', '1.2' ],
+  [ 'natural-selection', '1.4' ]
+].forEach( testData => {
+  const simName = testData[ 0 ];
+  const oldVersion = testData[ 1 ];
+  tests.push( {
+    test: [ simName, 'migration', `${oldVersion}->master` ],
+    type: 'wrapper-test',
+    url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=1000&silent`,
+    priority: 101  // Just while we are initially testing, TODO: remove in https://github.com/phetsims/phet-io/issues/1944
+  } );
+} );
+////////////////////////////////////////////
+
 //----------------------------------------------------------------------------------------------------------------------
 // Additional sim-specific tests
 //----------------------------------------------------------------------------------------------------------------------
@@ -507,19 +525,6 @@ tests.push( {
   type: 'sim-test',
   url: 'quadrilateral/quadrilateral_en.html',
   queryParameters: 'brand=phet&ea&fuzz&inheritTrapezoidSound&reducedStepSize'
-} );
-
-tests.push( {
-  test: [ 'molecule-polarity', 'migration', '1.2->master' ],
-  type: 'wrapper-test',
-  url: 'phet-io-wrappers/migration/?sim=molecule-polarity&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=1.2&migrationRate=1000&silent&webgl=false',
-  priority: 101  // Just while we are initially testing in, https://github.com/phetsims/phet-io/issues/1944
-} );
-tests.push( {
-  test: [ 'graphing-quadratics', 'migration', '1.2->master' ],
-  type: 'wrapper-test',
-  url: 'phet-io-wrappers/migration/?sim=graphing-quadratics&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=1.2&migrationRate=1000&silent&webgl=false',
-  priority: 102  // Just while we are initially testing in, https://github.com/phetsims/phet-io/issues/1944
 } );
 
 console.log( JSON.stringify( tests, null, 2 ) );
