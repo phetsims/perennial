@@ -9,6 +9,7 @@
 
 const puppeteerLoad = require( '../common/puppeteerLoad' );
 const withServer = require( '../common/withServer' );
+const path = require( 'path' );
 
 ( async () => {
 
@@ -35,7 +36,7 @@ const withServer = require( '../common/withServer' );
               '--enable-precise-memory-info',
 
               // To prevent filling up `/tmp`, see https://github.com/phetsims/aqua/issues/145
-              `--user-data-dir=${process.cwd()}/../tmp/puppeteerUserData/`
+              `--user-data-dir=${path.normalize( `${process.cwd()}/../tmp/puppeteerUserData/` )}`
             ]
           }
         } );
