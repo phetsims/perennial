@@ -46,6 +46,6 @@ const parseScreenNamesAllSimulations = async () => {
 };
 
 module.exports = {
-  parseScreenNames: async ( simName, locales, checkoutDir ) => await parseScreenNamesFromSimulation( simName, locales, checkoutDir ),
+  parseScreenNames: parseScreenNamesFromSimulation,
   parseScreenNamesAllSimulations: parseScreenNamesAllSimulations
 };
