@@ -17,7 +17,7 @@ const fs = require( 'fs' );
  * @param {string} checkoutDir
  * @returns {Promise.<stringMap[ stringKey ][ locale ]>}
  */
-module.exports = async function( repo, checkoutDir ) {
+module.exports = async function getRepoStringMap( repo, checkoutDir ) {
 
   // partialKeyMap[ partialStringKey ][ locale ] = stringValue
   const partialKeyMap = {};

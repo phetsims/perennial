@@ -18,7 +18,7 @@ const assert = require( 'assert' );
  * @returns {Promise.<string>} - Stdout
  * @rejects {ExecuteError}
  */
-module.exports = async function( repo, target ) {
+module.exports = async function gitCheckout( repo, target ) {
   assert( typeof repo === 'string' );
   assert( typeof target === 'string' );
 

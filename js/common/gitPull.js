@@ -16,6 +16,6 @@ const gitPullDirectory = require( './gitPullDirectory' );
  * @returns {Promise.<string>} - Stdout
  * @rejects {ExecuteError}
  */
-module.exports = async function( repo ) {
+module.exports = async function gitPull( repo ) {
   await gitPullDirectory( `../${repo}` );
 };
