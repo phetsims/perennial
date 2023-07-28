@@ -527,4 +527,14 @@ tests.push( {
   queryParameters: 'brand=phet&ea&fuzz&inheritTrapezoidSound&reducedStepSize'
 } );
 
+// build-a-nucleus: tests the public query parameters for configurations that cannot be changed during runtime
+const protons = Math.floor( Math.random() * 92 );
+const neutrons = Math.floor( Math.random() * 146 );
+tests.push( {
+  test: [ 'build-a-nucleus', 'fuzz', 'unbuilt', 'query-parameters' ],
+  type: 'sim-test',
+  url: 'build-a-nucleus/build-a-nucleus_en.html',
+  queryParameters: `brand=phet&ea&fuzz&protons=${protons}&neutrons=${neutrons}`
+} );
+
 console.log( JSON.stringify( tests, null, 2 ) );
