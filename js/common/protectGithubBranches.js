@@ -137,7 +137,7 @@ const createQueryData = queryString => {
 async function getRepositoryId( repositoryName ) {
   const handleJSONResponse = jsonResponse => {
     if ( !jsonResponse.data || jsonResponse.data.repository === null ) {
-      throw new Error( `Did not find repository: ${repositoryName}` );
+      throw new Error( `${jsonResponse.message}. developerGithubAccessToken in build-local.json may be incorrect or expired.` );
     }
 
     return jsonResponse.data.repository.id;
