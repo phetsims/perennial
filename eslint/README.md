@@ -23,7 +23,7 @@ For developers looking to ensure their changes pass ESLint, the typical entry po
 is to run `grunt lint`. See `grunt lint --help` for options. If your code passes
 `grunt lint`, then it is good to merge. You can add the `--format` option to achieve 
 formatting that comes close to PhET's code standards defined by the Webstorm code style 
-[here](https://github.com/phetsims/phet-info/blob/master/ide/idea/phet-idea-codestyle.xml).
+[here](https://github.com/phetsims/phet-info/blob/main/ide/idea/phet-idea-codestyle.xml).
 That is considered the ground truth for formatting currently, and `--format` attempts to
 get as close as we can to those rules.
 
@@ -82,4 +82,5 @@ answer these questions:
   https://github.com/phetsims/phet-info/issues/150
 
 - While ESLint can be plugged into many IDEs to perform code formatting automatically, many
-  PhET developers use other plugins in their IDEs. See https://github.com/phetsims/phet-info/tree/master/ide
+  PhET developers use other plugins 
+  their IDEs. See https://github.com/phetsims/phet-info/tree/main/ide
