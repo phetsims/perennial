@@ -36,7 +36,7 @@ async function getLikelyNextBranch( repo, incrementMajor, incrementMinor ) {
 qunit.test( 'Checkout target', async assert => {
   assert.timeout( 120000 );
   await execute( gruntCommand, [ 'checkout-target', '--repo=chains', '--target=1.42' ], '.' );
-  await execute( gruntCommand, [ 'checkout-master', '--repo=chains' ], '.' );
+  await execute( gruntCommand, [ 'checkout-main', '--repo=chains' ], '.' );
   assert.expect( 0 );
 } );
 
@@ -55,7 +55,7 @@ qunit.test( 'Bumper one-off (random)', async assert => {
 
   await execute( gruntCommand, [ 'one-off', '--repo=bumper', `--branch=${branch}`, '--brands=phet,phet-io', '--noninteractive' ], '.' );
 
-  await execute( gruntCommand, [ 'checkout-master', '--repo=bumper' ], '.' );
+  await execute( gruntCommand, [ 'checkout-main', '--repo=bumper' ], '.' );
   assert.expect( 0 );
 } );
 

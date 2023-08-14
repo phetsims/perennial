@@ -24,13 +24,13 @@ const winston = require( 'winston' );
 module.exports = async function( repo, timestamp, includeNpmUpdate ) {
   winston.info( `checking out timestamp for ${repo} at ${timestamp}` );
 
-  await gitCheckout( repo, await gitFromTimestamp( repo, 'master', timestamp ) );
+  await gitCheckout( repo, await gitFromTimestamp( repo, 'main', timestamp ) );
   const dependencies = await getDependencies( repo );
   const dependencyNames = Object.keys( dependencies ).filter( key => key !== 'comment' && key !== repo );
   const timestampDependencies = {};
   for ( const dependency of dependencyNames ) {
     timestampDependencies[ dependency ] = {
-      sha: await gitFromTimestamp( dependency, 'master', timestamp )
+      sha: await gitFromTimestamp( dependency, 'main', timestamp )
     };
   }
 

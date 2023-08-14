@@ -29,6 +29,6 @@ module.exports = async function( repo ) {
 
     await gitAdd( repo, 'package.json' );
     await gitCommit( repo, 'Marking repository as published' );
-    await gitPush( repo, 'master' );
+    await gitPush( repo, 'main' );
   }
 };

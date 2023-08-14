@@ -22,7 +22,7 @@ description like keyboard navigation. Sims in progress are also included in this
 
 phet-io (auto-generated) is the list of all simulations that are instrumented with PhET-iO features. This list is
 automatically fuzz tested and is used by phetmarks to dictate which sims have wrapper links. See the
-[PhET-iO Instrumentation Technical Guide](https://github.com/phetsims/phet-io/blob/master/doc/phet-io-instrumentation-technical-guide.md)
+[PhET-iO Instrumentation Technical Guide](https://github.com/phetsims/phet-io/blob/main/doc/phet-io-instrumentation-technical-guide.md)
 for more information.
 
 phet-io-api-stable (auto-generated) is the list of sims that have had a designer involved with the API definition.

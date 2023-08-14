@@ -57,11 +57,11 @@ const getStatus = async repo => {
           }
         }
 
-        // Go back to master
-        await gitCheckout( repo, 'master' );
+        // Go back to main
+        await gitCheckout( repo, 'main' );
       }
       else {
-        await gitCheckout( repo, 'master' );
+        await gitCheckout( repo, 'main' );
         await gitPullRebase( repo );
       }
     }
@@ -81,7 +81,7 @@ const getStatus = async repo => {
 
     let isGreen = false;
     if ( branch ) {
-      isGreen = !status && branch === 'master' && !track.length;
+      isGreen = !status && branch === 'main' && !track.length;
 
       if ( !isGreen || process.argv.includes( '--all' ) ) {
         data[ repo ] += `${repo}${moveRight}${isGreen ? green : red}${branch}${reset} ${track}\n`;

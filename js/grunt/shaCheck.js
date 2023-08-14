@@ -41,7 +41,7 @@ module.exports = async function( repo, sha ) {
     const repoSHA = dependencies[ repo ].sha;
     const isAncestor = await gitIsAncestor( repo, sha, repoSHA );
     ( isAncestor ? includedSims : excludedSims ).push( sim );
-    await gitCheckout( sim.name, 'master' );
+    await gitCheckout( sim.name, 'main' );
   }
 
   console.log( '\nSims that include the commit in their tree: ' );

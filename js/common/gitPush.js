@@ -14,7 +14,7 @@ const winston = require( 'winston' );
  * @public
  *
  * @param {string} repo - The repository name
- * @param {string} remoteBranch - The branch that is getting pushed to, e.g. 'master' or '1.0'
+ * @param {string} remoteBranch - The branch that is getting pushed to, e.g. 'main' or '1.0'
  * @returns {Promise.<string>} - Stdout
  * @rejects {ExecuteError}
  */

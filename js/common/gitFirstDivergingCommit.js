@@ -13,9 +13,9 @@ const assert = require( 'assert' );
  * Provides the SHA of the first SHA from a target that diverges from the second target
  * @public
  *
- * e.g. to get the first commit of acid-base-solutions' 1.2 branch that does not exist in master:
+ * e.g. to get the first commit of acid-base-solutions' 1.2 branch that does not exist in main:
  *
- *   gitFirstDivergingCommit( 'acid-base-solutions', '1.2', 'master' )
+ *   gitFirstDivergingCommit( 'acid-base-solutions', '1.2', 'main' )
  *
  * @param {string} repo - The repository name
  * @param {string} primaryTarget - Branch/SHA

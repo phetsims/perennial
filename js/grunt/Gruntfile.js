@@ -2,7 +2,7 @@
 
 /**
  * Grunt configuration file for tasks that have no dependencies on other repos.
- * In particular, grunt checkout-shas and grunt checkout-master can be run from here
+ * In particular, grunt checkout-shas and grunt checkout-main can be run from here
  * without worrying about an older version of chipper being checked out.
  *
  * In general when possible, modules are imported lazily in their task
@@ -143,8 +143,8 @@ module.exports = function( grunt ) {
       await checkoutTimestamp( repo, grunt.option( 'timestamp' ), !grunt.option( 'skipNpmUpdate' ) );
     } ) );
 
-  grunt.registerTask( 'checkout-master',
-    'Check out master branch for all dependencies, as specified in dependencies.json\n' +
+  grunt.registerTask( 'checkout-main',
+    'Check out main branch for all dependencies, as specified in dependencies.json\n' +
     '--repo : repository name where package.json should be read from\n' +
     '--skipNpmUpdate : If provided, will prevent the usual npm update',
     wrapTask( async () => {
@@ -159,8 +159,8 @@ module.exports = function( grunt ) {
       await checkoutMaster( repo, !grunt.option( 'skipNpmUpdate' ) );
     } ) );
 
-  grunt.registerTask( 'checkout-master-all',
-    'Check out master branch for all repos in git root',
+  grunt.registerTask( 'checkout-main-all',
+    'Check out main branch for all repos in git root',
     wrapTask( async () => {
       const checkoutMasterAll = require( './checkoutMasterAll' );
 
@@ -366,13 +366,13 @@ module.exports = function( grunt ) {
       const repo = grunt.option( 'repo' );
       assertIsValidRepoName( repo );
 
-      await dev( repo, grunt.option( 'brands' ).split( ',' ), noninteractive, 'master', grunt.option( 'message' ) );
+      await dev( repo, grunt.option( 'brands' ).split( ',' ), noninteractive, 'main', grunt.option( 'message' ) );
     } ) );
 
   grunt.registerTask( 'deploy-images',
     'Rebuilds all images\n' +
-    '--simulation : Optional. If present, only the given simulation will receive images from master. If absent, all sims' +
-    'will receive images from master.',
+    '--simulation : Optional. If present, only the given simulation will receive images from main. If absent, all sims' +
+    'will receive images from main.',
 
     wrapTask( async () => {
       console.log( grunt.option( 'simulation' ) );
@@ -406,7 +406,7 @@ module.exports = function( grunt ) {
         branch = await getBranch( repo );
         console.log( `--branch not provided, using ${branch} detected from ${repo}` );
       }
-      assert( branch !== 'master', 'One-off deploys for master are unsupported.' );
+      assert( branch !== 'main', 'One-off deploys for main are unsupported.' );
 
       await dev( repo, brands.split( ',' ), noninteractive, branch, grunt.option( 'message' ) );
     } ) );

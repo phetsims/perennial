@@ -88,7 +88,7 @@ allKeys.forEach( repo => {
       lines.forEach( line => {
 
         // If the line contains https://github.com/phetsims/ then add it to the set.
-        if ( line.includes( 'https://github.com/phetsims/' ) && !line.includes( 'Merge branch \'master\'' ) ) {
+        if ( line.includes( 'https://github.com/phetsims/' ) && !line.includes( 'Merge branch \'main\'' ) ) {
 
           // Find the URL in line using a regular expression
           const url = line.substring( line.indexOf( 'https://github.com/phetsims/' ) );

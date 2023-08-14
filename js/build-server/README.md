@@ -114,13 +114,13 @@ The build server does the following steps when a deploy request is received:
 - puts the build task on a queue so multiple builds don't occur simultaneously
 - pull perennial and npm update
 - clone missing repos
-- pull master for the sim and all dependencies
+- pull main for the sim and all dependencies
 - grunt checkout-shas
 - checkout sha for the current sim
 - npm update in chipper and the sim directory
 - grunt build-for-server --brands=phet for selected locales (see chipper's Gruntfile for details)
 - for rc deploys:
-    - deploy to the dev server, checkout master for all repositories, and finish
+    - deploy to the dev server, checkout main for all repositories, and finish
 - for production deploys:
     - mkdir for the new sim version
     - copy the build files to the correct location in the server doc root
@@ -128,6 +128,6 @@ The build server does the following steps when a deploy request is received:
     - write the XML file that tells the website which translations exist
     - notify the website that a new simulation/translation is published and should appear
     - add the sim to rosetta's simInfoArray and commit and push (if the sim isn't already there)
-    - checkout master for all repositories
+    - checkout main for all repositories
 
-If any of these steps fails, the build aborts and grunt checkout-master-all is run so all repos are back on master
+If any of these steps fails, the build aborts and grunt checkout-main-all is run so all repos are back on main

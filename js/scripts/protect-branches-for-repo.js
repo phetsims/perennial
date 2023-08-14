@@ -3,7 +3,7 @@
 const protectGithubBranches = require( '../common/protectGithubBranches' );
 
 /**
- * Set branch protection rules for the provided repo so that master, main, and release branches cannot be deleted.
+ * Set branch protection rules for the provided repo so that main, and release branches cannot be deleted.
  *
  * USAGE:
  * node perennial/js/scripts/protect-branches-for-repo.js repository-name

@@ -24,7 +24,7 @@ const axios = require( 'axios' );
 const deployImages = async function( { branch, brands, simulation } ) {
   const requestObject = {
     brands: brands || 'phet',
-    branch: branch || 'master',
+    branch: branch || 'main',
     authorizationCode: buildLocal.buildServerAuthorizationCode
   };
   if ( buildLocal.buildServerNotifyEmail ) {

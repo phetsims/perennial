@@ -35,7 +35,7 @@ for repo in $(cat perennial/data/active-repos | xargs | tr -d '\r'); do
     echo ${repo}
     cd ${repo} >/dev/null
 
-    if [[ $(git log origin/master..master) ]]; then
+    if [[ $(git log origin/main..main) ]]; then
       if [ ${parallel} == "true" ]; then
         # run in the background
         ${pullCommand} &

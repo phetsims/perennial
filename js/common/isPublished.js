@@ -13,14 +13,14 @@ const fs = require( 'fs' );
  * Returns whether a repo is published (not a prototype)
  * @public
  *
- * NOTE: Needs to be on master branch
+ * NOTE: Needs to be on main branch
  *
  * @param {string} repo
  *
  * @returns {Promise<boolean>}
  */
 module.exports = async function( repo ) {
-  await gitCheckout( repo, 'master' );
+  await gitCheckout( repo, 'main' );
   const packageObject = JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) );
 
   return !!packageObject?.phet?.published;

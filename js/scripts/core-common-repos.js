@@ -4,7 +4,7 @@
  * Export a list of core common repos. These repos are the ones we are interested
  * in making it easier to contribute to for POSE.
  *
- * List pulled from https://github.com/phetsims/phet-info/blob/master/doc/phet-development-overview.md#source-code-and-dependencies.
+ * List pulled from https://github.com/phetsims/phet-info/blob/main/doc/phet-development-overview.md#source-code-and-dependencies.
  *
  * @author Liam Mulhall <liammulh@gmail.com>
  */

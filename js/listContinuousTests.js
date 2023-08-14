@@ -1,7 +1,7 @@
 // Copyright 2020, University of Colorado Boulder
 
 /**
- * This prints out (in JSON form) the tests and operations requested for continuous testing for whatever is in master
+ * This prints out (in JSON form) the tests and operations requested for continuous testing for whatever is in main
  * at this point.
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
@@ -425,7 +425,7 @@ Object.keys( commonQueryParameters ).forEach( name => {
   const simName = testData[ 0 ];
   const oldVersion = testData[ 1 ];
   tests.push( {
-    test: [ simName, 'migration', `${oldVersion}->master` ],
+    test: [ simName, 'migration', `${oldVersion}->main` ],
     type: 'wrapper-test',
     url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=1000&silent`,
     priority: 102  // Just while we are initially testing, TODO: remove in https://github.com/phetsims/phet-io/issues/1944

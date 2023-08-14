@@ -62,7 +62,7 @@ async function usesTopLevelIndex( repo, branch ) {
   await gitCheckout( repo, branch );
   const dependencies = await getDependencies( repo );
   const sha = dependencies.chipper.sha;
-  await gitCheckout( repo, 'master' );
+  await gitCheckout( repo, 'main' );
 
   return gitIsAncestor( 'chipper', '8db0653ee0cbb6ed716fa3b4d4759bcb75d8118a', sha );
 }

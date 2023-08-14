@@ -3,7 +3,7 @@
 #
 # Shows git status for all repos
 #
-# GREEN: on master, no working copy changes
+# GREEN: on main, no working copy changes
 # RED: anything else
 #
 # Author: Jonathan Olson
@@ -56,12 +56,12 @@ do
         behind=`echo "${counts}" | awk '{ print $1 }'`
         ahead=`echo "${counts}" | awk '{ print $2 }'`
 
-        # color branch name based on branch and status. green for clean master, red for anything else
-        if [ "${branch}" = "master" ]; then
+        # color branch name based on branch and status. green for clean main, red for anything else
+        if [ "${branch}" = "main" ]; then
           if [ -z "$gitStatus" -a "${ahead}" -eq 0 ]; then
-            echo -e -n "${moveRight}${green}master${reset}"
+            echo -e -n "${moveRight}${green}main${reset}"
           else
-            echo -e -n "${moveRight}${red}master${reset}"
+            echo -e -n "${moveRight}${red}main${reset}"
           fi
         else
           echo -e -n "${moveRight}${red}${branch}${reset}"

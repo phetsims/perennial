@@ -63,8 +63,8 @@ module.exports = async function( project, dev, production ) {
   }
 
   const currentBranch = await getBranch( 'decaf' );
-  if ( currentBranch !== 'master' ) {
-    grunt.fail.fatal( `deployment should be on the branch master, not: ${currentBranch ? currentBranch : '(detached head)'}` );
+  if ( currentBranch !== 'main' ) {
+    grunt.fail.fatal( `deployment should be on the branch main, not: ${currentBranch ? currentBranch : '(detached head)'}` );
   }
 
   const packageFileRelative = `projects/${project}/package.json`;
@@ -79,7 +79,7 @@ module.exports = async function( project, dev, production ) {
 
   const currentSHA = await gitRevParse( 'decaf', 'HEAD' );
 
-  const latestSHA = ( await getRemoteBranchSHAs( 'decaf' ) ).master;
+  const latestSHA = ( await getRemoteBranchSHAs( 'decaf' ) ).main;
   if ( currentSHA !== latestSHA ) {
     // See https://github.com/phetsims/chipper/issues/699
     grunt.fail.fatal( `Out of date with remote, please push or pull repo. Current SHA: ${currentSHA}, latest SHA: ${latestSHA}` );
@@ -90,7 +90,7 @@ module.exports = async function( project, dev, production ) {
 
   // await gitAdd( 'decaf', packageFileRelative );
   // await gitCommit( 'decaf', `Bumping version to ${version.toString()}` );
-  // await gitPush( 'decaf', 'master' );
+  // await gitPush( 'decaf', 'main' );
 
   // Create (and fix permissions for) the main simulation directory, if it didn't already exist
   if ( dev ) {

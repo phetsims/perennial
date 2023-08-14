@@ -73,7 +73,7 @@ const booleanPrompt = require( '../common/booleanPrompt' );
 
   // git clone https://github.com/phetsims/vegas.git vegas-backup
   const historyCopyRepo = `${sourceRepo}-history-copy`;
-  await execute( 'git', `clone -b master --single-branch https://github.com/phetsims/${sourceRepo}.git ${historyCopyRepo}`.split( ' ' ), '.' );
+  await execute( 'git', `clone -b main --single-branch https://github.com/phetsims/${sourceRepo}.git ${historyCopyRepo}`.split( ' ' ), '.' );
 
   const filterArgs = [ 'filter-repo' ];
   filenameArray.forEach( filename => {
@@ -93,13 +93,13 @@ const booleanPrompt = require( '../common/booleanPrompt' );
 
   await execute( 'git', `remote add ${historyCopyRepo} ../${historyCopyRepo}`.split( ' ' ), `./${targetRepo}` );
   await execute( 'git', `fetch ${historyCopyRepo}`.split( ' ' ), `./${targetRepo}` );
-  await execute( 'git', `merge ${historyCopyRepo}/master --allow-unrelated`.split( ' ' ), `./${targetRepo}` );
+  await execute( 'git', `merge ${historyCopyRepo}/main --allow-unrelated`.split( ' ' ), `./${targetRepo}` );
   await execute( 'git', `remote remove ${historyCopyRepo}`.split( ' ' ), `./${targetRepo}` );
 
-  const aboutToPush = await execute( 'git', 'diff --stat --cached origin/master'.split( ' ' ), `./${targetRepo}` );
+  const aboutToPush = await execute( 'git', 'diff --stat --cached origin/main'.split( ' ' ), `./${targetRepo}` );
   console.log( 'About to push: ' + aboutToPush );
 
-  const unpushedCommits = await execute( 'git', 'log origin/master..master'.split( ' ' ), `./${targetRepo}` );
+  const unpushedCommits = await execute( 'git', 'log origin/main..main'.split( ' ' ), `./${targetRepo}` );
   console.log( unpushedCommits );
 
   console.log(

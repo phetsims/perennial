@@ -29,10 +29,10 @@ for ( const repo of coreCommonRepos ) {
   chdir( repo );
   const commitMessage = '"automated commit from phetsims/community; adding PR template, see https://github.com/phetsims/community/issues/9"';
   const commands = [
-    'git pull origin master',
+    'git pull origin main',
     'git add .github',
     `git commit --message ${commitMessage} --no-verify`,
-    'git push origin master'
+    'git push origin main'
   ];
   for ( const command of commands ) {
     console.log( `executing command: ${command}` );

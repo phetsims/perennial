@@ -28,7 +28,7 @@ const getStatus = async repo => {
 
   let isGreen = false;
   if ( status.branch ) {
-    isGreen = !status.status && status.branch === 'master' && status.ahead === 0;
+    isGreen = !status.status && status.branch === 'main' && status.ahead === 0;
 
     if ( !isGreen || process.argv.includes( '--all' ) ) {
       data[ repo ] += `${repo}${moveRight}${isGreen ? green : red}${status.branch}${reset}${status.ahead === 0 ? '' : ` ahead ${status.ahead}`}${status.behind === 0 ? '' : ` behind ${status.behind}`}\n`;

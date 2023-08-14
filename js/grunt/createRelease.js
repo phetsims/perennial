@@ -45,8 +45,8 @@ module.exports = async function createRelease( repo, branch, brands, message ) {
   assert( brands.length >= 1, 'must have a supported brand' );
 
   const currentBranch = await getBranch( repo );
-  if ( currentBranch !== 'master' ) {
-    grunt.fail.fatal( `Should be on master to create a release branch, not: ${currentBranch ? currentBranch : '(detached head)'}` );
+  if ( currentBranch !== 'main' ) {
+    grunt.fail.fatal( `Should be on main to create a release branch, not: ${currentBranch ? currentBranch : '(detached head)'}` );
   }
 
   const hasBranchAlready = await hasRemoteBranch( repo, branch );
@@ -86,14 +86,14 @@ module.exports = async function createRelease( repo, branch, brands, message ) {
   await gitCommit( repo, `updated dependencies.json for version ${newVersion.toString()}` );
   await gitPush( repo, branch );
 
-  // Update the version info in master
-  await gitCheckout( repo, 'master' );
+  // Update the version info in main
+  await gitCheckout( repo, 'main' );
   await setRepoVersion( repo, new SimVersion( major, minor + 1, 0, {
     testType: 'dev',
     testNumber: 0
   } ), message );
   await updateHTMLVersion( repo );
-  await gitPush( repo, 'master' );
+  await gitPush( repo, 'main' );
 
   // Go back to the branch (as they may want to do a deploy)
   await gitCheckout( repo, branch );

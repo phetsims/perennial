@@ -38,12 +38,12 @@ const _ = require( 'lodash' ); // eslint-disable-line no-unused-vars
  * @param {string} repo
  * @param {Array.<string>} brands
  * @param {boolean} noninteractive
- * @param {string} branch - 'master' for normal dev deploys, otherwise is the name of a one-off branch
+ * @param {string} branch - 'main' for normal dev deploys, otherwise is the name of a one-off branch
  * @param {string} [message] - Optional message to append to the version-increment commit.
  * @returns {Promise}
  */
 module.exports = async function( repo, brands, noninteractive, branch, message ) {
-  const isOneOff = branch !== 'master';
+  const isOneOff = branch !== 'main';
   const testType = isOneOff ? branch : 'dev';
   if ( isOneOff ) {
     assert( !branch.includes( '-' ), 'One-off versions should be from branches that do not include hyphens' );

@@ -3,7 +3,7 @@
 const protectGithubBranches = require( '../common/protectGithubBranches' );
 
 /**
- * Remove branch protection rules for the provided repo so that master, main, and release CAN be modified.
+ * Remove branch protection rules for the provided repo so that main, and release CAN be modified.
  * It is faster to just remove branch protections from the github UI, but this is helpful for automation.
  * For example, you can use this if the automated maintenance release process needs to force push to
  * production branches.

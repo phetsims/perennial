@@ -79,7 +79,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     let versionChanged;
 
     if ( previousVersion.testType === null ) {
-      if ( noninteractive || !await booleanPrompt( `The last deployment was a production deployment (${previousVersion.toString()}) and an RC version is required between production versions. Would you like to redeploy ${previousVersion.toString()} (y) or cancel this process and revert to master (N)`, false ) ) {
+      if ( noninteractive || !await booleanPrompt( `The last deployment was a production deployment (${previousVersion.toString()}) and an RC version is required between production versions. Would you like to redeploy ${previousVersion.toString()} (y) or cancel this process and revert to main (N)`, false ) ) {
         throw new Error( 'Aborted production deployment: It appears that the last deployment was for production.' );
       }
 
@@ -100,7 +100,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
 
     // Initial deployment nags
     if ( isFirstVersion ) {
-      if ( !await booleanPrompt( 'Is the master checklist complete (e.g. are screenshots added to assets, etc.)', noninteractive ) ) {
+      if ( !await booleanPrompt( 'Is the main checklist complete (e.g. are screenshots added to assets, etc.)', noninteractive ) ) {
         throw new Error( 'Aborted production deployment' );
       }
     }
@@ -166,7 +166,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
         await gitPush( repo, branch );
       }
 
-      // Abort checkout, (will be caught and master will be checked out
+      // Abort checkout, (will be caught and main will be checked out
       throw new Error( message );
     };
 
@@ -185,7 +185,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       servers: [ 'dev', 'production' ]
     } );
 
-    // Move back to master
+    // Move back to main
     await checkoutMaster( repo, true );
 
     if ( brands.includes( 'phet' ) ) {
@@ -201,14 +201,14 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     if ( isFirstVersion && brands.includes( 'phet' ) ) {
       grunt.log.writeln( 'After testing, let the simulation lead know it has been deployed, so they can edit metadata on the website' );
 
-      // Update the README on master
+      // Update the README on main
       if ( published ) {
-        grunt.log.writeln( 'Updating master README' );
+        grunt.log.writeln( 'Updating main README' );
         await execute( gruntCommand, [ 'published-README' ], `../${repo}` );
         await gitAdd( repo, 'README.md' );
         try {
           await gitCommit( repo, `Generated published README.md as part of a production deploy for ${versionString}` );
-          await gitPush( repo, 'master' );
+          await gitPush( repo, 'main' );
         }
         catch( e ) {
           grunt.log.writeln( 'Production README is already up-to-date' );
@@ -229,7 +229,7 @@ PhET-iO deploys involve a couple of extra steps after production. Please ensure 
     return version;
   }
   catch( e ) {
-    grunt.log.warn( 'Detected failure during deploy, reverting to master' );
+    grunt.log.warn( 'Detected failure during deploy, reverting to main' );
     await checkoutMaster( repo, true );
     throw e;
   }

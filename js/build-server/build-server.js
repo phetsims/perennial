@@ -231,7 +231,7 @@ const postQueueImageDeploy = ( req, res ) => {
     return;
   }
 
-  const branch = req.body[ constants.BRANCH_KEY ] || 'master';
+  const branch = req.body[ constants.BRANCH_KEY ] || 'main';
   const brands = req.body[ constants.BRANDS_KEY ] || 'phet';
   const email = req.body[ constants.EMAIL_KEY ] || null;
   const simulation = req.body[ constants.SIM_NAME_KEY ] || null;

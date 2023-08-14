@@ -16,9 +16,9 @@ const processSim = async ( simulation, brands, version ) => {
 
   const repoDir = `${imagesReposDir}/${simulation}`;
 
-  // Get master
+  // Get main
   await gitCloneOrFetchDirectory( simulation, imagesReposDir );
-  await gitCheckoutDirectory( 'master', repoDir );
+  await gitCheckoutDirectory( 'main', repoDir );
   await gitPullDirectory( repoDir );
 
   let brandsArray;
@@ -64,14 +64,14 @@ const processSim = async ( simulation, brands, version ) => {
 
 const updateRepoDir = async ( repo, dir ) => {
   await gitCloneOrFetchDirectory( repo, imagesReposDir );
-  await gitCheckoutDirectory( 'master', dir );
+  await gitCheckoutDirectory( 'main', dir );
   await gitPullDirectory( dir );
   await execute( 'npm', [ 'prune' ], dir );
   await execute( 'npm', [ 'update' ], dir );
 };
 
 /**
- * This task deploys all image assets from the master branch to the latest version of all published sims.
+ * This task deploys all image assets from the main branch to the latest version of all published sims.
  *
  * @param options
  */

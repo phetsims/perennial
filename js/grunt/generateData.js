@@ -33,8 +33,8 @@ const winston = require( 'winston' );
  * @public
  */
 module.exports = async function() {
-  if ( await getBranch( 'perennial' ) !== 'master' || !await gitIsClean( 'perennial' ) ) {
-    grunt.fail.fatal( 'Data will only be generated if perennial is on master with no working-copy changes.' );
+  if ( await getBranch( 'perennial' ) !== 'main' || !await gitIsClean( 'perennial' ) ) {
+    grunt.fail.fatal( 'Data will only be generated if perennial is on main with no working-copy changes.' );
   }
 
   const activeRepos = getActiveRepos();
@@ -81,7 +81,7 @@ module.exports = async function() {
   if ( hasChanges ) {
     winston.info( 'Changes to data files detected, will push' );
     await gitCommit( 'perennial', 'Automated update of perennial data files' );
-    await gitPush( 'perennial', 'master' );
+    await gitPush( 'perennial', 'main' );
   }
   else {
     winston.info( 'No changes detected' );

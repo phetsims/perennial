@@ -131,7 +131,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       servers: [ 'dev' ]
     } );
 
-    // Move back to master
+    // Move back to main
     await checkoutMaster( repo, true );
 
     const versionURL = `https://phet-dev.colorado.edu/html/${repo}/${versionString}`;
@@ -149,7 +149,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     return version;
   }
   catch( e ) {
-    grunt.log.warn( 'Detected failure during deploy, reverting to master' );
+    grunt.log.warn( 'Detected failure during deploy, reverting to main' );
     await checkoutMaster( repo, true );
     throw e;
   }

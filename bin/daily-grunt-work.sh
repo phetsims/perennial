@@ -26,7 +26,7 @@ date
 cd perennial || exit
 git pull
 npm prune && npm update
-grunt checkout-master-all
+grunt checkout-main-all
 cd ..
 
 perennial/bin/clone-missing-repos.sh

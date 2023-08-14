@@ -23,8 +23,8 @@
 const https = require( 'https' );
 const buildLocal = require( './buildLocal' );
 
-// protects master, main, and all branche used in production deploys
-const BRANCH_NAME_PATTERNS = [ 'master', 'main', '*[0-9].[0-9]*' ];
+// protects main, and all branche used in production deploys
+const BRANCH_NAME_PATTERNS = [ 'main', '*[0-9].[0-9]*' ];
 
 // Options for the https request to the github graphql server
 const options = {
@@ -284,7 +284,7 @@ async function clearBranchProtections( repositories ) {
 }
 
 /**
- * Apply branch protection rules to prodcution branches (master, main, release branches).
+ * Apply branch protection rules to prodcution branches (main, release branches).
  */
 async function protectBranches( repositories ) {
 

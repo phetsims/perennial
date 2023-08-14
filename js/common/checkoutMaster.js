@@ -1,7 +1,7 @@
 // Copyright 2017, University of Colorado Boulder
 
 /**
- * Checks out master for a repository and all of its dependencies.
+ * Checks out main for a repository and all of its dependencies.
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
@@ -12,7 +12,7 @@ const npmUpdate = require( './npmUpdate' );
 const winston = require( 'winston' );
 
 /**
- * Checks out master for a repository and all of its dependencies.
+ * Checks out main for a repository and all of its dependencies.
  * @public
  *
  * @param {string} repo - The repository name
@@ -20,7 +20,7 @@ const winston = require( 'winston' );
  * @returns {Promise}
  */
 module.exports = async function( repo, includeNpmUpdate ) {
-  winston.info( `checking out master for ${repo}` );
+  winston.info( `checking out main for ${repo}` );
 
   const dependencies = await getDependencies( repo );
 
@@ -28,7 +28,7 @@ module.exports = async function( repo, includeNpmUpdate ) {
   const repoNames = Object.keys( dependencies ).filter( key => key !== 'comment' );
 
   for ( const repoName of repoNames ) {
-    await gitCheckout( repoName, 'master' );
+    await gitCheckout( repoName, 'main' );
   }
 
   if ( includeNpmUpdate ) {

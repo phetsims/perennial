@@ -94,7 +94,7 @@ const fs = require( 'fs' );
               line = line.substring( 'nn hours ago '.length );
             }
 
-            if ( !outputtedLines.find( x => x === line ) && !line.startsWith( 'Merge branch \'master\' of' ) ) {
+            if ( !outputtedLines.find( x => x === line ) && !line.startsWith( 'Merge branch \'main\' of' ) ) {
 
               if ( !outputtedRepo ) {
                 console.log();

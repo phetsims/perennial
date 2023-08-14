@@ -34,7 +34,7 @@ const getStatus = async repo => {
 
   let isGreen = false;
   if ( branch ) {
-    isGreen = !status && branch === 'master' && !track.length;
+    isGreen = !status && branch === 'main' && !track.length;
 
     if ( !isGreen || process.argv.includes( '--all' ) ) {
       data[ repo ] += `${repo}${moveRight}${isGreen ? green : red}${branch}${reset} ${track}\n`;

@@ -48,7 +48,7 @@ module.exports = async function() {
 
     await gitCheckout( repo, 'gh-pages' );
     await gitPull( repo );
-    await execute( 'git', [ 'merge', 'master', '-m', 'Update for gh-pages' ], `../${repo}` );
+    await execute( 'git', [ 'merge', 'main', '-m', 'Update for gh-pages' ], `../${repo}` );
 
     if ( taggedRepo.build ) {
       await npmUpdate( repo );
@@ -62,6 +62,6 @@ module.exports = async function() {
     }
 
     await gitPush( repo, 'gh-pages' );
-    await gitCheckout( repo, 'master' );
+    await gitCheckout( repo, 'main' );
   }
 };

@@ -733,7 +733,7 @@ module.exports = ( function() {
               await gitPull( repo );
               const dependencies = await getDependencies( repo );
               const sha = dependencies[ patchRepo ].sha;
-              await gitCheckout( repo, 'master' );
+              await gitCheckout( repo, 'main' );
 
               // Then check it out
               await gitCheckout( patchRepo, sha );
@@ -771,7 +771,7 @@ module.exports = ( function() {
           }
         }
 
-        await gitCheckout( modifiedBranch.repo, 'master' );
+        await gitCheckout( modifiedBranch.repo, 'main' );
       }
 
       maintenance.save();

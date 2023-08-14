@@ -13,7 +13,7 @@
 
 const { exec } = require( 'child_process' ); // eslint-disable-line require-statement-match
 
-exec( 'git rev-list master', ( error, stdout, stderr ) => {
+exec( 'git rev-list main', ( error, stdout, stderr ) => {
   if ( error ) {
     console.error( `exec error: ${error}` );
     return;
@@ -48,8 +48,8 @@ exec( 'git rev-list master', ( error, stdout, stderr ) => {
                 else {
 
                   // done
-                  exec( 'git checkout master', ( error, stdout, stderr ) => {
-                    // console.log( 'checked out master' );
+                  exec( 'git checkout main', ( error, stdout, stderr ) => {
+                    // console.log( 'checked out main' );
                   } );
                 }
               } );

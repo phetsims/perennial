@@ -357,7 +357,7 @@ module.exports = ( function() {
         result = sha === currentSHA || await gitIsAncestor( repo, sha, currentSHA );
       }
 
-      await gitCheckout( this.repo, 'master' );
+      await gitCheckout( this.repo, 'main' );
 
       return result;
     }
@@ -383,13 +383,13 @@ module.exports = ( function() {
         result = sha !== currentSHA && !( await gitIsAncestor( repo, sha, currentSHA ) );
       }
 
-      await gitCheckout( this.repo, 'master' );
+      await gitCheckout( this.repo, 'main' );
 
       return result;
     }
 
     /**
-     * The SHA at which this release branch's main repository diverged from master.
+     * The SHA at which this release branch's main repository diverged from main.
      * @public
      *
      * @returns {Promise.<string>}
@@ -397,13 +397,13 @@ module.exports = ( function() {
     async getDivergingSHA() {
       await gitCheckout( this.repo, this.branch );
       await gitPull( this.repo );
-      await gitCheckout( this.repo, 'master' );
+      await gitCheckout( this.repo, 'main' );
 
-      return gitFirstDivergingCommit( this.repo, this.branch, 'master' );
+      return gitFirstDivergingCommit( this.repo, this.branch, 'main' );
     }
 
     /**
-     * The timestamp at which this release branch's main repository diverged from master.
+     * The timestamp at which this release branch's main repository diverged from main.
      * @public
      *
      * @returns {Promise.<number>}
@@ -491,7 +491,7 @@ module.exports = ( function() {
       await gitCheckout( this.repo, this.branch );
       const dependencies = await getDependencies( this.repo );
       const sha = dependencies.chipper.sha;
-      await gitCheckout( this.repo, 'master' );
+      await gitCheckout( this.repo, 'main' );
 
       return gitIsAncestor( 'chipper', '80b4ad62cd8f2057b844f18d3c00cf5c0c89ed8d', sha );
     }
@@ -514,7 +514,7 @@ module.exports = ( function() {
       await gitCheckout( this.repo, this.branch );
       const dependencies = await getDependencies( this.repo );
       const sha = dependencies.chipper.sha;
-      await gitCheckout( this.repo, 'master' );
+      await gitCheckout( this.repo, 'main' );
 
       return gitIsAncestor( 'chipper', 'e454f88ff51d1e3fabdb3a076d7407a2a9e9133c', sha );
     }
@@ -531,7 +531,7 @@ module.exports = ( function() {
       await gitCheckout( this.repo, this.branch );
       const dependencies = await getDependencies( this.repo );
       const sha = dependencies.chipper.sha;
-      await gitCheckout( this.repo, 'master' );
+      await gitCheckout( this.repo, 'main' );
 
       return !( await gitIsAncestor( 'chipper', '4814d6966c54f250b1c0f3909b71f2b9cfcc7665', sha ) );
     }
@@ -552,7 +552,7 @@ module.exports = ( function() {
       }
 
       const sha = dependencies[ 'phet-io' ].sha;
-      await gitCheckout( this.repo, 'master' );
+      await gitCheckout( this.repo, 'main' );
 
       return gitIsAncestor( 'phet-io', 'e3fc26079358d86074358a6db3ebaf1af9725632', sha );
     }
@@ -568,7 +568,7 @@ module.exports = ( function() {
       const dependencies = await getDependencies( this.repo );
 
       const sha = dependencies.chipper.sha;
-      await gitCheckout( this.repo, 'master' );
+      await gitCheckout( this.repo, 'main' );
 
       return gitIsAncestor( 'chipper', '7375f6a57b5874b6bbf97a54c9a908f19f88d38f', sha );
     }
@@ -589,7 +589,7 @@ module.exports = ( function() {
       }
 
       const sha = dependency.sha;
-      await gitCheckout( this.repo, 'master' );
+      await gitCheckout( this.repo, 'main' );
 
       return gitIsAncestor( 'phet-io-wrappers', '7ec1a04a70fb9707b381b8bcab3ad070815ef7fe', sha );
     }
@@ -609,8 +609,8 @@ module.exports = ( function() {
 
       const result = chipperVersion.major !== 0 || chipperVersion.minor !== 0;
 
-      await gitCheckout( this.repo, 'master' );
-      await gitCheckout( 'chipper', 'master' );
+      await gitCheckout( this.repo, 'main' );
+      await gitCheckout( 'chipper', 'main' );
 
       return result;
     }

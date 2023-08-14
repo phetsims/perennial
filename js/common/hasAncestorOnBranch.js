@@ -34,7 +34,7 @@ module.exports = async function( sim, branch, repo, sha ) {
   const repoSHA = dependencies[ repo ].sha;
 
   const isAncestor = await gitIsAncestor( repo, sha, repoSHA );
-  await gitCheckout( sim, 'master' );
+  await gitCheckout( sim, 'main' );
 
   return isAncestor;
 };

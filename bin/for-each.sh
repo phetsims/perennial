@@ -9,8 +9,8 @@
 # // print the working directory of all active repos:
 # for-each.sh active-repos pwd
 #
-# // checkout master for all repos:
-# for-each.sh active-repos git checkout master
+# // checkout main for all repos:
+# for-each.sh active-repos git checkout main
 #
 # // you can also string multiple commands together by putting everything inside quotes:
 # for-each.sh active-sims "npm install && grunt update"

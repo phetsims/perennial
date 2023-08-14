@@ -99,7 +99,7 @@ Generally for each issue that should be fixed, the following outline should be u
 complications):
 
 4. Learn about the change being applied, and try to anticipate what types of changes will be needed. What repositories
-   will need to be patched? (Even if the patch on master was only for 1 repository, other repos might also need to be
+   will need to be patched? (Even if the patch on main was only for 1 repository, other repos might also need to be
    changed if your change depends on newer features). If it exists, having a SHA that does "all" of the changes is nice.
    What types of release branches do you anticipate needing changes?
 5. Create patches for each repo that needs to change,
@@ -134,7 +134,7 @@ verify that the production deploys completed successfully.
 Below will be detailed information about all of the general steps, and all of the related commands. Usually running
 `Maintenance.list()` often to see the current state is recommended.
 
-[firefox-google-analytics-maintenance-example.md](https://github.com/phetsims/special-ops/blob/master/doc/firefox-google-analytics-maintenance-example.md)
+[firefox-google-analytics-maintenance-example.md](https://github.com/phetsims/special-ops/blob/main/doc/firefox-google-analytics-maintenance-example.md)
 shows an example of this general setup being followed (two issues, one simple and one complicated).
 
 Also note that if there are multiple required changes to a specific repository, it is best to make all of the changes at
@@ -327,7 +327,7 @@ easier to add "all" sims and remove ones that are not needed, and this makes it 
 ### Adding ALL needed patches
 
 `Maintenance.addAllNeededPatches( patchName )` will add all release branches as needing a patch, which is helpful if you
-just fixed something in master (every sim is guaranteed to NOT have the change).
+just fixed something in main (every sim is guaranteed to NOT have the change).
 
 ### Adding/removing filtered needed patches based on a SHA
 
@@ -548,5 +548,5 @@ git pull
 git branch -m ${BRANCH} ${BRANCH}-deprecated
 git push origin :${BRANCH}
 git push --set-upstream origin ${BRANCH}-deprecated
-git checkout master
+git checkout main
 ```

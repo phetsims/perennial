@@ -31,7 +31,7 @@
  *
  * 1.5.0                - Production simulation version (no test type). Major = 1, minor = 5, maintenance = 0
  * 1.5.0-rc.1           - Example of a release-candidate build version that would be published before '1.5.0' for testing.
- * 1.5.0-dev.1          - Example of a dev build that would be from master.
+ * 1.5.0-dev.1          - Example of a dev build that would be from main.
  * 1.5.0-sonification.1 - Example of a one-off build (which would be from the branch 'sonification')
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>

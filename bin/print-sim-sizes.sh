@@ -5,7 +5,7 @@
 # two dates. For each commit, we revert working copy to date of that commit and build
 # sim, printing size. By default will get sizes from 1 year ago to current date. Sizes
 # are printed in bytes. Output is readable format, but can also print in formats for
-# easy plotting. Reverts working copy to master when done.
+# easy plotting. Reverts working copy to main when done.
 # 
 # Options:
 # -s: start date for all commits, of the formats supported by git
@@ -106,5 +106,5 @@ for dep in "${dependencies[@]}"; do
   fi
 done
 
-# we are done, back to master
-perennial/bin/for-each.sh active-repos git checkout master
+# we are done, back to main
+perennial/bin/for-each.sh active-repos git checkout main
