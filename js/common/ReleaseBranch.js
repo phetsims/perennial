@@ -9,7 +9,7 @@
 const buildLocal = require( './buildLocal' );
 const buildServerRequest = require( './buildServerRequest' );
 const ChipperVersion = require( './ChipperVersion' );
-const checkoutMaster = require( './checkoutMaster' );
+const checkoutMain = require( './checkoutMain' );
 const checkoutTarget = require( './checkoutTarget' );
 const createDirectory = require( './createDirectory' );
 const execute = require( './execute' );
@@ -646,7 +646,7 @@ module.exports = ( function() {
         const version = await getRepoVersion( this.repo );
         const dependencies = await getDependencies( this.repo );
 
-        await checkoutMaster( this.repo, false );
+        await checkoutMain( this.repo, false );
 
         await buildServerRequest( this.repo, version, this.branch, dependencies, {
           locales: locales,

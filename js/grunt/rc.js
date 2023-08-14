@@ -11,7 +11,7 @@ const booleanPrompt = require( '../common/booleanPrompt' );
 const build = require( '../common/build' );
 const buildLocal = require( '../common/buildLocal' );
 const buildServerRequest = require( '../common/buildServerRequest' );
-const checkoutMaster = require( '../common/checkoutMaster' );
+const checkoutMain = require( '../common/checkoutMain' );
 const checkoutTarget = require( '../common/checkoutTarget' );
 const devDirectoryExists = require( '../common/devDirectoryExists' );
 const getDependencies = require( '../common/getDependencies' );
@@ -117,7 +117,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
       await gitPush( repo, branch );
 
       // Abort checkout
-      await checkoutMaster( repo, true );
+      await checkoutMain( repo, true );
       throw new Error( 'Aborted rc deployment (aborted version change too).' );
     }
 
@@ -132,7 +132,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     } );
 
     // Move back to main
-    await checkoutMaster( repo, true );
+    await checkoutMain( repo, true );
 
     const versionURL = `https://phet-dev.colorado.edu/html/${repo}/${versionString}`;
 
@@ -150,7 +150,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
   }
   catch( e ) {
     grunt.log.warn( 'Detected failure during deploy, reverting to main' );
-    await checkoutMaster( repo, true );
+    await checkoutMain( repo, true );
     throw e;
   }
 };

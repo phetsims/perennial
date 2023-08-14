@@ -10,7 +10,7 @@ const SimVersion = require( '../common/SimVersion' );
 const booleanPrompt = require( '../common/booleanPrompt' );
 const build = require( '../common/build' );
 const buildServerRequest = require( '../common/buildServerRequest' );
-const checkoutMaster = require( '../common/checkoutMaster' );
+const checkoutMain = require( '../common/checkoutMain' );
 const checkoutTarget = require( '../common/checkoutTarget' );
 const execute = require( '../common/execute' );
 const getDependencies = require( '../common/getDependencies' );
@@ -186,7 +186,7 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     } );
 
     // Move back to main
-    await checkoutMaster( repo, true );
+    await checkoutMain( repo, true );
 
     if ( brands.includes( 'phet' ) ) {
       grunt.log.writeln( `Deployed: https://phet.colorado.edu/sims/html/${repo}/latest/${repo}_all.html` );
@@ -230,7 +230,7 @@ PhET-iO deploys involve a couple of extra steps after production. Please ensure 
   }
   catch( e ) {
     grunt.log.warn( 'Detected failure during deploy, reverting to main' );
-    await checkoutMaster( repo, true );
+    await checkoutMain( repo, true );
     throw e;
   }
 };

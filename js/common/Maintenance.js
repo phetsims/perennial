@@ -13,7 +13,7 @@ const ModifiedBranch = require( './ModifiedBranch' );
 const Patch = require( './Patch' );
 const ReleaseBranch = require( './ReleaseBranch' );
 const build = require( './build' );
-const checkoutMaster = require( './checkoutMaster' );
+const checkoutMain = require( './checkoutMain' );
 const checkoutTarget = require( './checkoutTarget' );
 const execute = require( './execute' );
 const getActiveRepos = require( './getActiveRepos' );
@@ -857,7 +857,7 @@ module.exports = ( function() {
           modifiedBranch.pendingMessages = [];
           maintenance.save(); // save here in case a future failure would "revert" things
 
-          await checkoutMaster( modifiedBranch.repo, false );
+          await checkoutMain( modifiedBranch.repo, false );
         }
         catch( e ) {
           maintenance.save();

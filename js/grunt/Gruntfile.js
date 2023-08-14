@@ -152,19 +152,19 @@ module.exports = function( grunt ) {
 
       assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
-      const checkoutMaster = require( '../common/checkoutMaster' );
+      const checkoutMain = require( '../common/checkoutMain' );
 
       assertIsValidRepoName( repo );
 
-      await checkoutMaster( repo, !grunt.option( 'skipNpmUpdate' ) );
+      await checkoutMain( repo, !grunt.option( 'skipNpmUpdate' ) );
     } ) );
 
   grunt.registerTask( 'checkout-main-all',
     'Check out main branch for all repos in git root',
     wrapTask( async () => {
-      const checkoutMasterAll = require( './checkoutMasterAll' );
+      const checkoutMainAll = require( './checkoutMainAll' );
 
-      checkoutMasterAll();
+      checkoutMainAll();
     } ) );
 
   grunt.registerTask( 'sha-check',
