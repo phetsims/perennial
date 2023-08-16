@@ -594,7 +594,6 @@ module.exports = function( grunt ) {
   } ) );
 
   grunt.registerTask( 'reopen-issues-from-todos', 'If there is a TODO in the project pointing to a closed issue, reopen it.', wrapTask( async () => {
-    const reopenIssuesFromTODOs = require( './reopenIssuesFromTODOs' );
-    await reopenIssuesFromTODOs();
+    await require( './reopenIssuesFromTODOs' )();
   } ) );
 };
