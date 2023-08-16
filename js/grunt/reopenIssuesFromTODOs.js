@@ -36,10 +36,14 @@ module.exports = async function reopenIssuesFromTODOs() {
   fs.writeFileSync( '../chipper/dist/issuesFromTODOs.txt', '' );
 
   console.log( 'grunt lint-everything started' );
-  await execute( gruntCommand, [ 'lint-everything', '--disable-eslint-cache' ], '../perennial', {
+  const result = await execute( gruntCommand, [ 'lint-everything', '--disable-eslint-cache' ], '../perennial', {
     errors: 'resolve'
   } );
   console.log( 'grunt lint-everything finished' );
+  if ( result.code !== 0 ) {
+    console.log( 'Error running lint-everything:\n\n', result.stdout, result.stderr );
+    process.exit();
+  }
 
 
   const TODOIssues = fs.readFileSync( '../chipper/dist/issuesFromTODOs.txt' ).toString().trim().split( '\n' );
