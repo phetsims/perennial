@@ -528,13 +528,22 @@ tests.push( {
 } );
 
 // build-a-nucleus: tests the public query parameters for configurations that cannot be changed during runtime
-const protons = Math.floor( Math.random() * 92 );
-const neutrons = Math.floor( Math.random() * 146 );
+const decayProtons = Math.floor( Math.random() * 94.99 );
+const decayNeutrons = Math.floor( Math.random() * 146.99 );
+const chartIntroProtons = Math.floor( Math.random() * 10.99 );
+const chartIntroNeutrons = Math.floor( Math.random() * 12.99 );
 tests.push( {
   test: [ 'build-a-nucleus', 'fuzz', 'unbuilt', 'query-parameters' ],
   type: 'sim-test',
   url: 'build-a-nucleus/build-a-nucleus_en.html',
-  queryParameters: `brand=phet&ea&fuzz&protons=${protons}&neutrons=${neutrons}`
+  queryParameters: `brand=phet&ea&fuzz&decayScreenProtons=${decayProtons}&decayScreenNeutrons=${decayNeutrons}&chartIntoScreenProtons=${chartIntroProtons}&chartIntoScreenNeutrons=${chartIntroNeutrons}`
+} );
+
+tests.push( {
+  test: [ 'build-a-nucleus', 'fuzz', 'unbuilt', 'query-parameters-wrong' ],
+  type: 'sim-test',
+  url: 'build-a-nucleus/build-a-nucleus_en.html',
+  queryParameters: 'brand=phet&ea&fuzz&decayScreenProtons=200&decayScreenNeutrons=200&chartIntoScreenProtons=200&chartIntoScreenNeutrons=200'
 } );
 
 console.log( JSON.stringify( tests, null, 2 ) );
