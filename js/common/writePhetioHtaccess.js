@@ -114,16 +114,25 @@ ${commentSymbol} Allow from all
 
     // Write a file to add authentication to the top level index pages
     if ( phetioPackage.phet && phetioPackage.phet.addRootHTAccessFile ) {
-      const passwordProtectIndexContents = `<FilesMatch "(index\\.\\w+)$">\n${
+      const rootHtaccessContent = `<FilesMatch "(index\\.\\w+)$">\n${
         basePasswordProtectContents
       }</FilesMatch>
+      
+# If the request is for a SIM, anything in the /lib or /xhtml dirs, or is the api.json file, then allow it to be cached
+<If "-f %{REQUEST_FILENAME} && %{REQUEST_FILENAME} =~ m#(_all.*\\.html|api\\.json|/lib/.*|/xhtml/.*)$#">
+  ExpiresActive on
+  ExpiresDefault "access plus 1 day"
+  Header append Cache-Control "public"
+  Header append Cache-Control "stale-while-revalidate=5184000"
+  Header append Cache-Control "stale-if-error=5184000"
+</If>
                         
 # Editing these directly is not supported and will be overwritten by maintenance releases. Please change by modifying 
 # the sim's package.json allowPublicAccess flag followed by a re-deploy.
 ${commentSymbol} Satisfy Any
 ${commentSymbol} Allow from all
 `;
-      await writeFile( rootHtaccessFullPath, passwordProtectIndexContents );
+      await writeFile( rootHtaccessFullPath, rootHtaccessContent );
       if ( devVersionPath ) {
         await devScp( rootHtaccessFullPath, `${devVersionPath}/phet-io/${htaccessFilename}` );
       }
