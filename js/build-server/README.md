@@ -4,7 +4,8 @@ PhET build and deploy server.
 
 # Host
 
-The production version of the build server runs on **phet-server2.int.colorado.edu**, the same host as the PhET production website.
+The production version of the build server runs on **phet-server2.int.colorado.edu**, the same host as the PhET
+production website.
 
 A test version of the server runs on **phet-server-dev.int.colorado.edu**.
 
@@ -13,7 +14,8 @@ A test version of the server runs on **phet-server-dev.int.colorado.edu**.
 To start, stop, or restart the build server, run this command:
 `sudo systemctl [start|stop|restart] build-server`
 
-Starting the build-server runs the application that is currently checked out at `/data/share/phet/phet-repos/perennial`.  You must use the `phet-admin` account for all git operations on this repo, e.g. `sudo -u phet-admin git pull`.
+Starting the build-server runs the application that is currently checked out at `/data/share/phet/phet-repos/perennial`.
+You must use the `phet-admin` account for all git operations on this repo, e.g. `sudo -u phet-admin git pull`.
 
 To edit startup options, please see `/usr/lib/systemd/system/build-server.service`
 
@@ -120,14 +122,14 @@ The build server does the following steps when a deploy request is received:
 - npm update in chipper and the sim directory
 - grunt build-for-server --brands=phet for selected locales (see chipper's Gruntfile for details)
 - for rc deploys:
-    - deploy to the dev server, checkout main for all repositories, and finish
+  - deploy to the dev server, checkout main for all repositories, and finish
 - for production deploys:
-    - mkdir for the new sim version
-    - copy the build files to the correct location in the server doc root
-    - write the .htaccess file for indicating the latest directory and downloading the html files
-    - write the XML file that tells the website which translations exist
-    - notify the website that a new simulation/translation is published and should appear
-    - add the sim to rosetta's simInfoArray and commit and push (if the sim isn't already there)
-    - checkout main for all repositories
+  - mkdir for the new sim version
+  - copy the build files to the correct location in the server doc root
+  - write the .htaccess file for indicating the latest directory and downloading the html files
+  - write the XML file that tells the website which translations exist
+  - notify the website that a new simulation/translation is published and should appear
+  - add the sim to rosetta's simInfoArray and commit and push (if the sim isn't already there)
+  - checkout main for all repositories
 
 If any of these steps fails, the build aborts and grunt checkout-main-all is run so all repos are back on main

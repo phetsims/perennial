@@ -4,9 +4,11 @@ modified files (although the task will likely commit and push for you).
 
 active-common-sim-repos (manually maintained) - a list of the "common" repos
 
-active-repos (manually maintained) - a list of all repositories that you should have checked out if doing common-code refactoring.
+active-repos (manually maintained) - a list of all repositories that you should have checked out if doing common-code
+refactoring.
 
-active-repos-private (manually maintained) - a list of all private GitHub repositories that are possible to ignore when cloning with `-p`.
+active-repos-private (manually maintained) - a list of all private GitHub repositories that are possible to ignore when
+cloning with `-p`.
 
 active-runnables (auto-generated) - a list of all repositories that can be built with chipper and launched from an html
 file.
@@ -14,8 +16,10 @@ file.
 active-sims (auto-generated) - a list of all simulation repositories that can be built with chipper. Similar to
 runnables, but doesn't include repos with test code like sun, scenery-phet, etc.
 
-color-profiles (manually maintained) - a vestigial list of outdates color-profile-supporting sims that is only needed so that
-phetmarks works on release branches. DO NOT UPDATE. See https://github.com/phetsims/scenery-phet/issues/515#issuecomment-885921345
+color-profiles (manually maintained) - a vestigial list of outdates color-profile-supporting sims that is only needed so
+that
+phetmarks works on release branches. DO NOT UPDATE.
+See https://github.com/phetsims/scenery-phet/issues/515#issuecomment-885921345
 
 interactive-description (auto-generated) is a list of all repositories that have been outfitted with interactive
 description like keyboard navigation. Sims in progress are also included in this list.
@@ -34,7 +38,8 @@ phet-io-state-unsupported (manually maintained) - A manually supported list of s
 shouldn't be tested as
 such. Any sim in this list will not have its state wrapper fuzzed on CT.
 
-pixelzoom-repos (manually maintained) - A list of repos for which @pixelzoom is the responsible dev for, see `../phet-info/sim-info/responsible_dev.json` but without the common code repos.
+pixelzoom-repos (manually maintained) - A list of repos for which @pixelzoom is the responsible dev for,
+see `../phet-info/sim-info/responsible_dev.json` but without the common code repos.
 
 unit-tests (auto-generated) - A list of repos that support qunit tests with a committed harness for testing.
 
