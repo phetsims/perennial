@@ -427,7 +427,7 @@ Object.keys( commonQueryParameters ).forEach( name => {
   tests.push( {
     test: [ simName, 'migration', `${oldVersion}->main` ],
     type: 'wrapper-test',
-    url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=1000&silent`,
+    url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=10000&silent`,
     priority: 102  // Just while we are initially testing, TODO: remove in https://github.com/phetsims/phet-io/issues/1944
   } );
 } );
