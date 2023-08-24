@@ -935,7 +935,7 @@ module.exports = ( function() {
         try {
           console.log( `Running production deploy for ${modifiedBranch.repo} ${modifiedBranch.branch}` );
 
-          const version = await production( modifiedBranch.repo, modifiedBranch.branch, modifiedBranch.brands, true, modifiedBranch.pushedMessages.join( ', ' ) );
+          const version = await production( modifiedBranch.repo, modifiedBranch.branch, modifiedBranch.brands, true, false, modifiedBranch.pushedMessages.join( ', ' ) );
           modifiedBranch.deployedVersion = version;
           modifiedBranch.pushedMessages = [];
           maintenance.save(); // save here in case a future failure would "revert" things
@@ -1049,7 +1049,7 @@ module.exports = ( function() {
 
         console.log( releaseBranch.toString() );
         await rc( releaseBranch.repo, releaseBranch.branch, releaseBranch.brands, true, message );
-        await production( releaseBranch.repo, releaseBranch.branch, releaseBranch.brands, true, message );
+        await production( releaseBranch.repo, releaseBranch.branch, releaseBranch.brands, true, false, message );
       }
 
       console.log( 'Finished redeploying' );

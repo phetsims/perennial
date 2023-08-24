@@ -29,6 +29,7 @@ const simMetadata = require( '../common/simMetadata' );
 const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
 const vpnCheck = require( '../common/vpnCheck' );
 const buildLocal = require( '../common/buildLocal' );
+const assert = require( 'assert' );
 
 /**
  * Deploys a production version after incrementing the test version number.
@@ -38,10 +39,11 @@ const buildLocal = require( '../common/buildLocal' );
  * @param {string} branch
  * @param {Array.<string>} brands
  * @param {boolean} noninteractive
+ * @param {boolean} redeploy
  * @param {string} [message] - Optional message to append to the version-increment commit.
  * @returns {Promise.<SimVersion>}
  */
-module.exports = async function( repo, branch, brands, noninteractive, message ) {
+module.exports = async function( repo, branch, brands, noninteractive, redeploy, message ) {
   SimVersion.ensureReleaseBranch( branch );
 
   if ( !( await vpnCheck() ) ) {
@@ -69,6 +71,8 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     throw new Error( 'Aborted production deployment' );
   }
 
+  redeploy && assert( noninteractive, 'redeploy can only be specified with noninteractive:true' );
+
   const published = await isPublished( repo );
 
   await checkoutTarget( repo, branch, true ); // include npm update
@@ -79,7 +83,9 @@ module.exports = async function( repo, branch, brands, noninteractive, message )
     let versionChanged;
 
     if ( previousVersion.testType === null ) {
-      if ( noninteractive || !await booleanPrompt( `The last deployment was a production deployment (${previousVersion.toString()}) and an RC version is required between production versions. Would you like to redeploy ${previousVersion.toString()} (y) or cancel this process and revert to main (N)`, false ) ) {
+
+      // redeploy flag can bypass this prompt and error
+      if ( !redeploy && ( noninteractive || !await booleanPrompt( `The last deployment was a production deployment (${previousVersion.toString()}) and an RC version is required between production versions. Would you like to redeploy ${previousVersion.toString()} (y) or cancel this process and revert to main (N)`, false ) ) ) {
         throw new Error( 'Aborted production deployment: It appears that the last deployment was for production.' );
       }
 
