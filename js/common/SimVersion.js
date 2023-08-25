@@ -79,9 +79,9 @@
         testNumber = null
       } = options;
 
-      assert && assert( typeof major === 'number' && major >= 0 && major % 1 === 0, 'major version should be a non-negative integer' );
-      assert && assert( typeof minor === 'number' && minor >= 0 && minor % 1 === 0, 'minor version should be a non-negative integer' );
-      assert && assert( typeof maintenance === 'number' && maintenance >= 0 && maintenance % 1 === 0, 'maintenance version should be a non-negative integer' );
+      assert && assert( typeof major === 'number' && major >= 0 && major % 1 === 0, `major version should be a non-negative integer: ${major}` );
+      assert && assert( typeof minor === 'number' && minor >= 0 && minor % 1 === 0, `minor version should be a non-negative integer: ${minor}` );
+      assert && assert( typeof maintenance === 'number' && maintenance >= 0 && maintenance % 1 === 0, `maintenance version should be a non-negative integer: ${maintenance}` );
       assert && assert( typeof testType !== 'string' || typeof testNumber === 'number', 'if testType is provided, testNumber should be a number' );
 
       // @public {number}
