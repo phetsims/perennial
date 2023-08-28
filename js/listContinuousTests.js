@@ -546,23 +546,4 @@ tests.push( {
   queryParameters: 'brand=phet&ea&fuzz&decayScreenProtons=200&decayScreenNeutrons=200&chartIntoScreenProtons=200&chartIntoScreenNeutrons=200'
 } );
 
-
-// TEMP TESTING FOR https://github.com/phetsims/phet-io/issues/1944
-const myTests = [];
-/////////////////////////////////////////////////////
-// PhET-iO migration testing
-[
-  [ 'gravity-and-orbits', '1.6' ]
-].forEach( testData => {
-  const simName = testData[ 0 ];
-  const oldVersion = testData[ 1 ];
-  myTests.push( {
-    test: [ simName, 'migration', `${oldVersion}->main` ],
-    type: 'wrapper-test',
-    url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=10000&silent`,
-    priority: 102  // Just while we are initially testing, TODO: remove in https://github.com/phetsims/phet-io/issues/1944
-  } );
-} );
-
-
-console.log( JSON.stringify( myTests, null, 2 ) );
+console.log( JSON.stringify( tests, null, 2 ) );
