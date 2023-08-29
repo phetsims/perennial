@@ -418,9 +418,23 @@ Object.keys( commonQueryParameters ).forEach( name => {
 /////////////////////////////////////////////////////
 // PhET-iO migration testing
 [
-  [ 'molecule-polarity', '1.2' ],
-  [ 'graphing-quadratics', '1.2' ],
-  [ 'natural-selection', '1.4' ]
+  [ 'beers-law-lab', '1.7' ],
+  [ 'calculus-grapher', '1.0' ],
+  [ 'circuit-construction-kit-dc-virtual-lab', '1.3' ],
+  [ 'circuit-construction-kit-dc', '1.3' ],
+  [ 'concentration', '1.7' ],
+  [ 'density', '1.1' ],
+  [ 'friction', '1.6' ],
+  [ 'geometric-optics', '1.3' ],
+  [ 'geometric-optics-basics', '1.3' ],
+  [ 'graphing-quadratics', '1.2' ], // 1.3 is hydrogen
+  [ 'gravity-and-orbits', '1.5' ], // 1.6 is hydrogen
+  [ 'molecule-polarity', '1.2' ], // 1.3 is hydrogen
+  [ 'molecule-shapes', '1.6' ],
+  [ 'molecule-shapes-basics', '1.6' ],
+  [ 'natural-selection', '1.4' ], // 1.5 is hydrogen
+  [ 'ph-scale', '1.5' ], // 1.6 is hydrogen
+  [ 'ph-scale-basics', '1.5' ] // 1.6 is hydrogen
 ].forEach( testData => {
   const simName = testData[ 0 ];
   const oldVersion = testData[ 1 ];
