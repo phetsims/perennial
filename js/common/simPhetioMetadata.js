@@ -15,7 +15,7 @@ const axios = require( 'axios' );
  * @public
  *
  * @param {Object} [options]
- * @returns {Promise.<Object>} - Resolves with metadata object
+ * @returns {Promise.<Object[]>} - Resolves with metadata objects in an array
  */
 module.exports = async function( options ) {
   options = _.extend( {
