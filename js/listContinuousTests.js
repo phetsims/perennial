@@ -427,10 +427,11 @@ Object.keys( commonQueryParameters ).forEach( name => {
   [ 'friction', '1.6' ],
   [ 'geometric-optics', '1.3' ],
   [ 'geometric-optics-basics', '1.3' ],
-  [ 'graphing-quadratics', '1.3' ],
   [ 'graphing-quadratics', '1.2' ], // 1.3 is hydrogen
+  [ 'graphing-quadratics', '1.3' ],
   [ 'gravity-and-orbits', '1.5' ], // 1.6 is hydrogen
   [ 'gravity-and-orbits', '1.6' ],
+  [ 'greenhouse-effect', '1.2' ],
   [ 'molecule-polarity', '1.2' ], // 1.3 is hydrogen
   [ 'molecule-polarity', '1.3' ],
   [ 'molecule-shapes', '1.6' ],
