@@ -47,8 +47,8 @@ The release branch's latest version is stored in the `package.json` (on the bran
 auto-incrementing the version numbers. Release branches should NOT currently have anything like `dev` versions, and will
 either show an `rc` version or will have no test type (e.g. `1.2.3` or `1.2.3-rc.2`). If the version shows that a
 production version (e.g. `1.2.3`) was last released, the process will bump the maintenance version (e.g. to `1.2.4`),
-and will be a series of RC versions before a production version (e.g. `1.2.4-rc.1`, `1.2.4-rc.2`, ..., `1.2.4` ).
-The release branches should always have a RC version deployed between production versions (for at least brief testing).
+and will be a series of RC versions before a production version (e.g. `1.2.4-rc.1`, `1.2.4-rc.2`, ..., `1.2.4` ). The
+release branches should always have a RC version deployed between production versions (for at least brief testing).
 
 The exact SHAs of repositories for a release branch are determined by:
 
@@ -184,19 +184,19 @@ This is essentially a pretty-printed version of what is in your `.maintenance.js
 
 It is assumed that your `~/.phet/build.json` file will be properly configured so that simulations can be deployed. The
 standard developer guide instructions to set this up should be done before beginning the maintenance process. Notably,
-it is important that `npm config set save false` and `npm config set package-lock false` should be applied,
-so that package files are not changed during npm operations used by the maintenance process. In addition, it is helpful
-to set up build server notifications (with `buildServerNotifyEmail` in `~/.phet/build.json`) so that any failed
-deployments can be flagged.
+it is important that `npm config set save false` and `npm config set package-lock false` should be applied, so that
+package files are not changed during npm operations used by the maintenance process. In addition, it is helpful to set
+up build server notifications (with `buildServerNotifyEmail` in `~/.phet/build.json`) so that any failed deployments can
+be flagged.
 
 # General maintenance steps
 
 ## #1: Checking branch status: `Maintenance.checkBranchStatus()`
 
-This command will iterate through all available release branches, and will make a few checks to see whether they are
-in a consistent form (all common-code related branches are OK, etc.) and whether there were any commits since the last
-time it was released. If it detects any anomalies, it will be printed out. If this is a release branch that has a chance
-of being included in the release, it's best to investigate its status.
+This command will iterate through all available release branches, and will make a few checks to see whether they are in
+a consistent form (all common-code related branches are OK, etc.) and whether there were any commits since the last time
+it was released. If it detects any anomalies, it will be printed out. If this is a release branch that has a chance of
+being included in the release, it's best to investigate its status.
 
 For example, in a recent maintenance release, I had made commits on release branches that updated README.md which were
 not released, so things showed up as:
@@ -242,10 +242,10 @@ If any state is needed from a previous maintenance release, feel free to back up
 It helps to gather information about all the changes that will be required up front, before diving in. The most
 important questions I've found useful are the following:
 
-- Is there a specific commit (or commits) that made all of the changes? If so, record it/them down for use later.
-  Many times I'll leave all commits open in browser tabs (github.com references) for quick reference. Take a look at
-  the affected code in older simulations to see how things have changed. Many times you'll end up needing a few
-  completely different implementations, particularly if the affected code was heavily rewritten over time.
+- Is there a specific commit (or commits) that made all of the changes? If so, record it/them down for use later. Many
+  times I'll leave all commits open in browser tabs (github.com references) for quick reference. Take a look at the
+  affected code in older simulations to see how things have changed. Many times you'll end up needing a few completely
+  different implementations, particularly if the affected code was heavily rewritten over time.
 - What repositories will be affected? What are the exact dependencies of the code being added/changed? NOTE: there have
   been a number of patches that will only affect one repository (e.g. `scenery`) in recently-published simulations, but
   require changes to a different repository (e.g. `phet-core`) due to use of a feature that did not exist in the
