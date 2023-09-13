@@ -449,8 +449,7 @@ Object.keys( commonQueryParameters ).forEach( name => {
     return {
       test: [ simName, 'migration', `${oldVersion}->main`, ...( isStrict ? [ 'strictMigrationRules' ] : [] ) ],
       type: 'wrapper-test',
-      url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=10000&silent${isStrict ? '&strictMigrationRules' : ''}`,
-      priority: 102  // Just while we are initially testing, TODO: remove in https://github.com/phetsims/phet-io/issues/1944
+      url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=10000&silent${isStrict ? '&strictMigrationRules' : ''}`
     };
   };
   tests.push( getTest( false ) );
