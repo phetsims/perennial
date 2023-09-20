@@ -438,7 +438,7 @@ Object.keys( commonQueryParameters ).forEach( name => {
   [ 'molecule-shapes-basics', '1.6' ],
   [ 'natural-selection', '1.4', 'no-strict' ], // 1.5 is hydrogen
   [ 'natural-selection', '1.5' ],
-  [ 'ph-scale', '1.5' ], // 1.6 is hydrogen
+  [ 'ph-scale', '1.5', 'no-strict' ], // 1.6 is hydrogen
   [ 'ph-scale', '1.6' ],
   [ 'ph-scale-basics', '1.5', 'no-strict' ], // 1.6 is hydrogen
   [ 'ph-scale-basics', '1.6' ]
