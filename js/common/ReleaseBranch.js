@@ -443,7 +443,7 @@ module.exports = ( function() {
 
       const dependencies = await this.getDependencies();
       const dependencyNames = Object.keys( dependencies ).filter( key => {
-        return key !== 'comment' && key !== this.repo;
+        return key !== 'comment' && key !== this.repo && key !== 'phet-io-wrapper-sonification';
       } );
 
       // Check our own dependency
