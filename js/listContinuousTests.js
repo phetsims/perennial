@@ -26,6 +26,11 @@ const REPOS_EXCLUDED_FROM_MULTITOUCH_FUZZING = [
   'number-play'
 ];
 
+const REPOS_EXCLUDED_FROM_LISTENER_ORDER_RANDOM = [
+  'density',
+  'buoyancy'
+];
+
 /**
  * {Array.<Object>} test
  * {string} type
@@ -101,13 +106,15 @@ runnableRepos.forEach( repo => {
     priority: 0.001
   } );
 
-  tests.push( {
-    test: [ repo, 'fuzz', 'unbuilt', 'listenerOrderRandom' ],
-    type: 'sim-test',
-    url: `${repo}/${repo}_en.html`,
-    queryParameters: 'brand=phet&ea&fuzz&listenerOrder=random',
-    priority: 0.3
-  } );
+  if ( !REPOS_EXCLUDED_FROM_LISTENER_ORDER_RANDOM.includes( repo ) ) {
+    tests.push( {
+      test: [ repo, 'fuzz', 'unbuilt', 'listenerOrderRandom' ],
+      type: 'sim-test',
+      url: `${repo}/${repo}_en.html`,
+      queryParameters: 'brand=phet&ea&fuzz&listenerOrder=random',
+      priority: 0.3
+    } );
+  }
 
   // don't test select repos for fuzzPointers=2
   if ( !REPOS_EXCLUDED_FROM_MULTITOUCH_FUZZING.includes( repo ) ) {
