@@ -430,7 +430,7 @@ Object.keys( commonQueryParameters ).forEach( name => {
   [ 'circuit-construction-kit-dc-virtual-lab', '1.3' ],
   [ 'circuit-construction-kit-dc', '1.3' ],
   [ 'concentration', '1.7' ],
-  // [ 'density', '1.1' ], // See https://github.com/phetsims/phet-io-wrappers/issues/551
+  [ 'density', '1.1' ],
   [ 'friction', '1.6' ],
   [ 'geometric-optics', '1.3' ],
   [ 'geometric-optics-basics', '1.3' ],
