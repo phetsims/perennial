@@ -195,7 +195,7 @@ module.exports = ( function() {
     /**
      * @public
      */
-    async updateCheckout() {
+    async updateCheckout( overrideDependencies = {} ) {
       winston.info( `updating checkout for ${this.toString()}` );
 
       if ( !fs.existsSync( MAINTENANCE_DIRECTORY ) ) {
@@ -211,18 +211,22 @@ module.exports = ( function() {
       await gitCloneOrFetchDirectory( this.repo, checkoutDirectory );
       await gitCheckoutDirectory( this.branch, `${checkoutDirectory}/${this.repo}` );
       await gitPullDirectory( `${checkoutDirectory}/${this.repo}` );
-      const dependencies = await loadJSON( `${checkoutDirectory}/${this.repo}/dependencies.json` );
+      const dependenciesOnBranchTip = await loadJSON( `${checkoutDirectory}/${this.repo}/dependencies.json` );
 
-      dependencies.babel = { sha: buildLocal.babelBranch, branch: buildLocal.babelBranch };
+      dependenciesOnBranchTip.babel = { sha: buildLocal.babelBranch, branch: buildLocal.babelBranch };
 
-      const dependencyRepos = Object.keys( dependencies ).filter( repo => repo !== 'comment' );
+      const dependencyRepos = _.uniq( [
+        ...Object.keys( dependenciesOnBranchTip ),
+        ...Object.keys( overrideDependencies )
+      ].filter( repo => repo !== 'comment' ) );
 
       await Promise.all( dependencyRepos.map( async repo => {
         const repoPwd = `${checkoutDirectory}/${repo}`;
 
         await gitCloneOrFetchDirectory( repo, checkoutDirectory );
 
-        await gitCheckoutDirectory( dependencies[ repo ].sha, repoPwd );
+        const sha = overrideDependencies[ repo ] ? overrideDependencies[ repo ].sha : dependenciesOnBranchTip[ repo ].sha;
+        await gitCheckoutDirectory( sha, repoPwd );
 
         // Pull babel, since we don't give it a specific SHA (just a branch),
         // see https://github.com/phetsims/perennial/issues/326

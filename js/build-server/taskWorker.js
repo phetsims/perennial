@@ -76,6 +76,7 @@ async function runTask( options ) {
     // Parse and validate parameters
     //-------------------------------------------------------------------------------------
     const api = options.api;
+    const dependencies = options.repos;
     let locales = options.locales;
     const simName = options.simName;
     let version = options.version;
@@ -97,6 +98,33 @@ async function runTask( options ) {
     const simNameRegex = /^[a-z-]+$/;
     if ( !simNameRegex.test( simName ) ) {
       await abortBuild( `invalid simName ${simName}` );
+    }
+
+    // make sure the repos passed in validates
+    for ( const key in dependencies ) {
+      if ( dependencies.hasOwnProperty( key ) ) {
+        winston.log( 'info', `Validating repo: ${key}` );
+
+        // make sure all keys in dependencies object are valid sim names
+        if ( !simNameRegex.test( key ) ) {
+          await abortBuild( `invalid simName in dependencies: ${simName}` );
+        }
+
+        const value = dependencies[ key ];
+        if ( key === 'comment' ) {
+          if ( typeof value !== 'string' ) {
+            await abortBuild( 'invalid comment in dependencies: should be a string' );
+          }
+        }
+        else if ( value instanceof Object && value.hasOwnProperty( 'sha' ) ) {
+          if ( !/^[a-f0-9]{40}$/.test( value.sha ) ) {
+            await abortBuild( `invalid sha in dependencies. key: ${key} value: ${value} sha: ${value.sha}` );
+          }
+        }
+        else {
+          await abortBuild( `invalid item in dependencies. key: ${key} value: ${value}` );
+        }
+      }
     }
 
     // Infer brand from version string and keep unstripped version for phet-io
@@ -127,12 +155,22 @@ async function runTask( options ) {
 
     // Git pull, git checkout, npm prune & update, etc. in parallel directory
     const releaseBranch = new ReleaseBranch( simName, branch, brands, true );
-    await releaseBranch.updateCheckout();
+    await releaseBranch.updateCheckout( dependencies );
 
     const chipperVersion = releaseBranch.getChipperVersion();
     winston.debug( `Chipper version detected: ${chipperVersion.toString()}` );
     if ( !( chipperVersion.major === 2 && chipperVersion.minor === 0 ) && !( chipperVersion.major === 0 && chipperVersion.minor === 0 ) ) {
       await abortBuild( 'Unsupported chipper version' );
+    }
+
+    if ( chipperVersion.major !== 1 ) {
+      const checkoutDirectory = ReleaseBranch.getCheckoutDirectory( simName, branch );
+      const packageJSON = JSON.parse( fs.readFileSync( `${checkoutDirectory}/${simName}/package.json`, 'utf8' ) );
+      const packageVersion = packageJSON.version;
+
+      if ( packageVersion !== version ) {
+        await abortBuild( `Version mismatch between package.json and build request: ${packageVersion} vs ${version}` );
+      }
     }
 
     await releaseBranch.build( {
