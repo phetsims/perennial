@@ -26,7 +26,7 @@
     "ncp": "~2.0.0",
     "playwright": "~1.33.0",
     "puppeteer": "~19.2.2",
-    "qunit": "~2.10.0",
+    "qunit": "~2.20.0",
     "rimraf": "~2.5.4",
     "rsync": "~0.6.1",
     "thread-sleep": "~2.0.0",
