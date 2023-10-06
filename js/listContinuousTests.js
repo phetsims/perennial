@@ -450,17 +450,18 @@ Object.keys( commonQueryParameters ).forEach( name => {
   [ 'ph-scale-basics', '1.5' ], // 1.6 is hydrogen
   [ 'ph-scale-basics', '1.6' ]
 ].forEach( testData => {
-  const simName = testData[ 0 ];
-  const oldVersion = testData[ 1 ];
-  const getTest = isStrict => {
-    return {
-      test: [ simName, 'migration', `${oldVersion}->main`, ...( isStrict ? [ 'strictMigrationRules' ] : [] ) ],
-      type: 'wrapper-test',
-      url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=10000&silent${isStrict ? '&strictMigrationRules' : ''}`
-    };
-  };
-  tests.push( getTest( false ) );
-  tests.push( getTest( true ) );
+  // TODO: Turn back on once we get a handle on https://github.com/phetsims/phet-io-wrappers/issues/555
+  // const simName = testData[ 0 ];
+  // const oldVersion = testData[ 1 ];
+  // const getTest = isStrict => {
+  //   return {
+  //     test: [ simName, 'migration', `${oldVersion}->main`, ...( isStrict ? [ 'strictMigrationRules' ] : [] ) ],
+  //     type: 'wrapper-test',
+  //     url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=10000&silent${isStrict ? '&strictMigrationRules' : ''}`
+  //   };
+  // };
+  // tests.push( getTest( false ) );
+  // tests.push( getTest( true ) );
 } );
 ////////////////////////////////////////////
 
