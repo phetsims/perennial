@@ -450,7 +450,7 @@ Object.keys( commonQueryParameters ).forEach( name => {
   [ 'ph-scale-basics', '1.5' ], // 1.6 is hydrogen
   [ 'ph-scale-basics', '1.6' ]
 ].forEach( testData => {
-  // TODO: Turn back on once we get a handle on https://github.com/phetsims/phet-io-wrappers/issues/555
+  // TODO: Turn back on once we get a handle on https://github.com/phetsims/phet-io-wrappers/issues/565
   // const simName = testData[ 0 ];
   // const oldVersion = testData[ 1 ];
   // const getTest = isStrict => {
