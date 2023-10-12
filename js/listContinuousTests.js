@@ -457,7 +457,8 @@ Object.keys( commonQueryParameters ).forEach( name => {
   //   return {
   //     test: [ simName, 'migration', `${oldVersion}->main`, ...( isStrict ? [ 'strictMigrationRules' ] : [] ) ],
   //     type: 'wrapper-test',
-  //     url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=10000{isStrict ? '&strictMigrationRules' : ''}`
+  //     testQueryParameters: 'duration=80000' // Loading 2 studios takes time!
+  //     url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=5000{isStrict ? '&strictMigrationRules' : ''}`
   //   };
   // };
   // tests.push( getTest( false ) );
