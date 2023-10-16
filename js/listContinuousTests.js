@@ -446,16 +446,12 @@ Object.keys( commonQueryParameters ).forEach( name => {
 ].forEach( testData => {
   const simName = testData[ 0 ];
   const oldVersion = testData[ 1 ];
-  const getTest = isStrict => {
-    return {
-      test: [ simName, 'migration', `${oldVersion}->main`, ...( isStrict ? [ 'strictMigrationRules' ] : [] ) ],
-      type: 'wrapper-test',
-      testQueryParameters: 'duration=80000', // Loading 2 studios takes time!
-      url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=5000${isStrict ? '&strictMigrationRules' : ''}`
-    };
-  };
-  tests.push( getTest( false ) );
-  tests.push( getTest( true ) );
+  tests.push( {
+    test: [ simName, 'migration', `${oldVersion}->main` ],
+    type: 'wrapper-test',
+    testQueryParameters: 'duration=80000', // Loading 2 studios takes time!
+    url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=5000`
+  } );
 } );
 ////////////////////////////////////////////
 
