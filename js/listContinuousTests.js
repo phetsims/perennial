@@ -434,20 +434,14 @@ Object.keys( commonQueryParameters ).forEach( name => {
   [ 'friction', '1.6' ],
   [ 'geometric-optics', '1.3' ],
   [ 'geometric-optics-basics', '1.3' ],
-  //[ 'graphing-quadratics', '1.2' ], // 1.3 is hydrogen
   [ 'graphing-quadratics', '1.3' ],
-  //[ 'gravity-and-orbits', '1.5' ], // 1.6 is hydrogen
   [ 'gravity-and-orbits', '1.6' ],
   [ 'greenhouse-effect', '1.2' ],
-  //[ 'molecule-polarity', '1.2' ], // 1.3 is hydrogen
   [ 'molecule-polarity', '1.3' ],
   [ 'molecule-shapes', '1.6' ],
   [ 'molecule-shapes-basics', '1.6' ],
-  //[ 'natural-selection', '1.4' ], // 1.5 is hydrogen
   [ 'natural-selection', '1.5' ],
-  //[ 'ph-scale', '1.5' ], // 1.6 is hydrogen
   [ 'ph-scale', '1.6' ],
-  //[ 'ph-scale-basics', '1.5' ], // 1.6 is hydrogen
   [ 'ph-scale-basics', '1.6' ]
 ].forEach( testData => {
   // TODO: Turn back on once we get a handle on https://github.com/phetsims/phet-io-wrappers/issues/565
