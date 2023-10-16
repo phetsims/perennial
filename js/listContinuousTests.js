@@ -444,7 +444,6 @@ Object.keys( commonQueryParameters ).forEach( name => {
   [ 'ph-scale', '1.6' ],
   [ 'ph-scale-basics', '1.6' ]
 ].forEach( testData => {
-  // TODO: Turn back on once we get a handle on https://github.com/phetsims/phet-io-wrappers/issues/565
   const simName = testData[ 0 ];
   const oldVersion = testData[ 1 ];
   const getTest = isStrict => {
@@ -452,7 +451,7 @@ Object.keys( commonQueryParameters ).forEach( name => {
       test: [ simName, 'migration', `${oldVersion}->main`, ...( isStrict ? [ 'strictMigrationRules' ] : [] ) ],
       type: 'wrapper-test',
       testQueryParameters: 'duration=80000', // Loading 2 studios takes time!
-      url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=5000{isStrict ? '&strictMigrationRules' : ''}`
+      url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=5000${isStrict ? '&strictMigrationRules' : ''}`
     };
   };
   tests.push( getTest( false ) );
