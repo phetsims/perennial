@@ -450,7 +450,7 @@ Object.keys( commonQueryParameters ).forEach( name => {
     test: [ simName, 'migration', `${oldVersion}->main` ],
     type: 'wrapper-test',
     testQueryParameters: 'duration=80000', // Loading 2 studios takes time!
-    url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=5000&webgl=false`
+    url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=5000`
   } );
 } );
 ////////////////////////////////////////////
