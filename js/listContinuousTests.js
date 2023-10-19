@@ -453,6 +453,14 @@ Object.keys( commonQueryParameters ).forEach( name => {
     url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=5000`
   } );
 } );
+
+// TODO: This is just a test and should be removed after https://github.com/phetsims/phet-io-wrappers/issues/551 is fixed.
+tests.push( {
+  test: [ 'density', 'migration', '1.1.3-rc.1->main' ],
+  type: 'wrapper-test',
+  testQueryParameters: 'duration=80000', // Loading 2 studios takes time!
+  url: 'phet-io-wrappers/migration/?sim=density&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&migrationRate=5000&oldVersion=https://phet-dev.colorado.edu/html/density/1.1.3-rc.1/phet-io/wrappers/studio'
+} );
 ////////////////////////////////////////////
 
 //----------------------------------------------------------------------------------------------------------------------
