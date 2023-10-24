@@ -277,6 +277,7 @@ voicingRepos.forEach( repo => {
 
 // repo-specific Unit tests (unbuilt mode) from `grunt generate-test-harness`
 unitTestRepos.forEach( repo => {
+
   // Skip phet-io-wrappers unit tests here, we run it with multiple repos above
   if ( repo === 'phet-io-wrappers' ) {
     return;
