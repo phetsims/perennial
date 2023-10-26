@@ -288,7 +288,7 @@ unitTestRepos.forEach( repo => {
       return;
     }
     if ( repo === 'phet-io-wrappers' ) {
-      queryString += 'noSimTests';
+      queryString += 'noSimTests&sim=gravity-and-orbits';
     }
     tests.push( {
       test: [ repo, 'top-level-unit-tests', `unbuilt${queryString}` ],
