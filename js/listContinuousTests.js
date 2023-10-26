@@ -278,19 +278,17 @@ voicingRepos.forEach( repo => {
 // repo-specific Unit tests (unbuilt mode) from `grunt generate-test-harness`
 unitTestRepos.forEach( repo => {
 
-  // Skip phet-io-wrappers unit tests here, we run it with multiple repos above
-  if ( repo === 'phet-io-wrappers' ) {
-    return;
-  }
-
   // All tests should work with no query parameters, with assertions enabled, and should support PhET-iO also, so test
   // with brand=phet-io
   const queryParameters = [ '', '?ea', '?brand=phet-io', '?ea&brand=phet-io' ];
   queryParameters.forEach( queryString => {
 
     // Don't test phet-io or tandem unit tests in phet brand, they are meant for phet-io brand
-    if ( ( repo === 'phet-io' || repo === 'tandem' ) && !queryString.includes( 'phet-io' ) ) {
+    if ( ( repo === 'phet-io' || repo === 'tandem' || repo === 'phet-io-wrappers' ) && !queryString.includes( 'phet-io' ) ) {
       return;
+    }
+    if ( repo === 'phet-io-wrappers' ) {
+      queryString += 'noSimTests';
     }
     tests.push( {
       test: [ repo, 'top-level-unit-tests', `unbuilt${queryString}` ],
