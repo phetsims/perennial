@@ -9,6 +9,7 @@
 const gitAdd = require( './gitAdd' );
 const gitIsClean = require( './gitIsClean' );
 const grunt = require( 'grunt' );
+const isGitRepo = require( './isGitRepo' );
 
 /**
  * @public
@@ -23,8 +24,13 @@ module.exports = async function( repo, filePath, content ) {
   const outputFile = `../${repo}/${filePath}`;
   grunt.file.write( outputFile, content );
 
-  const fileClean = await gitIsClean( repo, filePath );
-  if ( !fileClean ) {
-    await gitAdd( repo, filePath );
+  if ( await isGitRepo( repo ) ) {
+    const fileClean = await gitIsClean( repo, filePath );
+    if ( !fileClean ) {
+      await gitAdd( repo, filePath );
+    }
+  }
+  else {
+    console.warn( `${repo} is not a git repository. Skipping gitAdd.` );
   }
 };
