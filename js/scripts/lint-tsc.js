@@ -53,7 +53,14 @@ const reset = '\u001b[0m';
     outputResult( 'tsc', tscResults );
   };
 
-  await Promise.all( [ runLint(), runTsc() ] );
+  const runAPIChecks = async () => {
+    lintResults = await execute( gruntCommand, [ 'generate-phet-io-api', '--stable' ], '../chipper', {
+      errors: 'resolve'
+    } );
+    outputResult( 'generate-phet-io-api', lintResults );
+  };
+
+  await Promise.all( [ runLint(), runTsc(), runAPIChecks() ] );
 
   console.log( `\n${lintResults.code === 0 && tscResults.code === 0 ? green : red}-----=====] finished [=====-----${reset}\n` );
 } )();
