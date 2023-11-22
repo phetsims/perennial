@@ -1113,9 +1113,11 @@ module.exports = ( function() {
 
       let releaseBranches = null;
       if ( maintenance.allReleaseBranches.length > 0 && !forceCacheBreak ) {
-        releaseBranches = maintenance.allReleaseBranches.map( releaseBranchData => ReleaseBranch.deserialize( releaseBranchData ) );
+        assert( maintenance.allReleaseBranches[ 0 ] instanceof ReleaseBranch, 'deserialization check' );
+        releaseBranches = maintenance.allReleaseBranches;
       }
       else {
+
         // cache miss
         releaseBranches = await ReleaseBranch.getAllMaintenanceBranches();
         maintenance.allReleaseBranches = releaseBranches;
