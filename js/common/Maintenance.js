@@ -104,16 +104,24 @@ module.exports = ( function() {
     }
 
     /**
-     * Resets ALL of the maintenance state to a default "blank" state.
+     * Resets ALL the maintenance state to a default "blank" state.
      * @public
+     * @param keepCachedReleaseBranches {boolean} - allReleaseBranches take a while to populate, and have little to do
+     *                                              with the current MR, so optionally keep them in storage.
      *
      * CAUTION: This will remove any information about any ongoing/complete maintenance release from your
      * .maintenance.json. Generally this should be done before any new maintenance release.
      */
-    static reset() {
+    static reset( keepCachedReleaseBranches = false ) {
       console.log( 'Make sure to check on the active PhET-iO Deploy Status on phet.colorado.edu to ensure that the ' +
                    'right PhET-iO sims are included in this maintenance release.' );
-      new Maintenance().save();
+
+      const allReleaseBranches = [];
+      if ( keepCachedReleaseBranches ) {
+        const maintenance = Maintenance.load();
+        allReleaseBranches.push( ...maintenance.allReleaseBranches );
+      }
+      new Maintenance( [], [], allReleaseBranches ).save();
     }
 
     /**
