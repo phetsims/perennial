@@ -659,7 +659,7 @@ module.exports = ( function() {
 
     /**
      * Helper for adding patches based on specific patterns, e.g.:
-     * Maintenance.addNeededPatches( 'phetmarks', Maintenance.singleFileReleaseBranchFilter( '../phetmarks/js/phetmarks.js' ), content => content.includes( 'data/wrappers' ) );
+     * Maintenance.addNeededPatches( 'phetmarks', Maintenance.singleFileReleaseBranchFilter( '../phetmarks/js/phetmarks.ts' ), content => content.includes( 'data/wrappers' ) );
      * @public
      *
      * @param {string} file
