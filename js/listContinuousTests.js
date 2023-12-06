@@ -9,6 +9,7 @@
 
 const getActiveRepos = require( './common/getActiveRepos' );
 const getRepoList = require( './common/getRepoList' );
+const loadJSON = require( './common/loadJSON' );
 const fs = require( 'fs' );
 
 const repos = getActiveRepos();
@@ -19,6 +20,7 @@ const interactiveDescriptionRepos = getRepoList( 'interactive-description' );
 const phetioNoState = getRepoList( 'phet-io-state-unsupported' );
 const unitTestRepos = getRepoList( 'unit-tests' );
 const voicingRepos = getRepoList( 'voicing' );
+const migrationSupportedSimsAndVersions = loadJSON( '../data/phet-io-migration.json' );
 
 // repos to not test multitouch fuzzing
 const REPOS_EXCLUDED_FROM_MULTITOUCH_FUZZING = [
@@ -423,28 +425,9 @@ Object.keys( commonQueryParameters ).forEach( name => {
 
 /////////////////////////////////////////////////////
 // PhET-iO migration testing
-[
-  [ 'beers-law-lab', '1.7' ],
-  [ 'calculus-grapher', '1.0' ],
-  [ 'circuit-construction-kit-dc-virtual-lab', '1.3' ],
-  [ 'circuit-construction-kit-dc', '1.3' ],
-  [ 'concentration', '1.7' ],
-  [ 'density', '1.1' ],
-  [ 'friction', '1.6' ],
-  [ 'geometric-optics', '1.3' ],
-  [ 'geometric-optics-basics', '1.3' ],
-  [ 'graphing-quadratics', '1.3' ],
-  [ 'gravity-and-orbits', '1.6' ],
-  [ 'greenhouse-effect', '1.2' ],
-  [ 'molecule-polarity', '1.3' ],
-  [ 'molecule-shapes', '1.6' ],
-  [ 'molecule-shapes-basics', '1.6' ],
-  [ 'natural-selection', '1.5' ],
-  [ 'ph-scale', '1.6' ],
-  [ 'ph-scale-basics', '1.6' ]
-].forEach( testData => {
-  const simName = testData[ 0 ];
-  const oldVersion = testData[ 1 ];
+migrationSupportedSimsAndVersions.forEach( testData => {
+  const simName = testData.sim;
+  const oldVersion = testData.version;
   const getTest = reportContext => {
     return {
       test: [ simName, 'migration', `${oldVersion}->main`, reportContext ],

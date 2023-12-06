@@ -28,6 +28,9 @@ automatically fuzz tested and is used by phetmarks to dictate which sims have wr
 [PhET-iO Instrumentation Technical Guide](https://github.com/phetsims/phet-io/blob/main/doc/phet-io-instrumentation-technical-guide.md)
 for more information.
 
+phet-io-migration.json (manually maintained) - the list of sim/version combos of published sims that are supported 
+migrating from said version to main. 
+
 phet-io-api-stable (auto-generated) is the list of sims that have had a designer involved with the API definition.
 PhET-iO API changes within phetioDesigned elements. will trigger a CT error. A sim can be added to this list before 1.0
 is published, when its API starts to stabilize. Add `phet["phet-io"].compareDesignedAPIChanges:true` to a

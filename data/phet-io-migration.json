@@ -1,0 +1,74 @@
+[
+  {
+    "sim": "beers-law-lab",
+    "version": "1.7"
+  },
+  {
+    "sim": "calculus-grapher",
+    "version": "1.0"
+  },
+  {
+    "sim": "circuit-construction-kit-dc-virtual-lab",
+    "version": "1.3"
+  },
+  {
+    "sim": "circuit-construction-kit-dc",
+    "version": "1.3"
+  },
+  {
+    "sim": "concentration",
+    "version": "1.7"
+  },
+  {
+    "sim": "density",
+    "version": "1.1"
+  },
+  {
+    "sim": "friction",
+    "version": "1.6"
+  },
+  {
+    "sim": "geometric-optics",
+    "version": "1.3"
+  },
+  {
+    "sim": "geometric-optics-basics",
+    "version": "1.3"
+  },
+  {
+    "sim": "graphing-quadratics",
+    "version": "1.3"
+  },
+  {
+    "sim": "gravity-and-orbits",
+    "version": "1.6"
+  },
+  {
+    "sim": "greenhouse-effect",
+    "version": "1.2"
+  },
+  {
+    "sim": "molecule-polarity",
+    "version": "1.3"
+  },
+  {
+    "sim": "molecule-shapes",
+    "version": "1.6"
+  },
+  {
+    "sim": "molecule-shapes-basics",
+    "version": "1.6"
+  },
+  {
+    "sim": "natural-selection",
+    "version": "1.5"
+  },
+  {
+    "sim": "ph-scale",
+    "version": "1.6"
+  },
+  {
+    "sim": "ph-scale-basics",
+    "version": "1.6"
+  }
+]
