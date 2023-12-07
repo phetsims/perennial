@@ -22,6 +22,7 @@ const unitTestRepos = getRepoList( 'unit-tests' );
 const voicingRepos = getRepoList( 'voicing' );
 const migrationSupportedSimsAndVersions = loadJSON( '../perennial/data/phet-io-migration.json' );
 
+console.log( 'TESTING: MIGRATION', migrationSupportedSimsAndVersions );
 // repos to not test multitouch fuzzing
 const REPOS_EXCLUDED_FROM_MULTITOUCH_FUZZING = [
   'number-compare',
