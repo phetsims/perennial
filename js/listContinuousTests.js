@@ -9,7 +9,6 @@
 
 const getActiveRepos = require( './common/getActiveRepos' );
 const getRepoList = require( './common/getRepoList' );
-const loadJSON = require( './common/loadJSON' );
 const fs = require( 'fs' );
 
 const repos = getActiveRepos();
@@ -20,7 +19,7 @@ const interactiveDescriptionRepos = getRepoList( 'interactive-description' );
 const phetioNoState = getRepoList( 'phet-io-state-unsupported' );
 const unitTestRepos = getRepoList( 'unit-tests' );
 const voicingRepos = getRepoList( 'voicing' );
-const migrationSupportedSimsAndVersions = JSON.parse( fs.readFileSync( `../perennial/data/phet-io-migration.json`, 'utf8' ).trim() );
+const migrationSupportedSimsAndVersions = JSON.parse( fs.readFileSync( '../perennial/data/phet-io-migration.json', 'utf8' ).trim() );
 
 console.log( 'TESTING: MIGRATION', migrationSupportedSimsAndVersions );
 // repos to not test multitouch fuzzing
