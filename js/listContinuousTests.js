@@ -191,15 +191,17 @@ phetioRepos.forEach( repo => {
     url: `studio/?sim=${repo}&phetioWrapperDebug=true&fuzz`
   } );
 
+  const phetioStateUnsupported = phetioNoState.includes( repo );
+
   // only test state on phet-io sims that support it
-  phetioNoState.indexOf( repo ) === -1 && tests.push( {
+  !phetioStateUnsupported && tests.push( {
     test: [ repo, 'phet-io-state-fuzz', 'unbuilt' ],
     type: 'wrapper-test',
     url: `phet-io-wrappers/state/?sim=${repo}&phetioDebug=true&phetioWrapperDebug=true&fuzz`
   } );
 
-  // phet-io wrappers tests for each PhET-iO Sim
-  [ false, true ].forEach( useAssert => {
+  // phet-io wrappers tests for each PhET-iO Sim, these tests rely on phet-io state working
+  !phetioStateUnsupported && [ false, true ].forEach( useAssert => {
     tests.push( {
       test: [ repo, 'phet-io-wrappers-tests', useAssert ? 'assert' : 'no-assert' ],
       type: 'qunit-test',
