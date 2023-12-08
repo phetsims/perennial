@@ -434,7 +434,8 @@ migrationSupportedSimsAndVersions.forEach( testData => {
       test: [ simName, 'migration', `${oldVersion}->main`, reportContext ],
       type: 'wrapper-test',
       testQueryParameters: 'duration=80000', // Loading 2 studios takes time!
-      url: `phet-io-wrappers/migration/?sim=${simName}&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&oldVersion=${oldVersion}&migrationRate=5000&phetioMigrationReport=${reportContext}`
+      url: `phet-io-wrappers/migration/?sim=${simName}&oldVersion=${oldVersion}&phetioMigrationReport=${reportContext}` +
+           '&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&migrationRate=5000&'
     };
   };
   tests.push( getTest( 'assert' ) );
