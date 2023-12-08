@@ -227,7 +227,8 @@ module.exports = async function( repo, branch, brands, noninteractive, redeploy,
       const phetioLogText = `
 PhET-iO deploys involve a couple of extra steps after production. Please ensure the following are accomplished:
 1. Make sure the sim is listed in perennial/data/phet-io-api-stable if it has had a designed production release.
-2. Create an issue in the phet-io repo and assign to @brent-phet to update the main "PhET-iO Simulations" spreadsheet for this new publication. (https://docs.google.com/spreadsheets/d/18_QNGuVtYtxOEKG9xRBs_PSQpyvzySF1Gk5puR-5Fv4/edit#gid=1881767354)
+2. Make sure the sim is listed in perennial/data/phet-io-hydrogen.json. It is almost certainly part of this featureset. 
+3. Create an issue in the phet-io repo and assign to @brent-phet to update the main "PhET-iO Simulations" spreadsheet for this new publication. (https://docs.google.com/spreadsheets/d/18_QNGuVtYtxOEKG9xRBs_PSQpyvzySF1Gk5puR-5Fv4/edit#gid=1881767354)
       `;
       grunt.log.writeln( phetioLogText );
     }
