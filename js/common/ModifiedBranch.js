@@ -205,7 +205,7 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
       }
       else {
         if ( this.brands.includes( 'phet' ) ) {
-          linkSuffixes.push( `](https://phet.colorado.edu/sims/html/${this.repo}/${versionString}/${this.repo}_en.html)` );
+          linkSuffixes.push( `](https://phet.colorado.edu/sims/html/${this.repo}/${versionString}/${this.repo}_all.html)` );
         }
         if ( this.brands.includes( 'phet-io' ) ) {
           linkSuffixes.push( ` phet-io](https://phet-io.colorado.edu/sims/${this.repo}/${versionString}${phetioBrandSuffix}/${this.repo}${phetioSuffix}.html?${standaloneParams})` );
