@@ -8,11 +8,11 @@
     "version": "1.0"
   },
   {
-    "sim": "circuit-construction-kit-dc-virtual-lab",
+    "sim": "circuit-construction-kit-dc",
     "version": "1.3"
   },
   {
-    "sim": "circuit-construction-kit-dc",
+    "sim": "circuit-construction-kit-dc-virtual-lab",
     "version": "1.3"
   },
   {
