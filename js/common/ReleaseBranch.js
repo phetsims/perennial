@@ -254,7 +254,8 @@ module.exports = ( function() {
       const args = getBuildArguments( this.getChipperVersion(), _.merge( {
         brands: this.brands,
         allHTML: true,
-        debugHTML: true
+        debugHTML: true,
+        lint: false
       }, options ) );
 
       winston.info( `building ${checkoutDirectory} with grunt ${args.join( ' ' )}` );
