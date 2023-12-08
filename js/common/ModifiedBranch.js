@@ -196,7 +196,7 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
 
       if ( this.deployedVersion.testType === 'rc' ) {
         if ( this.brands.includes( 'phet' ) ) {
-          linkSuffixes.push( `](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}${phetFolder}/${this.repo}_en${phetSuffix}.html)` );
+          linkSuffixes.push( `](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}${phetFolder}/${this.repo}_all${phetSuffix}.html)` );
         }
         if ( this.brands.includes( 'phet-io' ) ) {
           linkSuffixes.push( ` phet-io](https://phet-dev.colorado.edu/html/${this.repo}/${phetioDevVersion}${phetioFolder}/${this.repo}${phetioSuffix}.html?${standaloneParams})` );
