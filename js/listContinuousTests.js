@@ -19,7 +19,7 @@ const interactiveDescriptionRepos = getRepoList( 'interactive-description' );
 const phetioNoState = getRepoList( 'phet-io-state-unsupported' );
 const unitTestRepos = getRepoList( 'unit-tests' );
 const voicingRepos = getRepoList( 'voicing' );
-const migrationSupportedSimsAndVersions = JSON.parse( fs.readFileSync( '../perennial/data/phet-io-hydrogen.json', 'utf8' ).trim() );
+const phetioHydrogenSims = JSON.parse( fs.readFileSync( '../perennial/data/phet-io-hydrogen.json', 'utf8' ).trim() );
 
 // repos to not test multitouch fuzzing
 const REPOS_EXCLUDED_FROM_MULTITOUCH_FUZZING = [
@@ -426,7 +426,7 @@ Object.keys( commonQueryParameters ).forEach( name => {
 
 /////////////////////////////////////////////////////
 // PhET-iO migration testing
-migrationSupportedSimsAndVersions.forEach( testData => {
+phetioHydrogenSims.forEach( testData => {
   const simName = testData.sim;
   const oldVersion = testData.version;
   const getTest = reportContext => {
