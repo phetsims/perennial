@@ -556,4 +556,12 @@ tests.push( {
   queryParameters: 'brand=phet&ea&fuzz&decayScreenProtons=200&decayScreenNeutrons=200&chartIntoScreenProtons=200&chartIntoScreenNeutrons=200'
 } );
 
+// my-solar-system
+tests.push( {
+  test: [ 'my-solar-system', 'custom-wrapper', 'unbuilt' ],
+  type: 'wrapper-test',
+  url: 'phet-io-sim-specific/repos/my-solar-system/wrappers/my-solar-system-tests/',
+  queryParameter: 'sim=my-solar-system&phetioDebug=true&phetioWrapperDebug=true'
+} );
+
 console.log( JSON.stringify( tests, null, 2 ) );
