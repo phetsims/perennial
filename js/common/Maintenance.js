@@ -975,19 +975,25 @@ module.exports = ( function() {
 
       const releaseBranches = await Maintenance.getMaintenanceBranches();
 
-      const asyncFunctions = releaseBranches.map( releaseBranch => ( async () => {
+      const filteredBranches = [];
+
+      // Run all filtering in a step before the parallel step. This way the filter has full access to repos and git commands without race conditions, https://github.com/phetsims/perennial/issues/341
+      for ( const releaseBranch of releaseBranches ) {
         if ( !filter || await filter( releaseBranch ) ) {
+          filteredBranches.push( releaseBranch );
+        }
+      }
 
-          console.log( releaseBranch.toString() );
-          await releaseBranch.updateCheckout();
+      const asyncFunctions = filteredBranches.map( releaseBranch => ( async () => {
+        console.log( releaseBranch.toString() );
+        await releaseBranch.updateCheckout();
 
-          await releaseBranch.transpile();
-          try {
-            await releaseBranch.build();
-          }
-          catch( e ) {
-            console.log( `failed to build ${releaseBranch.toString()} ${e}` );
-          }
+        await releaseBranch.transpile();
+        try {
+          await releaseBranch.build();
+        }
+        catch( e ) {
+          console.log( `failed to build ${releaseBranch.toString()} ${e}` );
         }
       } ) );
 

@@ -13,3 +13,4 @@ js/build-server/tmp*
 .maintenance.json
 logs/
 .build-server-queue
+temp.js
