@@ -961,6 +961,7 @@ module.exports = ( function() {
     }
 
     /**
+     * Create a separate directory for each release branch.
      * @public
      *
      * @param {function(ReleaseBranch):Promise.<boolean>} [filter] - Optional filter, release branches will be skipped
