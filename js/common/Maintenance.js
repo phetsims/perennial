@@ -961,7 +961,8 @@ module.exports = ( function() {
     }
 
     /**
-     * Create a separate directory for each release branch.
+     * Create a separate directory for each release branch. This does not interface with the saved maintenance state at
+     * all, and instead just looks at the committed dependencies.json when updating.
      * @public
      *
      * @param {function(ReleaseBranch):Promise.<boolean>} [filter] - Optional filter, release branches will be skipped
