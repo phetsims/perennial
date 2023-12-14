@@ -560,8 +560,7 @@ tests.push( {
 tests.push( {
   test: [ 'my-solar-system', 'custom-wrapper', 'unbuilt' ],
   type: 'wrapper-test',
-  url: 'phet-io-sim-specific/repos/my-solar-system/wrappers/my-solar-system-tests/',
-  queryParameters: 'sim=my-solar-system&phetioDebug=true&phetioWrapperDebug=true'
+  url: 'phet-io-sim-specific/repos/my-solar-system/wrappers/my-solar-system-tests/?sim=my-solar-system&phetioDebug=true&phetioWrapperDebug=true'
 } );
 
 console.log( JSON.stringify( tests, null, 2 ) );
