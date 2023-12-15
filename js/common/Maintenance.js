@@ -31,6 +31,7 @@ const gitPush = require( './gitPush' );
 const gitRevParse = require( './gitRevParse' );
 const assert = require( 'assert' );
 const asyncq = require( 'async-q' ); // eslint-disable-line require-statement-match
+const _ = require( 'lodash' );
 const fs = require( 'fs' );
 const repl = require( 'repl' );
 const winston = require( 'winston' );
@@ -974,9 +975,16 @@ module.exports = ( function() {
      *
      * @param {function(ReleaseBranch):Promise.<boolean>} [filter] - Optional filter, release branches will be skipped
      *                                                               if this resolves to false
+     * @param {Object} [options] - build=false - to opt out of building, set to false.
+     *                             transpile=false - to opt out of transpiling, set to false.
      */
-    static async updateCheckouts( filter ) {
+    static async updateCheckouts( filter, options ) {
       const concurrent = 5;
+
+      options = _.assign( {
+        build: true,
+        transpile: true
+      }, options );
 
       console.log( `Updating checkouts (running in parallel with ${concurrent} threads)` );
 
@@ -995,9 +1003,9 @@ module.exports = ( function() {
         console.log( releaseBranch.toString() );
         await releaseBranch.updateCheckout();
 
-        await releaseBranch.transpile();
+        options.transpile && await releaseBranch.transpile();
         try {
-          await releaseBranch.build();
+          options.build && await releaseBranch.build();
         }
         catch( e ) {
           console.log( `failed to build ${releaseBranch.toString()} ${e}` );
