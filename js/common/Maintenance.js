@@ -484,6 +484,8 @@ module.exports = ( function() {
 
       const patch = maintenance.findPatch( patchName );
 
+      let count = 0;
+
       for ( const releaseBranch of releaseBranches ) {
         const needsPatch = await filter( releaseBranch );
 
@@ -496,12 +498,15 @@ module.exports = ( function() {
         if ( !modifiedBranch.neededPatches.includes( patch ) ) {
           modifiedBranch.neededPatches.push( patch );
           console.log( `Added needed patch ${patchName} to ${releaseBranch.repo} ${releaseBranch.branch}` );
+          count++;
           maintenance.save(); // save here in case a future failure would "revert" things
         }
         else {
           console.log( `Patch ${patchName} already included in ${releaseBranch.repo} ${releaseBranch.branch}` );
         }
       }
+
+      console.log( `Added ${count} releaseBranches to patch: ${patchName}` );
 
       maintenance.save();
     }
@@ -610,6 +615,8 @@ module.exports = ( function() {
 
       const patch = maintenance.findPatch( patchName );
 
+      let count = 0;
+
       for ( const modifiedBranch of maintenance.modifiedBranches ) {
         const needsRemoval = await filter( modifiedBranch.releaseBranch );
 
@@ -626,9 +633,10 @@ module.exports = ( function() {
 
         modifiedBranch.neededPatches.splice( index, 1 );
         maintenance.tryRemovingModifiedBranch( modifiedBranch );
-
+        count++;
         console.log( `Removed needed patch ${patchName} from ${modifiedBranch.repo} ${modifiedBranch.branch}` );
       }
+      console.log( `Removed ${count} releaseBranches from patch: ${patchName}` );
 
       maintenance.save();
     }
