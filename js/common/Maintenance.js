@@ -204,34 +204,39 @@ module.exports = ( function() {
     static async list() {
       const maintenance = Maintenance.load();
 
+      // At the top so that the important items are right above your cursor after calling the function
       if ( maintenance.allReleaseBranches.length > 0 ) {
-        console.log( `${maintenance.allReleaseBranches.length} ReleaseBranches loaded` );
+        console.log( `Total recognized ReleaseBranches: ${maintenance.allReleaseBranches.length}` );
       }
 
+      console.log( '\nRelease Branches in MR:', maintenance.patches.length === 0 ? 'None' : '' );
       for ( const modifiedBranch of maintenance.modifiedBranches ) {
-        console.log( `${modifiedBranch.repo} ${modifiedBranch.branch} ${modifiedBranch.brands.join( ',' )}${modifiedBranch.releaseBranch.isReleased ? '' : ' (unreleased)'}` );
+        const index = maintenance.modifiedBranches.indexOf( modifiedBranch );
+        console.log( `${index + 1}. ${modifiedBranch.repo} ${modifiedBranch.branch} ${modifiedBranch.brands.join( ',' )}${modifiedBranch.releaseBranch.isReleased ? '' : ' (unreleased)'}` );
         if ( modifiedBranch.deployedVersion ) {
-          console.log( `  deployed: ${modifiedBranch.deployedVersion.toString()}` );
+          console.log( `    deployed: ${modifiedBranch.deployedVersion.toString()}` );
         }
         if ( modifiedBranch.neededPatches.length ) {
-          console.log( `  needs: ${modifiedBranch.neededPatches.map( patch => patch.name ).join( ',' )}` );
+          console.log( `    needs: ${modifiedBranch.neededPatches.map( patch => patch.name ).join( ',' )}` );
         }
         if ( modifiedBranch.pushedMessages.length ) {
-          console.log( `  pushedMessages: ${modifiedBranch.pushedMessages.join( ' and ' )}` );
+          console.log( `    pushedMessages: \n      ${modifiedBranch.pushedMessages.join( '\n      ' )}` );
         }
         if ( modifiedBranch.pendingMessages.length ) {
-          console.log( `  pendingMessages: ${modifiedBranch.pendingMessages.join( ' and ' )}` );
+          console.log( `    pendingMessages: \n      ${modifiedBranch.pendingMessages.join( '\n      ' )}` );
         }
         if ( Object.keys( modifiedBranch.changedDependencies ).length > 0 ) {
-          console.log( '  deps:' );
+          console.log( '    deps:' );
           for ( const key of Object.keys( modifiedBranch.changedDependencies ) ) {
-            console.log( `    ${key}: ${modifiedBranch.changedDependencies[ key ]}` );
+            console.log( `      ${key}: ${modifiedBranch.changedDependencies[ key ]}` );
           }
         }
       }
 
+      console.log( '\nMaintenance Patches in MR:', maintenance.patches.length === 0 ? 'None' : '' );
       for ( const patch of maintenance.patches ) {
-        console.log( `[${patch.name}]${patch.name !== patch.repo ? ` (${patch.repo})` : ''} ${patch.message}` );
+        const index = maintenance.patches.indexOf( patch );
+        console.log( `${index + 1}. [${patch.name}]${patch.name !== patch.repo ? ` (${patch.repo})` : ''} ${patch.message}` );
         for ( const sha of patch.shas ) {
           console.log( `  ${sha}` );
         }
@@ -1156,7 +1161,7 @@ module.exports = ( function() {
      * @param {SerializedMaintenance} - see Maintenance.serialize()
      * @returns {Maintenance}
      */
-    static deserialize( { patches, modifiedBranches, allReleaseBranches } ) {
+    static deserialize( { patches = [], modifiedBranches = [], allReleaseBranches = [] } ) {
       // Pass in patch references to branch deserialization
       const deserializedPatches = patches.map( Patch.deserialize );
       modifiedBranches = modifiedBranches.map( modifiedBranch => ModifiedBranch.deserialize( modifiedBranch, deserializedPatches ) );
