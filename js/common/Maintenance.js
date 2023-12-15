@@ -999,8 +999,10 @@ module.exports = ( function() {
         }
       }
 
+      console.log( 'Filter applied. Updating:', filteredBranches );
+
       const asyncFunctions = filteredBranches.map( releaseBranch => ( async () => {
-        console.log( releaseBranch.toString() );
+        console.log( 'Beginning: ', releaseBranch.toString() );
         try {
 
           await releaseBranch.updateCheckout();
