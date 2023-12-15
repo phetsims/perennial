@@ -20,7 +20,6 @@ const gitRevParse = require( '../../common/gitRevParse' );
 const loadJSON = require( '../../common/loadJSON' );
 const vpnCheck = require( '../../common/vpnCheck' );
 const grunt = require( 'grunt' );
-const _ = require( 'lodash' ); // eslint-disable-line no-unused-vars
 const fs = require( 'fs' );
 
 // constants

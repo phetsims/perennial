@@ -10,7 +10,6 @@ const gitAdd = require( './gitAdd' );
 const gitCommit = require( './gitCommit' );
 const gitPush = require( './gitPush' );
 const fs = require( 'fs' );
-const _ = require( 'lodash' ); // eslint-disable-line no-unused-vars
 
 /**
  * Ensures that a simulation is marked as published in its package.json

@@ -16,7 +16,6 @@ const gitRevParse = require( '../../common/gitRevParse' );
 const loadJSON = require( '../../common/loadJSON' );
 const writeJSON = require( '../../common/writeJSON' );
 const fs = require( 'fs' );
-const _ = require( 'lodash' ); // eslint-disable-line no-unused-vars
 
 // constants
 const BUILD_LOCAL_FILENAME = `${process.env.HOME}/.phet/build-local.json`;

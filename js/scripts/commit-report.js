@@ -1,7 +1,6 @@
 // Copyright 2021, University of Colorado Boulder
 
 const execute = require( '../common/execute' );
-const _ = require( 'lodash' ); // eslint-disable-line no-unused-vars
 const fs = require( 'fs' );
 
 /**
