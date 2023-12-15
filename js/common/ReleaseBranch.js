@@ -240,6 +240,10 @@ module.exports = ( function() {
           await npmUpdateDirectory( repoPwd );
         }
       } ) );
+
+      // Perennial can be a nice manual addition in each dir, in case you need to go in and run commands to these
+      // branches manually (like build or checkout or update). No need to npm install, you can do that yourself if needed.
+      await gitCloneOrFetchDirectory( 'perennial', checkoutDirectory );
     }
 
     /**
