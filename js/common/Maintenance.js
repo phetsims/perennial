@@ -1001,14 +1001,20 @@ module.exports = ( function() {
 
       const asyncFunctions = filteredBranches.map( releaseBranch => ( async () => {
         console.log( releaseBranch.toString() );
-        await releaseBranch.updateCheckout();
-
-        options.transpile && await releaseBranch.transpile();
         try {
-          options.build && await releaseBranch.build();
+
+          await releaseBranch.updateCheckout();
+
+          options.transpile && await releaseBranch.transpile();
+          try {
+            options.build && await releaseBranch.build();
+          }
+          catch( e ) {
+            console.log( `failed to build ${releaseBranch.toString()}: ${e}` );
+          }
         }
         catch( e ) {
-          console.log( `failed to build ${releaseBranch.toString()} ${e}` );
+          console.log( `failed to update releaseBranch ${releaseBranch.toString()}: ${e}` );
         }
       } ) );
 
