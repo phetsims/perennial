@@ -211,8 +211,8 @@ module.exports = ( function() {
 
       console.log( '\nRelease Branches in MR:', maintenance.patches.length === 0 ? 'None' : '' );
       for ( const modifiedBranch of maintenance.modifiedBranches ) {
-        const index = maintenance.modifiedBranches.indexOf( modifiedBranch );
-        console.log( `${index + 1}. ${modifiedBranch.repo} ${modifiedBranch.branch} ${modifiedBranch.brands.join( ',' )}${modifiedBranch.releaseBranch.isReleased ? '' : ' (unreleased)'}` );
+        const count = maintenance.modifiedBranches.indexOf( modifiedBranch ) + 1;
+        console.log( `${count}. ${modifiedBranch.repo} ${modifiedBranch.branch} ${modifiedBranch.brands.join( ',' )}${modifiedBranch.releaseBranch.isReleased ? '' : ' (unreleased)'}` );
         if ( modifiedBranch.deployedVersion ) {
           console.log( `    deployed: ${modifiedBranch.deployedVersion.toString()}` );
         }
@@ -235,14 +235,16 @@ module.exports = ( function() {
 
       console.log( '\nMaintenance Patches in MR:', maintenance.patches.length === 0 ? 'None' : '' );
       for ( const patch of maintenance.patches ) {
-        const index = maintenance.patches.indexOf( patch );
-        console.log( `${index + 1}. [${patch.name}]${patch.name !== patch.repo ? ` (${patch.repo})` : ''} ${patch.message}` );
+        const count = maintenance.patches.indexOf( patch ) + 1;
+        const indexAndSpacing = `${count}. ` + ( count > 9 ? '' : ' ' );
+
+        console.log( `${indexAndSpacing}[${patch.name}]${patch.name !== patch.repo ? ` (${patch.repo})` : ''} ${patch.message}` );
         for ( const sha of patch.shas ) {
-          console.log( `  ${sha}` );
+          console.log( `      ${sha}` );
         }
         for ( const modifiedBranch of maintenance.modifiedBranches ) {
           if ( modifiedBranch.neededPatches.includes( patch ) ) {
-            console.log( `    ${modifiedBranch.repo} ${modifiedBranch.branch} ${modifiedBranch.brands.join( ',' )}` );
+            console.log( `        ${modifiedBranch.repo} ${modifiedBranch.branch} ${modifiedBranch.brands.join( ',' )}` );
           }
         }
       }
