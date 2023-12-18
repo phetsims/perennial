@@ -696,7 +696,7 @@ module.exports = ( function() {
     }
 
     /**
-     * Checks out a specific branch (using local commit data as necessary).
+     * Checks out a specific Release Branch (using local commit data as necessary).
      * @public
      *
      * @param {string} repo
