@@ -215,7 +215,7 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
 
       const results = linkSuffixes.map( link => `- [ ] [${this.repo} ${versionString}${link}` );
       if ( includeMessages ) {
-        results.unshift( `\n${this.repo} ${this.branch} (${this.pushedMessages.join( ', ' )})\n` );
+        results.unshift( `\n**${this.repo} ${this.branch}** (${this.pushedMessages.join( ', ' )})\n` );
       }
       return results;
     }
