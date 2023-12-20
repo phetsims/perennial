@@ -989,9 +989,10 @@ module.exports = ( function() {
     static async updateCheckouts( filter, options ) {
       const concurrent = 5;
 
-      options = _.assign( {
+      options = _.merge( {
         build: true,
-        transpile: true
+        transpile: true,
+        buildOptions: { lint: true }
       }, options );
 
       console.log( `Updating checkouts (running in parallel with ${concurrent} threads)` );
@@ -1017,7 +1018,7 @@ module.exports = ( function() {
 
           options.transpile && await releaseBranch.transpile();
           try {
-            options.build && await releaseBranch.build();
+            options.build && await releaseBranch.build( options.buildOptions );
           }
           catch( e ) {
             console.log( `failed to build ${releaseBranch.toString()}: ${e}` );
