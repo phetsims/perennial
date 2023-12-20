@@ -211,6 +211,8 @@ async function runTask( options ) {
       winston.info( 'deploying to production' );
       let targetVersionDir;
       let targetSimDir;
+      let imagesHaveBeenDeployed = false;
+
       // Loop over all brands
       for ( const i in brands ) {
         if ( brands.hasOwnProperty( i ) ) {
@@ -285,6 +287,14 @@ async function runTask( options ) {
           } );
 
           winston.debug( 'Copy finished' );
+          if ( !imagesHaveBeenDeployed && !isTranslationRequest ) {
+            await deployImages( {
+              simulation: options.simName,
+              brands: options.brands,
+              version: options.version
+            } );
+            imagesHaveBeenDeployed = true;
+          }
 
           // Post-copy steps
           if ( brand === constants.PHET_BRAND ) {
@@ -326,14 +336,6 @@ async function runTask( options ) {
             } );
           }
         }
-      }
-
-      if ( !isTranslationRequest ) {
-        await deployImages( {
-          simulation: options.simName,
-          brands: options.brands,
-          version: options.version
-        } );
       }
     }
     await afterDeploy( `${buildDir}` );
