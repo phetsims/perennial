@@ -44,7 +44,8 @@
   // To support loading in Node.js and the browser
   const assert = typeof module !== 'undefined' ? require( 'assert' ) : global && global.assert;
 
-  const SimVersion = class {
+  class SimVersion {
+
     /**
      * @constructor
      *
@@ -107,7 +108,7 @@
      * Convert into a plain JS object meant for JSON serialization.
      * @public
      *
-     * @returns {Object}
+     * @returns {Object} - with properties like major, minor, maintenance, testType, testNumber, and buildTimestamp
      */
     serialize() {
       return {
@@ -123,6 +124,7 @@
     /**
      * @returns {boolean}
      * @public
+     * @ignore - not needed by PhET-iO Clients
      */
     get isSimNotPublished() {
       return this.major < 1 || // e.g. 0.0.0-dev.1
@@ -135,6 +137,7 @@
     /**
      * @returns {boolean}
      * @public
+     * @ignore - not needed by PhET-iO Clients
      */
     get isSimPublished() {
       return !this.isSimNotPublished;
@@ -144,7 +147,7 @@
      * Takes a serialized form of the SimVersion and returns an actual instance.
      * @public
      *
-     * @param {Object}
+     * @param {Object} - with properties like major, minor, maintenance, testType, testNumber, and buildTimestamp
      * @returns {SimVersion}
      */
     static deserialize( { major, minor, maintenance, testType, testNumber, buildTimestamp } ) {
@@ -210,7 +213,7 @@
     }
 
     /**
-     * Returns the string form of the version.
+     * Returns the string form of the version. Like "1.3.5".
      * @public
      *
      * @returns {string}
@@ -273,13 +276,14 @@
      * @public
      *
      * @param {string} branch - e.g. '1.0'
+     * @ignore - not needed by PhET-iO Clients
      */
     static ensureReleaseBranch( branch ) {
       const version = SimVersion.fromBranch( branch.split( '-' )[ 0 ] );
       assert && assert( version.major > 0, 'Major version for a branch should be greater than zero' );
       assert && assert( version.minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
     }
-  };
+  }
 
   // Node.js-compatible definition
   if ( typeof module !== 'undefined' ) {
