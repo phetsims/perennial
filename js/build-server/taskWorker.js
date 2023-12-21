@@ -211,6 +211,7 @@ async function runTask( options ) {
       winston.info( 'deploying to production' );
       let targetVersionDir;
       let targetSimDir;
+
       // Loop over all brands
       for ( const i in brands ) {
         if ( brands.hasOwnProperty( i ) ) {
@@ -288,8 +289,19 @@ async function runTask( options ) {
 
           // Post-copy steps
           if ( brand === constants.PHET_BRAND ) {
+            if ( !isTranslationRequest ) {
+              await deployImages( {
+                simulation: options.simName,
+                brands: options.brands,
+                version: options.version
+              } );
+            }
             await writePhetHtaccess( simName, version );
             await createTranslationsXML( simName, version, checkoutDir );
+
+            // This should be the last function called for the phet brand.
+            // This triggers an asyncronous task on the tomcat/wicket application and only waits for a response that the request was received.
+            // Do not assume that this task is complete because we use await.
             await notifyServer( {
               simName: simName,
               email: email,
@@ -304,6 +316,9 @@ async function runTask( options ) {
             const parsedVersion = SimVersion.parse( version, '' );
             const simPackage = await loadJSON( `${simRepoDir}/package.json` );
             const ignoreForAutomatedMaintenanceReleases = !!( simPackage && simPackage.phet && simPackage.phet.ignoreForAutomatedMaintenanceReleases );
+
+            // This triggers an asyncronous task on the tomcat/wicket application and only waits for a response that the request was received.
+            // Do not assume that this task is complete because we use await.
             await notifyServer( {
               simName: simName,
               email: email,
@@ -326,14 +341,6 @@ async function runTask( options ) {
             } );
           }
         }
-      }
-
-      if ( !isTranslationRequest ) {
-        await deployImages( {
-          simulation: options.simName,
-          brands: options.brands,
-          version: options.version
-        } );
       }
     }
     await afterDeploy( `${buildDir}` );
