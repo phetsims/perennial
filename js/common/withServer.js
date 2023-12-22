@@ -44,6 +44,7 @@ module.exports = function( asyncCallback, options ) {
         jpg: 'image/jpeg',
         png: 'image/png',
         js: 'text/javascript',
+        mjs: 'text/javascript',
         css: 'text/css',
         gif: 'image/gif',
         mp3: 'audio/mpeg',
