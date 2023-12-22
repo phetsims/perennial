@@ -53,6 +53,13 @@ module.exports = async function( browserCreator, url, options ) {
   let browser;
   let page;
 
+  const cleanup = async () => {
+    page && !page.isClosed() && await page.close();
+
+    // If we created a temporary browser, close it
+    ownsBrowser && browser && await browser.close();
+  };
+
   try {
     browser = options.browser || await browserCreator.launch( options.launchOptions );
 
@@ -116,22 +123,24 @@ module.exports = async function( browserCreator, url, options ) {
         reject( new Error( `Did not load in ${options.allowedTimeToLoad}` ) );
       }
     } )();
-    await page.goto( url, {
-      timeout: options.gotoTimeout
-    } );
-    const result = await promise;
-    !page.isClosed() && await page.close();
+    let result = null;
 
-    // If we created a temporary browser, close it
-    ownsBrowser && await browser.close();
+    // Await both at the same time, because all rejection is hooked up to the `promise`, but that could cause an error
+    // during the goto call (not afterward), see https://github.com/phetsims/aqua/issues/197
+    await Promise.all( [
+      page.goto( url, {
+        timeout: options.gotoTimeout
+      } ),
+      promise.then( myResult => { result = myResult;} )
+    ] );
 
+    await cleanup();
     return result;
   }
 
   catch( e ) {
     options.logger( e );
-    page && !page.isClosed() && await page.close();
-    ownsBrowser && browser && await browser.close();
+    await cleanup();
     throw e;
   }
 };
