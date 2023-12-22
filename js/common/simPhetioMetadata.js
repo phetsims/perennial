@@ -18,7 +18,7 @@ const axios = require( 'axios' );
  * @returns {Promise.<Object[]>} - Resolves with metadata objects in an array
  */
 module.exports = async function( options ) {
-  options = _.extend( {
+  options = _.assignIn( {
     active: null, // {boolean|null} - If set, will only include active branches
     latest: null // {boolean|null} - If set, will only include latest branches
   }, options );

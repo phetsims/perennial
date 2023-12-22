@@ -18,7 +18,7 @@ const axios = require( 'axios' );
  * @returns {Promise.<Object>} - Resolves with metadata object
  */
 module.exports = async function( options ) {
-  options = _.extend( {
+  options = _.assignIn( {
     summary: true, // {boolean} - If set, will include a reduced amount of data for every included simulation
     type: 'html', // {string|null} - If provided (html/java/flash), will limit results to a specific type of simulation
     locale: null, // {string|null} - If provided, will limit results to a specific locale

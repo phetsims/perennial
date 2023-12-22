@@ -19,7 +19,7 @@ const _ = require( 'lodash' );
  * @returns {Promise.<*>} - Will reject if there's an error
  */
 module.exports = async function( url, evaluate, options ) {
-  options = _.extend( {
+  options = _.assignIn( {
     evaluate: evaluate
   }, options );
 

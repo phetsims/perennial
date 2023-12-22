@@ -66,7 +66,7 @@ if ( parsedCommandLineOptions.hasOwnProperty( 'help' ) || parsedCommandLineOptio
 }
 
 // Merge the default and supplied options.
-const options = _.extend( defaultOptions, parsedCommandLineOptions );
+const options = _.assignIn( defaultOptions, parsedCommandLineOptions );
 const verbose = options.verbose;
 
 const taskQueue = async.queue( taskWorker, 1 ); // 1 is the max number of tasks that can run concurrently
