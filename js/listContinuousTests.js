@@ -560,6 +560,7 @@ tests.push( {
 tests.push( {
   test: [ 'my-solar-system', 'custom-wrapper', 'unbuilt' ],
   type: 'wrapper-test',
+  testQueryParameters: 'duration=70000', // there are multiple systems to play through and fuzz
   url: 'phet-io-sim-specific/repos/my-solar-system/wrappers/my-solar-system-tests/?sim=my-solar-system&phetioDebug=true&phetioWrapperDebug=true'
 } );
 
