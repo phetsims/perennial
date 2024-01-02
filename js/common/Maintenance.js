@@ -1008,7 +1008,7 @@ module.exports = ( function() {
         }
       }
 
-      console.log( 'Filter applied. Updating:', filteredBranches.map( x => x.toString() ) );
+      console.log( `Filter applied. Updating ${filteredBranches.length}:`, filteredBranches.map( x => x.toString() ) );
 
       const asyncFunctions = filteredBranches.map( releaseBranch => ( async () => {
         console.log( 'Beginning: ', releaseBranch.toString() );
