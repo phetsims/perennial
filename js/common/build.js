@@ -21,7 +21,7 @@ const winston = require( 'winston' );
  * @param {Object} [options]
  * @returns {Promise.<string>} - The stdout of the build
  */
-module.exports = async function( repo, options ) {
+module.exports = async function build( repo, options ) {
   winston.info( `building ${repo}` );
 
   const chipperVersion = ChipperVersion.getFromRepository();

@@ -43,7 +43,7 @@ const assert = require( 'assert' );
  * @param {string} [message] - Optional message to append to the version-increment commit.
  * @returns {Promise.<SimVersion>}
  */
-module.exports = async function( repo, branch, brands, noninteractive, redeploy, message ) {
+module.exports = async function production( repo, branch, brands, noninteractive, redeploy, message ) {
   SimVersion.ensureReleaseBranch( branch );
 
   if ( !( await vpnCheck() ) ) {

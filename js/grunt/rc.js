@@ -39,7 +39,7 @@ const grunt = require( 'grunt' );
  * @param {string} [message] - Optional message to append to the version-increment commit.
  * @returns {Promise.<SimVersion>}
  */
-module.exports = async function( repo, branch, brands, noninteractive, message ) {
+module.exports = async function rc( repo, branch, brands, noninteractive, message ) {
   SimVersion.ensureReleaseBranch( branch );
 
   if ( !( await vpnCheck() ) ) {
