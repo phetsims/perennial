@@ -24,6 +24,7 @@ module.exports = function( chipperVersion, options ) {
     debugHTML = true, // Desired in almost all perennial builds, so set to true here
     uglify = true,
     mangle = true,
+    minify = true,
     lint = true,
     clean = true,
     thumbnails = false,
@@ -78,6 +79,9 @@ module.exports = function( chipperVersion, options ) {
     }
     if ( !mangle ) {
       args.push( '--minify.mangle=false' );
+    }
+    if ( !minify ) {
+      args.push( '--minify.minify=false' );
     }
     if ( !lint ) {
       args.push( '--lint=false' );
