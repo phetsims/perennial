@@ -74,10 +74,10 @@ module.exports = function( chipperVersion, options ) {
     args.push( `--brands=${brands.join( ',' )}` );
     args.push( `--locales=${locales}` );
     if ( !uglify ) {
-      args.push( '--uglify=false' );
+      args.push( '--minify.uglify=false' );
     }
     if ( !mangle ) {
-      args.push( '--mangle=false' );
+      args.push( '--minify.mangle=false' );
     }
     if ( !lint ) {
       args.push( '--lint=false' );
