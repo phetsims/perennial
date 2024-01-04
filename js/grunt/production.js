@@ -156,7 +156,8 @@ module.exports = async function production( repo, branch, brands, noninteractive
 
     // No special options required here, as we send the main request to the build server
     grunt.log.writeln( await build( repo, {
-      brands: brands
+      brands: brands,
+      minify: !noninteractive
     } ) );
 
     /**

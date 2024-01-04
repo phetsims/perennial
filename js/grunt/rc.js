@@ -107,7 +107,8 @@ module.exports = async function rc( repo, branch, brands, noninteractive, messag
 
     // No special options required here, as we send the main request to the build server
     grunt.log.writeln( await build( repo, {
-      brands: brands
+      brands: brands,
+      minify: !noninteractive
     } ) );
 
     if ( !await booleanPrompt( `Please test the built version of ${repo}.\nIs it ready to deploy`, noninteractive ) ) {
