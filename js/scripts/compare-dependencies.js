@@ -2,6 +2,7 @@
 // this is a file that runs in node
 // it compares all the dependencies from one project to another project.
 // Assumes you have a clean working copy, in case you are checking out shas
+// @author Sam Reid (PhET Interactive Simulations)
 
 // import fs
 const fs = require( 'fs' );

@@ -1,4 +1,5 @@
 // Copyright 2017-2019, University of Colorado Boulder
+// @author Matt Pennington (PhET Interactive Simulations)
 
 
 const constants = require( './constants' );

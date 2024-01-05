@@ -1,4 +1,6 @@
 // Copyright 2021, University of Colorado Boulder
+// @author Sam Reid (PhET Interactive Simulations)
+
 module.exports = {
   toGitHubDate( date ) {
     return `${date.toISOString().split( 'T' )[ 0 ]} 23:59`;

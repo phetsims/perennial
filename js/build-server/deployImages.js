@@ -1,4 +1,5 @@
 // Copyright 2020, University of Colorado Boulder
+// @author Matt Pennington (PhET Interactive Simulations)
 
 const execute = require( '../common/execute' );
 const gitCheckoutDirectory = require( '../common/gitCheckoutDirectory' );

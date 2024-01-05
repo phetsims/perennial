@@ -1,5 +1,5 @@
 // Copyright 2017, University of Colorado Boulder
-
+// @author Matt Pennington (PhET Interactive Simulations)
 
 module.exports = function logRequest( req, type, winston ) {
   // log the request, which is useful for debugging

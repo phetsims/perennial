@@ -2,6 +2,7 @@
 
 /**
  * This grunt task checks out the shas for a project, as specified in a dependencies.json file in its top level.
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
 const assert = require( 'assert' );

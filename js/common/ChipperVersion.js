@@ -2,6 +2,7 @@
 
 /**
  * Handles chipper version information, see https://github.com/phetsims/perennial/issues/78.
+ * @author Matt Pennington (PhET Interactive Simulations)
  */
 
 const assert = require( 'assert' );

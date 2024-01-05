@@ -2,6 +2,7 @@
 
 /**
  * This grunt task checks out main for all sims. Useful in some cases where different shas with conflicting dependencies are checked out.
+ * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
 const _ = require( 'lodash' );

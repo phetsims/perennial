@@ -1,4 +1,5 @@
 // Copyright 2021, University of Colorado Boulder
+// @author Matt Pennington (PhET Interactive Simulations)
 
 const axios = require( 'axios' );
 const getFullStringMap = require( './getFullStringMap' );
