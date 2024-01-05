@@ -1,6 +1,7 @@
 /* eslint-disable */
 // Adapted from https://github.com/davidtaylorhq/qunit-puppeteer which is distributed under the MIT License
 /* eslint-enable */
+// @author Michael Kauzmann (PhET Interactive Simulations)
 
 
 module.exports = function( browser, targetURL ) {
