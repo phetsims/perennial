@@ -111,9 +111,17 @@ module.exports = async function( browserCreator, url, options ) {
     } );
 
     page.on( 'response', async response => {
+      const responseStatus = response.status();
+
       // 200 and 300 class status are most likely fine here
-      if ( response.url() === url && response.status() >= 400 ) {
-        options.logger( `[ERROR] Could not load from status: ${response.status()}` );
+      if ( responseStatus >= 400 ) {
+        const responseURL = response.url();
+        if ( responseURL === url ) {
+          options.logger( `[ERROR] Could not load from status: ${responseStatus}` );
+        }
+        else if ( responseStatus !== 404 ) { // There will be lots of 404 errors, like for strings files that don't exist
+          options.logger( `[ERROR] Could not load dependency from status: ${responseStatus}, url: ${responseURL}` );
+        }
       }
     } );
     options.logConsoleOutput && page.on( 'console', msg => {
