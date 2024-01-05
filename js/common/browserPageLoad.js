@@ -97,9 +97,27 @@ module.exports = async function( browserCreator, url, options ) {
     await page.setDefaultNavigationTimeout( options.gotoTimeout );
 
     // The API for playwright was much more complicated, so just support puppeteer
-    if ( !options.browser && browserCreator === puppeteer &&
-         process.env.BASIC_PASSWORD && process.env.BASIC_USERNAME ) {
-      await page.authenticate( { username: process.env.BASIC_USERNAME, password: process.env.BASIC_PASSWORD } );
+    const username = process.env.BASIC_USERNAME;
+    const password = process.env.BASIC_PASSWORD;
+
+    if ( username && password ) {
+      if ( browserCreator === puppeteer ) {
+        // puppeteer has its own authentication method, thanks!
+        await page.authenticate( { username: username, password: password } );
+      }
+      else {
+        // Handle playwright browsers, see https://github.com/phetsims/aqua/issues/188
+
+        // This is not the best method for puppeteer because it violated CORS policies, for example with console errors like:
+        // [CONSOLE] Access to script at 'https://static.cloudflareinsights.com/beacon.min.js/v84a3a4012de94ce1a686ba8c167c359c1696973893317' from origin 'https:phet-io.colorado.edu' has been blocked by CORS policy: Request header field authorization is not allowed by Access-Control-Allow-Headers in preflight response.
+        // [CONSOLE] Failed to load resource: net::ERR_FAILED:      https://static.cloudflareinsights.com/beacon.min.js/v84a3a4012de94ce1a686ba8c167c359c1696973893317
+        // [CONSOLE] Access to fetch at 'https://phet.colorado.edu/services/metadata/phetio?latest=true&active=true' from origin 'https://phet-io.colorado.edu' has been blocked by CORS policy: Request header field authorization is not allowed by Access-Control-Allow-Headers in preflight response.
+        // [CONSOLE] Failed to load resource: net::ERR_FAILED:      https://phet.colorado.edu/services/metadata/phetio?latest=true&active=true
+        page.setExtraHTTPHeaders( {
+            Authorization: `Basic ${Buffer.from( `${username}:${password}` ).toString( 'base64' )}`
+          }
+        );
+      }
     }
 
     // promote for use outside the closure
