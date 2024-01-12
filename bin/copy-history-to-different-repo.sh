@@ -10,6 +10,10 @@
 # NOTE: See copy-history-to-different-repo.js
 #
 # Usage:
+# cd {{SOURCE}}
+# copy-history-to-different-repo.sh path/to/file.js ../{{DESTINATION}}
+#
+# Explanation:
 # 1. cd into the directory of the source repository
 # 2. copy-history-to-different-repo.sh FILE_OR_DIRECTORY DESTINATION_REPOSITORY
 # 3. review the patch file to make sure nothing looks like trouble
