@@ -16,9 +16,10 @@ const phetioRepos = getRepoList( 'phet-io' );
 const phetioAPIStableRepos = getRepoList( 'phet-io-api-stable' );
 const runnableRepos = getRepoList( 'active-runnables' );
 const interactiveDescriptionRepos = getRepoList( 'interactive-description' );
-const phetioNoState = getRepoList( 'phet-io-state-unsupported' );
+const phetioNoUnsupportedRepos = getRepoList( 'phet-io-state-unsupported' );
 const unitTestRepos = getRepoList( 'unit-tests' );
 const voicingRepos = getRepoList( 'voicing' );
+const phetioWrapperSuiteWrappers = getRepoList( 'wrappers' );
 const phetioHydrogenSims = JSON.parse( fs.readFileSync( '../perennial/data/phet-io-hydrogen.json', 'utf8' ).trim() );
 
 // repos to not test multitouch fuzzing
@@ -185,30 +186,52 @@ phetioRepos.forEach( repo => {
     priority: 1.5 // more often than the average test
   } );
 
-  // fuzz test important wrappers
-  tests.push( {
-    test: [ repo, 'phet-io-studio-fuzz', 'unbuilt' ],
-    type: 'wrapper-test',
-    url: `studio/?sim=${repo}&phetioWrapperDebug=true&fuzz`
-  } );
-
-  const phetioStateUnsupported = phetioNoState.includes( repo );
-
-  // only test state on phet-io sims that support it
-  !phetioStateUnsupported && tests.push( {
-    test: [ repo, 'phet-io-state-fuzz', 'unbuilt' ],
-    type: 'wrapper-test',
-    url: `phet-io-wrappers/state/?sim=${repo}&phetioDebug=true&phetioWrapperDebug=true&fuzz`
-  } );
+  const phetioStateSupported = !phetioNoUnsupportedRepos.includes( repo );
 
   // phet-io wrappers tests for each PhET-iO Sim, these tests rely on phet-io state working
-  !phetioStateUnsupported && [ false, true ].forEach( useAssert => {
+  phetioStateSupported && [ false, true ].forEach( useAssert => {
     tests.push( {
       test: [ repo, 'phet-io-wrappers-tests', useAssert ? 'assert' : 'no-assert' ],
       type: 'qunit-test',
       url: `phet-io-wrappers/phet-io-wrappers-tests.html?sim=${repo}${useAssert ? '&phetioDebug=true&phetioWrapperDebug=true' : ''}`,
       testQueryParameters: 'duration=600000' // phet-io-wrapper tests load the sim >5 times
     } );
+  } );
+
+  phetioWrapperSuiteWrappers.forEach( wrapperPath => {
+
+    const wrapperPathParts = wrapperPath.split( '/' );
+    const wrapperName = wrapperPathParts[ wrapperPathParts.length - 1 ];
+
+    const testName = `phet-io-${wrapperName}-fuzz`;
+    const wrapperQueryParameters = `sim=${repo}&locales=*&phetioWrapperDebug=true&fuzz`;
+
+    if ( wrapperName === 'studio' ) {
+
+      // fuzz test important wrappers
+      tests.push( {
+        test: [ repo, testName, 'unbuilt' ],
+        type: 'wrapper-test',
+        url: `studio/?${wrapperQueryParameters}`
+      } );
+    }
+    else if ( wrapperName === 'state' ) {
+
+      // only test state on phet-io sims that support it
+      phetioStateSupported && tests.push( {
+        test: [ repo, testName, 'unbuilt' ],
+        type: 'wrapper-test',
+        url: `phet-io-wrappers/state/?${wrapperQueryParameters}&phetioDebug=true`
+      } );
+    }
+    else {
+      tests.push( {
+        test: [ repo, testName, 'unbuilt' ],
+        type: 'wrapper-test',
+        url: `phet-io-wrappers/${wrapperName}/?${wrapperQueryParameters}&phetioDebug=true`,
+        testQueryParameters: 'duration=20000'
+      } );
+    }
   } );
 } );
 
