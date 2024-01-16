@@ -198,10 +198,16 @@ phetioRepos.forEach( repo => {
     } );
   } );
 
+  const wrappersToIgnore = [ 'migration', 'playback', 'diff', 'input-record-and-playback' ];
+
   phetioWrapperSuiteWrappers.forEach( wrapperPath => {
 
     const wrapperPathParts = wrapperPath.split( '/' );
     const wrapperName = wrapperPathParts[ wrapperPathParts.length - 1 ];
+
+    if ( wrappersToIgnore.includes( wrapperName ) ) {
+      return;
+    }
 
     const testName = `phet-io-${wrapperName}-fuzz`;
     const wrapperQueryParameters = `sim=${repo}&locales=*&phetioWrapperDebug=true&fuzz`;
