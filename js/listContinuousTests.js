@@ -198,7 +198,7 @@ phetioRepos.forEach( repo => {
     } );
   } );
 
-  const wrappersToIgnore = [ 'migration', 'playback', 'diff', 'input-record-and-playback' ];
+  const wrappersToIgnore = [ 'migration', 'playback', 'login', 'input-record-and-playback' ];
 
   phetioWrapperSuiteWrappers.forEach( wrapperPath => {
 
@@ -235,7 +235,7 @@ phetioRepos.forEach( repo => {
         test: [ repo, testName, 'unbuilt' ],
         type: 'wrapper-test',
         url: `phet-io-wrappers/${wrapperName}/?${wrapperQueryParameters}&phetioDebug=true`,
-        testQueryParameters: 'duration=20000'
+        testQueryParameters: `duration=${wrapperName === 'multi' ? '60000' : '15000'}`
       } );
     }
   } );
