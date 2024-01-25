@@ -396,6 +396,23 @@ unitTestRepos.forEach( repo => {
     urls: [
       'doc/layout-exemplars.html'
     ]
+  },
+  {
+    repo: 'phet-io-website',
+    urls: [
+      'root/devguide/',
+      'root/io-solutions/',
+      'root/io-features/',
+      'root/io-solutions/virtual-lab/saturation.html',
+      'root/io-solutions/online-homework/',
+      'root/io-solutions/e-textbook/',
+      'root/io-features/customize.html',
+      'root/io-features/integrate.html',
+      'root/io-features/assess.html',
+      'root/contact/',
+      'root/about/',
+      'root/partnerships/'
+    ]
   }
 ].forEach( ( { repo, urls } ) => {
   urls.forEach( pageloadRelativeURL => {
