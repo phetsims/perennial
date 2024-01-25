@@ -332,89 +332,83 @@ unitTestRepos.forEach( repo => {
 } );
 
 // Page-load tests (non-built)
-[
-  {
-    repo: 'dot',
-    urls: [
-      '', // the root URL
-      'doc/',
-      'examples/',
-      'examples/convex-hull-2.html',
-      'tests/',
-      'tests/playground.html'
-    ]
-  },
-  {
-    repo: 'kite',
-    urls: [
-      '', // the root URL
-      'doc/',
-      'examples/',
-      'tests/',
-      'tests/playground.html',
-      'tests/visual-shape-test.html'
-    ]
-  },
-  {
-    repo: 'scenery',
-    urls: [
-      '', // the root URL
-      'doc/',
-      'doc/a-tour-of-scenery.html',
-      'doc/accessibility/accessibility.html',
-      'doc/implementation-notes.html',
-      'doc/user-input.html',
-      'doc/layout.html',
-      'doc/accessibility/voicing.html',
-      'examples/',
-      'examples/cursors.html',
-      'examples/hello-world.html',
-      'examples/input-multiple-displays.html',
-      'examples/input.html',
-      'examples/mouse-wheel.html',
-      'examples/multi-touch.html',
-      'examples/nodes.html',
-      'examples/shapes.html',
-      'examples/sprites.html',
-      'examples/accessibility-shapes.html',
-      'examples/accessibility-button.html',
-      'examples/accessibility-animation.html',
-      'examples/accessibility-listeners.html',
-      'examples/accessibility-updating-pdom.html',
-      'examples/accessibility-slider.html',
-      // 'examples/webglnode.html', // currently disabled, since it fails without webgl
-      'tests/',
-      'tests/playground.html',
-      'tests/renderer-comparison.html?renderers=canvas,svg,dom',
-      'tests/sandbox.html',
-      'tests/text-bounds-comparison.html',
-      'tests/text-quality-test.html'
-    ]
-  },
-  {
-    repo: 'phet-lib',
-    urls: [
-      'doc/layout-exemplars.html'
-    ]
-  },
-  {
-    repo: 'phet-io-website',
-    urls: [
-      'root/devguide/',
-      'root/io-solutions/',
-      'root/io-features/',
-      'root/io-solutions/virtual-lab/saturation.html',
-      'root/io-solutions/online-homework/',
-      'root/io-solutions/e-textbook/',
-      'root/io-features/customize.html',
-      'root/io-features/integrate.html',
-      'root/io-features/assess.html',
-      'root/contact/',
-      'root/about/',
-      'root/partnerships/'
-    ]
-  }
-].forEach( ( { repo, urls } ) => {
+[ {
+  repo: 'dot',
+  urls: [
+    '', // the root URL
+    'doc/',
+    'examples/',
+    'examples/convex-hull-2.html',
+    'tests/',
+    'tests/playground.html'
+  ]
+}, {
+  repo: 'kite',
+  urls: [
+    '', // the root URL
+    'doc/',
+    'examples/',
+    'tests/',
+    'tests/playground.html',
+    'tests/visual-shape-test.html'
+  ]
+}, {
+  repo: 'scenery',
+  urls: [
+    '', // the root URL
+    'doc/',
+    'doc/a-tour-of-scenery.html',
+    'doc/accessibility/accessibility.html',
+    'doc/implementation-notes.html',
+    'doc/user-input.html',
+    'doc/layout.html',
+    'doc/accessibility/voicing.html',
+    'examples/',
+    'examples/cursors.html',
+    'examples/hello-world.html',
+    'examples/input-multiple-displays.html',
+    'examples/input.html',
+    'examples/mouse-wheel.html',
+    'examples/multi-touch.html',
+    'examples/nodes.html',
+    'examples/shapes.html',
+    'examples/sprites.html',
+    'examples/accessibility-shapes.html',
+    'examples/accessibility-button.html',
+    'examples/accessibility-animation.html',
+    'examples/accessibility-listeners.html',
+    'examples/accessibility-updating-pdom.html',
+    'examples/accessibility-slider.html',
+    // 'examples/webglnode.html', // currently disabled, since it fails without webgl
+    'tests/',
+    'tests/playground.html',
+    'tests/renderer-comparison.html?renderers=canvas,svg,dom',
+    'tests/sandbox.html',
+    'tests/text-bounds-comparison.html',
+    'tests/text-quality-test.html'
+  ]
+}, {
+  repo: 'phet-lib',
+  urls: [
+    'doc/layout-exemplars.html'
+  ]
+}, {
+  repo: 'phet-io-website',
+  urls: [
+    'root/devguide/',
+    'root/io-solutions/',
+    'root/io-features/',
+    'root/io-solutions/virtual-lab/saturation.html',
+    'root/io-solutions/online-homework/',
+    'root/io-solutions/e-textbook/',
+    'root/io-features/customize.html',
+    'root/io-features/integrate.html',
+    'root/io-features/assess.html',
+    'root/contact/',
+    'root/about/',
+    'root/partnerships/'
+  ]
+} ].forEach( ( { repo, urls } ) => {
   urls.forEach( pageloadRelativeURL => {
     tests.push( {
       test: [ repo, 'pageload', `/${pageloadRelativeURL}` ],
