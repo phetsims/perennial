@@ -407,6 +407,7 @@ unitTestRepos.forEach( repo => {
     'root/io-features/assess.html',
     'root/contact/',
     'root/about/',
+    'root/about/team/',
     'root/partnerships/',
     'root/'
   ]
