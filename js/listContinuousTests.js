@@ -396,6 +396,7 @@ unitTestRepos.forEach( repo => {
   repo: 'phet-io-website',
   urls: [
     'root/devguide/',
+    'root/devguide/api_overview.html',
     'root/io-solutions/',
     'root/io-features/',
     'root/io-solutions/virtual-lab/saturation.html',
@@ -406,7 +407,8 @@ unitTestRepos.forEach( repo => {
     'root/io-features/assess.html',
     'root/contact/',
     'root/about/',
-    'root/partnerships/'
+    'root/partnerships/',
+    'root/'
   ]
 } ].forEach( ( { repo, urls } ) => {
   urls.forEach( pageloadRelativeURL => {
