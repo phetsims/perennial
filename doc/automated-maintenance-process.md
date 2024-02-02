@@ -1,5 +1,33 @@
 # Overview of the automated maintenance process
 
+### Table Of Contents
+
+* [Terminology](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#terminology)
+* [The REPL](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#the-repl)
+* [Release branches](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#release-branches)
+* [General procedure](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#)
+* [.maintenance.json](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#maintenancejson)
+* [Viewing current maintenance state: `Maintenance.list()`](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#viewing-current-maintenance-state-maintenancelist)
+* [Prerequisites](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#prerequisites)
+* [General maintenance steps](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#general-maintenance-steps)
+  * [#1: Checking branch status: `Maintenance.checkBranchStatus()`](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#1-checking-branch-status-maintenancecheckbranchstatus)
+  * [#2: Communicate with the team about the maintenance release](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#2-communicate-with-the-team-about-the-maintenance-release)
+  * [#3: Get rid of any previous maintenance state: `Maintenance.reset()`](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#3-get-rid-of-any-previous-maintenance-state-maintenancereset)
+  * [#4: Gather information about the required changes](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#4-gather-information-about-the-required-changes)
+  * [#5: Create a patch: `Maintenance.createPatch( repo, message, [patchName] )`](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#5-create-a-patch-maintenancecreatepatch-repo-message-patchname-)
+  * [#6: Adding "needed patches"](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#6-adding-needed-patches)
+  * [#7: Checking out a "modified" release branch](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#7-checking-out-a-modified-release-branch)
+  * [#8: Create and record "fix" commits](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#8-create-and-record-fix-commits)
+  * [#9: Add the patch SHAs: `Maintenance.addPatchSHA( patchName, sha )`](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#9-add-the-patch-shas-maintenanceaddpatchsha-patchname-sha-)
+  * [#10: Apply patches: `Maintenance.applyPatches()`](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#10-apply-patches-maintenanceapplypatches)
+  * [#11: Update dependencies: `Maintenance.updateDependencies()`](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#11-update-dependencies-maintenanceupdatedependencies)
+  * [#12: Notify for unpublished RC branches](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#12-notify-for-unpublished-rc-branches)
+  * [#13: Deploying RCs and the QA issue: `Maintenance.deployReleaseCandidates()`](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#13-deploying-rcs-and-the-qa-issue-maintenancedeployreleasecandidates)
+  * [#14: Deploying changes to production: `Maintenance.deployProduction()`](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#14-deploying-changes-to-production-maintenancedeployproduction)
+* [Troubleshooting](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#troubleshooting)
+  * [Maintenance patches for a suite of sims in RC](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#maintenance-patches-for-a-suite-of-sims-in-rc)
+  * [Deprecating "unwanted" unpublished release branches](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#deprecating-unwanted-unpublished-release-branches)
+
 ## Terminology
 
 - Release Branch: A specific "sim", "branch", "brands" combination that will be patched/deployed as one unit. Sometimes
@@ -479,7 +507,6 @@ release branches.
 
 Afterwards, `Maintenance.listLinks()` will print out links to where the production versions should be. Quickly open all
 of these links to make sure the production deploys succeeded.
-
 
 ## Troubleshooting
 
