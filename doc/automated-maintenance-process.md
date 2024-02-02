@@ -480,7 +480,12 @@ release branches.
 Afterwards, `Maintenance.listLinks()` will print out links to where the production versions should be. Quickly open all
 of these links to make sure the production deploys succeeded.
 
-# Maintenance patches for a suite of sims in RC
+
+## Troubleshooting
+
+Here are some real world cases that people have run into. I hope this helps you!
+
+### Maintenance patches for a suite of sims in RC
 
 Something that comes up when releasing RCs for a suite of sims (e.g. area-model, fractions) is that you'll want to patch
 all of the associated simulations at once with a specific common patch (e.g. area-model-common, fractions-common, etc.)
@@ -488,20 +493,20 @@ The automated maintenance process makes this way more convenient than patching 4
 maintenance release was essentially typing:
 
 ```js
-maintenance > Maintenance.reset()
-maintenance > Maintenance.createPatch( 'area-model-common', 'https://github.com/phetsims/area-model-common/issues/172' );
+Maintenance.reset()
+Maintenance.createPatch( 'area-model-common', 'https://github.com/phetsims/area-model-common/issues/172' );
 // Created patch for area-model-common with message: https://github.com/phetsims/area-model-common/issues/172
-maintenance > Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( 'area-model-algebra', '1.1', [ 'phet' ] ), 'area-model-common' );
+Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( 'area-model-algebra', '1.1', [ 'phet' ] ), 'area-model-common' );
 // Added patch area-model-common as needed for area-model-algebra 1.1
-maintenance > Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( 'area-model-decimals', '1.1', [ 'phet' ] ), 'area-model-common' );
+Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( 'area-model-decimals', '1.1', [ 'phet' ] ), 'area-model-common' );
 // Added patch area-model-common as needed for area-model-decimals 1.1
-maintenance > Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( 'area-model-introduction', '1.1', [ 'phet' ] ), 'area-model-common' );
+Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( 'area-model-introduction', '1.1', [ 'phet' ] ), 'area-model-common' );
 // Added patch area-model-common as needed for area-model-introduction 1.1
-maintenance > Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( 'area-model-multiplication', '1.1', [ 'phet' ] ), 'area-model-common' );
+Maintenance.addNeededPatchReleaseBranch( new ReleaseBranch( 'area-model-multiplication', '1.1', [ 'phet' ] ), 'area-model-common' );
 // Added patch area-model-common as needed for area-model-multiplication 1.1
-maintenance > Maintenance.addPatchSHA( 'area-model-common', '81283b1e97fae5cd760f69d7a47284c603214697' );
+Maintenance.addPatchSHA( 'area-model-common', '81283b1e97fae5cd760f69d7a47284c603214697' );
 // Added SHA 81283b1e97fae5cd760f69d7a47284c603214697 to patch area-model-common
-maintenance > Maintenance.list();
+Maintenance.list();
 /*
 area-model-algebra 1.1 phet
   needs: area-model-common
@@ -518,7 +523,7 @@ area-model-multiplication 1.1 phet
     area-model-introduction 1.1 phet
     area-model-multiplication 1.1 phet
 */
-maintenance > Maintenance.applyPatches();
+Maintenance.applyPatches();
 /*
 Checked out area-model-common SHA for area-model-algebra 1.1
 Cherry-pick success for 81283b1e97fae5cd760f69d7a47284c603214697, result is 1f66b1367629b6f8e6da61ce6c93f35c5ff35775
@@ -530,14 +535,14 @@ Checked out area-model-common SHA for area-model-multiplication 1.1
 Cherry-pick success for 81283b1e97fae5cd760f69d7a47284c603214697, result is 1f66b1367629b6f8e6da61ce6c93f35c5ff35775
 4 patches applied
 */
-maintenance > Maintenance.updateDependencies();
+Maintenance.updateDependencies();
 // It pushes all of the dependency changes to the release branches, taking a number of minutes
 ```
 
 Notably, we need to somewhat manually add the release branches, since they can't be detected from the website (they
 aren't published!)
 
-# Deprecating "unwanted" unpublished release branches
+### Deprecating "unwanted" unpublished release branches
 
 If a release branch is discontinued (without being published), you can rename the branch to add the suffix
 `-deprecated` with the following (with either `${BRANCH}` replaced, or defined in an environment variable:
