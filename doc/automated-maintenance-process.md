@@ -27,6 +27,7 @@
 * [Troubleshooting](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#troubleshooting)
   * [Maintenance patches for a suite of sims in RC](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#maintenance-patches-for-a-suite-of-sims-in-rc)
   * [Deprecating "unwanted" unpublished release branches](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#deprecating-unwanted-unpublished-release-branches)
+  * [Your patch applied successfully to all sims, but it didn't fully fix one sim](https://github.com/phetsims/perennial/blob/main/doc/automated-maintenance-process.md#your-patch-applied-successfully-to-all-sims-but-it-didnt-fully-fix-one-sim)
 
 ## Terminology
 
@@ -582,3 +583,12 @@ git push origin :${BRANCH}
 git push --set-upstream origin ${BRANCH}-deprecated
 git checkout main
 ```
+
+### Your patch applied successfully to all sims, but it didn't fully fix one sim
+
+This is a common case that you may run into during an MR. In general, you can just create a new patch, and only add
+the sim that is now broken to it. Then treat the fix as a whole new patch, but just for that single sim that was
+manually defined. Likely this will involve calling `checkoutTarget()`, committing a dangling commit, and then using that
+to fix your patch. `applyPatches()` and `updateDependencies()` from there. It shouldn't matter if you run into this
+before or after you have called `updateDependencies()`. 
+
