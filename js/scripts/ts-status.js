@@ -50,6 +50,9 @@ const tsExpectErrorHeader = '"@ts-expect-error"';
 const completeHeader = '% Complete';
 const tableData = {};
 
+const doesNotCountJS = [ '-overrides.js' ];
+
+
 const percent = ( numerator, denominator ) => {
   return Math.floor( ( numerator / denominator ) * 100 );
 };
@@ -92,7 +95,9 @@ const captureData = ( path, tableData ) => {
       captureData( newPath, tableData );
     }
     else if ( file.match( /\.js$/ ) ) {
-      jsCount += countLines( newPath );
+      if ( !_.some( doesNotCountJS, string => file.includes( string ) ) ) {
+        jsCount += countLines( newPath );
+      }
     }
     else if ( file.match( /\.ts$/ ) ) {
       tsCount += countLines( newPath );
