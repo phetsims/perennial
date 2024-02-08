@@ -146,6 +146,7 @@ phet-io-wrapper-hookes-law-energy
 phet-io-wrapper-lab-book
 phet-io-wrappers
 phet-lib
+phet-vite-demo
 phetcommon
 phetmarks
 phettest
