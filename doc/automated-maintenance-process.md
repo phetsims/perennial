@@ -220,6 +220,11 @@ be flagged.
 
 # General maintenance steps
 
+## #0: Pull all branches of all repos
+
+One way to do this in perennial is `node js/scripts/main-pull-status.js --allBranches`. Otherwise the next step will show
+incorrect failures.
+
 ## #1: Checking branch status: `Maintenance.checkBranchStatus()`
 
 This command will iterate through all available release branches, and will make a few checks to see whether they are in
