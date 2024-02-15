@@ -374,7 +374,7 @@ unitTestRepos.forEach( repo => {
     'examples/nodes.html',
     'examples/shapes.html',
     'examples/sprites.html',
-    'examples/webglnode.html',
+    // 'examples/webglnode.html', // We don't test CT with webgl-enabled browsers, so this fails. Dang.
     'examples/accessibility-shapes.html',
     'examples/accessibility-button.html',
     'examples/accessibility-animation.html',
