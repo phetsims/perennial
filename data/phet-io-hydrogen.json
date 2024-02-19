@@ -56,6 +56,10 @@
     "version": "1.2"
   },
   {
+    "sim": "keplers-laws",
+    "version": "1.2"
+  },
+  {
     "sim": "molecule-polarity",
     "version": "1.3"
   },
