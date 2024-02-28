@@ -67,9 +67,6 @@ module.exports = async function( project ) {
   await copyFile( `${trunkPath}/simulations-java/simulations/${project}/deploy/${project}_all.jar`, allJar );
   console.log( 'copied' );
 
-  await execute( '/Applications/cheerpj/cheerpjfy.py', [ allJar ] );
-  console.log( 'cheerpjed' );
-
   const javaProperties = fs.readFileSync( `${trunkPath}/simulations-java/simulations/${project}/${project}-build.properties`, 'utf-8' );
   const flavors = javaProperties.split( '\n' ).filter( line => line.startsWith( 'project.flavor' ) ).map( line => line.split( '.' )[ 2 ] );
   let url = '';
