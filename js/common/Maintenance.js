@@ -766,6 +766,13 @@ module.exports = ( function() {
             console.log( `Checked out ${patchRepo} SHA for ${repo} ${branch}` );
 
             for ( const sha of patch.shas ) {
+
+              // If the sha doesn't exist in the repo, then give a specific error for that.
+              const hasSha = ( await execute( 'git', [ 'cat-file', '-e', sha ], `../${patchRepo}`, { errors: 'resolve' } ) ).code === 0;
+              if ( !hasSha ) {
+                throw new Error( `SHA not found in ${patchRepo}: ${sha}` );
+              }
+
               const cherryPickSuccess = await gitCherryPick( patchRepo, sha );
 
               if ( cherryPickSuccess ) {
