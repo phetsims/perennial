@@ -16,7 +16,7 @@ try {
   buildLocalObject = JSON.parse( fs.readFileSync( `${process.env.HOME}/.phet/build-local.json`, 'utf8' ) );
 }
 catch( e ) {
-  winston.warn( 'No build-local.json detected!' );
+  winston.warn( 'Missing or incorrect build-local.json!' );
   buildLocalObject = {};
 }
 
