@@ -288,11 +288,14 @@ async function clearBranchProtections( repositories ) {
  */
 async function protectBranches( repositories ) {
 
+  // remove any trailing '/' from the repository names, which may have been added by auto complete
+  const cleanedRepositories = repositories.map( repository => repository.replace( /\/$/, '' ) );
+
   // if the rule for the protected branch already exists, delete it - we assume that running this again means we
   // want to update rules for each namePattern
-  await clearBranchProtections( repositories );
+  await clearBranchProtections( cleanedRepositories );
 
-  for ( const repositoryName of repositories ) {
+  for ( const repositoryName of cleanedRepositories ) {
 
     // get the unique ID for each repository
     const repositoryId = await getRepositoryId( repositoryName );
