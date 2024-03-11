@@ -755,7 +755,10 @@ module.exports = ( function() {
         }
       }
 
-      return ReleaseBranch.combineLists( [ ...phetBranches, ...phetioBranches, ...unreleasedBranches ] );
+      const allReleaseBranches = ReleaseBranch.combineLists( [ ...phetBranches, ...phetioBranches, ...unreleasedBranches ] );
+
+      // FAMB 2.3-phetio keeps ending up in the MR list when we don't want it to, see https://github.com/phetsims/phet-io/issues/1957.
+      return allReleaseBranches.filter( rb => !( rb.repo === 'forces-and-motion-basics' && rb.branch === '2.3-phetio' ) );
     }
 
     /**
