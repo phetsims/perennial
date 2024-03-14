@@ -109,7 +109,7 @@ cd ..
 ##########################################################################################################
 
 echo "TASK - UPDATE LOCALE INFO FILES"
-cd chipper/data/js || exit
+cd chipper/js/data || exit
 node updateLocaleInfo.js
 cd ../../..
 
