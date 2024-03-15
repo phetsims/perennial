@@ -130,6 +130,20 @@ const createQueryData = queryString => {
 };
 
 /**
+ * Gets an error message from a JSON response. Just grabs the first error message if there are multiple.
+ * @param jsonResponse - JSON response object from github. Errors are in a .errors array.
+ * @returns {*|string}
+ */
+const getErrorMessage = jsonResponse => {
+  if ( jsonResponse.errors ) {
+    return jsonResponse.errors[ 0 ].message;
+  }
+  else {
+    return 'No data returned';
+  }
+};
+
+/**
  * Returns the unique ID of the provided phetsims repository.
  * @param {string} repositoryName
  * @returns {Promise<string>}
@@ -137,7 +151,7 @@ const createQueryData = queryString => {
 async function getRepositoryId( repositoryName ) {
   const handleJSONResponse = jsonResponse => {
     if ( !jsonResponse.data || jsonResponse.data.repository === null ) {
-      throw new Error( `${jsonResponse.message}. developerGithubAccessToken in build-local.json may be incorrect or expired.` );
+      throw new Error( `${getErrorMessage( jsonResponse )} Make sure developerGithubAccessToken in build-local.json may be incorrect or expired.` );
     }
 
     return jsonResponse.data.repository.id;
@@ -156,7 +170,7 @@ async function getRepositoryId( repositoryName ) {
 async function getExistingBranchProtectionRules( repositoryName ) {
   const handleJSONResponse = jsonResponse => {
     if ( jsonResponse.errors ) {
-      throw new Error( jsonResponse.errors );
+      throw new Error( getErrorMessage( jsonResponse ) );
     }
     if ( !jsonResponse.data ) {
       throw new Error( `No data returned by getExistingBranchProtectionRules for repo ${repositoryName}` );
@@ -178,7 +192,7 @@ async function getExistingBranchProtectionRules( repositoryName ) {
 async function writeProtectionRule( repositoryId, namePattern ) {
   const handleJSONResponse = jsonResponse => {
     if ( jsonResponse.errors ) {
-      throw new Error( jsonResponse.errors );
+      throw new Error( getErrorMessage( jsonResponse ) );
     }
   };
   return sendPromisedHttpsRequest( createRepositoryRuleMutationData( repositoryId, namePattern ), handleJSONResponse );
@@ -195,7 +209,7 @@ async function writeProtectionRule( repositoryId, namePattern ) {
 async function deleteExistingProtectionRule( ruleId, namePattern, repositoryName ) {
   const handleJSONResponse = jsonResponse => {
     if ( jsonResponse.errors ) {
-      throw new Error( jsonResponse.errors );
+      throw new Error( getErrorMessage( jsonResponse ) );
     }
     else {
       console.log( `Deleted existing branch protection rule ${namePattern} for repo ${repositoryName}` );
