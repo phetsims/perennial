@@ -1,7 +1,13 @@
 // Copyright 2021, University of Colorado Boulder
 
 /**
- * Checks status for repos, and prints it out to the console
+ * Generally a "one-stop shop" for all things needed to update the PhET Codebase. This will:
+ * - clone missing repos
+ * - pull all repos
+ * - set up tracking to the remote (only if needed)
+ * - npm update in chipper/perennial/perennial-alias
+ * - transpile (see --transpile)
+ * - Conduct pull and tracking on all branches associated with the repo (see --allBranches) (useful for doing batch MRs)
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
@@ -15,10 +21,20 @@ const gitIsClean = require( '../common/gitIsClean' );
 const gitPullRebase = require( '../common/gitPullRebase' );
 const gitRevParse = require( '../common/gitRevParse' );
 const npmUpdate = require( '../common/npmUpdate' );
+const outputJSAll = require( '../common/outputJSAll' );
 const winston = require( 'winston' );
 const _ = require( 'lodash' );
 
 winston.default.transports.console.level = 'error';
+
+// If this is provided, we'll track ALL remote branches, check them out, and pull them (with rebase)
+const allBranches = process.argv.includes( '--allBranches' );
+
+// Additionally run the transpiler after pulling
+const transpile = process.argv.includes( '--transpile' );
+
+// Log all repos, even if nothing changed with them.
+const allRepos = process.argv.includes( '--all' );
 
 // ANSI escape sequences to move to the right (in the same line) or to apply or reset colors
 const moveRight = ' \u001b[42G';
@@ -28,9 +44,6 @@ const reset = '\u001b[0m';
 
 const repos = getActiveRepos();
 const data = {};
-
-// If this is provided, we'll track ALL remote branches, check them out, and pull them (with rebase)
-const allBranches = process.argv.includes( '--allBranches' );
 
 const getStatus = async repo => {
   data[ repo ] = '';
@@ -83,7 +96,7 @@ const getStatus = async repo => {
     if ( branch ) {
       isGreen = !status && branch === 'main' && !track.length;
 
-      if ( !isGreen || process.argv.includes( '--all' ) ) {
+      if ( !isGreen || allRepos ) {
         data[ repo ] += `${repo}${moveRight}${isGreen ? green : red}${branch}${reset} ${track}\n`;
       }
     }
@@ -93,7 +106,7 @@ const getStatus = async repo => {
     }
 
     if ( status ) {
-      if ( !isGreen || process.argv.includes( '--all' ) ) {
+      if ( !isGreen || allRepos ) {
         data[ repo ] += status + '\n';
       }
     }
@@ -117,4 +130,10 @@ const getStatus = async repo => {
   await npmUpdate( 'perennial-alias' );
 
   console.log( `${_.every( repos, repo => !data[ repo ].length ) ? green : red}-----=====] finished npm [=====-----${reset}\n` );
+
+  if ( transpile ) {
+    await outputJSAll();
+
+    console.log( `${_.every( repos, repo => !data[ repo ].length ) ? green : red}-----=====] finished transpile [=====-----${reset}\n` );
+  }
 } )();
