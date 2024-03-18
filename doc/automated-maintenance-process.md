@@ -220,10 +220,15 @@ be flagged.
 
 # General maintenance steps
 
-## #0: Pull all branches of all repos
+## #0a: Pull all branches of all repos
 
 One way to do this in perennial is `node js/scripts/main-pull-status.js --allBranches`. Otherwise the next step will show
 incorrect failures.
+
+## #0b: Stop your transpiler
+
+If you are running a transpiler with the `--watch` flag, it should be stopped before continuing. It can interfere with
+builds and other operations that will be done in the maintenance process.
 
 ## #1: Checking branch status: `Maintenance.checkBranchStatus()`
 
