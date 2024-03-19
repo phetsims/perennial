@@ -994,15 +994,14 @@ module.exports = ( function() {
      *                             transpile=false - to opt out of transpiling, set to false.
      */
     static async updateCheckouts( filter, options ) {
-      const concurrent = 5;
-
       options = _.merge( {
+        concurrent: 5,
         build: true,
         transpile: true,
         buildOptions: { lint: true }
       }, options );
 
-      console.log( `Updating checkouts (running in parallel with ${concurrent} threads)` );
+      console.log( `Updating checkouts (running in parallel with ${options.concurrent} threads)` );
 
       const releaseBranches = await Maintenance.getMaintenanceBranches();
 
@@ -1036,7 +1035,7 @@ module.exports = ( function() {
         }
       } ) );
 
-      await asyncq.parallelLimit( asyncFunctions, concurrent );
+      await asyncq.parallelLimit( asyncFunctions, options.concurrent );
 
       console.log( 'Done' );
     }
