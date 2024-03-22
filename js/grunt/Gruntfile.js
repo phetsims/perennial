@@ -531,7 +531,6 @@ module.exports = function( grunt ) {
     const cache = !grunt.option( 'disable-eslint-cache' );
     const activeRepos = getDataFile( 'active-repos' );
     const fix = grunt.option( 'fix' );
-    const format = grunt.option( 'format' );
     const chipAway = grunt.option( 'chip-away' );
     const disableWithComment = grunt.option( 'disable-with-comment' );
     const showProgressBar = !grunt.option( 'hide-progress-bar' );
@@ -542,7 +541,6 @@ module.exports = function( grunt ) {
       const lintReturnValue = await lint( activeRepos, {
         cache: cache,
         fix: fix,
-        format: format,
         chipAway: chipAway,
         disableWithComment: disableWithComment,
         showProgressBar: showProgressBar
