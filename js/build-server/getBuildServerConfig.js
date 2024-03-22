@@ -71,4 +71,3 @@ function getDeployConfig( fs ) {
 }
 
 module.exports = getDeployConfig;
-

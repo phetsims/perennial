@@ -70,4 +70,3 @@ qunit.test( 'SimVersion Basics', async assert => {
   assert.ok( mySimVersion.toString() === '1.2.3-rc.1', 'as string' );
 
 } );
-
