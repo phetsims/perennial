@@ -16,6 +16,7 @@ const gitRevParse = require( '../../common/gitRevParse' );
 const loadJSON = require( '../../common/loadJSON' );
 const writeJSON = require( '../../common/writeJSON' );
 const fs = require( 'fs' );
+const path = require( 'path' );
 
 // constants
 const BUILD_LOCAL_FILENAME = `${process.env.HOME}/.phet/build-local.json`;
@@ -114,12 +115,52 @@ module.exports = async function( project ) {
   await copyFile( '../decaf/html/style.css', `${buildDir}/style.css` );
   await copyFile( '../decaf/html/splash.gif', `${buildDir}/splash.gif` );
 
+  // Recursively copy ../decaf/html/cheerpj_3.0 to ${buildDir}/cheerpj_3.0
+
+  // Function to create a directory if it doesn't exist
+  function ensureDir( dir ) {
+    try {
+      fs.mkdirSync( dir, { recursive: true } );
+    }
+    catch( error ) {
+      if ( error.code !== 'EEXIST' ) {
+        throw error;
+      } // Ignore the error if the directory already exists
+    }
+  }
+
+  // Recursive function to copy all files from one directory to another
+  async function copyDirRecursive( sourceDir, targetDir ) {
+
+    ensureDir( targetDir );
+
+    const entries = fs.readdirSync( sourceDir, { withFileTypes: true } );
+
+    for ( const entry of entries ) {
+      const sourcePath = path.join( sourceDir, entry.name );
+      const targetPath = path.join( targetDir, entry.name );
+
+      if ( entry.isDirectory() ) {
+        await copyDirRecursive( sourcePath, targetPath );
+      }
+      else {
+        await copyFile( sourcePath, targetPath );
+      }
+    }
+  }
+
+  const cheerpjDir = `${buildDir}/cheerpj_3.0`;
+  ensureDir( cheerpjDir );
+
+  await copyDirRecursive( '../decaf/html/cheerpj_3.0', cheerpjDir );
+
   const decafSHA = await gitRevParse( 'decaf', 'HEAD' );
   const chipperSHA = await gitRevParse( 'chipper', 'HEAD' );
   const perennialAliasSHA = await gitRevParse( 'perennial-alias', 'HEAD' );
   const perennialSHA = await gitRevParse( 'perennial', 'HEAD' );
 
-  const svnInfo = await execute( 'svn', [ 'info' ], `${trunkPath}` );
+  // Please set the svn command line path as appropriate for your system
+  const svnInfo = await execute( '/opt/homebrew/bin/svn', [ 'info' ], `${trunkPath}` );
 
   const dependencies = {
     version: versionString,
