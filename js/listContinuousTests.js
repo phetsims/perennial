@@ -454,8 +454,12 @@ const commonQueryParameters = {
   initialScreen2: 'brand=phet&fuzz&ea&initialScreen=2',
 
   // Purposefully use incorrect syntax to make sure it is caught correctly without crashing
-  screensVerbose: 'brand=phet&fuzz&ea&screens=Screen1,Screen2',
-  screensOther: 'brand=phet&fuzz&ea&screens=1.1,Screen2'
+  screensVerbose: 'brand=phet&fuzz&screens=Screen1,Screen2',
+  wrongInitialScreen1: 'brand=phet&fuzz&initialScreen=3',
+  wrongInitialScreen2: 'brand=phet&fuzz&initialScreen=2&screens=1',
+  wrongScreens1: 'brand=phet&fuzz&screens=3',
+  wrongScreens2: 'brand=phet&fuzz&screens=1,2,3',
+  screensOther: 'brand=phet&fuzz&screens=1.1,Screen2'
 };
 Object.keys( commonQueryParameters ).forEach( name => {
   const queryString = commonQueryParameters[ name ];
