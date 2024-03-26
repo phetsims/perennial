@@ -394,6 +394,11 @@ unitTestRepos.forEach( repo => {
     'doc/layout-exemplars.html'
   ]
 }, {
+  repo: 'phet-io-wrappers',
+  urls: [
+    'tests/FAMB-2.2-phetio-wrapper-test.html'
+  ]
+}, {
   repo: 'phet-io-website',
   urls: [
     'root/devguide/',
