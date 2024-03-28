@@ -47,7 +47,7 @@ const reset = '\u001b[0m';
   };
 
   const runTsc = async () => {
-    tscResults = await execute( '../../node_modules/typescript/bin/tsc', [], '../chipper/tsconfig/all', {
+    tscResults = await execute( 'node', [ '../../node_modules/typescript/bin/tsc' ], '../chipper/tsconfig/all', {
       errors: 'resolve'
     } );
     outputResult( 'tsc', tscResults );
