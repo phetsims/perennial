@@ -4,6 +4,8 @@
 # This script is run daily on bayes, doing automatic grunt work to keep the project up
 # to date. Edit this script and commit to automatically add to the daily cron job.
 #
+# To debug the process, log onto bayes as phet-admin, and view the daily-grunt-work-error.log, which should hold any
+# trouble, otherwise, you can parse through the whole `-out.log` file for details.
 #
 # The cron job on bayes:
 # 1 3 * * * cd /data/share/phet/automated-grunt-work/perennial; git pull; ./bin/daily-grunt-work.sh > ~/daily-grunt-work-out.log 2> ~/daily-grunt-work-error.log;
