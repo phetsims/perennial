@@ -6,7 +6,7 @@
 #
 #
 # The cron job on bayes:
-# 1 3 * * * cd /data/share/phet/automated-grunt-work/perennial; git pull; ./bin/daily-grunt-work.sh >& ~/daily-grunt-work.log;
+# 1 3 * * * cd /data/share/phet/automated-grunt-work/perennial; git pull; ./bin/daily-grunt-work.sh > ~/daily-grunt-work-out.log 2> ~/daily-grunt-work-error.log;
 #
 # Author: Michael Kauzmann
 #
