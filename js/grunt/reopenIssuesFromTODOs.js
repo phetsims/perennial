@@ -42,7 +42,7 @@ module.exports = async function reopenIssuesFromTODOs() {
   } );
   console.log( 'grunt lint-everything finished' );
   if ( result.code !== 0 ) {
-    console.log( 'Error running lint-everything:\n\n', result.stdout, result.stderr );
+    console.error( 'Error running lint-everything:\n\n', result.stdout, result.stderr );
     process.exit();
   }
 
@@ -63,7 +63,7 @@ module.exports = async function reopenIssuesFromTODOs() {
     const issueNumberMatch = issueURL.match( /phetsims\/[\w-]+\/issues\/(\d+)/ );
 
     if ( !repoMatch || !issueNumberMatch ) {
-      console.log( 'unexpected issue URL:', issueURL );
+      console.error( 'unexpected issue URL:', issueURL );
       continue;
     }
 
