@@ -1,6 +1,9 @@
 #!/bin/bash
 #====================================================================================================
 #
+# @deprecated - please instead use js/scripts/copy-history-to-different-repo
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#
 # Copies the history from one file/directory in one repo to another repo, using patches.
 # Implementation based on the highest voted answer in
 # http://stackoverflow.com/questions/1365541/how-to-move-files-from-one-git-repo-to-another-not-a-clone-preserving-history
