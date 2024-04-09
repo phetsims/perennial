@@ -35,7 +35,10 @@ module.exports = function( cmd, args, cwd, options ) {
     // {'reject'|'resolve'} - whether errors should be rejected or resolved.  If errors are resolved, then an object
     //                      - of the form {code:number,stdout:string,stderr:string} is returned. 'resolve' allows usage
     //                      - in Promise.all without exiting on the 1st failure
-    errors: 'reject'
+    errors: 'reject',
+
+    // Any options that you want to provide to the child_process.spawn() command.
+    childProcessOptions: {}
   }, options );
   assert( options.errors === 'reject' || options.errors === 'resolve', 'Errors must reject or resolve' );
 
@@ -46,9 +49,7 @@ module.exports = function( cmd, args, cwd, options ) {
     let stdout = ''; // to be appended to
     let stderr = '';
 
-    const process = child_process.spawn( cmd, args, {
-      cwd: cwd
-    } );
+    const process = child_process.spawn( cmd, args, _.assignIn( { cwd: cwd }, options.childProcessOptions ) );
 
     process.on( 'error', error => {
       rejectedByError = true;
