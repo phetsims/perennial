@@ -30,15 +30,15 @@ module.exports = function( cmd, args, cwd, options ) {
 
   const startTime = Date.now();
 
-  options = _.assignIn( {
+  options = _.merge( {
 
     // {'reject'|'resolve'} - whether errors should be rejected or resolved.  If errors are resolved, then an object
     //                      - of the form {code:number,stdout:string,stderr:string} is returned. 'resolve' allows usage
     //                      - in Promise.all without exiting on the 1st failure
     errors: 'reject',
 
-    // Any options that you want to provide to the child_process.spawn() command.
-    childProcessOptions: {}
+    // Provide additional env variables, and they will be merged with the existing defaults.
+    childProcessEnv: { ...process.env }
   }, options );
   assert( options.errors === 'reject' || options.errors === 'resolve', 'Errors must reject or resolve' );
 
@@ -49,9 +49,12 @@ module.exports = function( cmd, args, cwd, options ) {
     let stdout = ''; // to be appended to
     let stderr = '';
 
-    const process = child_process.spawn( cmd, args, _.assignIn( { cwd: cwd }, options.childProcessOptions ) );
+    const childProcess = child_process.spawn( cmd, args, {
+      cwd: cwd,
+      env: options.childProcessEnv
+    } );
 
-    process.on( 'error', error => {
+    childProcess.on( 'error', error => {
       rejectedByError = true;
 
       if ( options.errors === 'resolve' ) {
@@ -64,18 +67,18 @@ module.exports = function( cmd, args, cwd, options ) {
     } );
     winston.debug( `Running ${cmd} ${args.join( ' ' )} from ${cwd}` );
 
-    process.stderr.on( 'data', data => {
+    childProcess.stderr.on( 'data', data => {
       stderr += data;
       grunt.log.debug( `stderr: ${data}` );
       winston.debug( `stderr: ${data}` );
     } );
-    process.stdout.on( 'data', data => {
+    childProcess.stdout.on( 'data', data => {
       stdout += data;
       grunt.log.debug( `stdout: ${data}` );
       winston.debug( `stdout: ${data}` );
     } );
 
-    process.on( 'close', code => {
+    childProcess.on( 'close', code => {
       winston.debug( `Command ${cmd} finished. Output is below.` );
 
       winston.debug( stderr && `stderr: ${stderr}` || 'stderr is empty.' );
