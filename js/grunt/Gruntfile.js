@@ -532,7 +532,6 @@ module.exports = function( grunt ) {
     const activeRepos = getDataFile( 'active-repos' ).filter( repo => repo !== 'perennial-alias' ); // remove duplicate perennial copy
     const fix = grunt.option( 'fix' );
     const chipAway = grunt.option( 'chip-away' );
-    const disableWithComment = grunt.option( 'disable-with-comment' );
     const showProgressBar = !grunt.option( 'hide-progress-bar' );
 
     // TODO: Don't always require this, https://github.com/phetsims/chipper/issues/1429
@@ -544,7 +543,6 @@ module.exports = function( grunt ) {
         cache: cache,
         fix: fix,
         chipAway: chipAway,
-        disableWithComment: disableWithComment,
         showProgressBar: showProgressBar
       } );
 
