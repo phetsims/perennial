@@ -534,8 +534,14 @@ module.exports = function( grunt ) {
     const chipAway = grunt.option( 'chip-away' );
     const showProgressBar = !grunt.option( 'hide-progress-bar' );
 
-    // TODO: Don't always require this, https://github.com/phetsims/chipper/issues/1429
-    const lint = require( '../../../chipper/js/grunt/lint' );
+    let lint;
+    try {
+      lint = require( '../../../chipper/js/grunt/lint' );
+    }
+    catch( e ) {
+      console.log( 'lint process not found, is your chipper repo up to date?' );
+      lint = {};
+    }
 
     // The APIs are the same for these two versions of lint support
     if ( lint.chipperAPIVersion === 'promisesPerRepo1' || lint.chipperAPIVersion === 'npx' ) {
