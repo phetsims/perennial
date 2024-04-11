@@ -529,15 +529,17 @@ module.exports = function( grunt ) {
 
     // --disable-eslint-cache disables the cache, useful for developing rules
     const cache = !grunt.option( 'disable-eslint-cache' );
-    const activeRepos = getDataFile( 'active-repos' );
+    const activeRepos = getDataFile( 'active-repos' ).filter( repo => repo !== 'perennial-alias' ); // remove duplicate perennial copy
     const fix = grunt.option( 'fix' );
     const chipAway = grunt.option( 'chip-away' );
     const disableWithComment = grunt.option( 'disable-with-comment' );
     const showProgressBar = !grunt.option( 'hide-progress-bar' );
 
-    // Don't always require this, as we may have an older chipper checked out.  Also make sure it is the promise-based lint.
+    // TODO: Don't always require this, https://github.com/phetsims/chipper/issues/1429
     const lint = require( '../../../chipper/js/grunt/lint' );
-    if ( lint.chipperAPIVersion === 'promisesPerRepo1' ) {
+
+    // The APIs are the same for these two versions of lint support
+    if ( lint.chipperAPIVersion === 'promisesPerRepo1' || lint.chipperAPIVersion === 'npx' ) {
       const lintReturnValue = await lint( activeRepos, {
         cache: cache,
         fix: fix,
