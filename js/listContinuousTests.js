@@ -31,6 +31,7 @@ const REPOS_EXCLUDED_FROM_MULTITOUCH_FUZZING = [
 const REPOS_EXCLUDED_FROM_LISTENER_ORDER_RANDOM = [
   'density',
   'buoyancy',
+  'buoyancy-basics',
   'fourier-making-waves' // see https://github.com/phetsims/fourier-making-waves/issues/240
 ];
 
