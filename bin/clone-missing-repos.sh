@@ -1,7 +1,7 @@
 #!/bin/bash
 #=============================================================================================
 #
-# Clones all missing repos. Use -p to omit private repos.
+# Clones all missing repos. Use -p to omit private repos. Use -f to specify a different file.
 #
 # Author: Aaron Davis
 # Author: Chris Malley (PixelZoom, Inc.)
@@ -9,12 +9,16 @@
 #=============================================================================================
 
 omitPrivateRepos="false"
+filename="active-repos"  # default file
 
 # parse command line options
-while getopts ":p" opt; do
+while getopts ":pf:" opt; do
   case ${opt} in
     p)
       omitPrivateRepos="true"
+      ;;
+    f)
+      filename="${OPTARG}"
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -30,13 +34,11 @@ binDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd ${binDir}/../..
 
 if [ ${omitPrivateRepos} == "true" ]; then
-
   # Identify missing repos, public only
-  missingRepos=`comm -23 <(${binDir}/print-missing-repos.sh) perennial/data/active-repos-private | xargs`
+  missingRepos=`comm -23 <(${binDir}/print-missing-repos.sh ${filename}) perennial/data/active-repos-private | xargs`
 else
-
   # Identify missing repos, public and private
-  missingRepos=`${binDir}/print-missing-repos.sh | xargs`
+  missingRepos=`${binDir}/print-missing-repos.sh ${filename} | xargs`
 fi
 
 # Clone missing repos
