@@ -22,6 +22,7 @@ const parseScreenNamesFromSimulation = async ( simName, locales, checkoutDir ) =
 
   const result = {};
   for ( const locale of locales ) {
+    // TODO: proper locale fallback for https://github.com/phetsims/joist/issues/963
     result[ locale ] = screenNameKeys.map( key => stringMap[ key ][ locale ] || stringMap[ key ][ locale.slice( 0, 2 ) ] || stringMap[ key ].en );
   }
   return result;
