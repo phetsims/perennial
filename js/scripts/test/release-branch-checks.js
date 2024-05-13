@@ -16,6 +16,9 @@ const puppeteer = require( 'puppeteer' );
 
 winston.default.transports.console.level = 'error';
 
+const TEST_LOCALES = true;
+const TEST_ANALYTICS = false;
+
 ( async () => {
   const browser = await puppeteer.launch( {
     args: [
@@ -83,25 +86,48 @@ winston.default.transports.console.level = 'error';
     const urls = await getBaseURLs( releaseBranch );
 
     for ( const url of urls ) {
-      const plainURL = url;
-      const plainAnalysis = analyzeURLs( await getLoadedURLs( plainURL ) );
-      if ( !plainAnalysis.sentGoogleAnalytics ) {
-        console.log( '  No Google Analytics sent', plainURL );
-      }
-      if ( !plainAnalysis.sentYotta ) {
-        console.log( '  No yotta sent', plainURL );
+
+      if ( TEST_LOCALES ) {
+        // TODO: test unbuilt locales (https://github.com/phetsims/joist/issues/963)
+
+        // Check locale MR. es_PY should always be in localeData
+        const localeValues = await puppeteerLoad( url, {
+          evaluate: () => {
+            return [ !!phet.chipper.localeData, !!( phet.chipper.localeData?.es_PY ) ];
+          },
+          gotoTimeout: 60000,
+          waitAfterLoad: 2000,
+          browser: browser
+        } );
+        if ( !localeValues[ 0 ] ) {
+          console.log( '  no localeData' );
+        }
+        if ( !localeValues[ 1 ] ) {
+          console.log( '  no es_PY localeData' );
+        }
       }
 
-      const yottaFalseURL = `${url}&yotta=false`;
-      const yottaFalseAnalysis = analyzeURLs( await getLoadedURLs( yottaFalseURL ) );
-      if ( yottaFalseAnalysis.sentExternalRequest || yottaFalseAnalysis.sentGoogleAnalytics || yottaFalseAnalysis.sentYotta ) {
-        console.log( '  yotta=false sent something', yottaFalseAnalysis );
-      }
+      if ( TEST_ANALYTICS ) {
+        const plainURL = url;
+        const plainAnalysis = analyzeURLs( await getLoadedURLs( plainURL ) );
+        if ( !plainAnalysis.sentGoogleAnalytics ) {
+          console.log( '  No Google Analytics sent', plainURL );
+        }
+        if ( !plainAnalysis.sentYotta ) {
+          console.log( '  No yotta sent', plainURL );
+        }
 
-      const yottaSomeFlagURL = `${url}&${demoYottaQueryParameterKey}=${demoYottaQueryParameterValue}`;
-      const yottaSomeFlagAnalysis = analyzeURLs( await getLoadedURLs( yottaSomeFlagURL ) );
-      if ( !yottaSomeFlagAnalysis.hasDemoYottaQueryParameter ) {
-        console.log( `  No ${demoYottaQueryParameterKey}=${demoYottaQueryParameterValue} sent`, yottaSomeFlagAnalysis );
+        const yottaFalseURL = `${url}&yotta=false`;
+        const yottaFalseAnalysis = analyzeURLs( await getLoadedURLs( yottaFalseURL ) );
+        if ( yottaFalseAnalysis.sentExternalRequest || yottaFalseAnalysis.sentGoogleAnalytics || yottaFalseAnalysis.sentYotta ) {
+          console.log( '  yotta=false sent something', yottaFalseAnalysis );
+        }
+
+        const yottaSomeFlagURL = `${url}&${demoYottaQueryParameterKey}=${demoYottaQueryParameterValue}`;
+        const yottaSomeFlagAnalysis = analyzeURLs( await getLoadedURLs( yottaSomeFlagURL ) );
+        if ( !yottaSomeFlagAnalysis.hasDemoYottaQueryParameter ) {
+          console.log( `  No ${demoYottaQueryParameterKey}=${demoYottaQueryParameterValue} sent`, yottaSomeFlagAnalysis );
+        }
       }
 
       // Consider adding fuzzing in the future, it seems like we're unable to get things to run after a fuzz failure though
