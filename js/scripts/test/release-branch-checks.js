@@ -20,7 +20,7 @@ winston.default.transports.console.level = 'error';
 const TEST_LOCALES = true;
 const TEST_ANALYTICS = false;
 
-const localeData = fs.readFileSync( '../babel/localeData.json', 'utf8' );
+const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf8' ) );
 
 ( async () => {
   const browser = await puppeteer.launch( {
@@ -90,6 +90,9 @@ const localeData = fs.readFileSync( '../babel/localeData.json', 'utf8' );
 
     for ( const url of urls ) {
 
+      const getUrlWithLocale = locale => url.includes( '?' ) ? `${url}&locale=${locale}` : `${url}?locale=${locale}`;
+      const getLocaleSpecificURL = locale => url.replace( '_all', `_${locale}` );
+
       if ( TEST_LOCALES ) {
         // TODO: test unbuilt locales (https://github.com/phetsims/joist/issues/963)
 
@@ -111,7 +114,7 @@ const localeData = fs.readFileSync( '../babel/localeData.json', 'utf8' );
 
         const getRunningLocale = async locale => {
           try {
-            return await puppeteerLoad( url.includes( '?' ) ? `${url}&locale=${locale}` : `${url}?locale=${locale}`, {
+            return await puppeteerLoad( getUrlWithLocale( locale ), {
               evaluate: () => {
                 return phet.chipper.locale;
               },
@@ -161,7 +164,7 @@ const localeData = fs.readFileSync( '../babel/localeData.json', 'utf8' );
         if ( hasTitleKey ) {
           const getTitle = async locale => {
             try {
-              return await puppeteerLoad( url.includes( '?' ) ? `${url}&locale=${locale}` : `${url}?locale=${locale}`, {
+              return await puppeteerLoad( getUrlWithLocale( locale ), {
                 evaluate: () => {
                   return document.title;
                 },
@@ -194,7 +197,6 @@ const localeData = fs.readFileSync( '../babel/localeData.json', 'utf8' );
           };
 
           const lookupFallbackTitle = locale => {
-
             const locales = [
               locale,
               ...( localeData[ locale ]?.fallbackLocales || [] ),
@@ -223,7 +225,7 @@ const localeData = fs.readFileSync( '../babel/localeData.json', 'utf8' );
             }
           };
 
-          const esTitleError = await checkTitle( 'es' );
+          const esTitleError = await checkTitle( 'es', 'es' );
           if ( esTitleError ) {
             console.log( `  es title error: ${esTitleError}` );
           }
@@ -240,6 +242,54 @@ const localeData = fs.readFileSync( '../babel/localeData.json', 'utf8' );
         }
         else {
           console.log( '    (could not find title string key)' );
+        }
+
+        // QueryStringMachine.warnings testing
+        {
+          // boolean | null - null if warnings array not supported
+          const getHasQSMWarning = async locale => puppeteerLoad( getUrlWithLocale( locale ), {
+            evaluate: 'QueryStringMachine.warnings !== undefined ? ( QueryStringMachine.warnings.length > 0 ) : null',
+            gotoTimeout: 60000,
+            waitAfterLoad: 2000,
+            browser: browser
+          } );
+
+          if ( await getHasQSMWarning( 'en' ) ) {
+            console.log( '  en has QSM warning' );
+          }
+
+          if ( await getHasQSMWarning( 'ES' ) ) {
+            console.log( '  ES has QSM warning' );
+          }
+
+          if ( await getHasQSMWarning( 'XX' ) ) {
+            console.log( '  XX has QSM warning' );
+          }
+
+          if ( await getHasQSMWarning( 'XX-wX' ) ) {
+            console.log( '  XX-wX has QSM warning' );
+          }
+
+          const hasQSMNonsenseWarning = await getHasQSMWarning( 'alkrtnalrc9SRTXX' );
+          if ( hasQSMNonsenseWarning === false ) {
+            console.log( '  missing nonsense QSM warning' );
+          }
+        }
+
+        // Locale-specific file testing (everything has _es)
+        {
+          const esSpecificLocale = await puppeteerLoad( getLocaleSpecificURL( 'es' ), {
+            evaluate: () => {
+              return phet.chipper.locale;
+            },
+            gotoTimeout: 60000,
+            waitAfterLoad: 2000,
+            browser: browser
+          } );
+
+          if ( esSpecificLocale !== 'es' ) {
+            console.log( '  _es.html locale not es' );
+          }
         }
       }
 
