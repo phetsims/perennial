@@ -120,8 +120,8 @@ const localeData = fs.readFileSync( '../babel/localeData.json', 'utf8' );
               browser: browser
             } );
           }
-          catch ( e ) {
-            console.log( `  error running with locale=${locale}`);
+          catch( e ) {
+            console.log( `  error running with locale=${locale}` );
             return 'error';
           }
         };
@@ -170,8 +170,8 @@ const localeData = fs.readFileSync( '../babel/localeData.json', 'utf8' );
                 browser: browser
               } );
             }
-            catch ( e ) {
-              console.log( `  error running with locale=${locale}`);
+            catch( e ) {
+              console.log( `  error running with locale=${locale}` );
               return 'error';
             }
           };
@@ -186,7 +186,7 @@ const localeData = fs.readFileSync( '../babel/localeData.json', 'utf8' );
               try {
                 json = JSON.parse( fs.readFileSync( `../babel/${releaseBranch.repo}/${releaseBranch.repo}-strings_${locale}.json`, 'utf8' ) );
               }
-              catch ( e ) {
+              catch( e ) {
                 return null;
               }
             }
