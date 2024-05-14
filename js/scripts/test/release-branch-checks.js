@@ -151,104 +151,111 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
 
         const repoPackageObject = JSON.parse( fs.readFileSync( `../${releaseBranch.repo}/package.json`, 'utf8' ) );
 
-        const partialPotentialTitleStringKey = `${releaseBranch.repo}.title`;
-        const fullPotentialTitleStringKey = `${repoPackageObject.phet.requirejsNamespace}/${partialPotentialTitleStringKey}`;
+        // Title testing
+        {
+          // We would be testing the English version(!)
+          if ( !url.includes( '_en-phetio' ) ) {
 
-        const hasTitleKey = await puppeteerLoad( url, {
-          evaluate: `!!phet.chipper.strings.en[ "${fullPotentialTitleStringKey}" ]`,
-          gotoTimeout: 60000,
-          waitAfterLoad: 2000,
-          browser: browser
-        } );
+            const partialPotentialTitleStringKey = `${releaseBranch.repo}.title`;
+            const fullPotentialTitleStringKey = `${repoPackageObject.phet.requirejsNamespace}/${partialPotentialTitleStringKey}`;
 
-        if ( hasTitleKey ) {
-          const getTitle = async locale => {
-            try {
-              return await puppeteerLoad( getUrlWithLocale( locale ), {
-                evaluate: () => {
-                  return document.title;
-                },
-                gotoTimeout: 60000,
-                waitAfterLoad: 2000,
-                browser: browser
-              } );
-            }
-            catch( e ) {
-              console.log( `  error running with locale=${locale}` );
-              return 'error';
-            }
-          };
+            const hasTitleKey = await puppeteerLoad( url, {
+              evaluate: `!!phet.chipper.strings.en[ "${fullPotentialTitleStringKey}" ]`,
+              gotoTimeout: 60000,
+              waitAfterLoad: 2000,
+              browser: browser
+            } );
 
-          // null if could not be found
-          const lookupSpecificTitleTranslation = locale => {
-            let json;
-            if ( locale === 'en' ) {
-              json = JSON.parse( fs.readFileSync( `../${releaseBranch.repo}/${releaseBranch.repo}-strings_en.json`, 'utf8' ) );
+            if ( hasTitleKey ) {
+              const getTitle = async locale => {
+                try {
+                  return await puppeteerLoad( getUrlWithLocale( locale ), {
+                    evaluate: () => {
+                      return document.title;
+                    },
+                    gotoTimeout: 60000,
+                    waitAfterLoad: 2000,
+                    browser: browser
+                  } );
+                }
+                catch( e ) {
+                  console.log( `  error running with locale=${locale}` );
+                  return 'error';
+                }
+              };
+
+              // null if could not be found
+              const lookupSpecificTitleTranslation = locale => {
+                let json;
+                if ( locale === 'en' ) {
+                  json = JSON.parse( fs.readFileSync( `../${releaseBranch.repo}/${releaseBranch.repo}-strings_en.json`, 'utf8' ) );
+                }
+                else {
+                  try {
+                    json = JSON.parse( fs.readFileSync( `../babel/${releaseBranch.repo}/${releaseBranch.repo}-strings_${locale}.json`, 'utf8' ) );
+                  }
+                  catch( e ) {
+                    return null;
+                  }
+                }
+                return json[ partialPotentialTitleStringKey ]?.value ?? null;
+              };
+
+              const lookupFallbackTitle = locale => {
+                const locales = [
+                  locale,
+                  ...( localeData[ locale ]?.fallbackLocales || [] ),
+                  'en'
+                ];
+
+                for ( const testLocale of locales ) {
+                  const title = lookupSpecificTitleTranslation( testLocale );
+                  if ( title ) {
+                    return title;
+                  }
+                }
+
+                throw new Error( `could not compute fallback title for locale ${locale}` );
+              };
+
+              const checkTitle = async ( locale, lookupLocale ) => {
+                const actualTitle = await getTitle( locale );
+                const expectedTitle = lookupFallbackTitle( lookupLocale );
+
+                if ( actualTitle.trim().includes( expectedTitle.trim() ) ) {
+                  return null;
+                }
+                else {
+                  return `Actual title ${JSON.stringify( actualTitle )} does not match expected title ${JSON.stringify( expectedTitle )} for locale ${locale} / ${lookupLocale}`;
+                }
+              };
+
+              const esTitleError = await checkTitle( 'es', 'es' );
+              if ( esTitleError ) {
+                console.log( `  es title error: ${esTitleError}` );
+              }
+
+              const spaTitleError = await checkTitle( 'spa', 'es' );
+              if ( spaTitleError ) {
+                console.log( `  spa title error: ${spaTitleError}` );
+              }
+
+              const espyTitleError = await checkTitle( 'ES_PY', 'es_PY' );
+              if ( espyTitleError ) {
+                console.log( `  ES_PY title error: ${espyTitleError}` );
+              }
             }
             else {
-              try {
-                json = JSON.parse( fs.readFileSync( `../babel/${releaseBranch.repo}/${releaseBranch.repo}-strings_${locale}.json`, 'utf8' ) );
-              }
-              catch( e ) {
-                return null;
-              }
+              console.log( '    (could not find title string key)' );
             }
-            return json[ partialPotentialTitleStringKey ]?.value ?? null;
-          };
-
-          const lookupFallbackTitle = locale => {
-            const locales = [
-              locale,
-              ...( localeData[ locale ]?.fallbackLocales || [] ),
-              'en'
-            ];
-
-            for ( const testLocale of locales ) {
-              const title = lookupSpecificTitleTranslation( testLocale );
-              if ( title ) {
-                return title;
-              }
-            }
-
-            throw new Error( `could not compute fallback title for locale ${locale}` );
-          };
-
-          const checkTitle = async ( locale, lookupLocale ) => {
-            const actualTitle = await getTitle( locale );
-            const expectedTitle = lookupFallbackTitle( lookupLocale );
-
-            if ( actualTitle.includes( expectedTitle ) ) {
-              return null;
-            }
-            else {
-              return `Actual title ${JSON.stringify( actualTitle )} does not match expected title ${JSON.stringify( expectedTitle )} for locale ${locale} / ${lookupLocale}`;
-            }
-          };
-
-          const esTitleError = await checkTitle( 'es', 'es' );
-          if ( esTitleError ) {
-            console.log( `  es title error: ${esTitleError}` );
           }
-
-          const spaTitleError = await checkTitle( 'spa', 'es' );
-          if ( spaTitleError ) {
-            console.log( `  spa title error: ${spaTitleError}` );
-          }
-
-          const espyTitleError = await checkTitle( 'ES_PY', 'es_PY' );
-          if ( espyTitleError ) {
-            console.log( `  ES_PY title error: ${espyTitleError}` );
-          }
-        }
-        else {
-          console.log( '    (could not find title string key)' );
         }
 
         // QueryStringMachine.warnings testing
         {
           // boolean | null - null if warnings array not supported
           const getHasQSMWarning = async locale => puppeteerLoad( getUrlWithLocale( locale ), {
-            evaluate: 'QueryStringMachine.warnings !== undefined ? ( QueryStringMachine.warnings.length > 0 ) : null',
+            evaluate: '( window.QueryStringMachine && QueryStringMachine.warnings !== undefined ) ? ( QueryStringMachine.warnings.length > 0 ) : null',
             gotoTimeout: 60000,
             waitAfterLoad: 2000,
             browser: browser
