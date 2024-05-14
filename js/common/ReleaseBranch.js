@@ -259,7 +259,8 @@ module.exports = ( function() {
         brands: this.brands,
         allHTML: true,
         debugHTML: true,
-        lint: false
+        lint: false,
+        locales: '*'
       }, options ) );
 
       winston.info( `building ${checkoutDirectory} with grunt ${args.join( ' ' )}` );
