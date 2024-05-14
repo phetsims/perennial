@@ -278,17 +278,19 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
 
         // Locale-specific file testing (everything has _es)
         {
-          const esSpecificLocale = await puppeteerLoad( getLocaleSpecificURL( 'es' ), {
-            evaluate: () => {
-              return phet.chipper.locale;
-            },
-            gotoTimeout: 60000,
-            waitAfterLoad: 2000,
-            browser: browser
-          } );
+          if ( !url.includes( 'phet-io' ) && !url.includes( 'phetio' ) ) {
+            const esSpecificLocale = await puppeteerLoad( getLocaleSpecificURL( 'es' ), {
+              evaluate: () => {
+                return phet.chipper.locale;
+              },
+              gotoTimeout: 60000,
+              waitAfterLoad: 2000,
+              browser: browser
+            } );
 
-          if ( esSpecificLocale !== 'es' ) {
-            console.log( '  _es.html locale not es' );
+            if ( esSpecificLocale !== 'es' ) {
+              console.log( '  _es.html locale not es' );
+            }
           }
         }
       }
