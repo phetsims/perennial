@@ -17,6 +17,7 @@ const execute = require( '../common/execute' );
 const getActiveRepos = require( '../common/getActiveRepos' );
 const getBranches = require( '../common/getBranches' );
 const gitCheckout = require( '../common/gitCheckout' );
+const gitFetch = require( '../common/gitFetch' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPullRebase = require( '../common/gitPullRebase' );
 const gitRevParse = require( '../common/gitRevParse' );
@@ -55,6 +56,7 @@ const getStatus = async repo => {
         for ( const branch of branches ) {
           // Only track the remote branch if it hasn't been tracked yet
           if ( ( await execute( 'git', [ 'rev-parse', '--verify', branch ], `../${repo}`, { errors: 'resolve' } ) ).code !== 0 ) {
+            await gitFetch( repo );
             await execute( 'git', [ 'branch', '--track', branch, `origin/${branch}` ], `../${repo}` );
           }
           await gitCheckout( repo, branch );
