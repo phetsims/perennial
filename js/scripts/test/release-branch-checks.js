@@ -148,7 +148,7 @@ const localeData = fs.readFileSync( '../babel/localeData.json', 'utf8' );
 
         const repoPackageObject = JSON.parse( fs.readFileSync( `../${releaseBranch.repo}/package.json`, 'utf8' ) );
 
-        const partialPotentialTitleStringKey = `${repoPackageObject.phet.requirejsNamespace}/${releaseBranch.repo}.title`;
+        const partialPotentialTitleStringKey = `${releaseBranch.repo}.title`;
         const fullPotentialTitleStringKey = `${repoPackageObject.phet.requirejsNamespace}/${partialPotentialTitleStringKey}`;
 
         const hasTitleKey = await puppeteerLoad( url, {
