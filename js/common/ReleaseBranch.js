@@ -23,6 +23,7 @@ const getBranchVersion = require( './getBranchVersion' );
 const getFileAtBranch = require( './getFileAtBranch' );
 const getRepoVersion = require( './getRepoVersion' );
 const gitCheckout = require( './gitCheckout' );
+const gitCatFile = require( './gitCatFile' );
 const gitCheckoutDirectory = require( './gitCheckoutDirectory' );
 const gitCloneOrFetchDirectory = require( './gitCloneOrFetchDirectory' );
 const gitFirstDivergingCommit = require( './gitFirstDivergingCommit' );
@@ -611,18 +612,14 @@ module.exports = ( function() {
      * @returns {Promise.<boolean>}
      */
     async usesChipper2() {
-      await gitCheckout( this.repo, this.branch );
-      const dependencies = await getDependencies( this.repo );
-      await gitCheckout( 'chipper', dependencies.chipper.sha );
 
-      const chipperVersion = ChipperVersion.getFromRepository();
+      // TODO: use better functions once we convert getDependencies and getPackageJSON, https://github.com/phetsims/perennial/issues/355
+      const dependencies = JSON.parse( await gitCatFile( this.repo, 'dependencies.json', this.branch ) );
 
-      const result = chipperVersion.major !== 0 || chipperVersion.minor !== 0;
+      const chipperPackageJSON = JSON.parse( await gitCatFile( 'chipper', 'package.json', dependencies.chipper.sha ) );
+      const chipperVersion = ChipperVersion.getFromPackageJSON( chipperPackageJSON );
 
-      await gitCheckout( this.repo, 'main' );
-      await gitCheckout( 'chipper', 'main' );
-
-      return result;
+      return chipperVersion.major !== 0 || chipperVersion.minor !== 0;
     }
 
     /**
