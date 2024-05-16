@@ -115,9 +115,25 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
   for ( const releaseBranch of await Maintenance.loadAllMaintenanceBranches() ) {
     console.log( releaseBranch.toString() );
 
+    // if ( releaseBranch.repo < 'gravity-force-lab' ) {
+    //   console.log( 'skip!' );
+    //   continue;
+    // }
+
     const urls = await getAllURLs( releaseBranch );
 
     for ( const url of urls ) {
+
+      // Because `planet` and `planet.controls.title` keys present in translations OVERLAP in the string object created by
+      // getStringModule, and FAILS hard on these. Built versions work ok.
+      if ( releaseBranch.repo === 'gravity-force-lab' && releaseBranch.branch === '2.2' && url.includes( '_en.html' ) ) {
+        console.log( ' skipping gravity-force-lab 2.2 unbuilt, since planet / planet.controls.title strings in translations will not run in unbuilt mode' );
+        continue;
+      }
+      if ( releaseBranch.repo === 'gravity-force-lab-basics' && releaseBranch.branch === '1.1' && url.includes( '_en.html' ) ) {
+        console.log( ' skipping gravity-force-lab 2.2 unbuilt, since planet / planet.controls.title strings in translations will not run in unbuilt mode' );
+        continue;
+      }
 
       const getUrlWithLocale = locale => url.includes( '?' ) ? `${url}&locale=${locale}` : `${url}?locale=${locale}`;
       const getLocaleSpecificURL = locale => url.replace( '_all', `_${locale}` );
@@ -158,6 +174,9 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
 
         const espyLocale = await getRunningLocale( 'ES_PY' );
         logStatus( espyLocale === 'es' || espyLocale === 'es_PY', 'ES_PY phet.chipper.locale' );
+
+        const armaLocale = await getRunningLocale( 'ar_SA' );
+        logStatus( armaLocale === 'ar' || armaLocale === 'ar_SA' || armaLocale === 'ar_MA', 'ar_SA phet.chipper.locale' );
 
         const invalidLocale = await getRunningLocale( 'aenrtpyarntSRTS' );
         logStatus( invalidLocale === 'en', 'nonsense phet.chipper.locale' );
@@ -241,12 +260,10 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
         // QueryStringMachine.warnings testing
         {
           // boolean | null - null if warnings array not supported
-          const getHasQSMWarning = async locale => puppeteerLoad( getUrlWithLocale( locale ), {
-            evaluate: '( window.QueryStringMachine && QueryStringMachine.warnings !== undefined ) ? ( QueryStringMachine.warnings.length > 0 ) : null',
-            gotoTimeout: 60000,
-            waitAfterLoad: 2000,
-            browser: browser
-          } );
+          const getHasQSMWarning = async locale => evaluate(
+            getUrlWithLocale( locale ),
+            '( window.QueryStringMachine && QueryStringMachine.warnings !== undefined ) ? ( QueryStringMachine.warnings.length > 0 ) : null'
+          );
 
           logStatus( !( await getHasQSMWarning( 'en' ) ), 'en QSM warning' );
           logStatus( !( await getHasQSMWarning( 'ES' ) ), 'ES QSM warning' );
