@@ -499,10 +499,9 @@ module.exports = ( function() {
      * @returns {Promise<boolean>}
      */
     async usesES6() {
-      await gitCheckout( this.repo, this.branch );
-      const dependencies = await getDependencies( this.repo );
+      const dependencies = await this.getDependencies();
+
       const sha = dependencies.chipper.sha;
-      await gitCheckout( this.repo, 'main' );
 
       return gitIsAncestor( 'chipper', '80b4ad62cd8f2057b844f18d3c00cf5c0c89ed8d', sha );
     }
@@ -522,10 +521,9 @@ module.exports = ( function() {
      * @returns {Promise<boolean>}
      */
     async usesInitializeGlobalsQueryParameters() {
-      await gitCheckout( this.repo, this.branch );
-      const dependencies = await getDependencies( this.repo );
+      const dependencies = await this.getDependencies();
+
       const sha = dependencies.chipper.sha;
-      await gitCheckout( this.repo, 'main' );
 
       return gitIsAncestor( 'chipper', 'e454f88ff51d1e3fabdb3a076d7407a2a9e9133c', sha );
     }
@@ -539,10 +537,9 @@ module.exports = ( function() {
      * @returns {Promise.<boolean>}
      */
     async usesOldPhetioStandalone() {
-      await gitCheckout( this.repo, this.branch );
-      const dependencies = await getDependencies( this.repo );
+      const dependencies = await this.getDependencies();
+
       const sha = dependencies.chipper.sha;
-      await gitCheckout( this.repo, 'main' );
 
       return !( await gitIsAncestor( 'chipper', '4814d6966c54f250b1c0f3909b71f2b9cfcc7665', sha ) );
     }
@@ -555,15 +552,13 @@ module.exports = ( function() {
      * @returns {Promise.<boolean>}
      */
     async usesRelativeSimPath() {
-      await gitCheckout( this.repo, this.branch );
-      const dependencies = await getDependencies( this.repo );
+      const dependencies = await this.getDependencies();
 
       if ( !dependencies[ 'phet-io' ] ) {
         return true; // Doesn't really matter now, does it?
       }
 
       const sha = dependencies[ 'phet-io' ].sha;
-      await gitCheckout( this.repo, 'main' );
 
       return gitIsAncestor( 'phet-io', 'e3fc26079358d86074358a6db3ebaf1af9725632', sha );
     }
@@ -575,11 +570,9 @@ module.exports = ( function() {
      * @returns {Promise.<boolean>}
      */
     async usesPhetioStudio() {
-      await gitCheckout( this.repo, this.branch );
-      const dependencies = await getDependencies( this.repo );
+      const dependencies = await this.getDependencies();
 
       const sha = dependencies.chipper.sha;
-      await gitCheckout( this.repo, 'main' );
 
       return gitIsAncestor( 'chipper', '7375f6a57b5874b6bbf97a54c9a908f19f88d38f', sha );
     }
@@ -591,8 +584,7 @@ module.exports = ( function() {
      * @returns {Promise.<boolean>}
      */
     async usesPhetioStudioIndex() {
-      await gitCheckout( this.repo, this.branch );
-      const dependencies = await getDependencies( this.repo );
+      const dependencies = await this.getDependencies();
 
       const dependency = dependencies[ 'phet-io-wrappers' ];
       if ( !dependency ) {
@@ -600,7 +592,6 @@ module.exports = ( function() {
       }
 
       const sha = dependency.sha;
-      await gitCheckout( this.repo, 'main' );
 
       return gitIsAncestor( 'phet-io-wrappers', '7ec1a04a70fb9707b381b8bcab3ad070815ef7fe', sha );
     }
@@ -612,9 +603,7 @@ module.exports = ( function() {
      * @returns {Promise.<boolean>}
      */
     async usesChipper2() {
-
-      // TODO: use better functions once we convert getDependencies and getPackageJSON, https://github.com/phetsims/perennial/issues/355
-      const dependencies = JSON.parse( await gitCatFile( this.repo, 'dependencies.json', this.branch ) );
+      const dependencies = await this.getDependencies();
 
       const chipperPackageJSON = JSON.parse( await gitCatFile( 'chipper', 'package.json', dependencies.chipper.sha ) );
       const chipperVersion = ChipperVersion.getFromPackageJSON( chipperPackageJSON );
