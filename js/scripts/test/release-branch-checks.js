@@ -17,8 +17,11 @@ const fs = require( 'fs' );
 
 winston.default.transports.console.level = 'error';
 
+const VERBOSE_LOG_SUCCESS = true;
 const TEST_LOCALES = true;
 const TEST_ANALYTICS = false;
+
+const SKIP_TITLE_STRING_PATTERN = true;
 
 const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf8' ) );
 
@@ -29,7 +32,7 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
     ]
   } );
 
-  const getBaseURLs = async releaseBranch => {
+  const getBuiltURLs = async releaseBranch => {
     const buildDir = `http://localhost/release-branches/${releaseBranch.repo}-${releaseBranch.branch}/${releaseBranch.repo}/build`;
 
     const urls = [];
@@ -50,6 +53,17 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
     return urls;
   };
 
+  const getUnbuiltURL = async releaseBranch => {
+    return `http://localhost/release-branches/${releaseBranch.repo}-${releaseBranch.branch}/${releaseBranch.repo}/${releaseBranch.repo}_en.html?webgl=false`;
+  };
+
+  const getAllURLs = async releaseBranch => {
+    return [
+      ...( await getBuiltURLs( releaseBranch ) ),
+      await getUnbuiltURL( releaseBranch )
+    ];
+  };
+
   const getLoadedURLs = async url => {
     const urls = [];
 
@@ -62,7 +76,7 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
         }
       } ),
       gotoTimeout: 60000,
-      waitAfterLoad: 2000,
+      waitAfterLoad: 3000,
       browser: browser
     } );
 
@@ -83,71 +97,70 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
     };
   };
 
+  const evaluate = async ( url, evaluate ) => {
+    try {
+      return await puppeteerLoad( url, {
+        evaluate: evaluate,
+        gotoTimeout: 60000,
+        waitAfterLoad: 2000,
+        browser: browser
+      } );
+    }
+    catch( e ) {
+      console.log( `  error running ${url}` );
+      return 'error';
+    }
+  };
+
   for ( const releaseBranch of await Maintenance.loadAllMaintenanceBranches() ) {
     console.log( releaseBranch.toString() );
 
-    const urls = await getBaseURLs( releaseBranch );
+    const urls = await getAllURLs( releaseBranch );
 
     for ( const url of urls ) {
 
       const getUrlWithLocale = locale => url.includes( '?' ) ? `${url}&locale=${locale}` : `${url}?locale=${locale}`;
       const getLocaleSpecificURL = locale => url.replace( '_all', `_${locale}` );
 
+      const logPass = message => {
+        if ( VERBOSE_LOG_SUCCESS ) {
+          console.log( `      [OK] ${message} URL: ${url}` );
+        }
+      };
+
+      const logFailure = message => {
+        console.log( `  [FAIL] ${message} URL: ${url}` );
+      };
+
+      const logStatus = ( status, message ) => {
+        if ( status ) {
+          logPass( message );
+        }
+        else {
+          logFailure( message );
+        }
+      };
+
       if ( TEST_LOCALES ) {
         // TODO: test unbuilt locales (https://github.com/phetsims/joist/issues/963)
 
         // Check locale MR. es_PY should always be in localeData
-        const localeValues = await puppeteerLoad( url, {
-          evaluate: () => {
-            return [ !!phet.chipper.localeData, !!( phet.chipper.localeData?.es_PY ) ];
-          },
-          gotoTimeout: 60000,
-          waitAfterLoad: 2000,
-          browser: browser
-        } );
-        if ( !localeValues[ 0 ] ) {
-          console.log( '  no localeData' );
-        }
-        if ( !localeValues[ 1 ] ) {
-          console.log( '  no es_PY localeData' );
-        }
+        const localeValues = await evaluate( url, () => [ !!phet.chipper.localeData, !!( phet.chipper.localeData?.es_PY ) ] );
+        logStatus( localeValues[ 0 ] && localeValues[ 1 ], 'localeData (general, es_PY)' );
 
-        const getRunningLocale = async locale => {
-          try {
-            return await puppeteerLoad( getUrlWithLocale( locale ), {
-              evaluate: () => {
-                return phet.chipper.locale;
-              },
-              gotoTimeout: 60000,
-              waitAfterLoad: 2000,
-              browser: browser
-            } );
-          }
-          catch( e ) {
-            console.log( `  error running with locale=${locale}` );
-            return 'error';
-          }
-        };
+        const getRunningLocale = async locale => evaluate( getUrlWithLocale( locale ), () => phet.chipper.locale );
 
         const esLocale = await getRunningLocale( 'es' );
-        if ( esLocale !== 'es' ) {
-          console.log( '  es locale not es' );
-        }
+        logStatus( esLocale === 'es', 'es phet.chipper.locale' );
 
         const spaLocale = await getRunningLocale( 'spa' );
-        if ( spaLocale !== 'es' ) {
-          console.log( '  spa locale not es' );
-        }
+        logStatus( spaLocale === 'es', 'spa phet.chipper.locale' );
 
         const espyLocale = await getRunningLocale( 'ES_PY' );
-        if ( espyLocale !== 'es' && espyLocale !== 'es_PY' ) {
-          console.log( '  ES_PY locale not es/es_PY' );
-        }
+        logStatus( espyLocale === 'es' || espyLocale === 'es_PY', 'ES_PY phet.chipper.locale' );
 
         const invalidLocale = await getRunningLocale( 'aenrtpyarntSRTS' );
-        if ( invalidLocale !== 'en' ) {
-          console.log( '  invalid locale issue, not en' );
-        }
+        logStatus( invalidLocale === 'en', 'nonsense phet.chipper.locale' );
 
         const repoPackageObject = JSON.parse( fs.readFileSync( `../${releaseBranch.repo}/package.json`, 'utf8' ) );
 
@@ -159,30 +172,10 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
             const partialPotentialTitleStringKey = `${releaseBranch.repo}.title`;
             const fullPotentialTitleStringKey = `${repoPackageObject.phet.requirejsNamespace}/${partialPotentialTitleStringKey}`;
 
-            const hasTitleKey = await puppeteerLoad( url, {
-              evaluate: `!!phet.chipper.strings.en[ "${fullPotentialTitleStringKey}" ]`,
-              gotoTimeout: 60000,
-              waitAfterLoad: 2000,
-              browser: browser
-            } );
+            const hasTitleKey = SKIP_TITLE_STRING_PATTERN ? true : await evaluate( url, `!!phet.chipper.strings.en[ "${fullPotentialTitleStringKey}" ]` );
 
             if ( hasTitleKey ) {
-              const getTitle = async locale => {
-                try {
-                  return await puppeteerLoad( getUrlWithLocale( locale ), {
-                    evaluate: () => {
-                      return document.title;
-                    },
-                    gotoTimeout: 60000,
-                    waitAfterLoad: 2000,
-                    browser: browser
-                  } );
-                }
-                catch( e ) {
-                  console.log( `  error running with locale=${locale}` );
-                  return 'error';
-                }
-              };
+              const getTitle = async locale => evaluate( getUrlWithLocale( locale ), () => document.title );
 
               // null if could not be found
               const lookupSpecificTitleTranslation = locale => {
@@ -231,22 +224,16 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
               };
 
               const esTitleError = await checkTitle( 'es', 'es' );
-              if ( esTitleError ) {
-                console.log( `  es title error: ${esTitleError}` );
-              }
+              logStatus( !esTitleError, `es title ${esTitleError}` );
 
               const spaTitleError = await checkTitle( 'spa', 'es' );
-              if ( spaTitleError ) {
-                console.log( `  spa title error: ${spaTitleError}` );
-              }
+              logStatus( !spaTitleError, `spa title ${spaTitleError}` );
 
               const espyTitleError = await checkTitle( 'ES_PY', 'es_PY' );
-              if ( espyTitleError ) {
-                console.log( `  ES_PY title error: ${espyTitleError}` );
-              }
+              logStatus( !espyTitleError, `ES_PY title ${espyTitleError}` );
             }
             else {
-              console.log( '    (could not find title string key)' );
+              logFailure( 'could not find title string key' );
             }
           }
         }
@@ -261,67 +248,43 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
             browser: browser
           } );
 
-          if ( await getHasQSMWarning( 'en' ) ) {
-            console.log( '  en has QSM warning' );
-          }
-
-          if ( await getHasQSMWarning( 'ES' ) ) {
-            console.log( '  ES has QSM warning' );
-          }
-
-          if ( await getHasQSMWarning( 'XX' ) ) {
-            console.log( '  XX has QSM warning' );
-          }
-
-          if ( await getHasQSMWarning( 'XX-wX' ) ) {
-            console.log( '  XX-wX has QSM warning' );
-          }
-
-          const hasQSMNonsenseWarning = await getHasQSMWarning( 'alkrtnalrc9SRTXX' );
-          if ( hasQSMNonsenseWarning === false ) {
-            console.log( '  missing nonsense QSM warning' );
-          }
+          logStatus( !( await getHasQSMWarning( 'en' ) ), 'en QSM warning' );
+          logStatus( !( await getHasQSMWarning( 'ES' ) ), 'ES QSM warning' );
+          logStatus( !( await getHasQSMWarning( 'XX' ) ), 'XX QSM warning' );
+          logStatus( !( await getHasQSMWarning( 'XX-wX' ) ), 'XX-wX QSM warning' );
+          logStatus( ( await getHasQSMWarning( 'alkrtnalrc9SRTXX' ) ) !== false, 'nonsense QSM warning (expected)' );
         }
 
         // Locale-specific file testing (everything has _es)
         {
-          if ( !url.includes( 'phet-io' ) && !url.includes( 'phetio' ) ) {
-            const esSpecificLocale = await puppeteerLoad( getLocaleSpecificURL( 'es' ), {
-              evaluate: () => {
-                return phet.chipper.locale;
-              },
-              gotoTimeout: 60000,
-              waitAfterLoad: 2000,
-              browser: browser
-            } );
+          if ( !url.includes( 'phet-io' ) && !url.includes( 'phetio' ) && url.includes( '/build/' ) ) {
+            const esSpecificLocale = await evaluate( getLocaleSpecificURL( 'es' ), () => phet.chipper.locale );
 
-            if ( esSpecificLocale !== 'es' ) {
-              console.log( '  _es.html locale not es' );
-            }
+            logStatus( esSpecificLocale === 'es', '_es.html locale specific' );
           }
         }
       }
 
-      if ( TEST_ANALYTICS ) {
+      if ( TEST_ANALYTICS && url.includes( '/build/' ) ) {
         const plainURL = url;
         const plainAnalysis = analyzeURLs( await getLoadedURLs( plainURL ) );
         if ( !plainAnalysis.sentGoogleAnalytics ) {
-          console.log( '  No Google Analytics sent', plainURL );
+          logFailure( 'No Google Analytics sent', plainURL );
         }
         if ( !plainAnalysis.sentYotta ) {
-          console.log( '  No yotta sent', plainURL );
+          logFailure( 'No yotta sent', plainURL );
         }
 
         const yottaFalseURL = `${url}&yotta=false`;
         const yottaFalseAnalysis = analyzeURLs( await getLoadedURLs( yottaFalseURL ) );
         if ( yottaFalseAnalysis.sentExternalRequest || yottaFalseAnalysis.sentGoogleAnalytics || yottaFalseAnalysis.sentYotta ) {
-          console.log( '  yotta=false sent something', yottaFalseAnalysis );
+          logFailure( 'yotta=false sent something', yottaFalseAnalysis );
         }
 
         const yottaSomeFlagURL = `${url}&${demoYottaQueryParameterKey}=${demoYottaQueryParameterValue}`;
         const yottaSomeFlagAnalysis = analyzeURLs( await getLoadedURLs( yottaSomeFlagURL ) );
         if ( !yottaSomeFlagAnalysis.hasDemoYottaQueryParameter ) {
-          console.log( `  No ${demoYottaQueryParameterKey}=${demoYottaQueryParameterValue} sent`, yottaSomeFlagAnalysis );
+          logFailure( `No ${demoYottaQueryParameterKey}=${demoYottaQueryParameterValue} sent`, yottaSomeFlagAnalysis );
         }
       }
 
