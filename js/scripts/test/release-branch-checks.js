@@ -9,6 +9,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
+const _ = require( 'lodash' );
 const puppeteerLoad = require( '../../common/puppeteerLoad' );
 const Maintenance = require( '../../common/Maintenance' );
 const winston = require( 'winston' );
@@ -53,14 +54,23 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
     return urls;
   };
 
-  const getUnbuiltURL = async releaseBranch => {
-    return `http://localhost/release-branches/${releaseBranch.repo}-${releaseBranch.branch}/${releaseBranch.repo}/${releaseBranch.repo}_en.html?webgl=false`;
+  const getUnbuiltURLs = async releaseBranch => {
+    const urls = [
+      `http://localhost/release-branches/${releaseBranch.repo}-${releaseBranch.branch}/${releaseBranch.repo}/${releaseBranch.repo}_en.html?webgl=false`
+    ];
+
+    if ( releaseBranch.brands.includes( 'phet-io' ) ) {
+      const standaloneParams = await releaseBranch.getPhetioStandaloneQueryParameter();
+      urls.push( `http://localhost/release-branches/${releaseBranch.repo}-${releaseBranch.branch}/${releaseBranch.repo}/${releaseBranch.repo}_en.html?webgl=false&${standaloneParams}&brand=phet-io` );
+    }
+
+    return urls;
   };
 
   const getAllURLs = async releaseBranch => {
     return [
       ...( await getBuiltURLs( releaseBranch ) ),
-      await getUnbuiltURL( releaseBranch )
+      ...( await getUnbuiltURLs( releaseBranch ) )
     ];
   };
 
@@ -181,6 +191,11 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
         const invalidLocale = await getRunningLocale( 'aenrtpyarntSRTS' );
         logStatus( invalidLocale === 'en', 'nonsense phet.chipper.locale' );
 
+        if ( url.includes( '/build/' ) ) {
+          const puLocale = await getRunningLocale( 'pu' );
+          logStatus( puLocale === 'pu', 'pu phet.chipper.locale (custom test)' );
+        }
+
         const repoPackageObject = JSON.parse( fs.readFileSync( `../${releaseBranch.repo}/package.json`, 'utf8' ) );
 
         // Title testing
@@ -272,12 +287,61 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
           logStatus( ( await getHasQSMWarning( 'alkrtnalrc9SRTXX' ) ) !== false, 'nonsense QSM warning (expected)' );
         }
 
+        const nonEnglishTranslationLocales = fs.readdirSync( `../release-branches/${releaseBranch.repo}-${releaseBranch.branch}/babel/${releaseBranch.repo}/` )
+          .filter( file => file.startsWith( `${releaseBranch.repo}-strings_` ) )
+          .map( file => file.substring( file.indexOf( '_' ) + 1, file.lastIndexOf( '.' ) ) );
+
+        const getSomeRandomTranslatedLocales = () => {
+          return _.uniq(
+            [
+              'en',
+              'es',
+              'pu',
+              ..._.sampleSize( nonEnglishTranslationLocales, 8 )
+            ]
+          ).filter( locale => {
+            return url.includes( '/build/' ) ? true : locale !== 'pu';
+          } );
+        };
+
+        const includedDataLocales = _.sortBy( _.uniq( [
+          // Always include the fallback (en)
+          'en',
+
+          // Include directly-used locales
+          ...nonEnglishTranslationLocales,
+
+          // Include locales that will fall back to directly-used locales
+          ...Object.keys( localeData ).filter( locale => {
+            return localeData[ locale ].fallbackLocales && localeData[ locale ].fallbackLocales.some( fallbackLocale => {
+              return nonEnglishTranslationLocales.includes( fallbackLocale );
+            } );
+          } )
+        ] ) );
+
+        // Check presence of included data locales
+        {
+          const dataLocaleCheck = await evaluate( getUrlWithLocale( 'en' ), `${JSON.stringify( includedDataLocales )}.every( locale => phet.chipper.localeData[ locale ] )` );
+
+          logStatus( dataLocaleCheck, 'All included data locales present' );
+        }
+
         // Locale-specific file testing (everything has _es)
         {
           if ( !url.includes( 'phet-io' ) && !url.includes( 'phetio' ) && url.includes( '/build/' ) ) {
-            const esSpecificLocale = await evaluate( getLocaleSpecificURL( 'es' ), () => phet.chipper.locale );
 
-            logStatus( esSpecificLocale === 'es', '_es.html locale specific' );
+            for ( const locale of getSomeRandomTranslatedLocales() ) {
+              const checkLocale = await evaluate( getLocaleSpecificURL( locale ), () => phet.chipper.locale );
+
+              logStatus( checkLocale === locale, `Locale-specific ${locale} build should be ${checkLocale}` );
+            }
+          }
+        }
+
+        // Translation _all testing
+        {
+          for ( const locale of getSomeRandomTranslatedLocales() ) {
+            logStatus( ( await getRunningLocale( locale ) ) === locale, `_all test for locale ${locale}` );
           }
         }
       }
