@@ -168,8 +168,6 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
       };
 
       if ( TEST_LOCALES ) {
-        // TODO: test unbuilt locales (https://github.com/phetsims/joist/issues/963)
-
         // Check locale MR. es_PY should always be in localeData
         const localeValues = await evaluate( url, () => [ !!phet.chipper.localeData, !!( phet.chipper.localeData?.es_PY ) ] );
         logStatus( localeValues[ 0 ] && localeValues[ 1 ], 'localeData (general, es_PY)' );
