@@ -597,6 +597,17 @@ module.exports = ( function() {
     }
 
     /**
+     * Returns whether the sim is a "Hydrogen" phet-io sim.
+     * @public
+     *
+     * @returns {Promise<boolean>}
+     */
+    async isPhetIOHydrogen() {
+      return this.brands.includes( 'phet-io' ) &&
+        this.includesSHA( 'phet-io-wrappers', '7e8d97020c6451f68e898ae83aa43593b555137f' );
+    }
+
+    /**
      * Returns whether an additional folder exists in the build directory of the sim based on the brand.
      * @public
      *
