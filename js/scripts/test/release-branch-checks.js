@@ -19,8 +19,9 @@ const fs = require( 'fs' );
 winston.default.transports.console.level = 'error';
 
 const VERBOSE_LOG_SUCCESS = true;
-const TEST_LOCALES = true;
+const TEST_LOCALES = false;
 const TEST_ANALYTICS = false;
+const TEST_PHET_IO_LOCALE = true;
 
 const SKIP_TITLE_STRING_PATTERN = true;
 
@@ -114,6 +115,8 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
         gotoTimeout: 60000,
         waitAfterLoad: 2000,
         browser: browser
+        // logConsoleOutput: true,
+        // logger: console.log
       } );
     }
     catch( e ) {
@@ -367,6 +370,7 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
         }
       }
 
+
       // Consider adding fuzzing in the future, it seems like we're unable to get things to run after a fuzz failure though
       // const fuzzURL = `${url}&fuzz&fuzzMouse&fuzzTouch&fuzzBoard`;
       // try {
@@ -380,6 +384,74 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
       // catch( e ) {
       //   console.log( `fuzz failure on ${fuzzURL}:\n${e}` );
       // }
+    }
+
+    if ( TEST_PHET_IO_LOCALE && await releaseBranch.isPhetIOHydrogen() ) {
+      const testURLs = [
+        // `http://localhost/release-branches/${releaseBranch.repo}-${releaseBranch.branch}/studio/?sim=${releaseBranch.repo}`,
+        `http://localhost/release-branches/${releaseBranch.repo}-${releaseBranch.branch}/${releaseBranch.repo}/build/phet-io/wrappers/studio/?`
+      ];
+
+      for ( const url of testURLs ) {
+
+        const standardWrapper = await evaluate( `${url}&exposeStandardPhetioWrapper`, () => new Promise( ( resolve, reject ) => {
+
+          window.addEventListener( 'error', event => {
+            reject( event );
+          } );
+
+          window.addEventListener( 'message', event => {
+
+            if ( event.data.standardPhetioWrapper ) {
+
+              resolve( event.data.standardPhetioWrapper );
+            }
+          } );
+
+          setTimeout( () => {
+            window.phetioClient.invoke( `${phetio.PhetioClient.CAMEL_CASE_SIMULATION_NAME}.general.model.localeProperty`, 'setValue', [ 'de' ], () => {
+              window.postMessage( { type: 'getStandardPhetioWrapper' }, '*' );
+            } );
+          }, 10000 );
+        } ) );
+
+        fs.writeFileSync( '../tmp_p.html', standardWrapper );
+
+        const testLocale = async ( locale, expectedLocale, debug = true ) => {
+          const actualLocale = await evaluate( `http://localhost/tmp_p.html?${locale ? `locale=${locale}` : ''}&phetioDebug=${debug}`, () => new Promise( ( resolve, reject ) => {
+            setTimeout( () => {
+              resolve( document.getElementById( 'sim' ).contentWindow.phet.chipper.locale );
+            }, 10000 );
+          } ) );
+
+          const logPass = message => {
+            if ( VERBOSE_LOG_SUCCESS ) {
+              console.log( `      [OK] ${message} URL: ${url}` );
+            }
+          };
+
+          const logFailure = message => {
+            console.log( `  [FAIL] ${message} URL: ${url}` );
+          };
+
+          const success = actualLocale === expectedLocale;
+          const message = `phet-io built locale ${locale} should be ${expectedLocale}`;
+          if ( success ) {
+            logPass( message );
+          }
+          else {
+            logFailure( message );
+          }
+        };
+
+        await testLocale( null, 'de' );
+        await testLocale( 'spa', 'es' );
+        await testLocale( 'ES-py', 'es' );
+        await testLocale( 'xx_pW', 'en' );
+        await testLocale( 'artlakernt', 'en', false );
+
+        fs.rmSync( '../tmp_p.html' );
+      }
     }
   }
 
