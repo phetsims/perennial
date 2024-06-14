@@ -33,8 +33,15 @@ module.exports = function( asyncCallback, options ) {
     // Consider using https://github.com/cloudhead/node-static or reading https://nodejs.org/en/knowledge/HTTP/servers/how-to-serve-static-files/
     const server = http.createServer( ( req, res ) => {
 
+      const path = req.url.split( '?' )[ 0 ];
+      let url = req.url;
+      if ( path.endsWith( '/' ) ) {
+        const newPath = path + 'index.html';
+        url = url.replace( path, newPath );
+      }
+
       // Trim query string
-      const tail = req.url.indexOf( '?' ) >= 0 ? req.url.substring( 0, req.url.indexOf( '?' ) ) : req.url;
+      const tail = url.indexOf( '?' ) >= 0 ? url.substring( 0, url.indexOf( '?' ) ) : url;
       const fullPath = `${process.cwd()}/${options.path}${tail}`;
 
       // See https://gist.github.com/aolde/8104861
