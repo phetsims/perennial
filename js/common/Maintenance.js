@@ -1028,6 +1028,7 @@ module.exports = ( function() {
           }
           catch( e ) {
             console.log( `failed to build ${releaseBranch.toString()}: ${e}` );
+            console.log( 'Finished: ', releaseBranch.toString() );
           }
         }
         catch( e ) {
