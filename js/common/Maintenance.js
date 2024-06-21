@@ -1025,10 +1025,10 @@ module.exports = ( function() {
           options.transpile && await releaseBranch.transpile();
           try {
             options.build && await releaseBranch.build( options.buildOptions );
+            console.log( 'Finished: ', releaseBranch.toString() );
           }
           catch( e ) {
             console.log( `failed to build ${releaseBranch.toString()}: ${e}` );
-            console.log( 'Finished: ', releaseBranch.toString() );
           }
         }
         catch( e ) {
