@@ -403,11 +403,18 @@ const logResult = ( success, message, url ) => {
         for ( const url of testURLs ) {
 
           // Wrong format locale should result in a error dialog and resulting locale to fall back to 'en'
-          const startingLocale = await evaluate( `${url}&locale=fdsa`, () => new Promise( ( resolve, reject ) => {
+          const emptyLocaleParam = await evaluate( `${url}&locale=`, () => new Promise( ( resolve, reject ) => {
               resolve( phetio.phetioClient.frame.contentWindow.phet.chipper.locale );
             } ), { waitForFunction: '!!phetio.phetioClient.simStarted' }
           );
-          logResult( startingLocale === 'en', 'en fallback expected for badly formatted locale in studio', `${url}&locale=fdsa` );
+          logResult( emptyLocaleParam === 'en', 'en fallback expected for empty locale in studio', `${url}&locale=` );
+
+          // Wrong format locale should result in a error dialog and resulting locale to fall back to 'en'
+          const badFormatLocaleParam = await evaluate( `${url}&locale=fdsa`, () => new Promise( ( resolve, reject ) => {
+              resolve( phetio.phetioClient.frame.contentWindow.phet.chipper.locale );
+            } ), { waitForFunction: '!!phetio.phetioClient.simStarted' }
+          );
+          logResult( badFormatLocaleParam === 'en', 'en fallback expected for badly formatted locale in studio', `${url}&locale=fdsa` );
 
           const standardWrapper = await evaluate( `${url}&exposeStandardPhetioWrapper`, () => new Promise( ( resolve, reject ) => {
             window.addEventListener( 'message', event => {
