@@ -39,6 +39,15 @@ const SKIP_TITLE_STRING_PATTERN = true;
 
 const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf8' ) );
 
+const logResult = ( success, message, url ) => {
+  if ( success ) {
+    VERBOSE_LOG_SUCCESS && console.log( `      [OK] ${message} URL: ${url}` );
+  }
+  else {
+    console.log( `  [FAIL] ${message} URL: ${url}` );
+  }
+};
+
 ( async () => {
   const browser = await puppeteer.launch( {
     args: [
@@ -123,42 +132,42 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
       };
     };
 
-    const evaluate = async ( url, evaluate ) => {
+    const evaluate = async ( url, evaluate, options ) => {
       try {
         return await puppeteerLoad( url, {
+          ...options,
           evaluate: evaluate,
           gotoTimeout: 60000,
           waitAfterLoad: 2000,
+          allowedTimeToLoad: 40000,
           browser: browser
+          // , // eslint-disable-line comma-style
           // logConsoleOutput: true,
           // logger: console.log
         } );
       }
       catch( e ) {
-        console.log( `  error running ${url}` );
-        return 'error';
+        console.log( '    ERROR', e.message.split( '\n' )[ 0 ] );
+        return `error running ${url}`;
       }
     };
 
     for ( const releaseBranch of await Maintenance.loadAllMaintenanceBranches() ) {
-      console.log( releaseBranch.toString() );
-
-      // if ( releaseBranch.repo < 'gravity-force-lab' ) {
-      //   console.log( 'skip!' );
-      //   continue;
-      // }
+      console.log( '-', releaseBranch.toString() );
 
       const urls = await getAllURLs( releaseBranch );
+
+      const repo = releaseBranch.repo;
 
       for ( const url of urls ) {
 
         // Because `planet` and `planet.controls.title` keys present in translations OVERLAP in the string object created by
         // getStringModule, and FAILS hard on these. Built versions work ok.
-        if ( releaseBranch.repo === 'gravity-force-lab' && releaseBranch.branch === '2.2' && url.includes( '_en.html' ) ) {
+        if ( repo === 'gravity-force-lab' && releaseBranch.branch === '2.2' && url.includes( '_en.html' ) ) {
           console.log( ' skipping gravity-force-lab 2.2 unbuilt, since planet / planet.controls.title strings in translations will not run in unbuilt mode' );
           continue;
         }
-        if ( releaseBranch.repo === 'gravity-force-lab-basics' && releaseBranch.branch === '1.1' && url.includes( '_en.html' ) ) {
+        if ( repo === 'gravity-force-lab-basics' && releaseBranch.branch === '1.1' && url.includes( '_en.html' ) ) {
           console.log( ' skipping gravity-force-lab 2.2 unbuilt, since planet / planet.controls.title strings in translations will not run in unbuilt mode' );
           continue;
         }
@@ -166,23 +175,8 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
         const getUrlWithLocale = locale => url.includes( '?' ) ? `${url}&locale=${locale}` : `${url}?locale=${locale}`;
         const getLocaleSpecificURL = locale => url.replace( '_all', `_${locale}` );
 
-        const logPass = message => {
-          if ( VERBOSE_LOG_SUCCESS ) {
-            console.log( `      [OK] ${message} URL: ${url}` );
-          }
-        };
-
-        const logFailure = message => {
-          console.log( `  [FAIL] ${message} URL: ${url}` );
-        };
-
         const logStatus = ( status, message ) => {
-          if ( status ) {
-            logPass( message );
-          }
-          else {
-            logFailure( message );
-          }
+          logResult( status, message, url );
         };
 
         if ( TEST_LOCALES ) {
@@ -212,14 +206,14 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
             logStatus( puLocale === 'pu', 'pu phet.chipper.locale (custom test)' );
           }
 
-          const repoPackageObject = JSON.parse( fs.readFileSync( `../${releaseBranch.repo}/package.json`, 'utf8' ) );
+          const repoPackageObject = JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) );
 
           // Title testing
           {
             // We would be testing the English version(!)
             if ( !url.includes( '_en-phetio' ) ) {
 
-              const partialPotentialTitleStringKey = `${releaseBranch.repo}.title`;
+              const partialPotentialTitleStringKey = `${repo}.title`;
               const fullPotentialTitleStringKey = `${repoPackageObject.phet.requirejsNamespace}/${partialPotentialTitleStringKey}`;
 
               const hasTitleKey = SKIP_TITLE_STRING_PATTERN ? true : await evaluate( url, `!!phet.chipper.strings.en[ "${fullPotentialTitleStringKey}" ]` );
@@ -231,11 +225,11 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
                 const lookupSpecificTitleTranslation = locale => {
                   let json;
                   if ( locale === 'en' ) {
-                    json = JSON.parse( fs.readFileSync( `../${releaseBranch.repo}/${releaseBranch.repo}-strings_en.json`, 'utf8' ) );
+                    json = JSON.parse( fs.readFileSync( `../${repo}/${repo}-strings_en.json`, 'utf8' ) );
                   }
                   else {
                     try {
-                      json = JSON.parse( fs.readFileSync( `../babel/${releaseBranch.repo}/${releaseBranch.repo}-strings_${locale}.json`, 'utf8' ) );
+                      json = JSON.parse( fs.readFileSync( `../babel/${repo}/${repo}-strings_${locale}.json`, 'utf8' ) );
                     }
                     catch( e ) {
                       return null;
@@ -283,7 +277,7 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
                 logStatus( !espyTitleError, `ES_PY title ${espyTitleError}` );
               }
               else {
-                logFailure( 'could not find title string key' );
+                logResult( false, 'could not find title string key', url );
               }
             }
           }
@@ -303,8 +297,8 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
             logStatus( ( await getHasQSMWarning( 'alkrtnalrc9SRTXX' ) ) !== false, 'nonsense QSM warning (expected)' );
           }
 
-          const nonEnglishTranslationLocales = fs.readdirSync( `../release-branches/${releaseBranch.repo}-${releaseBranch.branch}/babel/${releaseBranch.repo}/` )
-            .filter( file => file.startsWith( `${releaseBranch.repo}-strings_` ) )
+          const nonEnglishTranslationLocales = fs.readdirSync( `../release-branches/${repo}-${releaseBranch.branch}/babel/${repo}/` )
+            .filter( file => file.startsWith( `${repo}-strings_` ) )
             .map( file => file.substring( file.indexOf( '_' ) + 1, file.lastIndexOf( '.' ) ) );
 
           const getSomeRandomTranslatedLocales = () => {
@@ -366,22 +360,22 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
           const plainURL = url;
           const plainAnalysis = analyzeURLs( await getLoadedURLs( plainURL ) );
           if ( !plainAnalysis.sentGoogleAnalytics ) {
-            logFailure( 'No Google Analytics sent', plainURL );
+            logResult( false, 'No Google Analytics sent', plainURL );
           }
           if ( !plainAnalysis.sentYotta ) {
-            logFailure( 'No yotta sent', plainURL );
+            logResult( false, 'No yotta sent', plainURL );
           }
 
           const yottaFalseURL = `${url}&yotta=false`;
           const yottaFalseAnalysis = analyzeURLs( await getLoadedURLs( yottaFalseURL ) );
           if ( yottaFalseAnalysis.sentExternalRequest || yottaFalseAnalysis.sentGoogleAnalytics || yottaFalseAnalysis.sentYotta ) {
-            logFailure( 'yotta=false sent something', yottaFalseAnalysis );
+            logResult( false, 'yotta=false sent something', yottaFalseAnalysis );
           }
 
           const yottaSomeFlagURL = `${url}&${demoYottaQueryParameterKey}=${demoYottaQueryParameterValue}`;
           const yottaSomeFlagAnalysis = analyzeURLs( await getLoadedURLs( yottaSomeFlagURL ) );
           if ( !yottaSomeFlagAnalysis.hasDemoYottaQueryParameter ) {
-            logFailure( `No ${demoYottaQueryParameterKey}=${demoYottaQueryParameterValue} sent`, yottaSomeFlagAnalysis );
+            logResult( false, `No ${demoYottaQueryParameterKey}=${demoYottaQueryParameterValue} sent`, yottaSomeFlagAnalysis );
           }
         }
 
@@ -401,62 +395,51 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
         // }
       }
 
-      if ( TEST_PHET_IO_LOCALE && await releaseBranch.isPhetIOHydrogen() ) {
+      if ( TEST_PHET_IO_LOCALE && await releaseBranch.isPhetioHydrogen() ) {
         const testURLs = [
-          // `http://localhost:${port}/release-branches/${releaseBranch.repo}-${releaseBranch.branch}/studio/?sim=${releaseBranch.repo}`,
-          `http://localhost:${port}/release-branches/${releaseBranch.repo}-${releaseBranch.branch}/${releaseBranch.repo}/build/phet-io/wrappers/studio/?`
+          `http://localhost:${port}/release-branches/${repo}-${releaseBranch.branch}/${repo}/build/phet-io/wrappers/studio/?`
         ];
 
         for ( const url of testURLs ) {
 
+          // Wrong format locale should result in a error dialog and resulting locale to fall back to 'en'
+          const startingLocale = await evaluate( `${url}&locale=fdsa`, () => new Promise( ( resolve, reject ) => {
+              resolve( phetio.phetioClient.frame.contentWindow.phet.chipper.locale );
+            } ), { waitForFunction: '!!phetio.phetioClient.simStarted' }
+          );
+          logResult( startingLocale === 'en', 'en fallback expected for badly formatted locale in studio', `${url}&locale=fdsa` );
+
           const standardWrapper = await evaluate( `${url}&exposeStandardPhetioWrapper`, () => new Promise( ( resolve, reject ) => {
-
-            window.addEventListener( 'error', event => {
-              reject( event );
-            } );
-
             window.addEventListener( 'message', event => {
-
               if ( event.data.standardPhetioWrapper ) {
-
                 resolve( event.data.standardPhetioWrapper );
               }
             } );
 
-            setTimeout( () => {
-              window.phetioClient.invoke( `${phetio.PhetioClient.CAMEL_CASE_SIMULATION_NAME}.general.model.localeProperty`, 'setValue', [ 'de' ], () => {
-                window.postMessage( { type: 'getStandardPhetioWrapper' }, '*' );
-              } );
-            }, 10000 );
-          } ) );
+            window.phetioClient.invoke( `${phetio.PhetioClient.CAMEL_CASE_SIMULATION_NAME}.general.model.localeProperty`, 'setValue', [ 'de' ], () => {
+              window.postMessage( { type: 'getStandardPhetioWrapper' }, '*' );
+            } );
+          } ), { waitForFunction: '!!window.phetioClient.simStarted' } );
 
-          fs.writeFileSync( '../tmp_p.html', standardWrapper );
+          const parentDir = '../temp/release-branch-tests/';
+          if ( !fs.existsSync( parentDir ) ) {
+            fs.mkdirSync( parentDir, { recursive: true } );
+          }
+
+          const path = `temp/release-branch-tests/${repo}-standard-wrapper.html`;
+          const filePath = `../${path}`;
+          fs.writeFileSync( filePath, standardWrapper );
 
           const testLocale = async ( locale, expectedLocale, debug = true ) => {
-            const actualLocale = await evaluate( `http://localhost:${port}/tmp_p.html?${locale ? `locale=${locale}` : ''}&phetioDebug=${debug}`, () => new Promise( ( resolve, reject ) => {
+            const standardWrapperURL = `http://localhost:${port}/${path}?${locale ? `locale=${locale}` : ''}&phetioDebug=${debug}`;
+            const actualLocale = await evaluate( standardWrapperURL, () => new Promise( resolve => {
               setTimeout( () => {
                 resolve( document.getElementById( 'sim' ).contentWindow.phet.chipper.locale );
-              }, 10000 );
-            } ) );
-
-            const logPass = message => {
-              if ( VERBOSE_LOG_SUCCESS ) {
-                console.log( `      [OK] ${message} URL: ${url}` );
-              }
-            };
-
-            const logFailure = message => {
-              console.log( `  [FAIL] ${message} URL: ${url}` );
-            };
-
+              }, 1000 ); // wait for state to be set after loading
+            } ), { waitForFunction: '!!window.phetioClient.simStarted' } );
             const success = actualLocale === expectedLocale;
             const message = `phet-io built locale ${locale} should be ${expectedLocale}`;
-            if ( success ) {
-              logPass( message );
-            }
-            else {
-              logFailure( message );
-            }
+            logResult( success, message, standardWrapperURL );
           };
 
           await testLocale( null, 'de' );
@@ -465,11 +448,10 @@ const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf
           await testLocale( 'xx_pW', 'en' );
           await testLocale( 'artlakernt', 'en', false );
 
-          fs.rmSync( '../tmp_p.html' );
+          fs.rmSync( filePath );
         }
       }
     }
-
   } );
 
   browser.close();

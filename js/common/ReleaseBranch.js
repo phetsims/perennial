@@ -602,9 +602,9 @@ module.exports = ( function() {
      *
      * @returns {Promise<boolean>}
      */
-    async isPhetIOHydrogen() {
+    async isPhetioHydrogen() {
       return this.brands.includes( 'phet-io' ) &&
-        this.includesSHA( 'phet-io-wrappers', '7e8d97020c6451f68e898ae83aa43593b555137f' );
+             this.includesSHA( 'phet-io-wrappers', '7e8d97020c6451f68e898ae83aa43593b555137f' );
     }
 
     /**
