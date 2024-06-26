@@ -35,7 +35,7 @@ winston.default.transports.console.level = 'error';
 
 // Test one sim from main, instead of from release-branches/. To test from main, ensure you first run
 // `cd acid-base-solutions; grunt --brands=phet,phet-io --locales=*`
-const TEST_FROM_MAIN = true;
+const TEST_FROM_MAIN = false;
 // Log tests that pass in addition to failures.
 const VERBOSE_LOG_SUCCESS = true;
 
