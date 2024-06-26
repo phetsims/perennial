@@ -30,12 +30,21 @@ const fs = require( 'fs' );
 
 winston.default.transports.console.level = 'error';
 
-const VERBOSE_LOG_SUCCESS = true;
-const TEST_LOCALES = false;
-const TEST_ANALYTICS = false;
-const TEST_PHET_IO_LOCALE = true;
+////////////////////////
+// RUNNING OPTIONS:
 
+// Test one sim from main, instead of from release-branches/. To test from main, ensure you first run
+// `cd acid-base-solutions; grunt --brands=phet,phet-io --locales=*`
+const TEST_FROM_MAIN = true;
+// Log tests that pass in addition to failures.
+const VERBOSE_LOG_SUCCESS = true;
+
+// Specific tests to run
+const TEST_LOCALES = true; // general locale feature upgrade
+const TEST_ANALYTICS = false; // GA analytics testing
+const TEST_PHET_IO_LOCALE = true; // phet-io + standard wrapper locale testing
 const SKIP_TITLE_STRING_PATTERN = true;
+///////////////////////////////////////////////
 
 const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf8' ) );
 
@@ -58,35 +67,54 @@ const logResult = ( success, message, url ) => {
   // Use withServer for cross-dev environment execution.
   await withServer( async port => {
 
-    const getBuiltURLs = async releaseBranch => {
-      const buildDir = `http://localhost:${port}/release-branches/${releaseBranch.repo}-${releaseBranch.branch}/${releaseBranch.repo}/build`;
+    const releaseBranches = TEST_FROM_MAIN ? [ null ] : await Maintenance.loadAllMaintenanceBranches();
 
+    const getBuiltURLs = async releaseBranch => {
       const urls = [];
+      const repo = releaseBranch ? releaseBranch.repo : 'acid-base-solutions';
+      const branch = releaseBranch ? releaseBranch.branch : 'main';
+      const releaseBranchPath = releaseBranch ? `release-branches/${repo}-${branch}/` : '';
+      const buildDir = `http://localhost:${port}/${releaseBranchPath}${repo}/build`;
+
+      if ( !releaseBranch ) {
+        urls.push( `${buildDir}/phet/${repo}_all_phet_debug.html?webgl=false` );
+        urls.push( `${buildDir}/phet-io/${repo}_all_phet-io.html?webgl=false&phetioStandalone` );
+        return urls;
+      }
 
       const usesChipper2 = await releaseBranch.usesChipper2();
 
       if ( releaseBranch.brands.includes( 'phet' ) ) {
-        urls.push( `${buildDir}/${usesChipper2 ? 'phet/' : ''}${releaseBranch.repo}_all${usesChipper2 ? '_phet' : ''}.html?webgl=false` );
+        urls.push( `${buildDir}/${usesChipper2 ? 'phet/' : ''}${repo}_all${usesChipper2 ? '_phet' : ''}.html?webgl=false` );
       }
       if ( releaseBranch.brands.includes( 'phet-io' ) ) {
         const standaloneParams = await releaseBranch.getPhetioStandaloneQueryParameter();
 
         const phetioSuffix = usesChipper2 ? '_all_phet-io' : '_en-phetio';
 
-        urls.push( `${buildDir}/${usesChipper2 ? 'phet-io/' : ''}${releaseBranch.repo}${phetioSuffix}.html?${standaloneParams}&webgl=false` );
+        urls.push( `${buildDir}/${usesChipper2 ? 'phet-io/' : ''}${repo}${phetioSuffix}.html?${standaloneParams}&webgl=false` );
       }
 
       return urls;
     };
 
     const getUnbuiltURLs = async releaseBranch => {
-      const urls = [
-        `http://localhost:${port}/release-branches/${releaseBranch.repo}-${releaseBranch.branch}/${releaseBranch.repo}/${releaseBranch.repo}_en.html?webgl=false`
-      ];
+      const urls = [];
+
+      if ( !releaseBranch ) {
+        const repo = 'acid-base-solutions';
+        urls.push( `http://localhost:${port}/${repo}/${repo}_en.html?webgl=false` );
+        urls.push( `http://localhost:${port}/${repo}/${repo}_en.html?webgl=false&brand=phet-io&phetioStandalone` );
+        return urls;
+      }
+
+      const repo = releaseBranch.repo;
+      const branch = releaseBranch.branch;
+      urls.push( `http://localhost:${port}/release-branches/${repo}-${branch}/${repo}/${repo}_en.html?webgl=false` );
 
       if ( releaseBranch.brands.includes( 'phet-io' ) ) {
         const standaloneParams = await releaseBranch.getPhetioStandaloneQueryParameter();
-        urls.push( `http://localhost:${port}/release-branches/${releaseBranch.repo}-${releaseBranch.branch}/${releaseBranch.repo}/${releaseBranch.repo}_en.html?webgl=false&${standaloneParams}&brand=phet-io` );
+        urls.push( `http://localhost:${port}/release-branches/${repo}-${branch}/${repo}/${repo}_en.html?webgl=false&${standaloneParams}&brand=phet-io` );
       }
 
       return urls;
@@ -152,31 +180,39 @@ const logResult = ( success, message, url ) => {
       }
     };
 
-    for ( const releaseBranch of await Maintenance.loadAllMaintenanceBranches() ) {
-      console.log( '-', releaseBranch.toString() );
+    for ( const releaseBranch of releaseBranches ) {
+
+      // releaseBranch=== null when running on main
+      const isUnbultOnMain = !releaseBranch;
+
+      const repo = isUnbultOnMain ? 'acid-base-solutions' : releaseBranch.repo;
+      const branch = isUnbultOnMain ? 'main' : releaseBranch.branch;
+      const releaseBranchPath = isUnbultOnMain ? '' : `release-branches/${repo}-${branch}/`;
 
       const urls = await getAllURLs( releaseBranch );
 
-      const repo = releaseBranch.repo;
+      console.log( '-', releaseBranch ? releaseBranch.toString() : repo );
 
       for ( const url of urls ) {
 
         // Because `planet` and `planet.controls.title` keys present in translations OVERLAP in the string object created by
         // getStringModule, and FAILS hard on these. Built versions work ok.
-        if ( repo === 'gravity-force-lab' && releaseBranch.branch === '2.2' && url.includes( '_en.html' ) ) {
+        if ( repo === 'gravity-force-lab' && branch === '2.2' && url.includes( '_en.html' ) ) {
           console.log( ' skipping gravity-force-lab 2.2 unbuilt, since planet / planet.controls.title strings in translations will not run in unbuilt mode' );
           continue;
         }
-        if ( repo === 'gravity-force-lab-basics' && releaseBranch.branch === '1.1' && url.includes( '_en.html' ) ) {
+        if ( repo === 'gravity-force-lab-basics' && branch === '1.1' && url.includes( '_en.html' ) ) {
           console.log( ' skipping gravity-force-lab 2.2 unbuilt, since planet / planet.controls.title strings in translations will not run in unbuilt mode' );
           continue;
         }
 
         const getUrlWithLocale = locale => url.includes( '?' ) ? `${url}&locale=${locale}` : `${url}?locale=${locale}`;
-        const getLocaleSpecificURL = locale => url.replace( '_all', `_${locale}` );
+        const getLocaleSpecificURL = locale => {
+          return isUnbultOnMain ? url.replace( '_all_phet_debug', `_${locale}_phet` ) : url.replace( '_all', `_${locale}` );
+        };
 
-        const logStatus = ( status, message ) => {
-          logResult( status, message, url );
+        const logStatus = ( status, message, loggedURL = url ) => {
+          logResult( status, message, loggedURL );
         };
 
         if ( TEST_LOCALES ) {
@@ -200,11 +236,6 @@ const logResult = ( success, message, url ) => {
 
           const invalidLocale = await getRunningLocale( 'aenrtpyarntSRTS' );
           logStatus( invalidLocale === 'en', 'nonsense phet.chipper.locale' );
-
-          if ( url.includes( '/build/' ) ) {
-            const puLocale = await getRunningLocale( 'pu' );
-            logStatus( puLocale === 'pu', 'pu phet.chipper.locale (custom test)' );
-          }
 
           const repoPackageObject = JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) );
 
@@ -297,7 +328,7 @@ const logResult = ( success, message, url ) => {
             logStatus( ( await getHasQSMWarning( 'alkrtnalrc9SRTXX' ) ) !== false, 'nonsense QSM warning (expected)' );
           }
 
-          const nonEnglishTranslationLocales = fs.readdirSync( `../release-branches/${repo}-${releaseBranch.branch}/babel/${repo}/` )
+          const nonEnglishTranslationLocales = fs.readdirSync( `../${releaseBranchPath}babel/${repo}/` )
             .filter( file => file.startsWith( `${repo}-strings_` ) )
             .map( file => file.substring( file.indexOf( '_' ) + 1, file.lastIndexOf( '.' ) ) );
 
@@ -306,12 +337,9 @@ const logResult = ( success, message, url ) => {
               [
                 'en',
                 'es',
-                'pu',
                 ..._.sampleSize( nonEnglishTranslationLocales, 8 )
               ]
-            ).filter( locale => {
-              return url.includes( '/build/' ) ? true : locale !== 'pu';
-            } );
+            );
           };
 
           const includedDataLocales = _.sortBy( _.uniq( [
@@ -341,9 +369,10 @@ const logResult = ( success, message, url ) => {
             if ( !url.includes( 'phet-io' ) && !url.includes( 'phetio' ) && url.includes( '/build/' ) ) {
 
               for ( const locale of getSomeRandomTranslatedLocales() ) {
-                const checkLocale = await evaluate( getLocaleSpecificURL( locale ), () => phet.chipper.locale );
+                const specificURL = getLocaleSpecificURL( locale );
+                const checkLocale = await evaluate( specificURL, () => phet.chipper.locale );
 
-                logStatus( checkLocale === locale, `Locale-specific ${locale} build should be ${checkLocale}` );
+                logStatus( checkLocale === locale, `Locale-specific ${locale} build should be ${checkLocale}`, specificURL );
               }
             }
           }
@@ -395,12 +424,20 @@ const logResult = ( success, message, url ) => {
         // }
       }
 
-      if ( TEST_PHET_IO_LOCALE && await releaseBranch.isPhetioHydrogen() ) {
+      if ( TEST_PHET_IO_LOCALE && ( !releaseBranch || await releaseBranch.isPhetioHydrogen() ) ) {
+
         const testURLs = [
-          `http://localhost:${port}/release-branches/${repo}-${releaseBranch.branch}/${repo}/build/phet-io/wrappers/studio/?`
+          `http://localhost:${port}/${releaseBranchPath}${repo}/build/phet-io/wrappers/studio/?`
         ];
 
         for ( const url of testURLs ) {
+
+          // Wrong format locale should result in a error dialog and resulting locale to fall back to 'en'
+          const fallbackLocale = await evaluate( `${url}&locale=es_PY`, () => new Promise( ( resolve, reject ) => {
+              resolve( phetio.phetioClient.frame.contentWindow.phet.chipper.locale );
+            } ), { waitForFunction: '!!phetio.phetioClient.simStarted' }
+          );
+          logResult( fallbackLocale === 'es', 'es fallback expected for non existent es_PY', `${url}&locale=es_PY` );
 
           // Wrong format locale should result in a error dialog and resulting locale to fall back to 'en'
           const emptyLocaleParam = await evaluate( `${url}&locale=`, () => new Promise( ( resolve, reject ) => {
