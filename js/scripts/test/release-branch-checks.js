@@ -37,7 +37,7 @@ winston.default.transports.console.level = 'error';
 // `cd acid-base-solutions; grunt --brands=phet,phet-io --locales=*`
 const TEST_FROM_MAIN = false;
 // Log tests that pass in addition to failures.
-const VERBOSE_LOG_SUCCESS = true;
+const VERBOSE_LOG_SUCCESS = false;
 
 // Specific tests to run
 const TEST_LOCALES = true; // general locale feature upgrade
@@ -250,7 +250,11 @@ const logResult = ( success, message, url ) => {
               const hasTitleKey = SKIP_TITLE_STRING_PATTERN ? true : await evaluate( url, `!!phet.chipper.strings.en[ "${fullPotentialTitleStringKey}" ]` );
 
               if ( hasTitleKey ) {
-                const getTitle = async locale => evaluate( getUrlWithLocale( locale ), () => document.title );
+                const getTitle = async locale => evaluate( getUrlWithLocale( locale ), () => document.title, {
+
+                  // PhET-iO Hydrogen sims won't have this behavior until the localeProperty has statically imported/loaded
+                  waitForFunction: '(phet.joist?.sim && !phet.joist.sim.isConstructionCompleteProperty) || phet.joist?.sim?.isConstructionCompleteProperty.value'
+                } );
 
                 // null if could not be found
                 const lookupSpecificTitleTranslation = locale => {
