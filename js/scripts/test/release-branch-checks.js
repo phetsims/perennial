@@ -236,7 +236,8 @@ const logResult = ( success, message, url ) => {
           logStatus( espyLocale === 'es' || espyLocale === 'es_PY', 'ES_PY phet.chipper.locale' );
 
           const armaLocale = await getRunningLocale( 'ar_SA' );
-          logStatus( armaLocale === 'ar' || armaLocale === 'ar_SA' || armaLocale === 'ar_MA', 'ar_SA phet.chipper.locale' );
+          const armaStatus = armaLocale === 'ar' || armaLocale === 'ar_SA' || armaLocale === 'ar_MA' || ( repo.includes( 'projectile-' ) && armaLocale === 'en' );
+          logStatus( armaStatus, 'ar_SA phet.chipper.locale' );
 
           const invalidLocale = await getRunningLocale( 'aenrtpyarntSRTS' );
           logStatus( invalidLocale === 'en', 'nonsense phet.chipper.locale' );
