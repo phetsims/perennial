@@ -193,10 +193,6 @@ const logResult = ( success, message, url ) => {
 
       console.log( '-', releaseBranch ? releaseBranch.toString() : repo );
 
-      if ( !( await releaseBranch.isPhetioHydrogen() ) ) {
-        continue;
-      }
-
       for ( const url of urls ) {
 
         // Because `planet` and `planet.controls.title` keys present in translations OVERLAP in the string object created by
