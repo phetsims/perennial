@@ -38,11 +38,13 @@ const npmUpdateDirectory = require( './npmUpdateDirectory' );
 const puppeteerLoad = require( './puppeteerLoad' );
 const simMetadata = require( './simMetadata' );
 const simPhetioMetadata = require( './simPhetioMetadata' );
+const SimVersion = require( './SimVersion' );
 const withServer = require( './withServer' );
 const assert = require( 'assert' );
 const fs = require( 'fs' );
 const winston = require( 'winston' );
 const _ = require( 'lodash' );
+const axios = require( 'axios' );
 
 module.exports = ( function() {
 
@@ -643,10 +645,10 @@ module.exports = ( function() {
     }
 
     /**
-     * Re-runs a production deploy for a specific branch.
+     * Re-runs a production deploy for a specific branch (based on the SHAs at the tip of the release branch)
      * @public
      */
-    async redeployProduction( locales = '*' ) {
+    async redeployBranchTipToProduction( locales = '*' ) {
       if ( this.isReleased ) {
         await checkoutTarget( this.repo, this.branch, false );
 
@@ -664,6 +666,54 @@ module.exports = ( function() {
       else {
         throw new Error( 'Should not redeploy a non-released branch' );
       }
+    }
+
+    /**
+     * Re-runs a production deploy for a specific branch (based on the SHAs that were most recently production deployed)
+     * @public
+     */
+    async redeployLastDeployedSHAsToProduction( locales = '*' ) {
+      if ( !this.isReleased ) {
+        throw new Error( 'Should not redeploy a non-released branch' );
+      }
+      if ( this.branch.includes( '-phetio' ) ) {
+        throw new Error( 'unsupported suffix -phetio' );
+      }
+
+      let url; // string
+      let version; // SimVersion
+      if ( this.brands.includes( 'phet' ) ) {
+        const metadata = await simMetadata( {
+          locale: 'en',
+          simulation: this.repo
+        } );
+
+        const project = metadata.projects.find( project => project.name === `html/${this.repo}` );
+        version = SimVersion.parse( project.version.string );
+        url = `https://phet.colorado.edu/sims/html/${this.repo}/${version.toString()}/dependencies.json`;
+      }
+      else if ( this.brands.includes( 'phet-io' ) ) {
+        const metadata = await simPhetioMetadata( {
+          active: true
+        } );
+
+        const localVersion = await this.getSimVersion();
+        const simData = metadata.find( simData => simData.name === this.repo && simData.versionMajor === localVersion.major && simData.versionMinor === localVersion.minor );
+
+        version = new SimVersion( simData.versionMajor, simData.versionMinor, simData.versionMaintenance );
+        url = `https://phet-io.colorado.edu/sims/${this.repo}/${version.major}.${version.minor}/dependencies.json`;
+      }
+      else {
+        throw new Error( 'unknown deployed brand' );
+      }
+
+      const dependencies = ( await axios.get( url ) ).data;
+
+      await buildServerRequest( this.repo, version, this.branch, dependencies, {
+        locales: '*',
+        brands: this.brands,
+        servers: [ 'production' ]
+      } );
     }
 
     /**
