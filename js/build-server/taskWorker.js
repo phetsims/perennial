@@ -174,9 +174,13 @@ async function runTask( options ) {
       }
     }
 
+    const localesArray = typeof ( locales ) === 'string' ? locales.split( ',' ) : locales;
+    // if this build request comes from rosetta it will have a userId field and only one locale
+    const isTranslationRequest = userId && localesArray.length === 1 && localesArray[ 0 ] !== '*';
+
     await releaseBranch.build( {
       clean: false,
-      locales: locales,
+      locales: isTranslationRequest ? '*' : locales,
       buildForServer: true,
       lint: false,
       allHTML: !( chipperVersion.major === 0 && chipperVersion.minor === 0 && brands[ 0 ] !== constants.PHET_BRAND )
@@ -203,10 +207,7 @@ async function runTask( options ) {
       await devDeploy( checkoutDir, simName, version, chipperVersion, brands, buildDir );
     }
 
-    const localesArray = typeof ( locales ) === 'string' ? locales.split( ',' ) : locales;
 
-    // if this build request comes from rosetta it will have a userId field and only one locale
-    const isTranslationRequest = userId && localesArray.length === 1 && localesArray[ 0 ] !== '*';
 
     if ( servers.indexOf( constants.PRODUCTION_SERVER ) >= 0 ) {
       winston.info( 'deploying to production' );
