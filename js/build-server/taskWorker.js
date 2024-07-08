@@ -207,8 +207,6 @@ async function runTask( options ) {
       await devDeploy( checkoutDir, simName, version, chipperVersion, brands, buildDir );
     }
 
-
-
     if ( servers.indexOf( constants.PRODUCTION_SERVER ) >= 0 ) {
       winston.info( 'deploying to production' );
       let targetVersionDir;
