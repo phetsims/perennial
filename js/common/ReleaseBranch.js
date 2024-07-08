@@ -709,11 +709,32 @@ module.exports = ( function() {
 
       const dependencies = ( await axios.get( url ) ).data;
 
-      await buildServerRequest( this.repo, version, this.branch, dependencies, {
-        locales: '*',
-        brands: this.brands,
-        servers: [ 'production' ]
-      } );
+      if ( dependencies ) {
+        await buildServerRequest( this.repo, version, this.branch, dependencies, {
+          locales: locales,
+          brands: this.brands,
+          servers: [ 'production' ]
+        } );
+      }
+      else {
+        throw new Error( 'no dependencies' );
+      }
+    }
+
+    /**
+     * Redeploys all last deployed SHAs to production for all maintenance branches.
+     * @public
+     */
+    static async redeployAllLastDeployedSHAsToProduction( locales = '*' ) {
+      const releaseBranches = await ReleaseBranch.getAllMaintenanceBranches();
+
+      for ( const releaseBranch of releaseBranches ) {
+        console.log( releaseBranch.toString() );
+
+        if ( releaseBranch.isReleased && !releaseBranch.branch.includes( '-phetio' ) ) {
+          await releaseBranch.redeployLastDeployedSHAsToProduction( locales );
+        }
+      }
     }
 
     /**
