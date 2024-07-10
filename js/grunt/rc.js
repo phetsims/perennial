@@ -126,7 +126,7 @@ module.exports = async function rc( repo, branch, brands, noninteractive, messag
 
     // Send the build request
     await buildServerRequest( repo, version, branch, await getDependencies( repo ), {
-      locales: [ 'en' ],
+      locales: [ '*' ],
       brands: brands,
       servers: [ 'dev' ]
     } );
