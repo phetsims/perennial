@@ -4,7 +4,7 @@
  *
  * USAGE:
  * cd perennial
- * node js/scripts/compare-dependencies-2.js dependencies1.json dependencies2.json
+ * node js/scripts/compare-dependencies-2.js ../mysim/dependenciesOLD.json ../mysim/dependencies.json
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */
