@@ -6,6 +6,9 @@
  * cd perennial
  * node js/scripts/compare-dependencies-2.js ../mysim/dependenciesOLD.json ../mysim/dependencies.json
  *
+ * NOTES: The old dependencies.json must be specified first. Also, keep in mind you may want to do a fresh build to get
+ * an updated dependencies.json if you are trying to compare to main.
+ *
  * @author Sam Reid (PhET Interactive Simulations)
  */
 const fs = require( 'fs' );
