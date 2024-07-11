@@ -9,6 +9,7 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 const fs = require( 'fs' );
+const _ = require( 'lodash' );
 
 // Parse the command line arguments
 const args = process.argv.slice( 2 );
@@ -22,7 +23,7 @@ const project2 = args[ 1 ];
 const dependencies1 = JSON.parse( fs.readFileSync( project1 ) );
 const dependencies2 = JSON.parse( fs.readFileSync( project2 ) );
 
-const allKeys = [ ...Object.keys( dependencies1 ), ...Object.keys( dependencies2 ) ].filter( repo => repo !== 'comment' );
+const allKeys = _.uniq( [ ...Object.keys( dependencies1 ), ...Object.keys( dependencies2 ) ].filter( repo => repo !== 'comment' ) );
 
 const issues = new Set();
 let commitCount = 0;
