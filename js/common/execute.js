@@ -38,7 +38,12 @@ module.exports = function( cmd, args, cwd, options ) {
     errors: 'reject',
 
     // Provide additional env variables, and they will be merged with the existing defaults.
-    childProcessEnv: { ...process.env }
+    childProcessEnv: { ...process.env },
+
+    // options.shell value to the child_process.spawn. shell:true is required for a NodeJS security update, see https://github.com/phetsims/perennial/issues/359
+    // In this case, only bash scripts fail with an EINVAL error, so we don't need to worry about node/git (and in
+    // fact don't want the overhead of a new shell).
+    childProcessShell: cmd !== 'node' && cmd !== 'git' && /^win/.test( process.platform )
   }, options );
   assert( options.errors === 'reject' || options.errors === 'resolve', 'Errors must reject or resolve' );
 
@@ -51,7 +56,8 @@ module.exports = function( cmd, args, cwd, options ) {
 
     const childProcess = child_process.spawn( cmd, args, {
       cwd: cwd,
-      env: options.childProcessEnv
+      env: options.childProcessEnv,
+      shell: options.childProcessShell
     } );
 
     childProcess.on( 'error', error => {
@@ -61,7 +67,6 @@ module.exports = function( cmd, args, cwd, options ) {
         resolve( { code: 1, stdout: stdout, stderr: stderr, cwd: cwd, error: error, time: Date.now() - startTime } );
       }
       else {
-
         reject( new ExecuteError( cmd, args, cwd, stdout, stderr, -1, Date.now() - startTime ) );
       }
     } );
