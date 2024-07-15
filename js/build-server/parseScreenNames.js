@@ -20,10 +20,25 @@ const parseScreenNamesFromSimulation = async ( simName, locales, checkoutDir ) =
   const packageObject = await loadJSON( `${checkoutDir}/${simName}/package.json` );
   const screenNameKeys = packageObject.phet.screenNameKeys || [];
 
+  const localeData = await loadJSON( `${checkoutDir}/babel/localeData.json` );
+
   const result = {};
   for ( const locale of locales ) {
-    // TODO: proper locale fallback for https://github.com/phetsims/chipper/issues/1441
-    result[ locale ] = screenNameKeys.map( key => stringMap[ key ][ locale ] || stringMap[ key ][ locale.slice( 0, 2 ) ] || stringMap[ key ].en );
+    const fallbackLocales = [
+      locale,
+      ...( localeData[ locale ].fallbackLocales || [] ),
+      'en'
+    ];
+
+    // Locale fallback
+    result[ locale ] = screenNameKeys.map( key => {
+      for ( const fallbackLocale of fallbackLocales ) {
+        if ( stringMap[ key ][ fallbackLocale ] ) {
+          return stringMap[ key ][ fallbackLocale ];
+        }
+      }
+      throw new Error( 'missing key: ' + key );
+    } );
   }
   return result;
 };
