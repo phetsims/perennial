@@ -326,6 +326,9 @@ Running `Maintenance.list()` afterwards should show the patch in maintenance sta
 [scenery] https://github.com/phetsims/scenery/issues/837
 ```
 
+NOTE: PhET-iO API files in phet-io-sim-specific do not need to be patched. Even if a change includes PhET-iO API
+changes, it is not necessary to patch the phet-io-sim-specific repo.
+
 ## #6: Adding "needed patches"
 
 Now that the patch references are in the system, you'll want to mark which release branches need which patches.
