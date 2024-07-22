@@ -146,6 +146,18 @@ module.exports = function( grunt ) {
       await checkoutTimestamp( repo, grunt.option( 'timestamp' ), !grunt.option( 'skipNpmUpdate' ) );
     } ) );
 
+  grunt.registerTask( 'checkout-common-timestamp',
+    'Check out a specific timestamp for common-code repositories\n' +
+    '--timestamp : the timestamp to check things out for, e.g. --timestamp="Jan 08 2018"\n' +
+    '--skipNpmUpdate : If provided, will prevent the usual npm update',
+    wrapTask( async () => {
+      assert( grunt.option( 'timestamp' ), 'Requires specifying a timestamp with --timestamp={{BRANCH}}' );
+
+      const checkoutCommonTimestamp = require( '../common/checkoutCommonTimestamp' );
+
+      await checkoutCommonTimestamp( grunt.option( 'timestamp' ), !grunt.option( 'skipNpmUpdate' ) );
+    } ) );
+
   grunt.registerTask( 'checkout-main',
     'Check out main branch for all dependencies, as specified in dependencies.json\n' +
     '--repo : repository name where package.json should be read from\n' +
