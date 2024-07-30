@@ -32,8 +32,16 @@
     "version": "1.1"
   },
   {
+    "sim": "faradays-electromagnetic-lab",
+    "version": "1.0"
+  },
+  {
     "sim": "friction",
     "version": "1.6"
+  },
+  {
+    "sim": "generator",
+    "version": "1.0"
   },
   {
     "sim": "geometric-optics",
@@ -58,6 +66,14 @@
   {
     "sim": "keplers-laws",
     "version": "1.2"
+  },
+  {
+    "sim": "magnet-and-compass",
+    "version": "1.0"
+  },
+  {
+    "sim": "magnets-and-electromagnets",
+    "version": "1.0"
   },
   {
     "sim": "molecule-polarity",
