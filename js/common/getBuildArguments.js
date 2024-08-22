@@ -87,7 +87,7 @@ module.exports = function( chipperVersion, options ) {
       args.push( '--lint=false' );
     }
     if ( allHTML ) {
-      args.push( '--allHTML' );
+      args.push( '--allHTML' ); // This option doesn't exist on main as of 8/22/24, but this is kept for backwards compatibility
     }
     if ( debugHTML ) {
       args.push( '--debugHTML' );
