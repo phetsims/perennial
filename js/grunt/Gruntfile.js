@@ -572,7 +572,7 @@ module.exports = function( grunt ) {
     }
   } ) );
 
-  // TODO: Does this belong in grunt? See https://github.com/phetsims/chipper/issues/1459
+  // TODO: Does this belong in grunt? See https://github.com/phetsims/chipper/issues/1461
   grunt.registerTask( 'generate-data', 'Generates the lists under perennial/data/, and if there were changes, will commit and push.', wrapTask( async () => {
     const generateData = require( './generateData' );
     await generateData( grunt );
@@ -584,7 +584,7 @@ module.exports = function( grunt ) {
     await cloneMissingRepos();
   } ) );
 
-  // TODO: Do these maintenance entry points belong in grunt? See https://github.com/phetsims/chipper/issues/1459
+  // TODO: Do these maintenance entry points belong in grunt? See https://github.com/phetsims/chipper/issues/1461
   grunt.registerTask( 'maintenance', 'Starts a maintenance REPL', wrapTask( async () => {
     const Maintenance = require( '../common/Maintenance' );
 
@@ -619,7 +619,7 @@ module.exports = function( grunt ) {
     await Maintenance.createPatch( repo, message );
   } ) );
 
-  // TODO: Probably shouldn't be in grunt, see https://github.com/phetsims/chipper/issues/1459
+  // TODO: Probably shouldn't be in grunt, see https://github.com/phetsims/chipper/issues/1461
   grunt.registerTask( 'reopen-issues-from-todos', 'If there is a TODO in the project pointing to a closed issue, reopen it.', wrapTask( async () => {
     await require( './reopenIssuesFromTODOs' )();
   } ) );
