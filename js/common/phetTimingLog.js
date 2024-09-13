@@ -30,7 +30,7 @@ const path = require( 'path' );
 const fs = require( 'fs' );
 const assert = require( 'assert' );
 
-const logDir = path.resolve( process.cwd(), '../perennial-alias/logs' );
+const logDir = path.resolve( __dirname, '../../logs' );
 try {
   fs.mkdirSync( logDir );
 }
