@@ -351,7 +351,6 @@ module.exports = function( grunt ) {
       await cherryPick( repo, shas );
     } ) );
 
-  // TODO: Is this duplicated with the one in chipper? See https://github.com/phetsims/chipper/issues/1459
   grunt.registerTask( 'lint', 'Lints this repository only', wrapTask( async () => {
     const execute = require( '../common/execute' );
     const gruntCommand = require( '../common/gruntCommand' );
