@@ -2,6 +2,7 @@
 
 const execute = require( '../common/execute' );
 const fs = require( 'fs' );
+const _ = require( 'lodash' );
 
 // constants
 // Don't use getActiveRepos() since it cannot be run from the root
@@ -15,33 +16,42 @@ const repos = contents.split( '\n' ).map( sim => sim.trim() );
  * cd ${root containing all repos}
  * node perennial/js/scripts/pull-all.js
  *
+ * OPTIONS:
+ * --batches=N - (1) by default, runing all pulls in parallel. Specify this to separate into N different synchronous chunks running repos/batches number of repos in parallel.
+ *
  * @author Sam Reid (PhET Interactive Simulations)
+ * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 ( async () => {
 
-  const a = repos.map( repo => execute( 'git', [ 'pull', '--rebase' ], `${repo}`, {
+  const batchesMatch = process.argv.join( ' ' ).match( /--batches=(\d+)/ );
+  const batches = batchesMatch ? batchesMatch[ 1 ] : 1;
+  const CHUNK_SIZE = repos.length / batches;
 
-    // resolve errors so Promise.all doesn't fail on first repo that cannot pull/rebase
-    errors: 'resolve'
-  } ) );
-  const out = await Promise.all( a );
+  for ( const chunkOfRepos of _.chunk( repos, CHUNK_SIZE ) ) {
+    const childPulls = chunkOfRepos.map( repo => execute( 'git', [ 'pull', '--rebase' ], `${repo}`, {
 
-  // Report results
-  for ( let i = 0; i < a.length; i++ ) {
-    const repo = repos[ i ];
-    const o = out[ i ];
+      // resolve errors so Promise.all doesn't fail on first repo that cannot pull/rebase
+      errors: 'resolve'
+    } ) );
+    const results = await Promise.all( childPulls );
 
-    if ( o.code === 0 && o.stderr === '' && ( o.stdout === 'Already up to date.\nCurrent branch main is up to date.\n' ||
-                                              o.stdout === 'Already up to date.\n' ||
-                                              o.stdout === 'Current branch main is up to date.\n' ) ) {
+    // Report results
+    for ( let i = 0; i < results.length; i++ ) {
+      const repo = chunkOfRepos[ i ];
+      const result = results[ i ];
 
-      // nothing to do
-    }
-    else {
-      console.log( '##', repo );
-      o.stdout.trim().length > 0 && console.log( o.stdout );
-      o.stderr.trim().length > 0 && console.log( o.stderr );
-      o.error && console.log( o.error );
+      if ( result.code === 0 && result.stderr === '' && ( result.stdout === 'Already up to date.\nCurrent branch main is up to date.\n' ||
+                                                          result.stdout === 'Already up to date.\n' ||
+                                                          result.stdout === 'Current branch main is up to date.\n' ) ) {
+        // nothing to do
+      }
+      else {
+        console.log( '##', repo );
+        result.stdout.trim().length > 0 && console.log( result.stdout );
+        result.stderr.trim().length > 0 && console.log( result.stderr );
+        result.error && console.log( result.error );
+      }
     }
   }
 } )();
