@@ -58,7 +58,7 @@ done
 
 # Execute the found script or display an error if not found
 if [[ -n "$FOUND_SCRIPT" ]]; then
-  echo "Executing task '$TASK' from '$FOUND_PATH'"
+  # echo "Executing task '$TASK' from '$FOUND_PATH'"
   "$TSX_EXEC" "$FOUND_SCRIPT" "$@"
 else
   error_exit "Unknown command or script file not found: $TASK"
