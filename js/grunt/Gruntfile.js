@@ -637,11 +637,11 @@ module.exports = function( grunt ) {
             }
           }
 
-          // TODO: https://github.com/phetsims/chipper/issues/1356 Clean up debugging output
+          // TODO: https://github.com/phetsims/chipper/issues/1468 Clean up debugging output
           // console.log( `Worker ${workerId} has completed all assigned repositories.` );
         };
 
-        // TODO: https://github.com/phetsims/chipper/issues/1356 fine tune the number of workers
+        // TODO: https://github.com/phetsims/chipper/issues/1468 fine tune the number of workers
         const numWorkers = 4;
         const workers = _.times( numWorkers, i => worker( i + 1 ) );
 
