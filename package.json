@@ -36,7 +36,19 @@
     "xml2js": "~0.4.15"
   },
   "eslintConfig": {
-    "extends": "../chipper/eslint/node_eslintrc.js"
+    "extends": "../chipper/eslint/node_eslintrc.js",
+    "overrides": [
+      {
+        "files": [
+          "**/*.ts"
+        ],
+        "parserOptions": {
+          "project": [
+            "../perennial-alias/tsconfig.json"
+          ]
+        }
+      }
+    ]
   },
   "dependencies": {
     "nodemailer": "^6.9.1",
