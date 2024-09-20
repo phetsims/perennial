@@ -546,7 +546,7 @@ module.exports = function( grunt ) {
       // remove duplicate perennial copy
       repo !== 'perennial-alias' &&
 
-      // TODO: Has no grunt file, maybe has a different way of linting? see https://github.com/phetsims/chipper/issues/1356
+      // Vite is linted via its own process, see phet-vite-demo/README.md
       repo !== 'phet-vite-demo' );
     const fix = grunt.option( 'fix' );
     const chipAway = grunt.option( 'chip-away' );
