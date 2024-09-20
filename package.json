@@ -44,7 +44,7 @@
         ],
         "parserOptions": {
           "project": [
-            "../perennial-alias/tsconfig.json"
+            "../perennial/tsconfig.json"
           ]
         }
       }
