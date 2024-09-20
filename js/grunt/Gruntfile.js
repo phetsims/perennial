@@ -541,17 +541,10 @@ module.exports = function( grunt ) {
 
     // --disable-eslint-cache disables the cache, useful for developing rules
     const cache = !grunt.option( 'disable-eslint-cache' );
-    const activeRepos = getDataFile( 'active-repos' ).filter( repo =>
-
-      // remove duplicate perennial copy
-      repo !== 'perennial-alias' &&
-
-      // Vite is linted via its own process, see phet-vite-demo/README.md
-      repo !== 'phet-vite-demo' );
+    const activeRepos = getDataFile( 'active-repos' ).filter( repo => repo !== 'perennial-alias' ); // remove duplicate perennial copy
     const fix = grunt.option( 'fix' );
     const chipAway = grunt.option( 'chip-away' );
-
-    console.log( `linting ${activeRepos.length} repos:` );
+    const showProgressBar = !grunt.option( 'hide-progress-bar' );
 
     let lint;
     try {
@@ -564,123 +557,17 @@ module.exports = function( grunt ) {
 
     // The APIs are the same for these two versions of lint support
     if ( lint.chipperAPIVersion === 'promisesPerRepo1' || lint.chipperAPIVersion === 'npx' ) {
-
-      /**
-       * Lints repositories using a worker pool approach.
-       *
-       * @param {Array} activeRepos - Array of repositories to lint.
-       * @param {object} options - Configuration options for the lint function.
-       */
-      // eslint-disable-next-line no-inner-declarations
-      async function lintRepositoriesWithWorkers( activeRepos, options ) {
-        // Clone the activeRepos array to avoid mutating the original array
-        const reposQueue = [ ...activeRepos ];
-
-        // Shared counter to keep track of processed repositories
-        let processedCount = 0;
-
-        // Total number of repositories
-        const totalRepos = reposQueue.length;
-
-        // Array to collect failed repositories
-        const failedRepos = [];
-
-        /**
-         * Worker function that continuously processes repositories from the queue.
-         */
-        const worker = async workerId => {
-          // eslint-disable-next-line no-constant-condition
-          while ( true ) {
-
-            // Synchronize access to the queue
-            // Since JavaScript is single-threaded, this is safe
-            if ( reposQueue.length === 0 ) {
-              break; // No more repositories to process
-            }
-
-            const repo = reposQueue.shift(); // Get the next repository
-
-            try {
-              // Lint the single repository.
-              const lintReturnValue = await lint( [ repo ], options );
-
-              // Check linting result
-              if ( !lintReturnValue.ok ) {
-
-                // Collect the failed repository and its errors
-                failedRepos.push( {
-                  repo: repo,
-                  errors: lintReturnValue.errors || lintReturnValue.message || 'Unknown lint error'
-                } );
-                console.log( `✖ Lint failed: ${repo}` );
-              }
-              else {
-                console.log( `✔ Lint passed: ${repo}` );
-              }
-
-              // Update progress
-              processedCount++;
-              if ( options.showProgressBar ) {
-                // Example: Update a progress bar here
-                // progressBar.update(processedCount / totalRepos);
-                console.log( `Progress: ${processedCount}/${totalRepos} repositories linted.` );
-              }
-            }
-            catch( error ) {
-
-              // Handle unexpected errors during linting
-              failedRepos.push( {
-                repo: repo,
-                errors: error.message || 'Unexpected error during linting'
-              } );
-              console.error( `✖ An error occurred while trying to lint repo: ${repo}`, error );
-            }
-          }
-
-          // TODO: https://github.com/phetsims/chipper/issues/1468 Clean up debugging output
-          // console.log( `Worker ${workerId} has completed all assigned repositories.` );
-        };
-
-        // TODO: https://github.com/phetsims/chipper/issues/1468 fine tune the number of workers
-        const numWorkers = 4;
-        const workers = _.times( numWorkers, i => worker( i + 1 ) );
-
-        // Wait for all workers to complete
-        await Promise.all( workers );
-
-        // After all workers have finished, check for any failed repositories
-        if ( failedRepos.length > 0 ) {
-          console.log( `\nLinting completed with ${failedRepos.length} error(s):` );
-
-          // Iterate through failedRepos and log each error
-          failedRepos.forEach( ( fail, index ) => {
-            console.log( `${index + 1}. Repository: ${fail.repo}` );
-            console.log( `   Error: ${fail.errors}` );
-          } );
-
-          // Fail the Grunt task with a summary of failures
-          grunt.fail.fatal( `Linting failed for ${failedRepos.length} out of ${totalRepos} repositories.` );
-        }
-        else {
-          // If all repositories passed linting
-          console.log( 'All repositories linted successfully.' );
-        }
-      }
-
-      const options = {
+      const lintReturnValue = await lint( activeRepos, {
         cache: cache,
         fix: fix,
         chipAway: chipAway,
-        showProgressBar: false
-      };
+        showProgressBar: showProgressBar
+      } );
 
-      // Call the function with activeRepos and options
-      await lintRepositoriesWithWorkers( activeRepos, options )
-        .catch( error => {
-          // Handle any unexpected errors that occurred outside the worker processing
-          console.error( 'An unexpected error occurred during linting:', error );
-          grunt.fail.fatal( 'Linting process encountered an unexpected error.' );
-        } );
+      // Output results on errors.
+      if ( !lintReturnValue.ok ) {
+        grunt.fail.fatal( 'Lint failed' );
+      }
     }
   } ) );
 
