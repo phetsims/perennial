@@ -13,6 +13,7 @@ module.exports = {
         project: [
 
           // Support both perennial and perennial-alias
+          // TODO: This was likely missed when pointing everything to chipper/tsconfig/eslint-all/tsconfig.json, see https://github.com/phetsims/chipper/issues/1468
           __dirname + '/tsconfig.json'
         ]
       }
