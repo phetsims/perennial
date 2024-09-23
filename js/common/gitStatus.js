@@ -17,7 +17,6 @@ const assert = require( 'assert' );
  * @public
  *
  * @param {string} repo - The repository name
- * @returns {Promise.<{symbolicRef:string, branch:string, sha:string, status:string, [trackingBranch:string}, [ahead:number], [behind:number]}>}
  */
 module.exports = async function( repo ) {
   assert( typeof repo === 'string' );
