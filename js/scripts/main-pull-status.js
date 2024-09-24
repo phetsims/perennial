@@ -37,6 +37,9 @@ const transpile = process.argv.includes( '--transpile' );
 // Log all repos, even if nothing changed with them.
 const allRepos = process.argv.includes( '--all' );
 
+// Pulling repos in parallel doesn't work on Windows git.  This is a workaround for that.
+const slowPull = process.argv.includes( '--slowPull' );
+
 // ANSI escape sequences to move to the right (in the same line) or to apply or reset colors
 const moveRight = ' \u001b[42G';
 const red = '\u001b[31m';
@@ -119,7 +122,17 @@ const getStatus = async repo => {
 };
 
 ( async () => {
-  await Promise.all( repos.map( repo => getStatus( repo ) ) );
+
+  if ( slowPull ) {
+
+    // Await each repo to pull them in sequence.
+    for ( const repo of repos ) {
+      await getStatus( repo );
+    }
+  }
+  else {
+    await Promise.all( repos.map( repo => getStatus( repo ) ) );
+  }
 
   repos.forEach( repo => {
     process.stdout.write( data[ repo ] );
