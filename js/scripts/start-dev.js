@@ -9,6 +9,10 @@
  * 3. Starts a watch-mode transpiler once the server is up.
  * 4. Handles graceful termination of both processes on receiving termination signals.
  *
+ * Run this from your root level directory containing all PhET repositories.
+ * Example usage:
+ * node perennial/js/scripts/start-dev.js
+ *
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 
