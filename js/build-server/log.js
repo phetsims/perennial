@@ -8,7 +8,7 @@
 
 const constants = require( './constants' );
 const winston = require( 'winston' );
-const Loggly = require( 'winston-loggly' ).Loggly; // eslint-disable-line no-property-in-require-statement
+const Loggly = require( 'winston-loggly' ).Loggly; // eslint-disable-line phet/no-property-in-require-statement
 
 const loggly_options = { subdomain: 'build-server', inputToken: 'none' };
 

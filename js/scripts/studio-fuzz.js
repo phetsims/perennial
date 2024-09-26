@@ -13,7 +13,8 @@ const path = require( 'path' );
 
 ( async () => {
 
-  while ( true ) { // eslint-disable-line no-constant-condition
+  // TODO why don't we need the no-constant-condition disable? See https://github.com/phetsims/chipper/issues/1451
+  while ( true ) {
     let studioFuzz = null;
 
     console.log( 'starting new fuzz' );

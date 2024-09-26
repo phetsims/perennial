@@ -3,9 +3,9 @@
 
 
 const constants = require( './constants' );
-const fs = require( 'graceful-fs' ); // eslint-disable-line require-statement-match
+const fs = require( 'graceful-fs' ); // eslint-disable-line phet/require-statement-match
 const getSortedVersionDirectories = require( './getSortedVersionDirectories' );
-const parseString = require( 'xml2js' ).parseString; // eslint-disable-line no-property-in-require-statement
+const parseString = require( 'xml2js' ).parseString; // eslint-disable-line phet/no-property-in-require-statement
 const winston = require( 'winston' );
 
 async function getJsonFromXML( xmlString ) {

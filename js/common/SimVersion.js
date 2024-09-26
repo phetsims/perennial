@@ -37,8 +37,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-/* eslint-env browser, node */
-
 ( function( global ) {
 
   // To support loading in Node.js and the browser

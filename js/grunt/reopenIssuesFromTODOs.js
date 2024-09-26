@@ -4,7 +4,7 @@
 const process = require( 'process' );
 const fs = require( 'fs' );
 const _ = require( 'lodash' );
-const Octokit = require( '@octokit/rest' ); // eslint-disable-line require-statement-match
+const Octokit = require( '@octokit/rest' ); // eslint-disable-line phet/require-statement-match
 
 const execute = require( '../common/execute' );
 const buildLocal = require( '../common/buildLocal' );

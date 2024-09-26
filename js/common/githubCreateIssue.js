@@ -7,7 +7,7 @@
  */
 
 const buildLocal = require( './buildLocal' );
-const Octokit = require( '@octokit/rest' ); // eslint-disable-line require-statement-match
+const Octokit = require( '@octokit/rest' ); // eslint-disable-line phet/require-statement-match
 const _ = require( 'lodash' );
 const winston = require( 'winston' );
 

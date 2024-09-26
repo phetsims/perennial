@@ -5,9 +5,6 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-/* eslint-env node */
-
-
 const SimVersion = require( './SimVersion' );
 const qunit = require( 'qunit' );
 

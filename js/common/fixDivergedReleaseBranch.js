@@ -19,7 +19,7 @@ const gitPush = require( './gitPush' );
 const gitRevParse = require( './gitRevParse' );
 const winston = require( 'winston' );
 const buildLocal = require( './buildLocal' );
-const Octokit = require( '@octokit/rest' ); // eslint-disable-line require-statement-match
+const Octokit = require( '@octokit/rest' ); // eslint-disable-line phet/require-statement-match
 
 /**
  * Does some branch changes so that a releaseBranch's dependency SHA matches a named branch

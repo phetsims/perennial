@@ -1,8 +1,5 @@
 // Copyright 2023, University of Colorado Boulder
 
-/* eslint-disable default-import-match-filename */
-
-
 /**
  * Append a note about contributing and a link to the contributing
  * doc in this repo to core common repos then commit. This script

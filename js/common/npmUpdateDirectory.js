@@ -9,7 +9,7 @@
 const execute = require( './execute' );
 const npmCommand = require( './npmCommand' );
 const winston = require( 'winston' );
-const asyncMutex = require( 'async-mutex' ); // eslint-disable-line require-statement-match
+const asyncMutex = require( 'async-mutex' ); // eslint-disable-line phet/require-statement-match
 
 const mutex = new asyncMutex.Mutex();
 

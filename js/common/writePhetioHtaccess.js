@@ -5,7 +5,7 @@ const buildLocal = require( './buildLocal' );
 const devScp = require( './devScp' );
 const writeFile = require( './writeFile' );
 const axios = require( 'axios' );
-const fs = require( 'graceful-fs' ); // eslint-disable-line require-statement-match
+const fs = require( 'graceful-fs' ); // eslint-disable-line phet/require-statement-match
 const winston = require( 'winston' );
 
 // A list of directories directly nested under the phet-io build output folder that should be password protected. Slashes

@@ -2,7 +2,7 @@
 // @author Matt Pennington (PhET Interactive Simulations)
 
 
-const fs = require( 'graceful-fs' ); // eslint-disable-line require-statement-match
+const fs = require( 'graceful-fs' ); // eslint-disable-line phet/require-statement-match
 
 /**
  * Define a helper function that will get a list of the PhET-style version directories at the given path.  The

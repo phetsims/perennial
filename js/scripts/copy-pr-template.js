@@ -11,7 +11,6 @@
 import { execSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync } from 'node:fs';
 
-// eslint-disable-next-line default-import-match-filename
 import coreCommonRepos from './core-common-repos.js';
 import { join, dirname } from 'node:path';
 import { cwd, chdir } from 'node:process';

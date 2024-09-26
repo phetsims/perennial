@@ -1,7 +1,7 @@
 // Copyright 2021, University of Colorado Boulder
 
 const fs = require( 'fs' );
-// eslint-disable-next-line require-statement-match
+// eslint-disable-next-line phet/require-statement-match
 const csv = require( 'csv-parser' );
 
 const filePath = process.argv[ 2 ];
