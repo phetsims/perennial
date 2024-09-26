@@ -13,7 +13,6 @@ const path = require( 'path' );
 
 ( async () => {
 
-  // TODO why don't we need the no-constant-condition disable? See https://github.com/phetsims/chipper/issues/1451
   while ( true ) {
     let studioFuzz = null;
 
