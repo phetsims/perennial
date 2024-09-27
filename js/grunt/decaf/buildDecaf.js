@@ -6,7 +6,6 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-
 const assert = require( 'assert' );
 const execute = require( '../../common/execute' );
 const copyFile = require( '../../common/copyFile' );

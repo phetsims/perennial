@@ -26,6 +26,6 @@ module.exports = file => {
     return docLines.join( '\n' );
   }
   else {
-    return 'No documentation found';
+    return 'No documentation';
   }
 };
