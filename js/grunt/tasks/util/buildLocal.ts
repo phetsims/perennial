@@ -4,7 +4,7 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-import * as grunt from 'grunt';
+import grunt from 'grunt';
 
 let buildLocal: any;
 try {

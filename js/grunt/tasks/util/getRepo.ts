@@ -4,7 +4,7 @@ import assert from 'assert';
 /**
  * @author Sam Reid (PhET Interactive Simulations)
  */
-import * as grunt from 'grunt';
+import grunt from 'grunt';
 import process from 'process';
 import getOption from './getOption';
 
