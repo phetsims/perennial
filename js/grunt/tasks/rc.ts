@@ -1,13 +1,12 @@
 // Copyright 2024, University of Colorado Boulder
 
 /**
- *  'Deploys an rc version of the simulation\n' +
- *   '--repo : The name of the repository to deploy\n' +
- *   '--branch : The release branch name (e.g. "1.7") that should be used for deployment\n' +
- *   '--brands : A comma-separated list of brand names to deploy\n' +
- *   '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out\n' +
- *   '--message : An optional message that will be appended on version-change commits.',
- *
+ * Deploys an rc version of the simulation
+ * --repo : The name of the repository to deploy
+ * --branch : The release branch name (e.g. "1.7") that should be used for deployment
+ * --brands : A comma-separated list of brand names to deploy
+ * --noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out
+ * --message : An optional message that will be appended on version-change commits.
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 

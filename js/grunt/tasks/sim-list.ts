@@ -2,9 +2,9 @@
 
 import winston from 'winston';
 /**
- *   'Prints out a list of live production HTML sims to stderr (can be filtered from other stdout output)\n' +
- *   '--versions : Outputs the sim version after its name.',
- *   @author Michael Kauzmann (PhET Interactive Simulations)
+ * Prints out a list of live production HTML sims to stderr (can be filtered from other stdout output)
+ * --versions : Outputs the sim version after its name.
+ * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import simMetadata from '../../common/simMetadata';
 import getOption from './util/getOption.ts';

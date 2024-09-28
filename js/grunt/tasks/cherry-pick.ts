@@ -1,11 +1,10 @@
 // Copyright 2024, University of Colorado Boulder
 
 /**
- *   'Runs cherry-pick on a list of SHAs until one works. Reports success or failure\n' +
- *   '--repo : The repository to cherry-pick on\n' +
- *   '--shas : Comma-separated list of SHAs to try',
- *
- *   @author Michael Kauzmann (PhET Interactive Simulations)
+ * Runs cherry-pick on a list of SHAs until one works. Reports success or failure
+ * --repo : The repository to cherry-pick on
+ * --shas : Comma-separated list of SHAs to try
+ * @author Michael Kauzmann (PhET Interactive Simulations)
  *
  */
 import assert from 'assert';

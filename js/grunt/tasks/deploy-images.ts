@@ -2,10 +2,10 @@
 
 
 /**
- * 'Rebuilds all images\n' +
- *   '--simulation : Optional. If present, only the given simulation will receive images from main. If absent, all sims' +
- *   'will receive images from main.',
- *   @author Michael Kauzmann (PhET Interactive Simulations)
+ * Rebuilds all images
+ * --simulation : Optional. If present, only the given simulation will receive images from main. If absent, all sims' +
+ * will receive images from main.
+ * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
 import deployImages from '../deployImages';

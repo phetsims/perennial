@@ -1,12 +1,11 @@
 // Copyright 2024, University of Colorado Boulder
 
 /**
- *   'Check out a specific timestamp for a simulation and all of its declared dependencies\n' +
- *   '--repo : repository name where package.json should be read from\n' +
- *   '--timestamp : the timestamp to check things out for, e.g. --timestamp="Jan 08 2018"\n' +
- *   '--skipNpmUpdate : If provided, will prevent the usual npm update',
- *
- *   @author Michael Kauzmann (PhET Interactive Simulations)
+ * Check out a specific timestamp for a simulation and all of its declared dependencies
+ * --repo : repository name where package.json should be read from
+ * --timestamp : the timestamp to check things out for, e.g. --timestamp="Jan 08 2018"
+ * --skipNpmUpdate : If provided, will prevent the usual npm update
+ * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';
 import assertIsValidRepoName from '../../common/assertIsValidRepoName';

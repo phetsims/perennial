@@ -1,13 +1,12 @@
 // Copyright 2024, University of Colorado Boulder
 
 /**
- * 'Deploys a one-off version of the simulation (using the current or specified branch)\n' +
- *   '--repo : The name of the repository to deploy\n' +
- *   '--branch : The name of the one-off branch (the name of the one-off)\n' +
- *   '--brands : A comma-separated list of brand names to deploy\n' +
- *   '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out\n' +
- *   '--message : An optional message that will be appended on version-change commits.',
- *
+ * Deploys a one-off version of the simulation (using the current or specified branch)
+ * --repo : The name of the repository to deploy
+ * --branch : The name of the one-off branch (the name of the one-off)
+ * --brands : A comma-separated list of brand names to deploy
+ * --noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out
+ * --message : An optional message that will be appended on version-change commits.
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 

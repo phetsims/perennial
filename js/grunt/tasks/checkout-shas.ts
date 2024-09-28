@@ -1,10 +1,10 @@
 // Copyright 2024, University of Colorado Boulder
 
 /**
- *  'Check out shas for a project, as specified in dependencies.json\n' +
- *   '--repo : repository name where package.json should be read from\n' +
- *   '--skipNpmUpdate : If provided, will prevent the usual npm update\n' +
- *   '--buildServer : If provided, it will read dependencies from the build-server temporary location (and will skip npm update)',
+ * Check out shas for a project, as specified in dependencies.json
+ * --repo : repository name where package.json should be read from
+ * --skipNpmUpdate : If provided, will prevent the usual npm update
+ * --buildServer : If provided, it will read dependencies from the build-server temporary location (and will skip npm update)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';

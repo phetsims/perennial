@@ -1,9 +1,9 @@
 // Copyright 2024, University of Colorado Boulder
 
 /**
- *   'Runs npm update/prune for chipper, perennial-alias and the given repository\n' +
- *   '--repo : The repository to update',
- *   @author Michael Kauzmann (PhET Interactive Simulations)
+ * Runs npm update/prune for chipper, perennial-alias and the given repository
+ * --repo : The repository to update
+ * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
 import assert from 'assert';

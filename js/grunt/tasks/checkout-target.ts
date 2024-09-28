@@ -1,12 +1,11 @@
 // Copyright 2024, University of Colorado Boulder
 
 /**
- *  'Check out a specific branch/SHA for a simulation and all of its declared dependencies\n' +
- *   '--repo : repository name where package.json should be read from\n' +
- *   '--target : the branch/SHA to check out\n' +
- *   '--branch : alias for --target\n' +
- *   '--skipNpmUpdate : If provided, will prevent the usual npm update',
- *
+ * Check out a specific branch/SHA for a simulation and all of its declared dependencies
+ * --repo : repository name where package.json should be read from
+ * --target : the branch/SHA to check out
+ * --branch : alias for --target
+ * --skipNpmUpdate : If provided, will prevent the usual npm update
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';

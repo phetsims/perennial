@@ -1,12 +1,11 @@
 // Copyright 2024, University of Colorado Boulder
 
 /**
- *  'Deploys a dev version of the simulation\n' +
- *   '--repo : The name of the repository to deploy\n' +
- *   '--brands : A comma-separated list of brand names to deploy\n' +
- *   '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out\n' +
- *   '--message : An optional message that will be appended on version-change commits.',
- *
+ * Deploys a dev version of the simulation
+ * --repo : The name of the repository to deploy
+ * --brands : A comma-separated list of brand names to deploy
+ * --noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out
+ * --message : An optional message that will be appended on version-change commits.
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';
@@ -21,6 +20,5 @@ import getOption from './util/getOption';
   const repo = getOption( 'repo' );
   assertIsValidRepoName( repo );
 
-  await dev( repo, getOption( 'brands' ).split( ',' ), !!getOption( 'noninteractive' ), 'main',
-    getOption( 'message' ) );
+  await dev( repo, getOption( 'brands' ).split( ',' ), !!getOption( 'noninteractive' ), 'main', getOption( 'message' ) );
 } )();
