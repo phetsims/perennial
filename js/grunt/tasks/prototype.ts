@@ -1,14 +1,13 @@
 // Copyright 2024, University of Colorado Boulder
 
 /**
- * 'Deploys a production (prototype) version of the simulation\n' +
- *   '--repo : The name of the repository to deploy\n' +
- *   '--branch : The release branch name (e.g. "1.7") that should be used for deployment\n' +
- *   '--brands : A comma-separated list of brand names to deploy\n' +
- *   '--noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out\n' +
- *   '--redeploy: If specified with noninteractive, allow the production deploy to have the same version as the previous deploy\n' +
- *   '--message : An optional message that will be appended on version-change commits.',
- *
+ * Deploys a production (prototype) version of the simulation
+ * --repo : The name of the repository to deploy
+ * --branch : The release branch name (e.g. "1.7") that should be used for deployment
+ * --brands : A comma-separated list of brand names to deploy
+ * --noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out
+ * --redeploy: If specified with noninteractive, allow the production deploy to have the same version as the previous deploy
+ * --message : An optional message that will be appended on version-change commits.
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';

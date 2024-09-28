@@ -5,7 +5,6 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-
 const puppeteer = require( 'puppeteer' );
 
 module.exports = async url => {

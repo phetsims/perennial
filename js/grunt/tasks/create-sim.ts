@@ -1,12 +1,11 @@
 // Copyright 2024, University of Colorado Boulder
 
 /**
- *  'Creates a sim based on the simula-rasa template.\n' +
- *   '--repo="string" : the repository name\n' +
- *   '--author="string" : the author name\n' +
- *   '--title="string" : (optional) the simulation title\n' +
- *   '--clean=true : (optional) deletes the repository directory if it exists',
- *
+ * Creates a sim based on the simula-rasa template.
+ * --repo="string" : the repository name
+ * --author="string" : the author name
+ * --title="string" : (optional) the simulation title
+ * --clean=true : (optional) deletes the repository directory if it exists
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';

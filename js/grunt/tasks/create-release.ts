@@ -1,12 +1,12 @@
 // Copyright 2024, University of Colorado Boulder
 
 /**
- *   'Creates a new release branch for a given simulation\n' +
- *   '--repo : The repository to add the release branch to\n' +
- *   '--branch : The branch name, which should be {{MAJOR}}.{{MINOR}}, e.g. 1.0\n' +
- *   '--brands : The supported brands for the release, comma separated.\n' +
- *   '--message : An optional message that will be appended on version-change commits.',
- *   @author Michael Kauzmann (PhET Interactive Simulations)
+ * Creates a new release branch for a given simulation
+ * --repo : The repository to add the release branch to
+ * --branch : The branch name, which should be {{MAJOR}}.{{MINOR}}, e.g. 1.0
+ * --brands : The supported brands for the release, comma separated.
+ * --message : An optional message that will be appended on version-change commits.
+ * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
 import assert from 'assert';

@@ -1,10 +1,9 @@
 // Copyright 2024, University of Colorado Boulder
 
 /**
- *   'Prints out a list of all release branches that would need maintenance patches\n' +
- *   '--repo : Only show branches for a specific repository\n' +
- *   '--order=<ORDER> : alphabetical|date',
- */
+ * Prints out a list of all release branches that would need maintenance patches
+ * --repo : Only show branches for a specific repository
+ * --order=<ORDER> : alphabetical|date */
 import assert from 'assert';
 import _ from 'lodash';
 import winston from 'winston';
