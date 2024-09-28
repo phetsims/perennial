@@ -1139,7 +1139,7 @@ module.exports = ( function() {
     /**
      * @public
      * @param {function(ReleaseBranch):boolean} filterRepo - return false if the ReleaseBranch should be excluded.
-     * @param {function} checkUnreleasedBranches - If false, will skip checking for unreleased branches. This checking needs all repos checked out
+     * @param {boolean} checkUnreleasedBranches - If false, will skip checking for unreleased branches. This checking needs all repos checked out
      * @param {boolean} forceCacheBreak=false - true if you want to force a recalculation of all ReleaseBranches
      @param {Maintenance} maintenance=Maintenance.load() - by default load from saved file the current maintenance instance.
      * @returns {Promise.<Array.<ReleaseBranch>>}

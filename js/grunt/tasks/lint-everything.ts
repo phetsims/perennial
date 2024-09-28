@@ -1,7 +1,15 @@
 // Copyright 2024, University of Colorado Boulder
 
-grunt.registerTask( 'lint-everything', 'lint all js files for all repos', wrapTask( async () => {
-  import getDataFile from '../../common/getDataFile';
+/**
+ * lint all js files for all repos
+ * @author Michael Kauzmann (PhET Interactive Simulations)
+ */
+
+import grunt from 'grunt';
+import getDataFile from '../../common/getDataFile';
+import getOption from './util/getOption';
+
+( async () => {
 
   // --disable-eslint-cache disables the cache, useful for developing rules
   const cache = !getOption( 'disable-eslint-cache' );
@@ -33,4 +41,4 @@ grunt.registerTask( 'lint-everything', 'lint all js files for all repos', wrapTa
       grunt.fail.fatal( 'Lint failed' );
     }
   }
-} ) );
+} )();

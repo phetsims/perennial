@@ -8,4 +8,4 @@
 
 import updateGithubPages from '../../common/updateGithubPages';
 
-( ( async () => updateGithubPages() ) )()
+( ( async () => updateGithubPages() ) )();

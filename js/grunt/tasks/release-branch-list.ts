@@ -25,7 +25,8 @@ import getOption from './util/getOption';
 
   assert( order === 'alphabetical' || order === 'date' );
 
-  const branches = await Maintenance.getMaintenanceBranches( releaseBranch => !repo || releaseBranch.repo === repo, true, true );
+  const branches = await Maintenance.getMaintenanceBranches( releaseBranch => !repo || releaseBranch.repo === repo,
+    true, true );
 
   let structures = [];
   for ( const branch of branches ) {

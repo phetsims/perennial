@@ -1,7 +1,10 @@
 // Copyright 2024, University of Colorado Boulder
 
-grunt.registerTask( 'clone-missing-repos', 'Clones missing repos', wrapTask( async () => {
-  import cloneMissingRepos from '../../common/cloneMissingRepos';
+/**
+ * Clones any repos not currently checked out in the code base.
+ * @author Michael Kauzmann (PhET Interactive Simulations)
+ */
 
-  await cloneMissingRepos();
-} ) );
+import cloneMissingRepos from '../../common/cloneMissingRepos';
+
+( async () => await cloneMissingRepos() )();
