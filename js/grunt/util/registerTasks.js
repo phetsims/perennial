@@ -13,6 +13,7 @@ const fs = require( 'fs' );
 const getDocumentationForTask = require( './getDocumentationForTask' );
 const path = require( 'path' );
 const gruntSpawn = require( './gruntSpawn' );
+const assert = require( 'assert' );
 
 // Constants
 const isWindows = /^win/.test( process.platform );
