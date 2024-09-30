@@ -26,6 +26,8 @@ function execTask( grunt, taskFilename ) {
 }
 
 module.exports = ( grunt, dir ) => {
+  assert( fs.existsSync( dir ), `dir does not exist: ${dir}` );
+
   // Load each file from tasks/ and register it as a task
   fs.readdirSync( dir ).forEach( file => {
     if ( file.endsWith( '.js' ) || file.endsWith( '.ts' ) ) {
