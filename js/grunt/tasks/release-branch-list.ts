@@ -3,7 +3,10 @@
 /**
  * Prints out a list of all release branches that would need maintenance patches
  * --repo : Only show branches for a specific repository
- * --order=<ORDER> : alphabetical|date */
+ * --order=<ORDER> : alphabetical|date
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * */
+
 import assert from 'assert';
 import _ from 'lodash';
 import winston from 'winston';

@@ -13,7 +13,7 @@ import getOption from './util/getOption';
 
 ( async () => {
 
-  // TODO: use getRepo?
+  // TODO: use getRepo? https://github.com/phetsims/chipper/issues/1464
   const repo = getOption( 'repo' );
   assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 

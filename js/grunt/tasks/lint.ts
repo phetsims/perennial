@@ -14,7 +14,7 @@ import getOption from './util/getOption.ts';
 ( async () => {
 
   const index = process.argv.indexOf( 'lint' );
-  assert && assert( index >= 0, 'lint command does not appear' );
+  assert( index >= 0, 'lint command does not appear' );
   const tail = process.argv.slice( index + 1 );
 
   if ( !getOption( 'repos' ) ) {
