@@ -8,4 +8,4 @@
 
 import Maintenance from '../../common/Maintenance';
 
-( async () => await Maintenance.startREPL() )();
+( async () => Maintenance.startREPL() )();

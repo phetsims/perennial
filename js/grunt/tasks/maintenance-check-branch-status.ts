@@ -10,4 +10,4 @@ import Maintenance from '../../common/Maintenance';
 
 winston.default.transports.console.level = 'error';
 
-( async () => await Maintenance.checkBranchStatus() )();
+( async () => Maintenance.checkBranchStatus() )();

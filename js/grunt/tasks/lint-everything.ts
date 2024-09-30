@@ -20,15 +20,15 @@ import getOption from './util/getOption';
 
   let lint;
   try {
-    lint = require( '../../../chipper/js/grunt/lint' );
+    lint = ( await import( '../../../../chipper/js/grunt/lint.js' ) ).default;
   }
   catch( e ) {
     console.log( 'lint process not found, is your chipper repo up to date?' );
-    lint = {};
+    lint;
   }
 
   // The APIs are the same for these two versions of lint support
-  if ( lint.chipperAPIVersion === 'promisesPerRepo1' || lint.chipperAPIVersion === 'npx' ) {
+  if ( lint && ( lint.chipperAPIVersion === 'promisesPerRepo1' || lint.chipperAPIVersion === 'npx' ) ) {
     const lintReturnValue = await lint( activeRepos, {
       cache: cache,
       fix: fix,

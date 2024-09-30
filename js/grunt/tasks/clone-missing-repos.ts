@@ -7,4 +7,4 @@
 
 import cloneMissingRepos from '../../common/cloneMissingRepos';
 
-( async () => await cloneMissingRepos() )();
+( async () => cloneMissingRepos() )();

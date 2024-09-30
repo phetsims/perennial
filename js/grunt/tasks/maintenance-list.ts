@@ -6,4 +6,4 @@
  */
 import Maintenance from '../../common/Maintenance';
 
-( async () => await Maintenance.list() )();
+( async () => Maintenance.list() )();
