@@ -9,5 +9,5 @@ import nodeEslintConfig from '../chipper/eslint/node.eslint.config.mjs';
  */
 export default [
   ...nodeEslintConfig,
-  ...buildtoolsEslintConfig
+  buildtoolsEslintConfig
 ];
