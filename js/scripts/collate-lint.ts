@@ -12,7 +12,6 @@
  */
 ( () => {
 
-  // @ts-expect-error Deno isn't a dependency of perennial yet, this is just an experiment.
   const text: string = Deno.readTextFileSync( './lintreport.txt' );
 
   const lines: string[] = text.split( '\n' );
