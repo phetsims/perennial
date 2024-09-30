@@ -7,4 +7,4 @@
 
 import checkoutMainAll from '../checkoutMainAll';
 
-checkoutMainAll();
+( async () => checkoutMainAll() )();
