@@ -6,6 +6,16 @@
  */
 
 ( async () => {
+  const Maintenance = require( '../../js/common/Maintenance.js' );
+  const m = Maintenance;
+
+  const setUpPatch = async ( patchName, sha, repo = 'density-buoyancy-common' ) => {
+    await m.createPatch( repo, 'for rc.2', patchName );
+    await m.addPatchSHA( patchName, sha );
+    await m.addNeededPatch( 'density', '1.2', patchName );
+    await m.addNeededPatch( 'buoyancy', '1.2', patchName );
+    await m.addNeededPatch( 'buoyancy-basics', '1.2', patchName );
+  }
 
   //////////////////////////////////////////////////////////////
   // SORT IMPORTS IN DBC: https://github.com/phetsims/chipper/issues/1462
@@ -30,14 +40,21 @@
 
   ////////////////////////////////////////////
   // Fix mass interrupting and reset/focus handling for https://github.com/phetsims/density-buoyancy-common/issues/399
-  const x = await m.getMaintenanceBranches();
-  Maintenance.loadAllMaintenanceBranches();
-  m.reset();
-  await m.createPatch( 'density-buoyancy-common', 'https://github.com/phetsims/density-buoyancy-common/issues/399', 'massReset' );
-  await m.addPatchSHA( 'massReset', '5d5dc60ef63906207978e0473603950372c3f5fc' );
-  await m.addNeededPatch( 'density', '1.2', 'massReset' );
-  await m.addNeededPatch( 'buoyancy', '1.2', 'massReset' );
-  await m.addNeededPatch( 'buoyancy-basics', '1.2', 'massReset' );
-  await m.applyPatches();
-  await m.updateDependencies();
+  // Maintenance.loadAllMaintenanceBranches();
+  // m.reset();
+  // await m.createPatch( 'density-buoyancy-common', 'https://github.com/phetsims/density-buoyancy-common/issues/399', 'massReset' );
+  // await m.addPatchSHA( 'massReset', '5d5dc60ef63906207978e0473603950372c3f5fc' );
+  // await m.addNeededPatch( 'density', '1.2', 'massReset' );
+  // await m.addNeededPatch( 'buoyancy', '1.2', 'massReset' );
+  // await m.addNeededPatch( 'buoyancy-basics', '1.2', 'massReset' );
+  // await m.applyPatches();
+  // await m.updateDependencies();
+
+
+  ////////////////////////////////////////////////////////
+  // interrupt boat on scene reset https://github.com/phetsims/density-buoyancy-common/issues/410
+  // https://github.com/phetsims/density-buoyancy-common/commit/729551166f916f180ed428db2761ee4bff26dd2a
+  // await setUpPatch( 'interruptBoatAndBlock', '729551166f916f180ed428db2761ee4bff26dd2a' );
+  // m.applyPatches()
+  // m.updateDependencies();
 } )();
