@@ -9,26 +9,35 @@
 
   //////////////////////////////////////////////////////////////
   // SORT IMPORTS IN DBC: https://github.com/phetsims/chipper/issues/1462
-  m.reset();
-  // https://github.com/phetsims/density-buoyancy-common/commit/6ba45b6a5fdbece5cba9590f520571a529697b35
-  await m.createPatch( 'density-buoyancy-common', 'https://github.com/phetsims/chipper/issues/1462', 'sortImports' );
-  await m.addPatchSHA( 'sortImports', '6ba45b6a5fdbece5cba9590f520571a529697b35' );
-  await m.addNeededPatch( 'density', '1.2', 'sortImports' );
-  await m.addNeededPatch( 'buoyancy', '1.2', 'sortImports' );
-  await m.addNeededPatch( 'buoyancy-basics', '1.2', 'sortImports' );
-
-  await m.applyPatches();
-  // nope
-  await m.checkoutBranch( 'density', '1.2');
-  // git cherry-pick 6ba45b6a5fdbece5cba9590f520571a529697b35
-  // three files, manual optimize
-  // git add .
-  // git cherry-pick --continue
-  // f4ba786b73564b570267978acddd231a5758d9c4
-  await m.addPatchSHA( 'sortImports', 'f4ba786b73564b570267978acddd231a5758d9c4' );
-  await m.updateDependencies();
+  // m.reset();
+  // // https://github.com/phetsims/density-buoyancy-common/commit/6ba45b6a5fdbece5cba9590f520571a529697b35
+  // await m.createPatch( 'density-buoyancy-common', 'https://github.com/phetsims/chipper/issues/1462', 'sortImports' );
+  // await m.addPatchSHA( 'sortImports', '6ba45b6a5fdbece5cba9590f520571a529697b35' );
+  // await m.addNeededPatch( 'density', '1.2', 'sortImports' );
+  // await m.addNeededPatch( 'buoyancy', '1.2', 'sortImports' );
+  // await m.addNeededPatch( 'buoyancy-basics', '1.2', 'sortImports' );
+  //
+  // await m.applyPatches();
+  // // nope
+  // await m.checkoutBranch( 'density', '1.2');
+  // // git cherry-pick 6ba45b6a5fdbece5cba9590f520571a529697b35
+  // // three files, manual optimize
+  // // git add .
+  // // git cherry-pick --continue
+  // // f4ba786b73564b570267978acddd231a5758d9c4
+  // await m.addPatchSHA( 'sortImports', 'f4ba786b73564b570267978acddd231a5758d9c4' );
+  // await m.updateDependencies();
 
   ////////////////////////////////////////////
-
-
+  // Fix mass interrupting and reset/focus handling for https://github.com/phetsims/density-buoyancy-common/issues/399
+  const x = await m.getMaintenanceBranches();
+  Maintenance.loadAllMaintenanceBranches();
+  m.reset();
+  await m.createPatch( 'density-buoyancy-common', 'https://github.com/phetsims/density-buoyancy-common/issues/399', 'massReset' );
+  await m.addPatchSHA( 'massReset', '5d5dc60ef63906207978e0473603950372c3f5fc' );
+  await m.addNeededPatch( 'density', '1.2', 'massReset' );
+  await m.addNeededPatch( 'buoyancy', '1.2', 'massReset' );
+  await m.addNeededPatch( 'buoyancy-basics', '1.2', 'massReset' );
+  await m.applyPatches();
+  await m.updateDependencies();
 } )();
