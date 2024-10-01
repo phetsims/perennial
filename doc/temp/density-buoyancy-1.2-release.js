@@ -15,6 +15,8 @@
     await m.addNeededPatch( 'density', '1.2', patchName );
     await m.addNeededPatch( 'buoyancy', '1.2', patchName );
     await m.addNeededPatch( 'buoyancy-basics', '1.2', patchName );
+
+    await m.applyPatches();
   }
 
   //////////////////////////////////////////////////////////////
@@ -57,4 +59,9 @@
   // await setUpPatch( 'interruptBoatAndBlock', '729551166f916f180ed428db2761ee4bff26dd2a' );
   // m.applyPatches()
   // m.updateDependencies();
+
+  ////////////////////////////////////////////////////////
+  // Fix memory leak: https://github.com/phetsims/density-buoyancy-common/issues/395
+  // await setUpPatch( 'disposeKeyboardListener', '1d6d8d570d34b085ab1be3784a0803ae7d82415f', 'scenery-phet' );
+  // await m.updateDependencies();
 } )();
