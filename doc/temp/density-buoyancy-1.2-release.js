@@ -64,4 +64,9 @@
   // Fix memory leak: https://github.com/phetsims/density-buoyancy-common/issues/395
   // await setUpPatch( 'disposeKeyboardListener', '1d6d8d570d34b085ab1be3784a0803ae7d82415f', 'scenery-phet' );
   // await m.updateDependencies();
+
+  ////////////////////////////////////////////////////////
+  // Fix max width for fallback text, see https://github.com/phetsims/density-buoyancy-common/issues/394
+  await setUpPatch( 'maxWidthFallbackText', '234443020a88a811a2c932ac0fb83d4d6ba2a85d' );
+  await m.updateDependencies();
 } )();
