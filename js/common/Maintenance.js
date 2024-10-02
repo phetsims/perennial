@@ -727,9 +727,10 @@ module.exports = ( function() {
      * @public
      */
     static async applyPatches() {
+      winston.info( 'applying patches' );
+      const maintenance = Maintenance.load();
 
       let success = true;
-      const maintenance = Maintenance.load();
       let numApplied = 0;
 
       for ( const modifiedBranch of maintenance.modifiedBranches ) {
@@ -749,23 +750,25 @@ module.exports = ( function() {
           const patchRepo = patch.repo;
 
           try {
+            let patchRepoCurrentSHA;
+
             // Checkout whatever the latest patched SHA is (if we've patched it)
             if ( modifiedBranch.changedDependencies[ patchRepo ] ) {
-              await gitCheckout( patchRepo, modifiedBranch.changedDependencies[ patchRepo ] );
+              patchRepoCurrentSHA = modifiedBranch.changedDependencies[ patchRepo ];
             }
             else {
-              // Look up the SHA to check out
+              // Look up the SHA to check out at the tip of the release branch dependencies.json
               await gitCheckout( repo, branch );
               await gitPull( repo );
               const dependencies = await getDependencies( repo );
-              const sha = dependencies[ patchRepo ].sha;
-              await gitCheckout( repo, 'main' );
-
-              // Then check it out
-              await gitCheckout( patchRepo, sha );
+              patchRepoCurrentSHA = dependencies[ patchRepo ].sha;
+              await gitCheckout( repo, 'main' ); // TODO: this assumes we were on main when we started running this. https://github.com/phetsims/perennial/issues/368
+              // TODO: see if the patchRepo has a branch for this release branch, and if so, pull it to make sure we have the above SHA https://github.com/phetsims/perennial/issues/368
             }
 
-            console.log( `Checked out ${patchRepo} SHA for ${repo} ${branch}` );
+            // Then check it out
+            await gitCheckout( patchRepo, patchRepoCurrentSHA );
+            console.log( `Checked out ${patchRepo} for ${repo} ${branch}, SHA: ${patchRepoCurrentSHA}` );
 
             for ( const sha of patch.shas ) {
 
@@ -823,6 +826,8 @@ module.exports = ( function() {
      *                                                                if this resolves to false
      */
     static async updateDependencies( filter ) {
+      winston.info( 'update dependencies' );
+
       const maintenance = Maintenance.load();
 
       for ( const modifiedBranch of maintenance.modifiedBranches ) {
