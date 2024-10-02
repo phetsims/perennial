@@ -729,6 +729,7 @@ module.exports = ( function() {
      */
     static async applyPatches() {
       winston.info( 'applying patches' );
+      winston.info( 'applying patches' );
 
       let success = true;
       const maintenance = Maintenance.load();
