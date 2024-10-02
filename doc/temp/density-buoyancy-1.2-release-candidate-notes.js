@@ -73,7 +73,13 @@
   ////////////////////////////////////////////////////////
   // densityNumberControl visibleProperty wire, see https://github.com/phetsims/density-buoyancy-common/issues/415
   // https://github.com/phetsims/density-buoyancy-common/commit/7cb3bd8a1e1115b5f3652be3508ba1f0d6a2b09c
-  await setUpPatch( 'densityNumberControlVisibleProperty', '7cb3bd8a1e1115b5f3652be3508ba1f0d6a2b09c' );
+  // await setUpPatch( 'densityNumberControlVisibleProperty', '7cb3bd8a1e1115b5f3652be3508ba1f0d6a2b09c' );
+  // await m.updateDependencies();
+
+  ////////////////////////////////////////////////////////
+  // B:B explore share usageTracker https://github.com/phetsims/density-buoyancy-common/issues/397
+  // https://github.com/phetsims/density-buoyancy-common/commit/45dc5d2946385141b6406654f3143ab0f8e2a3df
+  await setUpPatch( 'exploreGrabDragUsageTracker', '45dc5d2946385141b6406654f3143ab0f8e2a3df' );
   await m.updateDependencies();
 
 
