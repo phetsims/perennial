@@ -437,6 +437,7 @@ module.exports = ( function() {
      */
     static async addNeededPatch( repo, branch, patchName ) {
       const maintenance = Maintenance.load();
+      assert( repo !== patchName, 'Cannot patch a release branch repo, yet.' ); // TODO: remove in https://github.com/phetsims/perennial/issues/312
 
       const patch = maintenance.findPatch( patchName );
 
