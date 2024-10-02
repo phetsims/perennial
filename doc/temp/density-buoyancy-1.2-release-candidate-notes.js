@@ -21,6 +21,9 @@
     if ( success ) {
       await m.updateDependencies();
     }
+    else {
+      console.log( 'Change not cherry picked to all repos; dependencies not updated' );
+    }
   }
 
   //////////////////////////////////////////////////////////////
@@ -86,9 +89,11 @@
   // await setUpPatch( 'exploreGrabDragUsageTracker', '45dc5d2946385141b6406654f3143ab0f8e2a3df' );
   // await m.updateDependencies();
 
-  ////////////////////////////////////////////////////////
   // https://github.com/phetsims/density-buoyancy-common/issues/405
   // Avoid cascading density property changes from "hidden" fluids to the custom fluid density
-  // await cherryPickSHA( 'density-buoyancy-common', 'c22a525940eb520b74ef717f986c16ae83ab1183' );
+
+  ////////////////////////////////////////////////////////
+  // https://github.com/phetsims/density-buoyancy-common/issues/416
+  // await cherryPickSHA( 'density-buoyancy-common', '168b9a3be8daef085a09b129060d087cabcf6f2e' );
 
 } )();
