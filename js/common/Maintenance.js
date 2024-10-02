@@ -727,6 +727,8 @@ module.exports = ( function() {
      * @public
      */
     static async applyPatches() {
+
+      let success = true;
       const maintenance = Maintenance.load();
       let numApplied = 0;
 
@@ -791,6 +793,7 @@ module.exports = ( function() {
                 break;
               }
               else {
+                success = false;
                 console.log( `Could not cherry-pick ${sha}` );
               }
             }
@@ -808,6 +811,8 @@ module.exports = ( function() {
       maintenance.save();
 
       console.log( `${numApplied} patches applied` );
+
+      return success;
     }
 
     /**

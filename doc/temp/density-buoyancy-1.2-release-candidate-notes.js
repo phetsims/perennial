@@ -9,14 +9,18 @@
   const Maintenance = require( '../../js/common/Maintenance.js' );
   const m = Maintenance;
 
-  const setUpPatch = async ( patchName, sha, repo = 'density-buoyancy-common' ) => {
+  const cherryPickSHA = async ( repo, sha ) => {
+    const patchName = repo + sha;
     await m.createPatch( repo, 'for rc.2', patchName );
     await m.addPatchSHA( patchName, sha );
     await m.addNeededPatch( 'density', '1.2', patchName );
     await m.addNeededPatch( 'buoyancy', '1.2', patchName );
     await m.addNeededPatch( 'buoyancy-basics', '1.2', patchName );
 
-    await m.applyPatches();
+    const success = await m.applyPatches(); // could also throw
+    if ( success ) {
+      await m.updateDependencies();
+    }
   }
 
   //////////////////////////////////////////////////////////////
@@ -79,8 +83,12 @@
   ////////////////////////////////////////////////////////
   // B:B explore share usageTracker https://github.com/phetsims/density-buoyancy-common/issues/397
   // https://github.com/phetsims/density-buoyancy-common/commit/45dc5d2946385141b6406654f3143ab0f8e2a3df
-  await setUpPatch( 'exploreGrabDragUsageTracker', '45dc5d2946385141b6406654f3143ab0f8e2a3df' );
-  await m.updateDependencies();
+  // await setUpPatch( 'exploreGrabDragUsageTracker', '45dc5d2946385141b6406654f3143ab0f8e2a3df' );
+  // await m.updateDependencies();
 
+  ////////////////////////////////////////////////////////
+  // https://github.com/phetsims/density-buoyancy-common/issues/405
+  // Avoid cascading density property changes from "hidden" fluids to the custom fluid density
+  // await cherryPickSHA( 'density-buoyancy-common', 'c22a525940eb520b74ef717f986c16ae83ab1183' );
 
 } )();
