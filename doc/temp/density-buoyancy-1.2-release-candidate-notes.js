@@ -67,6 +67,14 @@
 
   ////////////////////////////////////////////////////////
   // Fix max width for fallback text, see https://github.com/phetsims/density-buoyancy-common/issues/394
-  await setUpPatch( 'maxWidthFallbackText', '234443020a88a811a2c932ac0fb83d4d6ba2a85d' );
+  // await setUpPatch( 'maxWidthFallbackText', '234443020a88a811a2c932ac0fb83d4d6ba2a85d' );
+  // await m.updateDependencies();
+
+  ////////////////////////////////////////////////////////
+  // densityNumberControl visibleProperty wire, see https://github.com/phetsims/density-buoyancy-common/issues/415
+  // https://github.com/phetsims/density-buoyancy-common/commit/7cb3bd8a1e1115b5f3652be3508ba1f0d6a2b09c
+  await setUpPatch( 'densityNumberControlVisibleProperty', '7cb3bd8a1e1115b5f3652be3508ba1f0d6a2b09c' );
   await m.updateDependencies();
+
+
 } )();
