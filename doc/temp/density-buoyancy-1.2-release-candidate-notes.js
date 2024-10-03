@@ -9,6 +9,9 @@
   const Maintenance = require( '../../js/common/Maintenance.js' );
   const m = Maintenance;
 
+  /**
+   * TODO: what if the sha to cherry pick isn't pushed? https://github.com/phetsims/perennial/issues/365
+   */
   const cherryPickSHA = async ( repo, sha ) => {
     const patchName = repo + sha;
     await m.createPatch( repo, 'for rc.2', patchName );
@@ -100,4 +103,14 @@
   // https://github.com/phetsims/density-buoyancy-common/issues/414
   // await cherryPickSHA( 'density-buoyancy-common', 'b18c2378b02ee013c8d04ec6d396a74702f324bb' );
 
+  ////////////////////////////////////////////////////////
+  // https://github.com/phetsims/density-buoyancy-common/issues/417
+  // const one = await cherryPickSHA( 'density-buoyancy-common', '3bc283c608f96c20bada618bf0c1ceeb07646d9f' );
+  // const two = await cherryPickSHA( 'scenery-phet', '7f08bd500902559c26f3a6b92283a50acc85d758' );
+  // if ( one && two ) {
+  //   await m.updateDependencies();
+  // }
+  // else {
+  //   console.log( 'Change not cherry picked to all repos; dependencies not updated' );
+  // }
 } )();
