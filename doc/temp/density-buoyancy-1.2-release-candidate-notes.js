@@ -27,6 +27,8 @@
     else {
       console.log( 'Change not cherry picked to all repos; dependencies not updated' );
     }
+
+    return success;
   }
 
   //////////////////////////////////////////////////////////////
@@ -113,4 +115,16 @@
   // else {
   //   console.log( 'Change not cherry picked to all repos; dependencies not updated' );
   // }
+
+  ////////////////////////////////////////////////////////
+  // https://github.com/phetsims/density-buoyancy-common/issues/411
+  const one = await cherryPickSHA( 'density-buoyancy-common', 'b0a4aa3bcef247fb6f0bd7978f43467fd686d11f' );
+  const two = await cherryPickSHA( 'phet-io-sim-specific', '4177139573f13d2f281b8decfc75e8708e3df806' );
+  if ( one && two ) {
+    await m.updateDependencies();
+  }
+  else {
+    console.log( 'Change not cherry picked to all repos; dependencies not updated' );
+  }
+
 } )();
