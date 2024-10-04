@@ -22,5 +22,6 @@ import getOption from './util/getOption.ts';
   }
 
   // Forward to chipper, supporting all of the options
+  // @ts-expect-error, remove in https://github.com/phetsims/perennial/issues/369
   grunt.log.writeln( ( await execute( gruntCommand, [ 'lint', ...tail ], '../chipper', { errors: 'resolve' } ) ).stdout );
 } )();
