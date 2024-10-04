@@ -6,6 +6,7 @@
   "include": [
     "js/**/*",
     "test/**/*",
-    "../chipper/js/grunt/lint.js" // TODO: this is horrible, https://github.com/phetsims/chipper/issues/1469
+    // TODO: this is horrible, MK would prefer to just ts-expect-error when importing instead. Let's talk https://github.com/phetsims/chipper/issues/1469
+    "../chipper/js/grunt/lint.js"
   ]
 }
