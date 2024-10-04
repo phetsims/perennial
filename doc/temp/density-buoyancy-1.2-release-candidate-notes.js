@@ -160,4 +160,16 @@
   // m.applyPatches();
   // m.updateDependencies();
 
+  //////////////////////////////////////////////////////
+  // https://github.com/phetsims/density-buoyancy-common/issues/412
+  // const one = await cherryPickSHA( 'density-buoyancy-common', 'ce5902d3b2ad8a7742ec80fee9d58a3ca3f116e0' );
+  // const two = await cherryPickSHA( 'density-buoyancy-common', '289819c99bf316237fede18b5baea84613263e5e' );
+  // if ( one && two ) {
+  //   await m.updateDependencies();
+  // }
+  // else {
+  //   console.log( 'Change not cherry picked to all repos; dependencies not updated' );
+  // }
+
+
 } )();
