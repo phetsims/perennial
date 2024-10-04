@@ -14,6 +14,7 @@ import getOption from './util/getOption.ts';
   const data = await simMetadata( {
     type: 'html'
   } );
+  // @ts-expect-error, remove in https://github.com/phetsims/perennial/issues/369
   console.error( data.projects.map( project => {
     const name = project.name.slice( project.name.indexOf( '/' ) + 1 );
 
