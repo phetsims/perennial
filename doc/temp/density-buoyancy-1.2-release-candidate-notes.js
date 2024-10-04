@@ -9,11 +9,13 @@
   const Maintenance = require( '../../js/common/Maintenance.js' );
   const m = Maintenance;
 
+  const getPatchName = ( repo, sha ) => repo + sha;
   /**
    * TODO: what if the sha to cherry pick isn't pushed? https://github.com/phetsims/perennial/issues/365
+   * TODO: what if my cwd isn't perennial/ do things work correctly in the maintenance tooling? https://github.com/phetsims/density-buoyancy-common/issues/401
    */
   const cherryPickSHA = async ( repo, sha ) => {
-    const patchName = repo + sha;
+    const patchName = getPatchName( repo, sha );
     await m.createPatch( repo, 'for rc.2', patchName );
     await m.addPatchSHA( patchName, sha );
     await m.addNeededPatch( 'density', '1.2', patchName );
@@ -145,4 +147,17 @@
   // else {
   //   console.log( 'Change not cherry picked to all repos; dependencies not updated' );
   // }
+
+  ////////////////////////////////////////////////////////
+  // https://github.com/phetsims/density-buoyancy-common/issues/404
+  // await cherryPickSHA( 'phet-io-sim-specific', '5c20b634f709527ea5836c00735bdfe8fe8b90f4' );
+  // Didn't work, manual cherry picks needed
+  // git checkout phet-io-sim-specific@49eb85d1965837d604eac643e56fea6370dd07ec
+  // git cherry-pick 5c20b634f709527ea5836c00735bdfe8fe8b90f4
+  // manually fix -> 6d28aa30163993447d61e3508b16cf5e80bbcedd
+  // const patchName = getPatchName( 'phet-io-sim-specific', '5c20b634f709527ea5836c00735bdfe8fe8b90f4' );
+  // m.addPatchSHA( patchName, '6d28aa30163993447d61e3508b16cf5e80bbcedd' )
+  // m.applyPatches();
+  // m.updateDependencies();
+
 } )();
