@@ -26,10 +26,6 @@ module.exports = file => {
     return docLines.join( '\n' );
   }
   else {
-<<<<<<< HEAD
-    return 'No documentation';
-=======
     return 'No documentation found';
->>>>>>> 564c3db (move grunt util functions for perennial, https://github.com/phetsims/chipper/issues/1464)
   }
 };
