@@ -1,7 +1,8 @@
 // Copyright 2024, University of Colorado Boulder
 
 /**
- * Lints this repository only'
+ * Lints this repository only
+ *
  * @author Michael Kauzmann (PhET Interactive Simulations)
  *
  */
@@ -17,8 +18,9 @@ import getOption from './util/getOption.ts';
   assert( index >= 0, 'lint command does not appear' );
   const tail = process.argv.slice( index + 1 );
 
-  if ( !getOption( 'repos' ) ) {
-    tail.push( '--repos=perennial' );
+  // Prevent from also linting the chipper repo
+  if ( !getOption( 'repo' ) ) {
+    tail.push( '--repo=perennial' );
   }
 
   // Forward to chipper, supporting all of the options

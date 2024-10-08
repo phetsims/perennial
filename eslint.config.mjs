@@ -1,6 +1,5 @@
 // Copyright 2024, University of Colorado Boulder
 
-import buildtoolsEslintConfig from '../chipper/eslint/buildtools.eslint.config.mjs';
 import nodeEslintConfig from '../chipper/eslint/node.eslint.config.mjs';
 
 /**
@@ -9,5 +8,11 @@ import nodeEslintConfig from '../chipper/eslint/node.eslint.config.mjs';
  */
 export default [
   ...nodeEslintConfig,
-  buildtoolsEslintConfig
+  {
+    rules: {
+
+      // There is a complication about importing phet-core from perennial, so until that is resolved, use `any` here instead
+      '@typescript-eslint/no-explicit-any': 'off' // TODO: Use IntentionalAny, https://github.com/phetsims/chipper/issues/1465
+    }
+  }
 ];
