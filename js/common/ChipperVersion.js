@@ -9,7 +9,7 @@ const assert = require( 'assert' );
 const fs = require( 'fs' );
 
 /**
- * TODO:  remove this workaround jsdoc once this file is in TypeScript, https://github.com/phetsims/chipper/issues/1469
+ * TODO:  remove this workaround jsdoc once this file is in TypeScript, https://github.com/phetsims/perennial/issues/369
  * @type
  */
 module.exports = ( function() {
