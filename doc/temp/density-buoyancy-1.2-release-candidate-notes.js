@@ -183,4 +183,10 @@
   // https://github.com/phetsims/density-buoyancy-common/issues/404
   // await cherryPickSHA( 'density-buoyancy-common', 'b3d9f6c35467cd837bb11fa9d83527c06f645957' );
 
+  ////////////////////////////////////////////////////////
+  // https://github.com/phetsims/density-buoyancy-common/issues/401
+  // await cherryPickSHA( 'phet-io-sim-specific', '415f7dc793e8051f3e68b60977eba8029bf29152' );
+  // Did not work, manually cherry pick and get the below sha.
+  // await m.addPatchSHA( 'phet-io-sim-specific415f7dc793e8051f3e68b60977eba8029bf29152', 'b50782b7cc88d5a5e665b6e3c2d6d420f616ef3d')
+  //
 } )();
