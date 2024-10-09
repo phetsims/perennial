@@ -8,6 +8,14 @@
     "version": "1.7"
   },
   {
+    "sim": "buoyancy",
+    "version": "1.2"
+  },
+  {
+    "sim": "buoyancy-basics",
+    "version": "1.2"
+  },
+  {
     "sim": "calculus-grapher",
     "version": "1.0"
   },
@@ -30,6 +38,10 @@
   {
     "sim": "density",
     "version": "1.1"
+  },
+  {
+    "sim": "density",
+    "version": "1.2"
   },
   {
     "sim": "diffusion",
