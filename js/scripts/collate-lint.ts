@@ -1,7 +1,7 @@
 // Copyright 2022, University of Colorado Boulder
 
 /**
- * This script uses Deno and is run like so:
+ * This script uses is run like so:
  *
  * grunt lint-everything > lintreport.txt
  * node js/scripts/collate-lint.ts
