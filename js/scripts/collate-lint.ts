@@ -4,15 +4,18 @@
  * This script uses Deno and is run like so:
  *
  * grunt lint-everything > lintreport.txt
- * deno run --allow-read js/scripts/collate-lint.ts
+ * node js/scripts/collate-lint.ts
  *
  * It counts failures of each rule
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */
+
+import fs from 'fs';
+
 ( () => {
 
-  const text: string = Deno.readTextFileSync( './lintreport.txt' );
+  const text: string = fs.readFileSync( './lintreport.txt', 'utf-8' );
 
   const lines: string[] = text.split( '\n' );
   let keys: string[] = [];
@@ -37,5 +40,3 @@
     console.log( key, count );
   } );
 } )();
-
-export {};
