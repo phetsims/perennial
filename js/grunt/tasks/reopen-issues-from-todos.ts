@@ -7,6 +7,4 @@
  */
 import reopenIssuesFromTODOs from '../reopenIssuesFromTODOs';
 
-( async () => {
-  await reopenIssuesFromTODOs();
-} )();
+( async () => reopenIssuesFromTODOs() )();

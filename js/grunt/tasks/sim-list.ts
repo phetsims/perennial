@@ -1,16 +1,18 @@
 // Copyright 2024, University of Colorado Boulder
 
-import winston from 'winston';
 /**
  * Prints out a list of live production HTML sims to stderr (can be filtered from other stdout output)
  * --versions : Outputs the sim version after its name.
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
+
+import winston from 'winston';
 import simMetadata from '../../common/simMetadata';
 import getOption from './util/getOption.ts';
 
+winston.default.transports.console.level = 'error';
+
 ( async () => {
-  winston.default.transports.console.level = 'error';
   const data = await simMetadata( {
     type: 'html'
   } );

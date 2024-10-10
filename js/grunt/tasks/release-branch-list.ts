@@ -25,7 +25,7 @@ import getOption from './util/getOption';
     assertIsValidRepoName( repo );
   }
 
-  assert( order === 'alphabetical' || order === 'date' );
+  assert( order === 'alphabetical' || order === 'date', `unsupported order type: ${order}` );
 
   const branches = await Maintenance.getMaintenanceBranches( releaseBranch => !repo || releaseBranch.repo === repo,
     true, true );
