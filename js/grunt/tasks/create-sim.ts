@@ -16,7 +16,6 @@ import getOption from './util/getOption';
 ( async () => {
 
     const repo = getOption( 'repo' );
-    assertIsValidRepoName( repo );
 
     const author = getOption( 'author' );
     const title = getOption( 'title' );
@@ -25,5 +24,6 @@ import getOption from './util/getOption';
     assert( repo, 'Requires specifying a repository name with --repo={{REPO}}' );
     assert( getOption( 'author' ), 'Requires specifying a author with --author={{AUTHOR}}' );
 
+    assertIsValidRepoName( repo );
     await createSim( repo, author, { title: title, clean: clean } );
 } )();

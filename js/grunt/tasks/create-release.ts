@@ -17,7 +17,6 @@ import getOption from './util/getOption';
 ( async () => {
 
   const repo = getOption( 'repo' );
-  assertIsValidRepoName( repo );
 
   const branch = getOption( 'branch' );
   const message = getOption( 'message' );
@@ -28,5 +27,6 @@ import getOption from './util/getOption';
   assert( branch, 'Requires specifying a branch with --branch={{BRANCH}}' );
   assert( branch.split( '.' ).length === 2, 'Branch should be {{MAJOR}}.{{MINOR}}' );
 
+  assertIsValidRepoName( repo );
   await createRelease( repo, branch, brands.split( ',' ), message );
 } )();

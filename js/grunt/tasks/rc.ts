@@ -16,11 +16,10 @@ import rc from '../rc';
 import getOption from './util/getOption';
 
 ( async () => {
-  assert( getOption( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
+  const repo = getOption( 'repo' );
+  assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
   assert( getOption( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
   assert( getOption( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
-
-  const repo = getOption( 'repo' );
   assertIsValidRepoName( repo );
 
   await rc( repo, getOption( 'branch' ), getOption( 'brands' ).split( ',' ),

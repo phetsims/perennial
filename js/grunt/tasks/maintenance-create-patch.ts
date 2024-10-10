@@ -18,12 +18,12 @@ winston.default.transports.console.level = 'error';
 ( async () => {
 
   const repo = getOption( 'repo' );
-  assertIsValidRepoName( repo );
 
   const message = getOption( 'message' );
 
   assert( repo, 'Requires specifying a repo that will need to be patched with --repo={{REPO}}' );
   assert( message, 'Requires specifying a message (included with commits) with --message={{MESSAGE}}' );
+  assertIsValidRepoName( repo );
 
   await Maintenance.createPatch( repo, message );
 } )();
