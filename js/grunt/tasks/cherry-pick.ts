@@ -17,11 +17,12 @@ import getOption from './util/getOption.ts';
   const repo = getOption( 'repo' );
 
   assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
-  assert( getOption( 'shas' ), 'Requires specifying a comma-separated list of SHAs with --shas={{SHAS}}' );
+  const shasString = getOption( 'shas' );
+  assert( shasString, 'Requires specifying a comma-separated list of SHAs with --shas={{SHAS}}' );
 
   assertIsValidRepoName( repo );
 
-  const shas = getOption( 'shas' ).split( ',' );
+  const shas = shasString.split( ',' );
 
   await cherryPick( repo, shas );
 } )();
