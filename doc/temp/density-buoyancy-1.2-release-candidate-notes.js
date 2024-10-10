@@ -183,4 +183,8 @@
   // https://github.com/phetsims/density-buoyancy-common/issues/404
   // await cherryPickSHA( 'density-buoyancy-common', 'b3d9f6c35467cd837bb11fa9d83527c06f645957' );
 
+  ////////////////////////////////////////////////////////
+  // https://github.com/phetsims/density-buoyancy-common/issues/404
+  // await cherryPickSHA( 'density-buoyancy-common', 'b2bcfcfb8e4186e4e18e7d288e772abed2c2db3f' );
+
 } )();
