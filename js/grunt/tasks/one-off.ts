@@ -19,12 +19,11 @@ import getOption from './util/getOption';
 ( async () => {
 
   const repo = getOption( 'repo' );
-  assertIsValidRepoName( repo );
-
   const brands = getOption( 'brands' );
 
   assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
   assert( brands, 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
+  assertIsValidRepoName( repo );
 
   let branch = getOption( 'branch' );
   if ( !branch ) {

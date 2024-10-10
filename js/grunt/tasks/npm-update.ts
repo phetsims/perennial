@@ -14,7 +14,6 @@ import getOption from './util/getOption';
 ( async () => {
   const repo = getOption( 'repo' );
   assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
-
   assertIsValidRepoName( repo );
 
   await npmUpdate( repo ).then( () => npmUpdate( 'chipper' ) ).then( () => npmUpdate( 'perennial-alias' ) );

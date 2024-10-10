@@ -15,13 +15,13 @@ import getOption from './util/getOption';
 ( async () => {
 
   const repo = getOption( 'repo' );
-  assertIsValidRepoName( repo );
 
   const branch = getOption( 'branch' );
   const message = getOption( 'message' );
   assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
   assert( branch, 'Requires specifying a branch with --branch={{BRANCH}}' );
   assert( !branch.includes( '-' ) && !branch.includes( '.' ), 'Branch should not contain dashes or periods' );
+  assertIsValidRepoName( repo );
 
   await createOneOff( repo, branch, message );
 } )();
