@@ -6,5 +6,6 @@
 
 
 import checkoutMainAll from '../checkoutMainAll';
+import getOption from './util/getOption';
 
-( async () => checkoutMainAll() )();
+( async () => checkoutMainAll( getOption( 'branch' ) ) )();
