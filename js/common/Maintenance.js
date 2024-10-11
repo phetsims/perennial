@@ -729,11 +729,9 @@ module.exports = ( function() {
      */
     static async applyPatches() {
       winston.info( 'applying patches' );
-      winston.info( 'applying patches' );
 
       let success = true;
       const maintenance = Maintenance.load();
-
       let numApplied = 0;
 
       for ( const modifiedBranch of maintenance.modifiedBranches ) {
