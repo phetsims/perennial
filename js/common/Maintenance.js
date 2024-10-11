@@ -734,7 +734,6 @@ module.exports = ( function() {
       let success = true;
       const maintenance = Maintenance.load();
 
-      let success = true;
       let numApplied = 0;
 
       for ( const modifiedBranch of maintenance.modifiedBranches ) {
