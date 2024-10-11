@@ -6,8 +6,8 @@
   "include": [
     "js/**/*",
     "test/**/*",
-    // TODO: this is horrible, MK would prefer to just ts-expect-error when importing instead. Let's talk https://github.com/phetsims/chipper/issues/1469
-    // TODO: Not only horrible, but it means that we lint chipper when we try to just lint perennial/ https://github.com/phetsims/chipper/issues/1469
+    // TODO: this is horrible, MK would prefer to just ts-expect-error when importing instead. Let's talk https://github.com/phetsims/chipper/issues/1489
+    // TODO: Not only horrible, but it means that we lint chipper when we try to just lint perennial/ https://github.com/phetsims/chipper/issues/1489
     "../chipper/js/grunt/lint.js"
   ]
 }
