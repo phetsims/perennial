@@ -47,7 +47,7 @@ const reset = '\u001b[0m';
   };
 
   const runTsc = async () => {
-    tscResults = await execute( 'node', [ '--max-old-space-size=8192', '../../node_modules/typescript/bin/tsc', '-b' ], '../chipper/tsconfig/all', {
+    tscResults = await execute( gruntCommand, [ 'check', '--everything' ], '../chipper', {
       errors: 'resolve'
     } );
     outputResult( 'tsc', tscResults );
