@@ -20,7 +20,6 @@ import getOption from './util/getOption';
 
   let lint;
   try {
-    // TODO: why does @ ts-expect-error - this is better not work without triggering "TS2578: Unused '@-ts-expect-error' directive." https://github.com/phetsims/chipper/issues/1464
     lint = ( await import( '../../../../chipper/js/grunt/lint.js' ) ).default;
   }
   catch( e ) {
