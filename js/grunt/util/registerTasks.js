@@ -14,6 +14,7 @@ const getDocumentationForTask = require( './getDocumentationForTask' );
 const path = require( 'path' );
 const gruntSpawn = require( './gruntSpawn' );
 const assert = require( 'assert' );
+const _ = require( 'lodash' );
 
 // Constants
 const isWindows = /^win/.test( process.platform );
@@ -26,18 +27,18 @@ function execTask( grunt, taskFilename ) {
   };
 }
 
+const supportedTaskFileExtensions = [ '.js', '.ts', '.cjs' ];
+
 module.exports = ( grunt, dir ) => {
   assert( fs.existsSync( dir ), `dir does not exist: ${dir}` );
 
   // Load each file from tasks/ and register it as a task
   fs.readdirSync( dir ).forEach( file => {
-    if ( file.endsWith( '.js' ) || file.endsWith( '.ts' ) ) {
+    if ( _.some( supportedTaskFileExtensions, extension => file.endsWith( extension ) ) ) {
       const taskName = file.substring( 0, file.lastIndexOf( '.' ) );
 
-      const tsExists = fs.existsSync( path.join( dir, `${taskName}.ts` ) );
-      const jsExists = fs.existsSync( path.join( dir, `${taskName}.js` ) );
-
-      if ( tsExists && jsExists ) {
+      const numberOfFiles = supportedTaskFileExtensions.map( extension => fs.existsSync( path.join( dir, `${taskName}${extension}` ) ) ).filter( _.identity );
+      if ( numberOfFiles.length > 1 ) {
         throw new Error( `Both TypeScript and JavaScript versions of the task ${taskName} exist. Please remove one of them.` );
       }
       else {
