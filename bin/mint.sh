@@ -11,9 +11,9 @@
 
 # Determine the operating system
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
-  TSX_EXEC="../chipper/node_modules/.bin/tsx.cmd"
+  TSX_EXEC="../perennial/node_modules/.bin/tsx.cmd"
 else
-  TSX_EXEC="../chipper/node_modules/.bin/tsx"
+  TSX_EXEC="../perennial/node_modules/.bin/tsx"
 fi
 
 # Define an array of base directories to search for task scripts

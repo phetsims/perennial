@@ -15,15 +15,12 @@ const path = require( 'path' );
 const gruntSpawn = require( './gruntSpawn' );
 const assert = require( 'assert' );
 const _ = require( 'lodash' );
-
-// Constants
-const isWindows = /^win/.test( process.platform );
+const tsxCommand = require( '../../common/tsxCommand.js' );
 
 function execTask( grunt, taskFilename ) {
-  const command = `${path.join( `../chipper/node_modules/.bin/${isWindows ? 'tsx.cmd' : 'tsx'}` )}`;
 
   return () => {
-    gruntSpawn( grunt, command, [ taskFilename, ...process.argv.slice( 2 ) ], process.cwd() );
+    gruntSpawn( grunt, tsxCommand, [ taskFilename, ...process.argv.slice( 2 ) ], process.cwd() );
   };
 }
 
