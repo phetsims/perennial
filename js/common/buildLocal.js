@@ -67,5 +67,7 @@ module.exports = {
   decafDeployPath: buildLocalObject.decafDeployPath || '/data/web/htdocs/dev/decaf/',
   buildServerNotifyEmail: buildLocalObject.buildServerNotifyEmail || null,
   productionServerURL: buildLocalObject.productionServerURL || 'https://phet.colorado.edu',
-  babelBranch: buildLocalObject.babelBranch || 'main'
+  babelBranch: buildLocalObject.babelBranch || 'main',
+
+  brands: buildLocalObject.brands || [ 'adapted-from-phet' ]
 };

@@ -4,9 +4,10 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 import assert from 'assert';
-import getOption from './getOption';
+import getOption from './getOption.js';
+import buildLocal from '../../../common/buildLocal.js';
 
-const getBrands = ( grunt: any, repo: string, buildLocal: any ) => {
+const getBrands = ( grunt: any, repo: string ) => {
 
   // Determine what brands we want to build
   assert( !getOption( 'brand' ), 'Use --brands={{BRANDS}} instead of brand' );
