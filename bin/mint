@@ -7,14 +7,7 @@
 # @author Sam Reid (PhET Interactive Simulations)
 #
 
-# Ensure the script runs with tsx on macOS/Linux or tsx.cmd on Windows
-
-# Determine the operating system
-if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
-  TSX_EXEC="../perennial/node_modules/.bin/tsx.cmd"
-else
-  TSX_EXEC="../perennial/node_modules/.bin/tsx"
-fi
+TSX_EXEC="../perennial/node_modules/.bin/tsx"
 
 # Define an array of base directories to search for task scripts
 BASE_DIRS=(
@@ -28,6 +21,13 @@ error_exit() {
   exit 1
 }
 
+# Function to execute a script with tsx
+execute_script() {
+  local script_path="$1"
+  shift
+  "$TSX_EXEC" "$script_path" "$@"
+}
+
 # Check if the first argument is missing or starts with a hyphen (indicating options)
 if [[ -z "$1" || "$1" =~ ^- ]]; then
   TASK="default"
@@ -36,20 +36,49 @@ else
   shift
 fi
 
+# Handle the 'run' directive
+if [[ "$TASK" == "run" ]]; then
+  if [[ -z "$1" ]]; then
+    error_exit "No script file specified for 'run' directive."
+  fi
+
+  SCRIPT_FILE="$1"
+  shift
+
+  # Check if the script file has a .js or .ts extension
+  if [[ ! "$SCRIPT_FILE" =~ \.(js|ts)$ ]]; then
+    error_exit "Script file must have a .js or .ts extension."
+  fi
+
+  # If the script path is not absolute, resolve it relative to current directory
+  if [[ ! "$SCRIPT_FILE" = /* ]]; then
+    SCRIPT_FILE="./$SCRIPT_FILE"
+  fi
+
+  # Check if the script file exists
+  if [[ ! -f "$SCRIPT_FILE" ]]; then
+    error_exit "Script file not found: $SCRIPT_FILE"
+  fi
+
+  # Execute the script with tsx
+  execute_script "$SCRIPT_FILE" "$@"
+  exit 0
+fi
+
 # Initialize variables to store the found script file and its path
 FOUND_SCRIPT=""
 FOUND_PATH=""
 
 # Iterate over each base directory to find the task script
 for BASE_DIR in "${BASE_DIRS[@]}"; do
-TS_SCRIPT_FILE="$BASE_DIR/${TASK}.ts"
-JS_SCRIPT_FILE="$BASE_DIR/${TASK}.js"
+  TS_SCRIPT_FILE="$BASE_DIR/${TASK}.ts"
+  JS_SCRIPT_FILE="$BASE_DIR/${TASK}.js"
 
-if [[ -f "$TS_SCRIPT_FILE" ]]; then
+  if [[ -f "$TS_SCRIPT_FILE" ]]; then
     FOUND_SCRIPT="$TS_SCRIPT_FILE"
     FOUND_PATH="$BASE_DIR"
     break
-elif [[ -f "$JS_SCRIPT_FILE" ]]; then
+  elif [[ -f "$JS_SCRIPT_FILE" ]]; then
     FOUND_SCRIPT="$JS_SCRIPT_FILE"
     FOUND_PATH="$BASE_DIR"
     break
@@ -59,7 +88,7 @@ done
 # Execute the found script or display an error if not found
 if [[ -n "$FOUND_SCRIPT" ]]; then
   # echo "Executing task '$TASK' from '$FOUND_PATH'"
-  "$TSX_EXEC" "$FOUND_SCRIPT" "$@"
+  execute_script "$FOUND_SCRIPT" "$@"
 else
   error_exit "Unknown command or script file not found: $TASK"
 fi
