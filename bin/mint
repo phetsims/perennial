@@ -7,7 +7,11 @@
 # @author Sam Reid (PhET Interactive Simulations)
 #
 
-TSX_EXEC="../perennial/node_modules/.bin/tsx"
+
+# Get the directory where the script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+TSX_EXEC="$SCRIPT_DIR/../node_modules/.bin/tsx"
 
 # Define an array of base directories to search for task scripts
 BASE_DIRS=(
