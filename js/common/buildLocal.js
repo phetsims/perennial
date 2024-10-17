@@ -69,5 +69,10 @@ module.exports = {
   productionServerURL: buildLocalObject.productionServerURL || 'https://phet.colorado.edu',
   babelBranch: buildLocalObject.babelBranch || 'main',
 
-  brands: buildLocalObject.brands || [ 'adapted-from-phet' ]
+  brands: buildLocalObject.brands || [ 'adapted-from-phet' ],
+
+  // By default, run all tasks
+  // check local preferences for overrides for which tasks to turn 'off'
+  // see hook-pre-commit.js
+  gitHooks: buildLocalObject.gitHooks || {}
 };
