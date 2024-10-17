@@ -20,7 +20,7 @@ else {
   let repos;
   let error = null;
   try {
-    repos = fs.readFileSync( '../perennial/data/active-sims' )
+    repos = fs.readFileSync( `${__dirname}../../data/active-sims` )
       .toString()
       .split( '\r\n' )
       .filter( e => e !== '' );

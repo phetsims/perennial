@@ -5,7 +5,7 @@ const fs = require( 'fs' );
 
 // constants
 // Don't use getActiveRepos() since it cannot be run from the root
-const contents = fs.readFileSync( 'perennial/data/active-repos', 'utf8' ).trim();
+const contents = fs.readFileSync( `${__dirname}/../../data/active-repos`, 'utf8' ).trim();
 const repos = contents.split( '\n' ).map( sim => sim.trim() );
 
 /**
