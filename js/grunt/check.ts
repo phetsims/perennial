@@ -8,9 +8,12 @@
 
 import { spawn } from 'child_process';
 import fs from 'fs';
+import _ from 'lodash';
 import fixEOL from '../common/fixEOL.js';
 import { Repo } from '../common/PerennialTypes.js';
-import _ from 'lodash';
+
+const PERENNIAL_ROOT = `${__dirname}/../..`;
+const ALL_CONFIG_PATH = `${PERENNIAL_ROOT}/../chipper/dist/tsconfig/all/`;
 
 type CheckOptions = {
   repo: Repo;
@@ -31,17 +34,17 @@ const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<void> =
     writeEverythingTSConfigFile();
   }
 
-  const tsconfigDir = options.everything ? '../chipper/tsconfig/all' : `../${options.repo}`;
+  const cwd = options.everything ? ALL_CONFIG_PATH : `${PERENNIAL_ROOT}/../${options.repo}`;
   // TODO: should be in perennial https://github.com/phetsims/perennial/issues/364
-  const pathToTSC = options.everything ? '../../../chipper/node_modules/typescript/bin/tsc'
-                                       : '../chipper/node_modules/typescript/bin/tsc';
+  const tscRunnable = options.everything ? '../../../../chipper/node_modules/typescript/bin/tsc'
+                                         : '../chipper/node_modules/typescript/bin/tsc';
 
   if ( options.clean ) {
     // TODO: Keep these as 'node'? https://github.com/phetsims/chipper/issues/1481
-    await runCommand( 'node', [ pathToTSC, '-b', '--clean' ], tsconfigDir );
+    await runCommand( 'node', [ tscRunnable, '-b', '--clean' ], cwd );
   }
 
-  await runCommand( 'node', [ pathToTSC, '-b', '--pretty', options.pretty + '' ], tsconfigDir );
+  await runCommand( 'node', [ tscRunnable, '-b', '--pretty', options.pretty + '' ], cwd );
 };
 
 // Utility function to spawn a child process with inherited stdio
@@ -65,16 +68,16 @@ const runCommand = ( command: string, args: string[], cwd: string ): Promise<voi
  * Write an aggregate tsconfig file that checks all entry points.
  */
 function writeEverythingTSConfigFile(): void {
-  const activeRepos = fs.readFileSync( `${__dirname}/../../data/active-repos`, 'utf-8' ).trim().split( /\r?\n/ ).map( s => s.trim() );
+  const activeRepos = fs.readFileSync( `${PERENNIAL_ROOT}/data/active-repos`, 'utf-8' ).trim().split( /\r?\n/ ).map( s => s.trim() );
 
   const filteredRepos = activeRepos.filter( repo => {
-    return fs.existsSync( `../${repo}/tsconfig.json` ) &&
-           // TODO: include these repos, see https://github.com/phetsims/phet-lib/issues/7 https://github.com/phetsims/phet-vite-demo/issues/2
-           repo !== 'phet-lib' && repo !== 'phet-vite-demo';
+    return fs.existsSync( `${PERENNIAL_ROOT}/../${repo}/tsconfig.json` ) &&
+           repo !== 'phet-lib' && // TODO: include this repo, see https://github.com/phetsims/phet-lib/issues/7
+           repo !== 'phet-vite-demo'; // TODO: include this repo, see https://github.com/phetsims/phet-vite-demo/issues/2
   } );
 
   const json = {
-    references: filteredRepos.map( repo => ( { path: `../../../${repo}` } ) )
+    references: filteredRepos.map( repo => ( { path: `../../../../${repo}` } ) )
   };
 
   const fileOutput = `/**
@@ -87,7 +90,9 @@ function writeEverythingTSConfigFile(): void {
  * @author Sam Reid (PhET Interactive Simulations)
  */
 ${JSON.stringify( json, null, 2 )}`;
-  fs.writeFileSync( '../chipper/tsconfig/all/tsconfig.json', fixEOL( fileOutput ) );
+
+  fs.mkdirSync( ALL_CONFIG_PATH, { recursive: true } ); // Silent no-op if it already exists.
+  fs.writeFileSync( ALL_CONFIG_PATH + 'tsconfig.json', fixEOL( fileOutput ) );
 }
 
 export default check;
