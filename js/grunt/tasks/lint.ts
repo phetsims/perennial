@@ -12,15 +12,14 @@
  */
 import * as grunt from 'grunt';
 import lint from '../lint.js';
-import getOption from './util/getOption.js';
-import getRepo from './util/getRepo.js';
+import getRepo, { getRepos } from './util/getRepo.js';
 import parseLintOptions from './util/parseLintOptions.js';
 
 const repo = getRepo();
 
 export const lintTask = ( async () => {
 
-  const extraRepos = getOption( 'repos' ) ? getOption( 'repos' ).split( ',' ) : [];
+  const extraRepos = getRepos();
   const lintReturnValue = await lint( parseLintOptions( { repos: [ repo, ...extraRepos ] } ) );
 
   if ( !lintReturnValue.ok ) {

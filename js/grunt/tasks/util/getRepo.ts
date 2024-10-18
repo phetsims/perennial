@@ -4,6 +4,7 @@ import assert from 'assert';
 import grunt from 'grunt';
 import path from 'path';
 import process from 'process';
+import { Repo } from '../../../common/PerennialTypes.js';
 import getOption from './getOption';
 
 /**
@@ -11,7 +12,7 @@ import getOption from './getOption';
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
-const getRepo = (): string => {
+const getRepo = (): Repo => {
 
   let repo = getOption( 'repo' );
 
@@ -35,6 +36,10 @@ const getRepo = (): string => {
   assert( typeof repo === 'string' && /^[a-z]+(-[a-z]+)*$/u.test( repo ), `repo name should be composed of lower-case characters, optionally with dashes used as separators: ${repo}` );
 
   return repo;
+};
+
+export const getRepos = (): Repo[] => {
+  return getOption( 'repos' ) ? getOption( 'repos' ).split( ',' ) : [];
 };
 
 export default getRepo;
