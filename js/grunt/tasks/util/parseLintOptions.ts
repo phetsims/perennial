@@ -1,15 +1,8 @@
 // Copyright 2024, University of Colorado Boulder
 
 import _ from 'lodash';
+import { LintOptions } from '../../lint.js';
 import getOption from './getOption.js';
-
-type LintOptions = {
-  cache: boolean;
-  fix: boolean;
-  chipAway: boolean;
-  showProgressBar: boolean;
-};
-
 
 /**
  * @author Sam Reid (PhET Interactive Simulations)

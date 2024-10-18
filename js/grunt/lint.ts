@@ -16,14 +16,23 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-// modules
-const { spawn } = require( 'child_process' ); // eslint-disable-line phet/require-statement-match
-const _ = require( 'lodash' );
-const fs = require( 'fs' );
-const path = require( 'path' );
-const showCommandLineProgress = require( '../common/showCommandLineProgress' );
+import { spawn } from 'child_process';
+import fs from 'fs';
+import _ from 'lodash';
+import path from 'path';
+import showCommandLineProgress from '../common/showCommandLineProgress';
 
 const ESLINT_COMMAND = path.join( '../chipper/node_modules/.bin/eslint' );
+type LintResult = { ok: boolean };
+
+type Repo = string;
+
+export type LintOptions = {
+  cache: boolean;
+  fix: boolean;
+  chipAway: boolean;
+  showProgressBar: boolean;
+};
 
 // Require ESLint from the correct path
 // eslint-disable-next-line phet/require-statement-match
@@ -31,9 +40,9 @@ const { ESLint } = require( 'eslint' );
 
 const DO_NOT_LINT = [ 'babel' ];
 
-const getCacheLocation = repo => path.resolve( `../chipper/dist/eslint/cache/${repo}.eslintcache` );
+const getCacheLocation = ( repo: Repo ) => path.resolve( `../chipper/dist/eslint/cache/${repo}.eslintcache` );
 
-function lintWithChildProcess( repo, options ) {
+function lintWithChildProcess( repo: Repo, options: LintOptions ): Promise<number> {
 
   // Always write to the cache, even if it was cleared previously.
   const cacheFile = getCacheLocation( repo );
@@ -77,7 +86,7 @@ function lintWithChildProcess( repo, options ) {
       cwd: `../${repo}`,
 
       // A shell is required for npx because the runnable is a shell script. see https://github.com/phetsims/perennial/issues/359
-      shell: /^win/.test( process.platform ),
+      shell: process.platform.startsWith( 'win' ),
       env: env // Use the prepared environment
     } );
     let hasPrinted = false;
@@ -98,16 +107,16 @@ function lintWithChildProcess( repo, options ) {
       preLoggingStep();
       console.error( data.toString() );
     } );
-    eslint.on( 'close', () => resolve( eslint.exitCode ) );
+    eslint.on( 'close', () => resolve( eslint.exitCode || 0 ) );
   } );
 }
 
 /**
  * Lints repositories using a worker pool approach.
  */
-async function lintWithWorkers( repos, options ) {
-  const reposQueue = [ ...repos.filter( repo => !DO_NOT_LINT.includes( repo ) ) ];
-  const exitCodes = [];
+async function lintWithWorkers( repos: Repo[], options: LintOptions ): Promise<LintResult> {
+  const reposQueue: Repo[] = [ ...repos.filter( repo => !DO_NOT_LINT.includes( repo ) ) ];
+  const exitCodes: number[] = [];
 
   options.showProgressBar && showCommandLineProgress( 0, false );
   let doneCount = 0;
@@ -125,7 +134,7 @@ async function lintWithWorkers( repos, options ) {
         break; // No more repositories to process
       }
 
-      const repo = reposQueue.shift(); // Get the next repository
+      const repo = reposQueue.shift()!; // Get the next repository
 
       const cacheLocation = getCacheLocation( repo );
       if ( fs.existsSync( cacheLocation ) ) {
@@ -154,12 +163,8 @@ async function lintWithWorkers( repos, options ) {
 
 /**
  * Runs ESLint on a single repository using the ESLint Node API.
- *
- * @param {string} repo - The repository to lint.
- * @param {object} options - The options for linting.
- * @returns {Promise<number>} - Resolves to 0 if linting passed, or 1 if there were errors.
  */
-async function lintWithNodeAPI( repo, options ) {
+async function lintWithNodeAPI( repo: Repo, options: LintOptions ): Promise<number> {
 
   // Prepare options for ESLint instance
   const eslintOptions = {
@@ -176,7 +181,7 @@ async function lintWithNodeAPI( repo, options ) {
   // Lint files in the repo
   const patterns = [ './' ]; // Lint all files starting from the repo root
 
-  let results;
+  let results: Array<{ errorCount: number }>;
   try {
     // console.log( 'linting files in repo', repo );
     results = await eslint.lintFiles( patterns );
@@ -216,7 +221,7 @@ async function lintWithNodeAPI( repo, options ) {
 }
 
 // TODO: Console log for all these repos? https://github.com/phetsims/chipper/issues/1484
-const clearCaches = originalRepos => {
+const clearCaches = ( originalRepos: Repo[] ) => {
   originalRepos.forEach( repo => {
     const cacheFile = getCacheLocation( repo );
 
@@ -224,7 +229,7 @@ const clearCaches = originalRepos => {
       fs.unlinkSync( cacheFile );
     }
     catch( err ) {
-      if ( err.code === 'ENOENT' ) {
+      if ( err instanceof Error && 'code' in err && err.code === 'ENOENT' ) {
 
         // Do nothing if the file does not exist
       }
@@ -240,16 +245,11 @@ const clearCaches = originalRepos => {
 
 /**
  * Lints the specified repositories.
- * @public
- *
- * @param {string[]} originalRepos - List of repos to lint.
- * @param {Object} [options] - Options for linting.
- * @returns {Promise<{ok:boolean}>} - Results from linting files.
  */
-const lint = async ( originalRepos, options ) => {
+const lint = async ( originalRepos: Repo[], providedOptions: Partial<LintOptions> ): Promise<LintResult> => {
   originalRepos = _.uniq( originalRepos ); // Don't double lint repos
 
-  options = _.assignIn( {
+  const options = _.assignIn( {
 
     // Cache results for a speed boost.
     cache: true,
@@ -262,7 +262,7 @@ const lint = async ( originalRepos, options ) => {
 
     // Show a progress bar while running, based on the current repo index in the provided list parameter
     showProgressBar: true
-  }, options );
+  }, providedOptions );
 
   // If options.cache is not set, clear the caches
   if ( !options.cache ) {
@@ -278,13 +278,15 @@ const lint = async ( originalRepos, options ) => {
     return await lintWithWorkers( originalRepos, options );
   }
   catch( error ) {
-    console.error( 'Error running ESLint:', error.message );
-    throw error;
+    if ( error instanceof Error ) {
+      console.error( 'Error running ESLint:', error.message );
+      throw error;
+    }
   }
+  return { ok: false };
 };
 
 // Mark the version so that we don't try to lint old shas if on an older version of chipper.
 // TODO: Should we change this? I'm unsure what all the possibilities are, https://github.com/phetsims/chipper/issues/1484
 lint.chipperAPIVersion = 'npx';
-
-module.exports = lint;
+export default lint;
