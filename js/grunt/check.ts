@@ -17,7 +17,7 @@ const ALL_CONFIG_PATH = `${PERENNIAL_ROOT}/../chipper/dist/tsconfig/all/`;
 
 type CheckOptions = {
   repo: Repo;
-  everything: boolean;
+  all: boolean;
   clean: boolean;
   pretty: boolean;
 };
@@ -25,18 +25,18 @@ type CheckOptions = {
 const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<void> => {
   const options = _.assignIn( {
     repo: 'perennial', // TODO: I hate this default, https://github.com/phetsims/chipper/issues/1487
-    everything: false,
+    all: false,
     clean: false,
     pretty: true
   }, providedOptions );
 
-  if ( options.everything ) {
-    writeEverythingTSConfigFile();
+  if ( options.all ) {
+    writeAllTSConfigFile();
   }
 
-  const cwd = options.everything ? ALL_CONFIG_PATH : `${PERENNIAL_ROOT}/../${options.repo}`;
+  const cwd = options.all ? ALL_CONFIG_PATH : `${PERENNIAL_ROOT}/../${options.repo}`;
   // TODO: should be in perennial https://github.com/phetsims/perennial/issues/364
-  const tscRunnable = options.everything ? '../../../../chipper/node_modules/typescript/bin/tsc'
+  const tscRunnable = options.all ? '../../../../chipper/node_modules/typescript/bin/tsc'
                                          : '../chipper/node_modules/typescript/bin/tsc';
 
   if ( options.clean ) {
@@ -67,7 +67,7 @@ const runCommand = ( command: string, args: string[], cwd: string ): Promise<voi
 /**
  * Write an aggregate tsconfig file that checks all entry points.
  */
-function writeEverythingTSConfigFile(): void {
+function writeAllTSConfigFile(): void {
   const activeRepos = fs.readFileSync( `${PERENNIAL_ROOT}/data/active-repos`, 'utf-8' ).trim().split( /\r?\n/ ).map( s => s.trim() );
 
   const filteredRepos = activeRepos.filter( repo => {

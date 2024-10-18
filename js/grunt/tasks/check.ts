@@ -6,7 +6,7 @@
  * grunt check
  *
  * Options (can be combined):
- * --everything: check all repos
+ * --all: check all repos
  * --clean: clean before checking (will still do the check, unlike running tsc directly)
  *
  * @author Sam Reid (PhET Interactive Simulations)
@@ -19,7 +19,7 @@ import getRepo from './util/getRepo';
 
 export const checkTask = ( async () => check( {
   repo: getRepo(),
-  everything: getOption( 'everything' ),
+  all: getOption( 'all' ),
   clean: getOption( 'clean' ),
   pretty: getOption( 'pretty' ) === undefined || getOption( 'pretty' ) === true
 } ) )();
