@@ -112,7 +112,7 @@ const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean
 
 
 // Utility function to spawn a child process with inherited stdio
-const runCommand = ( command: string, args: string[], cwd: string, absolute: boolean ): Promise<{ success: boolean; stdout: string; }> => {
+const runCommand = ( command: string, args: string[], cwd: string, absolute: boolean ): Promise<{ success: boolean; stdout: string }> => {
   return new Promise( ( resolve, reject ) => {
     type SpawnOptions = Parameters<typeof spawn>[2];
     const spawnOptions: SpawnOptions = {
