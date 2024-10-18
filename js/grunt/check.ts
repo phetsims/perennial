@@ -22,7 +22,7 @@ type CheckOptions = {
   pretty: boolean;
 };
 
-const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<void> => {
+const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean> => {
   const options = _.assignIn( {
     repo: 'perennial', // TODO: I hate this default, https://github.com/phetsims/chipper/issues/1487
     all: false,
@@ -37,18 +37,21 @@ const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<void> =
   const cwd = options.all ? ALL_CONFIG_PATH : `${PERENNIAL_ROOT}/../${options.repo}`;
   // TODO: should be in perennial https://github.com/phetsims/perennial/issues/364
   const tscRunnable = options.all ? '../../../../chipper/node_modules/typescript/bin/tsc'
-                                         : '../chipper/node_modules/typescript/bin/tsc';
+                                  : '../chipper/node_modules/typescript/bin/tsc';
 
   if ( options.clean ) {
     // TODO: Keep these as 'node'? https://github.com/phetsims/chipper/issues/1481
-    await runCommand( 'node', [ tscRunnable, '-b', '--clean' ], cwd );
-  }
 
-  await runCommand( 'node', [ tscRunnable, '-b', '--pretty', options.pretty + '' ], cwd );
+    const success = await runCommand( 'node', [ tscRunnable, '-b', '--clean' ], cwd );
+    if ( !success ) {
+      throw new Error( 'Checking failed to clean' );
+    }
+  }
+  return runCommand( 'node', [ tscRunnable, '-b', '--pretty', options.pretty + '' ], cwd );
 };
 
 // Utility function to spawn a child process with inherited stdio
-const runCommand = ( command: string, args: string[], cwd: string ): Promise<void> => {
+const runCommand = ( command: string, args: string[], cwd: string ): Promise<boolean> => {
   return new Promise( ( resolve, reject ) => {
     const child = spawn( command, args, {
       cwd: cwd,
@@ -57,10 +60,7 @@ const runCommand = ( command: string, args: string[], cwd: string ): Promise<voi
     } );
 
     child.on( 'error', error => reject( error ) );
-    child.on( 'close', code => {
-      if ( code !== 0 ) { reject( new Error( `Command "${command} ${args.join( ' ' )}" exited with code ${code}` ) ); }
-      else { resolve(); }
-    } );
+    child.on( 'close', code => resolve( code === 0 ) );
   } );
 };
 
