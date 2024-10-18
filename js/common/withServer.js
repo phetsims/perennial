@@ -16,7 +16,7 @@ const winston = require( 'winston' );
  * A simple webserver that will serve the git root on a specific port for the duration of an async callback
  * @public
  *
- * @param {async function(port:number):*} asyncCallback
+ * @param {function(number)} asyncCallback
  * @param {Object} [options]
  * @returns {Promise<*>} - Returns the result of the asyncCallback
  */

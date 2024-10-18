@@ -23,7 +23,7 @@ const grunt = require( 'grunt' );
  * @param {Array.<string>} args - Array of arguments. No need to extra-quote things.
  * @param {string} cwd - The working directory where the process should be run from
  * @param {Object} [options]
- * @returns {Promise.<string>} - Stdout
+ * @returns {Promise.<string|{code:number,stdout:string,stderr:string}>} - Stdout
  * @rejects {ExecuteError}
  */
 module.exports = function( cmd, args, cwd, options ) {
