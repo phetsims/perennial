@@ -31,7 +31,7 @@ const { ESLint } = require( 'eslint' );
 
 const DO_NOT_LINT = [ 'babel' ];
 
-const getCacheLocation = repo => path.resolve( `../chipper/eslint/cache/${repo}.eslintcache` );
+const getCacheLocation = repo => path.resolve( `../chipper/dist/eslint/cache/${repo}.eslintcache` );
 
 function lintWithChildProcess( repo, options ) {
 

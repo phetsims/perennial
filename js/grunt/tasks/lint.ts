@@ -1,29 +1,35 @@
-// Copyright 2024, University of Colorado Boulder
+// Copyright 2013-2024, University of Colorado Boulder
 
 /**
- * Lints this repository only
+ * lint js files. Options:
+ * --disable-eslint-cache: cache will not be read from, and cache will be cleared for next run.
+ * --fix: autofixable changes will be written to disk
+ * --chip-away: output a list of responsible devs for each repo with lint problems
+ * --repos: comma separated list of repos to lint in addition to the repo from running
  *
- * @author Michael Kauzmann (PhET Interactive Simulations)
- *
+ * @author Sam Reid (PhET Interactive Simulations)
  */
-import assert from 'assert';
-import grunt from 'grunt';
-import execute from '../../common/execute';
-import gruntCommand from '../../common/gruntCommand';
-import getOption from './util/getOption.ts';
+import * as grunt from 'grunt';
+import getOption from './util/getOption.js';
+import getRepo from './util/getRepo.js';
+import lint from '../lint.js';
 
-( async () => {
+const repo = getRepo();
 
-  const index = process.argv.indexOf( 'lint' );
-  assert( index >= 0, 'lint command does not appear' );
-  const tail = process.argv.slice( index + 1 );
+export const lintTask = ( async () => {
+  const cache = !getOption( 'disable-eslint-cache' );
+  const fix = getOption( 'fix' );
+  const chipAway = getOption( 'chip-away' );
 
-  // Prevent from also linting the chipper repo
-  if ( !getOption( 'repo' ) ) {
-    tail.push( '--repo=perennial' );
+  const extraRepos = getOption( 'repos' ) ? getOption( 'repos' ).split( ',' ) : [];
+
+  const lintReturnValue = await lint( [ repo, ...extraRepos ], {
+    cache: cache,
+    fix: fix,
+    chipAway: chipAway
+  } );
+
+  if ( !lintReturnValue.ok ) {
+    grunt.fail.fatal( 'Lint failed' );
   }
-
-  // Forward to chipper, supporting all of the options
-  // @ts-expect-error, remove in https://github.com/phetsims/perennial/issues/369
-  grunt.log.writeln( ( await execute( gruntCommand, [ 'lint', ...tail ], '../chipper', { errors: 'resolve' } ) ).stdout );
 } )();

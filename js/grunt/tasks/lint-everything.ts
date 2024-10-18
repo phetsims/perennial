@@ -7,6 +7,7 @@
 
 import grunt from 'grunt';
 import getDataFile from '../../common/getDataFile';
+import lint from '../lint.js';
 import getOption from './util/getOption';
 
 ( async () => {
@@ -18,27 +19,16 @@ import getOption from './util/getOption';
   const chipAway = getOption( 'chip-away' );
   const showProgressBar = !getOption( 'hide-progress-bar' );
 
-  let lint;
-  try {
-    lint = ( await import( '../../../../chipper/js/grunt/lint.js' ) ).default;
-  }
-  catch( e ) {
-    console.log( 'lint process not found, is your chipper repo up to date?' );
-    lint;
-  }
-
   // The APIs are the same for these two versions of lint support
-  if ( lint && ( lint.chipperAPIVersion === 'promisesPerRepo1' || lint.chipperAPIVersion === 'npx' ) ) {
-    const lintReturnValue = await lint( activeRepos, {
-      cache: cache,
-      fix: fix,
-      chipAway: chipAway,
-      showProgressBar: showProgressBar
-    } );
+  const lintReturnValue = await lint( activeRepos, {
+    cache: cache,
+    fix: fix,
+    chipAway: chipAway,
+    showProgressBar: showProgressBar
+  } );
 
-    // Output results on errors.
-    if ( !lintReturnValue.ok ) {
-      grunt.fail.fatal( 'Lint failed' );
-    }
+  // Output results on errors.
+  if ( !lintReturnValue.ok ) {
+    grunt.fail.fatal( 'Lint failed' );
   }
 } )();
