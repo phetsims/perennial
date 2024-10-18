@@ -246,7 +246,7 @@ const clearCaches = ( originalRepos: Repo[] ) => {
 /**
  * Lints the specified repositories.
  */
-const lint = async ( originalRepos: Repo[], providedOptions: Partial<LintOptions> ): Promise<LintResult> => {
+const lint = async ( originalRepos: Repo[], providedOptions?: Partial<LintOptions> ): Promise<LintResult> => {
   originalRepos = _.uniq( originalRepos ); // Don't double lint repos
 
   const options = _.assignIn( {
