@@ -40,14 +40,14 @@ const reset = '\u001b[0m';
   };
 
   const runLint = async () => {
-    lintResults = await execute( gruntCommand, [ 'lint-everything' ], '../perennial', {
+    lintResults = await execute( gruntCommand, [ 'lint-everything' ], `${__dirname}/../../`, {
       errors: 'resolve'
     } );
     outputResult( 'lint', lintResults );
   };
 
   const runTsc = async () => {
-    tscResults = await execute( gruntCommand, [ 'check', '--everything' ], '../chipper', {
+    tscResults = await execute( gruntCommand, [ 'check', '--everything' ], `${__dirname}/../../`, {
       errors: 'resolve'
     } );
     outputResult( 'tsc', tscResults );
