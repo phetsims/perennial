@@ -21,7 +21,7 @@ module.exports = ( function() {
    * @param {number} major - The major part of the version (the 3 in 3.1.2)
    * @param {number} minor - The minor part of the version (the 1 in 3.1.2)
    * @param {number} maintenance - The maintenance part of the version (the 2 in 3.1.2)
-   * @param {boolean} chipperSupportsOutputJSGruntTasks - Flag that indicates whether grunt suppports the family of command `output-js-all`
+   * @param {boolean} chipperSupportsOutputJSGruntTasks - Flag that indicates whether grunt suppports the family of commands like `output-js-project`
    */
   function ChipperVersion( major, minor, maintenance, chipperSupportsOutputJSGruntTasks ) {
 

@@ -29,7 +29,7 @@ module.exports = async function() {
 
     // Not every repo supports the output-js task, only proceed if it is supported
     winston.info( 'running grunt output-js' );
-    await execute( gruntCommand, [ 'output-js-all' ], '../chipper' );
+    await execute( gruntCommand, [ 'output-js', '--all' ], '../chipper' );
     ranOutputJS = true;
   }
   if ( !ranOutputJS ) {
