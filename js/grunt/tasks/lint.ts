@@ -21,7 +21,6 @@ const repo = getRepo();
 export const lintTask = ( async () => {
 
   const extraRepos = getOption( 'repos' ) ? getOption( 'repos' ).split( ',' ) : [];
-
   const lintReturnValue = await lint( parseLintOptions( { repos: [ repo, ...extraRepos ] } ) );
 
   if ( !lintReturnValue.ok ) {

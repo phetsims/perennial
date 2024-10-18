@@ -267,6 +267,7 @@ const lint = async ( providedOptions: RequiredReposInLintOptions ): Promise<Lint
   }, providedOptions );
 
   const originalRepos = _.uniq( options.repos ); // Don't double lint repos
+  console.log( originalRepos );
   assert( originalRepos.length > 0, 'no repos provided to lint' );
 
   // If options.cache is not set, clear the caches
