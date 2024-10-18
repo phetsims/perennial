@@ -6,61 +6,110 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
+import assert from 'assert';
 import { spawn } from 'child_process';
 import fs from 'fs';
 import _ from 'lodash';
+import os from 'os';
+import path from 'path';
 import fixEOL from '../common/fixEOL.js';
 import { Repo } from '../common/PerennialTypes.js';
 
 const PERENNIAL_ROOT = `${__dirname}/../..`;
 const ALL_CONFIG_PATH = `${PERENNIAL_ROOT}/../chipper/dist/tsconfig/all/`;
 
+// TODO: This is the best spot for doc, but this is duplicated with the tasks/check.ts doc for grunt --help, https://github.com/phetsims/chipper/issues/1482
 type CheckOptions = {
+
+  // The repo to use as the entrypoint for type checking. The repo provided MUST have a tsconfig.json at the top level.
   repo: Repo;
+
+  // Lint all supported repos in active-repos. Using this option ignore the "repo" option.
   all: boolean;
+
+  // Run tsc -b --clean before type checking (basically a cache clear)
   clean: boolean;
+
+  // Use good formatting/color output to the console.
   pretty: boolean;
+
+  /**
+   * This mode supports special logging output to support hyperlinks in output when run inside a Webstorm external tool.
+   * Most likely you will want to use this with --all.
+   *
+   * absolute:true will overwrite to pretty:false
+   *
+   * IMPORTANT!!! This makes the files paths clickable in Webstorm:
+   * output filters: $FILE_PATH$\($LINE$\,$COLUMN$\)
+   */
+  absolute: boolean;
 };
 
 const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean> => {
-  const options = _.assignIn( {
+
+  // TODO: absolute mode logs timing, should other modes too?? https://github.com/phetsims/chipper/issues/1487
+  const options: CheckOptions = _.assignIn( {
     repo: 'perennial', // TODO: I hate this default, https://github.com/phetsims/chipper/issues/1487
     all: false,
     clean: false,
-    pretty: true
+    pretty: true,
+    absolute: false
   }, providedOptions );
+
+  if ( options.absolute ) {
+    options.pretty = false;
+  }
 
   if ( options.all ) {
     writeAllTSConfigFile();
   }
 
-  const cwd = options.all ? ALL_CONFIG_PATH : `${PERENNIAL_ROOT}/../${options.repo}`;
+  const repoEntryPoint = `${PERENNIAL_ROOT}/../${options.repo}`;
+
+  assert( fs.existsSync( `${repoEntryPoint}/tsconfig.json` ), `repo provided does not have a tsconfig.json: ${options.repo}` );
+
+  const cwd = options.all ? ALL_CONFIG_PATH : repoEntryPoint;
   // TODO: should be in perennial https://github.com/phetsims/perennial/issues/364
   const tscRunnable = options.all ? '../../../../chipper/node_modules/typescript/bin/tsc'
                                   : '../chipper/node_modules/typescript/bin/tsc';
 
+  const startTime = Date.now();
   if ( options.clean ) {
     // TODO: Keep these as 'node'? https://github.com/phetsims/chipper/issues/1481
-
-    const success = await runCommand( 'node', [ tscRunnable, '-b', '--clean' ], cwd );
-    if ( !success ) {
+    const cleanResults = await runCommand( 'node', [ tscRunnable, '-b', '--clean' ], cwd, false );
+    if ( !cleanResults.success ) {
       throw new Error( 'Checking failed to clean' );
     }
   }
-  return runCommand( 'node', [ tscRunnable, '-b', '--pretty', options.pretty + '' ], cwd );
+
+  const tscResults = await runCommand( 'node', [ tscRunnable, '-b', '--pretty', `${options.pretty}` ], cwd, options.absolute );
+  options.absolute && handleAbsolute( tscResults.stdout, cwd, startTime );
+  return tscResults.success;
 };
 
+
 // Utility function to spawn a child process with inherited stdio
-const runCommand = ( command: string, args: string[], cwd: string ): Promise<boolean> => {
+const runCommand = ( command: string, args: string[], cwd: string, absolute: boolean ): Promise<{ success: boolean; stdout: string; }> => {
   return new Promise( ( resolve, reject ) => {
-    const child = spawn( command, args, {
+    type SpawnOptions = Parameters<typeof spawn>[2];
+    const spawnOptions: SpawnOptions = {
       cwd: cwd,
-      stdio: 'inherit', // Inherit stdio to preserve colors and interactive output
       shell: process.platform.startsWith( 'win' )
-    } );
+    };
+
+    if ( !absolute ) {
+      spawnOptions.stdio = 'inherit'; // Inherit stdio to preserve colors and interactive output
+    }
+    const child = spawn( command, args, spawnOptions );
+
+    let stdout = '';
+    child.stdout && child.stdout.on( 'data', data => { stdout += data; } );
 
     child.on( 'error', error => reject( error ) );
-    child.on( 'close', code => resolve( code === 0 ) );
+    child.on( 'close', code => resolve( {
+      success: code === 0,
+      stdout: stdout
+    } ) );
   } );
 };
 
@@ -94,5 +143,30 @@ ${JSON.stringify( json, null, 2 )}`;
   fs.mkdirSync( ALL_CONFIG_PATH, { recursive: true } ); // Silent no-op if it already exists.
   fs.writeFileSync( ALL_CONFIG_PATH + 'tsconfig.json', fixEOL( fileOutput ) );
 }
+
+// This function supports special logging output to support hyperlinks in output when run inside a Webstorm external tool.
+const handleAbsolute = ( stdout: string, cwd: string, startTime: number ) => {
+
+  const lines = stdout.trim().split( os.EOL );
+  const mappedToAbsolute = lines.map( line => {
+
+    if ( line.includes( '): error TS' ) ) {
+      const parenthesesIndex = line.indexOf( '(' );
+
+      const linePath = line.substring( 0, parenthesesIndex );
+      const resolved = path.resolve( cwd, linePath );
+      return resolved + line.substring( parenthesesIndex );
+    }
+    else {
+      return line;
+    }
+  } );
+
+  // If a line starts without whitespace, it begins a new error
+  const errorCount = mappedToAbsolute.filter( line => line.length > 0 && line === line.trim() ).length;
+
+  console.log( mappedToAbsolute.join( '\n' ) );
+  console.log( `${errorCount} ${errorCount === 1 ? 'error' : 'errors'} in ${Date.now() - startTime}ms` );
+};
 
 export default check;
