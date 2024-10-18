@@ -54,7 +54,7 @@ const reset = '\u001b[0m';
   };
 
   const runAPIChecks = async () => {
-    lintResults = await execute( gruntCommand, [ 'generate-phet-io-api', '--stable' ], '../chipper', {
+    lintResults = await execute( gruntCommand, [ 'generate-phet-io-api', '--stable' ], `${__dirname}/../../../chipper`, {
       errors: 'resolve'
     } );
     outputResult( 'generate-phet-io-api', lintResults );
