@@ -133,10 +133,10 @@ module.exports = async function production( repo, branch, brands, noninteractive
     if ( published ) {
       grunt.log.writeln( 'Updating branch README' );
       try {
-        await execute( gruntCommand, [ 'published-README' ], `../${repo}` );
+        await execute( gruntCommand, [ 'published-readme' ], `../${repo}` );
       }
       catch( e ) {
-        grunt.log.writeln( 'published-README error, may not exist, will try generate-published-README' );
+        grunt.log.writeln( 'published-readme error, may not exist, will try generate-published-README' );
         try {
           await execute( gruntCommand, [ 'generate-published-README' ], `../${repo}` );
         }
@@ -211,7 +211,7 @@ module.exports = async function production( repo, branch, brands, noninteractive
       // Update the README on main
       if ( published ) {
         grunt.log.writeln( 'Updating main README' );
-        await execute( gruntCommand, [ 'published-README' ], `../${repo}` );
+        await execute( gruntCommand, [ 'published-readme' ], `../${repo}` );
         await gitAdd( repo, 'README.md' );
         try {
           await gitCommit( repo, `Generated published README.md as part of a production deploy for ${versionString}` );

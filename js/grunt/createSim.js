@@ -127,5 +127,5 @@ module.exports = async function( repo, author, options ) {
   fs.writeFileSync( packagePath, JSON.stringify( simPackageJSON, null, 2 ) );
 
   await npmUpdate( repo );
-  await execute( gruntCommand, [ 'unpublished-README' ], `../${repo}` );
+  await execute( gruntCommand, [ 'unpublished-readme' ], `../${repo}` );
 };
