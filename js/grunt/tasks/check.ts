@@ -23,5 +23,6 @@ export const checkTask = ( async () => check( {
   clean: !!getOption( 'clean' ),
   pretty: getOption( 'pretty' ) === undefined || getOption( 'pretty' ) === true,
   verbose: !!getOption( 'verbose' ),
+  silent: !!getOption( 'silent' ),
   absolute: !!getOption( 'absolute' )
 } ) )();

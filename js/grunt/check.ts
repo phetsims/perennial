@@ -33,6 +33,9 @@ type CheckOptions = {
   // Use good formatting/color output to the console. Always false if absolute:true
   pretty: boolean;
 
+  // Prevent all output, even if verbose or absolute flags are set.
+  silent: boolean;
+
   // When true, this will provide extra output from tsc. Always false if absolute:true
   verbose: boolean;
 
@@ -56,13 +59,20 @@ const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean
     all: false,
     clean: false,
     pretty: true,
+
+    silent: false,
     verbose: false,
+
     absolute: false
   }, providedOptions );
 
   if ( options.absolute ) {
     options.pretty = false;
     options.verbose = false;
+  }
+  if ( options.silent ) {
+    options.verbose = false;
+    options.absolute = false;
   }
 
   if ( options.all ) {
