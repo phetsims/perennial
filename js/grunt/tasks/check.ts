@@ -19,8 +19,9 @@ import getRepo from './util/getRepo';
 
 export const checkTask = ( async () => check( {
   repo: getRepo(),
-  all: getOption( 'all' ),
-  clean: getOption( 'clean' ),
+  all: !!getOption( 'all' ),
+  clean: !!getOption( 'clean' ),
   pretty: getOption( 'pretty' ) === undefined || getOption( 'pretty' ) === true,
-  absolute: getOption( 'absolute' )
+  verbose: !!getOption( 'verbose' ),
+  absolute: !!getOption( 'absolute' )
 } ) )();

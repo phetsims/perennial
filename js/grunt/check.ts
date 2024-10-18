@@ -30,8 +30,11 @@ type CheckOptions = {
   // Run tsc -b --clean before type checking (basically a cache clear)
   clean: boolean;
 
-  // Use good formatting/color output to the console.
+  // Use good formatting/color output to the console. Always false if absolute:true
   pretty: boolean;
+
+  // When true, this will provide extra output from tsc. Always false if absolute:true
+  verbose: boolean;
 
   /**
    * This mode supports special logging output to support hyperlinks in output when run inside a Webstorm external tool.
@@ -53,11 +56,13 @@ const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean
     all: false,
     clean: false,
     pretty: true,
+    verbose: false,
     absolute: false
   }, providedOptions );
 
   if ( options.absolute ) {
     options.pretty = false;
+    options.verbose = false;
   }
 
   if ( options.all ) {
@@ -82,8 +87,16 @@ const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean
     }
   }
 
-  const tscResults = await runCommand( 'node', [ tscRunnable, '-b', '--pretty', `${options.pretty}` ], cwd, options.absolute );
+  const tscArgs = [
+    tscRunnable,
+    '-b', // always, because we use project references.
+    '--verbose', `${options.verbose}`,
+    '--pretty', `${options.pretty}`
+  ];
+  const tscResults = await runCommand( 'node', tscArgs, cwd, options.absolute );
+
   options.absolute && handleAbsolute( tscResults.stdout, cwd, startTime );
+
   return tscResults.success;
 };
 
