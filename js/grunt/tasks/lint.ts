@@ -6,28 +6,23 @@
  * --fix: autofixable changes will be written to disk
  * --chip-away: output a list of responsible devs for each repo with lint problems
  * --repos: comma separated list of repos to lint in addition to the repo from running
+ * see parseLintOptions() for full API.
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */
 import * as grunt from 'grunt';
+import lint from '../lint.js';
+import parseLintOptions from './util/parseLintOptions.js';
 import getOption from './util/getOption.js';
 import getRepo from './util/getRepo.js';
-import lint from '../lint.js';
 
 const repo = getRepo();
 
 export const lintTask = ( async () => {
-  const cache = !getOption( 'disable-eslint-cache' );
-  const fix = getOption( 'fix' );
-  const chipAway = getOption( 'chip-away' );
 
   const extraRepos = getOption( 'repos' ) ? getOption( 'repos' ).split( ',' ) : [];
 
-  const lintReturnValue = await lint( [ repo, ...extraRepos ], {
-    cache: cache,
-    fix: fix,
-    chipAway: chipAway
-  } );
+  const lintReturnValue = await lint( [ repo, ...extraRepos ], parseLintOptions() );
 
   if ( !lintReturnValue.ok ) {
     grunt.fail.fatal( 'Lint failed' );
