@@ -16,6 +16,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
+import assert from 'assert';
 import { spawn } from 'child_process';
 import fs from 'fs';
 import _ from 'lodash';
@@ -28,11 +29,13 @@ type LintResult = { ok: boolean };
 type Repo = string;
 
 export type LintOptions = {
+  repos: Repo[];
   cache: boolean;
   fix: boolean;
   chipAway: boolean;
   showProgressBar: boolean;
 };
+export type RequiredReposInLintOptions = Partial<LintOptions> & Pick<LintOptions, 'repos'>;
 
 // Require ESLint from the correct path
 // eslint-disable-next-line phet/require-statement-match
@@ -246,8 +249,7 @@ const clearCaches = ( originalRepos: Repo[] ) => {
 /**
  * Lints the specified repositories.
  */
-const lint = async ( originalRepos: Repo[], providedOptions?: Partial<LintOptions> ): Promise<LintResult> => {
-  originalRepos = _.uniq( originalRepos ); // Don't double lint repos
+const lint = async ( providedOptions: RequiredReposInLintOptions ): Promise<LintResult> => {
 
   const options = _.assignIn( {
 
@@ -263,6 +265,9 @@ const lint = async ( originalRepos: Repo[], providedOptions?: Partial<LintOption
     // Show a progress bar while running, based on the current repo index in the provided list parameter
     showProgressBar: true
   }, providedOptions );
+
+  const originalRepos = _.uniq( options.repos ); // Don't double lint repos
+  assert( originalRepos.length > 0, 'no repos provided to lint' );
 
   // If options.cache is not set, clear the caches
   if ( !options.cache ) {

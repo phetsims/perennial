@@ -15,7 +15,7 @@ import parseLintOptions from './util/parseLintOptions.js';
   const activeRepos = getDataFile( 'active-repos' ).filter( repo => repo !== 'perennial-alias' ); // remove duplicate perennial copy
 
   // The APIs are the same for these two versions of lint support
-  const lintReturnValue = await lint( activeRepos, parseLintOptions() );
+  const lintReturnValue = await lint( parseLintOptions( { repos: activeRepos } ) );
 
   // Output results on errors.
   if ( !lintReturnValue.ok ) {
