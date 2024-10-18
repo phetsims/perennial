@@ -32,10 +32,12 @@ const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<void> =
   }
 
   const tsconfigDir = options.everything ? '../chipper/tsconfig/all' : `../${options.repo}`;
+  // TODO: should be in perennial https://github.com/phetsims/perennial/issues/364
   const pathToTSC = options.everything ? '../../../chipper/node_modules/typescript/bin/tsc'
                                        : '../chipper/node_modules/typescript/bin/tsc';
 
   if ( options.clean ) {
+    // TODO: Keep these as 'node'? https://github.com/phetsims/chipper/issues/1481
     await runCommand( 'node', [ pathToTSC, '-b', '--clean' ], tsconfigDir );
   }
 
