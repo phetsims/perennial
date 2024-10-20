@@ -123,7 +123,7 @@ repos.forEach( repo => {
   };
   const repoData = tableData[ repo ];
 
-  captureData( `./${repo}/js`, repoData );
+  captureData( `${__dirname}/../../../${repo}/js`, repoData );
 
   repoData[ completeHeader ] = percent( repoData.TS, repoData.TS + repoData.JS );
 } );
