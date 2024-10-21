@@ -53,18 +53,21 @@ type CheckOptions = {
 
 const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean> => {
 
-  // TODO: absolute mode logs timing, should other modes too?? https://github.com/phetsims/chipper/issues/1487
   const options: CheckOptions = _.assignIn( {
-    repo: 'perennial', // TODO: I hate this default, https://github.com/phetsims/chipper/issues/1487
-    all: false,
-    clean: false,
-    pretty: true,
 
+    // Either repo or all must be provided
+    repo: null,
+    all: false,
+
+    clean: false,
+
+    pretty: true,
     silent: false,
     verbose: false,
-
     absolute: false
   }, providedOptions );
+
+  assert( options.repo || options.all, 'You must provide a repo or use --all' );
 
   if ( options.absolute ) {
     options.pretty = false;
