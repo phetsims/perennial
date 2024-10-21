@@ -714,7 +714,7 @@ module.exports = ( function() {
         console.log( 'Running output-js-project' );
 
         // We might not be able to run this command!
-        await execute( gruntCommand, [ 'output-js-project' ], `../${repo}`, {
+        await execute( gruntCommand, [ 'output-js-project', '--silent' ], `../${repo}`, {
           errors: 'resolve'
         } );
       }

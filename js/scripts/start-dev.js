@@ -19,6 +19,7 @@
 // eslint-disable-next-line phet/require-statement-match
 const { spawn, exec } = require( 'child_process' );
 const path = require( 'path' );
+const gruntCommand = require( '../common/gruntCommand' );
 
 // It takes a long time to pull all repos. This option skips that step for faster startup.
 const skipPull = process.argv.includes( '--skipPull' );
@@ -92,7 +93,7 @@ async function main() {
       process.stdout.write( `${data}` );
       if ( data.toString().includes( 'http://' ) ) {
         console.log( '\nStarting the transpiler...\n' );
-        transpileProcess = spawn( 'node', [ 'js/scripts/transpile.js', '--watch' ], { cwd: path.join( phetsimsDirectory, 'chipper' ) } );
+        transpileProcess = spawn( gruntCommand, [ 'output-js', '--watch' ], { cwd: path.join( phetsimsDirectory, 'chipper' ) } );
 
         transpileProcess.stdout.on( 'data', data => process.stdout.write( `transpile: ${data}` ) );
         transpileProcess.stderr.on( 'data', data => process.stderr.write( `transpile: ${data}` ) );

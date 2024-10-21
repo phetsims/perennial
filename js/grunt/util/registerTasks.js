@@ -20,7 +20,12 @@ const tsxCommand = require( '../../common/tsxCommand.js' );
 function execTask( grunt, taskFilename ) {
 
   return () => {
-    gruntSpawn( grunt, tsxCommand, [ taskFilename, ...process.argv.slice( 2 ) ], process.cwd() );
+
+    // Grunt tasks look like "node grunt TASK [...args]", we hope.
+    const args = process.argv.slice( 3 );
+    assert( process.argv[ 0 ].includes( 'node' ), `node expected as the first, runnable arg: ${process.argv[ 0 ]}` );
+
+    gruntSpawn( grunt, tsxCommand, [ taskFilename, ...args ], process.cwd() );
   };
 }
 
@@ -28,6 +33,13 @@ const supportedTaskFileExtensions = [ '.js', '.ts', '.cjs' ];
 
 module.exports = ( grunt, dir ) => {
   assert( fs.existsSync( dir ), `dir does not exist: ${dir}` );
+
+  // Grunt has a weird side-effect where one if its dependency's (liftup) dependency (flaggedRespawn) will mutate that
+  // args string, removing --watch and adding in --no-respawning. This ruins the watch process for PhET's transpiler.
+  if ( process.argv.includes( '--no-respawning' ) && !process.argv.includes( '--watch' ) ) {
+    process.argv.splice( process.argv.indexOf( '--no-respawning' ), 1 );
+    process.argv.push( '--watch' );
+  }
 
   // Load each file from tasks/ and register it as a task
   fs.readdirSync( dir ).forEach( file => {

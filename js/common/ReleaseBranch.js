@@ -278,12 +278,15 @@ module.exports = ( function() {
       const checkoutDirectory = ReleaseBranch.getCheckoutDirectory( this.repo, this.branch );
       const repoDirectory = `${checkoutDirectory}/${this.repo}`;
 
+      // TODO: Why not have this check here? IT is in Maintenance where we call output-js-project, https://github.com/phetsims/chipper/issues/1499
+      // if ( outputJS && chipperSupportsOutputJSGruntTasks() ) {
       winston.info( `transpiling ${checkoutDirectory}` );
 
       // We might not be able to run this command!
-      await execute( gruntCommand, [ 'output-js-project' ], repoDirectory, {
+      await execute( gruntCommand, [ 'output-js-project', '--silent' ], repoDirectory, {
         errors: 'resolve'
       } );
+      // }
     }
 
     /**
