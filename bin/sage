@@ -29,7 +29,7 @@ error_exit() {
 execute_script() {
   local script_path="$1"
   shift
-  "$TSX_EXEC" "$script_path" "$@"
+  "$TSX_EXEC" "$script_path" "$@" || exit 1
 }
 
 # Check if the first argument is missing or starts with a hyphen (indicating options)
@@ -92,7 +92,7 @@ done
 # Execute the found script or display an error if not found
 if [[ -n "$FOUND_SCRIPT" ]]; then
   # echo "Executing task '$TASK' from '$FOUND_PATH'"
-  execute_script "$FOUND_SCRIPT" "$@"
+  execute_script "$FOUND_SCRIPT" "$@" || exit 1
 else
   error_exit "Unknown command or script file not found: $TASK"
 fi
