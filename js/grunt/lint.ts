@@ -23,7 +23,7 @@ import _ from 'lodash';
 import path from 'path';
 import showCommandLineProgress from '../common/showCommandLineProgress';
 
-const ESLINT_COMMAND = path.join( '../chipper/node_modules/.bin/eslint' );
+const ESLINT_COMMAND = path.join( `${__dirname}/../../node_modules/.bin/eslint` );
 type LintResult = { ok: boolean };
 
 type Repo = string;
