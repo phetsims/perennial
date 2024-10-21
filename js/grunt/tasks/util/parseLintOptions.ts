@@ -12,7 +12,6 @@ import getOption from './getOption.js';
  */
 const parseLintOptions = ( options?: Partial<LintOptions> ): LintOptions => {
   // TODO: Optionize would be nice, https://github.com/phetsims/perennial/issues/369
-  //  TODO: Why is there no hard error when you remove the lodash import here? It picks it up from the browser-side phet-types.d.ts, https://github.com/phetsims/chipper/issues/1489
   const lintOptions = _.assignIn( {
     repos: [] as string[], // the repos to lint
 
