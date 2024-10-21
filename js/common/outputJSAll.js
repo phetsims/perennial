@@ -1,7 +1,7 @@
 // Copyright 2017, University of Colorado Boulder
 
 /**
- * Runs `grunt output-js-all`
+ * Runs `grunt output-js --all`
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  * @author Sam Reid (PhET Interactive Simulations)
