@@ -39,7 +39,13 @@ const getRepo = (): Repo => {
 };
 
 export const getRepos = (): Repo[] => {
-  return getOption( 'repos' ) ? getOption( 'repos' ).split( ',' ) : [];
+  const reposArg = getOption( 'repos' );
+  if ( reposArg ) {
+    assert( typeof reposArg === 'string', 'repos should be a comma separated list of values' );
+    return getOption( 'repos' ).split( ',' );
+  }
+
+  return [];
 };
 
 export default getRepo;
