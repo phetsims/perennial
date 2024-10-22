@@ -1,6 +1,7 @@
 // Copyright 2002-2015, University of Colorado Boulder
 /**
  * @fileoverview Rule to check that a require statement that contains PHET_IO also has the preface: ifphetio!
+ * @deprected - TODO: Delete this rule? https://github.com/phetsims/chipper/issues/1500
  * @author Michael Kauzmann (PhET Interactive Simulations)
  * @copyright 2016 University of Colorado Boulder
  */
