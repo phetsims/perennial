@@ -6,6 +6,10 @@
  */
 {
   "extends": "./tsconfig-core.json",
+  "compilerOptions": {
+    /* Allow accessing UMD globals from modules. */
+    "allowUmdGlobalAccess": true
+  },
   "files": [
     "../../js/phet-types.d.ts",
     "../../js/phet-types-module.d.ts",
