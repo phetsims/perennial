@@ -1,6 +1,6 @@
 // Copyright 2024, University of Colorado Boulder
 
-import nodeEslintConfig from '../chipper/eslint/node.eslint.config.mjs';
+import nodeEslintConfig from './js/eslint/node.eslint.config.mjs';
 
 /**
  * @author Sam Reid (PhET Interactive Simulations)
