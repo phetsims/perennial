@@ -1,7 +1,5 @@
 {
-  // TODO: Remove devDependencies from chipper and use many of them from perennial-alias, https://github.com/phetsims/perennial/issues/364
   // TODO: If you want to use optionize() in perennial, we need to move it from phet-core to perennial-alias. Or JO HELP, https://github.com/phetsims/perennial/issues/371
-  // TODO: Doesn't shared/tsconfig-node and core need to be in perennial-alias? https://github.com/phetsims/perennial/issues/364
   "extends": "./tsconfig/shared/tsconfig-node.json",
   "include": [
     "js/**/*",
