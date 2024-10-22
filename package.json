@@ -36,6 +36,7 @@
     "eslint-plugin-html": "~8.1.2",
     "eslint-plugin-react": "~7.36.1",
     "express": "~4.16.2",
+    "globals": "~15.9.0",
     "graceful-fs": "~4.1.11",
     "grunt": "~1.5.3",
     "html-differ": "~1.4.0",
