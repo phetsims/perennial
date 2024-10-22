@@ -13,9 +13,9 @@ import _ from 'lodash';
 import os from 'os';
 import path from 'path';
 import fixEOL from '../common/fixEOL.js';
+import { PERENNIAL_REPO_NAME, PERENNIAL_ROOT } from '../common/perennialRepoUtils.js';
 import { Repo } from '../common/PerennialTypes.js';
 
-const PERENNIAL_ROOT = `${__dirname}/../..`;
 const ALL_CONFIG_PATH = `${PERENNIAL_ROOT}/../chipper/dist/tsconfig/all/`;
 
 // TODO: This is the best spot for doc, but this is duplicated with the tasks/check.ts doc for grunt --help, https://github.com/phetsims/chipper/issues/1482
@@ -87,9 +87,8 @@ const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean
   assert( fs.existsSync( `${repoEntryPoint}/tsconfig.json` ), `repo provided does not have a tsconfig.json: ${options.repo}` );
 
   const cwd = options.all ? ALL_CONFIG_PATH : repoEntryPoint;
-  // TODO: should be in perennial https://github.com/phetsims/perennial/issues/364
-  const tscRunnable = options.all ? '../../../../chipper/node_modules/typescript/bin/tsc'
-                                  : '../chipper/node_modules/typescript/bin/tsc';
+  const tscRunnable = options.all ? `../../../../${PERENNIAL_REPO_NAME}/node_modules/typescript/bin/tsc`
+                                  : `../${PERENNIAL_REPO_NAME}/node_modules/typescript/bin/tsc`;
 
   const startTime = Date.now();
   if ( options.clean ) {
