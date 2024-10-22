@@ -32,7 +32,6 @@ import noPropertyInRequireStatement from './rules/no-property-in-require-stateme
 import noSimpleTypeCheckingAssertions from './rules/no-simple-type-checking-assertions.js';
 import noViewImportedFromModel from './rules/no-view-imported-from-model.js';
 import phetIoObjectOptionsShouldNotPickFromPhetIoObject from './rules/phet-io-object-options-should-not-pick-from-phet-io-object.js';
-import phetIoRequireContainsIfphetio from './rules/phet-io-require-contains-ifphetio.js';
 import phetObjectShorthand from './rules/phet-object-shorthand.js';
 import preferDerivedStringProperty from './rules/prefer-derived-string-property.js';
 import requirePropertySuffix from './rules/require-property-suffix.js';
@@ -120,7 +119,6 @@ export default [
 
           // phet-specific require statement rules
           'require-statement-match': requireStatementMatch,
-          'phet-io-require-contains-ifphetio': phetIoRequireContainsIfphetio,
 
           // Require @public/@private for this.something = result;
           'no-property-in-require-statement': noPropertyInRequireStatement,
@@ -1103,7 +1101,6 @@ export default [
 
       // phet-specific require statement rules
       'phet/require-statement-match': 'error',
-      'phet/phet-io-require-contains-ifphetio': 'error',
 
       // Require @public/@private for this.something = result;
       'phet/property-visibility-annotation': 'off',
