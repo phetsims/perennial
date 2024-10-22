@@ -17,6 +17,7 @@ const parseLintOptions = ( options?: Partial<LintOptions> ): LintOptions => {
     repos: [] as string[], // the repos to lint
 
     // Cache results for a speed boost. Use --disable-eslint-cache to disable the cache; useful for developing rules.
+    // TODO: Support --clean flag too, https://github.com/phetsims/chipper/issues/1484
     cache: !getOption( 'disable-eslint-cache' ),
 
     // Fix things that can be auto-fixed (written to disk)
