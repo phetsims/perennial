@@ -8,6 +8,7 @@
  * Options (can be combined):
  * --all: check all repos
  * --clean: clean before checking (will still do the check, unlike running tsc directly)
+ * --absolute: Updates the output formatting to integrate well with Webstorm as an "External Tool"
  *
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
