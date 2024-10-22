@@ -7,8 +7,8 @@
 {
   "extends": "./tsconfig-core.json",
   "files": [
-    "../../phet-types.d.ts",
-    "../../phet-types-module.d.ts",
+    "../../js/phet-types.d.ts",
+    "../../js/phet-types-module.d.ts",
     "../../node_modules/@types/jquery/index.d.ts",
     "../../node_modules/@types/lodash/index.d.ts",
     "../../node_modules/@types/p2/index.d.ts",

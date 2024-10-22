@@ -18,7 +18,6 @@ module.exports = {
     const forbiddenTextObjects = [
 
       // chipper should use perennial-alias instead of perennial, so that it can check out specific versions
-      // eslint-disable-next-line phet/bad-chipper-text
       '../perennial/js/'
     ];
 
