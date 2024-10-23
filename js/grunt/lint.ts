@@ -41,7 +41,7 @@ export type RequiredReposInLintOptions = Partial<LintOptions> & Pick<LintOptions
 // eslint-disable-next-line phet/require-statement-match
 const { ESLint } = require( 'eslint' );
 
-const DO_NOT_LINT = [ 'babel' ];
+const DO_NOT_LINT = [ 'babel', 'phet-vite-demo' ];
 
 const getCacheLocation = ( repo: Repo ) => path.resolve( `../chipper/dist/eslint/cache/${repo}.eslintcache` );
 
