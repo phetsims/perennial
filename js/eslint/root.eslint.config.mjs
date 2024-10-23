@@ -81,10 +81,6 @@ export default [
       phet: {
         rules: {
 
-          // TODO: What is this doing here? https://github.com/phetsims/chipper/issues/1492
-          'property-visibility-annotation': 'off',
-
-
           ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
           // Custom Rules
           //
@@ -1102,8 +1098,6 @@ export default [
       // phet-specific require statement rules
       'phet/require-statement-match': 'error',
 
-      // Require @public/@private for this.something = result;
-      'phet/property-visibility-annotation': 'off',
       'phet/no-property-in-require-statement': 'error',
 
       // never allow object shorthand for properties, functions are ok.
