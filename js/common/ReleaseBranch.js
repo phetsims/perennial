@@ -28,6 +28,7 @@ const gitCheckoutDirectory = require( './gitCheckoutDirectory' );
 const gitCloneOrFetchDirectory = require( './gitCloneOrFetchDirectory' );
 const gitFirstDivergingCommit = require( './gitFirstDivergingCommit' );
 const gitIsAncestor = require( './gitIsAncestor' );
+const chipperSupportsOutputJSGruntTasks = require( './chipperSupportsOutputJSGruntTasks' );
 const gitPull = require( './gitPull' );
 const gitPullDirectory = require( './gitPullDirectory' );
 const gitRevParse = require( './gitRevParse' );
@@ -278,15 +279,14 @@ module.exports = ( function() {
       const checkoutDirectory = ReleaseBranch.getCheckoutDirectory( this.repo, this.branch );
       const repoDirectory = `${checkoutDirectory}/${this.repo}`;
 
-      // TODO: Why not have this check here? IT is in Maintenance where we call output-js-project, https://github.com/phetsims/chipper/issues/1499
-      // if ( outputJS && chipperSupportsOutputJSGruntTasks() ) {
-      winston.info( `transpiling ${checkoutDirectory}` );
+      if ( chipperSupportsOutputJSGruntTasks() ) {
+        winston.info( `transpiling ${checkoutDirectory}` );
 
-      // We might not be able to run this command!
-      await execute( gruntCommand, [ 'output-js-project', '--silent' ], repoDirectory, {
-        errors: 'resolve'
-      } );
-      // }
+        // We might not be able to run this command!
+        await execute( gruntCommand, [ 'output-js-project', '--silent' ], repoDirectory, {
+          errors: 'resolve'
+        } );
+      }
     }
 
     /**
