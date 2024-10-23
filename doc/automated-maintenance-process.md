@@ -114,7 +114,7 @@ release branches that are marked for maintenance (NOTE that it returns a Promise
 NOTE: This is an outline. Details for each step will be listed below in this document.
 
 Before starting, ensure you have a clean working copy. Run
-`cd perennial; node js/scripts/main-pull-status.js --allBranches` to pull all repos and release branches. Then:
+`cd perennial; sage run js/scripts/main-pull-status.js --allBranches` to pull all repos and release branches. Then:
 
 0. This process can take a lot of time, all the while taking over every repo checked out. It may be nice to use separate
    device besides your primary development environment. Or checkout a separate clone of phet repos, and use them for
@@ -223,7 +223,7 @@ be flagged.
 
 ## #0a: Pull all branches of all repos
 
-One way to do this in perennial is `node js/scripts/main-pull-status.js --allBranches`. Otherwise the next step will
+One way to do this in perennial is `sage run js/scripts/main-pull-status.js --allBranches`. Otherwise the next step will
 show incorrect failures.
 
 ## #0b: Stop your transpiler
