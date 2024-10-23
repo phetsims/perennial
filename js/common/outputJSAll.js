@@ -1,7 +1,8 @@
 // Copyright 2017, University of Colorado Boulder
 
 /**
- * Runs `grunt output-js --all`
+ * TODO: Rename to "transpileAll" https://github.com/phetsims/chipper/issues/1499
+ * Runs `grunt transpile --all`
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  * @author Sam Reid (PhET Interactive Simulations)
@@ -29,8 +30,8 @@ module.exports = async function() {
   if ( chipperSupportsOutputJSGruntTasks() ) {
 
     // Not every repo supports the output-js task, only proceed if it is supported
-    winston.info( 'running grunt output-js' );
-    await execute( gruntCommand, [ 'output-js', '--silent' ], '../chipper' );
+    winston.info( 'running grunt transpile' );
+    await execute( gruntCommand, [ 'transpile', '--silent' ], '../chipper' );
     ranOutputJS = true;
   }
   if ( !ranOutputJS ) {
