@@ -1,8 +1,8 @@
 // Copyright 2017, University of Colorado Boulder
 
 /**
- * TODO: Rename to "transpileAll" https://github.com/phetsims/chipper/issues/1499
- * Runs `grunt transpile --all`
+ * Runs `grunt transpile --all` in current version of chipper. Will hard fail if on old shas that predate this task
+ * creation in 10/2024.
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  * @author Sam Reid (PhET Interactive Simulations)
@@ -13,7 +13,7 @@ const gruntCommand = require( './gruntCommand' );
 const winston = require( 'winston' );
 
 /**
- * Outputs JS for a directory
+ * Outputs transpiled JS for all repos
  * @public
  *
  * @returns {Promise}
