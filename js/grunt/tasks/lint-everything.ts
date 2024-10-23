@@ -6,10 +6,10 @@
  */
 
 import grunt from 'grunt';
-import lint, { parseLintOptions } from '../lint.js';
+import lint, { getLintOptions } from '../lint.js';
 
 ( async () => {
-  const lintReturnValue = await lint( parseLintOptions() );
+  const lintReturnValue = await lint( getLintOptions() );
 
   // Output results on errors.
   if ( !lintReturnValue.ok ) {

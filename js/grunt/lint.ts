@@ -298,7 +298,7 @@ const lint = async ( providedOptions: RequiredReposInLintOptions ): Promise<Lint
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
-export const parseLintOptions = ( options?: Partial<LintOptions> ): LintOptions => {
+export const getLintOptions = ( options?: Partial<LintOptions> ): LintOptions => {
   // TODO: Optionize would be nice, https://github.com/phetsims/perennial/issues/369
 
   // Two apis for turning this off.
