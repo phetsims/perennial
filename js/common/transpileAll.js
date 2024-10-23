@@ -21,7 +21,7 @@ const winston = require( 'winston' );
  */
 module.exports = async function() {
 
-  winston.info( 'running outputJSAll' );
+  winston.info( 'running transpileAll' );
 
   let ranOutputJS = false;
 
