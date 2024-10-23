@@ -29,11 +29,11 @@ const booleanPrompt = require( '../common/booleanPrompt' );
  * ##############################################################################
  *
  * USAGE:
- * node perennial/js/scripts/copy-history-to-different-repo source-path destination-repo
+ * sage run perennial/js/scripts/copy-history-to-different-repo.ts source-path destination-repo
  *
  * EXAMPLE:
- * node perennial/js/scripts/copy-history-to-different-repo center-and-variability/js/common/view/QuestionBar.ts scenery-phet
- * node perennial/js/scripts/copy-history-to-different-repo counting-common/js/ number-suite-common
+ * sage run perennial/js/scripts/copy-history-to-different-repo.ts center-and-variability/js/common/view/QuestionBar.ts scenery-phet
+ * sage run perennial/js/scripts/copy-history-to-different-repo.ts counting-common/js/ number-suite-common
  *
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Chris Klusendorf (PhET Interactive Simulations)
@@ -52,8 +52,8 @@ const booleanPrompt = require( '../common/booleanPrompt' );
   // const stdout = await execute( 'git', `log --oneline --follow -M --name-status -- ${relativePath}`.split( ' ' ), `./perennial/${sourceRepo}` );
   const gitlog = await execute( 'git', `log --oneline --follow -M --name-status -- ${relativePath}`.split( ' ' ), `./${sourceRepo}` );
 
-  const allFilenames = new Set();
-  gitlog.split( '\n' ).forEach( line => {
+  const allFilenames = new Set<string>();
+  gitlog.split( '\n' ).forEach( ( line: string ) => {
     if ( line.length > 0 &&
 
          // Catch lines that start with an uppercase letter
@@ -78,7 +78,7 @@ const booleanPrompt = require( '../common/booleanPrompt' );
   const historyCopyRepo = `${sourceRepo}-history-copy`;
   await execute( 'git', `clone -b main --single-branch https://github.com/phetsims/${sourceRepo}.git ${historyCopyRepo}`.split( ' ' ), '.' );
 
-  const filterArgs = [ 'filter-repo' ];
+  const filterArgs: string[] = [ 'filter-repo' ];
   filenameArray.forEach( filename => {
     filterArgs.push( '--path' );
     filterArgs.push( filename );

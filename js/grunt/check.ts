@@ -84,7 +84,7 @@ const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean
 
   const repoEntryPoint = `${PERENNIAL_ROOT}/../${options.repo}`;
 
-  assert( fs.existsSync( `${repoEntryPoint}/tsconfig.json` ), `repo provided does not have a tsconfig.json: ${options.repo}` );
+  options.repo && assert( fs.existsSync( `${repoEntryPoint}/tsconfig.json` ), `repo provided does not have a tsconfig.json: ${options.repo}` );
 
   const cwd = options.all ? ALL_CONFIG_PATH : repoEntryPoint;
   const tscRunnable = options.all ? `../../../../${PERENNIAL_REPO_NAME}/node_modules/typescript/bin/tsc`

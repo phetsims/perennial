@@ -22,7 +22,7 @@ const gitIsClean = require( '../common/gitIsClean' );
 const gitPullRebase = require( '../common/gitPullRebase' );
 const gitRevParse = require( '../common/gitRevParse' );
 const npmUpdate = require( '../common/npmUpdate' );
-const outputJSAll = require( '../common/outputJSAll' );
+const transpileAll = require( '../common/transpileAll.js' );
 const winston = require( 'winston' );
 const _ = require( 'lodash' );
 
@@ -147,7 +147,7 @@ const getStatus = async repo => {
   console.log( `${_.every( repos, repo => !data[ repo ].length ) ? green : red}-----=====] finished npm [=====-----${reset}\n` );
 
   if ( transpile ) {
-    await outputJSAll();
+    await transpileAll();
 
     console.log( `${_.every( repos, repo => !data[ repo ].length ) ? green : red}-----=====] finished transpile [=====-----${reset}\n` );
   }

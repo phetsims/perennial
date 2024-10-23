@@ -5,8 +5,8 @@
     "esModuleInterop": true,
     "moduleResolution": "NodeNext",
     "typeRoots": [
-      // Hard coded for chipper so that this file can be used by other repos without needing package dependencies duplicated
-      "../../node_modules/@types"
+      // Hard coded so that this file can be used by other repos without needing package dependencies duplicated
+      "../node_modules/@types"
     ],
     "types": [
       "node"

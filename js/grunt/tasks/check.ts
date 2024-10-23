@@ -22,7 +22,7 @@ export const checkTask = ( async () => check( {
   repo: getRepo(),
   all: !!getOption( 'all' ),
   clean: !!getOption( 'clean' ),
-  pretty: getOption( 'pretty' ) === undefined || getOption( 'pretty' ) === true,
+  pretty: getOption( 'pretty', true ),
   verbose: !!getOption( 'verbose' ),
   silent: !!getOption( 'silent' ),
   absolute: !!getOption( 'absolute' )

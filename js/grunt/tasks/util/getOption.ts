@@ -10,8 +10,11 @@ import nopt from 'nopt';
 
 const options = nopt( {}, {}, process.argv, 2 );
 
-// TODO: parametrize based on what you want your return type to be? https://github.com/phetsims/chipper/issues/1465
-function getOption( keyName: string ): any {
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+function getOption( keyName: string, defaultValue?: any ): any {
+  if ( defaultValue && options[ keyName ] === undefined ) {
+    return defaultValue;
+  }
   return options[ keyName ];
 }
 

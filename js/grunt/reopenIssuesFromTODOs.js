@@ -37,7 +37,7 @@ module.exports = async function reopenIssuesFromTODOs() {
   fs.writeFileSync( '../chipper/dist/issuesFromTODOs.txt', '' );
 
   console.log( 'grunt lint-everything started' );
-  const result = await execute( gruntCommand, [ 'lint-everything', '--disable-eslint-cache' ], '../perennial', {
+  const result = await execute( gruntCommand, [ 'lint', '--all', '--disable-eslint-cache' ], '../perennial', {
     errors: 'resolve'
   } );
   console.log( 'grunt lint-everything finished' );
