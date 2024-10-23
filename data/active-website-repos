@@ -2,3 +2,4 @@ website-build
 website-common
 website-direct
 website-meteor
+website-test
