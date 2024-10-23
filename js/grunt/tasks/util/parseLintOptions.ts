@@ -13,12 +13,16 @@ import getOption from './getOption.js';
  */
 const parseLintOptions = ( options?: Partial<LintOptions> ): LintOptions => {
   // TODO: Optionize would be nice, https://github.com/phetsims/perennial/issues/369
+
+  // Two apis for turning this off.
+  const cache = !( getOption( 'clean' ) || getOption( 'disable-eslint-cache' ) );
+
   const lintOptions = _.assignIn( {
     repos: [] as string[], // the repos to lint
 
-    // Cache results for a speed boost. Use --disable-eslint-cache to disable the cache; useful for developing rules.
-    // TODO: Support --clean flag too, https://github.com/phetsims/chipper/issues/1484
-    cache: !getOption( 'disable-eslint-cache' ),
+    // Cache results for a speed boost.
+    // Use --clean or --disable-eslint-cache to disable the cache; useful for developing rules.
+    cache: cache,
 
     // Fix things that can be auto-fixed (written to disk)
     fix: !!getOption( 'fix' ),
