@@ -40,7 +40,7 @@ const reset = '\u001b[0m';
   };
 
   const runLint = async () => {
-    lintResults = await execute( gruntCommand, [ 'lint-everything' ], `${__dirname}/../../`, {
+    lintResults = await execute( gruntCommand, [ 'lint', '--all' ], `${__dirname}/../../`, {
       errors: 'resolve'
     } );
     outputResult( 'lint', lintResults );
