@@ -11,9 +11,8 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 import * as grunt from 'grunt';
-import lint from '../lint.js';
+import lint, { parseLintOptions } from '../lint.js';
 import getRepo, { getRepos } from './util/getRepo.js';
-import parseLintOptions from './util/parseLintOptions.js';
 
 const repo = getRepo();
 

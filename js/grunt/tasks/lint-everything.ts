@@ -6,8 +6,7 @@
  */
 
 import grunt from 'grunt';
-import lint from '../lint.js';
-import parseLintOptions from './util/parseLintOptions.js';
+import lint, { parseLintOptions } from '../lint.js';
 
 ( async () => {
   const lintReturnValue = await lint( parseLintOptions() );

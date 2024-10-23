@@ -292,6 +292,43 @@ const lint = async ( providedOptions: RequiredReposInLintOptions ): Promise<Lint
   return { ok: false };
 };
 
+/**
+ * If no repos are provided, activeRepos will be used as the list of repos to lint (equivalent to --all)
+ * TODO: Rename to "getLintOptions" https://github.com/phetsims/chipper/issues/1489
+ * @author Sam Reid (PhET Interactive Simulations)
+ * @author Michael Kauzmann (PhET Interactive Simulations)
+ */
+export const parseLintOptions = ( options?: Partial<LintOptions> ): LintOptions => {
+  // TODO: Optionize would be nice, https://github.com/phetsims/perennial/issues/369
+
+  // Two apis for turning this off.
+  const cache = !( getOption( 'clean' ) || getOption( 'disable-eslint-cache' ) );
+
+  const lintOptions = _.assignIn( {
+    repos: [] as string[], // the repos to lint
+
+    // Cache results for a speed boost.
+    // Use --clean or --disable-eslint-cache to disable the cache; useful for developing rules.
+    cache: cache,
+
+    // Fix things that can be auto-fixed (written to disk)
+    fix: !!getOption( 'fix' ),
+
+    // Prints responsible dev info for any lint errors for easier GitHub issue creation.
+    chipAway: !!getOption( 'chip-away' ),
+
+    // Show a progress bar while running, based on the current repo index in the provided list parameter
+    showProgressBar: !getOption( 'hide-progress-bar' )
+  }, options );
+
+  if ( lintOptions.repos.length === 0 || getOption( 'all' ) ) {
+
+    // remove duplicate perennial copy
+    lintOptions.repos = getDataFile( 'active-repos' ).filter( repo => repo !== 'perennial-alias' );
+  }
+  return lintOptions;
+};
+
 // Mark the version so that we don't try to lint old shas if on an older version of chipper.
 // TODO: Should we change this? I'm unsure what all the possibilities are, https://github.com/phetsims/chipper/issues/1484
 lint.chipperAPIVersion = 'npx';
