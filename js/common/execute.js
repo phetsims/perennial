@@ -27,8 +27,6 @@ const grunt = require( 'grunt' );
  * @rejects {ExecuteError}
  */
 module.exports = function( cmd, args, cwd, options ) {
-  // TODO: Commit this at some point? https://github.com/phetsims/chipper/issues/1481
-  // assert( cmd !== 'node', 'our NodeJS code supports typescript now, please use tsx as a runnable using "tsxCommand"');
 
   const startTime = Date.now();
 

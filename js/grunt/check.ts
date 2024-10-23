@@ -92,7 +92,7 @@ const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean
 
   const startTime = Date.now();
   if ( options.clean ) {
-    // Don't use tsx here, just node since it is for a third-part runnable.
+
     const cleanResults = await runCommand( 'node', [ tscRunnable, '-b', '--clean' ], cwd, false );
     if ( !cleanResults.success ) {
       throw new Error( 'Checking failed to clean' );
