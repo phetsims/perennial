@@ -22,6 +22,8 @@ import fs from 'fs';
 import _ from 'lodash';
 import path from 'path';
 import showCommandLineProgress from '../common/showCommandLineProgress';
+import getOption from './tasks/util/getOption.js';
+import getDataFile from '../common/getDataFile.js';
 
 const ESLINT_COMMAND = path.join( `${__dirname}/../../node_modules/.bin/eslint` );
 type LintResult = { ok: boolean };
