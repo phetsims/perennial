@@ -294,7 +294,6 @@ const lint = async ( providedOptions: RequiredReposInLintOptions ): Promise<Lint
 
 /**
  * If no repos are provided, activeRepos will be used as the list of repos to lint (equivalent to --all)
- * TODO: Rename to "getLintOptions" https://github.com/phetsims/chipper/issues/1489
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
