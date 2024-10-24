@@ -72,7 +72,7 @@ module.exports = {
   brands: buildLocalObject.brands || [ 'adapted-from-phet' ],
 
   // By default, run all tasks
-  // check local preferences for overrides for which tasks to turn 'off'
+  // check local preferences for overrides for which tasks to turn off
   // see hook-pre-commit.js
   hookPreCommit: buildLocalObject.hookPreCommit || {},
 
