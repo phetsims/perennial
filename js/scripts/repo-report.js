@@ -11,7 +11,7 @@
  * TODO https://github.com/phetsims/tasks/issues/942 This is a "quick" version which could benefit from documentation, better command line hygiene, more options, etc.
  */
 
-const { exec } = require( 'child_process' ); // eslint-disable-line phet/require-statement-match
+const { exec } = require( 'child_process' );
 
 exec( 'git rev-list main', ( error, stdout, stderr ) => {
   if ( error ) {

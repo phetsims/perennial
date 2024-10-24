@@ -16,7 +16,6 @@
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 
-// eslint-disable-next-line phet/require-statement-match
 const { spawn, exec } = require( 'child_process' );
 const path = require( 'path' );
 const gruntCommand = require( '../common/gruntCommand' );

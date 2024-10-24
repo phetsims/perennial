@@ -21,9 +21,9 @@ import { spawn } from 'child_process';
 import fs from 'fs';
 import _ from 'lodash';
 import path from 'path';
+import getDataFile from '../common/getDataFile.js';
 import showCommandLineProgress from '../common/showCommandLineProgress';
 import getOption from './tasks/util/getOption.js';
-import getDataFile from '../common/getDataFile.js';
 
 const ESLINT_COMMAND = path.join( `${__dirname}/../../node_modules/.bin/eslint` );
 type LintResult = { ok: boolean };
@@ -40,7 +40,6 @@ export type LintOptions = {
 export type RequiredReposInLintOptions = Partial<LintOptions> & Pick<LintOptions, 'repos'>;
 
 // Require ESLint from the correct path
-// eslint-disable-next-line phet/require-statement-match
 const { ESLint } = require( 'eslint' );
 
 const DO_NOT_LINT = [ 'babel', 'phet-vite-demo' ];
