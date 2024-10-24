@@ -127,6 +127,10 @@ const getStatus = async repo => {
 
     // Await each repo to pull them in sequence.
     for ( const repo of repos ) {
+
+      // Pulling slowly takes a while so it is nice to see some progress output.
+      process.stdout.write( `Pulling ${repo}...\n` );
+
       await getStatus( repo );
     }
   }
