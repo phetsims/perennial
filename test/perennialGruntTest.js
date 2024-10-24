@@ -1,7 +1,7 @@
 // Copyright 2017, University of Colorado Boulder
 
 /**
- * Unit tests, run with `qunit` at the top-level of perennial. May need `npm install -g qunit` beforehand, if it hasn't been run yet.
+ * Unit tests, run with `npm run test` at the top-level of perennial.
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
@@ -35,14 +35,14 @@ async function getLikelyNextBranch( repo, incrementMajor, incrementMinor ) {
 
 qunit.test( 'Checkout target', async assert => {
   assert.timeout( 120000 );
-  await execute( gruntCommand, [ 'checkout-target', '--repo=chains', '--target=1.42' ], '.' );
-  await execute( gruntCommand, [ 'checkout-main', '--repo=chains' ], '.' );
+  await execute( gruntCommand, [ 'checkout-target', '--repo=bumper', '--target=19.9', '--skipNpmUpdate' ], '.' );
+  await execute( gruntCommand, [ 'checkout-main', '--repo=bumper', '--skipNpmUpdate' ], '.' );
   assert.expect( 0 );
 } );
 
 qunit.test( 'NPM update', async assert => {
   assert.timeout( 120000 );
-  await execute( gruntCommand, [ 'npm-update', '--repo=chains' ], '.' );
+  await execute( gruntCommand, [ 'npm-update', '--repo=bumper' ], '.' );
   assert.expect( 0 );
 } );
 
