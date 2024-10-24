@@ -15,8 +15,8 @@
 // Can't externally reference
 type IntentionalAny = any;
 
-declare var assert: undefined | ( ( x: IntentionalAny, ...messages?: IntentionalAny[] ) => void );
-declare var assertSlow: undefined | ( ( x: IntentionalAny, ...messages?: IntentionalAny[] ) => void );
+declare var assert: undefined | ( ( x: IntentionalAny, ...messages: IntentionalAny[] ) => void );
+declare var assertSlow: undefined | ( ( x: IntentionalAny, ...messages: IntentionalAny[] ) => void );
 declare var sceneryLog: null | false | ( Record<string, ( ob: IntentionalAny, style?: string ) => void> & {
   push(): void;
   pop(): void;
