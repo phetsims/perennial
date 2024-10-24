@@ -52,7 +52,8 @@ module.exports = {
              node.declarations[ 0 ].init.arguments &&
              node.declarations[ 0 ].init.arguments.length > 0 ) {
           if ( node.declarations[ 0 ].init &&
-               node.declarations[ 0 ].init.callee.name === 'require' ) {
+               node.declarations[ 0 ].init.callee.name === 'require' &&
+               node.declarations[ 0 ].id.type !== 'ObjectPattern' ) { // don't error out for const { hi }
             const lhs = node.declarations[ 0 ].id.name;
             const rhs = node.declarations[ 0 ].init.arguments[ 0 ].value;
 
