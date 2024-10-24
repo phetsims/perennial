@@ -74,7 +74,7 @@ module.exports = {
   // By default, run all tasks
   // check local preferences for overrides for which tasks to turn 'off'
   // see hook-pre-commit.js
-  gitHooks: buildLocalObject.gitHooks || {},
+  hookPreCommit: buildLocalObject.hookPreCommit || {},
 
   // Set to true to mark a codebase as supported by a phet developer. This unlocks internal behavior that is not
   // desirable to outside collaborators (or may just not work). See https://github.com/phetsims/special-ops/issues/268
