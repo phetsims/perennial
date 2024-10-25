@@ -4,19 +4,19 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 import assert from 'assert';
+import fs from 'fs';
 import buildLocal from '../../../common/buildLocal.js';
 import getOption from './getOption.js';
 
 type Brand = string;
-type TGrunt = any;
 
-const getBrands = ( grunt: TGrunt, repo: string ): Brand[] => {
+const getBrands = ( repo: string ): Brand[] => {
 
   // Determine what brands we want to build
   assert( !getOption( 'brand' ), 'Use --brands={{BRANDS}} instead of brand' );
 
-  const localPackageObject = grunt.file.readJSON( `../${repo}/package.json` );
-  const supportedBrands = localPackageObject.phet.supportedBrands || [];
+  const localPackageObject = JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf-8' ) );
+  const supportedBrands = localPackageObject.phet?.supportedBrands || [];
 
   let brands: string[];
   if ( getOption( 'brands' ) ) {
@@ -38,7 +38,7 @@ const getBrands = ( grunt: TGrunt, repo: string ): Brand[] => {
 
   // Ensure all listed brands are valid
   brands.forEach( brand => assert( supportedBrands.includes( brand ), `Unsupported brand: ${brand}` ) );
-
+  assert( brands.length > 0, 'must have one or more brands to build' );
   return brands;
 };
 
