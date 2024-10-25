@@ -28,6 +28,8 @@ export default {
   '@typescript-eslint/await-thenable': 'error',
 
   // Disallow @ts-<directive> comments or require descriptions after directive ✅
+  // A value of true for a particular directive means that this rule will report if it finds any usage of said directive.
+  // See banTSCommentConfig.mjs for a reusable strict configuration.
   '@typescript-eslint/ban-ts-comment': [ 'error', {
     'ts-ignore': false, // Covered by '@typescript-eslint/prefer-ts-expect-error'
     'ts-check': true,
