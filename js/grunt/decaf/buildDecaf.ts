@@ -14,20 +14,17 @@ const SimVersion = require( '../../common/SimVersion' );
 const gitRevParse = require( '../../common/gitRevParse' );
 const loadJSON = require( '../../common/loadJSON' );
 const writeJSON = require( '../../common/writeJSON' );
-const fs = require( 'fs' );
 const path = require( 'path' );
+
+import fs from 'fs';
 
 // constants
 const BUILD_LOCAL_FILENAME = `${process.env.HOME}/.phet/build-local.json`;
 
 /**
  * Deploys a dev version after incrementing the test version number.
- * @public
- *
- * @param {string} project
- * @returns {Promise}
  */
-module.exports = async function( project ) {
+module.exports = async function( project: string ): Promise<void> {
 
   const buildLocalJSON = JSON.parse( fs.readFileSync( BUILD_LOCAL_FILENAME, { encoding: 'utf-8' } ) );
   const gitRoot = buildLocalJSON.gitRoot;
@@ -68,7 +65,8 @@ module.exports = async function( project ) {
   console.log( 'copied' );
 
   const javaProperties = fs.readFileSync( `${trunkPath}/simulations-java/simulations/${project}/${project}-build.properties`, 'utf-8' );
-  const flavors = javaProperties.split( '\n' ).filter( line => line.startsWith( 'project.flavor' ) ).map( line => line.split( '.' )[ 2 ] );
+  const lines: string[] = javaProperties.split( '\n' );
+  const flavors = lines.filter( line => line.startsWith( 'project.flavor' ) ).map( line => line.split( '.' )[ 2 ] );
   let url = '';
   if ( flavors.length === 0 ) {
     url = `${urlRoot}/decaf/html?project=${project}`;
@@ -105,7 +103,7 @@ module.exports = async function( project ) {
   fs.writeFileSync( `${buildDir}/${project}.html`, html );
 
   const stringFiles = fs.readdirSync( `${trunkPath}/simulations-java/simulations/${project}/data/${project}/localization` );
-  const locales = stringFiles.filter( stringFile => stringFile.indexOf( '_' ) >= 0 ).map( file => file.substring( file.indexOf( '_' ) + 1, file.lastIndexOf( '.' ) ) );
+  const locales = stringFiles.filter( stringFile => stringFile.includes( '_' ) ).map( file => file.substring( file.indexOf( '_' ) + 1, file.lastIndexOf( '.' ) ) );
   console.log( locales.join( '\n' ) );
 
   fs.writeFileSync( `${buildDir}/locales.txt`, locales.join( '\n' ) );
@@ -117,11 +115,13 @@ module.exports = async function( project ) {
   // Recursively copy ../decaf/html/cheerpj_3.0 to ${buildDir}/cheerpj_3.0
 
   // Function to create a directory if it doesn't exist
-  function ensureDir( dir ) {
+  function ensureDir( dir: string ): void {
     try {
       fs.mkdirSync( dir, { recursive: true } );
     }
     catch( error ) {
+
+      // @ts-expect-error
       if ( error.code !== 'EEXIST' ) {
         throw error;
       } // Ignore the error if the directory already exists
@@ -129,7 +129,7 @@ module.exports = async function( project ) {
   }
 
   // Recursive function to copy all files from one directory to another
-  async function copyDirRecursive( sourceDir, targetDir ) {
+  async function copyDirRecursive( sourceDir: string, targetDir: string ): Promise<void> {
 
     ensureDir( targetDir );
 
