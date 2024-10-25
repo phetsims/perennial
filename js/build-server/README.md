@@ -17,7 +17,8 @@ To start, stop, or restart the build server, run this command:
 Starting the build-server runs the application that is currently checked out at `/data/share/phet/phet-repos/perennial`.
 You must use the `phet-admin` account for all git operations on this repo, e.g. `sudo -u phet-admin git pull`.
 
-To edit startup options, please see `/usr/lib/systemd/system/build-server.service`
+To edit startup options, please see `/etc/systemd/system/build-server.service` on phet-server2, and on phet-server-dev
+we have `/usr/lib/systemd/system/build-server.service`;
 
 ## Log Files
 
@@ -40,8 +41,8 @@ The "dev server" is currently `bayes.colorado.edu`. The "production server" is c
 All of the phet repos live on the production and dev servers under /data/share/phet/phet-repos. The build server lives
 in perennial: `/data/share/phet/phet-repos/perennial/js/build-server`.
 
-The build-server is run as user "phet-admin". It requires the certain fields filled out in
-phet-admin's `HOME/.phet/build-local.json`
+The build-server is run as user "phet-admin". It requires the certain fields filled out in phet-admin's
+`HOME/.phet/build-local.json`
 (see assertions in getBuildServerConfig.js). These fields are already filled out, but they may need to modified or
 updated.
 
@@ -81,8 +82,8 @@ input a JSON object with the following properties:
 
 - `{String} api` - the only option is `"2.0"`
 - `{JSON.Array<String>} brands` - a list brands to deploy.
-- `{JSON.Array<String>} servers` - a list of servers to receive the deployment. Should be a subset
-  of `[ "dev", "production" ]`
+- `{JSON.Array<String>} servers` - a list of servers to receive the deployment. Should be a subset of
+  `[ "dev", "production" ]`
 - `{JSON.Array} dependencies` - a json object with dependency repos and shas, in the form of dependencies.json files
 - `{JSON.Array} locales` - a list of locales to build (optional, defaults to all locales in babel).
 - `{String} simName` - the standardized name of the sim, lowercase with hyphens instead of spaces (i.e. area-builder)
