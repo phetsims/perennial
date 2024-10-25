@@ -102,7 +102,6 @@ ${commentSymbol} Allow from all
 
       // if the directory exists
       if ( fs.existsSync( htaccessPathToDir.replace( htaccessFilename, '' ) ) ) {
-
         await writeFile( htaccessPathToDir, passwordProtectWrapperContents );
         if ( devVersionPath ) {
           await devScp( htaccessPathToDir, `${devVersionPath}/phet-io/${getSubdirHtaccessPath( subdir )}` );
