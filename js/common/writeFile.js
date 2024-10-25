@@ -13,16 +13,16 @@ module.exports = async function( filepath, contents ) {
         if ( err ) {
           tries += 1;
           if ( err.code === 'ENOENT' ) {
-            winston.error( 'Write operation failed. The target directory did not exist.' );
+            winston.error( `Write operation failed. The target directory did not exist: ${filepath}` );
             reject( err );
           }
           else if ( tries >= 10 ) {
-            winston.error( `Write operation failed ${tries} time(s). I'm giving up, all hope is lost.` );
+            winston.error( `Write operation failed ${tries} time(s). I'm giving up, all hope is lost: ${filepath}` );
             clearInterval( writeFileInterval );
             reject( err );
           }
           else {
-            winston.error( `Write failed with error: ${JSON.stringify( err )}, trying again` );
+            winston.error( `Write failed with error: ${JSON.stringify( err )}, trying again: ${filepath}` );
           }
         }
         else {
