@@ -7,8 +7,8 @@
  */
 
 import assert from 'assert';
-import buildDecaf from '../decaf/buildDecaf';
-import getOption from './util/getOption';
+import buildDecaf from '../decaf/buildDecaf.js';
+import getOption from './util/getOption.js';
 
 ( async () => {
   const project = getOption( 'project' );

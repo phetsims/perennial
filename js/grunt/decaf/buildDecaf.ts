@@ -6,17 +6,17 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
+import getPreloads from './getPreloads';
+import fs from 'fs';
+
 const assert = require( 'assert' );
 const execute = require( '../../common/execute' );
 const copyFile = require( '../../common/copyFile' );
-const getPreloads = require( './getPreloads' );
 const SimVersion = require( '../../common/SimVersion' );
 const gitRevParse = require( '../../common/gitRevParse' );
 const loadJSON = require( '../../common/loadJSON' );
 const writeJSON = require( '../../common/writeJSON' );
 const path = require( 'path' );
-
-import fs from 'fs';
 
 // constants
 const BUILD_LOCAL_FILENAME = `${process.env.HOME}/.phet/build-local.json`;
@@ -24,7 +24,7 @@ const BUILD_LOCAL_FILENAME = `${process.env.HOME}/.phet/build-local.json`;
 /**
  * Deploys a dev version after incrementing the test version number.
  */
-module.exports = async function( project: string ): Promise<void> {
+export default async function( project: string ): Promise<void> {
 
   const buildLocalJSON = JSON.parse( fs.readFileSync( BUILD_LOCAL_FILENAME, { encoding: 'utf-8' } ) );
   const gitRoot = buildLocalJSON.gitRoot;
@@ -182,4 +182,4 @@ module.exports = async function( project: string ): Promise<void> {
       console.log( `build and ready for local testing: ${urlRoot}/decaf/projects/${project}/build/${project}.html?simulation=${flavor}` );
     } );
   }
-};
+}
