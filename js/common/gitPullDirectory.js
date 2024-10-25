@@ -1,7 +1,8 @@
 // Copyright 2023, University of Colorado Boulder
 
 /**
- * git pull
+ * git pull the specified path. Needs to work for repos relative to this copy of
+ * perennial, AND in ../release-branches/REPO-VERSION/REPO/
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */

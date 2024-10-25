@@ -1,7 +1,7 @@
 // Copyright 2017, University of Colorado Boulder
 
 /**
- * git pull
+ * git pull with an assumption that your cwd is in the top of a repo, like perennial/ or chipper/.
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
