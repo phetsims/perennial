@@ -17,13 +17,35 @@ const assert = require( 'assert' );
 const _ = require( 'lodash' );
 const tsxCommand = require( '../../common/tsxCommand.js' );
 
+/**
+ * Grunt tasks generally look like "node grunt TASK [...args]".
+ * We only want to forward the options, not the node and grunt runnables, and not the task name. This is complicated
+ * because we need to support a fair number of cases:
+ * node grunt lint
+ * node grunt lint --repo=bumper --all
+ * node grunt (default task)
+ * node grunt --lint=false
+ * grunt lint (not sure this every actually happens, but this algorithm would support it).
+ *
+ * Assert out eagerly if we get something that is unexpected.
+ */
+function getArgsToForward() {
+  for ( let i = 0; i < process.argv.length; i++ ) {
+    if ( process.argv[ i ].includes( 'grunt' ) ) {
+      const nextArg = process.argv[ i + 1 ];
+      const isNextArgTheTask = !nextArg || !nextArg.startsWith( '-' );
+      return process.argv.slice( i + ( isNextArgTheTask ? 2 : 1 ) );
+    }
+  }
+  assert( false, `unexpected grunt task arguments that didn't launch with "grunt": ${process.argv}` );
+  return [];
+}
+
 function execTask( grunt, taskFilename ) {
 
   return () => {
 
-    // Grunt tasks look like "node grunt TASK [...args]", we hope.
-    const args = process.argv.slice( 3 );
-    assert( process.argv[ 0 ].includes( 'node' ), `node expected as the first, runnable arg: ${process.argv[ 0 ]}` );
+    const args = getArgsToForward();
 
     gruntSpawn( grunt, tsxCommand, [ taskFilename, ...args ], process.cwd() );
   };
