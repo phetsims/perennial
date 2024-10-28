@@ -45,6 +45,7 @@ const { ESLint } = require( 'eslint' );
 const DO_NOT_LINT = [ 'babel', 'phet-vite-demo' ];
 
 const getCacheLocation = ( repo: Repo ) => path.resolve( `../chipper/dist/eslint/cache/${repo}.eslintcache` );
+const OLD_CACHE = '../chipper/eslint/cache/';
 
 function lintWithChildProcess( repo: Repo, options: LintOptions ): Promise<number> {
 
@@ -273,9 +274,9 @@ const lint = async ( providedOptions: RequiredReposInLintOptions ): Promise<Lint
 
   // If options.cache is not set, clear the caches
   if ( !options.cache ) {
-
     clearCaches( originalRepos );
   }
+  handleOldCacheLocation();
 
   // Don't show a progress bar for just a single repo
   options.showProgressBar = options.showProgressBar && originalRepos.length > 1;
@@ -292,6 +293,17 @@ const lint = async ( providedOptions: RequiredReposInLintOptions ): Promise<Lint
   }
   return { ok: false };
 };
+
+// Even though on main the new cache location is chipper/dist/eslint/cache, linting on old shas still produces a
+// cache in chipper/eslint/cache. Delete it eagerly and always when it is there.
+function handleOldCacheLocation(): void {
+  try {
+    fs.existsSync( OLD_CACHE ) && fs.rmSync( OLD_CACHE, { recursive: true } );
+  }
+  catch( e ) {
+    console.error( `error removing old cache location: ${e}` ); // Please report these problems to https://github.com/phetsims/chipper/issues/1508
+  }
+}
 
 /**
  * If no repos are provided, activeRepos will be used as the list of repos to lint (equivalent to --all)
