@@ -26,8 +26,8 @@ module.exports = function spawn( grunt, command, args, cwd, preHook ) {
   } );
   preHook && preHook( argsString );
 
-  spawned.stderr.on( 'data', data => grunt.log.error( data.toString() ) );
-  spawned.stdout.on( 'data', data => grunt.log.write( data.toString() ) );
+  spawned.stderr.on( 'data', data => console.error( data.toString() ) );
+  spawned.stdout.on( 'data', data => console.log( data.toString() ) );
   process.stdin.pipe( spawned.stdin );
 
   spawned.on( 'close', code => {
