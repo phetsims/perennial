@@ -9,12 +9,12 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( './execute' );
-const gitAdd = require( './gitAdd' );
-const gitCommit = require( './gitCommit' );
-const gitIsClean = require( './gitIsClean' );
-const gruntCommand = require( './gruntCommand' );
-const loadJSON = require( './loadJSON' );
+const execute = require( './execute.js' );
+const gitAdd = require( './gitAdd.js' );
+const gitCommit = require( './gitCommit.js' );
+const gitIsClean = require( './gitIsClean.js' );
+const gruntCommand = require( './gruntCommand.js' );
+const loadJSON = require( './loadJSON.js' );
 const winston = require( 'winston' );
 
 /**

@@ -6,9 +6,9 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const gitCheckout = require( './gitCheckout' );
-const gitDoesCommitExist = require( './gitDoesCommitExist' );
-const gitFetch = require( './gitFetch' );
+const gitCheckout = require( './gitCheckout.js' );
+const gitDoesCommitExist = require( './gitDoesCommitExist.js' );
+const gitFetch = require( './gitFetch.js' );
 const assert = require( 'assert' );
 
 /**

@@ -2,7 +2,7 @@
 // @author Matt Pennington (PhET Interactive Simulations)
 
 
-const constants = require( './constants' );
+const constants = require( './constants.js' );
 const winston = require( 'winston' );
 const nodemailer = require( 'nodemailer' );
 

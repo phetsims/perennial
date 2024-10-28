@@ -7,7 +7,7 @@
  *  @author Matt Pennington
  **/
 
-const buildLocal = require( '../common/buildLocal' );
+const buildLocal = require( '../common/buildLocal.js' );
 const fetch = require( 'node-fetch' ); // eslint-disable-line phet/require-statement-match
 const fs = require( 'fs' );
 

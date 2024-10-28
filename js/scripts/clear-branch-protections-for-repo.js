@@ -20,7 +20,7 @@
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 
-const protectGithubBranches = require( '../common/protectGithubBranches' );
+const protectGithubBranches = require( '../common/protectGithubBranches.js' );
 
 const args = process.argv.slice( 2 );
 const repo = args[ 0 ];

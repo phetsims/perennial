@@ -9,7 +9,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const simMetadata = require( '../common/simMetadata' );
+const simMetadata = require( '../common/simMetadata.js' );
 const winston = require( 'winston' );
 
 winston.default.transports.console.level = 'error';

@@ -7,8 +7,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const puppeteerLoad = require( '../common/puppeteerLoad' );
-const withServer = require( '../common/withServer' );
+const puppeteerLoad = require( '../common/puppeteerLoad.js' );
+const withServer = require( '../common/withServer.js' );
 const path = require( 'path' );
 
 ( async () => {

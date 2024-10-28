@@ -2,11 +2,11 @@
 // @author Matt Pennington (PhET Interactive Simulations)
 
 
-const constants = require( './constants' );
+const constants = require( './constants.js' );
 const fs = require( 'graceful-fs' ); // eslint-disable-line phet/require-statement-match
 const winston = require( 'winston' );
-const writeFile = require( '../common/writeFile' );
-const parseScreenNames = require( './parseScreenNames' );
+const writeFile = require( '../common/writeFile.js' );
+const parseScreenNames = require( './parseScreenNames.js' );
 
 /**
  * Create a [sim name].xml file in the live sim directory in htdocs. This file tells the website which

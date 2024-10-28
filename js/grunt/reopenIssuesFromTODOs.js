@@ -6,10 +6,10 @@ const fs = require( 'fs' );
 const _ = require( 'lodash' );
 const Octokit = require( '@octokit/rest' ); // eslint-disable-line phet/require-statement-match
 
-const execute = require( '../common/execute' );
-const buildLocal = require( '../common/buildLocal' );
-const gruntCommand = require( '../common/gruntCommand' );
-const createDirectory = require( '../common/createDirectory' );
+const execute = require( '../common/execute.js' );
+const buildLocal = require( '../common/buildLocal.js' );
+const gruntCommand = require( '../common/gruntCommand.js' );
+const createDirectory = require( '../common/createDirectory.js' );
 
 const CHIPPER_DIST = '../chipper/dist';
 

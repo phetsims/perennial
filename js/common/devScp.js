@@ -6,8 +6,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const buildLocal = require( './buildLocal' );
-const scp = require( './scp' );
+const buildLocal = require( './buildLocal.js' );
+const scp = require( './scp.js' );
 
 /**
  * Transfers a file (or directory recursively) to the dev server

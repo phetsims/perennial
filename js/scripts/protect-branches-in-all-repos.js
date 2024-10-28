@@ -9,7 +9,7 @@
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 
-const protectGithubBranches = require( '../common/protectGithubBranches' );
+const protectGithubBranches = require( '../common/protectGithubBranches.js' );
 const fs = require( 'fs' );
 
 // cannot use getActiveRepos() from root

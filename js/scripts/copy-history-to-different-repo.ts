@@ -1,7 +1,7 @@
 // Copyright 2021, University of Colorado Boulder
 
-const execute = require( '../common/execute' );
-const booleanPrompt = require( '../common/booleanPrompt' );
+const execute = require( '../common/execute.js' );
+const booleanPrompt = require( '../common/booleanPrompt.js' );
 
 /**
  * Copy the history of a file or directory to a different repo.

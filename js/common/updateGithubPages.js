@@ -6,15 +6,15 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( './execute' );
-const gitAdd = require( './gitAdd' );
-const gitCheckout = require( './gitCheckout' );
-const gitCommit = require( './gitCommit' );
-const gitIsClean = require( './gitIsClean' );
-const gitPull = require( './gitPull' );
-const gitPush = require( './gitPush' );
-const gruntCommand = require( './gruntCommand' );
-const npmUpdate = require( './npmUpdate' );
+const execute = require( './execute.js' );
+const gitAdd = require( './gitAdd.js' );
+const gitCheckout = require( './gitCheckout.js' );
+const gitCommit = require( './gitCommit.js' );
+const gitIsClean = require( './gitIsClean.js' );
+const gitPull = require( './gitPull.js' );
+const gitPush = require( './gitPush.js' );
+const gruntCommand = require( './gruntCommand.js' );
+const npmUpdate = require( './npmUpdate.js' );
 const winston = require( 'winston' );
 
 /**

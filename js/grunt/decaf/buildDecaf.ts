@@ -10,12 +10,12 @@ import getPreloads from './getPreloads';
 import fs from 'fs';
 
 const assert = require( 'assert' );
-const execute = require( '../../common/execute' );
-const copyFile = require( '../../common/copyFile' );
-const SimVersion = require( '../../common/SimVersion' );
-const gitRevParse = require( '../../common/gitRevParse' );
-const loadJSON = require( '../../common/loadJSON' );
-const writeJSON = require( '../../common/writeJSON' );
+const execute = require( '../../common/execute.js' );
+const copyFile = require( '../../common/copyFile.js' );
+const SimVersion = require( '../../common/SimVersion.js' );
+const gitRevParse = require( '../../common/gitRevParse.js' );
+const loadJSON = require( '../../common/loadJSON.js' );
+const writeJSON = require( '../../common/writeJSON.js' );
 const path = require( 'path' );
 
 // constants

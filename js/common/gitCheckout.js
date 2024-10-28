@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const gitCheckoutDirectory = require( './gitCheckoutDirectory' );
+const gitCheckoutDirectory = require( './gitCheckoutDirectory.js' );
 const assert = require( 'assert' );
 
 /**

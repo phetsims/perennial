@@ -6,14 +6,14 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const Patch = require( './Patch' );
-const ReleaseBranch = require( './ReleaseBranch' );
-const SimVersion = require( './SimVersion' );
-const checkoutDependencies = require( './checkoutDependencies' );
-const getDependencies = require( './getDependencies' );
-const gitCheckout = require( './gitCheckout' );
-const gitPull = require( './gitPull' );
-const githubCreateIssue = require( './githubCreateIssue' );
+const Patch = require( './Patch.js' );
+const ReleaseBranch = require( './ReleaseBranch.js' );
+const SimVersion = require( './SimVersion.js' );
+const checkoutDependencies = require( './checkoutDependencies.js' );
+const getDependencies = require( './getDependencies.js' );
+const gitCheckout = require( './gitCheckout.js' );
+const gitPull = require( './gitPull.js' );
+const githubCreateIssue = require( './githubCreateIssue.js' );
 const assert = require( 'assert' );
 
 module.exports = ( function() {

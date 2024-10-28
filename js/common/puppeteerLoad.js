@@ -7,7 +7,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-const browserPageLoad = require( './browserPageLoad' );
+const browserPageLoad = require( './browserPageLoad.js' );
 const puppeteer = require( 'puppeteer' );
 
 /**

@@ -7,10 +7,10 @@
  */
 
 const _ = require( 'lodash' );
-const gitFetchCheckout = require( './gitFetchCheckout' );
-const gitFromTimestamp = require( './gitFromTimestamp' );
-const getRepoList = require( './getRepoList' );
-const npmUpdate = require( './npmUpdate' );
+const gitFetchCheckout = require( './gitFetchCheckout.js' );
+const gitFromTimestamp = require( './gitFromTimestamp.js' );
+const getRepoList = require( './getRepoList.js' );
+const npmUpdate = require( './npmUpdate.js' );
 const winston = require( 'winston' );
 
 /**

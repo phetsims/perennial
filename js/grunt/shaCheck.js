@@ -7,10 +7,10 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const getDependencies = require( '../common/getDependencies' );
-const gitCheckout = require( '../common/gitCheckout' );
-const gitIsAncestor = require( '../common/gitIsAncestor' );
-const simMetadata = require( '../common/simMetadata' );
+const getDependencies = require( '../common/getDependencies.js' );
+const gitCheckout = require( '../common/gitCheckout.js' );
+const gitIsAncestor = require( '../common/gitIsAncestor.js' );
+const simMetadata = require( '../common/simMetadata.js' );
 
 /**
  * Will print out information about with simulations include the given SHA, and which ones don't.

@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const devSsh = require( './devSsh' );
+const devSsh = require( './devSsh.js' );
 
 /**
  * Checks whether access to the dev server is available (usually unavailable if not on VPN or on campus)

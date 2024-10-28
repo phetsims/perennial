@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const getRepoList = require( './getRepoList' );
+const getRepoList = require( './getRepoList.js' );
 
 /**
  * Returns a list of simulation repositories actively handled by tooling for PhET

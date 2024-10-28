@@ -6,37 +6,37 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const production = require( '../grunt/production' );
-const rc = require( '../grunt/rc' );
-const ChipperVersion = require( './ChipperVersion' );
-const ModifiedBranch = require( './ModifiedBranch' );
-const Patch = require( './Patch' );
-const ReleaseBranch = require( './ReleaseBranch' );
-const build = require( './build' );
-const checkoutMain = require( './checkoutMain' );
-const checkoutTarget = require( './checkoutTarget' );
-const execute = require( './execute' );
-const getActiveRepos = require( './getActiveRepos' );
-const getBranches = require( './getBranches' );
-const getBranchMap = require( './getBranchMap' );
-const getDependencies = require( './getDependencies' );
-const gitAdd = require( './gitAdd' );
-const gitCheckout = require( './gitCheckout' );
-const gitCherryPick = require( './gitCherryPick' );
-const gitCommit = require( './gitCommit' );
-const gitCreateBranch = require( './gitCreateBranch' );
-const gitIsClean = require( './gitIsClean' );
-const gitPull = require( './gitPull' );
-const gitPush = require( './gitPush' );
-const gitRevParse = require( './gitRevParse' );
+const production = require( '../grunt/production.js' );
+const rc = require( '../grunt/rc.js' );
+const ChipperVersion = require( './ChipperVersion.js' );
+const ModifiedBranch = require( './ModifiedBranch.js' );
+const Patch = require( './Patch.js' );
+const ReleaseBranch = require( './ReleaseBranch.js' );
+const build = require( './build.js' );
+const checkoutMain = require( './checkoutMain.js' );
+const checkoutTarget = require( './checkoutTarget.js' );
+const execute = require( './execute.js' );
+const getActiveRepos = require( './getActiveRepos.js' );
+const getBranches = require( './getBranches.js' );
+const getBranchMap = require( './getBranchMap.js' );
+const getDependencies = require( './getDependencies.js' );
+const gitAdd = require( './gitAdd.js' );
+const gitCheckout = require( './gitCheckout.js' );
+const gitCherryPick = require( './gitCherryPick.js' );
+const gitCommit = require( './gitCommit.js' );
+const gitCreateBranch = require( './gitCreateBranch.js' );
+const gitIsClean = require( './gitIsClean.js' );
+const gitPull = require( './gitPull.js' );
+const gitPush = require( './gitPush.js' );
+const gitRevParse = require( './gitRevParse.js' );
 const assert = require( 'assert' );
 const asyncq = require( 'async-q' ); // eslint-disable-line phet/require-statement-match
 const _ = require( 'lodash' );
 const fs = require( 'fs' );
 const repl = require( 'repl' );
 const winston = require( 'winston' );
-const gruntCommand = require( './gruntCommand' );
-const chipperSupportsOutputJSGruntTasks = require( './chipperSupportsOutputJSGruntTasks' );
+const gruntCommand = require( './gruntCommand.js' );
+const chipperSupportsOutputJSGruntTasks = require( './chipperSupportsOutputJSGruntTasks.js' );
 
 // constants
 const MAINTENANCE_FILE = '.maintenance.json';

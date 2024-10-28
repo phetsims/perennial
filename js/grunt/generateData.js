@@ -16,12 +16,12 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const getActiveRepos = require( '../common/getActiveRepos' );
-const getBranch = require( '../common/getBranch' );
-const gitAdd = require( '../common/gitAdd' );
-const gitCommit = require( '../common/gitCommit' );
-const gitIsClean = require( '../common/gitIsClean' );
-const gitPush = require( '../common/gitPush' );
+const getActiveRepos = require( '../common/getActiveRepos.js' );
+const getBranch = require( '../common/getBranch.js' );
+const gitAdd = require( '../common/gitAdd.js' );
+const gitCommit = require( '../common/gitCommit.js' );
+const gitIsClean = require( '../common/gitIsClean.js' );
+const gitPush = require( '../common/gitPush.js' );
 const assert = require( 'assert' );
 const fs = require( 'fs' );
 const grunt = require( 'grunt' );

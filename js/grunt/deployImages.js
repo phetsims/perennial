@@ -7,7 +7,7 @@
  */
 
 // modules
-const buildLocal = require( '../common/buildLocal' );
+const buildLocal = require( '../common/buildLocal.js' );
 const winston = require( 'winston' );
 const axios = require( 'axios' );
 

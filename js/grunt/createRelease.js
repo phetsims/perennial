@@ -6,21 +6,21 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const SimVersion = require( '../common/SimVersion' );
-const build = require( '../common/build' );
-const copyFile = require( '../common/copyFile' );
-const getBranch = require( '../common/getBranch' );
-const gitAdd = require( '../common/gitAdd' );
-const gitCheckout = require( '../common/gitCheckout' );
-const gitCommit = require( '../common/gitCommit' );
-const gitCreateBranch = require( '../common/gitCreateBranch' );
-const gitIsClean = require( '../common/gitIsClean' );
-const gitPush = require( '../common/gitPush' );
-const hasRemoteBranch = require( '../common/hasRemoteBranch' );
-const npmUpdate = require( '../common/npmUpdate' );
-const setRepoVersion = require( '../common/setRepoVersion' );
-const setRepoSupportedBrands = require( '../common/setRepoSupportedBrands' );
-const updateHTMLVersion = require( '../common/updateHTMLVersion' );
+const SimVersion = require( '../common/SimVersion.js' );
+const build = require( '../common/build.js' );
+const copyFile = require( '../common/copyFile.js' );
+const getBranch = require( '../common/getBranch.js' );
+const gitAdd = require( '../common/gitAdd.js' );
+const gitCheckout = require( '../common/gitCheckout.js' );
+const gitCommit = require( '../common/gitCommit.js' );
+const gitCreateBranch = require( '../common/gitCreateBranch.js' );
+const gitIsClean = require( '../common/gitIsClean.js' );
+const gitPush = require( '../common/gitPush.js' );
+const hasRemoteBranch = require( '../common/hasRemoteBranch.js' );
+const npmUpdate = require( '../common/npmUpdate.js' );
+const setRepoVersion = require( '../common/setRepoVersion.js' );
+const setRepoSupportedBrands = require( '../common/setRepoSupportedBrands.js' );
+const updateHTMLVersion = require( '../common/updateHTMLVersion.js' );
 const assert = require( 'assert' );
 const grunt = require( 'grunt' );
 const winston = require( 'winston' );

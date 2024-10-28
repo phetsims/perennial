@@ -7,7 +7,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-const loadJSON = require( './loadJSON' );
+const loadJSON = require( './loadJSON.js' );
 const winston = require( 'winston' );
 
 /**

@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const gitCheckout = require( './gitCheckout' );
+const gitCheckout = require( './gitCheckout.js' );
 const fs = require( 'fs' );
 
 /**
