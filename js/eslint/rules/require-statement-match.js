@@ -126,7 +126,7 @@ module.exports = {
               }
 
               // Optionally enforce .js suffix for relative paths
-              const enforceJsSuffix = true; // Set to false if not enforcing
+              const enforceJsSuffix = !rhs.includes( 'node_modules' ); // Set to false if not enforcing
 
               if ( enforceJsSuffix && !hasExtension ) {
                 context.report( {
