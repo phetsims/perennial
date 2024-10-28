@@ -14,7 +14,7 @@
 
  
 const fs = require( 'fs' );
-const childProcess = require( 'child_process' ); // eslint-disable-line phet/require-statement-match
+const childProcess = require( 'child_process' );
 
 // The repositories the script will iterate through to produce data
 const repos = [
