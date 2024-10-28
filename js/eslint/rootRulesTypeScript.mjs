@@ -365,8 +365,6 @@ export default {
   // it ignores the syntax, or it falsely reports against it. In these cases, we create what we call an extension
   // rule; a rule within our plugin that has the same functionality, but also supports TypeScript.
 
-  // You must disable the base rule to avoid duplicate/incorrect errors. TODO: Is that still necessary? https://github.com/phetsims/chipper/issues/1495
-
   // Enforce consistent brace style for blocks  🔧
   '@stylistic/brace-style': [ 'error', 'stroustrup', { allowSingleLine: true } ],
 
