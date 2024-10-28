@@ -52,10 +52,6 @@ const phetSimBrowserGlobals = {
       // QUnit
       QUnit: 'readonly',
 
-      // as used in Gruntfile.js
-      // TODO: not a browser global, only for Node https://github.com/phetsims/chipper/issues/1485
-      module: 'readonly',
-
       // Misc
       QueryStringMachine: 'readonly',
       QueryStringMachineSchema: 'readonly',
