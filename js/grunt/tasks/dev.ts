@@ -21,4 +21,5 @@ import getOption from './util/getOption';
   assertIsValidRepoName( repo );
 
   await dev( repo, getOption( 'brands' ).split( ',' ), !!getOption( 'noninteractive' ), 'main', getOption( 'message' ) );
+  console.log( 'Done, OK to type Ctrl-C' ); // TODO: https://github.com/phetsims/perennial/issues/389
 } )();
