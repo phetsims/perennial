@@ -42,7 +42,7 @@ export type RequiredReposInLintOptions = Partial<LintOptions> & Pick<LintOptions
 // Require ESLint from the correct path
 const { ESLint } = require( 'eslint' );
 
-const DO_NOT_LINT = [ 'babel', 'phet-vite-demo' ];
+const DO_NOT_LINT = [ 'babel', 'phet-vite-demo', 'scenery-stack-test' ]; // TODO: enable linting for scenery-stack-test, see https://github.com/phetsims/scenery-stack-test/issues/1
 
 const getCacheLocation = ( repo: Repo ) => path.resolve( `../chipper/dist/eslint/cache/${repo}.eslintcache` );
 const OLD_CACHE = '../chipper/eslint/cache/';
