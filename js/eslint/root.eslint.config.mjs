@@ -8,7 +8,6 @@ import globals from 'globals';
 import getNodeConfiguration from './getNodeConfiguration.mjs';
 import phetRules from './phetRules.mjs';
 import rootRules from './rootRules.mjs';
-import phetSimBrowserGlobalsEslintConfig from './phetSimBrowserGlobals.eslint.config.mjs';
 import rootRulesTypeScript from './rootRulesTypeScript.mjs';
 
 /**
@@ -89,6 +88,11 @@ export default [
   // Only HTML Files
   {
     files: [ '**/*.html' ],
+    languageOptions: {
+      globals: {
+        ...globals.browser
+      }
+    },
     rules: {
       // DUPLICATION ALERT, this overrides the base rule, just for HTML.
       'no-multiple-empty-lines': [ 'error', { max: 2, maxBOF: 2, maxEOF: 1 } ],
@@ -110,7 +114,6 @@ export default [
       'eol-last': [ 'error', 'never' ]
     }
   },
-  phetSimBrowserGlobalsEslintConfig,
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
