@@ -20,7 +20,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-/* global window document phet phetio */ // TODO: Clean up for https://github.com/phetsims/chipper/issues/1485
+// Used for evaluating browser-side code in puppeteer tests.
+/* global window document phet phetio */
 
 const _ = require( 'lodash' );
 const puppeteerLoad = require( '../../common/puppeteerLoad.js' );
