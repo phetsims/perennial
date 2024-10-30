@@ -24,29 +24,15 @@ export const phetSimBrowserGlobalsObject = {
   phetio: 'readonly',
   assert: 'readonly', // allow assertions
   assertSlow: 'readonly', // allow slow assertions
+  QueryStringMachine: 'readonly',
 
   _: 'readonly', // underscore, lodash
+
   $: 'readonly', // jQuery
   JQuery: 'readonly', // jQuery for TypeScript type definitions
-  jsondiffpatch: 'readonly', // JSON diffs
+
   QUnit: 'readonly', // QUnit
-
-  // Misc
-  QueryStringMachine: 'readonly',
-  QueryStringMachineSchema: 'readonly',
-
-  // define globals for missing Web Audio types, see https://github.com/phetsims/chipper/issues/1214
-  // TODO: define only where needed https://github.com/phetsims/chipper/issues/1485
-  OscillatorType: 'readonly',
-
-  // type for QUnit assert
-  // TODO: define only where needed https://github.com/phetsims/chipper/issues/1485
-  Assert: 'readonly',
-
-  // TODO: define only where needed https://github.com/phetsims/chipper/issues/1485
-  // React
-  React: 'readonly',
-  ReactDOM: 'readonly'
+  Assert: 'readonly' // type for QUnit assert
 };
 
 const phetSimBrowserGlobals = {

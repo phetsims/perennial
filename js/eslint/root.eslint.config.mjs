@@ -154,5 +154,14 @@ export default [
     rules: {
       '@typescript-eslint/no-floating-promises': 'off'
     }
+  },
+  {
+    files: [ '**/*.jsx', '**/*.tsx' ],
+    languageOptions: {
+      globals: {
+        React: 'readonly',
+        ReactDOM: 'readonly'
+      }
+    }
   }
 ];
