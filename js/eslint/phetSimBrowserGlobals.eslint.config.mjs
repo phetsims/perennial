@@ -10,9 +10,9 @@ export const phetSimBrowserGlobalsObject = {
   // globals that should never be accessed
   //=============================================================================================
 
-  // TODO: Does this work if they are overridden later? https://github.com/phetsims/chipper/issues/1485
-  // Using `event` is most likely a bug, instead the event should be passed through via a parameter,
-  // discovered in https://github.com/phetsims/scenery/issues/1053
+  // Using `event` is most likely a bug, instead the event should be passed through via a parameter, discovered in
+  // https://github.com/phetsims/scenery/issues/1053. Alternatively, if you must use `event`, you can refer to
+  // window.event or disable the lint rule with an override or directive.
   event: 'off',
 
   //=============================================================================================
