@@ -24,7 +24,7 @@ type CheckOptions = {
   // The repo to use as the entrypoint for type checking. The repo provided MUST have a tsconfig.json at the top level.
   repo: Repo;
 
-  // Lint all supported repos in active-repos. Using this option ignore the "repo" option.
+  // Type check all supported repos in active-repos. Using this option ignore the "repo" option.
   all: boolean;
 
   // Run tsc -b --clean before type checking (basically a cache clear)
