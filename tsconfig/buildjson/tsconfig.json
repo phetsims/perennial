@@ -42,6 +42,7 @@
     "../../../sherpa/js/fontawesome-4/checkEmptySolidShape.js",
     "../../../sherpa/js/fontawesome-4/checkSquareOSolidShape.js",
     "../../../sherpa/js/fontawesome-4/scissorsShape.js",
+    "../../../sherpa/js/fontawesome-4/warningSignShape.js",
     "../../../sherpa/js/fontawesome-5/**/*",
     "../../../sherpa/lib/game-up-camera-1.0.0.js",
     "../../../sherpa/lib/himalaya-1.1.0.js",
