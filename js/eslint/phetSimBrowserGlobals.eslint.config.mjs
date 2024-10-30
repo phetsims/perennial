@@ -11,8 +11,7 @@ export const phetSimBrowserGlobalsObject = {
   //=============================================================================================
 
   // TODO: Does this work if they are overridden later? https://github.com/phetsims/chipper/issues/1485
-  // TODO: Is this still needed? https://github.com/phetsims/chipper/issues/1485
-  // Using window.event is most likely a bug, instead the event should be passed through via a parameter,
+  // Using `event` is most likely a bug, instead the event should be passed through via a parameter,
   // discovered in https://github.com/phetsims/scenery/issues/1053
   event: 'off',
 
