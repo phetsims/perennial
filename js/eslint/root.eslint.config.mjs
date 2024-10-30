@@ -125,8 +125,15 @@ export default [
   // A couple of workarounds to make our testing files a bit easier.
   {
     files: [
-      '**/*[Tt]ests.{js,ts}'
+      '**/*[Tt]est*.{js,ts,jsx,tsx}',
+      '**/*qunit*.{js,ts,jsx,tsx}'
     ],
+    languageOptions: {
+      globals: {
+        QUnit: 'readonly', // QUnit
+        Assert: 'readonly' // type for QUnit assert
+      }
+    },
     rules: {
 
       // Test files are allowed to use bracket notation to circumnavigate private member access. Typescript
@@ -153,24 +160,6 @@ export default [
     ],
     rules: {
       '@typescript-eslint/no-floating-promises': 'off'
-    }
-  },
-  {
-    files: [ '**/*.jsx', '**/*.tsx' ],
-    languageOptions: {
-      globals: {
-        React: 'readonly',
-        ReactDOM: 'readonly'
-      }
-    }
-  },
-  {
-    files: [ '**/*Test*.{js,ts,jsx,tsx}', '**/*test*.{js,ts,jsx,tsx}', '**/*qunit*.{js,ts,jsx,tsx}' ],
-    languageOptions: {
-      globals: {
-        QUnit: 'readonly', // QUnit
-        Assert: 'readonly' // type for QUnit assert
-      }
     }
   }
 ];

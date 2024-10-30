@@ -22,7 +22,17 @@ export const getBrowserConfiguration = ( pattern = {} ) => {
         }
       },
       ...pattern
-    } ];
+    },
+    {
+      files: [ '**/*.jsx', '**/*.tsx' ],
+      languageOptions: {
+        globals: {
+          React: 'readonly',
+          ReactDOM: 'readonly'
+        }
+      }
+    }
+  ];
 };
 
 export default [
