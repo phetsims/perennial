@@ -46,7 +46,7 @@ export const phetSimBrowserGlobalsObject = {
   // TODO: define only where needed https://github.com/phetsims/chipper/issues/1485
   // React
   React: 'readonly',
-  ReactDOM: 'readonly',
+  ReactDOM: 'readonly'
 };
 
 const phetSimBrowserGlobals = {
