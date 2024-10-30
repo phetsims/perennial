@@ -20,6 +20,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
+/* global window document phet phetio */ // TODO: Clean up for https://github.com/phetsims/chipper/issues/1485
+
 const _ = require( 'lodash' );
 const puppeteerLoad = require( '../../common/puppeteerLoad.js' );
 const Maintenance = require( '../../common/Maintenance.js' );

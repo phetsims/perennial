@@ -42,11 +42,6 @@ export const phetSimBrowserGlobalsObject = {
   // JSON diffs
   jsondiffpatch: 'readonly',
 
-  document: 'readonly',
-
-  // for linting Node.js code
-  global: 'readonly',
-
   // QUnit
   QUnit: 'readonly',
 

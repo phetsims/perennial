@@ -37,6 +37,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
+/* global window */
 ( function( global ) {
 
   // To support loading in Node.js and the browser

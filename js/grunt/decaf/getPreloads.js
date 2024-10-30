@@ -7,6 +7,7 @@
 
 const puppeteer = require( 'puppeteer' );
 
+/* global window */
 module.exports = async url => {
 
   let runtimeResources = null;

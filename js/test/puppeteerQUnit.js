@@ -3,6 +3,7 @@
 /* eslint-enable */
 // @author Michael Kauzmann (PhET Interactive Simulations)
 
+/* global QUnit window */ // TODO: Clean up for https://github.com/phetsims/chipper/issues/1485
 
 module.exports = function( browser, targetURL ) {
 
