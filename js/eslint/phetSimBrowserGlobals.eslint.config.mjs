@@ -27,10 +27,7 @@ export const phetSimBrowserGlobalsObject = {
   QueryStringMachine: 'readonly',
 
   _: 'readonly', // underscore, lodash
-  $: 'readonly', // jQuery
-
-  QUnit: 'readonly', // QUnit
-  Assert: 'readonly' // type for QUnit assert
+  $: 'readonly' // jQuery
 };
 
 const phetSimBrowserGlobals = {

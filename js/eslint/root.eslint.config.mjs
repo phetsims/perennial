@@ -163,5 +163,14 @@ export default [
         ReactDOM: 'readonly'
       }
     }
+  },
+  {
+    files: [ '**/*Test*.{js,ts,jsx,tsx}', '**/*test*.{js,ts,jsx,tsx}', '**/*qunit*.{js,ts,jsx,tsx}' ],
+    languageOptions: {
+      globals: {
+        QUnit: 'readonly', // QUnit
+        Assert: 'readonly' // type for QUnit assert
+      }
+    }
   }
 ];
