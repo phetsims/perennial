@@ -18,7 +18,10 @@ Starting the build-server runs the application that is currently checked out at 
 You must use the `phet-admin` account for all git operations on this repo, e.g. `sudo -u phet-admin git pull`.
 
 To edit startup options, please see `/etc/systemd/system/build-server.service` on phet-server2, and on phet-server-dev
-we have `/usr/lib/systemd/system/build-server.service`;
+we have `/usr/lib/systemd/system/build-server.service`; 
+
+Updating NodeJS versions on the production server:
+Please note this doc, especially to update the selinux permissions: https://github.com/phetsims/website?tab=readme-ov-file#managing-node-versions-on-production-servers
 
 ## Log Files
 
