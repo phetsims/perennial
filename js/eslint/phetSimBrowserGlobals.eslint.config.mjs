@@ -21,74 +21,32 @@ export const phetSimBrowserGlobalsObject = {
   //=============================================================================================
 
   phet: 'readonly',
-
-  // allow assertions
-  assert: 'readonly',
-
-  // allow slow assertions
-  assertSlow: 'readonly',
-
   phetio: 'readonly',
+  assert: 'readonly', // allow assertions
+  assertSlow: 'readonly', // allow slow assertions
 
-  // underscore, lodash
-  _: 'readonly',
-
-  // jQuery
-  $: 'readonly',
-
-  // jQuery for type documentation
-  JQuery: 'readonly',
-
-  // JSON diffs
-  jsondiffpatch: 'readonly',
-
-  // QUnit
-  QUnit: 'readonly',
+  _: 'readonly', // underscore, lodash
+  $: 'readonly', // jQuery
+  JQuery: 'readonly', // jQuery for TypeScript type definitions
+  jsondiffpatch: 'readonly', // JSON diffs
+  QUnit: 'readonly', // QUnit
 
   // Misc
   QueryStringMachine: 'readonly',
   QueryStringMachineSchema: 'readonly',
-  QSMParsedParameters: 'readonly',
-
-  // Prism is a syntax highlighter that renders code in the browser. It is used for PhET-iO wrappers and for a11y.
-  // TODO: define only where needed https://github.com/phetsims/chipper/issues/1485
-  Prism: 'readonly',
-
-  // sole/tween.js
-  TWEEN: 'readonly',
-
-  // TODO: redundant right? https://github.com/phetsims/chipper/issues/1485
-  window: 'readonly',
-
-  // TODO: old and unused right? Otherwise define only where needed https://github.com/phetsims/chipper/issues/1485
-  handlePlaybackEvent: 'readonly',
-
-  // TODO: define only where needed. https://github.com/phetsims/chipper/issues/1485
-  paper: 'readonly',
-
-  // TODO: define only where needed https://github.com/phetsims/chipper/issues/1485
-  pako: 'readonly',
 
   // define globals for missing Web Audio types, see https://github.com/phetsims/chipper/issues/1214
   // TODO: define only where needed https://github.com/phetsims/chipper/issues/1485
   OscillatorType: 'readonly',
-  AudioContextState: 'readonly',
 
   // type for QUnit assert
   // TODO: define only where needed https://github.com/phetsims/chipper/issues/1485
   Assert: 'readonly',
 
-  // TODO: redundant right? https://github.com/phetsims/chipper/issues/1485
-  fetch: 'readonly',
-
   // TODO: define only where needed https://github.com/phetsims/chipper/issues/1485
   // React
   React: 'readonly',
   ReactDOM: 'readonly',
-
-  BigInt: 'readonly',
-
-  FlatQueue: 'readonly'
 };
 
 const phetSimBrowserGlobals = {
