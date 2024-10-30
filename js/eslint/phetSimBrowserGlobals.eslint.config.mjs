@@ -27,9 +27,7 @@ export const phetSimBrowserGlobalsObject = {
   QueryStringMachine: 'readonly',
 
   _: 'readonly', // underscore, lodash
-
   $: 'readonly', // jQuery
-  JQuery: 'readonly', // jQuery for TypeScript type definitions
 
   QUnit: 'readonly', // QUnit
   Assert: 'readonly' // type for QUnit assert
