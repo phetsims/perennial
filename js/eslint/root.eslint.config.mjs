@@ -126,7 +126,8 @@ export default [
   {
     files: [
       '**/*[Tt]est*.{js,ts,jsx,tsx}',
-      '**/*qunit*.{js,ts,jsx,tsx}'
+      '**/*qunit*.{js,ts,jsx,tsx}',
+      '**/*QUnit*.{js,ts,jsx,tsx}'
     ],
     languageOptions: {
       globals: {
