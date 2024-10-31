@@ -36,7 +36,7 @@ SCRIPT_FILE="$2"
 shift 2
 
 # Check if the script file has a .js or .ts extension
-if [[ ! "$SCRIPT_FILE" =~ \.(js|ts)$ ]]; then
+if [[ ! "$SCRIPT_FILE" =~ \.(js|ts|mjs|cjs)$ ]]; then
  echo "Script file must have a .js or .ts extension." >&2
  exit 1
 fi
