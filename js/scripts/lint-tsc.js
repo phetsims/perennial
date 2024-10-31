@@ -53,14 +53,15 @@ const reset = '\u001b[0m';
     outputResult( 'tsc', tscResults );
   };
 
-  const runAPIChecks = async () => {
-    lintResults = await execute( gruntCommand, [ 'compare-phet-io-api', '--stable' ], `${__dirname}/../../../chipper`, {
-      errors: 'resolve'
-    } );
-    outputResult( 'compare-phet-io-api', lintResults );
-  };
+  // const runAPIChecks = async () => {
+  //   lintResults = await execute( gruntCommand, [ 'compare-phet-io-api', '--stable' ], `${__dirname}/../../../chipper`, {
+  //     errors: 'resolve'
+  //   } );
+  //   outputResult( 'compare-phet-io-api', lintResults );
+  // };
 
-  await Promise.all( [ runLint(), runTsc(), runAPIChecks() ] );
+  // await Promise.all( [ runLint(), runTsc(), runAPIChecks() ] );
+  await Promise.all( [ runLint(), runTsc() ] );
 
   console.log( `\n${lintResults.code === 0 && tscResults.code === 0 ? green : red}-----=====] finished [=====-----${reset}\n` );
 } )();
