@@ -33,7 +33,6 @@ const { exec } = require( 'child_process' );
 // Path to the root directory with all repositories.
 const rootPath = `${__dirname}/../../..`;
 
-// Uncomment when ready to work through all active repositories.
 const fs = require( 'fs' );
 const contents = fs.readFileSync( `${__dirname}../../../data/active-repos`, 'utf8' ).trim();
 const repos = contents.split( '\n' ).map( sim => sim.trim() );
@@ -46,14 +45,15 @@ const repos = contents.split( '\n' ).map( sim => sim.trim() );
  * Runs a git command in a repository asynchronously.
  * @param {string} repo - The name of the repository to execute the git command in.
  * @param {string} command - The git command to execute.
- * @param {boolean} hideOutput - Whether to hide the output of the command.
  * @returns {Promise<Buffer>} - A promise that resolves with the result of the command.
  */
-const execGitCommand = async ( repo, command, hideOutput ) => {
+const execGitCommand = async ( repo, command ) => {
   const path = `${rootPath}/${repo}`;
 
   return new Promise( ( resolve, reject ) => {
-    exec( `git -C ${path} ${command}`, { stdio: hideOutput ? 'ignore' : 'pipe' }, ( error, stdout, stderr ) => {
+
+    // pipe hides results but makes them available for processing
+    exec( `git -C ${path} ${command}`, { stdio: 'pipe' }, ( error, stdout, stderr ) => {
       if ( error ) {
         console.error( `Error executing git command in ${repo}: ${stderr || error.message}` );
         reject( error );
@@ -98,7 +98,7 @@ const branchExists = async ( repo, branchName, checkRemote ) => {
   try {
 
     // Check for the branch locally
-    const localPromise = await execGitCommand( repo, `branch --list ${branchName}`, false );
+    const localPromise = await execGitCommand( repo, `branch --list ${branchName}` );
     const localBranches = localPromise.toString().trim();
     if ( localBranches ) {
       return true;
@@ -107,7 +107,7 @@ const branchExists = async ( repo, branchName, checkRemote ) => {
     if ( checkRemote ) {
 
       // Check for the branch remotely
-      const remotePromise = await execGitCommand( repo, `branch -r --list origin/${branchName}`, false );
+      const remotePromise = await execGitCommand( repo, `branch -r --list origin/${branchName}` );
       const remoteBranches = remotePromise.toString().trim();
       return !!remoteBranches;
     }
