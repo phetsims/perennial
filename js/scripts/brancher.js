@@ -137,9 +137,10 @@ const validateBranchName = branchName => {
  * Make sure that the branch exists in all repositories. As soon as one repository does not have the branch, the script
  * will exit.
  */
-const ensureBranchExists = ( branchName, checkRemote ) => {
+const ensureBranchExists = async ( branchName, checkRemote ) => {
   for ( const repo of repos ) {
-    if ( !branchExists( repo, branchName, checkRemote ) ) {
+    const exists = await branchExists( repo, branchName, checkRemote );
+    if ( !exists ) {
       console.error( `Branch '${branchName}' does not exist in ${repo}. You may need to pull it from remote.` );
       process.exit( 1 );
     }
@@ -192,8 +193,8 @@ const deleteBranch = async ( branchName, remote ) => {
 
     // Delete the branch in each repository
     for ( const repo of repos ) {
-
-      if ( !branchExists( repo, branchName, remote ) ) {
+      const exists = await branchExists( repo, branchName, remote );
+      if ( !exists ) {
 
         // The branch does not exist, skipping.
         console.log( `${repo} does not have branch ${branchName}, skipping delete...` );
@@ -243,7 +244,7 @@ const checkoutBranch = async branchName => {
 const mergeMainIntoFeature = async branchName => {
 
   // Make sure that branches are available locally for the merge.
-  ensureBranchExists( branchName, false );
+  await ensureBranchExists( branchName, false );
 
   // Merge main into the feature branch in each repository
   for ( const repo of repos ) {
@@ -276,7 +277,7 @@ const mergeMainIntoFeature = async branchName => {
 const mergeFeatureIntoMain = async branchName => {
 
   // Make sure the branch exists locally before merging
-  ensureBranchExists( branchName, false );
+  await ensureBranchExists( branchName, false );
 
   // Merge the feature branch into main in each repository
   for ( const repo of repos ) {
