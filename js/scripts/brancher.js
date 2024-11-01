@@ -148,7 +148,8 @@ const ensureBranchExists = async ( branchName, checkRemote ) => {
 };
 
 /**
- * Creates a new branch in all repositories. If the branch already exists in any repository (local or remote), the script will exit.
+ * Creates a new branch in all repositories. Feature branches are alwasy created from main.
+ * If the branch already exists in any repository (local or remote), the script will exit.
  * Working copy will be on the new branch after this operation.
  */
 const createBranch = async branchName => {
@@ -156,6 +157,7 @@ const createBranch = async branchName => {
   // Make sure the branchName is valid
   validateBranchName( branchName );
 
+  console.log( 'Checking out main to create feature branches...' );
   for ( const repo of repos ) {
     await execGitCommand( repo, 'checkout main' );
   }
