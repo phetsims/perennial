@@ -14,28 +14,31 @@ import tsxCommand from '../common/tsxCommand.js';
 
 qunit.module( 'test-exec-sync' );
 
-qunit.test( 'Test grunt test-grunt', ( assert: Assert ) => {
-
-  const result = execSync( `${gruntCommand} test-grunt --brands=a,b,c --lint=false --noTSC`, { encoding: 'utf-8' } );
-
+const checkOutput = ( result: string, assert: Assert ) => {
   assert.ok( result.includes( `<output>
 brands: a,b,c
 lint: false
 noTSC: true
 omitted: undefined
 </output>` ), 'result should correctly parse and output the options' );
+};
+
+qunit.test( 'grunt', ( assert: Assert ) => {
+  const result = execSync( `${gruntCommand} test-grunt --brands=a,b,c --lint=false --noTSC`, { encoding: 'utf-8' } );
+  checkOutput( result, assert );
 } );
 
-qunit.test( 'Test tsx', assert => {
+qunit.test( 'node grunt', assert => {
+  const result = execSync( 'node ../perennial-alias/node_modules/.bin/grunt test-grunt --brands=a,b,c --lint=false --noTSC', { encoding: 'utf-8' } );
+  checkOutput( result, assert );
+} );
 
-  const result = execSync( `${tsxCommand} ../perennial-alias/js/grunt/tasks/test-grunt.ts --brands=a,b,c --lint=false --noTSC`, {
-    encoding: 'utf-8'
-  } );
+qunit.test( 'tsx', assert => {
+  const result = execSync( `${tsxCommand} ../perennial-alias/js/grunt/tasks/test-grunt.ts --brands=a,b,c --lint=false --noTSC`, { encoding: 'utf-8' } );
+  checkOutput( result, assert );
+} );
 
-  assert.ok( result.includes( `<output>
-brands: a,b,c
-lint: false
-noTSC: true
-omitted: undefined
-</output>` ), 'result should correctly parse and output the options' );
+qunit.test( 'sage run', assert => {
+  const result = execSync( '../perennial-alias/bin/sage run ../perennial-alias/js/grunt/tasks/test-grunt.ts --brands=a,b,c --lint=false --noTSC', { encoding: 'utf-8' } );
+  checkOutput( result, assert );
 } );
