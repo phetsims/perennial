@@ -63,7 +63,7 @@ module.exports = async function( browserCreator, url, options ) {
       onLoadTimeout: ( resolve, reject ) => {
         if ( !pageLoaded ) {
           options.logger( 'puppeteer page not loaded' );
-          localReject( new Error( `Did not load in ${options.allowedTimeToLoad}` ) );
+          reject( new Error( `Did not load in ${options.allowedTimeToLoad}` ) );
         }
       },
       onPageCreation: null, // {function(page, resolve,reject):Promise<void>|null} - any extra items you want to do with the page before goto is called
@@ -101,6 +101,10 @@ module.exports = async function( browserCreator, url, options ) {
       ownsBrowser && browser && await browser.close();
     };
 
+    const localResolve = async result => {
+      await cleanup();
+      resolve( result );
+    };
     const localReject = async error => {
       const wasRejected = rejected;
       rejected = true; // Before the async cleanup
@@ -189,7 +193,7 @@ module.exports = async function( browserCreator, url, options ) {
         } );
       }
 
-      options.onPageCreation && await options.onPageCreation( page, resolve, reject );
+      options.onPageCreation && await options.onPageCreation( page, localResolve, localReject );
       if ( rejected ) { return; }
 
       // Support puppeteer (evaluateOnNewDocument) or playwright (addInitScript)
@@ -198,7 +202,7 @@ module.exports = async function( browserCreator, url, options ) {
 
       // Use timeout so that you can cancel it once we have a result. Node will wait for this if it is a orphaned Promise.
       const timeoutID = setTimeout( () => {
-        options.onLoadTimeout( resolve, reject );
+        options.onLoadTimeout( localResolve, localReject );
       }, options.allowedTimeToLoad );
 
       options.logger( `[URL] ${url}` );
@@ -231,8 +235,7 @@ module.exports = async function( browserCreator, url, options ) {
           if ( rejected ) { return; }
         }
         clearTimeout( timeoutID );
-        await cleanup();
-        resolve( result );
+        localResolve( result );
       }
       else {
         clearTimeout( timeoutID );
