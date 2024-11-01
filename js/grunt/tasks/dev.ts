@@ -21,5 +21,7 @@ import getOption from './util/getOption';
   assertIsValidRepoName( repo );
 
   await dev( repo, getOption( 'brands' ).split( ',' ), !!getOption( 'noninteractive' ), 'main', getOption( 'message' ) );
-  console.log( 'Done, OK to type Ctrl-C' ); // TODO: https://github.com/phetsims/perennial/issues/389
+
+  // When running tsx in combination with readline, the process does not exit properly, so we need to force it. See https://github.com/phetsims/perennial/issues/389
+  process.exit( 0 );
 } )();
