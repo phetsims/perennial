@@ -139,7 +139,7 @@ const validateBranchName = branchName => {
  * will exit.
  */
 const ensureBranchExists = async ( branchName, checkRemote ) => {
-  console.log( 'Checking branch in all repositories...' );
+  console.log( 'Checking branch exists in all repositories...' );
 
   for ( const repo of repos ) {
     const exists = await branchExists( repo, branchName, checkRemote );
@@ -244,6 +244,7 @@ const checkoutBranch = async branchName => {
 
 /**
  * Merge main into the feature branch in each repository. This will leave you with all repos on the feature branch.
+ * Pull main before running this command.
  * TODO: UNTESTED
  */
 const mergeMainIntoFeature = async branchName => {
@@ -251,16 +252,15 @@ const mergeMainIntoFeature = async branchName => {
   // Make sure that branches are available locally for the merge.
   await ensureBranchExists( branchName, false );
 
-  const reposWithCommitsAhead = await getReposWithCommitsAhead();
+  const reposWithCommitsBehind = await getDeviatedRepos( branchName, false );
 
   // Merge main into the feature branch in each repository
-  for ( const repo of reposWithCommitsAhead ) {
+  for ( const repo of reposWithCommitsBehind ) {
     try {
-      await execGitCommand( repo, 'checkout main' );
-      await execGitCommand( repo, 'pull' );
+
       await execGitCommand( repo, `checkout ${branchName}` );
 
-      console.log( 'Merging main into feature branch for ' + repo );
+      console.log( `Merging main into ${branchName} for ${repo}` );
       const resultsCode = await execGitCommand( repo, 'merge main' );
       const results = resultsCode.toString().trim();
 
@@ -280,6 +280,7 @@ const mergeMainIntoFeature = async branchName => {
 
 /**
  * Merge the feature branch into main in each repository.
+ * Pull main before running this command
  * TODO: UNTESTED
  */
 const mergeFeatureIntoMain = async branchName => {
@@ -287,7 +288,7 @@ const mergeFeatureIntoMain = async branchName => {
   // Make sure the branch exists locally before merging
   await ensureBranchExists( branchName, false );
 
-  const reposWithCommitsAhead = await getReposWithCommitsAhead();
+  const reposWithCommitsAhead = await getDeviatedRepos( branchName, true );
 
   // Merge the feature branch into main in each repository
   for ( const repo of reposWithCommitsAhead ) {
@@ -310,17 +311,28 @@ const mergeFeatureIntoMain = async branchName => {
   }
 };
 
-// Returns a list of repos with commits ahead of main
-const getReposWithCommitsAhead = async () => {
-  const reposWithCommitsAhead = [];
+/**
+ * Returns a list of branches that have commits deviating from main.
+ * @param branchName
+ * @param ahead - If true, returns repos that have commits ahead of main. If false, returns repos that are missing commits from main.
+ * @returns {Promise<*[]>}
+ */
+const getDeviatedRepos = async ( branchName, ahead ) => {
+  const deviatedRepos = [];
 
   for ( const repo of repos ) {
     try {
-      const statusPromise = await execGitCommand( repo, 'rev-list HEAD...origin/main --count' );
-      const count = statusPromise.toString().trim();
 
-      if ( count > 0 ) {
-        reposWithCommitsAhead.push( repo );
+      // Use --left-right to distinguish commits ahead and behind
+      const status = await execGitCommand( repo, `rev-list --left-right --count ${branchName}...origin/main` );
+      const [ aheadCount, behindCount ] = status.toString().trim().split( '\t' ).map( Number );
+
+      // leftCount represents commits ahead in the branch, rightCount represents commits ahead in main
+      if ( ahead && aheadCount > 0 ) {
+        deviatedRepos.push( repo );
+      }
+      else if ( !ahead && behindCount > 0 ) {
+        deviatedRepos.push( repo );
       }
     }
     catch( error ) {
@@ -329,14 +341,14 @@ const getReposWithCommitsAhead = async () => {
     }
   }
 
-  return reposWithCommitsAhead;
+  return deviatedRepos;
 };
 
 /**
  * Loops through all active repos. Prints any repo that has commits ahead of main.
  */
 const checkBranchStatus = async branchName => {
-  const reposWithCommitsAhead = await getReposWithCommitsAhead();
+  const reposWithCommitsAhead = await getDeviatedRepos( branchName, true );
 
   if ( reposWithCommitsAhead.length === 0 ) {
     console.log( 'All repositories are up to date with main.' );
