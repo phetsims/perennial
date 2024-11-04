@@ -7,7 +7,7 @@
     "url": "https://github.com/phetsims/perennial.git"
   },
   "scripts": {
-    "test": "qunit"
+    "test": "bash bin/sage run node_modules/qunit/bin/qunit.js js/test/perennial-tests.js"
   },
   "devDependencies": {
     "@octokit/rest": "~16.33.1",
