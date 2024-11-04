@@ -139,7 +139,7 @@ const validateBranchName = branchName => {
  * will exit.
  */
 const ensureBranchExists = async ( branchName, checkRemote ) => {
-  console.log( 'Checking branch in all repositories...' )
+  console.log( 'Checking branch in all repositories...' );
 
   for ( const repo of repos ) {
     const exists = await branchExists( repo, branchName, checkRemote );
@@ -316,7 +316,7 @@ const getReposWithCommitsAhead = async () => {
 
   for ( const repo of repos ) {
     try {
-      const statusPromise = await execGitCommand( repo, `rev-list HEAD...origin/main --count` );
+      const statusPromise = await execGitCommand( repo, 'rev-list HEAD...origin/main --count' );
       const count = statusPromise.toString().trim();
 
       if ( count > 0 ) {
@@ -330,7 +330,7 @@ const getReposWithCommitsAhead = async () => {
   }
 
   return reposWithCommitsAhead;
-}
+};
 
 /**
  * Loops through all active repos. Prints any repo that has commits ahead of main.
