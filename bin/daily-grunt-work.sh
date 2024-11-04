@@ -32,13 +32,13 @@ grunt checkout-main-all
 cd ..
 
 perennial/bin/clone-missing-repos.sh
-node perennial/js/scripts/pull-all.js
-node perennial/js/scripts/push-all.js
+perennial/bin/sage run perennial/js/scripts/pull-all.js
+perennial/bin/sage run perennial/js/scripts/push-all.js
 
 perennial/bin/for-each.sh perennial/data/active-repos "npm prune && npm update; git stash"
 
 cd chipper || exit
-node js/scripts/transpile.js
+../perennial/bin/sage run js/scripts/transpile.js
 cd ..
 
 ###########################################################################################################
@@ -62,7 +62,7 @@ cd ..
 ##########################################################################################################
 # Update responsible dev/designer markdown output
 echo "TASK - RESPONSIBLE DEV MARKDOWN:"
-node ./phet-info/sim-info/generateMarkdownOutput.mjs
+perennial/bin/sage run ./phet-info/sim-info/generateMarkdownOutput.mjs
 cd phet-info || exit
 git commit -am "Update responsible_dev markdown output from daily grunt work" --no-verify
 git push
@@ -105,14 +105,14 @@ cd ..
 
 echo "TASK - PUBLISH LATEST PHET_IO LINKS:"
 cd perennial || exit
-node js/scripts/publish-phet-io-latest-links.js /data/web/htdocs/dev/phet-io/latest
+bin/sage run js/scripts/publish-phet-io-latest-links.js /data/web/htdocs/dev/phet-io/latest
 cd ..
 
 ##########################################################################################################
 
 echo "TASK - UPDATE LOCALE INFO FILES"
 cd chipper/js/data || exit
-node updateLocaleInfo.js
+../perennial/bin/sage run updateLocaleInfo.js
 cd ../../..
 
 ##########################################################################################################
@@ -144,7 +144,7 @@ cd ..
 # No grunt work below this point.
 # Final clean up steps, just to be sure
 echo "TASK - PUSH ALL CLEANUP:"
-node perennial/js/scripts/pull-all.js
-node perennial/js/scripts/push-all.js
+perennial/bin/sage run perennial/js/scripts/pull-all.js
+perennial/bin/sage run perennial/js/scripts/push-all.js
 date
 echo "TASK - DAILY GRUNT WORK COMPLETE"
