@@ -24,6 +24,7 @@ import path from 'path';
 import getDataFile from '../common/getDataFile.js';
 import showCommandLineProgress from '../common/showCommandLineProgress';
 import getOption from './tasks/util/getOption.js';
+import { ESLint } from 'eslint';
 
 const ESLINT_COMMAND = path.join( `${__dirname}/../../node_modules/.bin/eslint` );
 type LintResult = { ok: boolean };
@@ -38,9 +39,6 @@ export type LintOptions = {
   showProgressBar: boolean;
 };
 export type RequiredReposInLintOptions = Partial<LintOptions> & Pick<LintOptions, 'repos'>;
-
-// Require ESLint from the correct path
-const { ESLint } = require( 'eslint' );
 
 const DO_NOT_LINT = [ 'babel', 'phet-vite-demo', 'scenery-stack-test' ]; // TODO: enable linting for scenery-stack-test, see https://github.com/phetsims/scenery-stack-test/issues/1
 
@@ -186,7 +184,7 @@ async function lintWithNodeAPI( repo: Repo, options: LintOptions ): Promise<numb
   // Lint files in the repo
   const patterns = [ './' ]; // Lint all files starting from the repo root
 
-  let results: Array<{ errorCount: number }>;
+  let results: ESLint.LintResult[];
   try {
     // console.log( 'linting files in repo', repo );
     results = await eslint.lintFiles( patterns );
@@ -212,7 +210,7 @@ async function lintWithNodeAPI( repo: Repo, options: LintOptions ): Promise<numb
 
   if ( results.length > 0 ) {
     const formatter = await eslint.loadFormatter( 'stylish' );
-    const resultText = formatter.format( results );
+    const resultText = await formatter.format( results );
 
     if ( resultText.trim().length > 0 ) {
       preLoggingStep();
