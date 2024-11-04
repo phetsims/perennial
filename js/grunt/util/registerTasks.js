@@ -29,17 +29,17 @@ const tsxCommand = require( '../../common/tsxCommand.js' );
  *
  * Assert out eagerly if we get something that is unexpected.
  */
-function getArgsToForward() {
-  for ( let i = 0; i < process.argv.length; i++ ) {
+function getArgsToForward( args = process.argv ) {
+  for ( let i = 0; i < args.length; i++ ) {
 
     // Grunt is the most common runnable, but pm2 seems to have its own way of running code, so support that as well.
-    if ( process.argv[ i ].includes( 'grunt' ) || /\bpm2\b/.test( process.argv[ i ] ) ) {
-      const nextArg = process.argv[ i + 1 ];
+    if ( args[ i ].includes( 'grunt' ) || /\bpm2\b/.test( args[ i ] ) ) {
+      const nextArg = args[ i + 1 ];
       const isNextArgTheTask = !nextArg || !nextArg.startsWith( '-' );
-      return process.argv.slice( i + ( isNextArgTheTask ? 2 : 1 ) );
+      return args.slice( i + ( isNextArgTheTask ? 2 : 1 ) );
     }
   }
-  assert( false, `unexpected grunt task arguments that didn't launch with "grunt": [${process.argv.join( ' ' )}]` );
+  assert( false, `unexpected grunt task arguments that didn't launch with "grunt": [${args.join( ' ' )}]` );
   return [];
 }
 
@@ -81,3 +81,5 @@ module.exports = ( grunt, dir ) => {
     }
   } );
 };
+
+module.exports.getArgsToForward = getArgsToForward;
