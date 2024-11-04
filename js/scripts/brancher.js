@@ -139,6 +139,8 @@ const validateBranchName = branchName => {
  * will exit.
  */
 const ensureBranchExists = async ( branchName, checkRemote ) => {
+  console.log( 'Checking branch in all repositories...' )
+
   for ( const repo of repos ) {
     const exists = await branchExists( repo, branchName, checkRemote );
     if ( !exists ) {
@@ -249,14 +251,18 @@ const mergeMainIntoFeature = async branchName => {
   // Make sure that branches are available locally for the merge.
   await ensureBranchExists( branchName, false );
 
+  const reposWithCommitsAhead = await getReposWithCommitsAhead();
+
   // Merge main into the feature branch in each repository
-  for ( const repo of repos ) {
+  for ( const repo of reposWithCommitsAhead ) {
     try {
       await execGitCommand( repo, 'checkout main' );
       await execGitCommand( repo, 'pull' );
       await execGitCommand( repo, `checkout ${branchName}` );
-      const resultsPromise = await execGitCommand( repo, 'merge main' );
-      const results = resultsPromise.toString().trim();
+
+      console.log( 'Merging main into feature branch for ' + repo );
+      const resultsCode = await execGitCommand( repo, 'merge main' );
+      const results = resultsCode.toString().trim();
 
       // Check for conflicts
       // TODO: Is there a better check for this?
@@ -266,7 +272,6 @@ const mergeMainIntoFeature = async branchName => {
     }
     catch( error ) {
       console.error( `Error merging main into feature branch in ${repo}: ${error.message}` );
-      process.exit( 1 );
     }
   }
 
@@ -282,11 +287,15 @@ const mergeFeatureIntoMain = async branchName => {
   // Make sure the branch exists locally before merging
   await ensureBranchExists( branchName, false );
 
+  const reposWithCommitsAhead = await getReposWithCommitsAhead();
+
   // Merge the feature branch into main in each repository
-  for ( const repo of repos ) {
+  for ( const repo of reposWithCommitsAhead ) {
     try {
       await execGitCommand( repo, 'checkout main' );
       await execGitCommand( repo, 'pull' );
+
+      console.log( `Merging ${branchName} into main in ${repo}` );
       const resultsPromise = await execGitCommand( repo, `merge ${branchName}` );
       const results = resultsPromise.toString().trim();
 
@@ -297,27 +306,45 @@ const mergeFeatureIntoMain = async branchName => {
     }
     catch( error ) {
       console.error( `Error merging feature branch into main in ${repo}: ${error.message}` );
-      process.exit( 1 );
     }
   }
 };
 
-/**
- * Loops through all active repos. Prints any repo that has commits ahead of main.
- */
-const checkBranchStatus = async branchName => {
+// Returns a list of repos with commits ahead of main
+const getReposWithCommitsAhead = async () => {
+  const reposWithCommitsAhead = [];
+
   for ( const repo of repos ) {
     try {
       const statusPromise = await execGitCommand( repo, `rev-list HEAD...origin/main --count` );
       const count = statusPromise.toString().trim();
 
       if ( count > 0 ) {
-        console.log( `${repo} has ${count} commits ahead of main.` );
+        reposWithCommitsAhead.push( repo );
       }
     }
     catch( error ) {
       console.error( `Error checking branch status in ${repo}: ${error.message}` );
       process.exit( 1 );
+    }
+  }
+
+  return reposWithCommitsAhead;
+}
+
+/**
+ * Loops through all active repos. Prints any repo that has commits ahead of main.
+ */
+const checkBranchStatus = async branchName => {
+  const reposWithCommitsAhead = await getReposWithCommitsAhead();
+
+  if ( reposWithCommitsAhead.length === 0 ) {
+    console.log( 'All repositories are up to date with main.' );
+  }
+  else {
+    console.log( 'The following repositories have commits ahead of main:' );
+    for ( const repo of reposWithCommitsAhead ) {
+      console.log( repo );
     }
   }
 };
