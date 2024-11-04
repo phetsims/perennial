@@ -24,4 +24,7 @@ import getOption from './util/getOption';
 
   await rc( repo, getOption( 'branch' ), getOption( 'brands' ).split( ',' ),
     !!getOption( 'noninteractive' ), getOption( 'message' ) );
+
+  // When running tsx in combination with readline, the process does not exit properly, so we need to force it. See https://github.com/phetsims/perennial/issues/389
+  process.exit( 0 );
 } )();

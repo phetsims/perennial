@@ -33,4 +33,7 @@ import getOption from './util/getOption';
   assert( branch !== 'main', 'One-off deploys for main are unsupported.' );
 
   await dev( repo, brands.split( ',' ), !!getOption( 'noninteractive' ), branch, getOption( 'message' ) );
+
+  // When running tsx in combination with readline, the process does not exit properly, so we need to force it. See https://github.com/phetsims/perennial/issues/389
+  process.exit( 0 );
 } )();

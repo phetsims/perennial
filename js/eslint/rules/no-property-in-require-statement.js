@@ -19,14 +19,9 @@ module.exports = {
 
         if ( node.declarations &&
              node.declarations.length > 0 &&
-             node.declarations[ 0 ] &&
-             node.declarations[ 0 ].init &&
-             node.declarations[ 0 ].init.type &&
-             node.declarations[ 0 ].init.type === 'MemberExpression' &&
-             node.declarations[ 0 ].init.object &&
-             node.declarations[ 0 ].init.object.callee &&
-             node.declarations[ 0 ].init.object.callee.name &&
-             node.declarations[ 0 ].init.object.callee.name === 'require' ) {
+             node.declarations[ 0 ]?.init?.type === 'MemberExpression' &&
+             node.declarations[ 0 ].init.property?.name !== 'default' &&
+             node.declarations[ 0 ].init?.object?.callee?.name === 'require' ) {
 
           context.report( {
             node: node,
