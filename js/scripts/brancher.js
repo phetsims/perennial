@@ -345,9 +345,10 @@ const getDeviatedRepos = async ( branchName, ahead ) => {
 };
 
 /**
- * Loops through all active repos. Prints any repo that has commits ahead of main.
+ * Prints any repos that have commits ahead of main.
  */
 const checkBranchStatus = async branchName => {
+  console.log( 'Checking branch status...' );
   const reposWithCommitsAhead = await getDeviatedRepos( branchName, true );
 
   if ( reposWithCommitsAhead.length === 0 ) {
