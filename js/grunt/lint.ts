@@ -17,7 +17,6 @@
  */
 
 import assert from 'assert';
-import { spawn } from 'child_process';
 import fs from 'fs';
 import _ from 'lodash';
 import path from 'path';
@@ -26,7 +25,6 @@ import showCommandLineProgress from '../common/showCommandLineProgress';
 import getOption from './tasks/util/getOption.js';
 import { ESLint } from 'eslint';
 
-const ESLINT_COMMAND = path.join( `${__dirname}/../../node_modules/.bin/eslint` );
 type LintResult = { ok: boolean };
 
 type Repo = string;
@@ -44,75 +42,6 @@ const DO_NOT_LINT = [ 'babel', 'phet-vite-demo', 'scenery-stack-test' ]; // TODO
 
 const getCacheLocation = ( repo: Repo ) => path.resolve( `../chipper/dist/eslint/cache/${repo}.eslintcache` );
 const OLD_CACHE = '../chipper/eslint/cache/';
-
-function lintWithChildProcess( repo: Repo, options: LintOptions ): Promise<number> {
-
-  // Always write to the cache, even if it was cleared previously.
-  const cacheFile = getCacheLocation( repo );
-  const args = [ '--cache', '--cache-location', cacheFile ];
-
-  args.push( '--no-error-on-unmatched-pattern' );
-
-  // add --flag unstable_config_lookup_from_file so that eslint will look for .eslintrc.js files relative to the file being linted
-  // This will be the default behavior in eslint 10.0
-  // TODO: Now that eslint.config.mjs resolution is based on the file being linted, can we bring back multiple repos being linted in one unit? See https://github.com/phetsims/chipper/issues/1484
-  args.push( '--flag', 'unstable_config_lookup_from_file' );
-
-  // Add the '--fix' option if fix is true
-  options.fix && args.push( '--fix' );
-
-  args.push( ...[
-    // '--rulesdir', '../chipper/eslint/rules/',
-    // '--resolve-plugins-relative-to', '../chipper',
-    // '--ignore-path', '../chipper/eslint/.eslintignore',
-    // '--ext', '.js,.jsx,.ts,.tsx,.mjs,.cjs,.html',
-    // '--debug'
-  ] );
-
-  // Only lint from that single repo, from that repo as cwd; last is best for this one
-  args.push( './' );
-
-  return new Promise( resolve => {
-
-    // Prepare environment for spawn process, defaulting to the existing env
-    const env = Object.create( process.env );
-
-    // Increase available memory for NodeJS heap, to future-proof for, https://github.com/phetsims/chipper/issues/1415
-    env.NODE_OPTIONS = env.NODE_OPTIONS || '';
-
-    if ( !env.NODE_OPTIONS.includes( '--max-old-space-size' ) ) {
-      env.NODE_OPTIONS += ' --max-old-space-size=8192';
-    }
-
-    // It is nice to use our own spawn here instead of execute() so we can stream progress updates as it runs.
-    const eslint = spawn( ESLINT_COMMAND, args, {
-      cwd: `../${repo}`,
-
-      // A shell is required for npx because the runnable is a shell script. see https://github.com/phetsims/perennial/issues/359
-      shell: process.platform.startsWith( 'win' ),
-      env: env // Use the prepared environment
-    } );
-    let hasPrinted = false;
-    // Make sure that the repo is clearly printed for the log
-    const preLoggingStep = () => {
-      if ( !hasPrinted ) {
-        console.log( `\n${repo}:` );
-        hasPrinted = true;
-      }
-    };
-
-    // It is possible the json is bigger than one chunk of data, so append to it.
-    eslint.stdout.on( 'data', data => {
-      preLoggingStep();
-      console.log( data.toString() );
-    } );
-    eslint.stderr.on( 'data', data => {
-      preLoggingStep();
-      console.error( data.toString() );
-    } );
-    eslint.on( 'close', () => resolve( eslint.exitCode || 0 ) );
-  } );
-}
 
 /**
  * Lints repositories using a worker pool approach.
@@ -139,13 +68,7 @@ async function lintWithWorkers( repos: Repo[], options: LintOptions ): Promise<L
 
       const repo = reposQueue.shift()!; // Get the next repository
 
-      const cacheLocation = getCacheLocation( repo );
-      if ( fs.existsSync( cacheLocation ) ) {
-        exitCodes.push( await lintWithNodeAPI( repo, options ) );
-      }
-      else {
-        exitCodes.push( await lintWithChildProcess( repo, options ) );
-      }
+      exitCodes.push( await lintWithNodeAPI( repo, options ) );
 
       doneCount++;
       options.showProgressBar && showCommandLineProgress( doneCount / repos.length, false );
