@@ -19,6 +19,7 @@
  *   - checkout: Checks out an existing branch in all repositories.
  *   - merge-into-feature: Merges 'main' into the specified feature branch.
  *   - merge-into-main: Merges a specified feature branch into 'main'.
+ *   - check: Prints repos that have commits ahead of main.
 
  * Examples:
  *   - node script.js create myFeatureBranch
@@ -301,6 +302,26 @@ const mergeFeatureIntoMain = async branchName => {
   }
 };
 
+/**
+ * Loops through all active repos. Prints any repo that has commits ahead of main.
+ */
+const checkBranchStatus = async branchName => {
+  for ( const repo of repos ) {
+    try {
+      const statusPromise = await execGitCommand( repo, `rev-list HEAD...origin/main --count` );
+      const count = statusPromise.toString().trim();
+
+      if ( count > 0 ) {
+        console.log( `${repo} has ${count} commits ahead of main.` );
+      }
+    }
+    catch( error ) {
+      console.error( `Error checking branch status in ${repo}: ${error.message}` );
+      process.exit( 1 );
+    }
+  }
+};
+
 const main = async () => {
   const args = process.argv.slice( 2 );
 
@@ -330,6 +351,9 @@ const main = async () => {
       break;
     case 'merge-into-main':
       await mergeFeatureIntoMain( branchName );
+      break;
+    case 'check':
+      await checkBranchStatus( branchName );
       break;
     default:
       console.error( 'Unknown command. Valid commands are: create, delete-local, delete-remote, checkout, merge-into-feature, merge-into-main' );
