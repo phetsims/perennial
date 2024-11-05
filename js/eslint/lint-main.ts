@@ -25,6 +25,7 @@ import getOption from '../grunt/tasks/util/getOption.js';
 import { ESLint } from 'eslint';
 import getLintOptions, { LintOptions, Repo, RequiredReposInLintOptions } from './getLintOptions.js';
 import check from '../grunt/check.js';
+import process from 'process';
 
 // TODO: enable linting for scenery-stack-test, see https://github.com/phetsims/scenery-stack-test/issues/1
 // It is problematic for every repo to have a eslint.config.mjs, so it is preferable to opt-out some repos here, see https://github.com/phetsims/chipper/issues/1484
@@ -66,10 +67,10 @@ async function lintWithWorkers( repos: Repo[], options: LintOptions ): Promise<b
   const workers = _.times( numWorkers, () => worker() );
 
   // Wait for all workers to complete
-  await Promise.all( workers );
+  const results = await Promise.allSettled( workers );
 
-  const success = _.every( exitCodes, code => code === 0 );
-  return success;
+  // output true if all succeeded, false if any failed
+  return results.every( result => result.status === 'fulfilled' && exitCodes.every( code => code === 0 ) );
 }
 
 /**
@@ -210,5 +211,7 @@ function handleOldCacheLocation(): void {
 void ( async () => {
   const repos = getOption( 'repos' );
   const options = repos ? getLintOptions( { repos: repos.split( ',' ) } ) : getLintOptions();
-  await lint( options );
+  const success = await lint( options );
+
+  process.exit( success ? 0 : 1 );
 } )();
