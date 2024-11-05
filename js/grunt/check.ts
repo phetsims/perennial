@@ -49,6 +49,9 @@ type CheckOptions = {
    * output filters: $FILE_PATH$\($LINE$\,$COLUMN$\)
    */
   absolute: boolean;
+
+  // Only run the clean step, do not run the type check
+  cleanOnly: boolean;
 };
 
 const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean> => {
@@ -60,6 +63,7 @@ const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean
     all: false,
 
     clean: false,
+    cleanOnly: false, // in rare circumstances, we need to clean without running a check. For instance, when cleaning ESLint cache
 
     pretty: true,
     silent: false,
@@ -96,6 +100,10 @@ const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean
     const cleanResults = await runCommand( 'node', [ tscRunnable, '-b', '--clean' ], cwd, false );
     if ( !cleanResults.success ) {
       throw new Error( 'Checking failed to clean' );
+    }
+
+    if ( options.cleanOnly ) {
+      return true;
     }
   }
 

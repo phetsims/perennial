@@ -24,6 +24,7 @@ import path from 'path';
 import getOption from '../grunt/tasks/util/getOption.js';
 import { ESLint } from 'eslint';
 import getLintOptions, { LintOptions, Repo, RequiredReposInLintOptions } from './getLintOptions.js';
+import check from '../grunt/check.js';
 
 // TODO: enable linting for scenery-stack-test, see https://github.com/phetsims/scenery-stack-test/issues/1
 // It is problematic for every repo to have a eslint.config.mjs, so it is preferable to opt-out some repos here, see https://github.com/phetsims/chipper/issues/1484
@@ -131,7 +132,7 @@ async function lintWithNodeAPI( repo: Repo, options: LintOptions ): Promise<numb
 }
 
 const clearCaches = ( originalRepos: Repo[] ) => {
-  originalRepos.forEach( repo => {
+  originalRepos.forEach( async repo => {
     const cacheFile = getCacheLocation( repo );
 
     try {
@@ -148,7 +149,12 @@ const clearCaches = ( originalRepos: Repo[] ) => {
         throw err;
       }
     }
-    // TODO: run tsc -b --clean here since we are breaking the cache? https://github.com/phetsims/chipper/issues/1484
+
+    await check( {
+      repo: repo,
+      clean: true,
+      cleanOnly: true
+    } );
   } );
 };
 

@@ -59,8 +59,8 @@ export default async function( providedOptions: RequiredReposInLintOptions ): Pr
       child.on( 'close', ( code: number ) => {
 
         // After the process closes, output its collected stdout and stderr, if any
-        stdout && console.log( `Output from batch ${batch.join( ', ' )}:\n${stdout}` );
-        stderr && console.error( `Errors from batch ${batch.join( ', ' )}:\n${stderr}` );
+        stdout && process.stdout.write( stdout );
+        stderr && process.stderr.write( stderr );
 
         if ( code === 0 ) {
           resolve();
