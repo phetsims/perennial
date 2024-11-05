@@ -9,7 +9,8 @@ import buildLocal from '../common/buildLocal.js';
 import createDirectory from '../common/createDirectory.js';
 import lint, { getLintOptions } from './lint.js';
 
-const CHIPPER_DIST = '../chipper/dist';
+const CHIPPER_DIST_ESLINT = '../chipper/dist/eslint/';
+const TODOsFilename = `${CHIPPER_DIST_ESLINT}/issuesFromTODOs.txt`;
 
 
 /**
@@ -28,10 +29,10 @@ async function reopenIssuesFromTODOs(): Promise<void> {
   // with all todo issues.
   process.env.saveTODOIssues = 'true';
 
-  if ( !fs.existsSync( CHIPPER_DIST ) ) {
-    await createDirectory( CHIPPER_DIST );
+  if ( !fs.existsSync( CHIPPER_DIST_ESLINT ) ) {
+    await createDirectory( CHIPPER_DIST_ESLINT );
   }
-  fs.writeFileSync( '../chipper/dist/issuesFromTODOs.txt', '' );
+  fs.writeFileSync( TODOsFilename, '' );
 
   console.log( 'grunt lint-everything started' );
   try {
@@ -46,7 +47,7 @@ async function reopenIssuesFromTODOs(): Promise<void> {
   }
   console.log( 'grunt lint-everything finished' );
 
-  const TODOIssues = fs.readFileSync( '../chipper/dist/issuesFromTODOs.txt' ).toString().trim().split( '\n' );
+  const TODOIssues = fs.readFileSync( TODOsFilename ).toString().trim().split( '\n' );
 
   const uniqueTODOIssues = _.uniq( TODOIssues );
   console.log( uniqueTODOIssues.length, 'issues to check' );

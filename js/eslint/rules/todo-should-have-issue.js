@@ -13,7 +13,7 @@ const fs = require( 'fs' );
 const issueShorthandRegex = /#(\d+)/;
 const urlRegex = /https:\/\/github.com\/phetsims\/[-\w]+\/issues\/\d+/;
 const filename = 'issuesFromTODOs.txt';
-const todoIssuesFilepath = path.resolve( __dirname, `../../../../chipper/dist/${filename}` );
+const todoIssuesFilepath = path.resolve( __dirname, `../../../../chipper/dist/eslint/${filename}` );
 
 // Match a comment line containing a TO-DO
 const containsTODO = string => string.includes( 'TODO' );
