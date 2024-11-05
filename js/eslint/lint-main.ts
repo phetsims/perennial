@@ -8,9 +8,10 @@
  * eslint config files across the codebase.
  *
  * This is called from lint.ts which batches into acceptable sizes (too many repos crashes with out of memory).
- *
- * TODO: should every active-repo have eslint.config.mjs? Or should we have an opt out list somewhere? https://github.com/phetsims/chipper/issues/1484
- * TODO: if two processes output problems at the same time, the output will be interleaved. But it is nice to output "as we go" instead of "at the end". See https://github.com/phetsims/chipper/issues/1484
+ * This architecture follows these design principles:
+ * 1. Parallelism for speed
+ * 2. Batching stdout/stderr instead of streaming, so that multiple processes don't intersperse/interfere
+ * 3. Simplicity (using the same algorithm for any number of repos)
  *
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
@@ -25,6 +26,7 @@ import { ESLint } from 'eslint';
 import getLintOptions, { LintOptions, Repo, RequiredReposInLintOptions } from './getLintOptions.js';
 
 // TODO: enable linting for scenery-stack-test, see https://github.com/phetsims/scenery-stack-test/issues/1
+// It is problematic for every repo to have a eslint.config.mjs, so it is preferable to opt-out some repos here, see https://github.com/phetsims/chipper/issues/1484
 const DO_NOT_LINT = [ 'babel', 'phet-vite-demo', 'scenery-stack-test' ];
 
 const getCacheLocation = ( repo: Repo ) => path.resolve( `../chipper/dist/eslint/cache/${repo}.eslintcache` );

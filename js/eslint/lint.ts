@@ -15,6 +15,8 @@ import path from 'path';
 import divideIntoBatches from './divideIntoBatches.js';
 import { RequiredReposInLintOptions } from './getLintOptions.js';
 
+const lintMainPath = path.join( __dirname, 'lint-main.js' );
+
 export default async function( providedOptions: RequiredReposInLintOptions ): Promise<boolean> {
 
   const options = _.assignIn( {
@@ -25,8 +27,6 @@ export default async function( providedOptions: RequiredReposInLintOptions ): Pr
     // Fix things that can be auto-fixed (written to disk)
     fix: false
   }, providedOptions );
-
-  const lintMainPath = path.join( __dirname, 'lint-main.js' );
 
   const originalRepos = _.uniq( options.repos ); // Don't double lint repos
 
