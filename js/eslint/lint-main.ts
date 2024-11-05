@@ -66,7 +66,7 @@ async function lintWithWorkers( repos: Repo[], options: LintOptions ): Promise<b
     }
   };
 
-  // TODO: https://github.com/phetsims/chipper/issues/1468 fine tune the number of workers, maybe with require('os').cpus().length?
+  // We experimented with different numbers of workers, and 8 seems to be a reasonable number to get good performance
   const numWorkers = 8;
   const workers = _.times( numWorkers, () => worker() );
 
