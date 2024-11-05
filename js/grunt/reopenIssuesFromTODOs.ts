@@ -1,14 +1,14 @@
 // Copyright 2023, University of Colorado Boulder
 // @author Michael Kauzmann (PhET Interactive Simulations)
 
-const process = require( 'process' );
-const fs = require( 'fs' );
-const _ = require( 'lodash' );
-const Octokit = require( '@octokit/rest' ); // eslint-disable-line phet/require-statement-match
-
-const execute = require( '../common/execute.js' );
-const buildLocal = require( '../common/buildLocal.js' );
-const createDirectory = require( '../common/createDirectory.js' );
+import Octokit from '@octokit/rest';
+import fs from 'fs';
+import _ from 'lodash';
+import process from 'process';
+import buildLocal from '../common/buildLocal.js';
+import createDirectory from '../common/createDirectory.js';
+import execute from '../common/execute.js';
+import gruntCommand from '../common/gruntCommand.js';
 
 const CHIPPER_DIST = '../chipper/dist';
 
@@ -22,13 +22,12 @@ const CHIPPER_DIST = '../chipper/dist';
  * - Use that list to ping github to see if the issue is open
  * - If not open, reopen it and send a comment noting that there is still at least one todo pointing here.
  *
- * @returns {Promise<void>}
  */
-module.exports = async function reopenIssuesFromTODOs() {
+async function reopenIssuesFromTODOs(): Promise<void> {
 
   // Mark an environment variable that tells lint's todo-should-have-issue rule to have a side-effect of saving a file
   // with all todo issues.
-  process.env.saveTODOIssues = true;
+  process.env.saveTODOIssues = 'true';
 
   if ( !fs.existsSync( CHIPPER_DIST ) ) {
     await createDirectory( CHIPPER_DIST );
@@ -40,11 +39,10 @@ module.exports = async function reopenIssuesFromTODOs() {
     errors: 'resolve'
   } );
   console.log( 'grunt lint-everything finished' );
-  if ( result.code !== 0 ) {
+  if ( typeof result !== 'string' && result.code !== 0 ) {
     console.error( 'Error running lint-everything:\n\n', result.stdout, result.stderr );
     process.exit();
   }
-
 
   const TODOIssues = fs.readFileSync( '../chipper/dist/issuesFromTODOs.txt' ).toString().trim().split( '\n' );
 
@@ -96,4 +94,6 @@ module.exports = async function reopenIssuesFromTODOs() {
       console.error( 'Issue does not exist', `${repo}#${issueNumber}`, e );
     }
   }
-};
+}
+
+export default reopenIssuesFromTODOs;
