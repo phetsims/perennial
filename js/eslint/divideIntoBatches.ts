@@ -12,26 +12,26 @@
 export default function( originalRepos: string[] ): string[][] {
   const N = originalRepos.length;
   const MAX_BATCH_SIZE = 50;
-  const PROCESSOR_COUNT = 6;
+  const PROCESS_COUNT = 6;
   const batches: string[][] = [];
 
   if ( N === 0 ) {
     return batches; // Return empty array if no repositories
   }
 
-  if ( N <= PROCESSOR_COUNT ) {
+  if ( N <= PROCESS_COUNT ) {
     // Create N batches, each with 1 repository
     for ( const repo of originalRepos ) {
       batches.push( [ repo ] );
     }
   }
-  else if ( N <= PROCESSOR_COUNT * MAX_BATCH_SIZE ) {
+  else if ( N <= PROCESS_COUNT * MAX_BATCH_SIZE ) {
     // Aim for 6 batches, distributing repositories as evenly as possible
-    const baseSize = Math.floor( N / PROCESSOR_COUNT );
-    const extra = N % PROCESSOR_COUNT;
+    const baseSize = Math.floor( N / PROCESS_COUNT );
+    const extra = N % PROCESS_COUNT;
     let start = 0;
 
-    for ( let i = 0; i < PROCESSOR_COUNT; i++ ) {
+    for ( let i = 0; i < PROCESS_COUNT; i++ ) {
       // Distribute the extra repositories one by one to the first 'extra' batches
       const batchSize = baseSize + ( i < extra ? 1 : 0 );
       const end = start + batchSize;
