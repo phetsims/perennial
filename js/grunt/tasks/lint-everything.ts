@@ -9,10 +9,10 @@ import grunt from 'grunt';
 import lint, { getLintOptions } from '../../eslint/lint.js';
 
 ( async () => {
-  const lintReturnValue = await lint( getLintOptions() );
+  const lintSuccess = await lint( getLintOptions() );
 
   // Output results on errors.
-  if ( !lintReturnValue.ok ) {
+  if ( !lintSuccess ) {
     grunt.fail.fatal( 'Lint failed' );
   }
 } )();

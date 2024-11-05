@@ -18,9 +18,9 @@ const repo = getRepo();
 export const lintTask = ( async () => {
 
   const extraRepos = getRepos();
-  const lintReturnValue = await lint( getLintOptions( { repos: [ repo, ...extraRepos ] } ) );
+  const lintSuccess = await lint( getLintOptions( { repos: [ repo, ...extraRepos ] } ) );
 
-  if ( !lintReturnValue.ok ) {
+  if ( !lintSuccess ) {
     grunt.fail.fatal( 'Lint failed' );
   }
 } )();

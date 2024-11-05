@@ -16,8 +16,6 @@ import { spawn } from 'child_process';
 import path from 'path';
 import divideIntoBatches from './divideIntoBatches.js';
 
-export type LintResult = { ok: boolean };
-
 export type Repo = string;
 
 export type LintOptions = {
@@ -27,7 +25,7 @@ export type LintOptions = {
 };
 export type RequiredReposInLintOptions = Partial<LintOptions> & Pick<LintOptions, 'repos'>;
 
-export default async function( providedOptions: RequiredReposInLintOptions ): Promise<LintResult> {
+export default async function( providedOptions: RequiredReposInLintOptions ): Promise<boolean> {
 
   const options = _.assignIn( {
 
@@ -89,10 +87,10 @@ export default async function( providedOptions: RequiredReposInLintOptions ): Pr
   // Await completion of all processes
   try {
     await Promise.all( promises );
-    return { ok: true };
+    return true;
   }
   catch( error ) {
-    return { ok: false };
+    return false;
   }
 }
 

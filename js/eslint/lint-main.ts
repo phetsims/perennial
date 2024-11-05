@@ -22,7 +22,7 @@ import _ from 'lodash';
 import path from 'path';
 import getOption from '../grunt/tasks/util/getOption.js';
 import { ESLint } from 'eslint';
-import { Repo, LintOptions, LintResult, RequiredReposInLintOptions, getLintOptions } from './lint.js';
+import { Repo, LintOptions, RequiredReposInLintOptions, getLintOptions } from './lint.js';
 
 // TODO: enable linting for scenery-stack-test, see https://github.com/phetsims/scenery-stack-test/issues/1
 const DO_NOT_LINT = [ 'babel', 'phet-vite-demo', 'scenery-stack-test' ];
@@ -33,7 +33,7 @@ const OLD_CACHE = '../chipper/eslint/cache/';
 /**
  * Lints repositories using a worker pool approach.
  */
-async function lintWithWorkers( repos: Repo[], options: LintOptions ): Promise<LintResult> {
+async function lintWithWorkers( repos: Repo[], options: LintOptions ): Promise<boolean> {
   const reposQueue: Repo[] = [ ...repos.filter( repo => !DO_NOT_LINT.includes( repo ) ) ];
   const exitCodes: number[] = [];
 
@@ -65,8 +65,8 @@ async function lintWithWorkers( repos: Repo[], options: LintOptions ): Promise<L
   // Wait for all workers to complete
   await Promise.all( workers );
 
-  const ok = _.every( exitCodes, code => code === 0 );
-  return { ok: ok };
+  const success = _.every( exitCodes, code => code === 0 );
+  return success;
 }
 
 /**
@@ -154,7 +154,7 @@ const clearCaches = ( originalRepos: Repo[] ) => {
 /**
  * Lints the specified repositories.
  */
-const lint = async ( providedOptions: RequiredReposInLintOptions ): Promise<LintResult> => {
+const lint = async ( providedOptions: RequiredReposInLintOptions ): Promise<boolean> => {
 
   const options = _.assignIn( {
 
@@ -185,7 +185,7 @@ const lint = async ( providedOptions: RequiredReposInLintOptions ): Promise<Lint
       throw error;
     }
   }
-  return { ok: false };
+  return false;
 };
 
 // Even though on main the new cache location is chipper/dist/eslint/cache, linting on old shas still produces a
