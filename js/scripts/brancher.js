@@ -225,8 +225,31 @@ const deleteBranch = async ( branchName, remote ) => {
   } );
 };
 
+/**
+ * Make sure that the working copy is clean in all repositories.
+ */
+const checkCleanWorkingCopy = async () => {
+  console.log( 'Checking working copy...' );
+  for ( const repo of repos ) {
+    try {
+      const status = await execGitCommand( repo, 'status --porcelain' );
+      if ( status.toString().trim() ) {
+        console.error( `Working copy is not clean in ${repo}. Please commit or stash changes before continuing.` );
+        process.exit( 1 );
+      }
+    }
+    catch( error ) {
+      console.error( `Error checking working copy in ${repo}: ${error.message}` );
+      process.exit( 1 );
+    }
+  }
+};
+
 // Checkout the branch in each repository
 const checkoutBranch = async branchName => {
+
+  // First make sure that the working copy is clean before checking out any branches.
+  await checkCleanWorkingCopy();
 
   for ( const repo of repos ) {
     try {
