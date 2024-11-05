@@ -4,6 +4,8 @@
  * This entry point for lint divides the list of repos into batches and spawns lint-main processes to do the work.
  * See lint-main.ts for details.
  *
+ * Sadly, the colorization from ESLint stylish is lost when spawning child processes.
+ *
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
@@ -14,7 +16,7 @@ import _ from 'lodash';
 import path from 'path';
 import tsxCommand from '../common/tsxCommand.js';
 import divideIntoBatches from './divideIntoBatches.js';
-import { RequiredReposInLintOptions } from './getLintOptions.js';
+import { RequiredReposInLintOptions, DEFAULT_MAX_PROCESSES } from './getLintOptions.js';
 
 const lintMainPath = path.join( __dirname, 'lint-main.js' );
 
@@ -26,20 +28,21 @@ export default async function( providedOptions: RequiredReposInLintOptions ): Pr
     cache: true,
 
     // Fix things that can be auto-fixed (written to disk)
-    fix: false
+    fix: false,
+
+    processes: DEFAULT_MAX_PROCESSES
   }, providedOptions );
 
   const originalRepos = _.uniq( options.repos ); // Don't double lint repos
 
   assert( originalRepos.length > 0, 'no repos provided to lint' );
 
-  const repoBatches = divideIntoBatches( originalRepos );
+  const repoBatches = divideIntoBatches( originalRepos, providedOptions.processes! );
 
   // spawn node lint-main.js for each batch and wait for all to complete using child process
   const promises = repoBatches.map( batch => {
     return new Promise<void>( ( resolve, reject ) => {
 
-      // TODO: https://github.com/phetsims/chipper/issues/1484 this strategy loses the colorization of the stylish eslint output. Can it be restored?
       const child = spawn( tsxCommand, [
           lintMainPath,
           `--repos=${batch.join( ',' )}`,
