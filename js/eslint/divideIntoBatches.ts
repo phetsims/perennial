@@ -22,7 +22,7 @@ export default function divideIntoBatches( originalRepos: Repo[] ): Repo[][] {
 
   // Use most of the processors. for instance, on Macbook air m1, we have 8 cores and we use 6, which has good performance
   const numCPUs = os.cpus().length; // as of 11/2024 -- MK: 20, SR: 16, sparky: 128
-  const PROCESS_COUNT = Math.min( Math.round( numCPUs * 0.75 ), MAX_PROCESS_COUNT );
+  const PROCESS_COUNT = Math.min( Math.round( numCPUs * 0.75 ), MAX_PROCESS_COUNT ); // TODO: 75% of cpus is probably more than we should use, https://github.com/phetsims/chipper/issues/1484
 
   const batches: Repo[][] = [];
 

@@ -62,7 +62,6 @@ async function lintWithWorkers( repos: Repo[], options: LintOptions ): Promise<b
 
       const result = await lintWithNodeAPI( repo, options );
       exitCodes.push( result );
-      // process.stdout.write( result === 0 ? '.' : 'x' );
     }
   };
 
@@ -73,8 +72,11 @@ async function lintWithWorkers( repos: Repo[], options: LintOptions ): Promise<b
   // Wait for all workers to complete
   const results = await Promise.allSettled( workers );
 
+  // Log any errors to prevent silent failures with exit code 1.
+  results.forEach( result => result.status === 'rejected' && console.error( result.reason ) );
+
   // output true if all succeeded, false if any failed
-  return results.every( result => result.status === 'fulfilled' && exitCodes.every( code => code === 0 ) );
+  return exitCodes.every( code => code === 0 ) && results.every( result => result.status === 'fulfilled' );
 }
 
 /**
@@ -88,6 +90,7 @@ async function lintWithNodeAPI( repo: Repo, options: LintOptions ): Promise<numb
     cache: true,
     cacheLocation: path.resolve( getCacheLocation( repo ) ),
     fix: options.fix,
+    // flags: [ 'unstable_config_lookup_from_file' ], // TODO: add back in? https://github.com/phetsims/chipper/issues/1484
     errorOnUnmatchedPattern: false
   };
 
@@ -112,21 +115,19 @@ async function lintWithNodeAPI( repo: Repo, options: LintOptions ): Promise<numb
     await ESLint.outputFixes( results );
   }
 
-  // Output results
-  let hasPrinted = false;
-  const preLoggingStep = () => {
-    if ( !hasPrinted ) {
-      console.log( `\n${repo}:` );
-      hasPrinted = true;
-    }
-  };
+  // Output results, prefixed with the repo name
+  let loggedRepo = false;
 
   if ( results.length > 0 ) {
     const formatter = await eslint.loadFormatter( 'stylish' );
     const resultText = await formatter.format( results );
 
     if ( resultText.trim().length > 0 ) {
-      preLoggingStep();
+      if ( !loggedRepo ) {
+        console.log( `\n${repo}:` );
+        loggedRepo = true;
+      }
+
       console.log( resultText );
     }
   }
@@ -145,13 +146,10 @@ const clearCaches = ( originalRepos: Repo[] ) => {
     }
     catch( err ) {
       if ( err instanceof Error && 'code' in err && err.code === 'ENOENT' ) {
-
         // Do nothing if the file does not exist
       }
       else {
-
-        // Re-throw the error if it's something else
-        throw err;
+        throw err; // Re-throw the error if it's something else
       }
     }
 
