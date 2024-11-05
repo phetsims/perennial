@@ -13,6 +13,10 @@
  * 2. Batching stdout/stderr instead of streaming, so that multiple processes don't intersperse/interfere
  * 3. Simplicity (using the same algorithm for any number of repos)
  *
+ * If you have a small enough batch (say, less than 50 repos), you can run this directly via:
+ * cd perennial-alias
+ * sage run js/eslint/lint-main.ts --repos=repo1,repo2,repo3
+ *
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
