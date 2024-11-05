@@ -9,4 +9,4 @@
 #====================================================================================================
 
 cd perennial
-node --no-warnings js/scripts/main-pull-status.js
+NODE_OPTIONS=--no-warnings ./bin/sage run js/scripts/main-pull-status.js
