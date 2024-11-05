@@ -294,7 +294,6 @@ const mergeFeatureIntoMain = async branchName => {
   for ( const repo of reposWithCommitsAhead ) {
     try {
       await execGitCommand( repo, 'checkout main' );
-      await execGitCommand( repo, 'pull' );
 
       console.log( `Merging ${branchName} into main in ${repo}` );
       const resultsPromise = await execGitCommand( repo, `merge ${branchName}` );
