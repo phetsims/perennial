@@ -4,7 +4,7 @@ import os from 'os';
 import { Repo } from './getLintOptions';
 
 const MAX_BATCH_SIZE = 50;
-const MAX_PROCESS_COUNT = 20;
+const MAX_PROCESS_COUNT = 6; // TODO: Make a cli option for this? https://github.com/phetsims/chipper/issues/1484
 
 /**
  * Divides an array of repository names into batches based on specified rules:
@@ -22,7 +22,7 @@ export default function divideIntoBatches( originalRepos: Repo[] ): Repo[][] {
 
   // Use most of the processors. for instance, on Macbook air m1, we have 8 cores and we use 6, which has good performance
   const numCPUs = os.cpus().length; // as of 11/2024 -- MK: 20, SR: 16, sparky: 128
-  const PROCESS_COUNT = Math.min( Math.round( numCPUs * 0.75 ), MAX_PROCESS_COUNT ); // TODO: 75% of cpus is probably more than we should use, https://github.com/phetsims/chipper/issues/1484
+  const PROCESS_COUNT = Math.min( Math.round( numCPUs * 0.25 ), MAX_PROCESS_COUNT ); // TODO: 75% of cpus is probably more than we should use, https://github.com/phetsims/chipper/issues/1484
 
   const batches: Repo[][] = [];
 
