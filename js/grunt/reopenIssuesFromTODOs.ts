@@ -7,8 +7,7 @@ import _ from 'lodash';
 import process from 'process';
 import buildLocal from '../common/buildLocal.js';
 import createDirectory from '../common/createDirectory.js';
-import execute from '../common/execute.js';
-import gruntCommand from '../common/gruntCommand.js';
+import lint, { getLintOptions } from './lint.js';
 
 const CHIPPER_DIST = '../chipper/dist';
 
@@ -35,14 +34,17 @@ async function reopenIssuesFromTODOs(): Promise<void> {
   fs.writeFileSync( '../chipper/dist/issuesFromTODOs.txt', '' );
 
   console.log( 'grunt lint-everything started' );
-  const result = await execute( gruntCommand, [ 'lint', '--all', '--disable-eslint-cache' ], '../perennial', {
-    errors: 'resolve'
-  } );
-  console.log( 'grunt lint-everything finished' );
-  if ( typeof result !== 'string' && result.code !== 0 ) {
-    console.error( 'Error running lint-everything:\n\n', result.stdout, result.stderr );
+  try {
+    await lint( getLintOptions( {
+      all: true,
+      cache: false
+    } ) );
+  }
+  catch( e ) {
+    console.error( 'Error running lint-everything:\n\n', e );
     process.exit();
   }
+  console.log( 'grunt lint-everything finished' );
 
   const TODOIssues = fs.readFileSync( '../chipper/dist/issuesFromTODOs.txt' ).toString().trim().split( '\n' );
 
