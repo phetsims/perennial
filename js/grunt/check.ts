@@ -13,10 +13,11 @@ import _ from 'lodash';
 import os from 'os';
 import path from 'path';
 import fixEOL from '../common/fixEOL.js';
-import { PERENNIAL_REPO_NAME, PERENNIAL_ROOT } from '../common/perennialRepoUtils.js';
+import { PERENNIAL_ROOT } from '../common/perennialRepoUtils.js';
 import { Repo } from '../common/PerennialTypes.js';
 
 const ALL_CONFIG_PATH = `${PERENNIAL_ROOT}/../chipper/dist/tsconfig/all/`;
+const tscCommand = `${PERENNIAL_ROOT}/node_modules/typescript/bin/tsc`;
 
 // TODO: This is the best spot for doc, but this is duplicated with the tasks/check.ts doc for grunt --help, https://github.com/phetsims/chipper/issues/1482
 type CheckOptions = {
@@ -49,9 +50,6 @@ type CheckOptions = {
    * output filters: $FILE_PATH$\($LINE$\,$COLUMN$\)
    */
   absolute: boolean;
-
-  // Only run the clean step, do not run the type check
-  cleanOnly: boolean;
 };
 
 const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean> => {
@@ -63,7 +61,6 @@ const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean
     all: false,
 
     clean: false,
-    cleanOnly: false, // in rare circumstances, we need to clean without running a check. For instance, when cleaning ESLint cache
 
     pretty: true,
     silent: false,
@@ -86,29 +83,19 @@ const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean
     writeAllTSConfigFile();
   }
 
-  const repoEntryPoint = `${PERENNIAL_ROOT}/../${options.repo}`;
+  const repoEntryPoint = getRepoCWD( options.repo );
 
   options.repo && assert( fs.existsSync( `${repoEntryPoint}/tsconfig.json` ), `repo provided does not have a tsconfig.json: ${options.repo}` );
 
   const cwd = options.all ? ALL_CONFIG_PATH : repoEntryPoint;
-  const tscRunnable = options.all ? `../../../../${PERENNIAL_REPO_NAME}/node_modules/typescript/bin/tsc`
-                                  : `../${PERENNIAL_REPO_NAME}/node_modules/typescript/bin/tsc`;
 
   const startTime = Date.now();
   if ( options.clean ) {
-
-    const cleanResults = await runCommand( 'node', [ tscRunnable, '-b', '--clean' ], cwd, false );
-    if ( !cleanResults.success ) {
-      throw new Error( 'Checking failed to clean' );
-    }
-
-    if ( options.cleanOnly ) {
-      return true;
-    }
+    await tscClean( cwd );
   }
 
   const tscArgs = [
-    tscRunnable,
+    tscCommand,
     '-b', // always, because we use project references.
     '--verbose', `${options.verbose}`,
     '--pretty', `${options.pretty}`
@@ -119,6 +106,21 @@ const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean
 
   return tscResults.success;
 };
+
+function getRepoCWD( repo: string ): string {
+  return `${PERENNIAL_ROOT}/../${repo}`;
+}
+
+async function tscClean( cwd: string ): Promise<void> {
+  const cleanResults = await runCommand( 'node', [ tscCommand, '-b', '--clean' ], cwd, false );
+  if ( !cleanResults.success ) {
+    throw new Error( 'Checking failed to clean' );
+  }
+}
+
+export async function tscCleanRepo( repo: string ): Promise<void> {
+  return tscClean( getRepoCWD( repo ) );
+}
 
 
 // Utility function to spawn a child process with inherited stdio

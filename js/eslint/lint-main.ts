@@ -22,14 +22,14 @@
  */
 
 import assert from 'assert';
+import { ESLint } from 'eslint';
 import fs from 'fs';
 import _ from 'lodash';
 import path from 'path';
-import getOption from '../grunt/tasks/util/getOption.js';
-import { ESLint } from 'eslint';
-import getLintOptions, { LintOptions, Repo, RequiredReposInLintOptions } from './getLintOptions.js';
-import check from '../grunt/check.js';
 import process from 'process';
+import { tscCleanRepo } from '../grunt/check.js';
+import getOption from '../grunt/tasks/util/getOption.js';
+import getLintOptions, { LintOptions, Repo, RequiredReposInLintOptions } from './getLintOptions.js';
 
 // TODO: enable linting for scenery-stack-test, see https://github.com/phetsims/scenery-stack-test/issues/1
 // It is problematic for every repo to have a eslint.config.mjs, so it is preferable to opt-out some repos here, see https://github.com/phetsims/chipper/issues/1484
@@ -156,11 +156,7 @@ const clearCaches = ( originalRepos: Repo[] ) => {
     }
 
     if ( fs.existsSync( path.resolve( `../${repo}/tsconfig.json` ) ) ) {
-      await check( {
-        repo: repo,
-        clean: true,
-        cleanOnly: true
-      } );
+      await tscCleanRepo( repo );
     }
   } );
 };
