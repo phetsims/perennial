@@ -5,6 +5,6 @@
  *
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
-import reopenIssuesFromTODOs from '../reopenIssuesFromTODOs';
+import reopenIssuesFromTODOs from '../reopenIssuesFromTODOs.js';
 
 ( async () => reopenIssuesFromTODOs() )();

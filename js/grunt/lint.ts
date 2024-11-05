@@ -18,13 +18,13 @@
 
 import assert from 'assert';
 import { spawn } from 'child_process';
+import { ESLint } from 'eslint';
 import fs from 'fs';
 import _ from 'lodash';
 import path from 'path';
 import getDataFile from '../common/getDataFile.js';
 import showCommandLineProgress from '../common/showCommandLineProgress';
 import getOption from './tasks/util/getOption.js';
-import { ESLint } from 'eslint';
 
 const ESLINT_COMMAND = path.join( `${__dirname}/../../node_modules/.bin/eslint` );
 type LintResult = { ok: boolean };
@@ -32,20 +32,22 @@ type LintResult = { ok: boolean };
 type Repo = string;
 
 export type LintOptions = {
+  all: boolean;
   repos: Repo[];
   cache: boolean;
   fix: boolean;
   chipAway: boolean;
   showProgressBar: boolean;
 };
-export type RequiredReposInLintOptions = Partial<LintOptions> & Pick<LintOptions, 'repos'>;
+type LintOptionsInternal = Omit<LintOptions, 'all'>; // eslint-disable-line @typescript-eslint/no-restricted-types
+export type RequiredReposInLintOptions = Partial<LintOptionsInternal> & Pick<LintOptions, 'repos'>;
 
 const DO_NOT_LINT = [ 'babel', 'phet-vite-demo', 'scenery-stack-test' ]; // TODO: enable linting for scenery-stack-test, see https://github.com/phetsims/scenery-stack-test/issues/1
 
 const getCacheLocation = ( repo: Repo ) => path.resolve( `../chipper/dist/eslint/cache/${repo}.eslintcache` );
 const OLD_CACHE = '../chipper/eslint/cache/';
 
-function lintWithChildProcess( repo: Repo, options: LintOptions ): Promise<number> {
+function lintWithChildProcess( repo: Repo, options: LintOptionsInternal ): Promise<number> {
 
   // Always write to the cache, even if it was cleared previously.
   const cacheFile = getCacheLocation( repo );
@@ -117,7 +119,7 @@ function lintWithChildProcess( repo: Repo, options: LintOptions ): Promise<numbe
 /**
  * Lints repositories using a worker pool approach.
  */
-async function lintWithWorkers( repos: Repo[], options: LintOptions ): Promise<LintResult> {
+async function lintWithWorkers( repos: Repo[], options: LintOptionsInternal ): Promise<LintResult> {
   const reposQueue: Repo[] = [ ...repos.filter( repo => !DO_NOT_LINT.includes( repo ) ) ];
   const exitCodes: number[] = [];
 
@@ -167,7 +169,7 @@ async function lintWithWorkers( repos: Repo[], options: LintOptions ): Promise<L
 /**
  * Runs ESLint on a single repository using the ESLint Node API.
  */
-async function lintWithNodeAPI( repo: Repo, options: LintOptions ): Promise<number> {
+async function lintWithNodeAPI( repo: Repo, options: LintOptionsInternal ): Promise<number> {
 
   // Prepare options for ESLint instance
   const eslintOptions = {
@@ -315,6 +317,7 @@ export const getLintOptions = ( options?: Partial<LintOptions> ): LintOptions =>
   const cache = !( getOption( 'clean' ) || getOption( 'disable-eslint-cache' ) );
 
   const lintOptions = _.assignIn( {
+    all: getOption( 'all' ),
     repos: [] as string[], // the repos to lint
 
     // Cache results for a speed boost.
@@ -331,7 +334,7 @@ export const getLintOptions = ( options?: Partial<LintOptions> ): LintOptions =>
     showProgressBar: !getOption( 'hide-progress-bar' )
   }, options );
 
-  if ( lintOptions.repos.length === 0 || getOption( 'all' ) ) {
+  if ( lintOptions.repos.length === 0 || lintOptions.all ) {
 
     // remove duplicate perennial copy
     lintOptions.repos = getDataFile( 'active-repos' ).filter( repo => repo !== 'perennial-alias' );
