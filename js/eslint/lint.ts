@@ -38,6 +38,7 @@ export default async function( providedOptions: RequiredReposInLintOptions ): Pr
   const promises = repoBatches.map( batch => {
     return new Promise<void>( ( resolve, reject ) => {
 
+      // TODO: https://github.com/phetsims/chipper/issues/1484 this strategy loses the colorization of the stylish eslint output. Can it be restored?
       const child = spawn( tsxCommand, [
           lintMainPath,
           `--repos=${batch.join( ',' )}`,
@@ -49,7 +50,6 @@ export default async function( providedOptions: RequiredReposInLintOptions ): Pr
         }
       );
 
-      // TODO: https://github.com/phetsims/chipper/issues/1484 this strategy loses the colorization of the stylish eslint output. Can it be restored?
       let stdout = '';
       let stderr = '';
 
