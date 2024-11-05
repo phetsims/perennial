@@ -6,7 +6,7 @@
  */
 
 import grunt from 'grunt';
-import lint, { getLintOptions } from '../lint.js';
+import lint, { getLintOptions } from '../../eslint/lint.js';
 
 ( async () => {
   const lintReturnValue = await lint( getLintOptions() );

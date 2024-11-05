@@ -7,11 +7,11 @@
  * It is assumed that linting occurs from one level deep in any given repo. This has ramifications for how we write
  * eslint config files across the codebase.
  *
- * TODO: This file was updated from https://github.com/phetsims/chipper/issues/1484, we should decide what to support
+ * This is called from lint.ts which batches into acceptable sizes (too many repos crashes with out of memory).
+ *
  * TODO: should every active-repo have eslint.config.mjs? Or should we have an opt out list somewhere? https://github.com/phetsims/chipper/issues/1484
- * TODO: Review this file: https://github.com/phetsims/chipper/issues/1484
- * TODO: Review the strategy of using new ESLint for cached, and child process for uncached, see https://github.com/phetsims/chipper/issues/1484
- * TODO: Should we just use new ESLint (node API), but spawn `grunt lint` on subsets of repos, see https://github.com/phetsims/chipper/issues/1484
+ * TODO: if two processes output problems at the same time, the output will be interleaved. But it is nice to output "as we go" instead of "at the end". See https://github.com/phetsims/chipper/issues/1484
+ *
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
@@ -20,25 +20,12 @@ import assert from 'assert';
 import fs from 'fs';
 import _ from 'lodash';
 import path from 'path';
-import getDataFile from '../common/getDataFile.js';
-import showCommandLineProgress from '../common/showCommandLineProgress';
-import getOption from './tasks/util/getOption.js';
+import getOption from '../grunt/tasks/util/getOption.js';
 import { ESLint } from 'eslint';
+import { Repo, LintOptions, LintResult, RequiredReposInLintOptions, getLintOptions } from './lint.js';
 
-type LintResult = { ok: boolean };
-
-type Repo = string;
-
-export type LintOptions = {
-  repos: Repo[];
-  cache: boolean;
-  fix: boolean;
-  chipAway: boolean;
-  showProgressBar: boolean;
-};
-export type RequiredReposInLintOptions = Partial<LintOptions> & Pick<LintOptions, 'repos'>;
-
-const DO_NOT_LINT = [ 'babel', 'phet-vite-demo', 'scenery-stack-test' ]; // TODO: enable linting for scenery-stack-test, see https://github.com/phetsims/scenery-stack-test/issues/1
+// TODO: enable linting for scenery-stack-test, see https://github.com/phetsims/scenery-stack-test/issues/1
+const DO_NOT_LINT = [ 'babel', 'phet-vite-demo', 'scenery-stack-test' ];
 
 const getCacheLocation = ( repo: Repo ) => path.resolve( `../chipper/dist/eslint/cache/${repo}.eslintcache` );
 const OLD_CACHE = '../chipper/eslint/cache/';
@@ -49,9 +36,6 @@ const OLD_CACHE = '../chipper/eslint/cache/';
 async function lintWithWorkers( repos: Repo[], options: LintOptions ): Promise<LintResult> {
   const reposQueue: Repo[] = [ ...repos.filter( repo => !DO_NOT_LINT.includes( repo ) ) ];
   const exitCodes: number[] = [];
-
-  options.showProgressBar && showCommandLineProgress( 0, false );
-  let doneCount = 0;
 
   /**
    * Worker function that continuously processes repositories from the queue.
@@ -68,10 +52,9 @@ async function lintWithWorkers( repos: Repo[], options: LintOptions ): Promise<L
 
       const repo = reposQueue.shift()!; // Get the next repository
 
-      exitCodes.push( await lintWithNodeAPI( repo, options ) );
-
-      doneCount++;
-      options.showProgressBar && showCommandLineProgress( doneCount / repos.length, false );
+      const result = await lintWithNodeAPI( repo, options );
+      exitCodes.push( result );
+      // process.stdout.write( result === 0 ? '.' : 'x' );
     }
   };
 
@@ -81,7 +64,6 @@ async function lintWithWorkers( repos: Repo[], options: LintOptions ): Promise<L
 
   // Wait for all workers to complete
   await Promise.all( workers );
-  options.showProgressBar && showCommandLineProgress( 1, true );
 
   const ok = _.every( exitCodes, code => code === 0 );
   return { ok: ok };
@@ -180,13 +162,7 @@ const lint = async ( providedOptions: RequiredReposInLintOptions ): Promise<Lint
     cache: true,
 
     // Fix things that can be auto-fixed (written to disk)
-    fix: false,
-
-    // Prints responsible dev info for any lint errors for easier GitHub issue creation.
-    chipAway: false, // TODO: not easy to support since flat config rewrite (since we don't get json output, just console logging), see https://github.com/phetsims/chipper/issues/1484
-
-    // Show a progress bar while running, based on the current repo index in the provided list parameter
-    showProgressBar: true
+    fix: false
   }, providedOptions );
 
   const originalRepos = _.uniq( options.repos ); // Don't double lint repos
@@ -198,9 +174,6 @@ const lint = async ( providedOptions: RequiredReposInLintOptions ): Promise<Lint
     clearCaches( originalRepos );
   }
   handleOldCacheLocation();
-
-  // Don't show a progress bar for just a single repo
-  options.showProgressBar = options.showProgressBar && originalRepos.length > 1;
 
   // Top level try-catch just in case.
   try {
@@ -226,43 +199,9 @@ function handleOldCacheLocation(): void {
   }
 }
 
-/**
- * If no repos are provided, activeRepos will be used as the list of repos to lint (equivalent to --all)
- * @author Sam Reid (PhET Interactive Simulations)
- * @author Michael Kauzmann (PhET Interactive Simulations)
- */
-export const getLintOptions = ( options?: Partial<LintOptions> ): LintOptions => {
-  // TODO: Optionize would be nice, https://github.com/phetsims/perennial/issues/369
-
-  // Two apis for turning this off.
-  const cache = !( getOption( 'clean' ) || getOption( 'disable-eslint-cache' ) );
-
-  const lintOptions = _.assignIn( {
-    repos: [] as string[], // the repos to lint
-
-    // Cache results for a speed boost.
-    // Use --clean or --disable-eslint-cache to disable the cache; useful for developing rules.
-    cache: cache,
-
-    // Fix things that can be auto-fixed (written to disk)
-    fix: !!getOption( 'fix' ),
-
-    // Prints responsible dev info for any lint errors for easier GitHub issue creation.
-    chipAway: !!getOption( 'chip-away' ),
-
-    // Show a progress bar while running, based on the current repo index in the provided list parameter
-    showProgressBar: !getOption( 'hide-progress-bar' )
-  }, options );
-
-  if ( lintOptions.repos.length === 0 || getOption( 'all' ) ) {
-
-    // remove duplicate perennial copy
-    lintOptions.repos = getDataFile( 'active-repos' ).filter( repo => repo !== 'perennial-alias' );
-  }
-  return lintOptions;
-};
-
-// Mark the version so that we don't try to lint old shas if on an older version of chipper.
-// TODO: Should we change this? I'm unsure what all the possibilities are, https://github.com/phetsims/chipper/issues/1484
-lint.chipperAPIVersion = 'npx';
-export default lint;
+// eslint-disable-next-line no-void
+void ( async () => {
+  const repos = getOption( 'repos' );
+  const options = repos ? getLintOptions( { repos: repos.split( ',' ) } ) : getLintOptions();
+  await lint( options );
+} )();
