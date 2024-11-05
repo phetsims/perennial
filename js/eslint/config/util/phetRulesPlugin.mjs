@@ -40,85 +40,87 @@ import visibilityAnnotation from '../../rules/visibility-annotation.js';
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 export default {
+  rules: {
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Custom Rules
-  //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Custom Rules
+    //
 
-  'additional-bad-text': additionalBadText,
-  'bad-text': badText,
-  'bad-chipper-text': badChipperText,
-  'bad-phet-library-text': badPhetLibraryText,
-  'bad-sim-text': badSimText,
-  'bad-typescript-text': badTypescriptText,
+    'additional-bad-text': additionalBadText,
+    'bad-text': badText,
+    'bad-chipper-text': badChipperText,
+    'bad-phet-library-text': badPhetLibraryText,
+    'bad-sim-text': badSimText,
+    'bad-typescript-text': badTypescriptText,
 
-  copyright: copyright,
-  // Custom rule for checking the copyright.copyright
+    copyright: copyright,
+    // Custom rule for checking the copyright.copyright
 
-  // Custom rule for checking TO-DOs have issues
-  'todo-should-have-issue': todoShouldHaveIssue,
+    // Custom rule for checking TO-DOs have issues
+    'todo-should-have-issue': todoShouldHaveIssue,
 
-  // Custom rule for ensuring that images and text use scenery node
-  'no-html-constructors': noHtmlConstructors,
+    // Custom rule for ensuring that images and text use scenery node
+    'no-html-constructors': noHtmlConstructors,
 
-  // Custom rule for avoiding instanceof Array.
-  'no-instanceof-array': noInstanceofArray,
+    // Custom rule for avoiding instanceof Array.
+    'no-instanceof-array': noInstanceofArray,
 
-  // Custom rule for keeping import statements on a single line.
-  'single-line-import': singleLineImport,
+    // Custom rule for keeping import statements on a single line.
+    'single-line-import': singleLineImport,
 
-  // method declarations must have a visibility annotation
-  'visibility-annotation': visibilityAnnotation,
+    // method declarations must have a visibility annotation
+    'visibility-annotation': visibilityAnnotation,
 
-  // key and value arguments to namespace.register() must match
-  'namespace-match': namespaceMatch,
+    // key and value arguments to namespace.register() must match
+    'namespace-match': namespaceMatch,
 
-  // phet-specific require statement rules
-  'require-statement-match': requireStatementMatch,
+    // phet-specific require statement rules
+    'require-statement-match': requireStatementMatch,
 
-  // Require @public/@private for this.something = result;
-  'no-property-in-require-statement': noPropertyInRequireStatement,
+    // Require @public/@private for this.something = result;
+    'no-property-in-require-statement': noPropertyInRequireStatement,
 
-  // never allow object shorthand for properties, functions are ok.
-  'phet-object-shorthand': phetObjectShorthand,
+    // never allow object shorthand for properties, functions are ok.
+    'phet-object-shorthand': phetObjectShorthand,
 
-  // a default import variable name should be the same as the filename
-  'default-import-match-filename': defaultImportMatchFilename,
+    // a default import variable name should be the same as the filename
+    'default-import-match-filename': defaultImportMatchFilename,
 
-  // When the default export of a file is a class, it should have a namespace register call
-  'default-export-class-should-register-namespace': defaultExportClassShouldRegisterNamespace,
+    // When the default export of a file is a class, it should have a namespace register call
+    'default-export-class-should-register-namespace': defaultExportClassShouldRegisterNamespace,
 
-  // Importing the view from the model, uh oh. TODO: This is still in discussion, numerous repos opt out, see: https://github.com/phetsims/chipper/issues/1385
-  'no-view-imported-from-model': noViewImportedFromModel,
+    // Importing the view from the model, uh oh. TODO: This is still in discussion, numerous repos opt out, see: https://github.com/phetsims/chipper/issues/1385
+    'no-view-imported-from-model': noViewImportedFromModel,
 
-  // Class names should match filename when exported.
-  'default-export-match-filename': defaultExportMatchFilename,
+    // Class names should match filename when exported.
+    'default-export-match-filename': defaultExportMatchFilename,
 
-  // Use DerivedStringProperty for its PhET-iO benefits and consistency, see https://github.com/phetsims/phet-io/issues/1943
-  'prefer-derived-string-property': preferDerivedStringProperty,
+    // Use DerivedStringProperty for its PhET-iO benefits and consistency, see https://github.com/phetsims/phet-io/issues/1943
+    'prefer-derived-string-property': preferDerivedStringProperty,
 
-  // A variable or attribute name should generally match the tandem name.
-  'tandem-name-should-match': tandemNameShouldMatch,
+    // A variable or attribute name should generally match the tandem name.
+    'tandem-name-should-match': tandemNameShouldMatch,
 
-  // Each source file should list at least one author
-  'author-annotation': authorAnnotation,
+    // Each source file should list at least one author
+    'author-annotation': authorAnnotation,
 
-  // Used for the website code, do not remove!
-  'jsx-text-elements-contain-matching-class': jsxTextElementsContainMatchingClass,
+    // Used for the website code, do not remove!
+    'jsx-text-elements-contain-matching-class': jsxTextElementsContainMatchingClass,
 
-  // Used for grunt sub-process Typescript pattern
-  'no-import-from-grunt-tasks': noImportFromGruntTasks,
+    // Used for grunt sub-process Typescript pattern
+    'no-import-from-grunt-tasks': noImportFromGruntTasks,
 
-  // Used for kebab-case convention for grunt tasks
-  'grunt-task-kebab-case': gruntTaskKebabCase,
+    // Used for kebab-case convention for grunt tasks
+    'grunt-task-kebab-case': gruntTaskKebabCase,
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Type checking rules. Documentation is at the usage site below
-  'no-simple-type-checking-assertions': noSimpleTypeCheckingAssertions,
-  'explicit-method-return-type': explicitMethodReturnType,
-  'require-property-suffix': requirePropertySuffix,
-  'uppercase-statics-should-be-readonly': uppercaseStaticsShouldBeReadonly,
-  'no-object-spread-on-non-literals': noObjectSpreadOnNonLiterals,
-  'phet-io-object-options-should-not-pick-from-phet-io-object': phetIoObjectOptionsShouldNotPickFromPhetIoObject
-  //////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Type checking rules. Documentation is at the usage site below
+    'no-simple-type-checking-assertions': noSimpleTypeCheckingAssertions,
+    'explicit-method-return-type': explicitMethodReturnType,
+    'require-property-suffix': requirePropertySuffix,
+    'uppercase-statics-should-be-readonly': uppercaseStaticsShouldBeReadonly,
+    'no-object-spread-on-non-literals': noObjectSpreadOnNonLiterals,
+    'phet-io-object-options-should-not-pick-from-phet-io-object': phetIoObjectOptionsShouldNotPickFromPhetIoObject
+    //////////////////////////////////////////////
+  }
 };
