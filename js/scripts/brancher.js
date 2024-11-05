@@ -19,8 +19,10 @@
  *   - checkout: Checks out an existing branch in all repositories.
  *   - merge-into-feature: Merges 'main' into the specified feature branch.
  *   - merge-into-main: Merges a specified feature branch into 'main'.
- *   - check: Prints repos that have commits ahead of main.
-
+ *   - check-branch: Prints repos that have commits ahead of main.
+ *   - check-main: Prints repos that are missing commits from main.
+ *   - check-working: Prints repos that have local uncommitted changes.
+ *
  * Examples:
  *   - node script.js create myFeatureBranch
  *   - node script.js delete-local myFeatureBranch
@@ -391,6 +393,26 @@ const checkBranchStatus = async ( branchName, ahead ) => {
   }
 };
 
+/**
+ * Prints a list of repositories that have uncommitted changes.
+ * @returns {Promise<void>}
+ */
+const checkWorkingStatus = async () => {
+  console.log( 'The following repositories have uncommitted changes:' );
+  for ( const repo of repos ) {
+    try {
+      const status = await execGitCommand( repo, 'status --porcelain' );
+      if ( status.toString().trim() ) {
+        console.log( repo );
+      }
+    }
+    catch( error ) {
+      console.error( `Error checking working status in ${repo}: ${error.message}` );
+      process.exit( 1 );
+    }
+  }
+};
+
 const main = async () => {
   const args = process.argv.slice( 2 );
 
@@ -426,6 +448,9 @@ const main = async () => {
       break;
     case 'check-main':
       await checkBranchStatus( branchName, false );
+      break;
+    case 'check-working':
+      await checkWorkingStatus();
       break;
     default:
       console.error( 'Unknown command. Valid commands are: create, delete-local, delete-remote, checkout, merge-into-feature, merge-into-main' );
