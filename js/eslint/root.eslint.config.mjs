@@ -6,9 +6,9 @@ import typescriptEslintParser from '@typescript-eslint/parser';
 import html from 'eslint-plugin-html';
 import globals from 'globals';
 import getNodeConfiguration from './getNodeConfiguration.mjs';
-import phetRules from './phetRules.mjs';
-import rootRules from './rootRules.mjs';
-import rootRulesTypeScript from './rootRulesTypeScript.mjs';
+import phetRules from './config/util/phetRules.mjs';
+import rootRules from './config/util/rootRules.mjs';
+import rootRulesTypeScript from './config/util/rootRulesTypeScript.mjs';
 
 /**
  * The base eslint configuration for the PhET projects.
