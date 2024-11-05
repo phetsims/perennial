@@ -345,17 +345,20 @@ const getDeviatedRepos = async ( branchName, ahead ) => {
 
 /**
  * Prints any repos that have commits ahead of main.
+ *
+ * @param branchName
+ * @param ahead - If true, prints repos that have commits ahead of main. If false, prints repos that are missing commits from main.
  */
-const checkBranchStatus = async branchName => {
+const checkBranchStatus = async ( branchName, ahead ) => {
   console.log( 'Checking branch status...' );
-  const reposWithCommitsAhead = await getDeviatedRepos( branchName, true );
+  const deviatedRepos = await getDeviatedRepos( branchName, ahead );
 
-  if ( reposWithCommitsAhead.length === 0 ) {
+  if ( deviatedRepos.length === 0 ) {
     console.log( 'All repositories are up to date with main.' );
   }
   else {
-    console.log( 'The following repositories have commits ahead of main:' );
-    for ( const repo of reposWithCommitsAhead ) {
+    console.log( `The following repositories have commits ${ahead ? 'ahead of' : 'behind'} main:` );
+    for ( const repo of deviatedRepos ) {
       console.log( repo );
     }
   }
@@ -391,8 +394,11 @@ const main = async () => {
     case 'merge-into-main':
       await mergeFeatureIntoMain( branchName );
       break;
-    case 'check':
-      await checkBranchStatus( branchName );
+    case 'check-branch':
+      await checkBranchStatus( branchName, true );
+      break;
+    case 'check-main':
+      await checkBranchStatus( branchName, false );
       break;
     default:
       console.error( 'Unknown command. Valid commands are: create, delete-local, delete-remote, checkout, merge-into-feature, merge-into-main' );
