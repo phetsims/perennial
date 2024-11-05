@@ -151,11 +151,13 @@ const clearCaches = ( originalRepos: Repo[] ) => {
       }
     }
 
-    await check( {
-      repo: repo,
-      clean: true,
-      cleanOnly: true
-    } );
+    if ( fs.existsSync( path.resolve( `../${repo}/tsconfig.json` ) ) ) {
+      await check( {
+        repo: repo,
+        clean: true,
+        cleanOnly: true
+      } );
+    }
   } );
 };
 

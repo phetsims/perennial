@@ -33,7 +33,6 @@ export default async function( providedOptions: RequiredReposInLintOptions ): Pr
   assert( originalRepos.length > 0, 'no repos provided to lint' );
 
   const repoBatches = divideIntoBatches( originalRepos );
-  console.log( `Linting ${originalRepos.length} repos in ${repoBatches.length} batches` );
 
   // spawn node lint-main.js for each batch and wait for all to complete using child process
   const promises = repoBatches.map( batch => {
