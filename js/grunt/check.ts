@@ -123,8 +123,9 @@ export async function tscCleanRepo( repo: string ): Promise<void> {
 }
 
 
-// Utility function to spawn a child process with inherited stdio
-const runCommand = ( command: string, args: string[], cwd: string, absolute: boolean ): Promise<{ success: boolean; stdout: string }> => {
+// Utility function to spawn a child process with inherited stdio, TODO: duplication? https://github.com/phetsims/perennial/issues/373
+function runCommand( command: string, args: string[], cwd: string, absolute: boolean ): Promise<{ success: boolean; stdout: string }> {
+
   return new Promise( ( resolve, reject ) => {
     type SpawnOptions = Parameters<typeof spawn>[2];
     const spawnOptions: SpawnOptions = {
@@ -146,7 +147,7 @@ const runCommand = ( command: string, args: string[], cwd: string, absolute: boo
       stdout: stdout
     } ) );
   } );
-};
+}
 
 /**
  * Write an aggregate tsconfig file that checks all entry points.
