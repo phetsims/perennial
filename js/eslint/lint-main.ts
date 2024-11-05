@@ -1,6 +1,7 @@
 // Copyright 2024, University of Colorado Boulder
 
 /**
+ * TODO: Fix doc, https://github.com/phetsims/chipper/issues/1484
  * Runs the eslint process on the specified repos. For cached repos, this uses the node API. For
  * uncached repos, it spawn a new process. This keeps within the memory limit and keeps up speed.
  *
