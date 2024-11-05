@@ -8,7 +8,6 @@ const Octokit = require( '@octokit/rest' ); // eslint-disable-line phet/require-
 
 const execute = require( '../common/execute.js' );
 const buildLocal = require( '../common/buildLocal.js' );
-const gruntCommand = require( '../common/gruntCommand.js' );
 const createDirectory = require( '../common/createDirectory.js' );
 
 const CHIPPER_DIST = '../chipper/dist';
