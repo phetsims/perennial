@@ -10,8 +10,9 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 import * as grunt from 'grunt';
-import lint, { getLintOptions } from '../../eslint/lint.js';
+import lint from '../../eslint/lint.js';
 import getRepo, { getRepos } from './util/getRepo.js';
+import getLintOptions from '../../eslint/getLintOptions.js';
 
 const repo = getRepo();
 

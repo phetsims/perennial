@@ -22,7 +22,7 @@ import _ from 'lodash';
 import path from 'path';
 import getOption from '../grunt/tasks/util/getOption.js';
 import { ESLint } from 'eslint';
-import { Repo, LintOptions, RequiredReposInLintOptions, getLintOptions } from './lint.js';
+import getLintOptions, { LintOptions, Repo, RequiredReposInLintOptions } from './getLintOptions.js';
 
 // TODO: enable linting for scenery-stack-test, see https://github.com/phetsims/scenery-stack-test/issues/1
 const DO_NOT_LINT = [ 'babel', 'phet-vite-demo', 'scenery-stack-test' ];
