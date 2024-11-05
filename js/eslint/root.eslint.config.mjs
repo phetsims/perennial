@@ -5,10 +5,10 @@ import typescriptEslintPlugin from '@typescript-eslint/eslint-plugin';
 import typescriptEslintParser from '@typescript-eslint/parser';
 import html from 'eslint-plugin-html';
 import globals from 'globals';
-import getNodeConfiguration from './getNodeConfiguration.mjs';
-import phetRules from './config/util/phetRules.mjs';
+import phetRulesPlugin from './config/util/phetRulesPlugin.mjs';
 import rootRules from './config/util/rootRules.mjs';
 import rootRulesTypeScript from './config/util/rootRulesTypeScript.mjs';
+import getNodeConfiguration from './getNodeConfiguration.mjs';
 
 /**
  * The base eslint configuration for the PhET projects.
@@ -46,9 +46,7 @@ export default [
   // Main config block that applies everywhere. Do NOT add `files` or `ignores` here.
   {
     plugins: {
-      phet: {
-        rules: phetRules
-      }
+      phet: phetRulesPlugin
     },
 
     linterOptions: {

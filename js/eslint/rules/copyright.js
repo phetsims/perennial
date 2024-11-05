@@ -50,7 +50,7 @@ const phetioLicenseRepos = [
   'studio'
 ].map( repo => repo + path.sep );
 
-const gitRootPath = path.resolve( __dirname, '../../../' ) + path.sep;
+const gitRootPath = path.resolve( __dirname, '../../../../' ) + path.sep;
 
 // Match for a PhET-iO license if in a PhET-iO licensed repo, but not an opted out of file.
 const needsPhetioLicense = filePath => {

@@ -19,6 +19,7 @@
  *   - checkout: Checks out an existing branch in all repositories.
  *   - merge-into-feature: Merges 'main' into the specified feature branch.
  *   - merge-into-main: Merges a specified feature branch into 'main'.
+ *   - check: Prints repos that have commits ahead of main.
 
  * Examples:
  *   - node script.js create myFeatureBranch
@@ -138,6 +139,8 @@ const validateBranchName = branchName => {
  * will exit.
  */
 const ensureBranchExists = async ( branchName, checkRemote ) => {
+  console.log( 'Checking branch exists in all repositories...' );
+
   for ( const repo of repos ) {
     const exists = await branchExists( repo, branchName, checkRemote );
     if ( !exists ) {
@@ -148,7 +151,8 @@ const ensureBranchExists = async ( branchName, checkRemote ) => {
 };
 
 /**
- * Creates a new branch in all repositories. If the branch already exists in any repository (local or remote), the script will exit.
+ * Creates a new branch in all repositories. Feature branches are alwasy created from main.
+ * If the branch already exists in any repository (local or remote), the script will exit.
  * Working copy will be on the new branch after this operation.
  */
 const createBranch = async branchName => {
@@ -156,6 +160,7 @@ const createBranch = async branchName => {
   // Make sure the branchName is valid
   validateBranchName( branchName );
 
+  console.log( 'Checking out main to create feature branches...' );
   for ( const repo of repos ) {
     await execGitCommand( repo, 'checkout main' );
   }
@@ -220,8 +225,31 @@ const deleteBranch = async ( branchName, remote ) => {
   } );
 };
 
+/**
+ * Make sure that the working copy is clean in all repositories.
+ */
+const checkCleanWorkingCopy = async () => {
+  console.log( 'Checking working copy...' );
+  for ( const repo of repos ) {
+    try {
+      const status = await execGitCommand( repo, 'status --porcelain' );
+      if ( status.toString().trim() ) {
+        console.error( `Working copy is not clean in ${repo}. Please commit or stash changes before continuing.` );
+        process.exit( 1 );
+      }
+    }
+    catch( error ) {
+      console.error( `Error checking working copy in ${repo}: ${error.message}` );
+      process.exit( 1 );
+    }
+  }
+};
+
 // Checkout the branch in each repository
 const checkoutBranch = async branchName => {
+
+  // First make sure that the working copy is clean before checking out any branches.
+  await checkCleanWorkingCopy();
 
   for ( const repo of repos ) {
     try {
@@ -239,6 +267,7 @@ const checkoutBranch = async branchName => {
 
 /**
  * Merge main into the feature branch in each repository. This will leave you with all repos on the feature branch.
+ * Pull main before running this command.
  * TODO: UNTESTED
  */
 const mergeMainIntoFeature = async branchName => {
@@ -246,14 +275,17 @@ const mergeMainIntoFeature = async branchName => {
   // Make sure that branches are available locally for the merge.
   await ensureBranchExists( branchName, false );
 
+  const reposWithCommitsBehind = await getDeviatedRepos( branchName, false );
+
   // Merge main into the feature branch in each repository
-  for ( const repo of repos ) {
+  for ( const repo of reposWithCommitsBehind ) {
     try {
-      await execGitCommand( repo, 'checkout main' );
-      await execGitCommand( repo, 'pull' );
+
       await execGitCommand( repo, `checkout ${branchName}` );
-      const resultsPromise = await execGitCommand( repo, 'merge main' );
-      const results = resultsPromise.toString().trim();
+
+      console.log( `Merging main into ${branchName} for ${repo}` );
+      const resultsCode = await execGitCommand( repo, 'merge main' );
+      const results = resultsCode.toString().trim();
 
       // Check for conflicts
       // TODO: Is there a better check for this?
@@ -263,7 +295,6 @@ const mergeMainIntoFeature = async branchName => {
     }
     catch( error ) {
       console.error( `Error merging main into feature branch in ${repo}: ${error.message}` );
-      process.exit( 1 );
     }
   }
 
@@ -272,6 +303,7 @@ const mergeMainIntoFeature = async branchName => {
 
 /**
  * Merge the feature branch into main in each repository.
+ * Pull main before running this command
  * TODO: UNTESTED
  */
 const mergeFeatureIntoMain = async branchName => {
@@ -279,11 +311,18 @@ const mergeFeatureIntoMain = async branchName => {
   // Make sure the branch exists locally before merging
   await ensureBranchExists( branchName, false );
 
+  const reposWithCommitsAhead = await getDeviatedRepos( branchName, true );
+
+  // First, checkout main in all repos
+  console.log( 'checking out main...' );
+  await checkoutBranch( 'main' );
+
   // Merge the feature branch into main in each repository
-  for ( const repo of repos ) {
+  for ( const repo of reposWithCommitsAhead ) {
     try {
       await execGitCommand( repo, 'checkout main' );
-      await execGitCommand( repo, 'pull' );
+
+      console.log( `Merging ${branchName} into main in ${repo}` );
       const resultsPromise = await execGitCommand( repo, `merge ${branchName}` );
       const results = resultsPromise.toString().trim();
 
@@ -294,7 +333,60 @@ const mergeFeatureIntoMain = async branchName => {
     }
     catch( error ) {
       console.error( `Error merging feature branch into main in ${repo}: ${error.message}` );
+    }
+  }
+};
+
+/**
+ * Returns a list of branches that have commits deviating from main.
+ * @param branchName
+ * @param ahead - If true, returns repos that have commits ahead of main. If false, returns repos that are missing commits from main.
+ * @returns {Promise<*[]>}
+ */
+const getDeviatedRepos = async ( branchName, ahead ) => {
+  const deviatedRepos = [];
+
+  for ( const repo of repos ) {
+    try {
+
+      // Use --left-right to distinguish commits ahead and behind
+      const status = await execGitCommand( repo, `rev-list --left-right --count ${branchName}...origin/main` );
+      const [ aheadCount, behindCount ] = status.toString().trim().split( '\t' ).map( Number );
+
+      // leftCount represents commits ahead in the branch, rightCount represents commits ahead in main
+      if ( ahead && aheadCount > 0 ) {
+        deviatedRepos.push( repo );
+      }
+      else if ( !ahead && behindCount > 0 ) {
+        deviatedRepos.push( repo );
+      }
+    }
+    catch( error ) {
+      console.error( `Error checking branch status in ${repo}: ${error.message}` );
       process.exit( 1 );
+    }
+  }
+
+  return deviatedRepos;
+};
+
+/**
+ * Prints any repos that have commits ahead of main.
+ *
+ * @param branchName
+ * @param ahead - If true, prints repos that have commits ahead of main. If false, prints repos that are missing commits from main.
+ */
+const checkBranchStatus = async ( branchName, ahead ) => {
+  console.log( 'Checking branch status...' );
+  const deviatedRepos = await getDeviatedRepos( branchName, ahead );
+
+  if ( deviatedRepos.length === 0 ) {
+    console.log( 'All repositories are up to date with main.' );
+  }
+  else {
+    console.log( `The following repositories have commits ${ahead ? 'ahead of' : 'behind'} main:` );
+    for ( const repo of deviatedRepos ) {
+      console.log( repo );
     }
   }
 };
@@ -328,6 +420,12 @@ const main = async () => {
       break;
     case 'merge-into-main':
       await mergeFeatureIntoMain( branchName );
+      break;
+    case 'check-branch':
+      await checkBranchStatus( branchName, true );
+      break;
+    case 'check-main':
+      await checkBranchStatus( branchName, false );
       break;
     default:
       console.error( 'Unknown command. Valid commands are: create, delete-local, delete-remote, checkout, merge-into-feature, merge-into-main' );

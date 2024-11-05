@@ -1,17 +1,16 @@
 // Copyright 2023, University of Colorado Boulder
 // @author Michael Kauzmann (PhET Interactive Simulations)
 
-const process = require( 'process' );
-const fs = require( 'fs' );
-const _ = require( 'lodash' );
-const Octokit = require( '@octokit/rest' ); // eslint-disable-line phet/require-statement-match
-
-const execute = require( '../common/execute.js' );
-const buildLocal = require( '../common/buildLocal.js' );
-const gruntCommand = require( '../common/gruntCommand.js' );
-const createDirectory = require( '../common/createDirectory.js' );
-
-const CHIPPER_DIST = '../chipper/dist';
+import Octokit from '@octokit/rest';
+import fs from 'fs';
+import _ from 'lodash';
+import process from 'process';
+import buildLocal from '../common/buildLocal.js';
+import createDirectory from '../common/createDirectory.js';
+import getLintOptions from '../eslint/getLintOptions.js';
+import lint from '../eslint/lint.js';
+const CHIPPER_DIST_ESLINT = '../chipper/dist/eslint/';
+const TODOsFilename = `${CHIPPER_DIST_ESLINT}/issuesFromTODOs.txt`;
 
 
 /**
@@ -23,31 +22,31 @@ const CHIPPER_DIST = '../chipper/dist';
  * - Use that list to ping github to see if the issue is open
  * - If not open, reopen it and send a comment noting that there is still at least one todo pointing here.
  *
- * @returns {Promise<void>}
  */
-module.exports = async function reopenIssuesFromTODOs() {
+async function reopenIssuesFromTODOs(): Promise<void> {
 
   // Mark an environment variable that tells lint's todo-should-have-issue rule to have a side-effect of saving a file
   // with all todo issues.
-  process.env.saveTODOIssues = true;
+  process.env.saveTODOIssues = 'true';
 
-  if ( !fs.existsSync( CHIPPER_DIST ) ) {
-    await createDirectory( CHIPPER_DIST );
+  if ( !fs.existsSync( CHIPPER_DIST_ESLINT ) ) {
+    await createDirectory( CHIPPER_DIST_ESLINT );
   }
-  fs.writeFileSync( '../chipper/dist/issuesFromTODOs.txt', '' );
+  fs.writeFileSync( TODOsFilename, '' );
 
   console.log( 'grunt lint-everything started' );
-  const result = await execute( gruntCommand, [ 'lint', '--all', '--disable-eslint-cache' ], '../perennial', {
-    errors: 'resolve'
-  } );
-  console.log( 'grunt lint-everything finished' );
-  if ( result.code !== 0 ) {
-    console.error( 'Error running lint-everything:\n\n', result.stdout, result.stderr );
+  try {
+    await lint( getLintOptions( {
+      cache: false
+    } ) );
+  }
+  catch( e ) {
+    console.error( 'Error running lint-everything:\n\n', e );
     process.exit();
   }
+  console.log( 'grunt lint-everything finished' );
 
-
-  const TODOIssues = fs.readFileSync( '../chipper/dist/issuesFromTODOs.txt' ).toString().trim().split( '\n' );
+  const TODOIssues = fs.readFileSync( TODOsFilename ).toString().trim().split( '\n' );
 
   const uniqueTODOIssues = _.uniq( TODOIssues );
   console.log( uniqueTODOIssues.length, 'issues to check' );
@@ -97,4 +96,6 @@ module.exports = async function reopenIssuesFromTODOs() {
       console.error( 'Issue does not exist', `${repo}#${issueNumber}`, e );
     }
   }
-};
+}
+
+export default reopenIssuesFromTODOs;

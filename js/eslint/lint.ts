@@ -8,10 +8,10 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';
-import _ from 'lodash';
-import tsxCommand from '../common/tsxCommand.js';
 import { spawn } from 'child_process';
+import _ from 'lodash';
 import path from 'path';
+import tsxCommand from '../common/tsxCommand.js';
 import divideIntoBatches from './divideIntoBatches.js';
 import { RequiredReposInLintOptions } from './getLintOptions.js';
 

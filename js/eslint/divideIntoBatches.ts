@@ -16,7 +16,7 @@ const MAX_PROCESS_COUNT = 20;
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */
-export default function( originalRepos: Repo[] ): Repo[][] {
+export default function divideIntoBatches( originalRepos: Repo[] ): Repo[][] {
 
   const N = originalRepos.length;
 

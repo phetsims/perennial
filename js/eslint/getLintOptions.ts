@@ -19,7 +19,7 @@ export type RequiredReposInLintOptions = Partial<LintOptions> & Pick<LintOptions
 
 export type Repo = string;
 
-export default function( options?: Partial<LintOptions> ): LintOptions {
+export default function getLintOptions( options?: Partial<LintOptions> ): LintOptions {
   // TODO: Optionize would be nice, https://github.com/phetsims/perennial/issues/369
 
   // Two apis for turning this off.

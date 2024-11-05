@@ -10,4 +10,5 @@
  *
  */
 import '../common/SimVersionTests.js';
+import '../grunt/util/registerTasksTests.js';
 import './test-exec-sync.js';
