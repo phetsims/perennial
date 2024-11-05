@@ -313,6 +313,10 @@ const mergeFeatureIntoMain = async branchName => {
 
   const reposWithCommitsAhead = await getDeviatedRepos( branchName, true );
 
+  // First, checkout main in all repos
+  console.log( 'checking out main...' );
+  await checkoutBranch( 'main' );
+
   // Merge the feature branch into main in each repository
   for ( const repo of reposWithCommitsAhead ) {
     try {

@@ -16,7 +16,7 @@ const prompt = require( './prompt.js' );
  * @param {boolean} noninteractive - If true, skips the prompt
  * @returns {Promise.<boolean>}
  */
-module.exports = async function( question, noninteractive ) {
+module.exports = async function booleanPrompt( question, noninteractive ) {
   if ( noninteractive ) {
     return true;
   }

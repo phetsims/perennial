@@ -6,7 +6,7 @@ import typescriptEslintParser from '@typescript-eslint/parser';
 import html from 'eslint-plugin-html';
 import globals from 'globals';
 import getNodeConfiguration from './getNodeConfiguration.mjs';
-import phetRules from './phetRules.mjs';
+import phetRulesPlugin from './phetRulesPlugin.mjs';
 import rootRules from './rootRules.mjs';
 import rootRulesTypeScript from './rootRulesTypeScript.mjs';
 
@@ -46,9 +46,7 @@ export default [
   // Main config block that applies everywhere. Do NOT add `files` or `ignores` here.
   {
     plugins: {
-      phet: {
-        rules: phetRules
-      }
+      phet: phetRulesPlugin
     },
 
     linterOptions: {

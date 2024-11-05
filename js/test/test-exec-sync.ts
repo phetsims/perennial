@@ -4,13 +4,24 @@
  * Test that we can invoke a grunt task from the command line, and make sure the options are passed correctly.
  *
  * @author Sam Reid (PhET Interactive Simulations)
+ * @author Michael Kauzmann (PhET Interactive Simulations)
  */
-import qunit from 'qunit';
 
-import gruntCommand from '../common/gruntCommand.js';
 import { execSync } from 'child_process';
+import _ from 'lodash';
+import qunit from 'qunit';
+import gruntCommand from '../common/gruntCommand';
+import tsxCommand from '../common/tsxCommand';
 
-import tsxCommand from '../common/tsxCommand.js';
+const SIM = 'acid-base-solutions';
+
+const EXEC_SYNC_OPTIONS = {
+  encoding: 'utf-8'
+} as const;
+
+const EXEC_AND_SIM_OPTIONS = _.assignIn( {
+  cwd: `../${SIM}`
+}, EXEC_SYNC_OPTIONS );
 
 qunit.module( 'test-exec-sync' );
 
@@ -24,35 +35,21 @@ omitted: undefined
 };
 
 qunit.test( 'grunt', ( assert: Assert ) => {
-  const result = execSync( `${gruntCommand} test-grunt --brands=a,b,c --lint=false --noTSC`, { encoding: 'utf-8' } );
-  checkOutput( result, assert );
-} );
-
-qunit.test( 'node grunt', assert => {
-  const result = execSync( 'node ../perennial-alias/node_modules/.bin/grunt test-grunt --brands=a,b,c --lint=false --noTSC', { encoding: 'utf-8' } );
+  const result = execSync( `${gruntCommand} test-grunt --brands=a,b,c --lint=false --noTSC`, EXEC_SYNC_OPTIONS );
   checkOutput( result, assert );
 } );
 
 qunit.test( 'tsx', assert => {
-  const result = execSync( `${tsxCommand} ../perennial-alias/js/grunt/tasks/test-grunt.ts --brands=a,b,c --lint=false --noTSC`, { encoding: 'utf-8' } );
+  const result = execSync( `${tsxCommand} ../perennial-alias/js/grunt/tasks/test-grunt.ts --brands=a,b,c --lint=false --noTSC`, EXEC_SYNC_OPTIONS );
   checkOutput( result, assert );
 } );
 
 qunit.test( 'sage run', assert => {
-  const result = execSync( '../perennial-alias/bin/sage run ../perennial-alias/js/grunt/tasks/test-grunt.ts --brands=a,b,c --lint=false --noTSC', { encoding: 'utf-8' } );
+  const result = execSync( 'bash ../perennial-alias/bin/sage run ../perennial-alias/js/grunt/tasks/test-grunt.ts --brands=a,b,c --lint=false --noTSC', EXEC_SYNC_OPTIONS );
   checkOutput( result, assert );
 } );
 
-// Testing in particular if the first option is dropped for the grunt default command. Therefore, put  --test-options later so we don't drop it.
-// Run in a sim, so we test picking up the default task
-qunit.module( 'test-exec-sync:default' );
-
-qunit.test( 'grunt', ( assert: Assert ) => {
-  const result = execSync( `${gruntCommand} --brands=a,b,c --lint=false --noTSC --test-options`, { encoding: 'utf-8', cwd: '../acid-base-solutions' } );
-  checkOutput( result, assert );
-} );
-
-qunit.test( 'node grunt', assert => {
-  const result = execSync( 'node ../perennial-alias/node_modules/.bin/grunt --brands=a,b,c --lint=false --noTSC --test-options', { encoding: 'utf-8', cwd: '../acid-base-solutions' } );
+qunit.test( `grunt ${SIM}`, ( assert: Assert ) => {
+  const result = execSync( `${gruntCommand} --brands=a,b,c --lint=false --noTSC --test-options`, EXEC_AND_SIM_OPTIONS );
   checkOutput( result, assert );
 } );
