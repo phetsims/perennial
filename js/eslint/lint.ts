@@ -7,6 +7,7 @@
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
+
 import assert from 'assert';
 import { spawn } from 'child_process';
 import _ from 'lodash';
