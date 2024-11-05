@@ -130,7 +130,6 @@ async function lintWithNodeAPI( repo: Repo, options: LintOptions ): Promise<numb
   return errorCount === 0 ? 0 : 1; // Return 0 if no errors, 1 if there are errors
 }
 
-// TODO: Console log for all these repos? https://github.com/phetsims/chipper/issues/1484
 const clearCaches = ( originalRepos: Repo[] ) => {
   originalRepos.forEach( repo => {
     const cacheFile = getCacheLocation( repo );
