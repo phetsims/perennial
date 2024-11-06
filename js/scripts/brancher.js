@@ -19,8 +19,10 @@
  *   - checkout: Checks out an existing branch in all repositories.
  *   - merge-into-feature: Merges 'main' into the specified feature branch.
  *   - merge-into-main: Merges a specified feature branch into 'main'.
- *   - check: Prints repos that have commits ahead of main.
-
+ *   - check-branch: Prints repos that have commits ahead of main.
+ *   - check-main: Prints repos that are missing commits from main.
+ *   - check-working: Prints repos that have local uncommitted changes.
+ *
  * Examples:
  *   - node script.js create myFeatureBranch
  *   - node script.js delete-local myFeatureBranch
@@ -225,8 +227,31 @@ const deleteBranch = async ( branchName, remote ) => {
   } );
 };
 
+/**
+ * Make sure that the working copy is clean in all repositories.
+ */
+const checkCleanWorkingCopy = async () => {
+  console.log( 'Checking working copy...' );
+  for ( const repo of repos ) {
+    try {
+      const status = await execGitCommand( repo, 'status --porcelain' );
+      if ( status.toString().trim() ) {
+        console.error( `Working copy is not clean in ${repo}. Please commit or stash changes before continuing.` );
+        process.exit( 1 );
+      }
+    }
+    catch( error ) {
+      console.error( `Error checking working copy in ${repo}: ${error.message}` );
+      process.exit( 1 );
+    }
+  }
+};
+
 // Checkout the branch in each repository
 const checkoutBranch = async branchName => {
+
+  // First make sure that the working copy is clean before checking out any branches.
+  await checkCleanWorkingCopy();
 
   for ( const repo of repos ) {
     try {
@@ -297,6 +322,7 @@ const mergeFeatureIntoMain = async branchName => {
   // Merge the feature branch into main in each repository
   for ( const repo of reposWithCommitsAhead ) {
     try {
+      await execGitCommand( repo, 'checkout main' );
 
       console.log( `Merging ${branchName} into main in ${repo}` );
       const resultsPromise = await execGitCommand( repo, `merge ${branchName}` );
@@ -348,18 +374,41 @@ const getDeviatedRepos = async ( branchName, ahead ) => {
 
 /**
  * Prints any repos that have commits ahead of main.
+ *
+ * @param branchName
+ * @param ahead - If true, prints repos that have commits ahead of main. If false, prints repos that are missing commits from main.
  */
-const checkBranchStatus = async branchName => {
+const checkBranchStatus = async ( branchName, ahead ) => {
   console.log( 'Checking branch status...' );
-  const reposWithCommitsAhead = await getDeviatedRepos( branchName, true );
+  const deviatedRepos = await getDeviatedRepos( branchName, ahead );
 
-  if ( reposWithCommitsAhead.length === 0 ) {
+  if ( deviatedRepos.length === 0 ) {
     console.log( 'All repositories are up to date with main.' );
   }
   else {
-    console.log( 'The following repositories have commits ahead of main:' );
-    for ( const repo of reposWithCommitsAhead ) {
+    console.log( `The following repositories have commits ${ahead ? 'ahead of' : 'behind'} main:` );
+    for ( const repo of deviatedRepos ) {
       console.log( repo );
+    }
+  }
+};
+
+/**
+ * Prints a list of repositories that have uncommitted changes.
+ * @returns {Promise<void>}
+ */
+const checkWorkingStatus = async () => {
+  console.log( 'The following repositories have uncommitted changes:' );
+  for ( const repo of repos ) {
+    try {
+      const status = await execGitCommand( repo, 'status --porcelain' );
+      if ( status.toString().trim() ) {
+        console.log( repo );
+      }
+    }
+    catch( error ) {
+      console.error( `Error checking working status in ${repo}: ${error.message}` );
+      process.exit( 1 );
     }
   }
 };
@@ -394,8 +443,14 @@ const main = async () => {
     case 'merge-into-main':
       await mergeFeatureIntoMain( branchName );
       break;
-    case 'check':
-      await checkBranchStatus( branchName );
+    case 'check-branch':
+      await checkBranchStatus( branchName, true );
+      break;
+    case 'check-main':
+      await checkBranchStatus( branchName, false );
+      break;
+    case 'check-working':
+      await checkWorkingStatus();
       break;
     default:
       console.error( 'Unknown command. Valid commands are: create, delete-local, delete-remote, checkout, merge-into-feature, merge-into-main' );

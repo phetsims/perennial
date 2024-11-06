@@ -1,48 +1,37 @@
 // Copyright 2015-2021, University of Colorado Boulder
 
-/**
- * This file defines the set of custom rules that PhET has created for linting its codebase. Every
- * custom rule, no matter where it is used must be included in this plugin here.
- *
- * NOTE: This includes some rules that are only used by the website team in website repos, so be careful
- * when removing these.
- *
- * @author Michael Kauzmann (PhET Interactive Simulations)
- * @author Sam Reid (PhET Interactive Simulations)
- */
-
-import additionalBadText from './rules/additional-bad-text.js';
-import authorAnnotation from './rules/author-annotation.js';
-import badChipperText from './rules/bad-chipper-text.js';
-import badPhetLibraryText from './rules/bad-phet-library-text.js';
-import badSimText from './rules/bad-sim-text.js';
-import badText from './rules/bad-text.js';
-import badTypescriptText from './rules/bad-typescript-text.js';
-import copyright from './rules/copyright.js';
-import defaultExportClassShouldRegisterNamespace from './rules/default-export-class-should-register-namespace.js';
-import defaultExportMatchFilename from './rules/default-export-match-filename.js';
-import defaultImportMatchFilename from './rules/default-import-match-filename.js';
-import explicitMethodReturnType from './rules/explicit-method-return-type.js';
-import gruntTaskKebabCase from './rules/grunt-task-kebab-case.js';
-import jsxTextElementsContainMatchingClass from './rules/jsx-text-elements-contain-matching-class.js';
-import namespaceMatch from './rules/namespace-match.js';
-import noHtmlConstructors from './rules/no-html-constructors.js';
-import noImportFromGruntTasks from './rules/no-import-from-grunt-tasks.js';
-import noInstanceofArray from './rules/no-instanceof-array.js';
-import noObjectSpreadOnNonLiterals from './rules/no-object-spread-on-non-literals.js';
-import noPropertyInRequireStatement from './rules/no-property-in-require-statement.js';
-import noSimpleTypeCheckingAssertions from './rules/no-simple-type-checking-assertions.js';
-import noViewImportedFromModel from './rules/no-view-imported-from-model.js';
-import phetIoObjectOptionsShouldNotPickFromPhetIoObject from './rules/phet-io-object-options-should-not-pick-from-phet-io-object.js';
-import phetObjectShorthand from './rules/phet-object-shorthand.js';
-import preferDerivedStringProperty from './rules/prefer-derived-string-property.js';
-import requirePropertySuffix from './rules/require-property-suffix.js';
-import requireStatementMatch from './rules/require-statement-match.js';
-import singleLineImport from './rules/single-line-import.js';
-import tandemNameShouldMatch from './rules/tandem-name-should-match.js';
-import todoShouldHaveIssue from './rules/todo-should-have-issue.js';
-import uppercaseStaticsShouldBeReadonly from './rules/uppercase-statics-should-be-readonly.js';
-import visibilityAnnotation from './rules/visibility-annotation.js';
+import additionalBadText from '../../rules/additional-bad-text.js';
+import authorAnnotation from '../../rules/author-annotation.js';
+import badChipperText from '../../rules/bad-chipper-text.js';
+import badPhetLibraryText from '../../rules/bad-phet-library-text.js';
+import badSimText from '../../rules/bad-sim-text.js';
+import badText from '../../rules/bad-text.js';
+import badTypescriptText from '../../rules/bad-typescript-text.js';
+import copyright from '../../rules/copyright.js';
+import defaultExportClassShouldRegisterNamespace from '../../rules/default-export-class-should-register-namespace.js';
+import defaultExportMatchFilename from '../../rules/default-export-match-filename.js';
+import defaultImportMatchFilename from '../../rules/default-import-match-filename.js';
+import explicitMethodReturnType from '../../rules/explicit-method-return-type.js';
+import gruntTaskKebabCase from '../../rules/grunt-task-kebab-case.js';
+import jsxTextElementsContainMatchingClass from '../../rules/jsx-text-elements-contain-matching-class.js';
+import namespaceMatch from '../../rules/namespace-match.js';
+import noHtmlConstructors from '../../rules/no-html-constructors.js';
+import noImportFromGruntTasks from '../../rules/no-import-from-grunt-tasks.js';
+import noInstanceofArray from '../../rules/no-instanceof-array.js';
+import noObjectSpreadOnNonLiterals from '../../rules/no-object-spread-on-non-literals.js';
+import noPropertyInRequireStatement from '../../rules/no-property-in-require-statement.js';
+import noSimpleTypeCheckingAssertions from '../../rules/no-simple-type-checking-assertions.js';
+import noViewImportedFromModel from '../../rules/no-view-imported-from-model.js';
+import phetIoObjectOptionsShouldNotPickFromPhetIoObject from '../../rules/phet-io-object-options-should-not-pick-from-phet-io-object.js';
+import phetObjectShorthand from '../../rules/phet-object-shorthand.js';
+import preferDerivedStringProperty from '../../rules/prefer-derived-string-property.js';
+import requirePropertySuffix from '../../rules/require-property-suffix.js';
+import requireStatementMatch from '../../rules/require-statement-match.js';
+import singleLineImport from '../../rules/single-line-import.js';
+import tandemNameShouldMatch from '../../rules/tandem-name-should-match.js';
+import todoShouldHaveIssue from '../../rules/todo-should-have-issue.js';
+import uppercaseStaticsShouldBeReadonly from '../../rules/uppercase-statics-should-be-readonly.js';
+import visibilityAnnotation from '../../rules/visibility-annotation.js';
 
 /**
  * Custom PhET rules for ESLint.

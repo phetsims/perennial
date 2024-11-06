@@ -7,8 +7,8 @@ import _ from 'lodash';
 import process from 'process';
 import buildLocal from '../common/buildLocal.js';
 import createDirectory from '../common/createDirectory.js';
-import lint, { getLintOptions } from './lint.js';
-
+import getLintOptions from '../eslint/getLintOptions.js';
+import lint from '../eslint/lint.js';
 const CHIPPER_DIST_ESLINT = '../chipper/dist/eslint/';
 const TODOsFilename = `${CHIPPER_DIST_ESLINT}/issuesFromTODOs.txt`;
 
@@ -37,7 +37,6 @@ async function reopenIssuesFromTODOs(): Promise<void> {
   console.log( 'grunt lint-everything started' );
   try {
     await lint( getLintOptions( {
-      all: true,
       cache: false
     } ) );
   }
