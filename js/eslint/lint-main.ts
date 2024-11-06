@@ -1,9 +1,7 @@
 // Copyright 2024, University of Colorado Boulder
 
 /**
- * TODO: Fix doc, https://github.com/phetsims/chipper/issues/1484
- * Runs the eslint process on the specified repos. For cached repos, this uses the node API. For
- * uncached repos, it spawn a new process. This keeps within the memory limit and keeps up speed.
+ * Run ESLint on the specified repos.
  *
  * It is assumed that linting occurs from one level deep in any given repo. This has ramifications for how we write
  * eslint config files across the codebase.
@@ -16,7 +14,7 @@
  *
  * If you have a small enough batch (say, less than 50 repos), you can run this directly via:
  * cd perennial-alias
- * sage run js/eslint/lint-main.ts --repos=repo1,repo2,repo3
+ * sage run js/eslint/lint-main.ts --repos=density
  *
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
@@ -30,7 +28,7 @@ import path from 'path';
 import process from 'process';
 import { tscCleanRepo } from '../grunt/check.js';
 import getOption from '../grunt/tasks/util/getOption.js';
-import getLintOptions, { LintOptions, Repo, RequiredReposInLintOptions } from './getLintOptions.js';
+import getLintOptions, { LintOptions, Repo, RequiredReposInLintOptions, DEFAULT_MAX_PROCESSES } from './getLintOptions.js';
 
 // TODO: enable linting for scenery-stack-test, see https://github.com/phetsims/scenery-stack-test/issues/1
 // It is problematic for every repo to have a eslint.config.mjs, so it is preferable to opt-out some repos here, see https://github.com/phetsims/chipper/issues/1484
@@ -91,7 +89,7 @@ async function lintWithNodeAPI( repo: Repo, options: LintOptions ): Promise<numb
     cache: true,
     cacheLocation: path.resolve( getCacheLocation( repo ) ),
     fix: options.fix,
-    // flags: [ 'unstable_config_lookup_from_file' ], // TODO: add back in? https://github.com/phetsims/chipper/issues/1484
+    flags: [ 'unstable_config_lookup_from_file' ],
     errorOnUnmatchedPattern: false
   };
 
@@ -171,7 +169,9 @@ const lint = async ( providedOptions: RequiredReposInLintOptions ): Promise<bool
     cache: true,
 
     // Fix things that can be auto-fixed (written to disk)
-    fix: false
+    fix: false,
+
+    processes: DEFAULT_MAX_PROCESSES
   }, providedOptions );
 
   const originalRepos = _.uniq( options.repos ); // Don't double lint repos

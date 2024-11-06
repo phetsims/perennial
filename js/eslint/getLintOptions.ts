@@ -14,8 +14,11 @@ export type LintOptions = {
   repos: Repo[];
   cache: boolean;
   fix: boolean;
+  processes: number;
 };
 export type RequiredReposInLintOptions = Partial<LintOptions> & Pick<LintOptions, 'repos'>;
+
+export const DEFAULT_MAX_PROCESSES = 6;
 
 export type Repo = string;
 
@@ -33,7 +36,10 @@ export default function getLintOptions( options?: Partial<LintOptions> ): LintOp
     cache: cache,
 
     // Fix things that can be auto-fixed (written to disk)
-    fix: !!getOption( 'fix' )
+    fix: !!getOption( 'fix' ),
+
+    // Max number of processes to divide up the work
+    processes: getOption( 'processes' ) || DEFAULT_MAX_PROCESSES
   }, options );
 
   if ( lintOptions.repos.length === 0 || getOption( 'all' ) ) {
