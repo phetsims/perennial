@@ -6,7 +6,6 @@
  * grunt doesn't work well with this, since grunt always prints out extra stuff to stdout. This is an independent
  * node.js script instead.
  *
- * TODO: Two copies? https://github.com/phetsims/perennial/issues/370
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */

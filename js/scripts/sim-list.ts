@@ -3,6 +3,8 @@
 /**
  * Prints out a list of live production HTML sims to stderr (can be filtered from other stdout output)
  * --versions : Outputs the sim version after its name.
+ *
+ * TODO: Two copies, one .js?? https://github.com/phetsims/perennial/issues/370
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
