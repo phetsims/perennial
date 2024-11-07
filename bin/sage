@@ -53,4 +53,4 @@ if [[ ! -f "$SCRIPT_FILE" ]]; then
 fi
 
 # Execute the script with tsx
-"$TSX_EXEC" "$SCRIPT_FILE" "$@" || exit 1
+exec "$TSX_EXEC" "$SCRIPT_FILE" "$@" || exit 1
