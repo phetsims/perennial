@@ -11,11 +11,11 @@
 import assert from 'assert';
 import _ from 'lodash';
 import winston from 'winston';
-import getRepoList from '../../common/getRepoList.js';
-import gitFetchCheckout from '../../common/gitFetchCheckout.js';
-import gitFromTimestamp from '../../common/gitFromTimestamp.js';
-import npmUpdate from '../../common/npmUpdate.js';
-import getOption from './util/getOption';
+import getRepoList from '../common/getRepoList.js';
+import gitFetchCheckout from '../common/gitFetchCheckout.js';
+import gitFromTimestamp from '../common/gitFromTimestamp.js';
+import npmUpdate from '../common/npmUpdate.js';
+import getOption from '../grunt/tasks/util/getOption.js';
 
 ( async () => {
   const timestamp = getOption( 'timestamp' );

@@ -4,9 +4,9 @@
  * Updates the gh-pages branches for various repos, including building of dot/kite/scenery
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  *
- * TODO: Move to perennial/js/scripts/ and inline module, https://github.com/phetsims/perennial/issues/370
+ * TODO: Inline module, https://github.com/phetsims/perennial/issues/370
  */
 
-import updateGithubPages from '../../common/updateGithubPages';
+import updateGithubPages from '../common/updateGithubPages.js';
 
 ( ( async () => updateGithubPages() ) )();

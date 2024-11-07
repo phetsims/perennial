@@ -51,6 +51,7 @@
     "rimraf": "~2.5.4",
     "rsync": "~0.6.1",
     "thread-sleep": "~2.0.0",
+    "ts-morph": "~21.0.1",
     "tsx": "~4.19.1",
     "typescript": "~5.5.4",
     "winston": "~2.4.5",

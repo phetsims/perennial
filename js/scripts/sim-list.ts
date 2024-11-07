@@ -4,12 +4,11 @@
  * Prints out a list of live production HTML sims to stderr (can be filtered from other stdout output)
  * --versions : Outputs the sim version after its name.
  * @author Michael Kauzmann (PhET Interactive Simulations)
- * TODO: Move to perennial/js/scripts/ https://github.com/phetsims/perennial/issues/370
  */
 
 import winston from 'winston';
-import simMetadata from '../../common/simMetadata';
-import getOption from './util/getOption.ts';
+import simMetadata from '../common/simMetadata.js';
+import getOption from '../grunt/tasks/util/getOption.ts';
 
 winston.default.transports.console.level = 'error';
 
