@@ -1,7 +1,7 @@
 // Copyright 2018, University of Colorado Boulder
 // @author Michael Kauzmann
 
-import getNodeConfiguration from './getNodeConfiguration.mjs';
+import getNodeConfiguration from './util/getNodeConfiguration.mjs';
 import rootEslintConfig from './root.eslint.config.mjs';
 
 /**

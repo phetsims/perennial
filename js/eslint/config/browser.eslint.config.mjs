@@ -7,7 +7,7 @@
  */
 
 import globals from 'globals';
-import { phetSimBrowserGlobalsObject } from './config/util/phetSimBrowserGlobals.mjs';
+import { phetSimBrowserGlobalsObject } from './util/phetSimBrowserGlobals.mjs';
 import rootEslintConfig from './root.eslint.config.mjs';
 
 export const getBrowserConfiguration = ( pattern = {} ) => {

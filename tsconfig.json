@@ -1,5 +1,4 @@
 {
-  // TODO: If you want to use optionize() in perennial, we need to move it from phet-core to perennial-alias. Or JO HELP, https://github.com/phetsims/perennial/issues/371
   "extends": "./tsconfig/tsconfig-node.json",
   "include": [
     "js/**/*",
