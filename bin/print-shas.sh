@@ -2,6 +2,7 @@
 #=======================================================================================
 #
 # Prints shas for all repos in the working directory.
+# TODO: ASK DEVS: Delete this, https://github.com/phetsims/chipper/issues/1461
 #
 # Author: Chris Malley (PixelZoom, Inc.)
 #

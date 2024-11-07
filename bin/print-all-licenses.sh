@@ -3,6 +3,7 @@
 #
 # For each file in active-repos, it prints the repo name and the 1st line of the LICENSE file
 # in a GitHub markdown table format
+# TODO: ASK DEVS: Delete this and prefer javascript code, https://github.com/phetsims/chipper/issues/1461
 #
 # Author: Sam Reid
 #

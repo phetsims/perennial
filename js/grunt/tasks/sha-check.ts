@@ -4,6 +4,8 @@
  * Checks which simulations\' latest release version includes the given common-code SHA in its git tree.
  * --repo : repository to check for the SHA
  * --sha : git SHA
+ *
+ * TODO: ASK DEVS: Delete this grunt task, SR MK think it doesn't belong in formal API, https://github.com/phetsims/chipper/issues/1461
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 

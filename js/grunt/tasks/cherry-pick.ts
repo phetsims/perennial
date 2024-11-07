@@ -6,6 +6,7 @@
  * --shas : Comma-separated list of SHAs to try
  * @author Michael Kauzmann (PhET Interactive Simulations)
  *
+ * TODO: ASK DEVS: Delete this grunt task, SR MK think it doesn't belong in formal API, https://github.com/phetsims/chipper/issues/1461
  */
 import assert from 'assert';
 import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';

@@ -4,6 +4,7 @@
 # Runs grunt for all runnables.
 # Command-line args are passed through to grunt.
 # With no args, this runs the default grunt task (build).
+# TODO: ASK DEVS: Delete this, https://github.com/phetsims/chipper/issues/1461
 #
 # Author: Jonathan Olson
 # Author: Chris Malley

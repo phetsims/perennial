@@ -4,6 +4,7 @@
  * Prints out a list of live production HTML sims to stderr (can be filtered from other stdout output)
  * --versions : Outputs the sim version after its name.
  * @author Michael Kauzmann (PhET Interactive Simulations)
+ * TODO: Move to perennial/js/scripts/ https://github.com/phetsims/perennial/issues/370
  */
 
 import winston from 'winston';

@@ -3,6 +3,7 @@
 /**
  * Runs npm update/prune for chipper, perennial-alias and the given repository
  * --repo : The repository to update
+ * TODO: ASK DEVS: Delete this grunt task, SR MK think it doesn't belong in formal API, https://github.com/phetsims/chipper/issues/1461 *
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
