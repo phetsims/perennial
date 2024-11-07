@@ -279,11 +279,12 @@ const mergeMainIntoFeature = async branchName => {
 
   const reposWithCommitsBehind = await getDeviatedRepos( branchName, false );
 
+  // First, check out the branch in all repos
+  await checkoutBranch( branchName );
+
   // Merge main into the feature branch in each repository
   for ( const repo of reposWithCommitsBehind ) {
     try {
-
-      await execGitCommand( repo, `checkout ${branchName}` );
 
       console.log( `Merging main into ${branchName} for ${repo}` );
       const resultsCode = await execGitCommand( repo, 'merge main' );
