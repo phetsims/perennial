@@ -16,13 +16,9 @@ import getOption from './util/getOption';
 ( async () => {
   assert( getOption( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
 
-  const buildServer = !!getOption( 'buildServer' );
-
   const repo = getOption( 'repo' );
   assertIsValidRepoName( repo );
 
-  const dependencies = grunt.file.readJSON( buildServer ? '../perennial/js/build-server/tmp/dependencies.json' : `../${repo}/dependencies.json` );
-  const includeNpmUpdate = !getOption( 'skipNpmUpdate' ) && !buildServer;
-
-  await checkoutDependencies( repo, dependencies, includeNpmUpdate );
+  const dependencies = grunt.file.readJSON( `../${repo}/dependencies.json` );
+  await checkoutDependencies( repo, dependencies, !getOption( 'skipNpmUpdate' ) );
 } )();
