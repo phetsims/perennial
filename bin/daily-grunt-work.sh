@@ -38,7 +38,7 @@ perennial/bin/sage run perennial/js/scripts/push-all.js
 perennial/bin/for-each.sh perennial/data/active-repos "npm prune && npm update; git stash"
 
 cd chipper || exit
-../perennial/bin/sage run js/scripts/transpile.js
+grunt transpile
 cd ..
 
 ###########################################################################################################
