@@ -1,11 +1,11 @@
 // Copyright 2013-2024, University of Colorado Boulder
 
 import assert from 'assert';
-import grunt from 'grunt';
 import path from 'path';
 import process from 'process';
 import { Repo } from '../../../common/PerennialTypes.js';
 import getOption from './getOption.js';
+import { readFileSync } from 'fs';
 
 /**
  * Get the repo by processing from multiple locations (command line options and package).
@@ -19,7 +19,7 @@ const getRepo = (): Repo => {
   if ( !repo ) {
 
     try {
-      const packageObject = grunt.file.readJSON( 'package.json' );
+      const packageObject = JSON.parse( readFileSync( 'package.json', 'utf8' ) );
       repo = packageObject.name;
 
       // Support checking in "perennial-alias" if running from that repo

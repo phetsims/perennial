@@ -8,10 +8,10 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';
-import grunt from 'grunt';
 import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
 import checkoutDependencies from '../../common/checkoutDependencies.js';
 import getOption from './util/getOption.js';
+import { readFileSync } from 'fs';
 
 ( async () => {
   assert( getOption( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
@@ -19,6 +19,6 @@ import getOption from './util/getOption.js';
   const repo = getOption( 'repo' );
   assertIsValidRepoName( repo );
 
-  const dependencies = grunt.file.readJSON( `../${repo}/dependencies.json` );
+  const dependencies = JSON.parse( readFileSync( `../${repo}/dependencies.json`, 'utf8' ) );
   await checkoutDependencies( repo, dependencies, !getOption( 'skipNpmUpdate' ) );
 } )();
