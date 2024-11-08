@@ -6,6 +6,6 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-const axios = require( 'axios' );
+import axios from 'axios';
 
-module.exports = axios;
+export default axios;
