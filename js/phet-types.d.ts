@@ -12,17 +12,17 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-// Can't externally reference
-type IntentionalAny = any;
+// NOTE: we cannot use IntentionalAny in this file because it is a global file, and IntentionalAny is a module file
+// Therefore, we must use `any` directly in this file. See https://github.com/phetsims/perennial/issues/406
 
-declare var assert: undefined | ( ( x: IntentionalAny, ...messages: IntentionalAny[] ) => void );
-declare var assertSlow: undefined | ( ( x: IntentionalAny, ...messages: IntentionalAny[] ) => void );
-declare var sceneryLog: null | false | ( Record<string, ( ob: IntentionalAny, style?: string ) => void> & {
+declare var assert: undefined | ( ( x: any, ...messages: any[] ) => void );
+declare var assertSlow: undefined | ( ( x: any, ...messages: any[] ) => void );
+declare var sceneryLog: null | false | ( Record<string, ( ob: any, style?: string ) => void> & {
   push(): void;
   pop(): void;
   getDepth(): number;
 } );
-declare var phet: Record<string, IntentionalAny>;
+declare var phet: Record<string, any>;
 
 // TODO: This can be moved to QueryStringMachine when it is moved to TypeScript, see https://github.com/phetsims/query-string-machine/issues/49
 declare type Warning = {
@@ -58,20 +58,20 @@ declare type QueryStringMachineSchema = {
     type: 'array';
     elementSchema: QueryStringMachineSchema;
     separator?: string;
-    defaultValue?: null | readonly IntentionalAny[];
-    validValues?: readonly IntentionalAny[][];
-    isValidValue?: ( n: IntentionalAny[] ) => boolean;
+    defaultValue?: null | readonly any[];
+    validValues?: readonly any[][];
+    isValidValue?: ( n: any[] ) => boolean;
   } |
   {
     type: 'custom';
-    parse: ( str: string ) => IntentionalAny;
-    defaultValue?: IntentionalAny;
-    validValues?: readonly IntentionalAny[];
-    isValidValue?: ( n: IntentionalAny ) => boolean;
+    parse: ( str: string ) => any;
+    defaultValue?: any;
+    validValues?: readonly any[];
+    isValidValue?: ( n: any ) => boolean;
   } );
 
 // Converts a Schema's type to the actual Typescript type it represents
-declare type QueryMachineTypeToType<T> = T extends ( 'flag' | 'boolean' ) ? boolean : ( T extends 'number' ? number : ( T extends 'string' ? ( string | null ) : ( T extends 'array' ? IntentionalAny[] : IntentionalAny ) ) );
+declare type QueryMachineTypeToType<T> = T extends ( 'flag' | 'boolean' ) ? boolean : ( T extends 'number' ? number : ( T extends 'string' ? ( string | null ) : ( T extends 'array' ? any[] : any ) ) );
 
 type QSMSchemaObject = Record<string, QueryStringMachineSchema>;
 
@@ -88,7 +88,7 @@ declare var QueryStringMachine: {
   get: <Schema extends QueryStringMachineSchema>( a: string, schema: Schema ) => QueryMachineTypeToType<Schema[ 'type' ]>;
   containsKey: ( key: string ) => boolean;
   warnings: Warning[];
-  addWarning: ( key: string, value: IntentionalAny, message: string ) => void;
+  addWarning: ( key: string, value: any, message: string ) => void;
   removeKeyValuePair: ( queryString: string, key: string ) => string;
   removeKeyValuePairs: ( queryString: string, keys: string[] ) => string;
   appendQueryString: ( url: string, tail: string ) => string;
@@ -103,7 +103,7 @@ declare var QueryStringMachine: {
 declare var phetSplashScreenDownloadComplete: () => void;
 declare var TWEEN: { update: ( dt: number ) => void };
 declare var phetSplashScreen: { dispose: () => void };
-declare var phetio: Record<string, IntentionalAny>;
+declare var phetio: Record<string, any>;
 
 // Typing for linebreaker-1.1.0.js preload
 declare type LineBreakerBreak = {
