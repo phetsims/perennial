@@ -185,7 +185,7 @@ export default {
   'no-useless-backreference': 'error',
 
   // Disallow assignments that can lead to race conditions due to usage of `await` or `yield`
-  'require-atomic-updates': 'off', // TODO: Enable: 6 fails, can we turn this on? see https://github.com/phetsims/rosetta/issues/265
+  'require-atomic-updates': 'error',
 
   // Require calls to `isNaN()` when checking for `NaN`
   'use-isnan': 'error',
