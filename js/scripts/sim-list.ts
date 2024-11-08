@@ -4,7 +4,9 @@
  * Prints out a list of live production HTML sims to stderr (can be filtered from other stdout output)
  * --versions : Outputs the sim version after its name.
  *
- * TODO: Two copies, one .js?? https://github.com/phetsims/perennial/issues/370
+ * grunt doesn't work well with this, since grunt always prints out extra stuff to stdout. This is an independent
+ * node.js script instead.
+ *
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
@@ -19,10 +21,8 @@ winston.default.transports.console.level = 'error';
     type: 'html'
   } );
   // @ts-expect-error, remove in https://github.com/phetsims/perennial/issues/369
-  console.error( data.projects.map( project => {
-    const name = project.name.slice( project.name.indexOf( '/' ) + 1 );
-
-    let result = name;
+  console.log( data.projects.map( project => {
+    let result = project.name.slice( project.name.indexOf( '/' ) + 1 );
     if ( getOption( 'versions' ) ) {
       result += ` ${project.version.major}.${project.version.minor}.${project.version.dev}`;
     }
