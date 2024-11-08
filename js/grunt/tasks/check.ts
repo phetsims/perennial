@@ -15,14 +15,14 @@
  */
 
 import check from '../check.js';
-import getOption from './util/getOption.ts';
+import getOption, { isOptionKeyProvided } from './util/getOption.ts';
 import getRepo from './util/getRepo.js';
 
 export const checkTask = ( async () => check( {
   repo: getRepo(),
   all: !!getOption( 'all' ),
   clean: !!getOption( 'clean' ),
-  pretty: getOption( 'pretty', true ),
+  pretty: isOptionKeyProvided( 'pretty' ) ? getOption( 'pretty' ) : true,
   verbose: !!getOption( 'verbose' ),
   silent: !!getOption( 'silent' ),
   absolute: !!getOption( 'absolute' )

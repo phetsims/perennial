@@ -10,12 +10,10 @@ import nopt from 'nopt';
 
 const options = nopt( {}, {}, process.argv, 2 );
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-function getOption( keyName: string, defaultValue?: any ): any {
-  if ( defaultValue && options[ keyName ] === undefined ) {
-    return defaultValue;
-  }
+export default function getOption( keyName: string ): any {
   return options[ keyName ];
 }
 
-export default getOption;
+export function isOptionKeyProvided( keyName: string ): boolean {
+  return options[ keyName ] !== undefined;
+}
