@@ -11,10 +11,10 @@
  */
 
 import assert from 'assert';
-import assertIsValidRepoName from '../../common/assertIsValidRepoName';
-import getBranch from '../../common/getBranch';
-import dev from '../dev';
-import getOption from './util/getOption';
+import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
+import getBranch from '../../common/getBranch.js';
+import dev from '../dev.js';
+import getOption from './util/getOption.js';
 
 ( async () => {
 

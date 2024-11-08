@@ -7,6 +7,6 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-import testGruntOptions from './util/testGruntOptions';
+import testGruntOptions from './util/testGruntOptions.js';
 
 testGruntOptions();

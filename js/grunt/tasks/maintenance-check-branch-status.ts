@@ -6,7 +6,7 @@
  */
 
 import winston from 'winston';
-import Maintenance from '../../common/Maintenance';
+import Maintenance from '../../common/Maintenance.js';
 
 winston.default.transports.console.level = 'error';
 

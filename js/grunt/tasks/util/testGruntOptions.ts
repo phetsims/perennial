@@ -1,6 +1,6 @@
 // Copyright 2024, University of Colorado Boulder
 
-import getOption from './getOption';
+import getOption from './getOption.js';
 
 /**
  * Test that grunt parses options as expected.

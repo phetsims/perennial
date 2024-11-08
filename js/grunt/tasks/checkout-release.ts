@@ -8,7 +8,7 @@
  */
 import assert from 'assert';
 import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
-import checkoutRelease from '../../common/checkoutRelease';
+import checkoutRelease from '../../common/checkoutRelease.js';
 import getOption from './util/getOption.ts';
 
 ( async () => {

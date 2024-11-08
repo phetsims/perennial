@@ -16,7 +16,7 @@
 
 import check from '../check.js';
 import getOption from './util/getOption.ts';
-import getRepo from './util/getRepo';
+import getRepo from './util/getRepo.js';
 
 export const checkTask = ( async () => check( {
   repo: getRepo(),

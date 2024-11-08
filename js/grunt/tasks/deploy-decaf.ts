@@ -6,8 +6,8 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';
-import deployDecaf from '../decaf/deployDecaf';
-import getOption from './util/getOption';
+import deployDecaf from '../decaf/deployDecaf.js';
+import getOption from './util/getOption.js';
 
 ( async () => {
 

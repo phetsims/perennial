@@ -5,6 +5,6 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import generateData from '../generateData';
+import generateData from '../generateData.js';
 
 ( async () => generateData() )();

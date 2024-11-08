@@ -5,7 +5,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import getPhetioLinks from '../../common/getPhetioLinks';
+import getPhetioLinks from '../../common/getPhetioLinks.js';
 
 ( async () => {
   const phetioLinks = await getPhetioLinks();

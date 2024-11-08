@@ -8,9 +8,9 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';
-import assertIsValidRepoName from '../../common/assertIsValidRepoName';
-import createOneOff from '../createOneOff';
-import getOption from './util/getOption';
+import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
+import createOneOff from '../createOneOff.js';
+import getOption from './util/getOption.js';
 
 ( async () => {
 

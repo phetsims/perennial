@@ -11,10 +11,10 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';
-import assertIsValidRepoName from '../../common/assertIsValidRepoName';
-import markSimAsPublished from '../../common/markSimAsPublished';
-import production from '../production';
-import getOption from './util/getOption';
+import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
+import markSimAsPublished from '../../common/markSimAsPublished.js';
+import production from '../production.js';
+import getOption from './util/getOption.js';
 
 ( async () => {
 

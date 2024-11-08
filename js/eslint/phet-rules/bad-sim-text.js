@@ -112,16 +112,6 @@ module.exports = {
         id: '.toFixed(', // support regex with english names this way
         regex: new RegExp( '(?<!Utils)\\.toFixed\\(' ) // NOTE: eslint parsing breaks when using regex syntax like `/regex/`
       },
-
-      {
-        id: 'Import from statements require a *.js suffix',
-        predicate: line => {
-          if ( line.trim().indexOf( 'import ' ) === 0 && line.includes( ' from ' ) && ( !line.includes( '.js' ) && !line.includes( '.mjs' ) ) ) {
-            return false;
-          }
-          return true;
-        }
-      },
       {
         id: 'Import statements require a *.js suffix',
         predicate: line => {

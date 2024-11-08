@@ -10,7 +10,7 @@ import assert from 'assert';
 import winston from 'winston';
 import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
 import Maintenance from '../../common/Maintenance.js';
-import getOption from './util/getOption';
+import getOption from './util/getOption.js';
 
 winston.default.transports.console.level = 'error';
 

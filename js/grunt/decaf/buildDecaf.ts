@@ -6,7 +6,7 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-import getPreloads from './getPreloads';
+import getPreloads from './getPreloads.js';
 import fs from 'fs';
 
 const assert = require( 'assert' );

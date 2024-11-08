@@ -10,7 +10,7 @@
  */
 import assert from 'assert';
 import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
-import cherryPick from '../cherryPick';
+import cherryPick from '../cherryPick.js';
 import getOption from './util/getOption.ts';
 
 ( async () => {

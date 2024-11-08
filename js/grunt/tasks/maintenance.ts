@@ -6,6 +6,6 @@
  */
 // TODO: Do these maintenance entry points belong in grunt? See https://github.com/phetsims/chipper/issues/1461
 
-import Maintenance from '../../common/Maintenance';
+import Maintenance from '../../common/Maintenance.js';
 
 ( async () => Maintenance.startREPL() )();

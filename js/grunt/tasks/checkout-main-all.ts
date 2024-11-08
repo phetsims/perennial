@@ -5,7 +5,7 @@
  */
 
 
-import checkoutMainAll from '../checkoutMainAll';
-import getOption from './util/getOption';
+import checkoutMainAll from '../checkoutMainAll.js';
+import getOption from './util/getOption.js';
 
 ( async () => checkoutMainAll( getOption( 'branch' ) ) )();

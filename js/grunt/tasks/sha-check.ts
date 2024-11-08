@@ -10,7 +10,7 @@
  */
 
 import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
-import shaCheck from '../shaCheck';
+import shaCheck from '../shaCheck.js';
 import getOption from './util/getOption.ts';
 
 ( async () => {

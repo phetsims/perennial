@@ -11,9 +11,9 @@
  */
 
 import assert from 'assert';
-import assertIsValidRepoName from '../../common/assertIsValidRepoName';
-import rc from '../rc';
-import getOption from './util/getOption';
+import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
+import rc from '../rc.js';
+import getOption from './util/getOption.js';
 
 ( async () => {
   const repo = getOption( 'repo' );

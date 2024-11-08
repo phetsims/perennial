@@ -9,9 +9,9 @@
  */
 import assert from 'assert';
 import grunt from 'grunt';
-import assertIsValidRepoName from '../../common/assertIsValidRepoName';
-import checkoutDependencies from '../../common/checkoutDependencies';
-import getOption from './util/getOption';
+import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
+import checkoutDependencies from '../../common/checkoutDependencies.js';
+import getOption from './util/getOption.js';
 
 ( async () => {
   assert( getOption( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );

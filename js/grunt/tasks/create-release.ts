@@ -10,9 +10,9 @@
  */
 
 import assert from 'assert';
-import assertIsValidRepoName from '../../common/assertIsValidRepoName';
-import createRelease from '../createRelease';
-import getOption from './util/getOption';
+import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
+import createRelease from '../createRelease.js';
+import getOption from './util/getOption.js';
 
 ( async () => {
 

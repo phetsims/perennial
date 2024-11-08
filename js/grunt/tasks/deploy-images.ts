@@ -8,8 +8,8 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import deployImages from '../deployImages';
-import getOption from './util/getOption';
+import deployImages from '../deployImages.js';
+import getOption from './util/getOption.js';
 
 ( async () => {
   console.log( getOption( 'simulation' ) );

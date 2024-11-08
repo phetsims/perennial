@@ -5,7 +5,7 @@ import grunt from 'grunt';
 import path from 'path';
 import process from 'process';
 import { Repo } from '../../../common/PerennialTypes.js';
-import getOption from './getOption';
+import getOption from './getOption.js';
 
 /**
  * Get the repo by processing from multiple locations (command line options and package).

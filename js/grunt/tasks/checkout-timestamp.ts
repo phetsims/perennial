@@ -8,9 +8,9 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';
-import assertIsValidRepoName from '../../common/assertIsValidRepoName';
-import checkoutTimestamp from '../../common/checkoutTimestamp';
-import getOption from './util/getOption';
+import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
+import checkoutTimestamp from '../../common/checkoutTimestamp.js';
+import getOption from './util/getOption.js';
 
 ( async () => {
   const repo = getOption( 'repo' );

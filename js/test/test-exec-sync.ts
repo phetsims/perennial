@@ -10,8 +10,8 @@
 import { execSync } from 'child_process';
 import _ from 'lodash';
 import qunit from 'qunit';
-import gruntCommand from '../common/gruntCommand';
-import tsxCommand from '../common/tsxCommand';
+import gruntCommand from '../common/gruntCommand.js';
+import tsxCommand from '../common/tsxCommand.js';
 
 const SIM = 'acid-base-solutions';
 
