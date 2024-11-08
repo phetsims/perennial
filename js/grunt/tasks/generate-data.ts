@@ -7,5 +7,4 @@
 
 import generateData from '../generateData';
 
-// TODO: Does this belong in grunt? See https://github.com/phetsims/chipper/issues/1461
 ( async () => generateData() )();
