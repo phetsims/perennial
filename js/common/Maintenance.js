@@ -147,6 +147,7 @@ module.exports = ( function() {
       const branchMaps = {};
       const getBranchMapAsyncCallback = async repo => {
         if ( !branchMaps[ repo ] ) {
+          // eslint-disable-next-line require-atomic-updates
           branchMaps[ repo ] = await getBranchMap( repo );
         }
         return branchMaps[ repo ];
@@ -1178,6 +1179,7 @@ module.exports = ( function() {
 
         // cache miss
         releaseBranches = await ReleaseBranch.getAllMaintenanceBranches();
+        // eslint-disable-next-line require-atomic-updates
         maintenance.allReleaseBranches = releaseBranches;
         maintenance.save();
       }
