@@ -30,7 +30,7 @@ const gitPull = require( './gitPull.js' );
 const gitPush = require( './gitPush.js' );
 const gitRevParse = require( './gitRevParse.js' );
 const assert = require( 'assert' );
-const asyncq = require( 'async-q' ); // eslint-disable-line phet/require-statement-match
+const asyncQ = require( 'async-q' );
 const _ = require( 'lodash' );
 const fs = require( 'fs' );
 const repl = require( 'repl' );
@@ -1047,7 +1047,7 @@ module.exports = ( function() {
         }
       } ) );
 
-      await asyncq.parallelLimit( asyncFunctions, options.concurrent );
+      await asyncQ.parallelLimit( asyncFunctions, options.concurrent );
 
       console.log( 'Done' );
     }

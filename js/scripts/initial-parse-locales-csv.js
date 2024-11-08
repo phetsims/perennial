@@ -1,8 +1,7 @@
 // Copyright 2021, University of Colorado Boulder
 
 const fs = require( 'fs' );
-// eslint-disable-next-line phet/require-statement-match
-const csv = require( 'csv-parser' );
+const csvParser = require( 'csv-parser' );
 
 const filePath = process.argv[ 2 ];
 
@@ -16,7 +15,7 @@ const parseCSV = ( filePath, callback ) => {
   const rows = [];
 
   fs.createReadStream( filePath )
-    .pipe( csv() )
+    .pipe( csvParser() )
     .on( 'data', row => {
       const values = Object.values( row );
       rows.push( values );
