@@ -29,8 +29,7 @@ export function getLintEverythingRepos(): Repo[] {
   return getDataFile( 'active-repos' ).filter( repo => repo !== 'perennial' );
 }
 
-// TODO: Rename to getLintCLIOptions, see https://github.com/phetsims/chipper/issues/1520
-export default function getLintOptions(): Partial<LintOptions> {
+export default function getLintCLIOptions(): Partial<LintOptions> {
 
   const lintOptions: Partial<LintOptions> = {};
 

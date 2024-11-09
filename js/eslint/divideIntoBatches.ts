@@ -1,7 +1,7 @@
 // Copyright 2024, University of Colorado Boulder
 
 import os from 'os';
-import { Repo } from './getLintOptions.js';
+import { Repo } from './getLintCLIOptions.js';
 
 const MAX_BATCH_SIZE = 50;
 

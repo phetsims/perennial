@@ -16,7 +16,7 @@ import _ from 'lodash';
 import path from 'path';
 import tsxCommand from '../common/tsxCommand.js';
 import divideIntoBatches from './divideIntoBatches.js';
-import { DEFAULT_MAX_PROCESSES, LintOptions, Repo } from './getLintOptions.js';
+import { DEFAULT_MAX_PROCESSES, LintOptions, Repo } from './getLintCLIOptions.js';
 
 const lintMainPath = path.join( __dirname, 'lint-main.ts' );
 

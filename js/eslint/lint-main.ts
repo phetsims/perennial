@@ -27,7 +27,7 @@ import _ from 'lodash';
 import path from 'path';
 import process from 'process';
 import { tscCleanRepo } from '../grunt/check.js';
-import { Repo } from './getLintOptions.js';
+import { Repo } from './getLintCLIOptions.js';
 import { DEBUG_PHET_LINT } from './lint.js';
 
 // TODO: enable linting for scenery-stack-test, see https://github.com/phetsims/scenery-stack-test/issues/1
