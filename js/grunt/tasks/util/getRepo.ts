@@ -12,7 +12,7 @@ import { readFileSync } from 'fs';
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
-const getRepo = (): Repo => {
+export default function getRepo(): Repo {
 
   let repo = getOption( 'repo' );
 
@@ -36,16 +36,4 @@ const getRepo = (): Repo => {
   assert( typeof repo === 'string' && /^[a-z]+(-[a-z]+)*$/u.test( repo ), `repo name should be composed of lower-case characters, optionally with dashes used as separators: ${repo}` );
 
   return repo;
-};
-
-export const getRepos = (): Repo[] => {
-  const reposArg = getOption( 'repos' );
-  if ( reposArg ) {
-    assert( typeof reposArg === 'string', 'repos should be a comma separated list of values' );
-    return getOption( 'repos' ).split( ',' );
-  }
-
-  return [];
-};
-
-export default getRepo;
+}

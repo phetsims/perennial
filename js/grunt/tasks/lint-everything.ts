@@ -7,10 +7,10 @@
 
 import grunt from 'grunt';
 import lint from '../../eslint/lint.js';
-import getLintOptions from '../../eslint/getLintOptions.js';
+import getLintOptions, { getLintEverythingRepos } from '../../eslint/getLintOptions.js';
 
 ( async () => {
-  const lintSuccess = await lint( getLintOptions() );
+  const lintSuccess = await lint( getLintEverythingRepos(), getLintOptions() );
 
   // Output results on errors.
   if ( !lintSuccess ) {

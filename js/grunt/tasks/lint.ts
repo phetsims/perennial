@@ -11,15 +11,22 @@
  */
 import * as grunt from 'grunt';
 import lint from '../../eslint/lint.js';
-import getRepo, { getRepos } from './util/getRepo.js';
-import getLintOptions from '../../eslint/getLintOptions.js';
-
-const repo = getRepo();
+import getRepo from './util/getRepo.js';
+import getLintOptions, { getLintEverythingRepos } from '../../eslint/getLintOptions.js';
+import getOption, { isOptionKeyProvided } from './util/getOption.js';
 
 export const lintTask = ( async () => {
 
-  const extraRepos = getRepos();
-  const lintSuccess = await lint( getLintOptions( { repos: [ repo, ...extraRepos ] } ) );
+  let repos = [ getRepo() ];
+  if ( isOptionKeyProvided( 'repos' ) ) {
+    repos.push( ...getOption( 'repos' ).split( ',' ) );
+  }
+
+  if ( isOptionKeyProvided( 'all' ) ) {
+    repos = getLintEverythingRepos();
+  }
+
+  const lintSuccess = await lint( repos, getLintOptions() );
 
   if ( !lintSuccess ) {
     grunt.fail.fatal( 'Lint failed' );

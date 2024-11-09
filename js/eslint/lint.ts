@@ -16,16 +16,22 @@ import _ from 'lodash';
 import path from 'path';
 import tsxCommand from '../common/tsxCommand.js';
 import divideIntoBatches from './divideIntoBatches.js';
-import { RequiredReposInLintOptions, DEFAULT_MAX_PROCESSES } from './getLintOptions.js';
+import { DEFAULT_MAX_PROCESSES, LintOptions, Repo } from './getLintOptions.js';
 
-const lintMainPath = path.join( __dirname, 'lint-main.js' );
+const lintMainPath = path.join( __dirname, 'lint-main.ts' );
 
-export default async function( providedOptions: RequiredReposInLintOptions ): Promise<boolean> {
+// TODO: Consider removing after review complete, see https://github.com/phetsims/chipper/issues/1520
+// This is primarily for debugging the options and making sure they pass through correctly
+export const DEBUG_PHET_LINT = false;
+
+export default async function lint( repos: Repo[], providedOptions?: LintOptions ): Promise<boolean> {
+  repos = _.uniq( repos ); // Don't double lint repos
+  assert( repos.length > 0, 'no repos provided to lint' );
 
   const options = _.assignIn( {
 
-    // Cache results for a speed boost.
-    cache: true,
+    // Cache results for a speed boost, but clean cache if the lint rules or configuration has changed
+    clean: false,
 
     // Fix things that can be auto-fixed (written to disk)
     fix: false,
@@ -33,11 +39,16 @@ export default async function( providedOptions: RequiredReposInLintOptions ): Pr
     processes: DEFAULT_MAX_PROCESSES
   }, providedOptions );
 
-  const originalRepos = _.uniq( options.repos ); // Don't double lint repos
 
-  assert( originalRepos.length > 0, 'no repos provided to lint' );
+  const repoBatches = divideIntoBatches( repos, options.processes );
 
-  const repoBatches = divideIntoBatches( originalRepos, providedOptions.processes! );
+  if ( DEBUG_PHET_LINT ) {
+    console.log( 'lint.js repos', repos );
+    console.log( 'lint.js clean', options.clean );
+    console.log( 'lint.js fix', options.fix );
+    console.log( 'lint.js processes', options.processes );
+    console.log( 'lint.js repoBatches', repoBatches );
+  }
 
   // spawn node lint-main.js for each batch and wait for all to complete using child process
   const promises = repoBatches.map( batch => {
@@ -46,13 +57,14 @@ export default async function( providedOptions: RequiredReposInLintOptions ): Pr
       const child = spawn( tsxCommand, [
           lintMainPath,
           `--repos=${batch.join( ',' )}`,
-          `--clean=${!options.cache}`,
+        `--clean=${options.clean}`,
           `--fix=${options.fix}`
         ], {
           stdio: [ 'ignore', 'pipe', 'pipe' ],
           shell: process.platform.startsWith( 'win' )
         }
       );
+      DEBUG_PHET_LINT && console.log( 'SPAWN ONCE on batch', batch );
 
       let stdout = '';
       let stderr = '';

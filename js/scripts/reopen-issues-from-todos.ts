@@ -6,8 +6,8 @@ import _ from 'lodash';
 import process from 'process';
 import buildLocal from '../common/buildLocal.js';
 import createDirectory from '../common/createDirectory.js';
-import getLintOptions from '../eslint/getLintOptions.js';
 import lint from '../eslint/lint.js';
+import getDataFile from '../common/getDataFile.js';
 
 const CHIPPER_DIST_ESLINT = '../chipper/dist/eslint/';
 const TODOsFilename = `${CHIPPER_DIST_ESLINT}/issuesFromTODOs.txt`;
@@ -40,9 +40,9 @@ const TODOsFilename = `${CHIPPER_DIST_ESLINT}/issuesFromTODOs.txt`;
 
   console.log( 'grunt lint --all started' );
   try {
-    await lint( getLintOptions( {
-      cache: false
-    } ) );
+    await lint( getDataFile( 'active-repos' ).filter( repo => repo !== 'perennial' ), {
+      clean: true
+    } );
   }
   catch( e ) {
     console.error( 'Error running lint-everything:\n\n', e );

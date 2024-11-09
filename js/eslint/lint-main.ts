@@ -14,7 +14,7 @@
  *
  * If you have a small enough batch (say, less than 50 repos), you can run this directly via:
  * cd perennial-alias
- * sage run js/eslint/lint-main.ts --repos=density
+ * sage run js/eslint/lint-main.ts --repos=density --clean=false --fix=false
  *
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
@@ -27,8 +27,8 @@ import _ from 'lodash';
 import path from 'path';
 import process from 'process';
 import { tscCleanRepo } from '../grunt/check.js';
-import getOption from '../grunt/tasks/util/getOption.js';
-import getLintOptions, { LintOptions, Repo, RequiredReposInLintOptions, DEFAULT_MAX_PROCESSES } from './getLintOptions.js';
+import { Repo } from './getLintOptions.js';
+import { DEBUG_PHET_LINT } from './lint.js';
 
 // TODO: enable linting for scenery-stack-test, see https://github.com/phetsims/scenery-stack-test/issues/1
 // It is problematic for every repo to have a eslint.config.mjs, so it is preferable to opt-out some repos here, see https://github.com/phetsims/chipper/issues/1484
@@ -40,7 +40,7 @@ const OLD_CACHE = '../chipper/eslint/cache/';
 /**
  * Lints repositories using a worker pool approach.
  */
-async function lintWithWorkers( repos: Repo[], options: LintOptions ): Promise<boolean> {
+async function lintWithWorkers( repos: Repo[], fix: boolean ): Promise<boolean> {
   const reposQueue: Repo[] = [ ...repos.filter( repo => !DO_NOT_LINT.includes( repo ) ) ];
   const exitCodes: number[] = [];
 
@@ -59,7 +59,7 @@ async function lintWithWorkers( repos: Repo[], options: LintOptions ): Promise<b
 
       const repo = reposQueue.shift()!; // Get the next repository
 
-      const result = await lintWithNodeAPI( repo, options );
+      const result = await lintWithNodeAPI( repo, fix );
       exitCodes.push( result );
     }
   };
@@ -81,17 +81,24 @@ async function lintWithWorkers( repos: Repo[], options: LintOptions ): Promise<b
 /**
  * Runs ESLint on a single repository using the ESLint Node API.
  */
-async function lintWithNodeAPI( repo: Repo, options: LintOptions ): Promise<number> {
+async function lintWithNodeAPI( repo: Repo, fix: boolean ): Promise<number> {
 
   // Prepare options for ESLint instance
   const eslintOptions = {
     cwd: path.resolve( `../${repo}` ),
+
+    // The --clean wipes the directory at the beginning, so we always want to cache the results of a run.
     cache: true,
     cacheLocation: path.resolve( getCacheLocation( repo ) ),
-    fix: options.fix,
+    fix: fix,
     flags: [ 'unstable_config_lookup_from_file' ],
     errorOnUnmatchedPattern: false
   };
+
+  if ( DEBUG_PHET_LINT ) {
+    console.log( 'lint-main: fix: ', eslintOptions.fix );
+    console.log( 'lint-main: repo', repo );
+  }
 
   // Create ESLint instance
   const eslint = new ESLint( eslintOptions );
@@ -101,7 +108,6 @@ async function lintWithNodeAPI( repo: Repo, options: LintOptions ): Promise<numb
 
   let results: ESLint.LintResult[];
   try {
-    // console.log( 'linting files in repo', repo );
     results = await eslint.lintFiles( patterns );
   }
   catch( error ) {
@@ -110,7 +116,7 @@ async function lintWithNodeAPI( repo: Repo, options: LintOptions ): Promise<numb
   }
 
   // If fix is enabled, write the fixed files
-  if ( options.fix ) {
+  if ( fix ) {
     await ESLint.outputFixes( results );
   }
 
@@ -136,7 +142,8 @@ async function lintWithNodeAPI( repo: Repo, options: LintOptions ): Promise<numb
   return errorCount === 0 ? 0 : 1; // Return 0 if no errors, 1 if there are errors
 }
 
-const clearCaches = ( originalRepos: Repo[] ) => {
+const cleanCaches = ( originalRepos: Repo[] ) => {
+  DEBUG_PHET_LINT && console.log( 'lint-main clearing: ', originalRepos );
   originalRepos.forEach( async repo => {
     const cacheFile = getCacheLocation( repo );
 
@@ -161,32 +168,17 @@ const clearCaches = ( originalRepos: Repo[] ) => {
 /**
  * Lints the specified repositories.
  */
-const lint = async ( providedOptions: RequiredReposInLintOptions ): Promise<boolean> => {
+const lintMain = async ( repos: Repo[], clean: boolean, fix: boolean ): Promise<boolean> => {
 
-  const options = _.assignIn( {
+  assert( repos.length > 0, 'no repos provided to lint' );
 
-    // Cache results for a speed boost.
-    cache: true,
-
-    // Fix things that can be auto-fixed (written to disk)
-    fix: false,
-
-    processes: DEFAULT_MAX_PROCESSES
-  }, providedOptions );
-
-  const originalRepos = _.uniq( options.repos ); // Don't double lint repos
-
-  assert( originalRepos.length > 0, 'no repos provided to lint' );
-
-  // If options.cache is not set, clear the caches
-  if ( !options.cache ) {
-    clearCaches( originalRepos );
-  }
+  // Clean in advance if requested. During linting the cache will be repopulated.
+  clean && cleanCaches( repos );
   handleOldCacheLocation();
 
   // Top level try-catch just in case.
   try {
-    return await lintWithWorkers( originalRepos, options );
+    return await lintWithWorkers( repos, fix );
   }
   catch( error ) {
     if ( error instanceof Error ) {
@@ -208,11 +200,31 @@ function handleOldCacheLocation(): void {
   }
 }
 
+/**
+ * Use a very strict syntax here to simplify interoperability with the call site. All options are required.
+ */
 // eslint-disable-next-line no-void
 void ( async () => {
-  const repos = getOption( 'repos' );
-  const options = repos ? getLintOptions( { repos: repos.split( ',' ) } ) : getLintOptions();
-  const success = await lint( options );
 
+  // search argv for --repos=a,b,c
+  const reposArg = process.argv.find( arg => arg.startsWith( '--repos=' ) );
+  const cleanArg = process.argv.find( arg => arg.startsWith( '--clean=' ) );
+  const fixArg = process.argv.find( arg => arg.startsWith( '--fix=' ) );
+
+  assert( reposArg, 'missing --repos argument' );
+  assert( cleanArg, 'missing --clean argument' );
+  assert( fixArg, 'missing --fix argument' );
+
+  const repos: Repo[] = reposArg ? reposArg.split( '=' )[ 1 ].split( ',' ) : [];
+  const clean = cleanArg ? cleanArg.split( '=' )[ 1 ] === 'true' : false;
+  const fix = fixArg ? fixArg.split( '=' )[ 1 ] === 'true' : false;
+
+  if ( DEBUG_PHET_LINT ) {
+    console.log( 'lint-main.ts repos', repos );
+    console.log( 'lint-main.ts clean', clean );
+    console.log( 'lint-main.ts fix', fix );
+  }
+
+  const success = await lintMain( _.uniq( repos ), clean, fix );
   process.exit( success ? 0 : 1 );
 } )();
