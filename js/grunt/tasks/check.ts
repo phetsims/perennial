@@ -19,6 +19,8 @@ import getOption, { isOptionKeyProvided } from './util/getOption.ts';
 import getRepo from './util/getRepo.js';
 
 export const checkTask = ( async () => check( {
+
+  // TODO: Use a pattern like getTranspileCLIOptions, see https://github.com/phetsims/chipper/issues/1520
   repo: getRepo(),
   all: !!getOption( 'all' ),
   clean: !!getOption( 'clean' ),
