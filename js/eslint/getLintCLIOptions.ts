@@ -6,7 +6,6 @@
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
-// import getDataFile from '../common/getDataFile.js';
 import getOption, { isOptionKeyProvided } from '../grunt/tasks/util/getOption.js';
 import getDataFile from '../common/getDataFile.js';
 
