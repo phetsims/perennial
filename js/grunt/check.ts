@@ -20,7 +20,7 @@ const ALL_CONFIG_PATH = `${PERENNIAL_ROOT}/../chipper/dist/tsconfig/all/`;
 const tscCommand = `${PERENNIAL_ROOT}/node_modules/typescript/bin/tsc`;
 
 // TODO: This is the best spot for doc, but this is duplicated with the tasks/check.ts doc for grunt --help, https://github.com/phetsims/chipper/issues/1482
-type CheckOptions = {
+export type CheckOptions = {
 
   // The repo to use as the entrypoint for type checking. The repo provided MUST have a tsconfig.json at the top level.
   repo: Repo;

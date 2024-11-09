@@ -9,23 +9,41 @@
  * --all: check all repos
  * --clean: clean before checking (will still do the check, unlike running tsc directly)
  * --absolute: Updates the output formatting to integrate well with Webstorm as an "External Tool"
+ * --pretty=false: Use pretty formatting (default is true)
+ * --verbose: Provide extra output from tsc
+ * --silent: Prevent all output, even if verbose or absolute flags are set
  *
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import check from '../check.js';
+import check, { CheckOptions } from '../check.js';
 import getOption, { isOptionKeyProvided } from './util/getOption.ts';
 import getRepo from './util/getRepo.js';
+import _ from 'lodash';
 
-export const checkTask = ( async () => check( {
+const checkCLIOptions: Partial<CheckOptions> = {};
 
-  // TODO: Use a pattern like getTranspileCLIOptions, see https://github.com/phetsims/chipper/issues/1520
-  repo: getRepo(),
-  all: !!getOption( 'all' ),
-  clean: !!getOption( 'clean' ),
-  pretty: isOptionKeyProvided( 'pretty' ) ? getOption( 'pretty' ) : true,
-  verbose: !!getOption( 'verbose' ),
-  silent: !!getOption( 'silent' ),
-  absolute: !!getOption( 'absolute' )
-} ) )();
+if ( isOptionKeyProvided( 'all' ) ) {
+  checkCLIOptions.all = true;
+}
+if ( isOptionKeyProvided( 'clean' ) ) {
+  checkCLIOptions.clean = true;
+}
+if ( isOptionKeyProvided( 'absolute' ) ) {
+  checkCLIOptions.absolute = true;
+}
+if ( isOptionKeyProvided( 'pretty' ) ) {
+  checkCLIOptions.pretty = getOption( 'pretty' );
+}
+if ( isOptionKeyProvided( 'verbose' ) ) {
+  checkCLIOptions.verbose = true;
+}
+if ( isOptionKeyProvided( 'silent' ) ) {
+  checkCLIOptions.silent = true;
+}
+
+const defaultOptions = {
+  repo: getRepo()
+};
+export const checkTask = ( async () => check( _.assignIn( {}, defaultOptions, checkCLIOptions ) ) )();
