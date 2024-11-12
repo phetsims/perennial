@@ -34,7 +34,12 @@ omitted: undefined
 </output>` ), 'result should correctly parse and output the options' );
 };
 
-qunit.test( 'grunt', ( assert: Assert ) => {
+qunit.test( 'grunt no args', ( assert: Assert ) => {
+  const result = execSync( `${gruntCommand} test-grunt`, EXEC_SYNC_OPTIONS );
+  assert.ok( result.match( /: undefined/g )?.length === 4, 'no args, all undefined' );
+} );
+
+qunit.test( 'grunt args', ( assert: Assert ) => {
   const result = execSync( `${gruntCommand} test-grunt --brands=a,b,c --lint=false --noTSC`, EXEC_SYNC_OPTIONS );
   checkOutput( result, assert );
 } );
@@ -49,6 +54,7 @@ qunit.test( 'sage run', assert => {
   checkOutput( result, assert );
 } );
 
+// Sim-specific
 qunit.test( `grunt ${SIM}`, ( assert: Assert ) => {
   const result = execSync( `${gruntCommand} --brands=a,b,c --lint=false --noTSC --test-options`, EXEC_AND_SIM_OPTIONS );
   checkOutput( result, assert );
