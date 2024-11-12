@@ -94,7 +94,8 @@ cd ..
 ##########################################################################################################
 
 logWithStderr "TASK - GENERATE DEVELOPMENT STRINGS:"
-perennial/bin/for-each.sh perennial/data/active-repos grunt generate-development-strings
+gruntUpdateCommand="grunt update && git commit -am 'grunt update  from daily grunt work' --no-verify && git push"
+perennial/bin/for-each.sh perennial/data/active-repos "${gruntUpdateCommand}"
 cd babel || exit
 git add ./_generated_development_strings # cover newly created files
 git commit -am "Update development strings from daily grunt work" --no-verify
