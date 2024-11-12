@@ -4,53 +4,71 @@
 # Bash script to run node/tsx code.
 #
 # Supported commands:
-# * run <script-file> [args] - Run a *.js or *.ts file with tsx
+# * sage run [--node-options] <script-file> [args] - Run a *.js or *.ts file with tsx
 #
 # @author Sam Reid (PhET Interactive Simulations)
+# @author Michael Kauzmann (PhET Interactive Simulations)
 #
 
 # Like __dirname, get the directory where this script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 TSX_EXEC="$SCRIPT_DIR/../node_modules/.bin/tsx"
 
-# Check if command was provided
+# Check if command was provided (only "run" supported now), , "sage" is $0
 if [[ -z "$1" ]]; then
- echo "No command specified" >&2
- exit 1
+  echo "No command specified" >&2
+  exit 1
 fi
 
+# Handle "run"
 COMMAND="$1"
+shift
 
 if [[ "$COMMAND" != "run" ]]; then
- echo "Command not supported: $COMMAND" >&2
- exit 1
+  echo "Command not supported: $COMMAND" >&2
+  exit 1
 fi
+
+# Handle any node options provided after run and before the script
+# Initialize arrays for node arguments and other arguments
+NODE_ARGS=()
+
+# Collect node arguments (starting with '--')
+while [[ "$1" == --* ]]; do
+  NODE_ARGS+=("$1")
+  shift
+done
 
 # Check if a script file was specified
-if [[ -z "$2" ]]; then
- echo "No script file specified for 'run' directive." >&2
- exit 1
+if [[ -z "$1" ]]; then
+  echo "No script file specified for 'run' directive." >&2
+  exit 1
 fi
 
-SCRIPT_FILE="$2"
-shift 2
+SCRIPT_FILE="$1"
+shift
 
-# Check if the script file has a .js or .ts extension
+# Check if the script file has a .js, .ts, .mjs, or .cjs extension
 if [[ ! "$SCRIPT_FILE" =~ \.(js|ts|mjs|cjs)$ ]]; then
- echo "Script file must have a .js or .ts extension." >&2
- exit 1
+  echo "Script file must have a .js, .ts, .mjs, or .cjs extension: $SCRIPT_FILE" >&2
+  exit 1
 fi
 
-# If the script path is not absolute, resolve it relative to current directory
+# If the script path is not absolute, resolve it relative to current directory, myScript.ts -> ./myScript.ts
 if [[ ! "$SCRIPT_FILE" = /* ]]; then
- SCRIPT_FILE="./$SCRIPT_FILE"
+  SCRIPT_FILE="./$SCRIPT_FILE"
 fi
 
 # Check if the script file exists
 if [[ ! -f "$SCRIPT_FILE" ]]; then
- echo "Script file not found: $SCRIPT_FILE" >&2
- exit 1
+  echo "Script file not found: $SCRIPT_FILE" >&2
+  exit 1
 fi
 
+# Remaining arguments are script arguments
+SCRIPT_ARGS=("$@")
+
+#echo "$TSX_EXEC" "${NODE_ARGS[@]}" "$SCRIPT_FILE" "${SCRIPT_ARGS[@]}"
+
 # Execute the script with tsx
-exec "$TSX_EXEC" "$SCRIPT_FILE" "$@" || exit 1
+exec "$TSX_EXEC" "${NODE_ARGS[@]}" "$SCRIPT_FILE" "${SCRIPT_ARGS[@]}" || exit 1
