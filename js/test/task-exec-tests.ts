@@ -104,7 +104,7 @@ qunit.test( 'sage run with node warning with script args', assert => {
 } );
 
 qunit.test( 'sage run without node warning with script args', assert => {
-  const result = spawnSync( `bash ./bin/sage run --no-warnings ./${sageTestFilename} ${args.join( ' ' )}`, SPAWN_SYNC_OPTIONS );
+  const result = spawnSync( `bash ./bin/sage run --no-warnings --max_old_space_size=8192 ./${sageTestFilename} ${args.join( ' ' )}`, SPAWN_SYNC_OPTIONS );
   assert.ok( result.stdout.includes( normalLog ), 'no warning log' );
   args.forEach( arg => assert.ok( new RegExp( `testArgs.*${arg}` ).test( result.stdout ), `has arg: ${arg}` ) );
   assert.ok( !result.stderr.includes( warningCode ), 'no warning no warning' );
