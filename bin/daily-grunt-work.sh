@@ -27,8 +27,7 @@ function logWithStderr(){
   echo $1 | tee >(cat >&2)
 }
 
-echo "running daily grunt work. . ."
-date
+logWithStderr "Daily Grunt Work on `date`"
 
 cd perennial || exit
 git pull
