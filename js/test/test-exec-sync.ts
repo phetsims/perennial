@@ -62,3 +62,41 @@ qunit.test( `grunt ${SIM}`, ( assert: Assert ) => {
   const result = spawnSync( `${gruntCommand} --brands=a,b,c --lint=false --noTSC --test-options`, SPAWN_FOR_SIM_OPTIONS );
   checkOutput( result, assert );
 } );
+
+const sageTestFilename = 'do-not-commit.ts';
+const warningCode = 'CUSTOM_WARNING';
+const normalLog = 'running test file';
+const testFileContent = `
+console.log( '${normalLog}' );
+// Emit a custom warning
+process.emitWarning( 'Test warning!', {
+  code: '${warningCode}'
+} );
+`;
+
+qunit.module( 'sage run tests', {
+  before: () => {
+    fs.writeFileSync( sageTestFilename, testFileContent );
+  }, after: () => {
+    fs.rmSync( sageTestFilename );
+  }
+} );
+
+qunit.test( 'sage run with node warning', assert => {
+
+  const result = spawnSync( `bash ./bin/sage run ./${sageTestFilename}`, SPAWN_SYNC_OPTIONS );
+  assert.ok( result.stdout.includes( normalLog ), 'warning log' );
+  assert.ok( result.stderr.includes( warningCode ), 'warning the warning' );
+} );
+
+qunit.test( 'sage run without node warning', assert => {
+  const result = spawnSync( `bash ./bin/sage run --no-warnings ./${sageTestFilename}`, SPAWN_SYNC_OPTIONS );
+  assert.ok( result.stdout.includes( normalLog ), 'no warning log' );
+  assert.ok( !result.stderr.includes( warningCode ), 'no warning no warning' );
+} );
+
+qunit.test( 'sage does not take node options', assert => {
+  const result = spawnSync( 'bash ./bin/sage --no-warnings run ./js/grunt/tasks/test-grunt.ts', SPAWN_SYNC_OPTIONS );
+  assert.ok( result.status !== 0 );
+  assert.ok( result.stderr.includes( '--no-warnings' ) );
+} );
