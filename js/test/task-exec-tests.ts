@@ -68,6 +68,7 @@ const warningCode = 'CUSTOM_WARNING';
 const normalLog = 'running test file';
 const testFileContent = `
 console.log( '${normalLog}' );
+console.log( 'testArgs', process.argv.join( ' ' ) );
 // Emit a custom warning
 process.emitWarning( 'Test warning!', {
   code: '${warningCode}'
@@ -83,7 +84,6 @@ qunit.module( 'sage run tests', {
 } );
 
 qunit.test( 'sage run with node warning', assert => {
-
   const result = spawnSync( `bash ./bin/sage run ./${sageTestFilename}`, SPAWN_SYNC_OPTIONS );
   assert.ok( result.stdout.includes( normalLog ), 'warning log' );
   assert.ok( result.stderr.includes( warningCode ), 'warning the warning' );
@@ -92,6 +92,21 @@ qunit.test( 'sage run with node warning', assert => {
 qunit.test( 'sage run without node warning', assert => {
   const result = spawnSync( `bash ./bin/sage run --no-warnings ./${sageTestFilename}`, SPAWN_SYNC_OPTIONS );
   assert.ok( result.stdout.includes( normalLog ), 'no warning log' );
+  assert.ok( !result.stderr.includes( warningCode ), 'no warning no warning' );
+} );
+
+const args = [ '--test1', '--test2', '--test3=hi' ];
+qunit.test( 'sage run with node warning with script args', assert => {
+  const result = spawnSync( `bash ./bin/sage run ./${sageTestFilename} ${args.join( ' ' )}`, SPAWN_SYNC_OPTIONS );
+  assert.ok( result.stdout.includes( normalLog ), 'no warning log' );
+  args.forEach( arg => assert.ok( new RegExp( `testArgs.*${arg}` ).test( result.stdout ), `has arg: ${arg}` ) );
+  assert.ok( result.stderr.includes( warningCode ), 'no warning the warning' );
+} );
+
+qunit.test( 'sage run without node warning with script args', assert => {
+  const result = spawnSync( `bash ./bin/sage run --no-warnings ./${sageTestFilename} ${args.join( ' ' )}`, SPAWN_SYNC_OPTIONS );
+  assert.ok( result.stdout.includes( normalLog ), 'no warning log' );
+  args.forEach( arg => assert.ok( new RegExp( `testArgs.*${arg}` ).test( result.stdout ), `has arg: ${arg}` ) );
   assert.ok( !result.stderr.includes( warningCode ), 'no warning no warning' );
 } );
 
