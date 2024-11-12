@@ -6,8 +6,8 @@ import _ from 'lodash';
 import process from 'process';
 import buildLocal from '../common/buildLocal.js';
 import createDirectory from '../common/createDirectory.js';
-import lint from '../eslint/lint.js';
 import getDataFile from '../common/getDataFile.js';
+import lint from '../eslint/lint.js';
 
 const CHIPPER_DIST_ESLINT = '../chipper/dist/eslint/';
 const TODOsFilename = `${CHIPPER_DIST_ESLINT}/issuesFromTODOs.txt`;
@@ -59,6 +59,8 @@ const TODOsFilename = `${CHIPPER_DIST_ESLINT}/issuesFromTODOs.txt`;
     auth: buildLocal.phetDevGitHubAccessToken
   } );
 
+  let reopenedCount = 0;
+
   for ( let i = 0; i < uniqueTODOIssues.length; i++ ) {
     const issueURL = uniqueTODOIssues[ i ];
 
@@ -94,10 +96,12 @@ const TODOsFilename = `${CHIPPER_DIST_ESLINT}/issuesFromTODOs.txt`;
           issue_number: issueNumber,
           body: 'Reopening because there is a TODO marked for this issue.'
         } );
+        reopenedCount++;
       }
     }
     catch( e ) {
       console.error( 'Issue does not exist', `${repo}#${issueNumber}`, e );
     }
   }
+  console.log( `Finished. Reopened ${reopenedCount}/${uniqueTODOIssues.length} issues` );
 } )();
