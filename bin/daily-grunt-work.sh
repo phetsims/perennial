@@ -31,6 +31,11 @@ logWithStderr "Daily Grunt Work on `date`"
 
 cd perennial || exit
 git pull
+cd ..
+
+perennial/bin/for-each.sh perennial/data/active-repos "git stash"
+
+cd perennial || exit
 npm prune && npm update
 grunt checkout-main-all
 cd ..
@@ -39,7 +44,7 @@ perennial/bin/clone-missing-repos.sh
 perennial/bin/sage run perennial/js/scripts/pull-all.js
 perennial/bin/sage run perennial/js/scripts/push-all.js
 
-perennial/bin/for-each.sh perennial/data/active-repos "npm prune && npm update; git stash"
+perennial/bin/for-each.sh perennial/data/active-repos "npm prune && npm update"
 
 cd chipper || exit
 grunt transpile
@@ -80,7 +85,7 @@ grunt generate-data
 cd ..
 
 ##########################################################################################################
-# Update perennial/data/ lists, make sure to npm prune and update first see https://github.com/phetsims/perennial/issues/155
+# Reopen any github issues that still have TODOs in the codebase linking to them
 logWithStderr "TASK - REOPEN ISSUES LINKED IN TODOS:"
 cd perennial || exit
 bin/sage run js/scripts/reopen-issues-from-todos.ts
