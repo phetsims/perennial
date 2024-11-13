@@ -94,7 +94,7 @@ cd ..
 
 ##########################################################################################################
 
-logWithStderr "TASK - GENERATE DEVELOPMENT STRINGS:"
+logWithStderr "TASK - GRUNT UPDATE:"
 gruntUpdateCommand="grunt update && git commit -am 'grunt update  from daily grunt work' --no-verify && git push"
 perennial/bin/for-each.sh perennial/data/active-repos "${gruntUpdateCommand}"
 cd babel || exit
