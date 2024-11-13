@@ -28,6 +28,7 @@ function logWithStderr(){
 }
 
 logWithStderr "Daily Grunt Work on `date`"
+logWithStderr "node@`node --version`, npm@`npm --version`"
 
 cd perennial || exit
 git pull
