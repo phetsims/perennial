@@ -56,7 +56,7 @@ const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean
 
   const options: CheckOptions = _.assignIn( {
 
-    // Either repo or all must be provided
+    // Either repo or all must be provided. "all" will take precedent if both are provided
     repo: null,
     all: false,
 

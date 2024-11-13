@@ -24,6 +24,7 @@ export type Repo = string;
  * Linting runs in perennial-alias by default, so skip perennial when running all, see https://github.com/phetsims/chipper/issues/1520
  * TODO: Careful eliminate this filter if we eliminate perennial-alias, see https://github.com/phetsims/perennial/issues/401
  * TODO: Please be aware of this opt out during review of https://github.com/phetsims/chipper/issues/1520
+ * TODO: MK: This is too much of a gotcha to me. Most importantly if you are making changes to either perennial-alias or perennial. I don't believe that the extra repo would change the overall time enough. https://github.com/phetsims/chipper/issues/1520
  */
 export function getLintEverythingRepos(): Repo[] {
   return getDataFile( 'active-repos' ).filter( repo => repo !== 'perennial' );

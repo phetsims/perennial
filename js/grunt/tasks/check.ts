@@ -17,10 +17,10 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
+import _ from 'lodash';
 import check, { CheckOptions } from '../check.js';
 import getOption, { isOptionKeyProvided } from './util/getOption.ts';
 import getRepo from './util/getRepo.js';
-import _ from 'lodash';
 
 const checkCLIOptions: Partial<CheckOptions> = {};
 
@@ -46,4 +46,4 @@ if ( isOptionKeyProvided( 'silent' ) ) {
 const defaultOptions = {
   repo: getRepo()
 };
-export const checkTask = ( async () => check( _.assignIn( {}, defaultOptions, checkCLIOptions ) ) )();
+export const checkTask = ( async () => check( _.assignIn( defaultOptions, checkCLIOptions ) ) )();
