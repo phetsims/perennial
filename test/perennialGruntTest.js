@@ -1,9 +1,11 @@
 // Copyright 2017, University of Colorado Boulder
 
 /**
- * Unit tests, run with `npm run test` at the top-level of perennial.
+ * Unit tests, run with `npm run test-long` at the top-level of perennial.
+ * NOTE! This task will change shas in many repos. Do not run in parallel and do not run outside of main.
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
 
@@ -14,7 +16,7 @@ const qunit = require( 'qunit' );
 
 qunit.module( 'Perennial grunt tasks' );
 
-async function getLikelyNextBranch( repo, incrementMajor, incrementMinor ) {
+async function getLatestBranch( repo ) {
   let currentMajor = 0;
   let currentMinor = 0;
   ( await getBranches( repo ) ).filter( branch => /^\d+\.\d+$/.test( branch ) ).forEach( branch => {
@@ -24,21 +26,21 @@ async function getLikelyNextBranch( repo, incrementMajor, incrementMinor ) {
       currentMinor = minor;
     }
   } );
-  if ( incrementMajor ) {
-    currentMajor++;
-  }
-  if ( incrementMinor ) {
-    currentMinor++;
-  }
-  return `${currentMajor}.${currentMinor}`;
+  return {
+    major: currentMajor,
+    minor: currentMinor,
+    toString() {
+      return `${this.major}.${this.minor}`;
+    }
+  };
 }
 
-qunit.test( 'Checkout target', async assert => {
-  assert.timeout( 120000 );
-  await execute( gruntCommand, [ 'checkout-target', '--repo=bumper', '--target=19.9', '--skipNpmUpdate' ], '.' );
-  await execute( gruntCommand, [ 'checkout-main', '--repo=bumper', '--skipNpmUpdate' ], '.' );
-  assert.expect( 0 );
-} );
+async function getLikelyNextBranch( repo, incrementMajor, incrementMinor ) {
+  const latest = await getLatestBranch( repo );
+  incrementMajor && latest.major++;
+  incrementMinor && latest.minor++;
+  return latest.toString();
+}
 
 qunit.test( 'NPM update', async assert => {
   assert.timeout( 120000 );
@@ -79,7 +81,7 @@ qunit.test( 'Bumper dev phet-io', async assert => {
 
 qunit.test( 'Major bump, RC/Production', async assert => {
   assert.timeout( 3000000 );
-  const branch = await getLikelyNextBranch( 'bumper', true, false );
+  const branch = await getLikelyNextBranch( 'bumper', false, true );
 
   // We can't create the branch interactively (for maintenance releases), so we do so here
   await execute( gruntCommand, [ 'create-release', '--repo=bumper', `--branch=${branch}`, '--brands=phet,phet-io' ], '.' );
@@ -95,5 +97,13 @@ qunit.test( 'Major bump, RC/Production', async assert => {
   // same thing, but maintenance:1 (phet-io brand only)
   await execute( gruntCommand, [ 'rc', '--repo=bumper', '--brands=phet-io', `--branch=${branch}`, '--noninteractive' ], '.' );
   await execute( gruntCommand, [ 'production', '--repo=bumper', '--brands=phet-io', `--branch=${branch}`, '--noninteractive' ], '.' );
+  assert.expect( 0 );
+} );
+
+qunit.test( 'Checkout target', async assert => {
+  assert.timeout( 120000 );
+  const latestBranch = await getLatestBranch( 'bumper' );
+  await execute( gruntCommand, [ 'checkout-target', '--repo=bumper', `--target=${latestBranch}`, '--skipNpmUpdate' ], '.' );
+  await execute( gruntCommand, [ 'checkout-main', '--repo=bumper', '--skipNpmUpdate' ], '.' );
   assert.expect( 0 );
 } );
