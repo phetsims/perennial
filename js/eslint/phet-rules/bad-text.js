@@ -10,7 +10,6 @@
 
 
 const getBadTextTester = require( './getBadTextTester.js' );
-const _ = require( 'lodash' );
 
 module.exports = {
   create: function( context ) {
@@ -149,21 +148,22 @@ module.exports = {
       },
 
       // Prefer _.assignIn() which returns the object in its type doc, https://github.com/phetsims/tasks/issues/1130
-      ' = _.extend(',
+      ' = _.extend('
 
-      // It would probably be better to use a third-party plugin, but alas, we use this. See https://github.com/phetsims/perennial/issues/407
-      {
-        id: 'Import from statements require a *.js suffix',
-        predicate: line => {
-          if ( line.trim().startsWith( 'import ' ) && !/.\.\w+'/.test( line.trim() ) &&
-               _.every( [ ' from ', '/' ], string => line.includes( string ) ) && // includes
-               _.every( [ '.js', '.mjs', '@', '{', 'node_modules' ], string => !line.includes( string ) ) // doesn't includes
-          ) {
-            return false;
-          }
-          return true;
-        }
-      }
+      // TODO: Comment back in (maybe) as part of https://github.com/phetsims/perennial/issues/407
+      // // It would probably be better to use a third-party plugin, but alas, we use this. See https://github.com/phetsims/perennial/issues/407
+      // {
+      //   id: 'Import from statements require a *.js suffix',
+      //   predicate: line => {
+      //     if ( line.trim().startsWith( 'import ' ) && !/.\.\w+'/.test( line.trim() ) &&
+      //          _.every( [ ' from ', '/' ], string => line.includes( string ) ) && // includes
+      //          _.every( [ '.js', '.mjs', '@', '{', 'node_modules' ], string => !line.includes( string ) ) // doesn't includes
+      //     ) {
+      //       return false;
+      //     }
+      //     return true;
+      //   }
+      // }
     ];
 
     return {
