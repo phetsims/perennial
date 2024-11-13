@@ -110,6 +110,15 @@ qunit.test( 'sage run without node warning with script args', assert => {
   assert.ok( !result.stderr.includes( warningCode ), 'no warning no warning' );
 } );
 
+qunit.test( 'sage run without node warning', assert => {
+  const result = spawnSync( `bash ./bin/sage run -fdt --fdsafwd ./${sageTestFilename}`, SPAWN_SYNC_OPTIONS );
+  const err = result.stderr;
+  assert.ok( err.includes( 'node' ) );
+  assert.ok( err.includes( 'bad option' ) );
+  assert.ok( err.includes( '-fdt' ) );
+  assert.ok( err.includes( '--fdsafwd' ) );
+} );
+
 qunit.test( 'sage does not take node options', assert => {
   const result = spawnSync( 'bash ./bin/sage --no-warnings run ./js/grunt/tasks/test-grunt.ts', SPAWN_SYNC_OPTIONS );
   assert.ok( result.status !== 0 );
