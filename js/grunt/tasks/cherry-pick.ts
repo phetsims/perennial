@@ -5,13 +5,43 @@
  * --repo : The repository to cherry-pick on
  * --shas : Comma-separated list of SHAs to try
  * @author Michael Kauzmann (PhET Interactive Simulations)
+ * @author Jonathan Olson (PhET Interactive Simulations)
  *
  * TODO: ASK DEVS: Delete this grunt task, SR MK think it doesn't belong in formal API, https://github.com/phetsims/chipper/issues/1461
  */
 import assert from 'assert';
 import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
-import cherryPick from '../cherryPick.js';
 import getOption from './util/getOption.ts';
+
+const gitCherryPick = require( '../common/gitCherryPick.js' );
+const grunt = require( 'grunt' );
+
+/**
+ * For `grunt cherry-pick`, see Gruntfile for details
+ *
+ * @param repo - The repository name
+ */
+async function cherryPick( repo: string, shas: string[] ): Promise<void> {
+  for ( let i = 0; i < shas.length; i++ ) {
+    const sha = shas[ i ];
+
+    let success;
+    try {
+      success = await gitCherryPick( repo, sha );
+    }
+    catch( e ) {
+      grunt.log.error( `abort failed :${JSON.stringify( e )}` );
+      return;
+    }
+
+    if ( success ) {
+      grunt.log.ok( `Cherry-pick with ${sha} was successful` );
+      return;
+    }
+  }
+
+  grunt.log.error( 'No SHAs were able to be cherry-picked without conflicts' );
+}
 
 ( async () => {
 
