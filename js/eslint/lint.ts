@@ -20,8 +20,7 @@ import { DEFAULT_MAX_PROCESSES, LintOptions, Repo } from './getLintCLIOptions.js
 
 const lintMainPath = path.join( __dirname, 'lint-main.ts' );
 
-// TODO: Consider removing after review complete, see https://github.com/phetsims/chipper/issues/1520
-// This is primarily for debugging the options and making sure they pass through correctly
+// For debugging the options and making sure they pass through correctly
 export const DEBUG_PHET_LINT = false;
 
 export default async function lint( repos: Repo[], providedOptions?: LintOptions ): Promise<boolean> {
