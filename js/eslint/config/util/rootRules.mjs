@@ -464,8 +464,9 @@ export default {
   // Disallow specified global variables
   'no-restricted-globals': 'error',
 
-  // Disallow specified modules when loaded by `import`
-  'no-restricted-imports': 'error',
+  // // Disallow specified modules when loaded by `import`, commented out until there are imports to restrict everywhere.
+  // NOTE! There is already a usage of this for node configuration. Be careful about how this overrides.
+  // 'no-restricted-imports': 'error',
 
   // Disallow certain properties on certain objects
   'no-restricted-properties': 'error',
