@@ -22,7 +22,17 @@ const getNodeConfiguration = ( pattern = {} ) => {
         '@typescript-eslint/no-require-imports': 'off',
         '@typescript-eslint/no-var-requires': 'off',
         'phet/no-import-from-grunt-tasks': 'error',
-        'phet/grunt-task-kebab-case': 'error'
+        'phet/grunt-task-kebab-case': 'error',
+
+        // Rule that prevents importing from installed node_modules instead of reusing the installation from perennial
+        'no-restricted-imports': [
+          'error', ...[ 'puppeteer', 'winston', 'axios', 'qunit' ].map( name => {
+            return {
+              name: name,
+              message: 'Prefer importing from perennial/js/npm-dependencies instead of installing a separate copy'
+            };
+          } )
+        ]
       },
       ...pattern
     }
