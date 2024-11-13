@@ -18,7 +18,7 @@ import getOption from './util/getOption.js';
 
   winston.default.transports.console.level = 'error';
 
-  const repo = getOption( 'repo' );
+  const repo = getOption( 'repo' )?.startsWith( 'perennial' ) ? null : getOption( 'repo' );
   const order = getOption( 'order' ) || 'alphabetical';
 
   if ( repo ) {
