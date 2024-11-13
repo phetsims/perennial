@@ -71,4 +71,4 @@ SCRIPT_ARGS=("$@")
 #echo "$TSX_EXEC" "${NODE_ARGS[@]}" "$SCRIPT_FILE" "${SCRIPT_ARGS[@]}"
 
 # Execute the script with tsx
-exec "$TSX_EXEC" "${NODE_ARGS[@]}" "$SCRIPT_FILE" "${SCRIPT_ARGS[@]}" || exit 1
+exec "$TSX_EXEC" "${NODE_ARGS[@]}" "$SCRIPT_FILE" "${SCRIPT_ARGS[@]}"
