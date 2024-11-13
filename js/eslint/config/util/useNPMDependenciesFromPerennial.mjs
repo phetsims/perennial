@@ -9,7 +9,7 @@
 export default {
   rules: {
     'no-restricted-imports': [
-      'error', ...[ 'puppeteer', 'winston', 'axios' ].map( name => {
+      'error', ...[ 'puppeteer', 'winston', 'axios', 'qunit' ].map( name => {
         return {
           name: name,
           message: 'Prefer importing from perennial/js/npm-dependencies instead of installing a separate copy'
