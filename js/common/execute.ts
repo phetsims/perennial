@@ -1,5 +1,8 @@
 // Copyright 2017, University of Colorado Boulder
 
+/* eslint-disable */
+// @ts-nocheck
+
 /**
  * Command execution wrapper (with common settings)
  *
