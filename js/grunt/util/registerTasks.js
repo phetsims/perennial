@@ -10,12 +10,12 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 const fs = require( 'fs' );
-const getDocumentationForTask = require( './getDocumentationForTask.js' );
+const getDocumentationForTask = require( './getDocumentationForTask' );
 const path = require( 'path' );
-const gruntSpawn = require( './gruntSpawn.js' );
+const gruntSpawn = require( './gruntSpawn' );
 const assert = require( 'assert' );
 const _ = require( 'lodash' );
-const tsxCommand = require( '../../common/tsxCommand.js' );
+const tsxCommand = require( '../../common/tsxCommand' );
 
 /**
  * Grunt tasks generally look like "node grunt TASK [...args]".

@@ -6,8 +6,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( './execute.js' );
-const npmCommand = require( './npmCommand.js' );
+const execute = require( './execute' );
+const npmCommand = require( './npmCommand' );
 const winston = require( 'winston' );
 const asyncMutex = require( 'async-mutex' );
 

@@ -8,8 +8,8 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-const execute = require( './execute.js' );
-const gruntCommand = require( './gruntCommand.js' );
+const execute = require( './execute' );
+const gruntCommand = require( './gruntCommand' );
 const winston = require( 'winston' );
 
 /**

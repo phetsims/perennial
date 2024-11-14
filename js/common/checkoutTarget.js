@@ -6,10 +6,10 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const checkoutDependencies = require( './checkoutDependencies.js' );
-const getDependencies = require( './getDependencies.js' );
-const gitCheckout = require( './gitCheckout.js' );
-const gitPull = require( './gitPull.js' );
+const checkoutDependencies = require( './checkoutDependencies' );
+const getDependencies = require( './getDependencies' );
+const gitCheckout = require( './gitCheckout' );
+const gitPull = require( './gitPull' );
 const winston = require( 'winston' );
 
 /**

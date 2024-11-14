@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const loadJSON = require( '../common/loadJSON.js' );
+const loadJSON = require( '../common/loadJSON' );
 const fs = require( 'fs' );
 
 /**

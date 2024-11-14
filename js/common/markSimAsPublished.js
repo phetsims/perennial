@@ -6,9 +6,9 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const gitAdd = require( './gitAdd.js' );
-const gitCommit = require( './gitCommit.js' );
-const gitPush = require( './gitPush.js' );
+const gitAdd = require( './gitAdd' );
+const gitCommit = require( './gitCommit' );
+const gitPush = require( './gitPush' );
 const fs = require( 'fs' );
 
 /**

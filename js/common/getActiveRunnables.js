@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const getRepoList = require( './getRepoList.js' );
+const getRepoList = require( './getRepoList' );
 
 /**
  * Returns a list of repositories (that can be run) actively handled by tooling for PhET

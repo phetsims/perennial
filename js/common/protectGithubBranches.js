@@ -21,7 +21,7 @@
  */
 
 const https = require( 'https' );
-const buildLocal = require( './buildLocal.js' );
+const buildLocal = require( './buildLocal' );
 
 // protects main, and all branche used in production deploys
 const BRANCH_NAME_PATTERNS = [ 'main', '*[0-9].[0-9]*' ];

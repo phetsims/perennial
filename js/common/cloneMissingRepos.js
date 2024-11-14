@@ -6,8 +6,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const cloneRepo = require( './cloneRepo.js' );
-const getMissingRepos = require( './getMissingRepos.js' );
+const cloneRepo = require( './cloneRepo' );
+const getMissingRepos = require( './getMissingRepos' );
 const winston = require( 'winston' );
 
 /**

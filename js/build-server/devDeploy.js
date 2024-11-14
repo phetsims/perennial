@@ -2,11 +2,11 @@
 // @author Matt Pennington (PhET Interactive Simulations)
 
 
-const constants = require( './constants.js' );
-const devSsh = require( '../common/devSsh.js' );
+const constants = require( './constants' );
+const devSsh = require( '../common/devSsh' );
 const rsync = require( 'rsync' );
 const winston = require( 'winston' );
-const writeFile = require( '../common/writeFile.js' );
+const writeFile = require( '../common/writeFile' );
 const fs = require( 'fs' );
 
 const user = constants.BUILD_SERVER_CONFIG.devUsername;

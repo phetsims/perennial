@@ -2,22 +2,22 @@
 // @author Matt Pennington (PhET Interactive Simulations)
 
 
-const constants = require( './constants.js' );
-const createTranslationsXML = require( './createTranslationsXML.js' );
-const devDeploy = require( './devDeploy.js' );
-const execute = require( '../common/execute.js' );
+const constants = require( './constants' );
+const createTranslationsXML = require( './createTranslationsXML' );
+const devDeploy = require( './devDeploy' );
+const execute = require( '../common/execute' );
 const fs = require( 'fs' );
-const getLocales = require( './getLocales.js' );
-const notifyServer = require( './notifyServer.js' );
+const getLocales = require( './getLocales' );
+const notifyServer = require( './notifyServer' );
 const rsync = require( 'rsync' );
-const SimVersion = require( '../common/SimVersion.js' );
+const SimVersion = require( '../common/SimVersion' );
 const winston = require( 'winston' );
-const writePhetHtaccess = require( './writePhetHtaccess.js' );
-const writePhetioHtaccess = require( '../common/writePhetioHtaccess.js' );
-const deployImages = require( './deployImages.js' );
-const persistentQueue = require( './persistentQueue.js' );
-const ReleaseBranch = require( '../common/ReleaseBranch.js' );
-const loadJSON = require( '../common/loadJSON.js' );
+const writePhetHtaccess = require( './writePhetHtaccess' );
+const writePhetioHtaccess = require( '../common/writePhetioHtaccess' );
+const deployImages = require( './deployImages' );
+const persistentQueue = require( './persistentQueue' );
+const ReleaseBranch = require( '../common/ReleaseBranch' );
+const loadJSON = require( '../common/loadJSON' );
 
 /**
  * Abort build with err

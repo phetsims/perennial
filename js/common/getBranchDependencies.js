@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const getFileAtBranch = require( './getFileAtBranch.js' );
+const getFileAtBranch = require( './getFileAtBranch' );
 
 /**
  * Gets the dependencies.json from a given branch of a repo

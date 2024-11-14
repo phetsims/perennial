@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const buildLocal = require( './buildLocal.js' );
+const buildLocal = require( './buildLocal' );
 const Octokit = require( '@octokit/rest' ); // eslint-disable-line phet/require-statement-match
 const _ = require( 'lodash' );
 const winston = require( 'winston' );

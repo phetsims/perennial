@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const buildLocal = require( './buildLocal.js' );
+const buildLocal = require( './buildLocal' );
 const assert = require( 'assert' );
 const axios = require( 'axios' );
 const winston = require( 'winston' );

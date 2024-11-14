@@ -11,7 +11,7 @@
 
 const fs = require( 'fs' );
 const path = require( 'path' );
-const getPhetioLinks = require( '../common/getPhetioLinks.js' );
+const getPhetioLinks = require( '../common/getPhetioLinks' );
 const assert = require( 'assert' );
 
 ( async () => {
