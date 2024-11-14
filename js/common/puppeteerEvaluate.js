@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const puppeteerLoad = require( './puppeteerLoad' );
+const puppeteerLoad = require( './puppeteerLoad.js' );
 const _ = require( 'lodash' );
 
 /**

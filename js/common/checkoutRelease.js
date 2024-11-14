@@ -6,8 +6,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const checkoutTarget = require( './checkoutTarget' );
-const simMetadata = require( './simMetadata' );
+const checkoutTarget = require( './checkoutTarget.js' );
+const simMetadata = require( './simMetadata.js' );
 const assert = require( 'assert' );
 const winston = require( 'winston' );
 

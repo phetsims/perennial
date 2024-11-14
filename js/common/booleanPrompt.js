@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const prompt = require( './prompt' );
+const prompt = require( './prompt.js' );
 
 /**
  * Gives a yes-or-no prompt that the user should respond to.

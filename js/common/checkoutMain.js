@@ -6,9 +6,9 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const getDependencies = require( './getDependencies' );
-const gitCheckout = require( './gitCheckout' );
-const npmUpdate = require( './npmUpdate' );
+const getDependencies = require( './getDependencies.js' );
+const gitCheckout = require( './gitCheckout.js' );
+const npmUpdate = require( './npmUpdate.js' );
 const winston = require( 'winston' );
 
 /**

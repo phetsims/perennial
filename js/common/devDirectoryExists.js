@@ -7,7 +7,7 @@
  */
 
 
-const devSsh = require( './devSsh' );
+const devSsh = require( './devSsh.js' );
 
 /**
  * Checks to see whether a directory on the dev server exists.

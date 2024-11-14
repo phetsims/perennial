@@ -1,6 +1,6 @@
 // Copyright 2021, University of Colorado Boulder
 
-const execute = require( '../common/execute' );
+const execute = require( '../common/execute.js' );
 const fs = require( 'fs' );
 
 /**

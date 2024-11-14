@@ -5,7 +5,7 @@
  *
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
-const execute = require( './execute' );
+const execute = require( './execute.js' );
 
 module.exports = async function( repo ) {
   try {

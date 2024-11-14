@@ -8,7 +8,7 @@
 
 
 const fs = require( 'graceful-fs' ); // eslint-disable-line phet/require-statement-match
-const getBuildServerConfig = require( './getBuildServerConfig' );
+const getBuildServerConfig = require( './getBuildServerConfig.js' );
 
 const BUILD_SERVER_CONFIG = getBuildServerConfig( fs );
 

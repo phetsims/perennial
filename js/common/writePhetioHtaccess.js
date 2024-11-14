@@ -1,9 +1,9 @@
 // Copyright 2017-2019, University of Colorado Boulder
 // @author Matt Pennington (PhET Interactive Simulations)
 
-const buildLocal = require( './buildLocal' );
-const devScp = require( './devScp' );
-const writeFile = require( './writeFile' );
+const buildLocal = require( './buildLocal.js' );
+const devScp = require( './devScp.js' );
+const writeFile = require( './writeFile.js' );
 const axios = require( 'axios' );
 const fs = require( 'graceful-fs' ); // eslint-disable-line phet/require-statement-match
 const winston = require( 'winston' );

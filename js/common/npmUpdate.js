@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const npmUpdateDirectory = require( './npmUpdateDirectory' );
+const npmUpdateDirectory = require( './npmUpdateDirectory.js' );
 
 /**
  * Executes an effective "npm update" (with pruning because it's required).

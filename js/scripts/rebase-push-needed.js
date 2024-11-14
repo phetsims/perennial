@@ -6,11 +6,11 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( '../common/execute' );
-const getActiveRepos = require( '../common/getActiveRepos' );
-const gitIsClean = require( '../common/gitIsClean' );
-const gitPullRebase = require( '../common/gitPullRebase' );
-const gitPush = require( '../common/gitPush' );
+const execute = require( '../common/execute.js' );
+const getActiveRepos = require( '../common/getActiveRepos.js' );
+const gitIsClean = require( '../common/gitIsClean.js' );
+const gitPullRebase = require( '../common/gitPullRebase.js' );
+const gitPush = require( '../common/gitPush.js' );
 const winston = require( 'winston' );
 
 winston.default.transports.console.level = 'error';

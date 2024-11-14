@@ -6,11 +6,11 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const ChipperVersion = require( './ChipperVersion' );
-const copyFile = require( './copyFile' );
-const gitAdd = require( './gitAdd' );
-const gitCommit = require( './gitCommit' );
-const gitPush = require( './gitPush' );
+const ChipperVersion = require( './ChipperVersion.js' );
+const copyFile = require( './copyFile.js' );
+const gitAdd = require( './gitAdd.js' );
+const gitCommit = require( './gitCommit.js' );
+const gitPush = require( './gitPush.js' );
 const winston = require( 'winston' );
 
 /**

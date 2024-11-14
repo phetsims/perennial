@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( './execute' );
+const execute = require( './execute.js' );
 const assert = require( 'assert' );
 const winston = require( 'winston' );
 

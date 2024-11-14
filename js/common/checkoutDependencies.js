@@ -6,8 +6,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const gitFetchCheckout = require( './gitFetchCheckout' );
-const npmUpdate = require( './npmUpdate' );
+const gitFetchCheckout = require( './gitFetchCheckout.js' );
+const npmUpdate = require( './npmUpdate.js' );
 const winston = require( 'winston' );
 
 /**

@@ -2,9 +2,9 @@
 // @author Matt Pennington (PhET Interactive Simulations)
 
 const axios = require( 'axios' );
-const getFullStringMap = require( './getFullStringMap' );
-const loadJSON = require( '../common/loadJSON' );
-const gitCheckout = require( '../common/gitCheckout' );
+const getFullStringMap = require( './getFullStringMap.js' );
+const loadJSON = require( '../common/loadJSON.js' );
+const gitCheckout = require( '../common/gitCheckout.js' );
 
 /**
  * NOTE: release branch NEEDS to be checked out for this to be called, since we'll need the dependencies.json file

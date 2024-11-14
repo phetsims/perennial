@@ -7,8 +7,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const getActiveRepos = require( './common/getActiveRepos' );
-const getRepoList = require( './common/getRepoList' );
+const getActiveRepos = require( './common/getActiveRepos.js' );
+const getRepoList = require( './common/getRepoList.js' );
 const fs = require( 'fs' );
 
 const repos = getActiveRepos();
