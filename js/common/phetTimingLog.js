@@ -126,6 +126,7 @@ const phetTimingLog = {
    * Invoke the task and return the return value of the task.
    * @param {string} taskName
    * @param {()=>Promise<T>} task
+   * @param [options]
    * @returns {Promise<T>}
    */
   async startAsync( taskName, task, options ) {
