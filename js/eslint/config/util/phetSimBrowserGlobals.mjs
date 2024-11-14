@@ -24,6 +24,7 @@ export const phetSimBrowserGlobalsObject = {
   assert: 'readonly', // allow assertions
   assertSlow: 'readonly', // allow slow assertions
   QueryStringMachine: 'readonly',
+  Fluent: 'readonly',
 
   _: 'readonly', // underscore, lodash
   $: 'readonly' // jQuery
