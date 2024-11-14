@@ -37,6 +37,7 @@ module.exports = {
 
     // Get a list of built-in Node.js modules
     const builtInModules = new Set( module.builtinModules );
+    const filename = context.getFilename();
 
     // Retrieve custom exceptions from rule options
     const options = context.options[ 0 ] || {};
@@ -125,17 +126,17 @@ module.exports = {
                 moduleName = moduleName.slice( 0, -extName.length );
               }
 
-              // Optionally enforce .js suffix for relative paths
-              const enforceJsSuffix = !rhs.includes( 'node_modules' ); // Set to false if not enforcing
+              // Enforce no .js suffix for relative paths in javascript files, see https://github.com/phetsims/chipper/issues/1498
+              const enforceNoJsSuffix = filename.endsWith( '.js' ) && !rhs.includes( 'node_modules' ); // Set to false if not enforcing
 
-              if ( enforceJsSuffix && !hasExtension ) {
+              if ( enforceNoJsSuffix && hasExtension && extName === '.js' ) {
                 context.report( {
                   node: init.arguments[ 0 ],
-                  message: `Require path '${rhs}' should include '.js' extension.`,
+                  message: `Require path '${rhs}' should never include'.js' extension. (It is harder to convert commonJS modules to TypeScript)`,
                   fix: function( fixer ) {
                     return fixer.replaceText(
                       init.arguments[ 0 ],
-                      `'${rhs}.js'`
+                      `'${rhs.replace( '.js', '' )}'`
                     );
                   }
                 } );

@@ -923,9 +923,11 @@ export default {
   // key and value arguments to namespace.register() must match
   'phet/namespace-match': 'error',
 
+  // TODO: Move to node config, https://github.com/phetsims/chipper/issues/1498
   // phet-specific require statement rules
   'phet/require-statement-match': 'error',
 
+  // TODO: Move to node config, https://github.com/phetsims/chipper/issues/1498
   'phet/no-property-in-require-statement': 'error',
 
   // never allow object shorthand for properties, functions are ok.
