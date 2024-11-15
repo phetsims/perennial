@@ -71,5 +71,4 @@ SCRIPT_ARGS=("$@")
 #echo "$TSX_EXEC" "${NODE_ARGS[@]}" "$SCRIPT_FILE" "${SCRIPT_ARGS[@]}"
 
 # Execute the script with tsx
-# TODO: Remove --no-warnings once complete with completion of https://github.com/phetsims/perennial/issues/410
-exec "$TSX_EXEC" --no-warnings "${NODE_ARGS[@]}" "$SCRIPT_FILE" "${SCRIPT_ARGS[@]}"
+exec "$TSX_EXEC" "${NODE_ARGS[@]}" "$SCRIPT_FILE" "${SCRIPT_ARGS[@]}"
