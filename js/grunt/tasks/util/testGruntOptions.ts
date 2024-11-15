@@ -7,7 +7,7 @@ import getOption from './getOption.js';
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */
-export default function(): void {
+export default function testGruntOptions(): void {
 
 // grunt test-grunt --brands=a,b,c --lint=false --noTSC
   const brands = getOption( 'brands' );
