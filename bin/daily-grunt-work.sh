@@ -83,6 +83,8 @@ cd ..
 logWithStderr "TASK - GENERATE DATA LISTS:"
 cd perennial || exit
 grunt generate-data
+git commit -am "Update data lists from daily grunt work" --no-verify
+git push
 cd ..
 
 ##########################################################################################################
@@ -124,6 +126,8 @@ cd ..
 logWithStderr "TASK - UPDATE LOCALE INFO FILES"
 cd chipper/js/data || exit
 ../perennial/bin/sage run updateLocaleInfo.js
+git commit -am "Update locale info module.exports from daily grunt work" --no-verify
+git push
 cd ../../..
 
 ##########################################################################################################
