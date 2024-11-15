@@ -1,11 +1,15 @@
 // Copyright 2013-2024, University of Colorado Boulder
 
 import assert from 'assert';
+import { readFileSync } from 'fs';
 import path from 'path';
 import process from 'process';
+import dirname from '../../../common/dirname.js';
 import { Repo } from '../../../common/PerennialTypes.js';
 import getOption from './getOption.js';
-import { readFileSync } from 'fs';
+
+// @ts-expect-error - until we have "type": "module" in our package.json
+const __dirname = dirname( import.meta.url );
 
 /**
  * Get the repo by processing from multiple locations (command line options and package).

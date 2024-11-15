@@ -14,9 +14,13 @@ import assert from 'assert';
 import { spawn } from 'child_process';
 import _ from 'lodash';
 import path from 'path';
+import dirname from '../common/dirname.js';
 import tsxCommand from '../common/tsxCommand.js';
 import divideIntoBatches from './divideIntoBatches.js';
 import { DEFAULT_MAX_PROCESSES, LintOptions, Repo } from './getLintCLIOptions.js';
+
+// @ts-expect-error - until we have "type": "module" in our package.json
+const __dirname = dirname( import.meta.url );
 
 const lintMainPath = path.join( __dirname, 'lint-main.ts' );
 
@@ -56,7 +60,7 @@ export default async function lint( repos: Repo[], providedOptions?: LintOptions
       const child = spawn( tsxCommand, [
           lintMainPath,
           `--repos=${batch.join( ',' )}`,
-        `--clean=${options.clean}`,
+          `--clean=${options.clean}`,
           `--fix=${options.fix}`
         ], {
           stdio: [ 'ignore', 'pipe', 'pipe' ],

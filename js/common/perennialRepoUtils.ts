@@ -1,6 +1,10 @@
 // Copyright 2024, University of Colorado Boulder
 
 import path from 'path';
+import dirname from './dirname.js';
+
+// @ts-expect-error - until we have "type": "module" in our package.json
+const __dirname = dirname( import.meta.url );
 
 /**
  * Collection of helper content for using perennial
