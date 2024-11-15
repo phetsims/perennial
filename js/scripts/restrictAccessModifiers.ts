@@ -144,11 +144,14 @@ function isBuildSuccessful(): boolean {
     const gruntCommand = require( '../../../perennial-alias/js/common/gruntCommand.js' );
 
     // Run the specified TypeScript compiler in the current directory
-    execSync( `${gruntCommand} check`, {
+    const result = execSync( `${gruntCommand} check`, {
 
       // set the working directory
       cwd: repoPath
     } );
+    if ( result.toString().includes( 'error' ) ) {
+      return false;
+    }
 
     // If tsc exits without error, the build is successful
     return true;
