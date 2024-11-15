@@ -15,7 +15,10 @@ const path = require( 'path' );
 const gruntSpawn = require( './gruntSpawn.js' );
 const assert = require( 'assert' );
 const _ = require( 'lodash' );
-const tsxCommand = require( '../../common/tsxCommand.js' );
+
+const isWindows = process.platform.startsWith( 'win' );
+const runnable = isWindows ? 'tsx.cmd' : 'tsx';
+const tsxCommand = `${path.join( __dirname, `../../../node_modules/.bin/${runnable}` )}`;
 
 /**
  * Grunt tasks generally look like "node grunt TASK [...args]".
