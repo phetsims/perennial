@@ -146,7 +146,7 @@ export default [
   // Use node configuration just for these two files
   ...getNodeConfiguration( {
     files: [
-      '**/Gruntfile.js',
+      '**/Gruntfile.{js,cjs}',
       '**/eslint.config.mjs'
     ]
   } ),
