@@ -7,7 +7,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import getOption, { isOptionKeyProvided } from '../grunt/tasks/util/getOption.js';
-import getDataFile from '../common/getDataFile.js';
+import getRepoList from '../common/getRepoList.js';
 
 export type LintOptions = {
   clean?: boolean;
@@ -24,7 +24,7 @@ export type Repo = string;
  * Linting runs in perennial-alias by default, so skip perennial when running all, see https://github.com/phetsims/chipper/issues/1520
  */
 export function getLintEverythingRepos(): Repo[] {
-  return getDataFile( 'active-repos' );
+  return getRepoList( 'active-repos' );
 }
 
 export default function getLintCLIOptions(): Partial<LintOptions> {
