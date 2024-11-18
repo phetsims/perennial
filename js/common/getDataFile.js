@@ -2,6 +2,7 @@
 
 /**
  * Load a data file from perennial/data/
+ * TODO: Duplicate with getRepoList(), https://github.com/phetsims/perennial/issues/410
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
@@ -14,6 +15,5 @@ const fs = require( 'fs' );
  * @returns {string[]} - list of the items in the perennial list
  */
 module.exports = listName => {
-
-  return fs.readFileSync( `../perennial/data/${listName}`, 'utf-8' ).trim().split( /\r?\n/ ).map( sim => sim.trim() );
+  return fs.readFileSync( `${__dirname}/../../data/${listName}`, 'utf-8' ).trim().split( /\r?\n/ ).map( sim => sim.trim() );
 };

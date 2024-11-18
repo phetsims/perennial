@@ -4,6 +4,8 @@
  * This prints out (in JSON form) the tests and operations requested for continuous testing for whatever is in main
  * at this point.
  *
+ * usage: sage run ../perennial/js/listContinuousTests.js
+ *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
@@ -20,7 +22,7 @@ const phetioNoUnsupportedRepos = getRepoList( 'phet-io-state-unsupported' );
 const unitTestRepos = getRepoList( 'unit-tests' );
 const voicingRepos = getRepoList( 'voicing' );
 const phetioWrapperSuiteWrappers = getRepoList( 'wrappers' );
-const phetioHydrogenSims = JSON.parse( fs.readFileSync( '../perennial/data/phet-io-hydrogen.json', 'utf8' ).trim() );
+const phetioHydrogenSims = JSON.parse( fs.readFileSync( `${__dirname}/../data/phet-io-hydrogen.json`, 'utf8' ).trim() );
 
 // repos to not test multitouch fuzzing
 const REPOS_EXCLUDED_FROM_MULTITOUCH_FUZZING = [
