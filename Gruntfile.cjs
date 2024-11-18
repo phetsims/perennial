@@ -1,5 +1,7 @@
 // Copyright 2002-2024, University of Colorado Boulder
 
+'use strict';
+
 require( './js/grunt/commonjs/checkNodeVersion.js' );
 const registerTasks = require( './js/grunt/commonjs/registerTasks.js' );
 
