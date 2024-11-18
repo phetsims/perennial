@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( './execute.js' );
+const execute = require( './execute' );
 
 /**
  * Gets the contents of a file at a specific git branch/SHA/object

@@ -8,7 +8,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-const browserPageLoad = require( './browserPageLoad.js' );
+const browserPageLoad = require( './browserPageLoad' );
 const playwright = require( 'playwright' );
 const _ = require( 'lodash' );
 

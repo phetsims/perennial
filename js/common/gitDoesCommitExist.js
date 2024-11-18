@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( './execute.js' );
+const execute = require( './execute' );
 
 /**
  * Executes git commit

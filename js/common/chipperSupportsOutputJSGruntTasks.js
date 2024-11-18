@@ -6,7 +6,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-const ChipperVersion = require( './ChipperVersion.js' );
+const ChipperVersion = require( './ChipperVersion' );
 const winston = require( 'winston' );
 
 /**

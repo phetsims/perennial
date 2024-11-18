@@ -6,8 +6,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( './execute.js' );
-const gruntCommand = require( './gruntCommand.js' );
+const execute = require( './execute' );
+const gruntCommand = require( './gruntCommand' );
 const winston = require( 'winston' );
 
 /**

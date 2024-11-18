@@ -1,11 +1,11 @@
 // Copyright 2020, University of Colorado Boulder
 // @author Matt Pennington (PhET Interactive Simulations)
 
-const execute = require( '../common/execute.js' );
-const gitCheckoutDirectory = require( '../common/gitCheckoutDirectory.js' );
-const gitCloneOrFetchDirectory = require( '../common/gitCloneOrFetchDirectory.js' );
-const gitPullDirectory = require( '../common/gitPullDirectory.js' );
-const constants = require( './constants.js' );
+const execute = require( '../common/execute' );
+const gitCheckoutDirectory = require( '../common/gitCheckoutDirectory' );
+const gitCloneOrFetchDirectory = require( '../common/gitCloneOrFetchDirectory' );
+const gitPullDirectory = require( '../common/gitPullDirectory' );
+const constants = require( './constants' );
 const fs = require( 'fs' );
 const axios = require( 'axios' );
 

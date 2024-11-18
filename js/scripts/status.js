@@ -6,8 +6,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const getActiveRepos = require( '../common/getActiveRepos.js' );
-const gitStatus = require( '../common/gitStatus.js' );
+const getActiveRepos = require( '../common/getActiveRepos' );
+const gitStatus = require( '../common/gitStatus' );
 const winston = require( 'winston' );
 
 winston.default.transports.console.level = 'error';

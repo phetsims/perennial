@@ -6,10 +6,10 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const checkoutDependencies = require( './checkoutDependencies.js' );
-const getDependencies = require( './getDependencies.js' );
-const gitCheckout = require( './gitCheckout.js' );
-const gitFromTimestamp = require( './gitFromTimestamp.js' );
+const checkoutDependencies = require( './checkoutDependencies' );
+const getDependencies = require( './getDependencies' );
+const gitCheckout = require( './gitCheckout' );
+const gitFromTimestamp = require( './gitFromTimestamp' );
 const winston = require( 'winston' );
 
 /**

@@ -14,7 +14,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-const sleep = require( './sleep.js' );
+const sleep = require( './sleep' );
 const _ = require( 'lodash' );
 const winston = require( 'winston' );
 const puppeteer = require( 'puppeteer' );

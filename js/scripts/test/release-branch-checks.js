@@ -24,9 +24,9 @@
 /* global window document phet phetio */
 
 const _ = require( 'lodash' );
-const puppeteerLoad = require( '../../common/puppeteerLoad.js' );
-const Maintenance = require( '../../common/Maintenance.js' );
-const withServer = require( '../../common/withServer.js' );
+const puppeteerLoad = require( '../../common/puppeteerLoad' );
+const Maintenance = require( '../../common/Maintenance' );
+const withServer = require( '../../common/withServer' );
 const winston = require( 'winston' );
 const puppeteer = require( 'puppeteer' );
 const fs = require( 'fs' );

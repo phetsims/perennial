@@ -6,8 +6,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const getRemoteBranchSHAs = require( './getRemoteBranchSHAs.js' );
-const gitRevParse = require( './gitRevParse.js' );
+const getRemoteBranchSHAs = require( './getRemoteBranchSHAs' );
+const gitRevParse = require( './gitRevParse' );
 
 /**
  * Asynchronously checks whether a repo is not up-to-date with origin/main

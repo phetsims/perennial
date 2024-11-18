@@ -20,10 +20,10 @@
 
 const _ = require( 'lodash' );
 const assert = require( 'assert' );
-const execute = require( '../common/execute.js' );
+const execute = require( '../common/execute' );
 const grunt = require( 'grunt' );
-const gruntCommand = require( '../common/gruntCommand.js' );
-const npmUpdate = require( '../common/npmUpdate.js' );
+const gruntCommand = require( '../common/gruntCommand' );
+const npmUpdate = require( '../common/npmUpdate' );
 const fs = require( 'fs' );
 const { readFileSync } = require( 'fs' );
 

@@ -2,8 +2,8 @@
 
 'use strict';
 
-require( './js/grunt/commonjs/checkNodeVersion.js' );
-const registerTasks = require( './js/grunt/commonjs/registerTasks.js' );
+require( './js/grunt/commonjs/checkNodeVersion' );
+const registerTasks = require( './js/grunt/commonjs/registerTasks' );
 
 module.exports = function( grunt ) {
   if ( grunt.option( 'debug' ) ) {
