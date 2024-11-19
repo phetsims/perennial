@@ -5,10 +5,10 @@ import typescriptEslintPlugin from '@typescript-eslint/eslint-plugin';
 import typescriptEslintParser from '@typescript-eslint/parser';
 import html from 'eslint-plugin-html';
 import globals from 'globals';
+import getNodeConfiguration from './util/getNodeConfiguration.mjs';
 import phetRulesPlugin from './util/phetRulesPlugin.mjs';
 import rootRules from './util/rootRules.mjs';
 import rootRulesTypeScript from './util/rootRulesTypeScript.mjs';
-import getNodeConfiguration from './util/getNodeConfiguration.mjs';
 
 /**
  * The base eslint configuration for the PhET projects.
@@ -150,6 +150,12 @@ export default [
       '**/eslint.config.mjs'
     ]
   } ),
+  {
+    files: [ '**/Gruntfile.{js,cjs}' ],
+    rules: {
+      strict: 'off'
+    }
+  },
 
   // For entry points like scripts and "grunt" tasks, we often end with a floating promise which is not a problem
   {
