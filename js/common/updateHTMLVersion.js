@@ -9,7 +9,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( './execute' );
+const execute = require( './execute' ).default;
 const gitAdd = require( './gitAdd' );
 const gitCommit = require( './gitCommit' );
 const gitIsClean = require( './gitIsClean' );

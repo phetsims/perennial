@@ -7,7 +7,7 @@
  */
 
 const ChipperVersion = require( './ChipperVersion' );
-const execute = require( './execute' );
+const execute = require( './execute' ).default;
 const getBuildArguments = require( './getBuildArguments' );
 const gruntCommand = require( './gruntCommand' );
 const fs = require( 'fs' );

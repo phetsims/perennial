@@ -10,7 +10,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( './execute' );
+const execute = require( './execute' ).default;
 const getBranchDependencies = require( './getBranchDependencies' );
 const getBranches = require( './getBranches' );
 const gitCheckout = require( './gitCheckout' );

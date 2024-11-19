@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( '../common/execute' );
+const execute = require( '../common/execute' ).default;
 const getActiveRepos = require( '../common/getActiveRepos' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPullRebase = require( '../common/gitPullRebase' );

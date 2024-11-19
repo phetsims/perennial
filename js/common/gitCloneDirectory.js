@@ -7,7 +7,7 @@
  */
 
 const winston = require( 'winston' );
-const execute = require( './execute' );
+const execute = require( './execute' ).default;
 
 /**
  * @public

@@ -20,7 +20,7 @@
 
 const _ = require( 'lodash' );
 const assert = require( 'assert' );
-const execute = require( '../common/execute' );
+const execute = require( '../common/execute' ).default;
 const grunt = require( 'grunt' );
 const gruntCommand = require( '../common/gruntCommand' );
 const npmUpdate = require( '../common/npmUpdate' );

@@ -13,7 +13,7 @@
  */
 
 const cloneMissingRepos = require( '../common/cloneMissingRepos' );
-const execute = require( '../common/execute' );
+const execute = require( '../common/execute' ).default;
 const getActiveRepos = require( '../common/getActiveRepos' );
 const getBranches = require( '../common/getBranches' );
 const gitCheckout = require( '../common/gitCheckout' );

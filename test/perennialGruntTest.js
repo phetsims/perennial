@@ -9,7 +9,7 @@
  */
 
 
-const execute = require( '../js/common/execute' );
+const execute = require( '../js/common/execute' ).default;
 const getBranches = require( '../js/common/getBranches' );
 const gruntCommand = require( '../js/common/gruntCommand' );
 const qunit = require( 'qunit' );

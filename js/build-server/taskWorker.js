@@ -5,7 +5,7 @@
 const constants = require( './constants' );
 const createTranslationsXML = require( './createTranslationsXML' );
 const devDeploy = require( './devDeploy' );
-const execute = require( '../common/execute' );
+const execute = require( '../common/execute' ).default;
 const fs = require( 'fs' );
 const getLocales = require( './getLocales' );
 const notifyServer = require( './notifyServer' );

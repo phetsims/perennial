@@ -9,7 +9,7 @@
 const SimVersion = require( '../common/SimVersion' );
 const build = require( '../common/build' );
 const copyFile = require( '../common/copyFile' );
-const execute = require( '../common/execute' );
+const execute = require( '../common/execute' ).default;
 const getRepoVersion = require( '../common/getRepoVersion' );
 const gitAdd = require( '../common/gitAdd' );
 const gitCommit = require( '../common/gitCommit' );

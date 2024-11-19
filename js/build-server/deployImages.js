@@ -1,7 +1,7 @@
 // Copyright 2020, University of Colorado Boulder
 // @author Matt Pennington (PhET Interactive Simulations)
 
-const execute = require( '../common/execute' );
+const execute = require( '../common/execute' ).default;
 const gitCheckoutDirectory = require( '../common/gitCheckoutDirectory' );
 const gitCloneOrFetchDirectory = require( '../common/gitCloneOrFetchDirectory' );
 const gitPullDirectory = require( '../common/gitPullDirectory' );
