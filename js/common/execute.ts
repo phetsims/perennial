@@ -6,11 +6,36 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-import child_process from 'child_process';
-import winston from 'winston';
-import _ from 'lodash';
 import assert from 'assert';
+import child_process from 'child_process';
 import grunt from 'grunt';
+import _ from 'lodash';
+import winston from 'winston';
+
+type ErrorsHandled = 'resolve' | 'reject';
+
+type ExecuteOptions = {
+  childProcessEnv: typeof process.env;
+  childProcessShell: boolean;
+};
+export type ExecuteResult = { code: number; stdout: string; stderr: string; cwd: string; error?: Error; time: number };
+
+
+// Overload when options.errors is 'resolve'
+function execute(
+  cmd: string,
+  args: string[],
+  cwd: string,
+  options: { errors: 'resolve' } & Partial<ExecuteOptions>
+): Promise<ExecuteResult>;
+
+// Overload when options.errors is 'reject' or undefined (default)
+function execute(
+  cmd: string,
+  args: string[],
+  cwd: string,
+  options?: { errors?: 'reject' } & Partial<ExecuteOptions>
+): Promise<string>;
 
 /**
  * Executes a command, with specific arguments and in a specific directory (cwd).
@@ -24,8 +49,7 @@ import grunt from 'grunt';
  * @param [options]
  * @rejects {ExecuteError}
  */
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export default function( cmd: string, args: string[], cwd: string, options?: any ): Promise<string | { code: number; stdout: string; stderr: string; cwd: string; error?: Error; time: number }> {
+function execute( cmd: string, args: string[], cwd: string, options?: Partial<ExecuteOptions & { errors: ErrorsHandled }> ): Promise<string | ExecuteResult> {
 
   const startTime = Date.now();
 
@@ -86,7 +110,7 @@ export default function( cmd: string, args: string[], cwd: string, options?: any
       winston.debug( `stdout: ${data}` );
     } );
 
-    childProcess.on( 'close', code => {
+    childProcess.on( 'close', ( code: number ) => {
       winston.debug( `Command ${cmd} finished. Output is below.` );
 
       winston.debug( stderr && `stderr: ${stderr}` || 'stderr is empty.' );
@@ -94,15 +118,11 @@ export default function( cmd: string, args: string[], cwd: string, options?: any
 
       if ( !rejectedByError ) {
         if ( options.errors === 'resolve' ) {
-
-          // TODO: https://github.com/phetsims/perennial/issues/403 code! ?
-          resolve( { code: code!, stdout: stdout, stderr: stderr, cwd: cwd, time: Date.now() - startTime } );
+          resolve( { code: code, stdout: stdout, stderr: stderr, cwd: cwd, time: Date.now() - startTime } );
         }
         else {
           if ( code !== 0 ) {
-
-            // TODO: https://github.com/phetsims/perennial/issues/403 code! ?
-            reject( new ExecuteError( cmd, args, cwd, stdout, stderr, code!, Date.now() - startTime ) );
+            reject( new ExecuteError( cmd, args, cwd, stdout, stderr, code, Date.now() - startTime ) );
           }
           else {
             resolve( stdout );
@@ -127,3 +147,5 @@ class ExecuteError extends Error {
     super( `${cmd} ${args.join( ' ' )} in ${cwd} failed with exit code ${code}${stdout ? `\nstdout:\n${stdout}` : ''}${stderr ? `\nstderr:\n${stderr}` : ''}` );
   }
 }
+
+export default execute;
