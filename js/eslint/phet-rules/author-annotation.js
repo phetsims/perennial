@@ -4,7 +4,7 @@ const path = require( 'path' );
 const _ = require( 'lodash' );
 
 // Files (or any "endsWith"-testable path) that don't need author annotations
-const NO_AUTHOR_NEEDED = [ 'Gruntfile.js', 'Gruntfile.cjs' ];
+const NO_AUTHOR_NEEDED = [ 'Gruntfile.cjs' ];
 
 /**
  * Lint detector that requires each file to list at least one @author annotation.

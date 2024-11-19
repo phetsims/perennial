@@ -75,7 +75,7 @@ tests.push( {
 
 // lints
 repos.forEach( repo => {
-  if ( fs.existsSync( `../${repo}/Gruntfile.js` ) || fs.existsSync( `../${repo}/Gruntfile.cjs` ) ) {
+  if ( fs.existsSync( `../${repo}/Gruntfile.cjs` ) ) {
     tests.push( {
       test: [ repo, 'lint' ],
       type: 'lint',

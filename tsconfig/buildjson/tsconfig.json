@@ -56,7 +56,6 @@
     "../../../utterance-queue/js/**/*"
   ],
   "exclude": [
-    "../../../*/Gruntfile.js",
     "../../../*/Gruntfile.cjs",
     "../../../*/js/grunt/**/*"
   ]

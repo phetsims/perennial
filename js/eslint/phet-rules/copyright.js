@@ -32,7 +32,6 @@ const phetioComments = [
 
 // A list of files in phet-io repos that don't need a phet-io license
 const nonPhetioLicensedFiles = [
-  'Gruntfile.js',
   'Gruntfile.cjs',
   'eslint.config.mjs',
   '-phet-io-overrides.js'
