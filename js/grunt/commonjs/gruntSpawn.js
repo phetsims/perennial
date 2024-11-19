@@ -1,9 +1,9 @@
 // Copyright 2024, University of Colorado Boulder
 /**
  * Spawns a child process to run a command with the specified arguments. Similar to execute, but simplified to be run
- * from the Gruntfile.js
+ * from the Gruntfile.cjs
  *
- * Moved out of Gruntfile.js on Sept 17, 2024.
+ * Moved out of Gruntfile.cjs on Sept 17, 2024.
  *
  * @param {string} command - The command to run.
  * @param {string[]} args - The arguments to pass to the command.

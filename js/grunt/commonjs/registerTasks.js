@@ -3,9 +3,9 @@
  * registerTasks.js - Registers all *.js or *.ts files in the tasks directory as grunt tasks.
  * Visits the directory only, does not recurse.
  *
- * This file must remain as *.js + requirejs since it is loaded by Gruntfile.js
+ * This file must remain as *.js + requirejs since it is loaded by Gruntfile.cjs
  *
- * Moved out of Gruntfile.js on Sept 17, 2024
+ * Moved out of Gruntfile.cjs on Sept 17, 2024
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */
