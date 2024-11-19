@@ -6,27 +6,26 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const child_process = require( 'child_process' );
-const winston = require( 'winston' );
-const _ = require( 'lodash' );
-const assert = require( 'assert' );
-const grunt = require( 'grunt' );
+import child_process from 'child_process';
+import winston from 'winston';
+import _ from 'lodash';
+import assert from 'assert';
+import grunt from 'grunt';
 
 /**
  * Executes a command, with specific arguments and in a specific directory (cwd).
- * @public
  *
  * Resolves with the stdout: {string}
  * Rejects with { code: {number}, stdout: {string} } -- Happens if the exit code is non-zero.
  *
- * @param {string} cmd - The process to execute. Should be on the current path.
- * @param {Array.<string>} args - Array of arguments. No need to extra-quote things.
- * @param {string} cwd - The working directory where the process should be run from
- * @param {Object} [options]
- * @returns {Promise.<string|{code:number,stdout:string,stderr:string}>} - Stdout
+ * @param cmd - The process to execute. Should be on the current path.
+ * @param args - Array of arguments. No need to extra-quote things.
+ * @param cwd - The working directory where the process should be run from
+ * @param [options]
  * @rejects {ExecuteError}
  */
-module.exports = function( cmd, args, cwd, options ) {
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export default function( cmd: string, args: string[], cwd: string, options?: any ): Promise<string | { code: number; stdout: string; stderr: string; cwd: string; error?: Error; time: number }> {
 
   const startTime = Date.now();
 
@@ -38,12 +37,13 @@ module.exports = function( cmd, args, cwd, options ) {
     errors: 'reject',
 
     // Provide additional env variables, and they will be merged with the existing defaults.
+    // eslint-disable-next-line phet/no-object-spread-on-non-literals
     childProcessEnv: { ...process.env },
 
     // options.shell value to the child_process.spawn. shell:true is required for a NodeJS security update, see https://github.com/phetsims/perennial/issues/359
     // In this case, only bash scripts fail with an EINVAL error, so we don't need to worry about node/git (and in
     // fact don't want the overhead of a new shell).
-    childProcessShell: cmd !== 'node' && cmd !== 'git' && /^win/.test( process.platform )
+    childProcessShell: cmd !== 'node' && cmd !== 'git' && process.platform.startsWith( 'win' )
   }, options );
   assert( options.errors === 'reject' || options.errors === 'resolve', 'Errors must reject or resolve' );
 
@@ -74,11 +74,14 @@ module.exports = function( cmd, args, cwd, options ) {
 
     childProcess.stderr.on( 'data', data => {
       stderr += data;
+      // @ts-expect-error
       grunt.log.debug( `stderr: ${data}` );
       winston.debug( `stderr: ${data}` );
     } );
     childProcess.stdout.on( 'data', data => {
       stdout += data;
+
+      // @ts-expect-error
       grunt.log.debug( `stdout: ${data}` );
       winston.debug( `stdout: ${data}` );
     } );
@@ -91,11 +94,15 @@ module.exports = function( cmd, args, cwd, options ) {
 
       if ( !rejectedByError ) {
         if ( options.errors === 'resolve' ) {
-          resolve( { code: code, stdout: stdout, stderr: stderr, cwd: cwd, time: Date.now() - startTime } );
+
+          // TODO: https://github.com/phetsims/perennial/issues/403 code! ?
+          resolve( { code: code!, stdout: stdout, stderr: stderr, cwd: cwd, time: Date.now() - startTime } );
         }
         else {
           if ( code !== 0 ) {
-            reject( new ExecuteError( cmd, args, cwd, stdout, stderr, code, Date.now() - startTime ) );
+
+            // TODO: https://github.com/phetsims/perennial/issues/403 code! ?
+            reject( new ExecuteError( cmd, args, cwd, stdout, stderr, code!, Date.now() - startTime ) );
           }
           else {
             resolve( stdout );
@@ -104,29 +111,19 @@ module.exports = function( cmd, args, cwd, options ) {
       }
     } );
   } );
-};
+}
 
 class ExecuteError extends Error {
 
-  /**
-   * @param {string} cmd
-   * @param {Array.<string>} args
-   * @param {string} cwd
-   * @param {string} stdout
-   * @param {string} stderr
-   * @param {number} code - exit code
-   * @param {number} time - ms
-   */
-  constructor( cmd, args, cwd, stdout, stderr, code, time ) {
+  public constructor(
+    public readonly cmd: string,
+    public readonly args: string[],
+    public readonly cwd: string,
+    public readonly stdout: string,
+    public readonly stderr: string,
+    public readonly code: number,
+    public readonly time: number // ms
+  ) {
     super( `${cmd} ${args.join( ' ' )} in ${cwd} failed with exit code ${code}${stdout ? `\nstdout:\n${stdout}` : ''}${stderr ? `\nstderr:\n${stderr}` : ''}` );
-
-    // @public
-    this.cmd = cmd;
-    this.args = args;
-    this.cwd = cwd;
-    this.stdout = stdout;
-    this.stderr = stderr;
-    this.code = code;
-    this.time = time;
   }
 }
