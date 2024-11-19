@@ -1,7 +1,8 @@
 // Copyright 2021, University of Colorado Boulder
 
-const execute = require( '../common/execute.js' );
-const booleanPrompt = require( '../common/booleanPrompt.js' );
+import execute from '../common/execute.js';
+import booleanPrompt from '../common/booleanPrompt.js';
+import assert from 'assert';
 
 /**
  * Copy the history of a file or directory to a different repo.
@@ -52,6 +53,9 @@ const booleanPrompt = require( '../common/booleanPrompt.js' );
   // const stdout = await execute( 'git', `log --oneline --follow -M --name-status -- ${relativePath}`.split( ' ' ), `./perennial/${sourceRepo}` );
   const gitlog = await execute( 'git', `log --oneline --follow -M --name-status -- ${relativePath}`.split( ' ' ), `./${sourceRepo}` );
 
+  // TODO: Better types for execute modes, see https://github.com/phetsims/perennial/issues/403
+  assert( typeof gitlog === 'string' );
+
   const allFilenames = new Set<string>();
   gitlog.split( '\n' ).forEach( ( line: string ) => {
     if ( line.length > 0 &&
@@ -100,6 +104,10 @@ const booleanPrompt = require( '../common/booleanPrompt.js' );
   await execute( 'git', `remote remove ${historyCopyRepo}`.split( ' ' ), `./${targetRepo}` );
 
   const aboutToPush = await execute( 'git', 'diff --stat --cached origin/main'.split( ' ' ), `./${targetRepo}` );
+
+  // TODO: Better types for execute modes, see https://github.com/phetsims/perennial/issues/403
+  assert( typeof aboutToPush === 'string' );
+
   console.log( 'About to push: ' + aboutToPush );
 
   const unpushedCommits = await execute( 'git', 'log origin/main..main'.split( ' ' ), `./${targetRepo}` );

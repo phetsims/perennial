@@ -8,9 +8,9 @@
 
 import getPreloads from './getPreloads.js';
 import fs from 'fs';
+import execute from '../../common/execute.js';
 
 const assert = require( 'assert' );
-const execute = require( '../../common/execute.js' );
 const copyFile = require( '../../common/copyFile.js' );
 const SimVersion = require( '../../common/SimVersion.js' );
 const gitRevParse = require( '../../common/gitRevParse.js' );
@@ -50,7 +50,7 @@ export default async function( project: string ): Promise<void> {
   ];
 
   const program = '/Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home/bin/java';
-  await execute( program, cmd );
+  await execute( program, cmd, process.cwd() );
 
   const buildDir = `../decaf/projects/${project}/build/`;
   try {
