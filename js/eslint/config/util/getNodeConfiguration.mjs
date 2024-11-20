@@ -24,6 +24,10 @@ const getNodeConfiguration = ( pattern = {} ) => {
         'phet/no-import-from-grunt-tasks': 'error',
         'phet/grunt-task-kebab-case': 'error',
 
+        // phet-specific require statement rules
+        'phet/require-statement-match': 'error',
+        'phet/no-property-in-require-statement': 'error',
+
         // Rule that prevents importing from installed node_modules instead of reusing the installation from perennial
         'no-restricted-imports': [
           'error', ...[ 'puppeteer', 'winston', 'axios', 'qunit' ].map( name => {
