@@ -10,12 +10,12 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 import grunt from 'grunt';
-import lint from '../../eslint/lint.js';
-import getRepo from './util/getRepo.js';
 import getLintCLIOptions, { getLintEverythingRepos } from '../../eslint/getLintCLIOptions.js';
+import lint from '../../eslint/lint.js';
 import getOption, { isOptionKeyProvided } from './util/getOption.js';
+import getRepo from './util/getRepo.js';
 
-export const lintTask = ( async () => {
+export const lintPromise = ( async () => {
 
   let repos = [ getRepo() ];
   if ( isOptionKeyProvided( 'repos' ) ) {

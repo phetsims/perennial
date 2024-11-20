@@ -46,4 +46,4 @@ if ( isOptionKeyProvided( 'silent' ) ) {
 const defaultOptions = {
   repo: getRepo()
 };
-export const checkTask = ( async () => check( _.assignIn( defaultOptions, checkCLIOptions ) ) )();
+export const checkPromise = ( async () => check( _.assignIn( defaultOptions, checkCLIOptions ) ) )();
