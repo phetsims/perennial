@@ -125,7 +125,7 @@ cd ..
 
 logWithStderr "TASK - UPDATE LOCALE INFO FILES"
 cd chipper/js/data || exit
-../perennial/bin/sage run updateLocaleInfo.js
+../../../perennial/bin/sage run updateLocaleInfo.js
 git commit -am "Update locale info module.exports from daily grunt work" --no-verify
 git push
 cd ../../..
