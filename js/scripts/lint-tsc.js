@@ -6,8 +6,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( '../common/execute' ).default;
-const gruntCommand = require( '../common/gruntCommand' );
+const execute = require( '../common/execute.js' ).default;
+const gruntCommand = require( '../common/gruntCommand.js' );
 const winston = require( 'winston' );
 
 winston.default.transports.console.level = 'error';

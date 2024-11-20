@@ -6,18 +6,18 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const SimVersion = require( '../common/SimVersion' );
-const build = require( '../common/build' );
-const copyFile = require( '../common/copyFile' );
-const execute = require( '../common/execute' ).default;
-const getRepoVersion = require( '../common/getRepoVersion' );
-const gitAdd = require( '../common/gitAdd' );
-const gitCommit = require( '../common/gitCommit' );
-const gitIsClean = require( '../common/gitIsClean' );
-const gitPush = require( '../common/gitPush' );
-const hasRemoteBranch = require( '../common/hasRemoteBranch' );
-const npmUpdate = require( '../common/npmUpdate' );
-const setRepoVersion = require( '../common/setRepoVersion' );
+const SimVersion = require( '../common/SimVersion.js' );
+const build = require( '../common/build.js' );
+const copyFile = require( '../common/copyFile.js' );
+const execute = require( '../common/execute.js' ).default;
+const getRepoVersion = require( '../common/getRepoVersion.js' );
+const gitAdd = require( '../common/gitAdd.js' );
+const gitCommit = require( '../common/gitCommit.js' );
+const gitIsClean = require( '../common/gitIsClean.js' );
+const gitPush = require( '../common/gitPush.js' );
+const hasRemoteBranch = require( '../common/hasRemoteBranch.js' );
+const npmUpdate = require( '../common/npmUpdate.js' );
+const setRepoVersion = require( '../common/setRepoVersion.js' );
 const grunt = require( 'grunt' );
 
 /**

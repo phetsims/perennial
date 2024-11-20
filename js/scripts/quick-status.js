@@ -7,9 +7,9 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( '../common/execute' ).default;
-const getActiveRepos = require( '../common/getActiveRepos' );
-const gitRevParse = require( '../common/gitRevParse' );
+const execute = require( '../common/execute.js' ).default;
+const getActiveRepos = require( '../common/getActiveRepos.js' );
+const gitRevParse = require( '../common/gitRevParse.js' );
 const winston = require( 'winston' );
 
 winston.default.transports.console.level = 'error';

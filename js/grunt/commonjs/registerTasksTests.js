@@ -6,7 +6,7 @@
  */
 
 const { getArgsToForward } = require( './registerTasks.js' );
-const registerTasks = require( './registerTasks' );
+const registerTasks = require( './registerTasks.js' );
 const qunit = require( 'qunit' );
 
 qunit.module( 'registerTasks' );

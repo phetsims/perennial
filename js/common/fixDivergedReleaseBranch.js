@@ -10,15 +10,15 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( './execute' ).default;
-const getBranchDependencies = require( './getBranchDependencies' );
-const getBranches = require( './getBranches' );
-const gitCheckout = require( './gitCheckout' );
-const gitCreateBranch = require( './gitCreateBranch' );
-const gitPush = require( './gitPush' );
-const gitRevParse = require( './gitRevParse' );
+const execute = require( './execute.js' ).default;
+const getBranchDependencies = require( './getBranchDependencies.js' );
+const getBranches = require( './getBranches.js' );
+const gitCheckout = require( './gitCheckout.js' );
+const gitCreateBranch = require( './gitCreateBranch.js' );
+const gitPush = require( './gitPush.js' );
+const gitRevParse = require( './gitRevParse.js' );
 const winston = require( 'winston' );
-const buildLocal = require( './buildLocal' );
+const buildLocal = require( './buildLocal.js' );
 const Octokit = require( '@octokit/rest' ); // eslint-disable-line phet/require-statement-match
 
 /**

@@ -6,10 +6,10 @@
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 
-const gitAdd = require( './gitAdd' );
-const gitIsClean = require( './gitIsClean' );
+const gitAdd = require( './gitAdd.js' );
+const gitIsClean = require( './gitIsClean.js' );
 const grunt = require( 'grunt' );
-const isGitRepo = require( './isGitRepo' );
+const isGitRepo = require( './isGitRepo.js' );
 
 /**
  * @public

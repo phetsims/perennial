@@ -10,10 +10,10 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-const execute = require( './execute' ).default;
-const gitPull = require( './gitPull' );
-const getBranch = require( './getBranch' );
-const gitCheckout = require( './gitCheckout' );
+const execute = require( './execute.js' ).default;
+const gitPull = require( './gitPull.js' );
+const getBranch = require( './getBranch.js' );
+const gitCheckout = require( './gitCheckout.js' );
 
 /**
  * If your local repo does not have a remote branch, this script will grab it and set up tracking on it.

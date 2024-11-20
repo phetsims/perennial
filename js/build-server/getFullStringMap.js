@@ -6,8 +6,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const getDependencyRepos = require( '../common/getDependencyRepos' );
-const getRepoStringMap = require( './getRepoStringMap' );
+const getDependencyRepos = require( '../common/getDependencyRepos.js' );
+const getRepoStringMap = require( './getRepoStringMap.js' );
 
 /**
  * Returns an inverse string map (stringMap[ stringKey ][ locale ]) for all strings in all dependencies for a given repo

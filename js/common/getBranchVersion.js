@@ -6,8 +6,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const SimVersion = require( './SimVersion' );
-const getFileAtBranch = require( './getFileAtBranch' );
+const SimVersion = require( './SimVersion.js' );
+const getFileAtBranch = require( './getFileAtBranch.js' );
 const winston = require( 'winston' );
 
 /**

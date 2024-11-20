@@ -13,7 +13,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-const getBadTextTester = require( './getBadTextTester' );
+const getBadTextTester = require( './getBadTextTester.js' );
 
 module.exports = {
   create: function( context ) {

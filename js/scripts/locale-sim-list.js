@@ -6,8 +6,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const localeInfo = require( '../../../chipper/js/data/localeInfo' );
-const simMetadata = require( '../common/simMetadata' );
+const localeInfo = require( '../../../chipper/js/data/localeInfo.js' );
+const simMetadata = require( '../common/simMetadata.js' );
 const winston = require( 'winston' );
 
 winston.default.transports.console.level = 'error';

@@ -9,10 +9,10 @@
  */
 
 const _ = require( 'lodash' );
-const getDependencies = require( './getDependencies' );
-const gitCheckout = require( './gitCheckout' );
-const gitIsAncestor = require( './gitIsAncestor' );
-const simPhetioMetadata = require( './simPhetioMetadata' );
+const getDependencies = require( './getDependencies.js' );
+const gitCheckout = require( './gitCheckout.js' );
+const gitIsAncestor = require( './gitIsAncestor.js' );
+const simPhetioMetadata = require( './simPhetioMetadata.js' );
 
 module.exports = async () => {
 

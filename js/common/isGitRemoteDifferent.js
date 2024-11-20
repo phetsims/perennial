@@ -7,9 +7,9 @@
  */
 
 const assert = require( 'assert' );
-const getBranch = require( './getBranch' );
-const getRemoteBranchSHAs = require( './getRemoteBranchSHAs' );
-const gitRevParse = require( './gitRevParse' );
+const getBranch = require( './getBranch.js' );
+const getRemoteBranchSHAs = require( './getRemoteBranchSHAs.js' );
+const gitRevParse = require( './gitRevParse.js' );
 
 /**
  * Whether the current branch's remote SHA differs from the current SHA

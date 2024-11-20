@@ -2,9 +2,9 @@
 // @author Matt Pennington (PhET Interactive Simulations)
 
 
-const constants = require( './constants' );
+const constants = require( './constants.js' );
 const fs = require( 'graceful-fs' ); // eslint-disable-line phet/require-statement-match
-const getSortedVersionDirectories = require( './getSortedVersionDirectories' );
+const getSortedVersionDirectories = require( './getSortedVersionDirectories.js' );
 const parseString = require( 'xml2js' ).parseString; // eslint-disable-line phet/no-property-in-require-statement
 const winston = require( 'winston' );
 

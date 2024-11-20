@@ -10,9 +10,9 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 const fs = require( 'fs' );
-const getDocumentationForTask = require( './getDocumentationForTask' );
+const getDocumentationForTask = require( './getDocumentationForTask.js' );
 const path = require( 'path' );
-const gruntSpawn = require( './gruntSpawn' );
+const gruntSpawn = require( './gruntSpawn.js' );
 const assert = require( 'assert' );
 const _ = require( 'lodash' );
 

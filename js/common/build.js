@@ -6,10 +6,10 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const ChipperVersion = require( './ChipperVersion' );
-const execute = require( './execute' ).default;
-const getBuildArguments = require( './getBuildArguments' );
-const gruntCommand = require( './gruntCommand' );
+const ChipperVersion = require( './ChipperVersion.js' );
+const execute = require( './execute.js' ).default;
+const getBuildArguments = require( './getBuildArguments.js' );
+const gruntCommand = require( './gruntCommand.js' );
 const fs = require( 'fs' );
 const winston = require( 'winston' );
 

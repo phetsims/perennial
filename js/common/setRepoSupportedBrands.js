@@ -7,11 +7,11 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const gitAdd = require( './gitAdd' );
-const gitCommit = require( './gitCommit' );
-const gitIsClean = require( './gitIsClean' );
-const loadJSON = require( './loadJSON' );
-const writeJSON = require( './writeJSON' );
+const gitAdd = require( './gitAdd.js' );
+const gitCommit = require( './gitCommit.js' );
+const gitIsClean = require( './gitIsClean.js' );
+const loadJSON = require( './loadJSON.js' );
+const writeJSON = require( './writeJSON.js' );
 const winston = require( 'winston' );
 
 /**

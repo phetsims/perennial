@@ -6,8 +6,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const buildLocal = require( './buildLocal' );
-const ssh = require( './ssh' );
+const buildLocal = require( './buildLocal.js' );
+const ssh = require( './ssh.js' );
 
 /**
  * Executes a command on the dev server
