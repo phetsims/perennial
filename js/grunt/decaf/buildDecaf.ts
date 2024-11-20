@@ -9,10 +9,10 @@
 import getPreloads from './getPreloads.js';
 import fs from 'fs';
 import execute from '../../common/execute.js';
+import SimVersion from '../../common/SimVersion.js';
 
 const assert = require( 'assert' );
 const copyFile = require( '../../common/copyFile.js' );
-const SimVersion = require( '../../common/SimVersion.js' );
 const gitRevParse = require( '../../common/gitRevParse.js' );
 const loadJSON = require( '../../common/loadJSON.js' );
 const writeJSON = require( '../../common/writeJSON.js' );

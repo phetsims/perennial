@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const SimVersion = require( '../common/SimVersion.js' );
+const SimVersion = require( '../common/SimVersion.js' ).default;
 const booleanPrompt = require( '../common/booleanPrompt.js' );
 const build = require( '../common/build.js' );
 const buildServerRequest = require( '../common/buildServerRequest.js' );

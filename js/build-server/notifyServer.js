@@ -17,10 +17,10 @@ const axios = require( 'axios' );
  *  @property {string} locales
  *  @property {number} translatorId
  *  @property {Object} [phetioOptions]
- *    @property {SimVersion} version
- *    @property {string} branch
- *    @property {string} suffix
- *    @property {boolean} ignoreForAutomatedMaintenanceReleases
+ *  @property {SimVersion} version
+ *  @property {string} branch
+ *  @property {string} suffix
+ *  @property {boolean} ignoreForAutomatedMaintenanceReleases
  */
 module.exports = async function notifyServer( options ) {
   if ( options.brand === constants.PHET_BRAND ) {
