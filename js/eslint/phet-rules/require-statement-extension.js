@@ -21,9 +21,6 @@ module.exports = {
 
   create: function( context ) {
     const filename = context.getFilename();
-    if ( filename.endsWith( '.ts' ) ) {
-      console.log( filename );
-    }
     return {
       CallExpression( node ) {
         if (
