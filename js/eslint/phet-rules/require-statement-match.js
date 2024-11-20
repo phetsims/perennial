@@ -127,11 +127,7 @@ module.exports = {
               }
 
               // Enforce no .js suffix for relative paths in javascript files, see https://github.com/phetsims/chipper/issues/1498
-              // Set to false if not enforcing
-              const enforceNoJsSuffix = filename.endsWith( '.js' ) && !rhs.includes( 'node_modules' ) &&
-
-                                        // TODO: remove this as part of https://github.com/phetsims/perennial/issues/410
-                                        !filename.includes( 'perennial' );
+              const enforceNoJsSuffix = filename.endsWith( '.js' ) && !rhs.includes( 'node_modules' ); // Set to false if not enforcing
 
               if ( enforceNoJsSuffix && hasExtension && extName === '.js' ) {
                 context.report( {
