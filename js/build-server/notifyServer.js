@@ -2,8 +2,8 @@
 // @author Matt Pennington (PhET Interactive Simulations)
 
 
-const constants = require( './constants.js' );
-const sendEmail = require( './sendEmail.js' );
+const constants = require( './constants' );
+const sendEmail = require( './sendEmail' );
 const winston = require( 'winston' );
 const axios = require( 'axios' );
 

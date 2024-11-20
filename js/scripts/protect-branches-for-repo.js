@@ -1,6 +1,6 @@
 // Copyright 2021, University of Colorado Boulder
 
-const protectGithubBranches = require( '../common/protectGithubBranches.js' );
+const protectGithubBranches = require( '../common/protectGithubBranches' );
 
 /**
  * Set branch protection rules for the provided repo so that main, and release branches cannot be deleted.

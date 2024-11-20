@@ -3,8 +3,8 @@
 
 
 const fs = require( 'fs' );
-const execute = require( './execute.js' ).default;
-const gitCloneDirectory = require( './gitCloneDirectory.js' );
+const execute = require( './execute' ).default;
+const gitCloneDirectory = require( './gitCloneDirectory' );
 
 module.exports = async function gitCloneOrFetchDirectory( repo, directory ) {
   const repoPwd = `${directory}/${repo}`;

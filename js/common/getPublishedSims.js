@@ -6,8 +6,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const simMetadata = require( './simMetadata.js' );
-const simPhetioMetadata = require( './simPhetioMetadata.js' );
+const simMetadata = require( './simMetadata' );
+const simPhetioMetadata = require( './simPhetioMetadata' );
 const _ = require( 'lodash' );
 
 /**

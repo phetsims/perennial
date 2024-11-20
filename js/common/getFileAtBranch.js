@@ -6,8 +6,8 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const getGitFile = require( './getGitFile.js' );
-const createLocalBranchFromRemote = require( './createLocalBranchFromRemote.js' );
+const getGitFile = require( './getGitFile' );
+const createLocalBranchFromRemote = require( './createLocalBranchFromRemote' );
 
 /**
  * Gets the dependencies.json from a given branch of a repo

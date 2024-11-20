@@ -39,7 +39,7 @@ module.exports = {
     ]
   },
   create: function( context ) {
-    const getBadTextTester = require( './getBadTextTester.js' );
+    const getBadTextTester = require( './getBadTextTester' );
     const options = context.options[ 0 ];
 
     return {

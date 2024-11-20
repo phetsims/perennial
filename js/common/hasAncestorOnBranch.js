@@ -6,9 +6,9 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const getDependencies = require( './getDependencies.js' );
-const gitCheckout = require( './gitCheckout.js' );
-const gitIsAncestor = require( './gitIsAncestor.js' );
+const getDependencies = require( './getDependencies' );
+const gitCheckout = require( './gitCheckout' );
+const gitIsAncestor = require( './gitIsAncestor' );
 const winston = require( 'winston' );
 
 /**

@@ -2,9 +2,9 @@
 // @author Matt Pennington (PhET Interactive Simulations)
 
 
-const constants = require( './constants.js' );
-const SimVersion = require( '../common/SimVersion.js' ).default;
-const writeFile = require( '../common/writeFile.js' );
+const constants = require( './constants' );
+const SimVersion = require( '../common/SimVersion' ).default;
+const writeFile = require( '../common/writeFile' );
 const axios = require( 'axios' );
 
 /**

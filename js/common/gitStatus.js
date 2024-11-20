@@ -6,10 +6,10 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( './execute.js' ).default;
-const getBranch = require( './getBranch.js' );
-const getRemoteBranchSHAs = require( './getRemoteBranchSHAs.js' );
-const gitRevParse = require( './gitRevParse.js' );
+const execute = require( './execute' ).default;
+const getBranch = require( './getBranch' );
+const getRemoteBranchSHAs = require( './getRemoteBranchSHAs' );
+const gitRevParse = require( './gitRevParse' );
 const assert = require( 'assert' );
 
 /**

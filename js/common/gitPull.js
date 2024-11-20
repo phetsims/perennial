@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const gitPullDirectory = require( './gitPullDirectory.js' );
+const gitPullDirectory = require( './gitPullDirectory' );
 
 /**
  * Executes git pull

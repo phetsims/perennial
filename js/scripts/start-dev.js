@@ -18,7 +18,7 @@
 
 const { spawn, exec } = require( 'child_process' );
 const path = require( 'path' );
-const gruntCommand = require( '../common/gruntCommand.js' );
+const gruntCommand = require( '../common/gruntCommand' );
 
 // It takes a long time to pull all repos. This option skips that step for faster startup.
 const skipPull = process.argv.includes( '--skipPull' );

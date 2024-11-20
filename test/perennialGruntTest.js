@@ -9,9 +9,9 @@
  */
 
 
-const execute = require( '../js/common/execute.js' ).default;
-const getBranches = require( '../js/common/getBranches.js' );
-const gruntCommand = require( '../js/common/gruntCommand.js' );
+const execute = require( '../js/common/execute' ).default;
+const getBranches = require( '../js/common/getBranches' );
+const gruntCommand = require( '../js/common/gruntCommand' );
 const qunit = require( 'qunit' );
 
 qunit.module( 'Perennial grunt tasks' );

@@ -8,7 +8,7 @@
  */
 
 const assert = require( 'assert' );
-const execute = require( './execute.js' ).default;
+const execute = require( './execute' ).default;
 
 /**
  * Gets the contents of the file at a given state in the git tree

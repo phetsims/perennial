@@ -6,7 +6,7 @@
  */
 
 ( async () => {
-  const Maintenance = require( '../../js/common/Maintenance.js' );
+  const Maintenance = require( '../../js/common/Maintenance' );
   const m = Maintenance;
 
   const getPatchName = ( repo, sha ) => repo + sha;

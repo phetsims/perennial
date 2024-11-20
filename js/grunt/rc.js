@@ -6,26 +6,26 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const SimVersion = require( '../common/SimVersion.js' ).default;
-const booleanPrompt = require( '../common/booleanPrompt.js' );
-const build = require( '../common/build.js' );
-const buildLocal = require( '../common/buildLocal.js' );
-const buildServerRequest = require( '../common/buildServerRequest.js' );
-const checkoutMain = require( '../common/checkoutMain.js' );
-const checkoutTarget = require( '../common/checkoutTarget.js' );
-const devDirectoryExists = require( '../common/devDirectoryExists.js' );
-const getDependencies = require( '../common/getDependencies.js' );
-const getRepoVersion = require( '../common/getRepoVersion.js' );
-const gitCheckout = require( '../common/gitCheckout.js' );
-const gitIsClean = require( '../common/gitIsClean.js' );
-const gitPush = require( '../common/gitPush.js' );
-const hasRemoteBranch = require( '../common/hasRemoteBranch.js' );
-const loadJSON = require( '../common/loadJSON.js' );
-const npmUpdate = require( '../common/npmUpdate.js' );
-const setRepoVersion = require( '../common/setRepoVersion.js' );
-const updateDependenciesJSON = require( '../common/updateDependenciesJSON.js' );
-const vpnCheck = require( '../common/vpnCheck.js' );
-const createRelease = require( './createRelease.js' );
+const SimVersion = require( '../common/SimVersion' ).default;
+const booleanPrompt = require( '../common/booleanPrompt' );
+const build = require( '../common/build' );
+const buildLocal = require( '../common/buildLocal' );
+const buildServerRequest = require( '../common/buildServerRequest' );
+const checkoutMain = require( '../common/checkoutMain' );
+const checkoutTarget = require( '../common/checkoutTarget' );
+const devDirectoryExists = require( '../common/devDirectoryExists' );
+const getDependencies = require( '../common/getDependencies' );
+const getRepoVersion = require( '../common/getRepoVersion' );
+const gitCheckout = require( '../common/gitCheckout' );
+const gitIsClean = require( '../common/gitIsClean' );
+const gitPush = require( '../common/gitPush' );
+const hasRemoteBranch = require( '../common/hasRemoteBranch' );
+const loadJSON = require( '../common/loadJSON' );
+const npmUpdate = require( '../common/npmUpdate' );
+const setRepoVersion = require( '../common/setRepoVersion' );
+const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
+const vpnCheck = require( '../common/vpnCheck' );
+const createRelease = require( './createRelease' );
 const grunt = require( 'grunt' );
 
 /**

@@ -8,17 +8,17 @@
 
 
 const assert = require( 'assert' );
-const SimVersion = require( '../../common/SimVersion.js' ).default;
-const buildLocal = require( '../../common/buildLocal.js' );
-const devDirectoryExists = require( '../../common/devDirectoryExists.js' );
-const devScp = require( '../../common/devScp.js' );
-const devSsh = require( '../../common/devSsh.js' );
-const getBranch = require( '../../common/getBranch.js' );
-const getRemoteBranchSHAs = require( '../../common/getRemoteBranchSHAs.js' );
-const gitIsClean = require( '../../common/gitIsClean.js' );
-const gitRevParse = require( '../../common/gitRevParse.js' );
-const loadJSON = require( '../../common/loadJSON.js' );
-const vpnCheck = require( '../../common/vpnCheck.js' );
+const SimVersion = require( '../../common/SimVersion' ).default;
+const buildLocal = require( '../../common/buildLocal' );
+const devDirectoryExists = require( '../../common/devDirectoryExists' );
+const devScp = require( '../../common/devScp' );
+const devSsh = require( '../../common/devSsh' );
+const getBranch = require( '../../common/getBranch' );
+const getRemoteBranchSHAs = require( '../../common/getRemoteBranchSHAs' );
+const gitIsClean = require( '../../common/gitIsClean' );
+const gitRevParse = require( '../../common/gitRevParse' );
+const loadJSON = require( '../../common/loadJSON' );
+const vpnCheck = require( '../../common/vpnCheck' );
 const grunt = require( 'grunt' );
 const fs = require( 'fs' );
 

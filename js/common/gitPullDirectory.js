@@ -7,7 +7,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( './execute.js' ).default;
+const execute = require( './execute' ).default;
 const winston = require( 'winston' );
 
 /**

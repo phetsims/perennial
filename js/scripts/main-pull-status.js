@@ -12,17 +12,17 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const cloneMissingRepos = require( '../common/cloneMissingRepos.js' );
-const execute = require( '../common/execute.js' ).default;
-const getActiveRepos = require( '../common/getActiveRepos.js' );
-const getBranches = require( '../common/getBranches.js' );
-const gitCheckout = require( '../common/gitCheckout.js' );
-const gitFetch = require( '../common/gitFetch.js' );
-const gitIsClean = require( '../common/gitIsClean.js' );
-const gitPullRebase = require( '../common/gitPullRebase.js' );
-const gitRevParse = require( '../common/gitRevParse.js' );
-const npmUpdate = require( '../common/npmUpdate.js' );
-const transpileAll = require( '../common/transpileAll.js' );
+const cloneMissingRepos = require( '../common/cloneMissingRepos' );
+const execute = require( '../common/execute' ).default;
+const getActiveRepos = require( '../common/getActiveRepos' );
+const getBranches = require( '../common/getBranches' );
+const gitCheckout = require( '../common/gitCheckout' );
+const gitFetch = require( '../common/gitFetch' );
+const gitIsClean = require( '../common/gitIsClean' );
+const gitPullRebase = require( '../common/gitPullRebase' );
+const gitRevParse = require( '../common/gitRevParse' );
+const npmUpdate = require( '../common/npmUpdate' );
+const transpileAll = require( '../common/transpileAll' );
 const winston = require( 'winston' );
 const _ = require( 'lodash' );
 

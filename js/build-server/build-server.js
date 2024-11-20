@@ -9,19 +9,19 @@
  */
 
 
-const constants = require( './constants.js' );
+const constants = require( './constants' );
 const childProcess = require( 'child_process' );
-const winston = require( './log.js' ); // eslint-disable-line phet/require-statement-match
-const logRequest = require( './logRequest.js' );
-const sendEmail = require( './sendEmail.js' );
-const taskWorker = require( './taskWorker.js' );
+const winston = require( './log' ); // eslint-disable-line phet/require-statement-match
+const logRequest = require( './logRequest' );
+const sendEmail = require( './sendEmail' );
+const taskWorker = require( './taskWorker' );
 const async = require( 'async' );
 const bodyParser = require( 'body-parser' );
 const express = require( 'express' );
 const _ = require( 'lodash' );
 const parseArgs = require( 'minimist' ); // eslint-disable-line phet/require-statement-match
-const persistentQueue = require( './persistentQueue.js' );
-const getStatus = require( './getStatus.js' );
+const persistentQueue = require( './persistentQueue' );
+const getStatus = require( './getStatus' );
 
 // set this process up with the appropriate permissions, value is in octal
 process.umask( 0o0002 );

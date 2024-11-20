@@ -5,8 +5,8 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-const { getArgsToForward } = require( './registerTasks.js' );
-const registerTasks = require( './registerTasks.js' );
+const { getArgsToForward } = require( './registerTasks' );
+const registerTasks = require( './registerTasks' );
 const qunit = require( 'qunit' );
 
 qunit.module( 'registerTasks' );
