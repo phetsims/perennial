@@ -63,6 +63,7 @@ module.exports = ( grunt, dir ) => {
 
   // Grunt has a weird side-effect where one if its dependency's (liftup) dependency (flaggedRespawn) will mutate that
   // args string, removing --watch and adding in --no-respawning. This ruins the watch process for PhET's transpiler.
+  // TODO: https://github.com/phetsims/chipper/issues/1521 can this be removed now?
   if ( process.argv.includes( '--no-respawning' ) && !process.argv.includes( '--watch' ) ) {
     process.argv.splice( process.argv.indexOf( '--no-respawning' ), 1 );
     process.argv.push( '--watch' );

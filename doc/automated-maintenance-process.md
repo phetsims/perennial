@@ -228,7 +228,7 @@ show incorrect failures.
 
 ## #0b: Stop your transpiler
 
-If you are running a transpiler with the `--watch` flag, it should be stopped before continuing. It can interfere with
+If you are running a transpiler with the `--live` flag, it should be stopped before continuing. It can interfere with
 builds and other operations that will be done in the maintenance process.
 
 ## #1: Checking branch status: `Maintenance.checkBranchStatus()`

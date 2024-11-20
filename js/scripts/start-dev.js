@@ -92,7 +92,7 @@ async function main() {
       process.stdout.write( `${data}` );
       if ( data.toString().includes( 'http://' ) ) {
         console.log( '\nStarting the transpiler...\n' );
-        transpileProcess = spawn( gruntCommand, [ 'transpile', '--watch' ], { cwd: path.join( phetsimsDirectory, 'chipper' ), shell: true } );
+        transpileProcess = spawn( gruntCommand, [ 'transpile', '--live' ], { cwd: path.join( phetsimsDirectory, 'chipper' ), shell: true } );
 
         transpileProcess.stdout.on( 'data', data => process.stdout.write( `transpile: ${data}` ) );
         transpileProcess.stderr.on( 'data', data => process.stderr.write( `transpile: ${data}` ) );
