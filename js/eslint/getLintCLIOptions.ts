@@ -21,7 +21,7 @@ export type Repo = string;
 
 /**
  * Get the list of repos to lint when doing lint-everything or lint --all
- * Linting runs in perennial-alias by default, so skip perennial when running all, see https://github.com/phetsims/chipper/issues/1520
+ * Linting runs in perennial-alias by default in all repos except perennial/ see https://github.com/phetsims/chipper/issues/1520
  */
 export function getLintEverythingRepos(): Repo[] {
   return getRepoList( 'active-repos' );

@@ -26,6 +26,7 @@ import phetIoObjectOptionsShouldNotPickFromPhetIoObject from '../../phet-rules/p
 import phetObjectShorthand from '../../phet-rules/phet-object-shorthand.js';
 import preferDerivedStringProperty from '../../phet-rules/prefer-derived-string-property.js';
 import requirePropertySuffix from '../../phet-rules/require-property-suffix.js';
+import requireStatementExtension from '../../phet-rules/require-statement-extension.js';
 import requireStatementMatch from '../../phet-rules/require-statement-match.js';
 import singleLineImport from '../../phet-rules/single-line-import.js';
 import tandemNameShouldMatch from '../../phet-rules/tandem-name-should-match.js';
@@ -74,7 +75,10 @@ export default {
     // key and value arguments to namespace.register() must match
     'namespace-match': namespaceMatch,
 
-    // phet-specific require statement rules
+    // phet-specific require statement rule
+    'require-statement-extension': requireStatementExtension,
+
+    // phet-specific require statement rule
     'require-statement-match': requireStatementMatch,
 
     // Require @public/@private for this.something = result;
