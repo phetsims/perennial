@@ -52,10 +52,21 @@ const REPOS_EXCLUDED_FROM_LISTENER_ORDER_RANDOM = [
 const tests = [];
 
 tests.push( {
-  test: [ 'perennial', 'lint-everything' ],
-  type: 'lint-everything',
+  test: [ 'perennial', 'lint', 'all' ],
+  type: 'npm-run',
+  command: 'lint-all',
+  repo: 'perennial',
   priority: 100
 } );
+
+tests.push( {
+  test: [ 'perennial', 'check', 'all' ],
+  type: 'npm-run',
+  command: 'check-all',
+  repo: 'perennial',
+  priority: 100
+} );
+
 
 // Node unit tests
 [ 'chipper', 'perennial', 'perennial-alias' ].forEach( repo => {
