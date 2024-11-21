@@ -945,7 +945,10 @@ export default {
   'phet/tandem-name-should-match': 'error',
 
   // Each source file should list at least one author
-  'phet/author-annotation': 'error'
+  'phet/author-annotation': 'error',
+
+  // Importing a relative path should end with *.js suffix
+  'phet/import-statement-extension': 'off'
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 };
