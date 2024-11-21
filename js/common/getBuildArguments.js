@@ -44,6 +44,7 @@ module.exports = function( chipperVersion, options ) {
       args.push( 'clean' );
     }
     if ( buildForServer ) {
+      // This is a vital flag for chipper 1.0. Do not remove until this is no longer supported.
       args.push( 'build-for-server' );
     }
     else {
