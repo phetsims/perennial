@@ -57,6 +57,16 @@ tests.push( {
   priority: 100
 } );
 
+// Node unit tests
+[ 'chipper', 'perennial', 'perennial-alias' ].forEach( repo => {
+  tests.push( {
+    test: [ repo, 'qunit', 'node' ],
+    type: 'npm-run',
+    command: 'test', // run like "npm run test"
+    repo: repo
+  } );
+} );
+
 // phet and phet-io brand builds
 [
   ...runnableRepos,
