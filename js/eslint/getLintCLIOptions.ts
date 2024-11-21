@@ -17,6 +17,7 @@ export type LintOptions = {
 
 export const DEFAULT_MAX_PROCESSES = 6;
 
+// TODO: Use the one in PerennialTypes, see https://github.com/phetsims/perennial/issues/404
 export type Repo = string;
 
 /**
