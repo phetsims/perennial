@@ -948,7 +948,10 @@ export default {
   'phet/author-annotation': 'error',
 
   // Importing a relative path should have an extension
-  'phet/import-statement-extension': 'error'
+  'phet/import-statement-extension': 'error',
+
+  // Importing should prefer *.js to *.ts etc.
+  'phet/import-statement-extension-js': 'error'
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 };
