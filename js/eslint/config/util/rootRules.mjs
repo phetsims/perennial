@@ -947,8 +947,8 @@ export default {
   // Each source file should list at least one author
   'phet/author-annotation': 'error',
 
-  // Importing a relative path should end with *.js suffix
-  'phet/import-statement-extension': 'off'
+  // Importing a relative path should have an extension
+  'phet/import-statement-extension': 'error'
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 };
