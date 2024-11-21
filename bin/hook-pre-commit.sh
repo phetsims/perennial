@@ -17,5 +17,5 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # Only run pre-commit hooks in main, see https://github.com/phetsims/perennial/issues/276
 if [[ "$current_branch" == "main" ]]; then
- "$SCRIPT_DIR/sage" run "$SCRIPT_DIR/../../chipper/js/scripts/hook-pre-commit.ts"
+ "$SCRIPT_DIR/sage" run "$SCRIPT_DIR/../../chipper/js/grunt/tasks/pre-commit.ts"
 fi

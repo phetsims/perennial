@@ -73,7 +73,7 @@ module.exports = {
 
   // By default, run all tasks
   // check local preferences for overrides for which tasks to turn off
-  // see hook-pre-commit.js
+  // see grunt/tasks/pre-commit.ts
   hookPreCommit: buildLocalObject.hookPreCommit || {},
 
   // Set to true to mark a codebase as supported by a phet developer. This unlocks internal behavior that is not
