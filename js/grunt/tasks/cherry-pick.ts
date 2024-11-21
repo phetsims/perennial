@@ -11,7 +11,7 @@
  */
 import assert from 'assert';
 import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
-import getOption from './util/getOption.ts';
+import getOption from './util/getOption.js';
 
 const gitCherryPick = require( '../common/gitCherryPick.js' );
 const grunt = require( 'grunt' );
