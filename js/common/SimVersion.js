@@ -37,7 +37,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-// TODO: Convert to TypeScript, see https://github.com/phetsims/chipper/issues/972
+// TODO: Convert to TypeScript, see https://github.com/phetsims/chipper/issues/1530
 
 // Since this script is used in node and in the browser, we cannot rely on import 'assert' or on the assert.js preload global.
 const assert = ( predicate, message ) => {
