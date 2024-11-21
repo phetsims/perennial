@@ -2,7 +2,7 @@
  
 
 /**
- * Do not allow basic assertions in typescript files where typescript typesc make that redundant. This rule applies in
+ * Do not allow basic assertions in typescript files where typescript types make that redundant. This rule applies in
  * cases like:
  *
  * assert && assert( typeof x === 'number', 'should be a number' );
@@ -22,7 +22,7 @@ module.exports = {
     const forbiddenTextObject = [
       {
         id: 'asserting values are instanceof or typeof in TypeScript is redundant',
-        regex: /assert && assert\( ((\w+ instanceof \w+)|(typeof \w+ === '\w+'))(,| \))/
+        regex: /^ *(assert && )?assert\( ((\w+ instanceof \w+)|(typeof \w+ === '\w+'))(,| \))/
       }
     ];
 
