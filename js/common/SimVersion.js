@@ -37,9 +37,14 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-/* global assert */
-
 // TODO: Convert to TypeScript, see https://github.com/phetsims/chipper/issues/972
+
+// Since this script is used in node and in the browser, we cannot rely on import 'assert' or on the assert.js preload global.
+const assert = ( predicate, message ) => {
+  if ( !predicate ) {
+    throw new Error( message );
+  }
+};
 
 // eslint-disable-next-line phet/default-export-class-should-register-namespace
 export default class SimVersion {
@@ -78,10 +83,10 @@ export default class SimVersion {
       testNumber = null
     } = options;
 
-    assert && assert( typeof major === 'number' && major >= 0 && major % 1 === 0, `major version should be a non-negative integer: ${major}` );
-    assert && assert( typeof minor === 'number' && minor >= 0 && minor % 1 === 0, `minor version should be a non-negative integer: ${minor}` );
-    assert && assert( typeof maintenance === 'number' && maintenance >= 0 && maintenance % 1 === 0, `maintenance version should be a non-negative integer: ${maintenance}` );
-    assert && assert( typeof testType !== 'string' || typeof testNumber === 'number', 'if testType is provided, testNumber should be a number' );
+    assert( typeof major === 'number' && major >= 0 && major % 1 === 0, `major version should be a non-negative integer: ${major}` );
+    assert( typeof minor === 'number' && minor >= 0 && minor % 1 === 0, `minor version should be a non-negative integer: ${minor}` );
+    assert( typeof maintenance === 'number' && maintenance >= 0 && maintenance % 1 === 0, `maintenance version should be a non-negative integer: ${maintenance}` );
+    assert( typeof testType !== 'string' || typeof testNumber === 'number', 'if testType is provided, testNumber should be a number' );
 
     // @public {number}
     this.major = major;
@@ -261,7 +266,7 @@ export default class SimVersion {
    */
   static fromBranch( branch ) {
     const bits = branch.split( '.' );
-    assert && assert( bits.length === 2, `Bad branch, should be {{MAJOR}}.{{MINOR}}, had: ${branch}` );
+    assert( bits.length === 2, `Bad branch, should be {{MAJOR}}.{{MINOR}}, had: ${branch}` );
 
     const major = Number( branch.split( '.' )[ 0 ] );
     const minor = Number( branch.split( '.' )[ 1 ] );
@@ -278,7 +283,7 @@ export default class SimVersion {
    */
   static ensureReleaseBranch( branch ) {
     const version = SimVersion.fromBranch( branch.split( '-' )[ 0 ] );
-    assert && assert( version.major > 0, 'Major version for a branch should be greater than zero' );
-    assert && assert( version.minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
+    assert( version.major > 0, 'Major version for a branch should be greater than zero' );
+    assert( version.minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
   }
 }
