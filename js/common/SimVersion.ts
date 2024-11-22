@@ -47,6 +47,12 @@ const localAssert = ( predicate: boolean, message: string ) => {
   }
 };
 
+type SimVersionOptions = {
+  testType?: string | null;
+  testNumber?: number | null;
+  buildTimestamp?: string | null;
+};
+
 // eslint-disable-next-line phet/default-export-class-should-register-namespace
 export default class SimVersion {
   public readonly major: number;
@@ -64,7 +70,7 @@ export default class SimVersion {
    * @param {number|string} maintenance - The maintenance part of the version (the 2 in 3.1.2)
    * @param {Object} [options]
    */
-  public constructor( major: number | string, minor: number | string, maintenance: number | string, options: any = {} ) {
+  public constructor( major: number | string, minor: number | string, maintenance: number | string, options: SimVersionOptions = {} ) {
 
     if ( typeof major === 'string' ) {
       major = Number( major );
