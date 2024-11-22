@@ -40,9 +40,12 @@
 // Include @param and @returns in the JSDoc comments for JSDoc api documentation
 /* eslint-disable phet/bad-typescript-text */
 
+// @ts-expect-error - window is not available in modules used in browser and NodeJS
+const assertionsEnabled = typeof window !== 'undefined' ? globalThis.assert : true;
+
 // Since this script is used in node and in the browser, we cannot rely on import 'assert' or on the assert.js preload global.
 const localAssert = ( predicate: boolean, message: string ) => {
-  if ( !predicate ) {
+  if ( assertionsEnabled && !predicate ) {
     throw new Error( message );
   }
 };
@@ -131,10 +134,10 @@ export default class SimVersion {
    */
   public get isSimNotPublished(): boolean {
     return !!( this.major < 1 || // e.g. 0.0.0-dev.1
-           ( this.major === 1 && // e.g. 1.0.0-dev.1
-             this.minor === 0 &&
-             this.maintenance === 0 &&
-             this.testType ) );
+               ( this.major === 1 && // e.g. 1.0.0-dev.1
+                 this.minor === 0 &&
+                 this.maintenance === 0 &&
+                 this.testType ) );
   }
 
   /**
