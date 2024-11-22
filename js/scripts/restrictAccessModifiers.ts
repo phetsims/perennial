@@ -8,7 +8,7 @@
  * stage. This helps in enforcing stricter encapsulation in the codebase.
  *
  * Usage:
- * cd chipper/
+ * cd perennial-alias/
  * sage run js/scripts/restrictAccessModifiers.ts [relative-path-to-repo-directory]
  *
  * Parameters:
