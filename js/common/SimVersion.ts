@@ -37,10 +37,11 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-// TODO: Convert to TypeScript, see https://github.com/phetsims/chipper/issues/972
+// Include @param and @returns in the JSDoc comments for JSDoc api documentation
+/* eslint-disable phet/bad-typescript-text */
 
 // Since this script is used in node and in the browser, we cannot rely on import 'assert' or on the assert.js preload global.
-const localAssert = ( predicate, message ) => {
+const localAssert = ( predicate: boolean, message: string ) => {
   if ( !predicate ) {
     throw new Error( message );
   }
@@ -48,6 +49,12 @@ const localAssert = ( predicate, message ) => {
 
 // eslint-disable-next-line phet/default-export-class-should-register-namespace
 export default class SimVersion {
+  public readonly major: number;
+  public readonly minor: number;
+  public readonly maintenance: number;
+  public readonly testType: string | null;
+  public readonly testNumber: number | null;
+  public readonly buildTimestamp: string | null; // If provided, like '2015-06-12 16:05:03 UTC' (phet.chipper.buildTimestamp)
 
   /**
    * @constructor
@@ -57,7 +64,7 @@ export default class SimVersion {
    * @param {number|string} maintenance - The maintenance part of the version (the 2 in 3.1.2)
    * @param {Object} [options]
    */
-  constructor( major, minor, maintenance, options = {} ) {
+  public constructor( major: number | string, minor: number | string, maintenance: number | string, options: any = {} ) {
 
     if ( typeof major === 'string' ) {
       major = Number( major );
@@ -88,22 +95,11 @@ export default class SimVersion {
     localAssert( typeof maintenance === 'number' && maintenance >= 0 && maintenance % 1 === 0, `maintenance version should be a non-negative integer: ${maintenance}` );
     localAssert( typeof testType !== 'string' || typeof testNumber === 'number', 'if testType is provided, testNumber should be a number' );
 
-    // @public {number}
     this.major = major;
-
-    // @public {number}
     this.minor = minor;
-
-    // @public {number}
     this.maintenance = maintenance;
-
-    // @public {string|null}
     this.testType = testType;
-
-    // @public {number|null}
     this.testNumber = testNumber;
-
-    // @public {string|null} - If provided, like '2015-06-12 16:05:03 UTC' (phet.chipper.buildTimestamp)
     this.buildTimestamp = buildTimestamp;
   }
 
@@ -113,7 +109,7 @@ export default class SimVersion {
    *
    * @returns {Object} - with properties like major, minor, maintenance, testType, testNumber, and buildTimestamp
    */
-  serialize() {
+  public serialize(): Record<string, unknown> {
     return {
       major: this.major,
       minor: this.minor,
@@ -125,24 +121,20 @@ export default class SimVersion {
   }
 
   /**
-   * @returns {boolean}
-   * @public
    * @ignore - not needed by PhET-iO Clients
    */
-  get isSimNotPublished() {
-    return this.major < 1 || // e.g. 0.0.0-dev.1
+  public get isSimNotPublished(): boolean {
+    return !!( this.major < 1 || // e.g. 0.0.0-dev.1
            ( this.major === 1 && // e.g. 1.0.0-dev.1
              this.minor === 0 &&
              this.maintenance === 0 &&
-             this.testType );
+             this.testType ) );
   }
 
   /**
-   * @returns {boolean}
-   * @public
    * @ignore - not needed by PhET-iO Clients
    */
-  get isSimPublished() {
+  public get isSimPublished(): boolean {
     return !this.isSimNotPublished;
   }
 
@@ -153,7 +145,10 @@ export default class SimVersion {
    * @param {Object} - with properties like major, minor, maintenance, testType, testNumber, and buildTimestamp
    * @returns {SimVersion}
    */
-  static deserialize( { major, minor, maintenance, testType, testNumber, buildTimestamp } ) {
+  public static deserialize(
+    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    { major, minor, maintenance, testType, testNumber, buildTimestamp } ): SimVersion {
     return new SimVersion( major, minor, maintenance, {
       testType: testType,
       testNumber: testNumber,
@@ -170,7 +165,7 @@ export default class SimVersion {
    *
    * @param {SimVersion} version
    */
-  compareNumber( version ) {
+  public compareNumber( version: SimVersion ): number {
     return SimVersion.comparator( this, version );
   }
 
@@ -185,7 +180,7 @@ export default class SimVersion {
    * @param {SimVersion} a
    * @param {SimVersion} b
    */
-  static comparator( a, b ) {
+  public static comparator( a: SimVersion, b: SimVersion ): number {
     if ( a.major < b.major ) { return -1; }
     if ( a.major > b.major ) { return 1; }
     if ( a.minor < b.minor ) { return -1; }
@@ -201,7 +196,7 @@ export default class SimVersion {
    * @returns {boolean}
    * @public
    */
-  isAfter( version ) {
+  public isAfter( version: SimVersion ): boolean {
     return this.compareNumber( version ) === 1;
   }
 
@@ -211,7 +206,7 @@ export default class SimVersion {
    * @returns {boolean}
    * @public
    */
-  isBeforeOrEqualTo( version ) {
+  public isBeforeOrEqualTo( version: SimVersion ): boolean {
     return this.compareNumber( version ) <= 0;
   }
 
@@ -221,7 +216,7 @@ export default class SimVersion {
    *
    * @returns {string}
    */
-  toString() {
+  public toString(): string {
     let str = `${this.major}.${this.minor}.${this.maintenance}`;
     if ( typeof this.testType === 'string' ) {
       str += `-${this.testType}.${this.testNumber}`;
@@ -237,7 +232,7 @@ export default class SimVersion {
    * @param {string} [buildTimestamp] - Optional build timestamp, like '2015-06-12 16:05:03 UTC' (phet.chipper.buildTimestamp)
    * @returns {SimVersion}
    */
-  static parse( versionString, buildTimestamp ) {
+  public static parse( versionString: string, buildTimestamp?: string ): SimVersion {
     const matches = versionString.match( /^(\d+)\.(\d+)\.(\d+)(-(([^.-]+)\.(\d+)))?(-([^.-]+))?$/ );
 
     if ( !matches ) {
@@ -264,7 +259,7 @@ export default class SimVersion {
    * @param {string} branch - e.g. '1.0'
    * @returns {SimVersion}
    */
-  static fromBranch( branch ) {
+  public static fromBranch( branch: string ): SimVersion {
     const bits = branch.split( '.' );
     localAssert( bits.length === 2, `Bad branch, should be {{MAJOR}}.{{MINOR}}, had: ${branch}` );
 
@@ -281,7 +276,7 @@ export default class SimVersion {
    * @param {string} branch - e.g. '1.0'
    * @ignore - not needed by PhET-iO Clients
    */
-  static ensureReleaseBranch( branch ) {
+  public static ensureReleaseBranch( branch: string ): void {
     const version = SimVersion.fromBranch( branch.split( '-' )[ 0 ] );
     localAssert( version.major > 0, 'Major version for a branch should be greater than zero' );
     localAssert( version.minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
