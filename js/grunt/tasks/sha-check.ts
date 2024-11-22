@@ -12,7 +12,7 @@
  */
 
 import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
-import getOption from './util/getOption.ts';
+import getOption from './util/getOption.js';
 
 const getDependencies = require( '../../common/getDependencies.js' );
 const gitCheckout = require( '../../common/gitCheckout.js' );

@@ -13,6 +13,8 @@ import defaultExportMatchFilename from '../../phet-rules/default-export-match-fi
 import defaultImportMatchFilename from '../../phet-rules/default-import-match-filename.js';
 import explicitMethodReturnType from '../../phet-rules/explicit-method-return-type.js';
 import gruntTaskKebabCase from '../../phet-rules/grunt-task-kebab-case.js';
+import importStatementExtension from '../../phet-rules/import-statement-extension.js';
+import importStatementExtensionJs from '../../phet-rules/import-statement-extension-js.js';
 import jsxTextElementsContainMatchingClass from '../../phet-rules/jsx-text-elements-contain-matching-class.js';
 import namespaceMatch from '../../phet-rules/namespace-match.js';
 import noHtmlConstructors from '../../phet-rules/no-html-constructors.js';
@@ -77,6 +79,12 @@ export default {
 
     // phet-specific require statement rule
     'require-statement-extension': requireStatementExtension,
+
+    // phet-specific import statement rule
+    'import-statement-extension': importStatementExtension,
+
+    // phet-specific import statement rule
+    'import-statement-extension-js': importStatementExtensionJs,
 
     // phet-specific require statement rule
     'require-statement-match': requireStatementMatch,

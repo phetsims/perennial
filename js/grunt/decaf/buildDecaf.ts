@@ -87,7 +87,7 @@ export default async function( project: string ): Promise<void> {
   // Bump the version
   const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, {
     testType: 'dev',
-    testNumber: previousVersion.testNumber + 1
+    testNumber: previousVersion.testNumber! + 1
   } );
   packageObject.version = version.toString();
   await writeJSON( packageFile, packageObject );

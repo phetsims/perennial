@@ -1,15 +1,14 @@
 // Copyright 2024, University of Colorado Boulder
 
 /**
- * This script automates the process of tightening access modifiers within TypeScript files in a specified project.
- * It iterates over TypeScript files in the 'js/' directory, attempting to change public and protected class members
- * to private. It then runs the TypeScript type checker to validate these changes. If the type checker fails, it
- * escalates the access level from private to protected, and if necessary, back to public, testing the build at each
- * stage. This helps in enforcing stricter encapsulation in the codebase.
+ * This script automates the process of enforcing the 'readonly' modifier on class properties within TypeScript files in a specified project.
+ * It iterates over TypeScript files in the 'js/' directory, attempting to add the 'readonly' modifier to class properties that are not already readonly.
+ * After each modification, it runs the TypeScript type checker to validate the change. If the type checker fails, it reverts the change.
+ * This helps in ensuring that class properties are immutable where possible, enhancing code reliability and maintainability.
  *
  * Usage:
  * cd perennial-alias/
- * sage run js/scripts/restrictAccessModifiers.ts [relative-path-to-repo-directory]
+ * sage run js/scripts/enforceReadonlyModifiers.ts [relative-path-to-repo-directory]
  *
  * Parameters:
  * [relative-path-to-repo-directory] - The path to the repository where TypeScript files are located. This script assumes
@@ -19,7 +18,7 @@
  * --help                   - Displays this help message and exits.
  *
  * Example:
- * sage run js/scripts/restrictAccessModifiers.ts ../my-ts-project
+ * sage run js/scripts/enforceReadonlyModifiers.ts ../my-ts-project
  *
  * Note:
  * - Ensure that 'tsconfig.json' is correctly set up in your project root.
@@ -30,67 +29,59 @@
  *   you will see the changes being made to trial values.
  *
  * @author Sam Reid (PhET Interactive Simulations)
- * @author Matt Blackman (PhET Interactive Simulations)
  */
 
 import { execSync } from 'child_process';
-import { Project, Scope } from 'ts-morph';
+import { Project, PropertyDeclaration } from 'ts-morph';
 
-// Function to tighten accessibility annotations
-async function restrictAccessModifiers( repoPath: string ): Promise<void> {
-
+/**
+ * Function to enforce 'readonly' on class properties
+ * @param repoPath - The path to the repository directory
+ */
+async function enforceReadonlyModifiers( repoPath: string ): Promise<void> {
   // Initialize a new ts-morph Project
   const project = new Project( {
-
     // Assuming tsconfig.json is in the root, adjust if necessary
     tsConfigFilePath: `${repoPath}/tsconfig.json`
+    // Optionally add any additional compiler options or project settings here
   } );
 
+  // Retrieve all TypeScript source files in the 'js/' directory
   const sourceFiles = project.getSourceFiles( `${repoPath}/js/**/*.ts` ); // Adjust the glob pattern as necessary
 
   for ( const sourceFile of sourceFiles ) {
     const classes = sourceFile.getClasses();
 
     for ( const classDeclaration of classes ) {
+      const className = classDeclaration.getName() || '<Unnamed Class>';
+      console.log( `# Processing class: ${className}` );
 
-      console.log( `# Processing class: ${classDeclaration.getName()}` );
+      // Retrieve all property declarations (both instance and static)
+      const properties: PropertyDeclaration[] = classDeclaration.getProperties();
 
-      const members = [
-        ...classDeclaration.getInstanceProperties(),
-        ...classDeclaration.getInstanceMethods(),
-        ...classDeclaration.getStaticProperties(),
-        ...classDeclaration.getStaticMethods()
-      ];
+      for ( const property of properties ) {
+        const propertyName = property.getName();
+        const isReadonly = property.isReadonly();
 
-      for ( const member of members ) {
+        if ( isReadonly ) {
+          console.log( `  - Property '${propertyName}' is already readonly. Skipping.` );
+          continue;
+        }
 
-        console.log( member.getScope() + ' ' + member.getName() );
+        console.log( `  - Attempting to set 'readonly' on property '${propertyName}'.` );
 
-        if ( member.getScope() === 'public' || member.getScope() === 'protected' ) {
+        // Add 'readonly' modifier
+        property.setIsReadonly( true );
+        await sourceFile.save();
 
-          // Try setting to private
-          member.setScope( Scope.Private );
+        if ( isBuildSuccessful( repoPath ) ) {
+          console.log( `    Successfully set 'readonly' on '${propertyName}'.` );
+        }
+        else {
+          // Revert the change if the build fails
+          property.setIsReadonly( false );
           await sourceFile.save();
-
-          if ( !isBuildSuccessful() ) {
-
-            // If not successful, try protected
-            member.setScope( Scope.Protected );
-            await sourceFile.save();
-
-            if ( !isBuildSuccessful() ) {
-
-              // If still not successful, revert to public
-              member.setScope( Scope.Public );
-              await sourceFile.save();
-            }
-            else {
-              console.log( `    Successfully changed ${member.getName()} to protected.` );
-            }
-          }
-          else {
-            console.log( `    Successfully changed ${member.getName()} to private.` );
-          }
+          console.log( `    Failed to set 'readonly' on '${propertyName}'. Reverted the change.` );
         }
       }
     }
@@ -101,8 +92,8 @@ async function restrictAccessModifiers( repoPath: string ): Promise<void> {
 if ( process.argv.includes( '--help' ) ) {
   console.log( `
 \x1b[1mUsage:\x1b[0m
-  \x1b[36mcd chipper/\x1b[0m
-  \x1b[36msage run js/scripts/restrictAccessModifiers.ts [relative-path-to-repo-directory]\x1b[0m
+  \x1b[36mcd perennial-alias/\x1b[0m
+  \x1b[36msage run js/scripts/enforceReadonlyModifiers.ts [relative-path-to-repo-directory]\x1b[0m
 
 \x1b[1mParameters:\x1b[0m
   \x1b[33m[relative-path-to-repo-directory]\x1b[0m - The path to the repository where TypeScript files are located. Assumes
@@ -112,7 +103,7 @@ if ( process.argv.includes( '--help' ) ) {
   \x1b[32m--help\x1b[0m                  - Displays this help message and exits.
 
 \x1b[1mExample:\x1b[0m
-  \x1b[36msage run js/scripts/restrictAccessModifiers.ts ../my-ts-project\x1b[0m
+  \x1b[36msage run js/scripts/enforceReadonlyModifiers.ts ../my-ts-project\x1b[0m
 
 \x1b[1mNote:\x1b[0m
 - Ensure that 'tsconfig.json' is correctly set up in your project root.
@@ -136,32 +127,39 @@ const repoPath = process.argv[ 2 ];
 
 /**
  * Check if the proposed change (already saved to the filesystem) passes the type checker.
+ * @param repoPath - The path to the repository directory
+ * @returns - True if the build is successful, else false
  */
-function isBuildSuccessful(): boolean {
+function isBuildSuccessful( repoPath: string ): boolean {
   try {
-
-    // Specify the path to the TypeScript compiler you want to use
+    // Specify the path to the TypeScript compiler or build command you want to use
     const gruntCommand = require( '../../../perennial-alias/js/common/gruntCommand.js' );
 
-    // Run the specified TypeScript compiler in the current directory
+    // Run the specified TypeScript compiler or build command in the current directory
     const result = execSync( `${gruntCommand} check`, {
-
       // set the working directory
-      cwd: repoPath
+      cwd: repoPath,
+      stdio: 'pipe', // Capture the output
+      encoding: 'utf-8'
     } );
-    if ( result.toString().includes( 'error' ) ) {
+
+    if ( result.toLowerCase().includes( 'error' ) ) {
       return false;
     }
 
-    // If tsc exits without error, the build is successful
+    // If the build command exits without error, the build is successful
     return true;
   }
   catch( error ) {
-
-    // If tsc exits with an error (non-zero exit code), the build failed
+    // If the build command exits with an error (non-zero exit code), the build failed
     return false;
   }
 }
 
 // Run the script
-restrictAccessModifiers( repoPath ).then( () => console.log( 'Finished processing files.' ) );
+enforceReadonlyModifiers( repoPath )
+  .then( () => console.log( 'Finished processing files.' ) )
+  .catch( error => {
+    console.error( 'An error occurred:', error );
+    process.exit( 1 );
+  } );

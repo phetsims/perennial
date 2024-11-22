@@ -12,7 +12,7 @@
 
 import winston from 'winston';
 import simMetadata from '../common/simMetadata.js';
-import getOption from '../grunt/tasks/util/getOption.ts';
+import getOption from '../grunt/tasks/util/getOption.js';
 
 winston.default.transports.console.level = 'error';
 

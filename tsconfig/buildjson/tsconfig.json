@@ -16,7 +16,7 @@
     "../../../chipper/js/LocalizedStringProperty.ts",
     "../../../chipper/js/chipper.ts",
     "../../../chipper/js/getStringModule.ts",
-    "../../../chipper/js/phet-io/phetioCompareAPIs.js",
+    "../../../chipper/js/phet-io/phetioCompareAPIs.ts",
     "../../../chipper/js/sim-tests/qunitStart.js",
     "../../../chipper/js/grunt/tasks/util/getOption.ts",
     "../../../dot/js/**/*",
@@ -24,7 +24,7 @@
     "../../../joist/js/**/*",
     "../../../joist/sounds/**/*",
     "../../../kite/js/**/*",
-    "../../../perennial-alias/js/common/SimVersion.js",
+    "../../../perennial-alias/js/common/SimVersion.ts",
     "../../../phet-core/js/**/*",
     // It's OK to list private repo phet-io files here, even though open source clients cannot check them out.
     // They are only checked if they are present at runtime

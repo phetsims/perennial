@@ -16,7 +16,7 @@ const TODOsFilename = `${CHIPPER_DIST_ESLINT}/issuesFromTODOs.txt`;
  * This script is meant to ensure that all todos pointing to a github issue are pointing to open issues.
  *
  * This script works by. . .
- * - Running lint-everything with a flag to specify a side effect to the to-do-should-have-issue rule which will keep
+ * - Running lint --all with a flag to specify a side effect to the to-do-should-have-issue rule which will keep
  * track of all to-do issues.
  * - Use that list to ping github to see if the issue is open
  * - If not open, reopen it and send a comment noting that there is still at least one to-do pointing here.
@@ -45,7 +45,7 @@ const TODOsFilename = `${CHIPPER_DIST_ESLINT}/issuesFromTODOs.txt`;
     } );
   }
   catch( e ) {
-    console.error( 'Error running lint-everything:\n\n', e );
+    console.error( 'Error running lint --all:\n\n', e );
     process.exit();
   }
   console.log( 'grunt lint --all finished' );

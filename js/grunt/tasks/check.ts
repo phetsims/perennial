@@ -19,7 +19,7 @@
 
 import _ from 'lodash';
 import check, { CheckOptions } from '../check.js';
-import getOption, { isOptionKeyProvided } from './util/getOption.ts';
+import getOption, { isOptionKeyProvided } from './util/getOption.js';
 import getRepo from './util/getRepo.js';
 
 const checkCLIOptions: Partial<CheckOptions> = {};
