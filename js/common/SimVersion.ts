@@ -40,15 +40,7 @@
 // Include @param and @returns in the JSDoc comments for JSDoc api documentation
 /* eslint-disable phet/bad-typescript-text */
 
-// @ts-expect-error - window is not available in modules used in browser and NodeJS
-const assertionsEnabled = typeof window !== 'undefined' ? globalThis.assert : true;
-
-// Since this script is used in node and in the browser, we cannot rely on import 'assert' or on the assert.js preload global.
-const localAssert = ( predicate: boolean, message: string ) => {
-  if ( assertionsEnabled && !predicate ) {
-    throw new Error( message );
-  }
-};
+import affirm from '../browser-and-node/affirm.js';
 
 type SimVersionOptions = {
   testType?: string | null;
@@ -99,10 +91,11 @@ export default class SimVersion {
       testNumber = null
     } = options;
 
-    localAssert( typeof major === 'number' && major >= 0 && major % 1 === 0, `major version should be a non-negative integer: ${major}` );
-    localAssert( typeof minor === 'number' && minor >= 0 && minor % 1 === 0, `minor version should be a non-negative integer: ${minor}` );
-    localAssert( typeof maintenance === 'number' && maintenance >= 0 && maintenance % 1 === 0, `maintenance version should be a non-negative integer: ${maintenance}` );
-    localAssert( typeof testType !== 'string' || typeof testNumber === 'number', 'if testType is provided, testNumber should be a number' );
+    // TODO: Confirm that affirm errors trigger in Node.js mode, see https://github.com/phetsims/assert/issues/5
+    affirm( typeof major === 'number' && major >= 0 && major % 1 === 0, `major version should be a non-negative integer: ${major}` );
+    affirm( typeof minor === 'number' && minor >= 0 && minor % 1 === 0, `minor version should be a non-negative integer: ${minor}` );
+    affirm( typeof maintenance === 'number' && maintenance >= 0 && maintenance % 1 === 0, `maintenance version should be a non-negative integer: ${maintenance}` );
+    affirm( typeof testType !== 'string' || typeof testNumber === 'number', 'if testType is provided, testNumber should be a number' );
 
     this.major = major;
     this.minor = minor;
@@ -270,7 +263,7 @@ export default class SimVersion {
    */
   public static fromBranch( branch: string ): SimVersion {
     const bits = branch.split( '.' );
-    localAssert( bits.length === 2, `Bad branch, should be {{MAJOR}}.{{MINOR}}, had: ${branch}` );
+    affirm( bits.length === 2, `Bad branch, should be {{MAJOR}}.{{MINOR}}, had: ${branch}` );
 
     const major = Number( branch.split( '.' )[ 0 ] );
     const minor = Number( branch.split( '.' )[ 1 ] );
@@ -287,7 +280,7 @@ export default class SimVersion {
    */
   public static ensureReleaseBranch( branch: string ): void {
     const version = SimVersion.fromBranch( branch.split( '-' )[ 0 ] );
-    localAssert( version.major > 0, 'Major version for a branch should be greater than zero' );
-    localAssert( version.minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
+    affirm( version.major > 0, 'Major version for a branch should be greater than zero' );
+    affirm( version.minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
   }
 }
