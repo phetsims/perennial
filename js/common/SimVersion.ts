@@ -91,7 +91,6 @@ export default class SimVersion {
       testNumber = null
     } = options;
 
-    // TODO: Confirm that affirm errors trigger in Node.js mode, see https://github.com/phetsims/assert/issues/5
     affirm( typeof major === 'number' && major >= 0 && major % 1 === 0, `major version should be a non-negative integer: ${major}` );
     affirm( typeof minor === 'number' && minor >= 0 && minor % 1 === 0, `minor version should be a non-negative integer: ${minor}` );
     affirm( typeof maintenance === 'number' && maintenance >= 0 && maintenance % 1 === 0, `maintenance version should be a non-negative integer: ${maintenance}` );
