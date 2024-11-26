@@ -16,7 +16,7 @@
     "../../../chipper/js/LocalizedStringProperty.ts",
     "../../../chipper/js/chipper.ts",
     "../../../chipper/js/getStringModule.ts",
-    "../../../chipper/js/browser-and-node/phetioCompareAPIs.ts",
+    "../../../chipper/js/browser-and-node/**/*",
     "../../../chipper/js/sim-tests/qunitStart.js",
     "../../../chipper/js/grunt/tasks/util/getOption.ts",
     "../../../dot/js/**/*",
