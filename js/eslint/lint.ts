@@ -15,9 +15,10 @@ import { spawn } from 'child_process';
 import _ from 'lodash';
 import path from 'path';
 import dirname from '../common/dirname.js';
+import { Repo } from '../common/PerennialTypes.js';
 import tsxCommand from '../common/tsxCommand.js';
 import divideIntoBatches from './divideIntoBatches.js';
-import { DEFAULT_MAX_PROCESSES, LintOptions, Repo } from './getLintCLIOptions.js';
+import { DEFAULT_MAX_PROCESSES, LintOptions } from './getLintCLIOptions.js';
 
 // @ts-expect-error - until we have "type": "module" in our package.json
 const __dirname = dirname( import.meta.url );

@@ -1,5 +1,6 @@
 // Copyright 2024, University of Colorado Boulder
 
+import { Repo } from '../common/PerennialTypes.js';
 /**
  * Parse command line options for linting.
  *
@@ -17,8 +18,6 @@ export type LintOptions = {
 
 export const DEFAULT_MAX_PROCESSES = 6;
 
-// TODO: Use the one in PerennialTypes, see https://github.com/phetsims/perennial/issues/404
-export type Repo = string;
 
 /**
  * Get the list of repos to lint when doing lint-everything or lint --all
