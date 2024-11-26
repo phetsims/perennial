@@ -9,16 +9,16 @@ import getOption from './getOption.js';
  */
 export default function testGruntOptions(): void {
 
-// grunt test-grunt --brands=a,b,c --lint=false --noTSC
+// grunt test-grunt --brands=a,b,c --lint=false --tsc=false
   const brands = getOption( 'brands' );
   const lint = getOption( 'lint' );
-  const noTSC = getOption( 'noTSC' );
+  const tsc = getOption( 'tsc' );
   const omitted = getOption( 'omitted' );
 
   console.log( '<output>' );
   console.log( `brands: ${brands}` );
   console.log( `lint: ${lint}` );
-  console.log( `noTSC: ${noTSC}` );
+  console.log( `tsc: ${tsc}` );
   console.log( `omitted: ${omitted}` );
   console.log( '</output>' );
 }

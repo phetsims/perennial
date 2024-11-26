@@ -32,7 +32,7 @@ const checkOutput = ( result: ReturnType<typeof spawnSync>, assert: Assert ) => 
   assert.ok( result.stdout.includes( `<output>
 brands: a,b,c
 lint: false
-noTSC: true
+tsc: false
 omitted: undefined
 </output>` ), 'result should correctly parse and output the options' );
 };
@@ -43,23 +43,23 @@ qunit.test( 'grunt no args', ( assert: Assert ) => {
 } );
 
 qunit.test( 'grunt args', ( assert: Assert ) => {
-  const result = spawnSync( `${gruntCommand} test-grunt --brands=a,b,c --lint=false --noTSC`, SPAWN_SYNC_OPTIONS );
+  const result = spawnSync( `${gruntCommand} test-grunt --brands=a,b,c --lint=false --tsc=false`, SPAWN_SYNC_OPTIONS );
   checkOutput( result, assert );
 } );
 
 qunit.test( 'tsx', assert => {
-  const result = spawnSync( `${tsxCommand} ./js/grunt/tasks/test-grunt.ts --brands=a,b,c --lint=false --noTSC`, SPAWN_SYNC_OPTIONS );
+  const result = spawnSync( `${tsxCommand} ./js/grunt/tasks/test-grunt.ts --brands=a,b,c --lint=false --tsc=false`, SPAWN_SYNC_OPTIONS );
   checkOutput( result, assert );
 } );
 
 qunit.test( 'sage run', assert => {
-  const result = spawnSync( 'bash ./bin/sage run ./js/grunt/tasks/test-grunt.ts --brands=a,b,c --lint=false --noTSC', SPAWN_SYNC_OPTIONS );
+  const result = spawnSync( 'bash ./bin/sage run ./js/grunt/tasks/test-grunt.ts --brands=a,b,c --lint=false --tsc=false', SPAWN_SYNC_OPTIONS );
   checkOutput( result, assert );
 } );
 
 // Sim-specific
 qunit.test( `grunt ${SIM}`, ( assert: Assert ) => {
-  const result = spawnSync( `${gruntCommand} --brands=a,b,c --lint=false --noTSC --test-options`, SPAWN_FOR_SIM_OPTIONS );
+  const result = spawnSync( `${gruntCommand} --brands=a,b,c --lint=false --tsc=false --test-options`, SPAWN_FOR_SIM_OPTIONS );
   checkOutput( result, assert );
 } );
 
