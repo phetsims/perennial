@@ -1,0 +1,6 @@
+{// TODO: How should we use this? https://github.com/phetsims/perennial/issues/418
+  "extends": "./tsconfig-core.json",
+  "include": [
+    "../js/browser-and-node/**/*"
+  ]
+}
