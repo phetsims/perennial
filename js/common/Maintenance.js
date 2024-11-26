@@ -1340,7 +1340,7 @@ module.exports = ( function() {
 
     /**
      * Looks up (or adds) a ModifiedBranch by its identifying information.
-     * @private
+     * @public
      *
      * @param {string} repo
      * @param {string} branch
