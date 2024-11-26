@@ -116,4 +116,7 @@ import execute from '../common/execute.js';
 * If the history, file, type checks and lint all seem good, git push the changes. (otherwise re-clone).
 * Delete the copy in the prior directory. In the commit message, refer to an issue so there is a paper trail.
 ` );
+
+  // When running tsx in combination with readline, the process does not exit properly, so we need to force it. See https://github.com/phetsims/perennial/issues/389
+  process.exit( 0 );
 } )();
