@@ -6,8 +6,8 @@
  */
 
 import grunt from 'grunt';
-import lint from '../../eslint/lint.js';
 import getLintCLIOptions, { getLintEverythingRepos } from '../../eslint/getLintCLIOptions.js';
+import lint from '../../eslint/lint.js';
 
 ( async () => {
   const lintSuccess = await lint( getLintEverythingRepos(), getLintCLIOptions() );

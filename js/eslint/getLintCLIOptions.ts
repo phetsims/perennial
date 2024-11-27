@@ -1,5 +1,6 @@
 // Copyright 2024, University of Colorado Boulder
 
+import getRepoList from '../common/getRepoList.js';
 import { Repo } from '../common/PerennialTypes.js';
 /**
  * Parse command line options for linting.
@@ -8,7 +9,6 @@ import { Repo } from '../common/PerennialTypes.js';
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import getOption, { isOptionKeyProvided } from '../grunt/tasks/util/getOption.js';
-import getRepoList from '../common/getRepoList.js';
 
 export type LintOptions = {
   clean?: boolean;

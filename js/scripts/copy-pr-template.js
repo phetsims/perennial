@@ -10,10 +10,10 @@
 
 import { execSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { chdir, cwd } from 'node:process';
 
 import coreCommonRepos from './core-common-repos.js';
-import { join, dirname } from 'node:path';
-import { cwd, chdir } from 'node:process';
 
 const pathToPrTemplate = join( cwd(), 'community', '.github', 'pull_request_template.md' );
 

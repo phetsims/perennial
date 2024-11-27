@@ -1,8 +1,8 @@
 // Copyright 2018, University of Colorado Boulder
 // @author Michael Kauzmann
 
-import getNodeConfiguration from './util/getNodeConfiguration.mjs';
 import rootEslintConfig from './root.eslint.config.mjs';
+import getNodeConfiguration from './util/getNodeConfiguration.mjs';
 
 /**
  * The config file to use for node-based code.
