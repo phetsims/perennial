@@ -4,7 +4,6 @@
 # Checks out the specified branch of all repositories in the present working dir.
 # Skips and prints a warning for any repository that doesn't have such a branch.
 # Also skips directories that are not Git repositories.
-# TODO: ASK DEVS: Delete this and prefer javascript code, https://github.com/phetsims/chipper/issues/1461
 #
 # Usage: checkout-branch.sh branchName
 #
