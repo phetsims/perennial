@@ -4,7 +4,6 @@
 # Prints a list of repos that are missing from your working copy.
 # Requires perennial repo to be checked out at the top-level of your working copy,
 # and all other repos to be siblings of perennial.
-# TODO: ASK DEVS: Delete this and prefer javascript code, https://github.com/phetsims/chipper/issues/1461
 #
 # Author: Chris Malley (PixelZoom, Inc.)
 # Author: Jonathan Olson <jonathan.olson@colorado.edu>

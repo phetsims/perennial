@@ -2,7 +2,6 @@
 #====================================================================================================
 #
 # For each active repository, prints the names of all remote branches.
-# TODO: ASK DEVS: Delete this and prefer javascript code, https://github.com/phetsims/chipper/issues/1461
 #
 # Author: Chris Malley
 #

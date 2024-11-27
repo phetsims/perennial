@@ -17,7 +17,7 @@
 #
 # Author: Sam Reid
 # Author: Chris Malley
-# Author: Jonathan Olson (from work in grunt-all.sh)
+# Author: Jonathan Olson
 #
 #====================================================================================================
 
