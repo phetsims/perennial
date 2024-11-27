@@ -5,6 +5,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
+import winston from 'winston';
 import execute from '../common/execute.js';
 import gitAdd from '../common/gitAdd.js';
 import gitCheckout from '../common/gitCheckout.js';
@@ -14,7 +15,6 @@ import gitPull from '../common/gitPull.js';
 import gitPush from '../common/gitPush.js';
 import gruntCommand from '../common/gruntCommand.js';
 import npmUpdate from '../common/npmUpdate.js';
-import winston from 'winston';
 
 ( ( async () => {
 

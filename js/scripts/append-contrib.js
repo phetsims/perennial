@@ -8,9 +8,9 @@
  * @author Liam Mulhall <liammulh@gmail.com>
  */
 
-import { join } from 'node:path';
 import { execSync } from 'node:child_process';
-import { cwd, chdir } from 'node:process';
+import { join } from 'node:path';
+import { chdir, cwd } from 'node:process';
 import appendToFile from './append-to-file.js';
 import coreCommonRepos from './core-common-repos.js';
 

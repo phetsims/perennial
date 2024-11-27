@@ -8,8 +8,8 @@
 const _ = require( 'lodash' );
 const grunt = require( 'grunt' );
 
-import getOption from './util/getOption.js';
 import child_process from 'child_process';
+import getOption from './util/getOption.js';
 
 function checkoutMainAll( branch = 'main' ): Promise<void> {
   return new Promise( resolve => {

@@ -6,10 +6,10 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-import getPreloads from './getPreloads.js';
 import fs from 'fs';
 import execute from '../../common/execute.js';
 import SimVersion from '../../common/SimVersion.js';
+import getPreloads from './getPreloads.js';
 
 const assert = require( 'assert' );
 const copyFile = require( '../../common/copyFile.js' );
