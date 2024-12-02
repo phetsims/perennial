@@ -8,7 +8,7 @@
 
 import fs from 'fs';
 import execute from '../../common/execute.js';
-import SimVersion from '../../common/SimVersion.js';
+import SimVersion from '../../browser-and-node/SimVersion.js';
 import getPreloads from './getPreloads.js';
 
 const assert = require( 'assert' );

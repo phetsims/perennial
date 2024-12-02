@@ -1,7 +1,3 @@
 {
-  "extends": "../../tsconfig/tsconfig-browser-and-node.json",
-  "include": [
-    "./**/*",
-    "../common/SimVersion.ts"
-  ]
+  "extends": "../../tsconfig/tsconfig-browser-and-node.json"
 }

@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const SimVersion = require( './SimVersion' ).default;
+const SimVersion = require( '../browser-and-node/SimVersion' ).default;
 const loadJSON = require( './loadJSON' );
 const winston = require( 'winston' );
 

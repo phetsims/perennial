@@ -3,7 +3,7 @@
 
 
 const constants = require( './constants' );
-const SimVersion = require( '../common/SimVersion' ).default;
+const SimVersion = require( '../browser-and-node/SimVersion' ).default;
 const writeFile = require( '../common/writeFile' );
 const axios = require( 'axios' );
 

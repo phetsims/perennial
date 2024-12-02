@@ -40,7 +40,7 @@
 // Include @param and @returns in the JSDoc comments for JSDoc api documentation
 /* eslint-disable phet/bad-typescript-text */
 
-import affirm from '../browser-and-node/affirm.js';
+import affirm from './affirm.js';
 
 type SimVersionOptions = {
   testType?: string | null;
