@@ -1,0 +1,8 @@
+/**
+ * Shared for files that run in node and in browser environments.
+ * @author Michael Kauzmann (PhET Interactive Simulations)
+ * @author Sam Reid (PhET Interactive Simulations)
+ */
+{
+  "extends": "./tsconfig-core.json"
+}
