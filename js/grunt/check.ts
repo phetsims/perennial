@@ -84,7 +84,7 @@ const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean
 
   const repoEntryPoint = getRepoCWD( options.repo );
 
-  options.repo && assert( fs.existsSync( `${repoEntryPoint}/tsconfig.json` ), `repo provided does not have a tsconfig.json: ${options.repo}` );
+  !options.all && options.repo && assert( fs.existsSync( `${repoEntryPoint}/tsconfig.json` ), `repo provided does not have a tsconfig.json: ${options.repo}` );
 
   const cwd = options.all ? ALL_CONFIG_PATH : repoEntryPoint;
 
