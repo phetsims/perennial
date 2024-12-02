@@ -1,0 +1,7 @@
+{
+  "extends": "../../tsconfig/tsconfig-core.json",
+  "include": [
+    "./**/*",
+    "../common/SimVersion.ts"
+  ]
+}
