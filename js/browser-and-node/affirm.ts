@@ -1,15 +1,15 @@
 // Copyright 2024, University of Colorado Boulder
 
 /**
- * Like assertions, but call sites can be stripped out during the babel step during the build, without another flag.
- * We choose the term affirm since it has a positive connotation, and has a similar letter pattern as assert.
- * Also, the term affirm is not otherwise used in our codebase.
+ * Like assert.js, with the following differences:
  *
- * assert
- * affirm
+ * 1. Can be used in browser/node/both code
+ * 2. Call are stripped out during the babel step, without another guard
+ * 3. Adds an `asserts` type to the predicate, which is a TypeScript feature that allows the type checker to
+ *    understand that the predicate is true after the call to affirm.
  *
- * If/when this becomes the predominant use case, it can be renamed to assert() and the legacy assert can be deleted
- * or renamed.
+ * We choose the term affirm since it has a positive connotation, and has a similar letter pattern as assert, and since
+ * the term `affirm` is not otherwise used in our codebase.
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */
