@@ -3,5 +3,13 @@
   "include": [
     "js/**/*",
     "test/**/*"
+  ],
+  "exclude": [
+    "js/browser-and-node/**/*"
+  ],
+  "references": [
+    {
+      "path": "js/browser-and-node/tsconfig.json"
+    }
   ]
 }
