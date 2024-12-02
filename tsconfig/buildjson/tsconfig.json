@@ -24,6 +24,7 @@
     "../../../chipper/js/browser/LocalizedStringProperty.ts",
     "../../../chipper/js/browser/chipper.ts",
     "../../../chipper/js/browser/getStringModule.ts",
+    // TODO: Move this to a references project instead https://github.com/phetsims/perennial/issues/418
     "../../../chipper/js/browser-and-node/**/*",
     "../../../chipper/js/browser/sim-tests/qunitStart.js",
     "../../../chipper/js/grunt/tasks/util/getOption.ts",
@@ -32,8 +33,6 @@
     "../../../joist/js/**/*",
     "../../../joist/sounds/**/*",
     "../../../kite/js/**/*",
-    "../../../perennial-alias/js/browser-and-node/**/*",
-    "../../../perennial-alias/js/common/SimVersion.ts",
     "../../../phet-core/js/**/*",
     // It's OK to list private repo phet-io files here, even though open source clients cannot check them out.
     // They are only checked if they are present at runtime
@@ -69,5 +68,10 @@
   "exclude": [
     "../../../*/Gruntfile.cjs",
     "../../../*/js/grunt/**/*"
+  ],
+  "references": [
+    {
+      "path": "../../js/browser-and-node/tsconfig.json"
+    }
   ]
 }

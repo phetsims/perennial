@@ -47,6 +47,7 @@ export default function affirm( predicate: unknown, ...messages: IntentionalAny[
     const stackTraceWritable = descriptor && ( descriptor.writable || ( descriptor.set && typeof descriptor.set === 'function' ) );
 
     if ( stackTraceWritable ) {
+      // @ts-expect-error - At some point this will no longer be experimental for the Browser error constructor, but not this day.
       Error.stackTraceLimit = 20;
     }
 
