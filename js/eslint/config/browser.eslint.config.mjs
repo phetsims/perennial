@@ -10,34 +10,27 @@ import globals from 'globals';
 import rootEslintConfig from './root.eslint.config.mjs';
 import { phetSimBrowserGlobalsObject } from './util/phetSimBrowserGlobals.mjs';
 
-export const getBrowserConfiguration = ( pattern = {} ) => {
-  return [
-
-    // Where getBrowserConfiguration is included elsewhere, the call site must supply the rootEslintConfig.
-    {
-      languageOptions: {
-        globals: {
-          ...globals.browser,
-          ...phetSimBrowserGlobalsObject
-        }
-      },
-      ...pattern
-    },
-    {
-      files: [ '**/*.jsx', '**/*.tsx' ],
-      languageOptions: {
-        globals: {
-          React: 'readonly',
-          ReactDOM: 'readonly'
-        }
-      }
-    }
-  ];
-};
-
 export default [
 
   // Here, we must have a complete set of rules for interpretation, so we include the rootEslintConfig.
   ...rootEslintConfig,
-  ...getBrowserConfiguration()
+
+  // Where getBrowserConfiguration is included elsewhere, the call site must supply the rootEslintConfig.
+  {
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...phetSimBrowserGlobalsObject
+      }
+    }
+  },
+  {
+    files: [ '**/*.jsx', '**/*.tsx' ],
+    languageOptions: {
+      globals: {
+        React: 'readonly',
+        ReactDOM: 'readonly'
+      }
+    }
+  }
 ];
