@@ -5,7 +5,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-const SimVersion = require( './SimVersion' ).default;
+const SimVersion = require( '../browser-and-node/SimVersion' ).default;
 const qunit = require( 'qunit' );
 
 qunit.module( 'SimVersion' );

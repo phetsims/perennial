@@ -8,7 +8,7 @@
 
 
 const assert = require( 'assert' );
-const SimVersion = require( '../../common/SimVersion' ).default;
+const SimVersion = require( '../../browser-and-node/SimVersion' ).default;
 const buildLocal = require( '../../common/buildLocal' );
 const devDirectoryExists = require( '../../common/devDirectoryExists' );
 const devScp = require( '../../common/devScp' );
