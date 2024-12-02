@@ -160,6 +160,7 @@ export default [
   // For entry points like scripts and "grunt" tasks, we often end with a floating promise which is not a problem
   {
     files: [
+      // TODO: These absolute paths don't work for nested eslint configs. For example, importing root config in `js/grunt/eslint.config.mjs`, https://github.com/phetsims/chipper/issues/1483/
       '**/js/grunt/tasks/**/*',
       '**/js/scripts/**/*'
     ],
