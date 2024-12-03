@@ -17,6 +17,10 @@ const isGruntTaskFileRegex = /[\\/]grunt[\\/]tasks[\\/]?/;
 const validKebabCase = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
 const path = require( 'path' );
 
+const OPT_OUT = [
+  'eslint.config.mjs'
+];
+
 module.exports = {
   create: function( context ) {
     return {
@@ -29,6 +33,8 @@ module.exports = {
 
              // top level only
              parsed.dir.endsWith( 'tasks' ) &&
+
+             !OPT_OUT.includes( parsed.base ) &&
 
              // not valid kebab-case
              !validKebabCase.test( parsed.name ) ) {
