@@ -1,5 +1,16 @@
 // Copyright 2024, University of Colorado Boulder
 
+import { IntentionalPerennialAny } from './PerennialTypes.js';
+
+// Define an interface that includes the optional 'assert' property
+type GlobalWithAssert = {
+  assert?: boolean;
+};
+
+// Respect the global assert flag, which can be set to false to disable all assertions
+const isBrowser = globalThis.hasOwnProperty( 'window' );
+const isNode = !isBrowser;
+
 /**
  * Like assert.js, with the following differences:
  *
@@ -12,20 +23,9 @@
  * the term `affirm` is not otherwise used in our codebase.
  *
  * @author Sam Reid (PhET Interactive Simulations)
+ * @author Michael Kauzmann (PhET Interactive Simulations)
  */
-
-type IntentionalAny = any;
-
-// Define an interface that includes the optional 'assert' property
-type GlobalWithAssert = {
-  assert?: boolean;
-};
-
-// Respect the global assert flag, which can be set to false to disable all assertions
-const isBrowser = globalThis.hasOwnProperty( 'window' );
-const isNode = !isBrowser;
-
-export default function affirm( predicate: unknown, ...messages: IntentionalAny[] ): asserts predicate {
+export default function affirm( predicate: unknown, ...messages: IntentionalPerennialAny[] ): asserts predicate {
 
   // Cast 'globalThis' to 'GlobalWithAssert' to access 'assert' safely
   const isAssertEnabled = isNode || ( globalThis as GlobalWithAssert ).assert;

@@ -1,7 +1,7 @@
 // Copyright 2024, University of Colorado Boulder
 
 import getRepoList from '../common/getRepoList.js';
-import { Repo } from '../common/PerennialTypes.js';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
 /**
  * Parse command line options for linting.
  *

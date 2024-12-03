@@ -14,7 +14,7 @@ import os from 'os';
 import path from 'path';
 import fixEOL from '../common/fixEOL.js';
 import { PERENNIAL_ROOT } from '../common/perennialRepoUtils.js';
-import { Repo } from '../common/PerennialTypes.js';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
 
 const ALL_CONFIG_PATH = `${PERENNIAL_ROOT}/../chipper/dist/tsconfig/all/`;
 const tscCommand = `${PERENNIAL_ROOT}/node_modules/typescript/bin/tsc`;

@@ -26,7 +26,7 @@ import fs from 'fs';
 import _ from 'lodash';
 import path from 'path';
 import process from 'process';
-import { Repo } from '../common/PerennialTypes.js';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
 import { tscCleanRepo } from '../grunt/check.js';
 import { DEBUG_PHET_LINT } from './lint.js';
 
