@@ -11,8 +11,8 @@ export default [
   {
     rules: {
 
-      // There is a complication about importing phet-core from perennial, so until that is resolved, use `any` here instead
-      '@typescript-eslint/no-explicit-any': 'off', // TODO: Use IntentionalAny, https://github.com/phetsims/chipper/issues/1465
+      // There is a complication about importing phet-core from perennial, so use `any` in this repo
+      '@typescript-eslint/no-explicit-any': 'off',
 
       // Overrides so that perennial can import its own node_modules directly instead of using npm-dependencies/
       'no-restricted-imports': 'off'
