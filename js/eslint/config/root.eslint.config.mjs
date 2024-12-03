@@ -10,6 +10,34 @@ import phetRulesPlugin from './util/phetRulesPlugin.mjs';
 import rootRules from './util/rootRules.mjs';
 import rootRulesTypeScript from './util/rootRulesTypeScript.mjs';
 
+
+// Keep this in a separate block from all other keys to make sure this behaves globally. These paths are relative to the root of a repo.
+const TOP_LEVEL_IGNORES = {
+  ignores: [
+    '.git/',
+    'build/',
+    'dist/',
+    'node_modules/',
+    'templates/',
+    'js/*Strings.ts',
+    'images/',
+    'doc/',
+    'sounds/',
+    'mipmaps/',
+    'assets/',
+    '*_en.html',
+    '*-tests.html',
+    '*_a11y_view.html'
+  ]
+};
+
+// Adapt an eslint config so it is suitable for a non-top-level location. This is because some config assumes paths
+// from the top of a repo. We only want to use the above "ignores" paths when at the root level of a repo. For
+// example, don't want to ignore `js/common/images/*`.
+export function mutateForNestedConfig( eslintConfig ) {
+  return eslintConfig.filter( config => config !== TOP_LEVEL_IGNORES );
+}
+
 /**
  * The base eslint configuration for the PhET projects.
  *
@@ -23,25 +51,7 @@ export default [
     // Keep this in a separate block from all other keys to make sure this behaves globally.
     files: [ '{**/*,*}.{js,ts,jsx,tsx,html,mjs,cjs}' ]
   },
-  {
-    // Keep this in a separate block from all other keys to make sure this behaves globally.
-    ignores: [
-      '.git/',
-      'build/',
-      'dist/',
-      'node_modules/',
-      'templates/',
-      'js/*Strings.ts',
-      'images/',
-      'doc/',
-      'sounds/',
-      'mipmaps/',
-      'assets/',
-      '*_en.html',
-      '*-tests.html',
-      '*_a11y_view.html'
-    ]
-  },
+  TOP_LEVEL_IGNORES,
 
   // Main config block that applies everywhere. Do NOT add `files` or `ignores` here.
   {
