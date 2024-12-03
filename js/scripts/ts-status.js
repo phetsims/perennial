@@ -1,7 +1,7 @@
 // Copyright 2022, University of Colorado Boulder
 /**
  *
- * The tsc-status script runs through relevant common code repos and counts the lines of code written in javascript
+ * The ts-status script runs through relevant common code repos and counts the lines of code written in javascript
  * and typescript. Provides data on conversion status, as well as occurrences of @ts-expect-error.
  *
  * Run from sims root directory
