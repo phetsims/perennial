@@ -21,7 +21,7 @@ const reset = '\u001b[0m';
 
   // {code:number,stdout:string,stderr:string}
   let lintResults = null;
-  let tscResults = null;
+  let typeCheckResults = null;
 
   const outputResult = ( name, results ) => {
     if ( results.code === 0 ) {
@@ -47,10 +47,10 @@ const reset = '\u001b[0m';
   };
 
   const runTsc = async () => {
-    tscResults = await execute( gruntCommand, [ 'type-check', '--all' ], `${__dirname}/../../`, {
+    typeCheckResults = await execute( gruntCommand, [ 'type-check', '--all' ], `${__dirname}/../../`, {
       errors: 'resolve'
     } );
-    outputResult( 'tsc', tscResults );
+    outputResult( 'type-check', typeCheckResults );
   };
 
   // const runAPIChecks = async () => {
@@ -63,5 +63,5 @@ const reset = '\u001b[0m';
   // await Promise.all( [ runLint(), runTsc(), runAPIChecks() ] );
   await Promise.all( [ runLint(), runTsc() ] );
 
-  console.log( `\n${lintResults.code === 0 && tscResults.code === 0 ? green : red}-----=====] finished [=====-----${reset}\n` );
+  console.log( `\n${lintResults.code === 0 && typeCheckResults.code === 0 ? green : red}-----=====] finished [=====-----${reset}\n` );
 } )();
