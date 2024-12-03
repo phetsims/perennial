@@ -2,13 +2,6 @@
 
 import nodeEslintConfig from './js/eslint/config/node.eslint.config.mjs';
 
-export const perennialRules = {
-  rules: {
-
-    // There is a complication about importing phet-core from perennial, so use `any` in this repo
-    '@typescript-eslint/no-explicit-any': 'off'
-  }
-};
 
 /**
  * @author Sam Reid (PhET Interactive Simulations)
@@ -16,7 +9,6 @@ export const perennialRules = {
  */
 export default [
   ...nodeEslintConfig,
-  perennialRules,
   {
     rules: {
 

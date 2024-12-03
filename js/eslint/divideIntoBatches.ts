@@ -1,7 +1,7 @@
 // Copyright 2024, University of Colorado Boulder
 
 import os from 'os';
-import { Repo } from '../common/PerennialTypes.js';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
 
 const MAX_BATCH_SIZE = 50;
 

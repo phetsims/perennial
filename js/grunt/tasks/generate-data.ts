@@ -1,5 +1,7 @@
 // Copyright 2024, University of Colorado Boulder
 
+import { IntentionalPerennialAny } from '../../browser-and-node/PerennialTypes.js';
+
 /**
  * Generates the lists under perennial/data/, and if there were changes, will commit and push.
  *
@@ -39,7 +41,7 @@ async function generateData(): Promise<void> {
 
   const activeRepos: string[] = getActiveRepos();
 
-  function writeList( name: string, packageFilter: ( repo: any ) => void ): void {
+  function writeList( name: string, packageFilter: ( repo: IntentionalPerennialAny ) => void ): void {
     const repos = activeRepos.filter( repo => {
       // Make sure that if someone doesn't have all repositories checked out that this will FAIL. Otherwise bad things.
       assert( grunt.file.exists( `../${repo}` ) );

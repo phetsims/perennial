@@ -5,7 +5,7 @@ import { readFileSync } from 'fs';
 import path from 'path';
 import process from 'process';
 import dirname from '../../../common/dirname.js';
-import { Repo } from '../../../common/PerennialTypes.js';
+import { Repo } from '../../../browser-and-node/PerennialTypes.js';
 import getOption from './getOption.js';
 
 // @ts-expect-error - until we have "type": "module" in our package.json
