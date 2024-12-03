@@ -27,7 +27,7 @@ import _ from 'lodash';
 import path from 'path';
 import process from 'process';
 import { Repo } from '../browser-and-node/PerennialTypes.js';
-import { tscCleanRepo } from '../grunt/check.js';
+import { tscCleanRepo } from '../grunt/typeCheck.js';
 import { DEBUG_PHET_LINT } from './lint.js';
 
 // TODO: enable linting for scenery-stack-test, see https://github.com/phetsims/scenery-stack-test/issues/1

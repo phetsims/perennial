@@ -9,7 +9,7 @@
   "scripts": {
     "test": "bash bin/sage run node_modules/qunit/bin/qunit.js js/test/perennial-tests.js",
     "test-long": "npm run test && bash bin/sage run node_modules/qunit/bin/qunit.js js/test/perennialGruntTest.js",
-    "check-all": "grunt check --all --clean",
+    "type-check-all": "grunt type-check --all --clean",
     "lint-all": "grunt lint --all --clean"
   },
   "devDependencies": {
