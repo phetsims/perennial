@@ -98,15 +98,13 @@ function execute( cmd: string, args: string[], cwd: string, options?: Partial<Ex
 
     childProcess.stderr.on( 'data', data => {
       stderr += data;
-      // @ts-expect-error
-      grunt.log.debug( `stderr: ${data}` );
+      grunt.log.verbose.writeln( `stderr: ${data}` );
       winston.debug( `stderr: ${data}` );
     } );
     childProcess.stdout.on( 'data', data => {
       stdout += data;
 
-      // @ts-expect-error
-      grunt.log.debug( `stdout: ${data}` );
+      grunt.log.verbose.writeln( `stdout: ${data}` );
       winston.debug( `stdout: ${data}` );
     } );
 
