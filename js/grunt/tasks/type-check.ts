@@ -1,9 +1,9 @@
 // Copyright 2024, University of Colorado Boulder
 /**
- * Type checks *.ts files. Named after deno check. Automatically uses "-b" as appropriate for project references.
+ * Type checks *.ts files. Automatically uses "-b" as appropriate for project references.
  *
  * Usage:
- * grunt check
+ * grunt type-check
  *
  * Options (can be combined):
  * --all: check all repos
@@ -18,7 +18,7 @@
  */
 
 import _ from 'lodash';
-import check, { CheckOptions } from '../check.js';
+import typeCheck, { CheckOptions } from '../typeCheck.js';
 import getOption, { isOptionKeyProvided } from './util/getOption.js';
 import getRepo from './util/getRepo.js';
 
@@ -46,4 +46,4 @@ if ( isOptionKeyProvided( 'silent' ) ) {
 const defaultOptions = {
   repo: getRepo()
 };
-export const checkPromise = ( async () => check( _.assignIn( defaultOptions, checkCLIOptions ) ) )();
+export const typeCheckPromise = ( async () => typeCheck( _.assignIn( defaultOptions, checkCLIOptions ) ) )();

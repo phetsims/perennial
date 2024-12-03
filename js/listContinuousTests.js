@@ -60,9 +60,9 @@ tests.push( {
 } );
 
 tests.push( {
-  test: [ 'perennial', 'check', 'all' ],
+  test: [ 'perennial', 'type-check', 'all' ],
   type: 'npm-run',
-  command: 'check-all',
+  command: 'type-check-all',
   repo: 'perennial',
   priority: 100
 } );

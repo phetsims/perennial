@@ -47,7 +47,7 @@ const reset = '\u001b[0m';
   };
 
   const runTsc = async () => {
-    tscResults = await execute( gruntCommand, [ 'check', '--all' ], `${__dirname}/../../`, {
+    tscResults = await execute( gruntCommand, [ 'type-check', '--all' ], `${__dirname}/../../`, {
       errors: 'resolve'
     } );
     outputResult( 'tsc', tscResults );

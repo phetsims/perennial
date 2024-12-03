@@ -51,7 +51,7 @@ export type CheckOptions = {
   absolute: boolean;
 };
 
-const check = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean> => {
+const typeCheck = async ( providedOptions?: Partial<CheckOptions> ): Promise<boolean> => {
 
   const options: CheckOptions = _.assignIn( {
 
@@ -204,4 +204,4 @@ const handleAbsolute = ( stdout: string, cwd: string, startTime: number ) => {
   console.log( `${errorCount} ${errorCount === 1 ? 'error' : 'errors'} in ${Date.now() - startTime}ms` );
 };
 
-export default check;
+export default typeCheck;
