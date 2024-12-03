@@ -36,7 +36,7 @@ export type CheckOptions = {
   // Prevent all output, even if verbose or absolute flags are set.
   silent: boolean;
 
-  // When true, this will provide extra output from tsc. Always false if absolute:true
+  // When true, this will provide extra output from `tsc`. Always false if absolute:true
   verbose: boolean;
 
   /**
