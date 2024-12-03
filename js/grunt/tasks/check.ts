@@ -2,7 +2,7 @@
 /**
  * Alias for the type-check task.
  *
- * @deprecated, please use type-check
+ * @deprecated, please use type-check.
  *
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
