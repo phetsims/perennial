@@ -35,7 +35,7 @@ const TOP_LEVEL_IGNORES = {
 // from the top of a repo. We only want to use the above "ignores" paths when at the root level of a repo. For
 // example, don't want to ignore `js/common/images/*`.
 export function mutateForNestedConfig( eslintConfig ) {
-  return eslintConfig.filter( config => config !== TOP_LEVEL_IGNORES );
+  return eslintConfig.filter( configObject => configObject !== TOP_LEVEL_IGNORES );
 }
 
 /**
@@ -164,18 +164,6 @@ export default [
     files: [ '**/Gruntfile.{js,cjs}' ],
     rules: {
       strict: 'off'
-    }
-  },
-
-  // For entry points like scripts and "grunt" tasks, we often end with a floating promise which is not a problem
-  {
-    files: [
-      // TODO: These absolute paths don't work for nested eslint configs. For example, importing root config in `js/grunt/eslint.config.mjs`, https://github.com/phetsims/chipper/issues/1483/
-      '**/js/grunt/tasks/**/*',
-      '**/js/scripts/**/*'
-    ],
-    rules: {
-      '@typescript-eslint/no-floating-promises': 'off'
     }
   }
 ];
