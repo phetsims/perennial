@@ -36,9 +36,13 @@ const getBrands = ( repo: string ): Brand[] => {
     brands = [ 'adapted-from-phet' ];
   }
 
-  // Ensure all listed brands are valid
-  brands.forEach( brand => assert( supportedBrands.includes( brand ), `Unsupported brand: ${brand}` ) );
-  assert( brands.length > 0, 'must have one or more brands to build' );
+  if ( !localPackageObject.phet?.buildStandalone ) {
+
+    // Ensure all listed brands are valid
+    brands.forEach( brand => assert( supportedBrands.includes( brand ), `Unsupported brand: ${brand}` ) );
+    assert( brands.length > 0, 'must have one or more brands to build' );
+  }
+
   return brands;
 };
 
