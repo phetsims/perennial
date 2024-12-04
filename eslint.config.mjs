@@ -15,5 +15,12 @@ export default [
       // Overrides so that perennial can import its own node_modules directly instead of using npm-dependencies/
       'no-restricted-imports': 'off'
     }
+  },
+  {
+    // TODO: Use eslint/config/util/allowFloatingPromises instead, see https://github.com/phetsims/chipper/issues/1541
+    files: [ 'js/scripts/**/*', 'js/grunt/tasks/**/*' ],
+    rules: {
+      '@typescript-eslint/no-floating-promises': 'off'
+    }
   }
 ];
