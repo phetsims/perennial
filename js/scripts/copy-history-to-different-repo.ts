@@ -112,7 +112,7 @@ import execute from '../common/execute.js';
 * Delete the temporary cloned repo: rm -rf ${historyCopyRepo}
 * Update the namespace and registry statement, if appropriate.
 * Move the file to the desired directory.
-* Type check, lint and test the new code.
+* Type-check, lint and test the new code.
 * If the history, file, type checks and lint all seem good, git push the changes. (otherwise re-clone).
 * Delete the copy in the prior directory. In the commit message, refer to an issue so there is a paper trail.
 ` );
