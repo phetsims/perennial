@@ -136,7 +136,7 @@ function isBuildSuccessful( repoPath: string ): boolean {
     const gruntCommand = require( '../../../perennial-alias/js/common/gruntCommand.js' );
 
     // Run the specified TypeScript compiler or build command in the current directory
-    const result = execSync( `${gruntCommand} check`, {
+    const result = execSync( `${gruntCommand} type-check`, {
       // set the working directory
       cwd: repoPath,
       stdio: 'pipe', // Capture the output

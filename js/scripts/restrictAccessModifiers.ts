@@ -153,12 +153,12 @@ function isBuildSuccessful(): boolean {
       return false;
     }
 
-    // If type check exits without error, the build is successful
+    // If type-check exits without error, the build is successful
     return true;
   }
   catch( error ) {
 
-    // If type check exits with an error (non-zero exit code), the build failed
+    // If type-check exits with an error (non-zero exit code), the build failed
     return false;
   }
 }
