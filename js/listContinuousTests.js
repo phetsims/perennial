@@ -175,6 +175,20 @@ runnableRepos.forEach( repo => {
     buildDependencies: [ repo ],
     es5: true
   } );
+  tests.push( {
+    test: [ repo, 'fuzz', 'built', 'debug' ],
+    type: 'sim-test',
+    url: `${repo}/build/phet/${repo}_en_phet_debug.html`,
+    queryParameters: 'fuzz',
+    testQueryParameters: 'duration=80000',
+
+    // We want to elevate the priority so that we get a more even balance (we can't test these until they are built,
+    // which doesn't happen always)
+    priority: 2,
+
+    brand: 'phet',
+    buildDependencies: [ repo ]
+  } );
 
   if ( phetioRepos.includes( repo ) ) {
     tests.push( {
@@ -198,6 +212,13 @@ phetioRepos.forEach( repo => {
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
     queryParameters: 'ea&brand=phet-io&phetioStandalone&fuzz'
+  } );
+
+  tests.push( {
+    test: [ repo, 'phet-io-fuzz', 'unbuilt', 'assertSlow' ],
+    type: 'sim-test',
+    url: `${repo}/${repo}_en.html`,
+    queryParameters: 'eall&brand=phet-io&phetioStandalone&fuzz'
   } );
 
   // Test for API compatibility, for sims that support it
