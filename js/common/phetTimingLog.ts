@@ -26,9 +26,9 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-const path = require( 'path' );
-const fs = require( 'fs' );
-const assert = require( 'assert' );
+import assert from 'assert';
+import fs, { WriteStream } from 'fs';
+import path from 'path';
 
 const logDir = path.resolve( __dirname, '../../logs' );
 try {
@@ -38,25 +38,24 @@ catch( e ) {
   // already exists
 }
 
+type PhetTimingLogOptions = {
+  depth?: number;
+};
+
 // Log to perennial-alias if running a perennial-alias task, or perennial if running a perennial task.
 const logPath = path.resolve( logDir, 'phet-timing-log.txt' );
 
 // WriteStream for appending data.  Created lazily.  Closed on each top-level pop so we can guarantee flush.
-let stream = null;
+let stream: WriteStream | null = null;
 
 // Depth of nesting.  -1 means not yet started.  0 means top-level.
 let depth = -1;
 
-const indent = depth => '  '.repeat( depth );
+const indent = ( depth = 0 ) => '  '.repeat( depth );
 
 const getDate = () => new Date().toLocaleString( 'en-US', { timeZone: 'America/Denver' } );
 
-/**
- * @param {string} taskName
- * @param {{depth:number}} [options]
- * @returns {number} - time of the start
- */
-const push = ( taskName, options = null ) => {
+const push = ( taskName: string, options?: PhetTimingLogOptions ): number => {
   assert( !taskName.includes( ':' ), 'task name cannot include :, it was ' + taskName );
 
   depth++;
@@ -77,12 +76,7 @@ const push = ( taskName, options = null ) => {
   return Date.now();
 };
 
-/**
- * @param {string} taskName
- * @param {string} startTime
- * @param {{depth:number}} [options]
- */
-const pop = ( taskName, startTime, options = null ) => {
+const pop = ( taskName: string, startTime: number, options?: PhetTimingLogOptions ): number => {
   const endTime = Date.now();
 
   const isTopLevel = depth === 0;
@@ -90,10 +84,13 @@ const pop = ( taskName, startTime, options = null ) => {
   const indentSpacing = indent( options && options.hasOwnProperty( 'depth' ) ? options.depth : depth );
   const startSlash = isTopLevel ? '/' : ''; // end tag for depth 0
   const endSlash = isTopLevel ? '' : '/'; // tag is a solo tag when depth is not 0
-  stream.write( `${indentSpacing}<${startSlash}${taskName} time="${endTime - startTime}ms"${endSlash}>\n` );
+  assert( stream );
+  const totalTime = endTime - startTime;
+  stream.write( `${indentSpacing}<${startSlash}${taskName} time="${totalTime}ms"${endSlash}>\n` );
 
   if ( isTopLevel ) {
     stream.write( '\n', () => {
+      assert( stream );
 
       // Guaranteed flushing the buffer.  Without this, we end up with partial/truncated output.
       stream.close( () => {
@@ -105,17 +102,16 @@ const pop = ( taskName, startTime, options = null ) => {
   }
 
   depth--;
+
+  return totalTime;
 };
 
 const phetTimingLog = {
 
   /**
    * Invoke the task and return the return value of the task.
-   * @param {string} taskName
-   * @param {()=>T} task
-   * @returns {T}
    */
-  start( taskName, task ) {
+  start<T>( taskName: string, task: () => T ): T {
     const startTime = push( taskName );
     const result = task();
     pop( taskName, startTime );
@@ -124,12 +120,8 @@ const phetTimingLog = {
 
   /**
    * Invoke the task and return the return value of the task.
-   * @param {string} taskName
-   * @param {()=>Promise<T>} task
-   * @param [options]
-   * @returns {Promise<T>}
    */
-  async startAsync( taskName, task, options ) {
+  async startAsync<T>( taskName: string, task: () => Promise<T>, options?: PhetTimingLogOptions ): Promise<T> {
     const startTime = push( taskName, options );
     const result = await task();
     pop( taskName, startTime, options );
@@ -138,9 +130,9 @@ const phetTimingLog = {
 
   /**
    * Flush the write stream before exiting node.
-   * @param {()=>void} [callback]
    */
-  close( callback = () => {} ) {
+  close( callback: () => void = _.noop ): void {
+    assert( stream );
     stream.close( callback );
   }
 };
