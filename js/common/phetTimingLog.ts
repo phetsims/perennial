@@ -28,6 +28,7 @@
 
 import assert from 'assert';
 import fs, { WriteStream } from 'fs';
+import _ from 'lodash';
 import path from 'path';
 
 const logDir = path.resolve( __dirname, '../../logs' );
