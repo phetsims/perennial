@@ -30,6 +30,7 @@ import assert from 'assert';
 import fs, { WriteStream } from 'fs';
 import _ from 'lodash';
 import path from 'path';
+import { IntentionalPerennialAny } from '../browser-and-node/PerennialTypes.js';
 
 const logDir = path.resolve( __dirname, '../../logs' );
 try {
@@ -39,8 +40,9 @@ catch( e ) {
   // already exists
 }
 
-type PhetTimingLogOptions = {
+type PhetTimingLogOptions<T = IntentionalPerennialAny> = {
   depth?: number;
+  timingCallback?: ( time: number, result: T ) => void;
 };
 
 // Log to perennial-alias if running a perennial-alias task, or perennial if running a perennial task.
@@ -112,20 +114,11 @@ const phetTimingLog = {
   /**
    * Invoke the task and return the return value of the task.
    */
-  start<T>( taskName: string, task: () => T ): T {
-    const startTime = push( taskName );
-    const result = task();
-    pop( taskName, startTime );
-    return result;
-  },
-
-  /**
-   * Invoke the task and return the return value of the task.
-   */
-  async startAsync<T>( taskName: string, task: () => Promise<T>, options?: PhetTimingLogOptions ): Promise<T> {
+  async startAsync<T>( taskName: string, task: () => Promise<T>, options?: PhetTimingLogOptions<T> ): Promise<T> {
     const startTime = push( taskName, options );
     const result = await task();
-    pop( taskName, startTime, options );
+    const time = pop( taskName, startTime, options );
+    options?.timingCallback && options.timingCallback( time, result );
     return result;
   },
 
@@ -138,4 +131,4 @@ const phetTimingLog = {
   }
 };
 
-module.exports = phetTimingLog;
+export default phetTimingLog;
