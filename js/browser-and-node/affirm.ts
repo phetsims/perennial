@@ -11,6 +11,14 @@ type GlobalWithAssert = {
 const isBrowser = globalThis.hasOwnProperty( 'window' );
 const isNode = !isBrowser;
 
+// NOTE: DO NOT export this function! At this time, there is no way to strip out usages of this boolean when building. Instead, see affirmLazy() or, if you must, use `if( window.assert ){...}`. See https://github.com/phetsims/assert/issues/5
+function isAssertEnabled(): boolean {
+
+  // Cast 'globalThis' to 'GlobalWithAssert' to access 'assert' safely
+  return isNode || !!( globalThis as GlobalWithAssert ).assert;
+}
+
+
 /**
  * Like assert.js, with the following differences:
  *
@@ -27,10 +35,7 @@ const isNode = !isBrowser;
  */
 export default function affirm( predicate: unknown, ...messages: IntentionalPerennialAny[] ): asserts predicate {
 
-  // Cast 'globalThis' to 'GlobalWithAssert' to access 'assert' safely
-  const isAssertEnabled = isNode || ( globalThis as GlobalWithAssert ).assert;
-
-  if ( isAssertEnabled && !predicate ) {
+  if ( isAssertEnabled() && !predicate ) {
 
     // Add "Affirmation Failed" to the front of the message list
     const affirmPrefix = messages.length > 0 ? 'Affirmation failed: ' : 'Affirmation failed';
@@ -55,7 +60,17 @@ export default function affirm( predicate: unknown, ...messages: IntentionalPere
   }
 }
 
-const affirmationHooks: ( () => void )[] = [];
+/**
+ * A lazy version of affirm that accepts a function which returns the predicate.
+ *
+ * If assertions are disabled, `predicate` won't even be called.
+ * If assertions are enabled, `affirmLazy` calls `affirm` with the returned value.
+ */
+export function affirmLazy( predicate: () => unknown, ...messages: IntentionalPerennialAny[] ): void {
+  isAssertEnabled() && affirm( predicate(), ...messages );
+}
+
+const affirmationHooks: VoidFunction[] = [];
 
 export function addAffirmationHook( hook: () => void ): void {
   affirmationHooks.push( hook );
