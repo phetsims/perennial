@@ -11,8 +11,8 @@
     "allowUmdGlobalAccess": true
   },
   "files": [
-    "../js/phet-types.d.ts",
-    "../js/phet-types-module.d.ts",
+    "../js/browser-and-node/phet-types.d.ts",
+    "../js/browser-and-node/phet-types-module.d.ts",
     // TODO: Can we use typeRoots instead of files? See https://github.com/phetsims/chipper/issues/1483
     "../node_modules/@types/jquery/index.d.ts",
     "../node_modules/@types/lodash/index.d.ts",
