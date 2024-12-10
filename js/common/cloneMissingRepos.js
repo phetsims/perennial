@@ -15,7 +15,7 @@ const execute = require( './execute' ).default;
 /**
  * Clones missing repositories
  * @public
- *
+ * @param [omitPrivate]
  * @returns {Promise.<string>} - The names of the repos cloned
  */
 module.exports = async omitPrivate => {
