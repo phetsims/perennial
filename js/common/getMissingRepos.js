@@ -15,15 +15,17 @@ const fs = require( 'fs' );
  *
  * @returns {Array.<string>}
  */
-module.exports = function() {
+module.exports = function( omitPrivate ) {
   const activeRepos = getRepoList( 'active-repos' );
+  const activePrivateRepos = getRepoList( 'active-repos-private' );
   const missingRepos = [];
 
-  for ( const repo of activeRepos ) {
+  const possibleRepos = omitPrivate ? activeRepos.filter( repo => !activePrivateRepos.includes( repo ) ) : activeRepos;
+
+  for ( const repo of possibleRepos ) {
     if ( !fs.existsSync( `../${repo}` ) ) {
       missingRepos.push( repo );
     }
   }
-
   return missingRepos;
 };

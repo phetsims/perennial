@@ -6,8 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const execute = require( './execute' ).default;
-const winston = require( 'winston' );
+const gitCloneDirectory = require( './gitCloneDirectory' );
 
 /**
  * Clones the given repo name into the working copy
@@ -16,13 +15,6 @@ const winston = require( 'winston' );
  * @param {string} repo - The repository name
  * @returns {Promise}
  */
-module.exports = function( repo ) {
-  winston.info( `cloning ${repo}` );
-
-  if ( repo === 'perennial-alias' ) {
-    return execute( 'git', [ 'clone', 'https://github.com/phetsims/perennial.git', 'perennial-alias' ], '../' );
-  }
-  else {
-    return execute( 'git', [ 'clone', `https://github.com/phetsims/${repo}.git` ], '../' );
-  }
+module.exports = function cloneRepo( repo ) {
+  return gitCloneDirectory( repo, '../' );
 };

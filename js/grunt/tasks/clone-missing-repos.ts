@@ -6,5 +6,6 @@
  */
 
 import cloneMissingRepos from '../../common/cloneMissingRepos.js';
+import getOption from './util/getOption.js';
 
-( async () => cloneMissingRepos() )();
+( async () => cloneMissingRepos( getOption( 'p' ) ) )();
