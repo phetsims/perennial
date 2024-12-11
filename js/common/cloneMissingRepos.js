@@ -31,7 +31,7 @@ module.exports = async omitPrivate => {
       winston.info( `Could not clone ${repo}, did you mean to omit private repos with  -p?` );
       throw e;
     }
-    await execute( 'git', [ 'init', '--template=../phet-info/git-template-dir' ], '../' );
+    await execute( 'git', [ 'init', '--template=../phet-info/git-template-dir' ], `../${repo}` );
   }
 
   return missingRepos;
