@@ -13,6 +13,6 @@
 binDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # requires cwd to be the top level of a repo
-cd ${binDir}/../
+cd "${binDir}/../"
 
 ./bin/sage run ./js/grunt/tasks/clone-missing-repos.ts "$@"
