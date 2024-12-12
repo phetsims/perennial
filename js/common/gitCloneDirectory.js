@@ -16,7 +16,7 @@ const execute = require( './execute' ).default;
  * @param {string} directory
  * @returns {Promise}
  */
-module.exports = async function( repo, directory ) {
+module.exports = async function gitCloneDirectory( repo, directory ) {
   winston.info( `cloning repo ${repo} in ${directory}` );
   if ( repo === 'perennial-alias' ) {
     await execute( 'git', [ 'clone', 'https://github.com/phetsims/perennial.git', repo ], directory );

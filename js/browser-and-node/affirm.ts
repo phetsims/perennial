@@ -12,7 +12,8 @@ const isBrowser = globalThis.hasOwnProperty( 'window' );
 const isNode = !isBrowser;
 
 // NOTE: DO NOT export this function! At this time, there is no way to strip out usages of this boolean when building. Instead, see affirmLazy() or, if you must, use `if( window.assert ){...}`. See https://github.com/phetsims/assert/issues/5
-function isAssertEnabled(): boolean {
+// Use this as a boolean like window.assert to write code that is stripped out when assertions are disabled
+export function isAffirmEnabled(): boolean {
 
   // Cast 'globalThis' to 'GlobalWithAssert' to access 'assert' safely
   return isNode || !!( globalThis as GlobalWithAssert ).assert;
@@ -35,7 +36,7 @@ function isAssertEnabled(): boolean {
  */
 export default function affirm( predicate: unknown, ...messages: IntentionalPerennialAny[] ): asserts predicate {
 
-  if ( isAssertEnabled() && !predicate ) {
+  if ( isAffirmEnabled() && !predicate ) {
 
     // Add "Affirmation Failed" to the front of the message list
     const affirmPrefix = messages.length > 0 ? 'Affirmation failed: ' : 'Affirmation failed';
@@ -67,7 +68,7 @@ export default function affirm( predicate: unknown, ...messages: IntentionalPere
  * If assertions are enabled, `affirmLazy` calls `affirm` with the returned value.
  */
 export function affirmLazy( predicate: () => unknown, ...messages: IntentionalPerennialAny[] ): void {
-  isAssertEnabled() && affirm( predicate(), ...messages );
+  isAffirmEnabled() && affirm( predicate(), ...messages );
 }
 
 const affirmationHooks: VoidFunction[] = [];
