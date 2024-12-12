@@ -88,6 +88,10 @@
     "version": "1.2"
   },
   {
+    "sim": "greenhouse-effect",
+    "version": "1.3"
+  },
+  {
     "sim": "keplers-laws",
     "version": "1.2"
   },
