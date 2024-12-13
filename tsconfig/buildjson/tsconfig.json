@@ -19,7 +19,6 @@
     "../../../joist/js/**/*",
     "../../../joist/sounds/**/*",
     "../../../kite/js/**/*",
-    "../../../phet-core/js/**/*",
     // It's OK to list private repo phet-io files here, even though open source clients cannot check them out.
     // They are only checked if they are present at runtime
     "../../../phet-io/js/PhetioStateEngine.ts",
@@ -53,21 +52,15 @@
   ],
   "exclude": [
     "../../../*/Gruntfile.cjs",
-    "../../../*/js/grunt/**/*",
-    // TODO: get rid of these hard coded by using top level phet-core tsconfig that excludes tests https://github.com/phetsims/chipper/issues/1523
-    "../../../phet-core/js/types/**/*",
-    "../../../phet-core/js/optionize.ts",
-    "../../../phet-core/js/merge.ts",
-    "../../../phet-core/js/phetCore.ts",
-    "../../../phet-core/js/Namespace.ts"
+    "../../../*/js/grunt/**/*"
   ],
   "references": [
     {
       "path": "../../../chipper/js/browser-and-node/tsconfig.json"
     },
     {
-      // This is the browser-and-node part of phet-core
-      "path": "../../../phet-core/tsconfig-browser-and-node.json"
+      // This doesn't include phet-core testing code
+      "path": "../../../phet-core/tsconfig-module.json"
     }
   ]
 }
