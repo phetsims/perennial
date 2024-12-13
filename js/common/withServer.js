@@ -1,14 +1,5 @@
 // Copyright 2017, University of Colorado Boulder
 
-/**
- * A simple webserver that will serve the git root on a specific port for the duration of an async callback,
- * now with an in-memory cache to speed up repeated requests.
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- * @author Michael Kauzmann (PhET Interactive Simulations)
- * @author Sam Reid (PhET Interactive Simulations)
- */
-
 const http = require( 'http' );
 const fs = require( 'fs' );
 const _ = require( 'lodash' );
@@ -17,6 +8,19 @@ const winston = require( 'winston' );
 // Memory cache: key is the fullPath, value is { mimeType: string, data: Buffer }
 const cache = new Map();
 
+/**
+ * A simple webserver that will serve the git root on a specific port for the duration of an async callback,
+ * now with an in-memory cache to speed up repeated requests.
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Michael Kauzmann (PhET Interactive Simulations)
+ * @author Sam Reid (PhET Interactive Simulations)
+ *
+ * @param {function(number)} asyncCallback
+ * @param {Object} [options]
+ * @returns {Promise<*>} - Returns the result of the asyncCallback
+ *
+ */
 module.exports = function( asyncCallback, options ) {
 
   options = _.merge( {
