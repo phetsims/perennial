@@ -1,10 +1,12 @@
 // Copyright 2017, University of Colorado Boulder
 
 /**
- * A simple webserver that will serve the git root on a specific port for the duration of an async callback
+ * A simple webserver that will serve the git root on a specific port for the duration of an async callback,
+ * now with an in-memory cache to speed up repeated requests.
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  * @author Michael Kauzmann (PhET Interactive Simulations)
+ * @author Sam Reid (PhET Interactive Simulations)
  */
 
 const http = require( 'http' );
@@ -12,14 +14,9 @@ const fs = require( 'fs' );
 const _ = require( 'lodash' );
 const winston = require( 'winston' );
 
-/**
- * A simple webserver that will serve the git root on a specific port for the duration of an async callback
- * @public
- *
- * @param {function(number)} asyncCallback
- * @param {Object} [options]
- * @returns {Promise<*>} - Returns the result of the asyncCallback
- */
+// Memory cache: key is the fullPath, value is { mimeType: string, data: Buffer }
+const cache = new Map();
+
 module.exports = function( asyncCallback, options ) {
 
   options = _.merge( {
@@ -29,10 +26,7 @@ module.exports = function( asyncCallback, options ) {
 
   return new Promise( ( resolve, reject ) => {
 
-
-    // Consider using https://github.com/cloudhead/node-static or reading https://nodejs.org/en/knowledge/HTTP/servers/how-to-serve-static-files/
-    const server = http.createServer( ( req, res ) => {
-
+    const server = http.createServer( async ( req, res ) => {
       const path = req.url.split( '?' )[ 0 ];
       let url = req.url;
       if ( path.endsWith( '/' ) ) {
@@ -44,7 +38,7 @@ module.exports = function( asyncCallback, options ) {
       const tail = url.indexOf( '?' ) >= 0 ? url.substring( 0, url.indexOf( '?' ) ) : url;
       const fullPath = `${process.cwd()}/${options.path}${tail}`;
 
-      // See https://gist.github.com/aolde/8104861
+      // Mime types
       const mimeTypes = {
         html: 'text/html',
         jpeg: 'image/jpeg',
@@ -56,8 +50,6 @@ module.exports = function( asyncCallback, options ) {
         gif: 'image/gif',
         mp3: 'audio/mpeg',
         wav: 'audio/wav',
-
-        // needed to be added to support PhET sims.
         svg: 'image/svg+xml',
         json: 'application/json',
         ico: 'image/x-icon'
@@ -70,35 +62,50 @@ module.exports = function( asyncCallback, options ) {
       }
 
       if ( !mimeType ) {
-        throw new Error( `unsupported mime type, please add above: ${fileExtension}` );
+        res.writeHead( 415 );
+        res.end( `Unsupported file type: ${fileExtension}` );
+        return;
       }
+
+      // Check the cache
+      const cachedEntry = cache.get( fullPath );
+      if ( cachedEntry ) {
+        // Serve from cache
+        res.writeHead( 200, { 'Content-Type': cachedEntry.mimeType } );
+        res.end( cachedEntry.data );
+        return;
+      }
+
+      // Not in cache, read from disk
       fs.readFile( fullPath, ( err, data ) => {
         if ( err ) {
           res.writeHead( 404 );
           res.end( JSON.stringify( err ) );
         }
         else {
+          // Store in cache
+          cache.set( fullPath, { mimeType: mimeType, data: data } );
           res.writeHead( 200, { 'Content-Type': mimeType } );
           res.end( data );
         }
       } );
     } );
+
     server.on( 'listening', async () => {
       const port = server.address().port;
       winston.debug( 'info', `Server listening on port ${port}` );
 
       let result;
-
       try {
         result = await asyncCallback( port );
       }
       catch( e ) {
         reject( e );
+        return;
       }
 
       server.close( () => {
         winston.debug( 'info', `Express stopped listening on port ${port}` );
-
         resolve( result );
       } );
     } );
