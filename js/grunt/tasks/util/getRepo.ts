@@ -4,12 +4,16 @@ import assert from 'assert';
 import { readFileSync } from 'fs';
 import path from 'path';
 import process from 'process';
-import dirname from '../../../common/dirname.js';
 import { Repo } from '../../../browser-and-node/PerennialTypes.js';
+import dirname from '../../../common/dirname.js';
 import getOption from './getOption.js';
 
 // @ts-expect-error - until we have "type": "module" in our package.json
 const __dirname = dirname( import.meta.url );
+
+const repoDirPath = path.resolve( `${__dirname}/../../../../` );
+const perennialRepoName = path.parse( repoDirPath ).name; // could be perennial-alias
+const gitRoot = path.resolve( `${repoDirPath}/../` );
 
 /**
  * Get the repo by processing from multiple locations (command line options and package).
@@ -28,12 +32,16 @@ export default function getRepo(): Repo {
 
       // Support checking in "perennial-alias" if running from that repo
       if ( repo === 'perennial' ) {
-        repo = path.parse( path.resolve( `${__dirname}/../../../../` ) ).name;
+        repo = perennialRepoName;
         assert( repo.startsWith( 'perennial' ), `unexpected repo name in perennial: ${repo}` );
       }
     }
     catch( e ) {
-      assert( false, `Expected package.json for current working directory: ${process.cwd()}` );
+
+      // If there is no name in a package.json, then calculate based on the file system.
+      const relative = path.relative( gitRoot, process.cwd() );
+      assert( relative !== '' && !relative.startsWith( '..' ), `cannot find repo name, expected cwd to be inside of git root. gitRoot: ${gitRoot}, cwd: ${process.cwd()}` );
+      repo = relative.split( path.sep )[ 0 ]; // the first term from the
     }
   }
 

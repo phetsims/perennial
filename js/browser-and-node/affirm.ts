@@ -65,9 +65,9 @@ export default function affirm( predicate: unknown, ...messages: IntentionalPere
  * A lazy version of affirm that accepts a function which returns the predicate.
  *
  * If assertions are disabled, `predicate` won't even be called.
- * If assertions are enabled, `affirmLazy` calls `affirm` with the returned value.
+ * If assertions are enabled, `affirmCallback` calls `affirm` with the returned value.
  */
-export function affirmLazy( predicate: () => unknown, ...messages: IntentionalPerennialAny[] ): void {
+export function affirmCallback( predicate: () => unknown, ...messages: IntentionalPerennialAny[] ): void {
   isAffirmEnabled() && affirm( predicate(), ...messages );
 }
 

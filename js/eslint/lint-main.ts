@@ -27,6 +27,7 @@ import _ from 'lodash';
 import path from 'path';
 import process from 'process';
 import { Repo } from '../browser-and-node/PerennialTypes.js';
+import callbackOnWorkers from '../common/callbackOnWorkers.js';
 import { tscCleanRepo } from '../grunt/typeCheck.js';
 import { DEBUG_PHET_LINT } from './lint.js';
 
@@ -44,32 +45,10 @@ async function lintWithWorkers( repos: Repo[], fix: boolean ): Promise<boolean> 
   const reposQueue: Repo[] = [ ...repos.filter( repo => !DO_NOT_LINT.includes( repo ) ) ];
   const exitCodes: number[] = [];
 
-  /**
-   * Worker function that continuously processes repositories from the queue.
-   */
-  const worker = async () => {
-
-    while ( true ) {
-
-      // Synchronize access to the queue
-      // Since JavaScript is single-threaded, this is safe
-      if ( reposQueue.length === 0 ) {
-        break; // No more repositories to process
-      }
-
-      const repo = reposQueue.shift()!; // Get the next repository
-
-      const result = await lintWithNodeAPI( repo, fix );
-      exitCodes.push( result );
-    }
-  };
-
-  // We experimented with different numbers of workers, and 8 seems to be a reasonable number to get good performance
-  const numWorkers = 8;
-  const workers = _.times( numWorkers, () => worker() );
-
-  // Wait for all workers to complete
-  const results = await Promise.allSettled( workers );
+  const results = await callbackOnWorkers( reposQueue, async repo => {
+    const lintResult = await lintWithNodeAPI( repo, fix );
+    exitCodes.push( lintResult );
+  } );
 
   // Log any errors to prevent silent failures with exit code 1.
   results.forEach( result => result.status === 'rejected' && console.error( result.reason ) );
