@@ -6,7 +6,7 @@
  * Run from sims root directory
  * USAGE:
  * cd ${root containing all repos}
- * node ./perennial/js/scripts/mv-string-files.js
+ * sage run ./perennial/js/scripts/mv-string-files.js
  *
  * @author Marla Schulz (PhET Interactive Simulations)
  * @author Chris Klusendorf (PhET Interactive Simulations)

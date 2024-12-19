@@ -11,11 +11,11 @@
  *
  * USAGE:
  * cd perennial;
- * node js/scripts/test/release-branch-checks.js
+ * sage run js/scripts/test/release-branch-checks.js
  *
  * NOTE: refresh release branches if not doing an active MR:
  * cd perennial;
- * node js/scripts/main-pull-status.js --allBranches
+ * sage run js/scripts/main-pull-status.js --allBranches
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */

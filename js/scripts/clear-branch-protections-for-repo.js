@@ -12,10 +12,10 @@
  * production branches.
  *
  * USAGE:
- * node perennial/js/scripts/clear-branch-protections-for-repo.js repository-name
+ * sage run perennial/js/scripts/clear-branch-protections-for-repo.js repository-name
  *
  * EXAMPLE:
- * node perennial/js/scripts/clear-branch-protections-for-repo.js john-travoltage
+ * sage run perennial/js/scripts/clear-branch-protections-for-repo.js john-travoltage
  *
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */

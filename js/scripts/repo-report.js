@@ -3,7 +3,7 @@
 /**
  * usage:
  * cd {{repo}}
- * node ../perennial/js/scripts/repo-report.js > out.txt
+ * sage run ../perennial/js/scripts/repo-report.js > out.txt
  * then import in Excel
  *
  * @author Sam Reid (PhET Interactive Simulations)

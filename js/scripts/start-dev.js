@@ -11,7 +11,7 @@
  *
  * Run this from your root level directory containing all PhET repositories.
  * Example usage:
- * node perennial/js/scripts/start-dev.js
+ * sage run perennial/js/scripts/start-dev.js
  *
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */

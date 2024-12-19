@@ -4,7 +4,7 @@
  * Applies or updates branch protection rules for all active repos.
  *
  * USAGE:
- * node perennial/js/scripts/protect-branches-in-all-repos.js
+ * sage run perennial/js/scripts/protect-branches-in-all-repos.js
  *
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */

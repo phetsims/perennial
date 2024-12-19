@@ -14,7 +14,7 @@ const repos = contents.split( '\n' ).map( sim => sim.trim() );
  *
  * USAGE:
  * cd ${root containing all repos}
- * node perennial/js/scripts/pull-all.js
+ * sage run perennial/js/scripts/pull-all.js
  *
  * OPTIONS:
  * --batches=N - (1) by default, runing all pulls in parallel. Specify this to separate into N different synchronous chunks running repos/batches number of repos in parallel.
