@@ -14,7 +14,7 @@ const winston = require( 'winston' );
  * @public
  *
  * @param {string} repo - The repository name
- * @returns {Promise.<Array.<Record<string, string>>>}
+ * @returns {Promise.<Record<string, string>>}
  * @rejects {ExecuteError}
  */
 module.exports = async function( repo ) {

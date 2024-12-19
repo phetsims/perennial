@@ -8,7 +8,6 @@
  **/
 
 import getFileAtBranch from '../common/getFileAtBranch.js';
-// @ts-expect-error - remove once we convert ReleaseBranch.js to typescript, https://github.com/phetsims/perennial/issues/415
 import ReleaseBranch from '../common/ReleaseBranch.js';
 import winston from '../npm-dependencies/winston.js';
 

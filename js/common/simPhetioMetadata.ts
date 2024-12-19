@@ -1,27 +1,35 @@
 // Copyright 2018, University of Colorado Boulder
 
+import axios from 'axios';
+import _ from 'lodash';
+import winston from 'winston';
+
+type SimPhetioMetadataOptions = {
+  active: boolean | null;
+  latest: boolean | null;
+};
+
+type SimPhetioMetadata = {
+  versionMaintenance: number;
+  name: string;
+  active: boolean;
+  versionMajor: number;
+  versionMinor: number;
+  versionSuffix: string;
+  latest: boolean;
+  timestamp: string;
+};
+
 /**
  * Returns phet-io metadata from the production website
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
-
-const _ = require( 'lodash' );
-const winston = require( 'winston' );
-const axios = require( 'axios' );
-
-/**
- * Returns metadata from the production website.
- * @public
- *
- * @param {Object} [options]
- * @returns {Promise.<Object[]>} - Resolves with metadata objects in an array
- */
-module.exports = async function( options ) {
-  options = _.assignIn( {
+async function simPhetioMetadata( providedOptions?: Partial<SimPhetioMetadataOptions> ): Promise<SimPhetioMetadata[]> {
+  const options = _.assignIn( {
     active: null, // {boolean|null} - If set, will only include active branches
     latest: null // {boolean|null} - If set, will only include latest branches
-  }, options );
+  }, providedOptions );
 
   let metadataURL = 'https://phet.colorado.edu/services/metadata/phetio?';
   if ( options.active !== null ) {
@@ -41,9 +49,12 @@ module.exports = async function( options ) {
   }
 
   if ( response.status !== 200 ) {
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
     throw new Error( `metadata request failed with status ${response.status} ${response}` );
   }
   else {
     return response.data;
   }
-};
+}
+
+export default simPhetioMetadata;

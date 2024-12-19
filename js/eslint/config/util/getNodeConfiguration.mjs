@@ -23,6 +23,7 @@ const getNodeConfiguration = ( pattern = {} ) => {
         '@typescript-eslint/no-var-requires': 'off',
         'phet/no-import-from-grunt-tasks': 'error',
         'phet/grunt-task-kebab-case': 'error',
+        'phet/default-export-class-should-register-namespace': 'off',
 
         // phet-specific require statement rules
         'phet/require-statement-match': 'error',

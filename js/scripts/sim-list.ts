@@ -20,7 +20,6 @@ winston.default.transports.console.level = 'error';
   const data = await simMetadata( {
     type: 'html'
   } );
-  // @ts-expect-error, remove in https://github.com/phetsims/perennial/issues/369
   console.log( data.projects.map( project => {
     let result = project.name.slice( project.name.indexOf( '/' ) + 1 );
     if ( getOption( 'versions' ) ) {

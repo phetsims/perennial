@@ -7,7 +7,7 @@
  */
 
 const Patch = require( './Patch' );
-const ReleaseBranch = require( './ReleaseBranch' );
+const ReleaseBranch = require( './ReleaseBranch' ).default;
 const SimVersion = require( '../browser-and-node/SimVersion' ).default;
 const checkoutDependencies = require( './checkoutDependencies' );
 const getDependencies = require( './getDependencies' );
