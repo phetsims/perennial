@@ -211,14 +211,14 @@ phetioRepos.forEach( repo => {
     test: [ repo, 'phet-io-fuzz', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'ea&brand=phet-io&phetioStandalone&fuzz'
+    queryParameters: 'ea&brand=phet-io&phetioStandalone&fuzz&phetioLogFuzzedValues'
   } );
 
   tests.push( {
     test: [ repo, 'phet-io-fuzz', 'unbuilt', 'assertSlow' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'eall&brand=phet-io&phetioStandalone&fuzz'
+    queryParameters: 'eall&brand=phet-io&phetioStandalone&fuzz&phetioLogFuzzedValues'
   } );
 
   // Test for API compatibility, for sims that support it
