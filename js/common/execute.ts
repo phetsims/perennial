@@ -4,6 +4,7 @@
  * Command execution wrapper (with common settings)
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
 import assert from 'assert';
