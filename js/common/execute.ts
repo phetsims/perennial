@@ -8,7 +8,6 @@
 
 import assert from 'assert';
 import child_process from 'child_process';
-import grunt from 'grunt';
 import _ from 'lodash';
 import winston from 'winston';
 
@@ -98,13 +97,11 @@ function execute( cmd: string, args: string[], cwd: string, options?: Partial<Ex
 
     childProcess.stderr.on( 'data', data => {
       stderr += data;
-      grunt.log.verbose.writeln( `stderr: ${data}` );
       winston.debug( `stderr: ${data}` );
     } );
     childProcess.stdout.on( 'data', data => {
       stdout += data;
 
-      grunt.log.verbose.writeln( `stdout: ${data}` );
       winston.debug( `stdout: ${data}` );
     } );
 
