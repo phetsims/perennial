@@ -25,7 +25,6 @@ type ExecuteOptions = {
 };
 export type ExecuteResult = { code: number; stdout: string; stderr: string; cwd: string; error?: Error; time: number };
 
-
 // Overload when options.errors is 'resolve'
 function execute(
   cmd: string,
