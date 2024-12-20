@@ -73,7 +73,7 @@ function execute( cmd: string, args: string[], cwd: string, providedOptions?: Ex
       shell: cmd !== 'node' && cmd !== 'git' && process.platform.startsWith( 'win' )
     }
   }, providedOptions );
-  console.log( options.childProcessOptions );
+
   assert( options.errors === 'reject' || options.errors === 'resolve', 'Errors must reject or resolve' );
 
   return new Promise( ( resolve, reject ) => {
