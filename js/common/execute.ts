@@ -16,8 +16,10 @@ type ErrorsHandled = 'resolve' | 'reject';
 
 type ExecuteOptions = {
 
-  // Provided to child_process.spawn command
-  childProcessOptions?: SpawnOptions;
+  // Options passed directly to child_process.spawn command
+  // We cannot use phet-core, so we need Omit
+  // eslint-disable-next-line @typescript-eslint/no-restricted-types
+  childProcessOptions?: Omit<SpawnOptions, 'cwd'>;
 
   // {'reject'|'resolve'} - whether errors should be rejected or resolved.  If errors are resolved, then an object
   //                      - of the form {code:number,stdout:string,stderr:string} is returned. 'resolve' allows usage
