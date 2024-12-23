@@ -13,7 +13,7 @@ const repos = contents.split( '\n' ).map( sim => sim.trim() );
  *
  * USAGE:
  * cd ${root containing all repos}
- * node perennial/js/scripts/push-all.js
+ * sage run perennial/js/scripts/push-all.js
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */

@@ -7,14 +7,14 @@
  */
 
 import assert from 'assert';
-import { spawn } from 'child_process';
 import fs from 'fs';
 import _ from 'lodash';
 import os from 'os';
 import path from 'path';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
+import execute from '../common/execute.js';
 import fixEOL from '../common/fixEOL.js';
 import { PERENNIAL_ROOT } from '../common/perennialRepoUtils.js';
-import { Repo } from '../browser-and-node/PerennialTypes.js';
 
 const ALL_CONFIG_PATH = `${PERENNIAL_ROOT}/../chipper/dist/tsconfig/all/`;
 const tscCommand = `${PERENNIAL_ROOT}/node_modules/typescript/bin/tsc`;
@@ -113,7 +113,7 @@ function getRepoCWD( repo: string ): string {
 async function tscClean( cwd: string ): Promise<void> {
   const cleanResults = await runCommand( 'node', [ tscCommand, '-b', '--clean' ], cwd, false );
   if ( !cleanResults.success ) {
-    throw new Error( 'Checking failed to clean' );
+    throw new Error( `Checking failed to clean, ${cleanResults.stderr}` );
   }
 }
 
@@ -121,31 +121,23 @@ export async function tscCleanRepo( repo: string ): Promise<void> {
   return tscClean( getRepoCWD( repo ) );
 }
 
-
-// Utility function to spawn a child process with inherited stdio, TODO: duplication? https://github.com/phetsims/perennial/issues/373
-function runCommand( command: string, args: string[], cwd: string, absolute: boolean ): Promise<{ success: boolean; stdout: string }> {
-
-  return new Promise( ( resolve, reject ) => {
-    type SpawnOptions = Parameters<typeof spawn>[2];
-    const spawnOptions: SpawnOptions = {
-      cwd: cwd,
-      shell: process.platform.startsWith( 'win' )
+// Utility function to execute with inherited stdio.
+async function runCommand( command: string, args: string[], cwd: string, absolute: boolean ): Promise<{ success: boolean; stdout: string; stderr: string }> {
+  const options = {
+    errors: 'resolve' as const,
+    childProcessOptions: {}
+  };
+  if ( !absolute ) {
+    options.childProcessOptions = {
+      stdio: 'inherit'
     };
-
-    if ( !absolute ) {
-      spawnOptions.stdio = 'inherit'; // Inherit stdio to preserve colors and interactive output
-    }
-    const child = spawn( command, args, spawnOptions );
-
-    let stdout = '';
-    child.stdout && child.stdout.on( 'data', data => { stdout += data; } );
-
-    child.on( 'error', error => reject( error ) );
-    child.on( 'close', code => resolve( {
-      success: code === 0,
-      stdout: stdout
-    } ) );
-  } );
+  }
+  const result = await execute( command, args, cwd, options );
+  return {
+    success: result.code === 0,
+    stdout: result.stdout,
+    stderr: result.stderr
+  };
 }
 
 /**

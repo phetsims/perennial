@@ -103,7 +103,11 @@ declare var QueryStringMachine: {
 
 // globals used in Sim.ts
 declare var phetSplashScreenDownloadComplete: () => void;
-declare var TWEEN: { update: ( dt: number ) => void };
+declare var TWEEN: {
+  update: ( dt: number ) => void;
+  Tween: Any;
+  Easing: Any;
+};
 declare var phetSplashScreen: { dispose: () => void };
 declare var phetio: Record<string, Any>;
 

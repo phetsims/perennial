@@ -7,7 +7,7 @@
  */
 
 const checkoutTarget = require( './checkoutTarget' );
-const simMetadata = require( './simMetadata' );
+const simMetadata = require( './simMetadata' ).default;
 const assert = require( 'assert' );
 const winston = require( 'winston' );
 

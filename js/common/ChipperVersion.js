@@ -8,12 +8,8 @@
 const assert = require( 'assert' );
 const fs = require( 'fs' );
 
-/**
- * TODO:  remove this workaround jsdoc once this file is in TypeScript, https://github.com/phetsims/perennial/issues/369
- * @type
- */
-module.exports = ( function() {
 
+class ChipperVersion {
   /**
    * @public
    * @constructor
@@ -23,7 +19,7 @@ module.exports = ( function() {
    * @param {number} maintenance - The maintenance part of the version (the 2 in 3.1.2)
    * @param {boolean} chipperSupportsOutputJSGruntTasks - Flag that indicates whether grunt supports the family of commands like `output-js-project`
    */
-  function ChipperVersion( major, minor, maintenance, chipperSupportsOutputJSGruntTasks ) {
+  constructor( major, minor, maintenance, chipperSupportsOutputJSGruntTasks ) {
 
     assert( typeof major === 'number' && major >= 0 && major % 1 === 0, 'major version should be a non-negative integer' );
     assert( typeof minor === 'number' && minor >= 0 && minor % 1 === 0, 'minor version should be a non-negative integer' );
@@ -36,22 +32,22 @@ module.exports = ( function() {
     this.chipperSupportsOutputJSGruntTasks = chipperSupportsOutputJSGruntTasks;
   }
 
-  // Can't rely on inherit existing
-  ChipperVersion.prototype = {
-    constructor: ChipperVersion,
+  /**
+   * Returns a string form of the version.
+   * @public
+   *
+   * @returns {string}
+   */
+  toString() {
+    return `${this.major}.${this.minor}.${this.maintenance}`;
+  }
 
-    /**
-     * Returns a string form of the version.
-     * @public
-     *
-     * @returns {string}
-     */
-    toString: function() {
-      return `${this.major}.${this.minor}.${this.maintenance}`;
-    }
-  };
-
-  ChipperVersion.getFromPackageJSON = function( packageJSON ) {
+  /**
+   * @public
+   * @param packageJSON
+   * @returns {ChipperVersion}
+   */
+ static getFromPackageJSON( packageJSON ) {
     const versionString = packageJSON.version;
 
     const matches = versionString.match( /(\d+)\.(\d+)\.(\d+)/ );
@@ -66,7 +62,7 @@ module.exports = ( function() {
     const chipperSupportsOutputJSGruntTasks = packageJSON.phet && packageJSON.phet.chipperSupportsOutputJSGruntTasks;
 
     return new ChipperVersion( major, minor, maintenance, chipperSupportsOutputJSGruntTasks );
-  };
+  }
 
   /**
    * Returns the chipper version of the currently-checked-out chipper repository.
@@ -74,11 +70,11 @@ module.exports = ( function() {
    *
    * @returns {ChipperVersion}
    */
-  ChipperVersion.getFromRepository = function() {
+ static getFromRepository() {
     return ChipperVersion.getFromPackageJSON(
       JSON.parse( fs.readFileSync( '../chipper/package.json', 'utf8' ) )
     );
-  };
+  }
+}
 
-  return ChipperVersion;
-} )();
+module.exports = ChipperVersion;

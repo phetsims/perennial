@@ -7,7 +7,7 @@
  * Run from sims root directory
  * USAGE:
  * cd ${root containing all repos}
- * node ./perennial/js/scripts/ts-status.js
+ * sage run ./perennial/js/scripts/ts-status.js
  *
  * @author Marla Schulz (PhET Interactive Simulations)
  */

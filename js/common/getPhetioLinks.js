@@ -9,26 +9,12 @@
  */
 
 const _ = require( 'lodash' );
-const getDependencies = require( './getDependencies' );
-const gitCheckout = require( './gitCheckout' );
 const gitIsAncestor = require( './gitIsAncestor' );
-const simPhetioMetadata = require( './simPhetioMetadata' );
+const getFileAtBranch = require( './getFileAtBranch' );
+const simPhetioMetadata = require( './simPhetioMetadata' ).default;
 
 module.exports = async () => {
 
-  // {Array.<Object>} get sim metadata via metadata API, here is an example of what an entry might look like:
-  /*
-  {
-    "versionMaintenance": 12,
-    "name": "molarity",
-    "active": true,
-    "versionMajor": 1,
-    "versionMinor": 4,
-    "versionSuffix": "",
-    "latest": true,
-    "timestamp": "2019-10-25"
-  }
-   */
   const allSimsData = await simPhetioMetadata( {
     active: true,
     latest: true
@@ -59,10 +45,8 @@ module.exports = async () => {
  * @returns {Promise.<boolean>}
  */
 async function usesTopLevelIndex( repo, branch ) {
-  await gitCheckout( repo, branch );
-  const dependencies = await getDependencies( repo );
+  const dependencies = JSON.parse( await getFileAtBranch( repo, branch, 'dependencies.json' ) );
   const sha = dependencies.chipper.sha;
-  await gitCheckout( repo, 'main' );
 
   return gitIsAncestor( 'chipper', '8db0653ee0cbb6ed716fa3b4d4759bcb75d8118a', sha );
 }

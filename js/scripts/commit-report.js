@@ -9,10 +9,10 @@ const fs = require( 'fs' );
  *
  * USAGE:
  * cd directory-with-all-repos
- * node perennial/js/scripts/commit-report.js username > report.txt
+ * sage run perennial/js/scripts/commit-report.js username > report.txt
  *
  * EXAMPLE:
- * node perennial/js/scripts/commit-report.js samreid > report.txt
+ * sage run perennial/js/scripts/commit-report.js samreid > report.txt
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */

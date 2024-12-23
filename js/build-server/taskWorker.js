@@ -16,7 +16,7 @@ const writePhetHtaccess = require( './writePhetHtaccess' );
 const writePhetioHtaccess = require( '../common/writePhetioHtaccess' );
 const deployImages = require( './deployImages' );
 const persistentQueue = require( './persistentQueue' );
-const ReleaseBranch = require( '../common/ReleaseBranch' );
+const ReleaseBranch = require( '../common/ReleaseBranch' ).default;
 const loadJSON = require( '../common/loadJSON' );
 
 /**

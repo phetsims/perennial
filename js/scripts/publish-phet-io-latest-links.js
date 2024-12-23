@@ -5,7 +5,7 @@
  *
  * USAGE:
  * cd perennial/
- * node publish-phet-io-latest-links.js ./path/to/public/html/file/
+ * sage run publish-phet-io-latest-links.js ./path/to/public/html/file/
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
