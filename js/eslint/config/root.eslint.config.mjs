@@ -27,7 +27,8 @@ const TOP_LEVEL_IGNORES = {
     'assets/',
     '*_en.html',
     '*-tests.html',
-    '*_a11y_view.html'
+    '*_a11y_view.html',
+    '.scenerystack/'
   ]
 };
 
