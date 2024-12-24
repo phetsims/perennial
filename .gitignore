@@ -14,3 +14,4 @@ js/build-server/tmp*
 logs/
 .build-server-queue
 temp.js
+.scenerystack

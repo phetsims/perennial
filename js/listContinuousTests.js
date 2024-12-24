@@ -67,6 +67,14 @@ tests.push( {
   priority: 100
 } );
 
+tests.push( {
+  test: [ 'perennial', 'scenerystack-test' ],
+  type: 'npm-run',
+  command: 'scenerystack-test',
+  repo: 'perennial',
+  priority: 20
+} );
+
 
 // Node unit tests
 [ 'chipper', 'perennial', 'perennial-alias' ].forEach( repo => {
