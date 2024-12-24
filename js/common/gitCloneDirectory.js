@@ -8,6 +8,7 @@
 
 const winston = require( 'winston' );
 const execute = require( './execute' ).default;
+const getActiveSceneryStackRepos = require( './getActiveSceneryStackRepos' );
 
 /**
  * @public
@@ -18,7 +19,10 @@ const execute = require( './execute' ).default;
  */
 module.exports = async function gitCloneDirectory( repo, directory ) {
   winston.info( `cloning repo ${repo} in ${directory}` );
-  if ( repo === 'perennial-alias' ) {
+  if ( getActiveSceneryStackRepos().includes( repo ) ) {
+    await execute( 'git', [ 'clone', `https://github.com/scenerystack/${repo}.git` ], directory );
+  }
+  else if ( repo === 'perennial-alias' ) {
     await execute( 'git', [ 'clone', 'https://github.com/phetsims/perennial.git', repo ], directory );
   }
   else {

@@ -33,7 +33,21 @@ import { DEBUG_PHET_LINT } from './lint.js';
 
 // TODO: enable linting for scenery-stack-test, see https://github.com/phetsims/scenery-stack-test/issues/1
 // It is problematic for every repo to have a eslint.config.mjs, so it is preferable to opt-out some repos here, see https://github.com/phetsims/chipper/issues/1484
-const DO_NOT_LINT = [ 'babel', 'phet-vite-demo', 'scenery-stack-test' ];
+const DO_NOT_LINT = [
+  'babel',
+
+  // these are old?
+  'phet-vite-demo', 'scenery-stack-test',
+
+  // scenerystack repos - might need npm installs (all of them) to work, TODO https://github.com/phetsims/aqua/issues/226
+  'community',
+  'demo-sim',
+  'scenery-template-parcel',
+  'scenery-template-vite',
+  // NOTE: scenerystack is NOT included here, since it doesn't have NPM dependencies in its eslint config
+  'sim-template-parcel',
+  'sim-template-vite'
+];
 
 const getCacheLocation = ( repo: Repo ) => path.resolve( `../chipper/dist/eslint/cache/${repo}.eslintcache` );
 const OLD_CACHE = '../chipper/eslint/cache/';
