@@ -72,7 +72,7 @@ tests.push( {
   type: 'npm-run',
   command: 'scenerystack-test',
   repo: 'perennial',
-  priority: 20 // is this too much or too little?
+  priority: 20 // Is this too much or too little?
 } );
 
 
