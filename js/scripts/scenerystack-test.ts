@@ -57,6 +57,14 @@ const npxCommand = process.platform.startsWith( 'win' ) ? 'npx.cmd' : 'npx';
       packageJSON.dependencies.scenerystack = 'file:../scenerystack';
       fs.writeFileSync( `./.scenerystack/${repo}/package.json`, JSON.stringify( packageJSON, null, 2 ) );
 
+      // Patch vite configs so that they don't watch (fails on linux/sparky)
+      if ( fs.existsSync( `./.scenerystack/${repo}/vite.config.js` ) ) {
+        const viteConfig = fs.readFileSync( `./.scenerystack/${repo}/vite.config.js`, 'utf8' );
+        if ( !viteConfig.includes( 'server: { watch: null }' ) ) {
+          fs.writeFileSync( `./.scenerystack/${repo}/vite.config.js`, viteConfig.replace( 'base: "./",', 'base: "./", server: { watch: null }' ) );
+        }
+      }
+
       console.log( `npm update ${repo}` );
       await npmUpdateDirectory( `./.scenerystack/${repo}` );
     }
