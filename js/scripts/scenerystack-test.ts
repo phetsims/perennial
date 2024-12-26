@@ -241,6 +241,7 @@ const npxCommand = process.platform.startsWith( 'win' ) ? 'npx.cmd' : 'npx';
       {
         console.log( `parcel serve ${repo}` );
         const served = await parcelServe( `./.scenerystack/${repo}` );
+        console.log( 'served' );
         await puppeteerLoad( served.url );
         served.close();
       }
@@ -249,6 +250,7 @@ const npxCommand = process.platform.startsWith( 'win' ) ? 'npx.cmd' : 'npx';
       {
         console.log( `parcel build ${repo}` );
         await parcelBuild( `./.scenerystack/${repo}` );
+        console.log( 'built' );
         await withServer( async port => {
           await puppeteerLoad( `http://localhost:${port}/perennial/.scenerystack/${repo}/dist/index.html` );
         } );
