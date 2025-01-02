@@ -31,13 +31,12 @@ import callbackOnWorkers from '../common/callbackOnWorkers.js';
 import { tscCleanRepo } from '../grunt/typeCheck.js';
 import { DEBUG_PHET_LINT } from './lint.js';
 
-// TODO: enable linting for scenery-stack-test, see https://github.com/phetsims/scenery-stack-test/issues/1
 // It is problematic for every repo to have a eslint.config.mjs, so it is preferable to opt-out some repos here, see https://github.com/phetsims/chipper/issues/1484
 const DO_NOT_LINT = [
   'babel',
 
   // these are old?
-  'phet-vite-demo', 'scenery-stack-test',
+  'phet-vite-demo',
 
   // scenerystack repos - might need npm installs (all of them) to work, TODO https://github.com/phetsims/aqua/issues/226
   'community',
