@@ -5,6 +5,7 @@
  * module model, unlike phet-types.d.ts which is in globals mode.  We cannot use globals mode here because we must import
  * lodash.
  *
+ * TODO: Use import from npm-dependencies? https://github.com/phetsims/chipper/issues/1523
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
