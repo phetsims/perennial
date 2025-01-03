@@ -104,6 +104,7 @@ tests.push( {
 
 // lints
 repos.forEach( repo => {
+  // Support eslint.config.js and eslint.config.mjs
   if ( fs.readdirSync( `../${repo}` ).some( path => path.includes( 'eslint.config.' ) ) ) {
     tests.push( {
       test: [ repo, 'lint' ],
