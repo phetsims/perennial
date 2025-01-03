@@ -31,7 +31,7 @@ const deployImages = async function( { branch, brands, simulation } ) {
     requestObject.email = buildLocal.buildServerNotifyEmail;
   }
   if ( simulation ) {
-    requestObject.simulation = simulation;
+    requestObject.simName = simulation;
     try {
       const metadataResponse = await axios.get( `https://phet.colorado.edu/services/metadata/1.2/simulations?format=json&summary&locale=en&type=html&simulation=${simulation}` );
       if ( metadataResponse.data && metadataResponse.data?.projects?.[ 0 ]?.version?.string ) {
