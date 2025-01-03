@@ -67,7 +67,7 @@ const deployImages = async function( { branch, brands, simulation } ) {
     throw new Error( `Image deploy request failed with status code ${response.status}.` );
   }
   else {
-    winston.info( 'Image deploy request sent successfully.  If additional alternative images were deployed, go to the main admin page and trigger a recount.' );
+    winston.info( 'Image deploy request sent successfully. If additional alternative images were deployed, go to the main admin page and trigger a recount (Administration -> Initial setup commands-> Count Alt Images).' );
   }
 };
 

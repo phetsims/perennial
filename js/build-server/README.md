@@ -31,6 +31,8 @@ To tail the log: `sudo journalctl -u build-server -f`
 
 To tail a specific number of lines (e.g. 500): `sudo journalctl -u build-server -f -n 500`
 
+Recommended to support control characters: `sudo journalctl -afu build-server`
+
 Pressing Shift+F will scroll to the end (navigation is `less`-like).
 
 ## Checking Deploy Status

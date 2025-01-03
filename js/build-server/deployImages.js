@@ -72,9 +72,8 @@ const updateRepoDir = async ( repo, dir ) => {
 };
 
 /**
- * This task deploys all image assets from the main branch to the latest version of all published sims.
- *
- * @param options
+ * This task deploys all image assets from the main branch to the latest version of all published sims. If specific
+ * simulation/version options are provided, it will deploy only that specific one.
  */
 const deployImages = async options => {
   console.log( `deploying images with brands ${options.brands}` );
