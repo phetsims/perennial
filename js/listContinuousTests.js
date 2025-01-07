@@ -44,7 +44,6 @@ const REPOS_EXCLUDED_FROM_LISTENER_ORDER_RANDOM = [
  * {string} [repo]
  * {string} [queryParameters]
  * {string} [testQueryParameters]
- * {boolean} [es5]
  * {string} [brand]
  * {number} [priority=1] - higher priorities are tested more eagerly
  * {Array.<string>} buildDependencies
@@ -181,8 +180,7 @@ runnableRepos.forEach( repo => {
     priority: 2,
 
     brand: 'phet',
-    buildDependencies: [ repo ],
-    es5: true
+    buildDependencies: [ repo ]
   } );
   tests.push( {
     test: [ repo, 'fuzz', 'built', 'debug' ],
@@ -208,8 +206,7 @@ runnableRepos.forEach( repo => {
       testQueryParameters: 'duration=80000',
 
       brand: 'phet-io',
-      buildDependencies: [ repo ],
-      es5: true
+      buildDependencies: [ repo ]
     } );
   }
 } );
@@ -327,8 +324,7 @@ interactiveDescriptionRepos.forEach( repo => {
     testQueryParameters: 'duration=40000',
 
     brand: 'phet',
-    buildDependencies: [ repo ],
-    es5: true
+    buildDependencies: [ repo ]
   } );
 
   tests.push( {
@@ -339,8 +335,7 @@ interactiveDescriptionRepos.forEach( repo => {
     testQueryParameters: 'duration=40000',
 
     brand: 'phet',
-    buildDependencies: [ repo ],
-    es5: true
+    buildDependencies: [ repo ]
   } );
 } );
 
@@ -493,7 +488,6 @@ unitTestRepos.forEach( repo => {
 //       priority: 5, // When these are built, it should be really quick to test
 //
 //       brand: 'phet',
-//       es5: true
 //     } );
 //   } );
 // } );
