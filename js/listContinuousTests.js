@@ -7,6 +7,7 @@
  * usage: sage run ../perennial/js/listContinuousTests.js
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
 const getActiveRepos = require( './common/getActiveRepos' );
