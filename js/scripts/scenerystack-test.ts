@@ -20,6 +20,7 @@ import puppeteerEvaluate from '../common/puppeteerEvaluate.js';
 import withServer from '../common/withServer.js';
 import puppeteerLoad from '../common/puppeteerLoad.js';
 import npmCommand from '../common/npmCommand.js';
+import os from 'os';
 
 winston.default.transports.console.level = 'debug';
 
@@ -238,8 +239,8 @@ const npxCommand = process.platform.startsWith( 'win' ) ? 'npx.cmd' : 'npx';
     {
       const repo = `${repoPrefix}parcel`;
 
-      // serve
-      {
+      // serve, disabled for now on Linux: https://github.com/phetsims/aqua/issues/230
+      if ( os.platform() !== 'linux' ) {
         console.log( `parcel serve ${repo}` );
         const served = await parcelServe( `./.scenerystack/${repo}` );
         console.log( 'served' );
