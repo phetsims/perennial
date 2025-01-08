@@ -19,6 +19,7 @@ import npmUpdateDirectory from '../common/npmUpdateDirectory.js';
 import puppeteerEvaluate from '../common/puppeteerEvaluate.js';
 import withServer from '../common/withServer.js';
 import puppeteerLoad from '../common/puppeteerLoad.js';
+import npmCommand from '../common/npmCommand.js';
 
 winston.default.transports.console.level = 'debug';
 
@@ -117,7 +118,7 @@ const npxCommand = process.platform.startsWith( 'win' ) ? 'npx.cmd' : 'npx';
 
   const parcelServe = ( cwd: string ): Promise<ServeResult> => {
     return new Promise<ServeResult>( ( resolve, reject ) => {
-      const parcelProcess = spawn( npxCommand, [ 'parcel', 'index.html' ], { stdio: 'pipe', shell: true, cwd: cwd } );
+      const parcelProcess = spawn( npmCommand, [ 'start' ], { stdio: 'pipe', shell: true, cwd: cwd } );
 
       parcelProcess.stdout.on( 'data', ( data: Buffer ) => {
         const output = data.toString();
