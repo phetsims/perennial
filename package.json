@@ -11,7 +11,8 @@
     "test-long": "npm run test && bash bin/sage run node_modules/qunit/bin/qunit.js js/test/perennialGruntTest.js",
     "type-check-all": "grunt type-check --all --clean",
     "lint-all": "grunt lint --all --clean",
-    "scenerystack-test": "bash bin/sage run js/scripts/scenerystack-test.ts"
+    "scenerystack-test": "bash bin/sage run js/scripts/scenerystack-test.ts",
+    "init-v1": "npm install && bash bin/sage run js/scripts/init-v1.ts && npm run start-v1"
   },
   "devDependencies": {
     "@octokit/rest": "~16.33.1",
