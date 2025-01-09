@@ -67,3 +67,33 @@ qunit.test( 'SimVersion Basics', async assert => {
   assert.ok( mySimVersion.toString() === '1.2.3-rc.1', 'as string' );
 
 } );
+
+qunit.test( 'SimVersion Parsing', async assert => {
+
+  assert.throws( () => {
+    return SimVersion.parse( '3.0' );
+  }, 'only major.minor' );
+
+  assert.throws( () => {
+    return SimVersion.parse( 'gfjkdslgjf' );
+  }, 'only major.minor' );
+} );
+
+qunit.test( 'SimVersion Sorting', async assert => {
+
+  const versions = [
+    '2.4.1',
+    '0.3.3',
+    '2.0.0',
+    '2.3.1-dev.1',
+    '2.4.0',
+    '2.3.3-rc.2',
+    '2.3.35',
+    '2.3.36'
+  ];
+  versions.map( version => SimVersion.parse( version ) );
+
+  const sorted = versions.map( version => SimVersion.parse( version ) ).sort( SimVersion.comparator );
+  assert.equal( sorted[ 0 ].toString(), '0.3.3', 'smallest' );
+  assert.equal( sorted[ sorted.length - 1 ].toString(), '2.4.1', 'largest' );
+} );
