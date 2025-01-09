@@ -44,6 +44,9 @@ clone_if_missing "phetcommon"
 clone_if_missing "scenery"
 clone_if_missing "utterance-queue"
 clone_if_missing "kite"
+clone_if_missing "assert"
+clone_if_missing "babel"
+clone_if_missing "axon"
 
 # Install NPM dependencies in 'perennial-alias'
 cd ./perennial-alias
