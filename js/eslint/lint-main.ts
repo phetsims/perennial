@@ -43,6 +43,8 @@ const DO_NOT_LINT = [
   'demo-sim',
   'scenery-template-parcel',
   'scenery-template-vite',
+  'scenerystack',
+  'scenerystack-tests',
   // NOTE: scenerystack is NOT included here, since it doesn't have NPM dependencies in its eslint config
   'sim-template-parcel',
   'sim-template-vite'

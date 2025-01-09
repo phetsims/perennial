@@ -35,6 +35,7 @@ const npxCommand = process.platform.startsWith( 'win' ) ? 'npx.cmd' : 'npx';
     'demo-sim',
     'scenery-template-parcel',
     'scenery-template-vite',
+    'scenerystack-tests',
     'sim-template-parcel',
     'sim-template-vite'
   ];
@@ -210,6 +211,26 @@ const npxCommand = process.platform.startsWith( 'win' ) ? 'npx.cmd' : 'npx';
     if ( !hasDisplay ) {
       onError( 'demo-sim vite build runtime failure' );
     }
+  }
+
+  // scenerystack-tests vite serve (we are pulling qunit in a way where only this will work)
+  {
+    console.log( 'scenerystack-tests vite serve' );
+
+    const served = await viteServe( './.scenerystack/scenerystack-tests' );
+
+    console.log( 'launching puppeteer' );
+    const sceneryStackTestResults = await puppeteerEvaluate( served.url, 'sceneryStackTestResults', {
+      waitAfterLoad: 5000
+    } );
+
+    console.log( sceneryStackTestResults );
+
+    if ( sceneryStackTestResults.testCounts.passed === 0 || sceneryStackTestResults.testCounts.failed > 0 || sceneryStackTestResults.status !== 'passed' ) {
+      onError( 'scenerystack-tests vite serve runtime failure' );
+    }
+
+    served.close();
   }
 
   for ( const repoPrefix of [ 'scenery-template-', 'sim-template-' ] ) {
