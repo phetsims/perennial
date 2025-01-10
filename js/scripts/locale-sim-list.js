@@ -7,7 +7,7 @@
  */
 
 const localeInfo = require( '../../../chipper/js/data/localeInfo' );
-const simMetadata = require( '../common/simMetadata' );
+const simMetadata = require( '../common/simMetadata' ).default;
 const winston = require( 'winston' );
 
 winston.default.transports.console.level = 'error';

@@ -43,11 +43,13 @@ circuit-construction-kit-dc
 circuit-construction-kit-dc-virtual-lab
 collision-lab
 color-vision
+community
 concentration
 coulombs-law
 counting-common
 curve-fitting
 decaf
+demo-sim
 density
 density-buoyancy-common
 description-demo
@@ -148,7 +150,6 @@ phet-io-wrapper-haptics
 phet-io-wrapper-lab-book
 phet-io-wrappers
 phet-lib
-phet-vite-demo
 phetcommon
 phetmarks
 phettest
@@ -170,8 +171,14 @@ rutherford-scattering
 scenery
 scenery-lab-demo
 scenery-phet
+scenery-template-parcel
+scenery-template-vite
+scenerystack
+scenerystack-tests
 sherpa
 shred
+sim-template-parcel
+sim-template-vite
 simula-rasa
 skiffle
 soccer-common

@@ -18,6 +18,7 @@ const deployImages = require( './deployImages' );
 const persistentQueue = require( './persistentQueue' );
 const ReleaseBranch = require( '../common/ReleaseBranch' ).default;
 const loadJSON = require( '../common/loadJSON' );
+const sendEmail = require( './sendEmail' );
 
 /**
  * Abort build with err
@@ -309,6 +310,15 @@ async function runTask( options ) {
               locales: locales,
               translatorId: isTranslationRequest ? userId : undefined
             } );
+
+            const latestFileSystemVersion = getLatestFileSystemProductionVersion( targetSimDir );
+
+            // Production deploy to PhET Brand is most likely buggy if deploying a previous major.minor version. Let's
+            // tell someone.
+            if ( SimVersion.parse( version ).compareNumber( latestFileSystemVersion ) < 0 ) {
+              sendEmail( 'PhET Production Deploy of older release',
+                `Build server deployed ${simName} version:${version} to phet brand production site but the latest version is ${latestFileSystemVersion}` );
+            }
           }
           else if ( brand === constants.PHET_IO_BRAND ) {
             const suffix = originalVersion.split( '-' ).length >= 2 ? originalVersion.split( '-' )[ 1 ] :
@@ -349,6 +359,14 @@ async function runTask( options ) {
     await abortBuild( err );
   }
 }
+
+// Look at the file system for the directory that has the latest version as its name.
+function getLatestFileSystemProductionVersion( dirPath ) {
+  const versionDirRegex = /^\d+\.\d+\.\d+$/; // start and end markers because we only care about production deploys
+  const versionStrings = fs.readdirSync( dirPath ).filter( f => versionDirRegex.test( f ) );
+  return versionStrings.map( f => SimVersion.parse( f ) ).sort( SimVersion.comparator ).pop();
+}
+
 
 module.exports = function taskWorker( task, taskCallback ) {
   runTask( task )

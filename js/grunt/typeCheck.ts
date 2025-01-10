@@ -145,8 +145,13 @@ async function runCommand( command: string, args: string[], cwd: string, absolut
  */
 function writeAllTSConfigFile(): void {
   const activeRepos = fs.readFileSync( `${PERENNIAL_ROOT}/data/active-repos`, 'utf-8' ).trim().split( /\r?\n/ ).map( s => s.trim() );
+  const activeSceneryStackRepos = fs.readFileSync( `${PERENNIAL_ROOT}/data/active-scenerystack-repos`, 'utf-8' ).trim().split( /\r?\n/ ).map( s => s.trim() );
 
   const filteredRepos = activeRepos.filter( repo => {
+    // TODO: https://github.com/phetsims/aqua/issues/226
+    if ( activeSceneryStackRepos.includes( repo ) ) {
+      return false;
+    }
     return fs.existsSync( `${PERENNIAL_ROOT}/../${repo}/tsconfig.json` ) &&
            repo !== 'phet-lib' && // TODO: include this repo, see https://github.com/phetsims/phet-lib/issues/7
            repo !== 'phet-vite-demo'; // TODO: include this repo, see https://github.com/phetsims/phet-vite-demo/issues/2

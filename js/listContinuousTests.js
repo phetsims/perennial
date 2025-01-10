@@ -7,6 +7,7 @@
  * usage: sage run ../perennial/js/listContinuousTests.js
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
 const getActiveRepos = require( './common/getActiveRepos' );
@@ -44,7 +45,6 @@ const REPOS_EXCLUDED_FROM_LISTENER_ORDER_RANDOM = [
  * {string} [repo]
  * {string} [queryParameters]
  * {string} [testQueryParameters]
- * {boolean} [es5]
  * {string} [brand]
  * {number} [priority=1] - higher priorities are tested more eagerly
  * {Array.<string>} buildDependencies
@@ -65,6 +65,14 @@ tests.push( {
   command: 'type-check-all',
   repo: 'perennial',
   priority: 100
+} );
+
+tests.push( {
+  test: [ 'perennial', 'scenerystack-test' ],
+  type: 'npm-run',
+  command: 'scenerystack-test',
+  repo: 'perennial',
+  priority: 20 // Is this too much or too little?
 } );
 
 
@@ -96,7 +104,8 @@ tests.push( {
 
 // lints
 repos.forEach( repo => {
-  if ( fs.existsSync( `../${repo}/Gruntfile.cjs` ) ) {
+  // Support eslint.config.js and eslint.config.mjs
+  if ( fs.readdirSync( `../${repo}` ).some( path => path.includes( 'eslint.config.' ) ) ) {
     tests.push( {
       test: [ repo, 'lint' ],
       type: 'lint',
@@ -172,8 +181,7 @@ runnableRepos.forEach( repo => {
     priority: 2,
 
     brand: 'phet',
-    buildDependencies: [ repo ],
-    es5: true
+    buildDependencies: [ repo ]
   } );
   tests.push( {
     test: [ repo, 'fuzz', 'built', 'debug' ],
@@ -199,8 +207,7 @@ runnableRepos.forEach( repo => {
       testQueryParameters: 'duration=80000',
 
       brand: 'phet-io',
-      buildDependencies: [ repo ],
-      es5: true
+      buildDependencies: [ repo ]
     } );
   }
 } );
@@ -318,8 +325,7 @@ interactiveDescriptionRepos.forEach( repo => {
     testQueryParameters: 'duration=40000',
 
     brand: 'phet',
-    buildDependencies: [ repo ],
-    es5: true
+    buildDependencies: [ repo ]
   } );
 
   tests.push( {
@@ -330,8 +336,7 @@ interactiveDescriptionRepos.forEach( repo => {
     testQueryParameters: 'duration=40000',
 
     brand: 'phet',
-    buildDependencies: [ repo ],
-    es5: true
+    buildDependencies: [ repo ]
   } );
 } );
 
@@ -484,7 +489,6 @@ unitTestRepos.forEach( repo => {
 //       priority: 5, // When these are built, it should be really quick to test
 //
 //       brand: 'phet',
-//       es5: true
 //     } );
 //   } );
 // } );
