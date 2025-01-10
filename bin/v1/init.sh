@@ -21,7 +21,7 @@ clone_if_missing() {
         echo "Repository '$target_dir' already exists. Skipping clone."
     else
         echo "Cloning '$repo_url' into '$target_dir' (branch: $branch)..."
-        git clone "$repo_url" -b "$branch" --single-branch "$target_dir"
+        git clone "$repo_url" -b "$branch" "$target_dir"
     fi
 }
 
