@@ -4,12 +4,11 @@
 set -e
 
 # Install root NPM dependencies
+echo "Installing root NPM dependencies..."
 npm install
 
+# Navigate to the parent directory
 cd ..
-
-# Number of parallel clone operations
-MAX_PARALLEL=8
 
 # Function to clone repositories only if they don't exist
 clone_if_missing() {
@@ -22,7 +21,7 @@ clone_if_missing() {
         echo "Repository '$target_dir' already exists. Skipping clone."
     else
         echo "Cloning '$repo_url' into '$target_dir' (branch: $branch)..."
-        git clone "$repo_url" -b "$branch" --single-branch "$target_dir" &
+        git clone "$repo_url" -b "$branch" --single-branch "$target_dir"
     fi
 }
 
@@ -53,26 +52,12 @@ repos=(
     "utterance-queue"
 )
 
-# Counter for parallel jobs
-job_count=0
-
-# Iterate over repositories and initiate cloning
+# Iterate over repositories and clone them one by one
 for repo in "${repos[@]}"; do
     # Split repo and target_dir if a colon is present
     IFS=':' read -r repo_name target_dir <<< "$repo"
     clone_if_missing "$repo_name" "$target_dir"
-
-    ((job_count++))
-
-    # If MAX_PARALLEL jobs are running, wait for any to finish
-    if (( job_count >= MAX_PARALLEL )); then
-        wait -n
-        ((job_count--))
-    fi
 done
-
-# Wait for all background jobs to finish
-wait
 
 echo "All cloning operations completed."
 
