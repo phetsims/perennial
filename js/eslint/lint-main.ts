@@ -28,6 +28,7 @@ import path from 'path';
 import process from 'process';
 import { Repo } from '../browser-and-node/PerennialTypes.js';
 import callbackOnWorkers from '../common/callbackOnWorkers.js';
+import getActiveSceneryStackRepos from '../common/getActiveSceneryStackRepos.js';
 import { tscCleanRepo } from '../grunt/typeCheck.js';
 import { DEBUG_PHET_LINT } from './lint.js';
 
@@ -39,15 +40,7 @@ const DO_NOT_LINT = [
   'phet-vite-demo',
 
   // scenerystack repos - might need npm installs (all of them) to work, TODO https://github.com/phetsims/aqua/issues/226
-  'community',
-  'demo-sim',
-  'scenery-template-parcel',
-  'scenery-template-vite',
-  'scenerystack',
-  'scenerystack-tests',
-  // NOTE: scenerystack is NOT included here, since it doesn't have NPM dependencies in its eslint config
-  'sim-template-parcel',
-  'sim-template-vite'
+  ...getActiveSceneryStackRepos()
 ];
 
 const getCacheLocation = ( repo: Repo ) => path.resolve( `../chipper/dist/eslint/cache/${repo}.eslintcache` );
