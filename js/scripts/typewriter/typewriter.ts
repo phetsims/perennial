@@ -20,7 +20,9 @@
  */
 
 import { execSync } from 'node:child_process';
-import { Project } from 'ts-morph';
+import { Project, Scope, SyntaxKind } from 'ts-morph';
+
+const VISIT_CONSTRUCTOR_CLASS_PROPERTY_ASSIGNMENTS = false;
 
 async function visitFile( file: string ): Promise<void> {
 
@@ -38,25 +40,91 @@ async function visitFile( file: string ): Promise<void> {
 
   const classes = sourceFile.getClasses();
 
-  const combos = [];
+  const instanceMethodCombos = [];
 
   for ( const classDeclaration of classes ) {
 
     console.log( `# Enumerating class: ${classDeclaration.getName()}` );
 
-    const members = [
+    const methods = [
       ...classDeclaration.getInstanceMethods()
       // ...classDeclaration.getStaticMethods()
     ];
 
-    for ( const member of members ) {
-      console.log( '\n\nenumerating: ', member.getName() );
-      combos.push( { file: file, className: classDeclaration.getName()!, methodName: member.getName() } );
+    for ( const method of methods ) {
+      console.log( '\n\nenumerating: ', method.getName() );
+      instanceMethodCombos.push( { file: file, className: classDeclaration.getName()!, methodName: method.getName() } );
+    }
+
+    if ( VISIT_CONSTRUCTOR_CLASS_PROPERTY_ASSIGNMENTS ) {
+
+      // Get the constructors
+      const constructors = classDeclaration.getConstructors();
+      for ( const constructor of constructors ) {
+        // console.log( '\n\nenumerating: ', constructor.getName() );
+        // instanceMethodCombos.push( { file: file, className: classDeclaration.getName()!, methodName: constructor.getName() } );
+
+        const statements = constructor.getStatements();
+
+        // if the statement assigns a class property, then we need to create a class property for it.
+        for ( const statement of statements ) {
+          console.log( 'statement: ', statement.getText() );
+
+          // Check if the statement is an expression statement
+          if ( statement.getKind() === SyntaxKind.ExpressionStatement ) {
+            // Get the expression within the expression statement
+            const expression = statement.asKindOrThrow( SyntaxKind.ExpressionStatement ).getExpression();
+
+            // Check if the expression is a binary expression (e.g. assignment)
+            if ( expression.getKind() === SyntaxKind.BinaryExpression ) {
+              const binaryExpr = expression.asKindOrThrow( SyntaxKind.BinaryExpression );
+
+              // Check if the operator is '=' (the equals token)
+              if ( binaryExpr.getOperatorToken().getKind() === SyntaxKind.EqualsToken ) {
+                const leftSide = binaryExpr.getLeft();
+
+                // Check if the left side is a property access expression like "this.propName"
+                if ( leftSide.getKind() === SyntaxKind.PropertyAccessExpression ) {
+                  const propAccess = leftSide.asKindOrThrow( SyntaxKind.PropertyAccessExpression );
+
+                  // Ensure the object is "this"
+                  if ( propAccess.getExpression().getText() === 'this' ) {
+                    const propertyName = propAccess.getName();
+                    console.log( `Found assignment to property: ${propertyName}` );
+
+                    // Infer the type of the right-hand side expression
+                    const rhs = binaryExpr.getRight();
+                    const inferredType = rhs.getType().getText();
+
+                    console.log( `Inferred type for ${propertyName}: ${inferredType}` );
+
+                    // Insert the property declaration at the top of the class.
+                    // It will be marked as private and readonly.
+                    classDeclaration.insertProperty( 0, {
+                      name: propertyName,
+                      type: inferredType,
+                      scope: Scope.Private,
+                      isReadonly: true
+                    } );
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
-  console.log( 'Visiting combos: ', JSON.stringify( combos, null, 2 ) );
 
-  for ( const combo of combos ) {
+  if ( VISIT_CONSTRUCTOR_CLASS_PROPERTY_ASSIGNMENTS ) {
+
+    // Save the modified file back to disk.
+    await sourceFile.save();
+  }
+
+  console.log( 'Visiting combos: ', JSON.stringify( instanceMethodCombos, null, 2 ) );
+
+  for ( const combo of instanceMethodCombos ) {
 
     // Run in a separate process, otherwise the Project will be corrupted and crash
     execSync( `sage run js/scripts/typewriter/visitInstanceMethod.ts ${combo.file} ${combo.className} ${combo.methodName}` );
