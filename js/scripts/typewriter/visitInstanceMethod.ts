@@ -1,6 +1,5 @@
 // Copyright 2025, University of Colorado Boulder
 
-/* eslint-disable phet/bad-typescript-text*/
 /**
  * One step in converting JavaScript to TypeScript is to move JSDoc annotations to the method signature.
  * Runs in a separate process since we do text operations that disrupt the ts-morph Project.
@@ -11,6 +10,7 @@
 import process from 'process';
 import { Project } from 'ts-morph';
 import { IntentionalPerennialAny } from '../../browser-and-node/PerennialTypes.js';
+import moveJSDocParamsToSignature from './prompts/moveJSDocParamsToSignature.js';
 
 async function visitInstanceMethod( file: string, className: string, methodName: string ): Promise<void> {
   // file is a relative string like '../myRepo/js/buttons/RoundToggleButton.ts'
@@ -106,55 +106,7 @@ async function visitInstanceMethod( file: string, className: string, methodName:
             // model: 'openai/gpt-3.5-turbo',
             model: 'deepseek/deepseek-chat',
             messages: [
-              {
-                role: 'user',
-                content: 'We are converting JavaScript to TypeScript. Here is an instance method, potentially with JSDoc. Please move ' +
-                         'the JSDoc annotations to the method signature. Note that any documentation in @param must be preserved, but ' +
-                         'remove the {Type}. Don\'t worry about imports, I will do those later. If none of the @param have any documentation, then remove all @params entirely. ' +
-                         'Do not add, remove or change documentation. Preserve it. If any param has type @param {Object}, specify IntentionalAny in the type declaration. I will fix it later. ' +
-                         'If no changes are needed then just output the same text. Do not use code fences. Do not explain reasoning, just do your best and output code only:'
-              },
-              {
-                role: 'user',
-                content: '  /**\n' +
-                         '   * Step the model (automatically called by joist)\n' +
-                         '   * @public\n' +
-                         '   * @override\n' +
-                         '   *\n' +
-                         '   * @param {number} dt - in seconds\n' +
-                         '   */\n' +
-                         '  step( dt )'
-              },
-              {
-                role: 'assistant',
-                content: '  /**\n' +
-                         '   * Step the model (automatically called by joist)\n' +
-                         '   *\n' +
-                         '   * @param dt - in seconds\n' +
-                         '   */\n' +
-                         '  public step( dt: number ): void'
-              },
-              {
-                role: 'user',
-                content: '  /**\n' +
-                         '   * The skater moves along the ground with the same coefficient of fraction as the tracks, see #11. Returns a\n' +
-                         '   * SkaterState that is applied to this.skater.\n' +
-                         '   * @private\n' +
-                         '   *\n' +
-                         '   * @param {number} dt\n' +
-                         '   * @param {SkaterState} skaterState\n' +
-                         '   *\n' +
-                         '   * @returns {SkaterState}\n' +
-                         '   */\n' +
-                         '  stepGround( dt, skaterState )'
-              }, {
-                role: 'assistant',
-                content: '  /**\n' +
-                         '   * The skater moves along the ground with the same coefficient of fraction as the tracks, see #11. Returns a\n' +
-                         '   * SkaterState that is applied to this.skater.\n' +
-                         '   */\n' +
-                         '  private stepGround( dt: number, skaterState: SkaterState ): SkaterState'
-              },
+              ...moveJSDocParamsToSignature,
               {
                 role: 'user',
                 content: jsDocRawText + signatureText
