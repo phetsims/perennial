@@ -9,6 +9,7 @@
 
 import assert from 'assert';
 import child_process, { SpawnOptions } from 'child_process';
+import EventEmitter from 'events';
 import _ from 'lodash';
 import winston from 'winston';
 
@@ -25,6 +26,10 @@ type ExecuteOptions = {
   //                      - of the form {code:number,stdout:string,stderr:string} is returned. 'resolve' allows usage
   //                      - in Promise.all without exiting on the 1st failure
   errors?: ErrorsHandled;
+
+  // Provide to allow the child process to be killed (with SIGINT) before it is completed, with the "kill" event.
+  // Run like `killEmitter.emit( 'kill' )`. The listener in execute() will be removed after the first emit of "kill".
+  killEmitter?: EventEmitter | null;
 };
 export type ExecuteResult = { code: number; stdout: string; stderr: string; cwd: string; error?: Error; time: number };
 
@@ -60,9 +65,10 @@ function execute( cmd: string, args: string[], cwd: string, providedOptions?: Ex
 
   const startTime = Date.now();
 
-  const options = _.merge( {
+  const options: Required<ExecuteOptions> = _.merge( {
     errors: 'reject' as ErrorsHandled,
 
+    killEmitter: null,
     childProcessOptions: {
 
       // Provide additional env variables, and they will be merged with the existing defaults.
@@ -110,8 +116,21 @@ function execute( cmd: string, args: string[], cwd: string, providedOptions?: Ex
       winston.debug( `stdout: ${data}` );
     } );
 
+    if ( options.killEmitter ) {
+      const killListener = () => {
+        childProcess.kill( 'SIGINT' );
+        options.killEmitter!.removeListener( 'kill', killListener );
+      };
+      options.killEmitter.addListener( 'kill', killListener );
+    }
+
+    // Called even when interrupted or killed
+    childProcess.on( 'exit', () => {
+      winston.debug( `Exit callback: ${cmd}` );
+    } );
+
     childProcess.on( 'close', ( code: number ) => {
-      winston.debug( `Command ${cmd} finished. Output is below.` );
+      winston.debug( `Command ${cmd} finished (from "close"). Output is below.` );
 
       winston.debug( stderr && `stderr: ${stderr}` || 'stderr is empty.' );
       winston.debug( stdout && `stdout: ${stdout}` || 'stdout is empty.' );
