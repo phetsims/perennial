@@ -6,8 +6,12 @@ Steps:
 3. Add SelfOptions to capture the allowable options.
 4. Move the documentation from the merge site to the SelfOptions site.
 5. Combine MyTypeOptions = SelfOptions & ParentOptions; This is the ProvidedOptions.
+6. Note: the new types must be outside of the class declaration and not just outside the constructor.
+7. Remove now redundant types in the documentation, like `// {number} - initial/default value of friction for the model` becomes `// initial/default value of friction for the model`
+8. Preserve the original documentation (ok to move it). Do not improve it, or remove it.
 
-Examples:
+####################################
+# EXAMPLE 1:
 
 Subject: [PATCH] Export default class, see https://github.com/phetsims/energy-skate-park/issues/387
 ---
@@ -84,3 +88,94 @@ diff --git a/js/common/model/ControlPoint.ts b/js/common/model/ControlPoint.ts
      const tandem = options.tandem;
 
      super( options );
+
+####################################
+# EXAMPLE 2:
+
+BEFORE:
+
+  // Updates the model with constant event intervals even if there is a drop in the framerate
+  // so that simulation performance has no impact on physical behavior.
+  public readonly eventTimer: EventTimer;
+
+  public constructor( preferencesModel: EnergySkateParkPreferencesModel, tandem: Tandem, options?: IntentionalAny ) {
+    super( {
+      phetioType: EnergySkateParkModel.EnergySkateParkModelIO,
+      tandem: tandem,
+      phetioState: false
+    } );
+
+    // eslint-disable-next-line phet/bad-typescript-text
+    options = merge( {
+
+      // {number} - initial/default value of friction for the model
+      defaultFriction: EnergySkateParkConstants.DEFAULT_FRICTION,
+
+      // {boolean} - if true, tracks can be dragged around the play area
+      tracksDraggable: false,
+
+      // {boolean} - if true, track control points can be dragged and track shapes can change
+      tracksConfigurable: false,
+
+      // @boolean - default for the speedValueVisibleProperty, whether or not the value of speed is displayed
+      // on the speedometer
+      defaultSpeedValueVisible: true,
+
+      // passed to Skater
+      skaterOptions: null
+    }, options );
+
+    this.trackChangedEmitter = new Emitter();
+
+AFTER:
+
+
+type SelfOptions = {
+
+  // initial/default value of friction for the model
+  defaultFriction?: number;
+
+  // if true, tracks can be dragged around the play area
+  tracksDraggable?: boolean;
+
+  // if true, track control points can be dragged and track shapes can change
+  tracksConfigurable?: boolean;
+
+  // default for the speedValueVisibleProperty, whether or not the value of speed is displayed
+  // on the speedometer
+  defaultSpeedValueVisible?: boolean;
+
+  // options passed to Skater
+  skaterOptions?: IntentionalAny | null;
+};
+
+type EnergySkateParkModelOptions = SelfOptions & PhetioObjectOptions;
+
+export default class EnergySkateParkModel extends PhetioObject {
+
+  // emits an event whenever a track changes in some way (control points dragged, track split apart,
+  // track dragged, track deleted or scene changed, etc...)
+  public readonly trackChangedEmitter: Emitter;
+
+  // etc..........
+
+  // Updates the model with constant event intervals even if there is a drop in the framerate
+  // so that simulation performance has no impact on physical behavior.
+  public readonly eventTimer: EventTimer;
+
+  public constructor( preferencesModel: EnergySkateParkPreferencesModel, tandem: Tandem, providedOptions?: EnergySkateParkModelOptions ) {
+    super( {
+      phetioType: EnergySkateParkModel.EnergySkateParkModelIO,
+      tandem: tandem,
+      phetioState: false
+    } );
+
+    const options = optionize<EnergySkateParkModelOptions, SelfOptions, PhetioObjectOptions>()( {
+      defaultFriction: EnergySkateParkConstants.DEFAULT_FRICTION,
+      tracksDraggable: false,
+      tracksConfigurable: false,
+      defaultSpeedValueVisible: true,
+      skaterOptions: null
+    }, providedOptions );
+
+    this.trackChangedEmitter = new Emitter();
