@@ -9,6 +9,7 @@ Steps:
 6. Note: the new types must be outside of the class declaration and not just outside the constructor.
 7. Remove now redundant types in the documentation, like `// {number} - initial/default value of friction for the model` becomes `// initial/default value of friction for the model`
 8. Preserve the original documentation (ok to move it). Do not improve it, or remove it.
+9. If there was a `// eslint-disable-next-line phet/bad-typescript-text` before the merge, remove it.
 
 ####################################
 # EXAMPLE 1:
