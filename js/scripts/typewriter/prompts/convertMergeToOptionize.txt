@@ -1,0 +1,86 @@
+For constructors that have options and merge, we would like to rewrite those to use our custom function optionize instead.
+
+Steps:
+1. Rename the constuctor parameter from options to providedOptions.
+2. Change `options = merge({...},options)` to `const options = optionize<ProvidedOptions,SelfOptions,ParentOptions>()({...},providedOptions)`
+3. Add SelfOptions to capture the allowable options.
+4. Move the documentation from the merge site to the SelfOptions site.
+5. Combine MyTypeOptions = SelfOptions & ParentOptions; This is the ProvidedOptions.
+
+Examples:
+
+Subject: [PATCH] Export default class, see https://github.com/phetsims/energy-skate-park/issues/387
+---
+Index: js/common/model/ControlPoint.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/js/common/model/ControlPoint.ts b/js/common/model/ControlPoint.ts
+--- a/js/common/model/ControlPoint.ts	(revision 6adea90f46d824f5ca3056b988f341ef7af8cf5e)
++++ b/js/common/model/ControlPoint.ts	(date 1736790173832)
+@@ -15,9 +15,8 @@
+ import Bounds2 from '../../../../dot/js/Bounds2.js';
+ import Vector2 from '../../../../dot/js/Vector2.js';
+ import Vector2Property from '../../../../dot/js/Vector2Property.js';
+-import merge from '../../../../phet-core/js/merge.js';
+-import IntentionalAny from '../../../../phet-core/js/types/IntentionalAny.js';
+-import PhetioObject from '../../../../tandem/js/PhetioObject.js';
++import optionize from '../../../../phet-core/js/optionize.js';
++import PhetioObject, { PhetioObjectOptions } from '../../../../tandem/js/PhetioObject.js';
+ import Tandem from '../../../../tandem/js/Tandem.js';
+ import IOType from '../../../../tandem/js/types/IOType.js';
+ import NullableIO from '../../../../tandem/js/types/NullableIO.js';
+@@ -25,6 +24,22 @@
+ import energySkatePark from '../../energySkatePark.js';
+ import EnergySkateParkModel from './EnergySkateParkModel.js';
+
++type SelfOptions = {
++
++  // {boolean} - if true, this control point will be displayed on the track
++  visible?: boolean;
++
++  // {boolean} - can this control point specifically be dragged? If true, the control point is draggable,
++  // changes opacity on over, and supports track splitting at the ControlPoint
++  interactive?: boolean;
++
++  // {Bounds2|null} - if specified, the ControlPoint will also be constrained to these bounds during dragging, or
++  // when the track is bumped above ground, in model coordinates
++  limitBounds?: Bounds2 | null;
++};
++
++type ControlPointOptions = SelfOptions & PhetioObjectOptions;
++
+ export default class ControlPoint extends PhetioObject {
+
+   public readonly limitBounds: Bounds2 | null;
+@@ -45,26 +60,17 @@
+   // whether the control point is currently being dragged
+   public readonly draggingProperty: BooleanProperty;
+
+-  public constructor( x: number, y: number, options: IntentionalAny ) {
++  public constructor( x: number, y: number, providedOptions: ControlPointOptions ) {
+
+-    // eslint-disable-next-line phet/bad-typescript-text
+-    options = merge( {
+-
+-      // {boolean} - if true, this control point will be displayed on the track
++    const options = optionize<ControlPointOptions, SelfOptions, PhetioObjectOptions>()( {
+       visible: true,
+-
+-      // {boolean} - can this control point specifically be dragged? If true, the control point is draggable,
+-      // changes opacity on over, and supports track splitting at the ControlPoint
+       interactive: true,
+-
+-      // {Bounds2|null} - if specified, the ControlPoint will also be constrained to these bounds during dragging, or
+-      // when the track is bumped above ground, in model coordinates
+       limitBounds: null,
+
+       tandem: Tandem.REQUIRED,
+       phetioType: ControlPoint.ControlPointIO,
+       phetioState: PhetioObject.DEFAULT_OPTIONS.phetioState
+-    }, options );
++    }, providedOptions );
+     const tandem = options.tandem;
+
+     super( options );
