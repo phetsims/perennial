@@ -69,10 +69,8 @@ function execute( cmd: string, args: string[], cwd: string, providedOptions?: Ex
       // eslint-disable-next-line phet/no-object-spread-on-non-literals
       env: { ...process.env },
 
-      // options.shell value to the child_process.spawn. shell:true is required for a NodeJS security update, see https://github.com/phetsims/perennial/issues/359
-      // In this case, only bash scripts fail with an EINVAL error, so we don't need to worry about node/git (and in
-      // fact don't want the overhead of a new shell).
-      shell: cmd !== 'node' && cmd !== 'git' && process.platform.startsWith( 'win' )
+      // options.shell value to the child_process.spawn.
+      shell: getShellOption( cmd )
     }
   }, providedOptions );
 
@@ -134,6 +132,11 @@ function execute( cmd: string, args: string[], cwd: string, providedOptions?: Ex
     } );
   } );
 }
+
+// shell:true is required for a NodeJS security update, see https://github.com/phetsims/perennial/issues/359
+// In this case, only bash scripts fail with an EINVAL error, so we don't need to worry about node/git (and in
+// fact don't want the overhead of a new shell).
+export const getShellOption = ( cmd: string ): boolean => cmd !== 'node' && cmd !== 'git' && process.platform.startsWith( 'win' );
 
 class ExecuteError extends Error {
 
