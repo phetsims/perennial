@@ -317,7 +317,7 @@ async function runTask( options ) {
             // tell someone.
             if ( SimVersion.parse( version ).compareNumber( latestFileSystemVersion ) < 0 ) {
               sendEmail( 'PhET Production Deploy of older release',
-                `Build server deployed ${simName} version:${version} to phet brand production site but the latest version is ${latestFileSystemVersion}` );
+                `Build server deployed ${simName} version: ${version} to phet brand production site but the latest version is ${latestFileSystemVersion}` );
             }
           }
           else if ( brand === constants.PHET_IO_BRAND ) {

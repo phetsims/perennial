@@ -4,8 +4,10 @@
 set -e
 
 # Install root NPM dependencies
+echo "Installing root NPM dependencies..."
 npm install
 
+# Navigate to the parent directory
 cd ..
 
 # Function to clone repositories only if they don't exist
@@ -13,40 +15,51 @@ clone_if_missing() {
     local repo_name=$1
     local target_dir=${2:-$repo_name}  # Default to repo_name if target_dir is not provided
     local repo_url="https://github.com/phetsims/${repo_name}.git"
+    local branch="main" # TODO: Change to phetsims-v1
 
     if [ -d "$target_dir" ]; then
         echo "Repository '$target_dir' already exists. Skipping clone."
     else
-        echo "Cloning '$repo_url' into '$target_dir'..."
-        # TODO: Change branch to phetsims-v1
-        git clone "$repo_url" -b main --single-branch "$target_dir"
+        echo "Cloning '$repo_url' into '$target_dir' (branch: $branch)..."
+        git clone "$repo_url" -b "$branch" "$target_dir"
     fi
 }
 
-# Clone missing repositories
-clone_if_missing "perennial" "perennial-alias"
-clone_if_missing "assert"
-clone_if_missing "axon"
-clone_if_missing "babel"
-clone_if_missing "blackbody-spectrum"
-clone_if_missing "brand"
-clone_if_missing "chipper"
-clone_if_missing "dot"
-clone_if_missing "joist"
-clone_if_missing "kite"
-clone_if_missing "least-squares-regression"
-clone_if_missing "phet-core"
-clone_if_missing "phetcommon"
-clone_if_missing "phetmarks"
-clone_if_missing "query-string-machine"
-clone_if_missing "scenery"
-clone_if_missing "scenery-phet"
-clone_if_missing "sherpa"
-clone_if_missing "sun"
-clone_if_missing "tambo"
-clone_if_missing "tandem"
-clone_if_missing "twixt"
-clone_if_missing "utterance-queue"
+# Array of repositories to clone
+repos=(
+    "perennial:perennial-alias"
+    "assert"
+    "axon"
+    "babel"
+    "blackbody-spectrum"
+    "brand"
+    "chipper"
+    "dot"
+    "joist"
+    "kite"
+    "least-squares-regression"
+    "phet-core"
+    "phetcommon"
+    "phetmarks"
+    "query-string-machine"
+    "scenery"
+    "scenery-phet"
+    "sherpa"
+    "sun"
+    "tambo"
+    "tandem"
+    "twixt"
+    "utterance-queue"
+)
+
+# Iterate over repositories and clone them one by one
+for repo in "${repos[@]}"; do
+    # Split repo and target_dir if a colon is present
+    IFS=':' read -r repo_name target_dir <<< "$repo"
+    clone_if_missing "$repo_name" "$target_dir"
+done
+
+echo "All cloning operations completed."
 
 # Install NPM dependencies in 'perennial-alias'
 cd ./perennial-alias

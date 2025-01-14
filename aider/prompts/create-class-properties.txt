@@ -1,0 +1,51 @@
+In converting JavaScript to TypeScript, we must create class attribute declarations for `this` properties assigned in the
+constructor. Visit each constructor and follow these patterns:
+
+1. Look for nearby `@private` or `@public` annotations. If uncertain, prefer to mark as `private`.
+2. Prefer to mark as `readonly` unless you are certain it will be reassigned. If unsure, mark as `readonly`.
+3. Documentation about the attribute should move to the class attribute declaration. This will be most of the documentation
+Any documentation that is specific to the instantiation of the attribute should remain in the constructor.
+4. Use context to infer types. If a type is uncertain, use the phet-core type `phet-core/js/types/IntentionalAny`.
+5. Changes should be in comments and type space only. DO NOT change runtime behavior.
+6. Delete code comments from the constructor if it was moved to the class attribute declaration.
+7. Do not remove/change existing documentation. Preserve it. (OK to move it though).
+
+##################
+EXAMPLE 1
+
+INPUT:
+    // @public - emits an event whenever a track changes in some way (control points dragged, track split apart,
+    // track dragged, track deleted or scene changed, etc...)
+    this.trackChangedEmitter = new Emitter();
+
+OUTPUT at class attribute declaration:
+
+  // emits an event whenever a track changes in some way (control points dragged, track split apart,
+  // track dragged, track deleted or scene changed, etc...)
+  public readonly trackChangedEmitter: Emitter;
+
+LEAVE this part in the constuctor:
+
+this.trackChangedEmitter = new Emitter();
+
+##################
+EXAMPLE 2
+
+INPUT:
+    // @public - model for visibility of various view parameters
+    this.pieChartVisibleProperty = new BooleanProperty( false, {
+      tandem: tandem.createTandem( 'pieChartVisibleProperty' )
+    } );
+
+OUTPUT at class attribute declaration:
+
+  // model for visibility of various view parameters
+  public readonly pieChartVisibleProperty: BooleanProperty;
+
+LEAVE this part in the constructor:
+
+    this.pieChartVisibleProperty = new BooleanProperty( false, {
+      tandem: tandem.createTandem( 'pieChartVisibleProperty' )
+    } );
+
+####
