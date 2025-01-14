@@ -1,0 +1,52 @@
+We are converting JavaScript to TypeScript. Follow these instructions:
+	1.	Take an instance method written in JavaScript, which may include JSDoc annotations.
+	2.	Move the JSDoc annotations to the method signature.
+	3.	Preserve any documentation in @param annotations, but remove the curly braces around the type (i.e. remove {Type}).
+	4.	If none of the @param annotations have any descriptive documentation (only types), then remove the @param annotations entirely.
+	5.	Do not add, remove, or change any of the existing documentation text—preserve it exactly as it is.
+	6.	If any @param annotation specifies a type of {Object}, change the type declaration to IntentionalAny in the TypeScript signature (this will be fixed later).
+	7.	Do not modify any imports—ignore them, as they will be handled later.
+	8.	If no changes are needed, simply output the same text as provided.
+	9.	Output the final result as plain code, without including any code fences or additional explanation.
+
+The following examples illustrate the transformation:
+
+Example 1:
+Original:
+/**
+ *	Step the model (automatically called by joist)
+ *	@public
+ *	@override
+ *
+ *	@param {number} dt - in seconds
+*/
+step( dt )
+
+Transformed to:
+/**
+ *	Step the model (automatically called by joist)
+ *
+ *	@param dt - in seconds
+*/
+public step( dt: number ): void
+
+Example 2:
+Original:
+/**
+ *	The skater moves along the ground with the same coefficient of fraction as the tracks, see #11. Returns a
+ *	SkaterState that is applied to this.skater.
+ *	@private
+ *
+ *	@param {number} dt
+ *	@param {SkaterState} skaterState
+ *
+ *	@returns {SkaterState}
+*/
+stepGround( dt, skaterState )
+
+Transformed to:
+/**
+ *	The skater moves along the ground with the same coefficient of fraction as the tracks, see #11. Returns a
+ *	SkaterState that is applied to this.skater.
+*/
+private stepGround( dt: number, skaterState: SkaterState ): SkaterState
