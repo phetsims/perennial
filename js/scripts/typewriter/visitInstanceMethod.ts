@@ -10,7 +10,8 @@
 import process from 'process';
 import { Project } from 'ts-morph';
 import { IntentionalPerennialAny } from '../../browser-and-node/PerennialTypes.js';
-import moveJSDocParamsToSignature from './prompts/moveJSDocParamsToSignature.js';
+
+// import moveJSDocParamsToSignature from './prompts/moveJSDocParamsToSignature.js';
 
 async function visitInstanceMethod( file: string, className: string, methodName: string ): Promise<void> {
   // file is a relative string like '../myRepo/js/buttons/RoundToggleButton.ts'
@@ -106,7 +107,7 @@ async function visitInstanceMethod( file: string, className: string, methodName:
             // model: 'openai/gpt-3.5-turbo',
             model: 'deepseek/deepseek-chat',
             messages: [
-              ...moveJSDocParamsToSignature,
+              // ...moveJSDocParamsToSignature,
               {
                 role: 'user',
                 content: jsDocRawText + signatureText
