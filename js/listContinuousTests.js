@@ -86,6 +86,13 @@ tests.push( {
   } );
 } );
 
+tests.push( {
+  test: [ 'chipper', 'test-string-keys' ],
+  type: 'npm-run',
+  command: 'test-string-keys',
+  repo: 'chipper'
+} );
+
 // phet and phet-io brand builds
 [
   ...runnableRepos,

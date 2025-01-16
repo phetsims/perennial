@@ -48,9 +48,5 @@ def main():
     # Run the instructions from the file.
     coder.run(instructions)
 
-    # print hello world
-    print("Hello, World!")
-
-
 if __name__ == '__main__':
     main()
