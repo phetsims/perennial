@@ -76,6 +76,9 @@
     {
       // This doesn't include phet-core testing code
       "path": "../../../phet-core/tsconfig-module.json"
+    },
+    {
+      "path": "../../../sherpa/tsconfig-fluent.json"
     }
   ]
 }
