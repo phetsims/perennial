@@ -736,8 +736,9 @@ class ReleaseBranch implements ReleaseBranchSerialized {
       for ( const resultBranch of resultBranches ) {
         if ( simBranch.repo === resultBranch.repo && simBranch.branch === resultBranch.branch ) {
           foundBranch = true;
+          const resultBrands = [ ...resultBranch.brands ];
           resultBranch.brands.length = 0;
-          resultBranch.brands.push( ..._.uniq( [ ...resultBranch.brands, ...simBranch.brands ] ) );
+          resultBranch.brands.push( ..._.uniq( [ ...resultBrands, ...simBranch.brands ] ) );
           break;
         }
       }
