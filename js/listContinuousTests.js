@@ -93,6 +93,13 @@ tests.push( {
   repo: 'chipper'
 } );
 
+tests.push( {
+  test: [ 'chipper', 'test-deprecated-string-keys' ],
+  type: 'npm-run',
+  command: 'test-string-keys',
+  repo: 'chipper'
+} );
+
 // phet and phet-io brand builds
 [
   ...runnableRepos,
