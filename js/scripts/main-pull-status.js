@@ -9,6 +9,10 @@
  * - transpile (see --transpile)
  * - Conduct pull and tracking on all branches associated with the repo (see --allBranches) (useful for doing batch MRs)
  *
+ * usage:
+ * cd perennial/
+ * sage run js/scripts/main-pull-status.js
+ *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
