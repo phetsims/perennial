@@ -96,7 +96,7 @@ tests.push( {
 tests.push( {
   test: [ 'chipper', 'test-deprecated-string-keys' ],
   type: 'npm-run',
-  command: 'test-string-keys',
+  command: 'test-deprecated-string-keys',
   repo: 'chipper'
 } );
 
