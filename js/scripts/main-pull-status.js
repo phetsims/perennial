@@ -29,6 +29,7 @@ const npmUpdate = require( '../common/npmUpdate' );
 const transpileAll = require( '../common/transpileAll' );
 const winston = require( 'winston' );
 const _ = require( 'lodash' );
+const chunkDelayed = require( '../common/util/chunkDelayed' ).default;
 
 winston.default.transports.console.level = 'error';
 
@@ -128,15 +129,10 @@ const getStatus = async repo => {
 ( async () => {
 
   if ( slowPull ) {
-
-    // Await each repo to pull them in sequence.
-    for ( const repo of repos ) {
-
-      // Pulling slowly takes a while so it is nice to see some progress output.
-      process.stdout.write( `Pulling ${repo}...\n` );
-
-      await getStatus( repo );
-    }
+    await chunkDelayed( repos, repo => getStatus( repo ), {
+      waitPerItem: allBranches ? 1000 : 100,
+      chunkSize: allBranches ? 20 : 10
+    } );
   }
   else {
     await Promise.all( repos.map( repo => getStatus( repo ) ) );
