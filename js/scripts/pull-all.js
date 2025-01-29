@@ -2,6 +2,7 @@
 
 const execute = require( '../common/execute' ).default;
 const fs = require( 'fs' );
+const path = require( 'path' );
 const _ = require( 'lodash' );
 
 // constants
@@ -16,6 +17,9 @@ const repos = contents.split( '\n' ).map( sim => sim.trim() );
  * cd ${root containing all repos}
  * sage run perennial/js/scripts/pull-all.js
  *
+ * cd perennial
+ * sage run js/scripts/pull-all.js
+ *
  * OPTIONS:
  * --batches=N - (1) by default, runing all pulls in parallel. Specify this to separate into N different synchronous chunks running repos/batches number of repos in parallel.
  *
@@ -29,7 +33,7 @@ const repos = contents.split( '\n' ).map( sim => sim.trim() );
   const CHUNK_SIZE = repos.length / batches;
 
   for ( const chunkOfRepos of _.chunk( repos, CHUNK_SIZE ) ) {
-    const childPulls = chunkOfRepos.map( repo => execute( 'git', [ 'pull', '--rebase' ], `${repo}`, {
+    const childPulls = chunkOfRepos.map( repo => execute( 'git', [ 'pull', '--rebase' ], path.join( __dirname, `../../../${repo}` ), {
 
       // resolve errors so Promise.all doesn't fail on first repo that cannot pull/rebase
       errors: 'resolve'
