@@ -704,12 +704,13 @@ module.exports = ( function() {
      * @param {string} repo
      * @param {string} branch
      * @param {boolean} outputJS=false - if true, once checked out this will also run `grunt output-js-project`
+     * @param {boolean} npmUpdate=true - do a npm update after checking out shas
      */
-    static async checkoutBranch( repo, branch, outputJS = false ) {
+    static async checkoutBranch( repo, branch, outputJS = false, npmUpdate = true ) {
       const maintenance = Maintenance.load();
 
       const modifiedBranch = await maintenance.ensureModifiedBranch( repo, branch, true );
-      await modifiedBranch.checkout();
+      await modifiedBranch.checkout( npmUpdate );
 
       if ( outputJS && chipperSupportsOutputJSGruntTasks() ) {
         console.log( 'Running output-js-project' );
