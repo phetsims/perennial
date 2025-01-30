@@ -950,7 +950,7 @@ module.exports = ( function() {
         catch( e ) {
           maintenance.save();
 
-          throw new Error( `Failure with RC deploy for ${modifiedBranch.repo} to ${modifiedBranch.branch}: ${e}` );
+          console.error( `Failure with RC deploy for ${modifiedBranch.repo} to ${modifiedBranch.branch}: ${e}` );
         }
       }
 
