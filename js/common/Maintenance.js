@@ -744,6 +744,8 @@ module.exports = ( function() {
         const repo = modifiedBranch.repo;
         const branch = modifiedBranch.branch;
 
+        let simSuccess = false;
+
         // Defensive copy, since we modify it during iteration
         for ( const patch of modifiedBranch.neededPatches.slice() ) {
           if ( patch.shas.length === 0 ) {
@@ -786,6 +788,7 @@ module.exports = ( function() {
               if ( cherryPickSuccess ) {
                 const currentSHA = await gitRevParse( patchRepo, 'HEAD' );
                 console.log( `Cherry-pick success for ${sha}, result is ${currentSHA}` );
+                simSuccess = true;
 
                 modifiedBranch.changedDependencies[ patchRepo ] = currentSHA;
                 modifiedBranch.neededPatches.splice( modifiedBranch.neededPatches.indexOf( patch ), 1 );
@@ -799,7 +802,6 @@ module.exports = ( function() {
                 break;
               }
               else {
-                success = false;
                 console.log( `Could not cherry-pick ${sha}` );
               }
             }
@@ -812,6 +814,7 @@ module.exports = ( function() {
         }
 
         await gitCheckout( modifiedBranch.repo, 'main' );
+        success = success && simSuccess;
       }
 
       maintenance.save();
