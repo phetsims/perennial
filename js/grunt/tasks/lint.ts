@@ -9,7 +9,6 @@
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */
-import grunt from 'grunt';
 import getLintCLIOptions, { getLintEverythingRepos } from '../../eslint/getLintCLIOptions.js';
 import lint from '../../eslint/lint.js';
 import getOption, { isOptionKeyProvided } from './util/getOption.js';
@@ -29,6 +28,6 @@ export const lintPromise = ( async () => {
   const lintSuccess = await lint( repos, getLintCLIOptions() );
 
   if ( !lintSuccess ) {
-    grunt.fail.fatal( 'Lint failed' );
+    throw new Error( 'Lint failed' );
   }
 } )();

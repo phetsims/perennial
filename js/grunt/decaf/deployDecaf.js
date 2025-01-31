@@ -58,12 +58,12 @@ module.exports = async function( project, dev, production ) {
   console.log( flavors.join( '\n' ) );
 
   if ( !( await vpnCheck() ) ) {
-    grunt.fail.fatal( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
+    throw new Error( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
   }
 
   const currentBranch = await getBranch( 'decaf' );
   if ( currentBranch !== 'main' ) {
-    grunt.fail.fatal( `deployment should be on the branch main, not: ${currentBranch ? currentBranch : '(detached head)'}` );
+    throw new Error( `deployment should be on the branch main, not: ${currentBranch ? currentBranch : '(detached head)'}` );
   }
 
   const packageFileRelative = `projects/${project}/package.json`;
@@ -81,7 +81,7 @@ module.exports = async function( project, dev, production ) {
   const latestSHA = ( await getRemoteBranchSHAs( 'decaf' ) ).main;
   if ( currentSHA !== latestSHA ) {
     // See https://github.com/phetsims/chipper/issues/699
-    grunt.fail.fatal( `Out of date with remote, please push or pull repo. Current SHA: ${currentSHA}, latest SHA: ${latestSHA}` );
+    throw new Error( `Out of date with remote, please push or pull repo. Current SHA: ${currentSHA}, latest SHA: ${latestSHA}` );
   }
 
   const versionString = version.toString();
@@ -101,7 +101,7 @@ module.exports = async function( project, dev, production ) {
     const versionPathExists = await devDirectoryExists( versionPath );
 
     if ( versionPathExists ) {
-      grunt.fail.fatal( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
+      throw new Error( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
     }
 
     if ( !simPathExists ) {

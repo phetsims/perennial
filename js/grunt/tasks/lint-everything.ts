@@ -5,7 +5,6 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import grunt from 'grunt';
 import getLintCLIOptions, { getLintEverythingRepos } from '../../eslint/getLintCLIOptions.js';
 import lint from '../../eslint/lint.js';
 
@@ -14,6 +13,6 @@ import lint from '../../eslint/lint.js';
 
   // Output results on errors.
   if ( !lintSuccess ) {
-    grunt.fail.fatal( 'Lint failed' );
+    throw new Error( 'Lint failed' );
   }
 } )();

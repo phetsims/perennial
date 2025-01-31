@@ -18,7 +18,6 @@ const gitPush = require( '../common/gitPush' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
 const setRepoVersion = require( '../common/setRepoVersion' );
-const grunt = require( 'grunt' );
 
 /**
  * For `grunt create-one-off`, see Gruntfile for details
@@ -32,7 +31,7 @@ const grunt = require( 'grunt' );
 module.exports = async function( repo, branch, message ) {
   const hasBranchAlready = await hasRemoteBranch( repo, branch );
   if ( hasBranchAlready ) {
-    grunt.fail.fatal( 'Branch already exists, aborting' );
+    throw new Error( 'Branch already exists, aborting' );
   }
 
   const branchedVersion = await getRepoVersion( repo );

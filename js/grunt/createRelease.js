@@ -22,7 +22,6 @@ const setRepoVersion = require( '../common/setRepoVersion' );
 const setRepoSupportedBrands = require( '../common/setRepoSupportedBrands' );
 const updateHTMLVersion = require( '../common/updateHTMLVersion' );
 const assert = require( 'assert' );
-const grunt = require( 'grunt' );
 const winston = require( 'winston' );
 
 /**
@@ -46,12 +45,12 @@ module.exports = async function createRelease( repo, branch, brands, message ) {
 
   const currentBranch = await getBranch( repo );
   if ( currentBranch !== 'main' ) {
-    grunt.fail.fatal( `Should be on main to create a release branch, not: ${currentBranch ? currentBranch : '(detached head)'}` );
+    throw new Error( `Should be on main to create a release branch, not: ${currentBranch ? currentBranch : '(detached head)'}` );
   }
 
   const hasBranchAlready = await hasRemoteBranch( repo, branch );
   if ( hasBranchAlready ) {
-    grunt.fail.fatal( 'Branch already exists, aborting' );
+    throw new Error( 'Branch already exists, aborting' );
   }
 
   const newVersion = new SimVersion( major, minor, 0, {

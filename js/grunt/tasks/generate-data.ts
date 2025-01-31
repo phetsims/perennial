@@ -36,7 +36,7 @@ const winston = require( 'winston' );
  */
 async function generateData(): Promise<void> {
   if ( await getBranch( 'perennial' ) !== 'main' || !await gitIsClean( 'perennial' ) ) {
-    grunt.fail.fatal( 'Data will only be generated if perennial is on main with no working-copy changes.' );
+    throw new Error( 'Data will only be generated if perennial is on main with no working-copy changes.' );
   }
 
   const activeRepos: string[] = getActiveRepos();
