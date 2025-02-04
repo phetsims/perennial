@@ -13,6 +13,7 @@ import lint from '../../eslint/lint.js';
 
   // Output results on errors.
   if ( !lintSuccess ) {
-    throw new Error( 'Lint failed' );
+    console.error( 'Lint failed' );
+    process.exit( 1 );
   }
 } )();

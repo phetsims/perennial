@@ -28,6 +28,7 @@ export const lintPromise = ( async () => {
   const lintSuccess = await lint( repos, getLintCLIOptions() );
 
   if ( !lintSuccess ) {
-    throw new Error( 'Lint failed' );
+    console.error( 'Lint failed' );
+    process.exit( 1 );
   }
 } )();
