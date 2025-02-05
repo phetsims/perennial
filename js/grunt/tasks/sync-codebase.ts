@@ -56,10 +56,9 @@ const red = '\u001b[31m';
 const green = '\u001b[32m';
 const reset = '\u001b[0m';
 
-const repos = getActiveRepos();
 const data: Record<string, string> = {};
 
-const getStatus = async ( repo: string ) => {
+const updateRepo = async ( repo: string ) => {
   data[ repo ] = '';
 
   try {
@@ -131,16 +130,18 @@ const getStatus = async ( repo: string ) => {
   }
 };
 
+// Main iife
 ( async () => {
+  const repos = getActiveRepos();
 
   if ( slowPull ) {
-    await chunkDelayed( repos, repo => getStatus( repo ), {
+    await chunkDelayed( repos, repo => updateRepo( repo ), {
       waitPerItem: allBranches ? 1000 : 100,
       chunkSize: allBranches ? 20 : 10
     } );
   }
   else {
-    await Promise.all( repos.map( repo => getStatus( repo ) ) );
+    await Promise.all( repos.map( repo => updateRepo( repo ) ) );
   }
 
   repos.forEach( repo => {
@@ -149,16 +150,31 @@ const getStatus = async ( repo: string ) => {
 
   console.log( `${_.every( repos, repo => !data[ repo ].length ) ? green : red}-----=====] finished pulls [=====-----${reset}\n` );
 
-  await npmUpdate( 'chipper' );
-  await npmUpdate( 'perennial' );
-  await npmUpdate( 'perennial-alias' );
-  repo && !repo.startsWith( 'perennial' ) && fs.existsSync( `../${repo}/package.json` ) && await npmUpdate( repo );
+  let npmUpdateProblems = false;
+  try {
 
-  console.log( `${_.every( repos, repo => !data[ repo ].length ) ? green : red}-----=====] finished npm [=====-----${reset}\n` );
+    await npmUpdate( 'chipper' );
+    await npmUpdate( 'perennial' );
+    await npmUpdate( 'perennial-alias' );
+    repo && !repo.startsWith( 'perennial' ) && fs.existsSync( `../${repo}/package.json` ) && await npmUpdate( repo );
+  }
+  catch( e ) {
+    npmUpdateProblems = true;
+    console.error( 'Error npm updating:', e );
+  }
+
+  console.log( `${npmUpdateProblems ? red : green}-----=====] finished npm [=====-----${reset}\n` );
 
   if ( transpile ) {
-    await transpileAll();
+    let transpileProblems = false;
 
-    console.log( `${_.every( repos, repo => !data[ repo ].length ) ? green : red}-----=====] finished transpile [=====-----${reset}\n` );
+    try {
+      await transpileAll();
+    }
+    catch( e ) {
+      transpileProblems = true;
+      console.error( 'Error transpiling:', e );
+    }
+    console.log( `${transpileProblems ? red : green}-----=====] finished transpile [=====-----${reset}\n` );
   }
 } )();
