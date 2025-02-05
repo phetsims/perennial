@@ -129,6 +129,14 @@ module.exports = async function dev( repo, brands, noninteractive, branch, messa
     debugHTML: true
   } ) );
 
+  // If there is a protected directory and we are copying to the dev server, include the .htaccess file
+  // This is for PhET-iO simulations, to protected the password protected wrappers, see
+  // https://github.com/phetsims/phet-io/issues/641
+  if ( brands.includes( 'phet-io' ) && buildLocal.devDeployServer === 'bayes.colorado.edu' ) {
+    const htaccessLocation = `../${repo}/build/phet-io`;
+    await writePhetioHtaccess( htaccessLocation );
+  }
+
   // Create (and fix permissions for) the main simulation directory, if it didn't already exist
   if ( !simPathExists ) {
     await devSsh( `mkdir -p "${simPath}" && echo "IndexOrderDefault Descending Date\n" > "${simPath}/.htaccess"` );
@@ -140,14 +148,6 @@ module.exports = async function dev( repo, brands, noninteractive, branch, messa
   // Copy the build contents into the version-specific directory
   for ( const brand of brands ) {
     await devScp( `../${repo}/build/${brand}`, `${versionPath}/` );
-  }
-
-  // If there is a protected directory and we are copying to the dev server, include the .htaccess file
-  // This is for PhET-iO simulations, to protected the password protected wrappers, see
-  // https://github.com/phetsims/phet-io/issues/641
-  if ( brands.includes( 'phet-io' ) && buildLocal.devDeployServer === 'bayes.colorado.edu' ) {
-    const htaccessLocation = `../${repo}/build/phet-io`;
-    await writePhetioHtaccess( htaccessLocation, null, versionPath );
   }
 
   // Move over dependencies.json and commit/push

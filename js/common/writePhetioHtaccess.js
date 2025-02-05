@@ -2,7 +2,6 @@
 // @author Matt Pennington (PhET Interactive Simulations)
 
 const buildLocal = require( './buildLocal' );
-const devScp = require( './devScp' );
 const writeFile = require( './writeFile' );
 const axios = require( 'axios' );
 const fs = require( 'graceful-fs' ); // eslint-disable-line phet/require-statement-match
@@ -27,9 +26,8 @@ const PASSWORD_PROTECTED_SUB_DIRS = [ 'wrappers', 'doc' ];
  *      This is only to be used for production deploys by the build-server. directory is the write destination.
  *      checkoutDir is where the release branch repos live locally.
  *      simName, version, and directory are required if isProductionDeploy is true
- * @param {string} [devVersionPath] - if provided, scp the htaccess files to here, relatively
  */
-module.exports = async function writePhetioHtaccess( passwordProtectPath, latestOption, devVersionPath ) {
+module.exports = async function writePhetioHtaccess( passwordProtectPath, latestOption = null ) {
   const authFilepath = '/etc/httpd/conf/phet-io_pw';
 
   const isProductionDeploy = latestOption?.isProductionDeploy;
@@ -103,9 +101,6 @@ ${commentSymbol} Allow from all
       // if the directory exists
       if ( fs.existsSync( htaccessPathToDir.replace( htaccessFilename, '' ) ) ) {
         await writeFile( htaccessPathToDir, passwordProtectWrapperContents );
-        if ( devVersionPath ) {
-          await devScp( htaccessPathToDir, `${devVersionPath}/phet-io/${getSubdirHtaccessPath( subdir )}` );
-        }
       }
     }
 
@@ -138,9 +133,6 @@ ${commentSymbol} Satisfy Any
 ${commentSymbol} Allow from all
 `;
       await writeFile( rootHtaccessFullPath, rootHtaccessContent );
-      if ( devVersionPath ) {
-        await devScp( rootHtaccessFullPath, `${devVersionPath}/phet-io/${htaccessFilename}` );
-      }
     }
     winston.debug( 'phetio authentication htaccess written' );
   }
