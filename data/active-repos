@@ -174,12 +174,14 @@ scenery-lab-demo
 scenery-phet
 scenery-template-parcel
 scenery-template-vite
+scenery-template-webpack
 scenerystack
 scenerystack-tests
 sherpa
 shred
 sim-template-parcel
 sim-template-vite
+sim-template-webpack
 simula-rasa
 skiffle
 soccer-common
