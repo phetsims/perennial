@@ -10,15 +10,15 @@
  * - Conduct pull and tracking on all branches associated with the repo (see --allBranches) (useful for doing batch MRs)
  *
  * usage:
+ * grunt sync-codebase
+ * ################ or
  * cd perennial/
  * sage run js/grunt/tasks/sync-codebase.ts
  *
- * # or...
- * grunt sync-codebase
- *
- * NOTE: Cannot be run from git repo root, must be from inside a repo
+ * NOTE: Cannot be run from git repo root, must be from inside a repo.
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
 import fs from 'fs';
