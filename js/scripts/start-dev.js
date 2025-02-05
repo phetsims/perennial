@@ -12,7 +12,7 @@
  * Run this from your root level directory containing all PhET repositories.
  * Example usage:
  * sage run perennial/js/scripts/start-dev.js
- *
+ * @deprecated - please see `grunt sync-codebase` TODO: Delete in https://github.com/phetsims/perennial/issues/405?
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 
@@ -78,7 +78,7 @@ async function main() {
 
     if ( !skipPull ) {
       console.log( '\nUpdating code base, installing dependencies. This may take several minutes. You can skip this step with --skipPull option.' );
-      await runCommand( 'node js/scripts/main-pull-status.js --all --slowPull', { cwd: path.join( phetsimsDirectory, 'perennial' ) } );
+      await runCommand( 'grunt sync-codebase --all --slowPull', { cwd: path.join( phetsimsDirectory, 'perennial' ) } );
     }
     else {
       console.log( '\nSkipping pull step.' );
