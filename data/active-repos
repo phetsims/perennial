@@ -172,6 +172,7 @@ rutherford-scattering
 scenery
 scenery-lab-demo
 scenery-phet
+scenery-template-esbuild
 scenery-template-parcel
 scenery-template-vite
 scenery-template-webpack
@@ -179,6 +180,7 @@ scenerystack
 scenerystack-tests
 sherpa
 shred
+sim-template-esbuild
 sim-template-parcel
 sim-template-vite
 sim-template-webpack
