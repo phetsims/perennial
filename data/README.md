@@ -23,6 +23,10 @@ See https://github.com/phetsims/scenery-phet/issues/515#issuecomment-885921345
 **interactive-description (auto-generated)** - is a list of all repositories that have been outfitted with interactive
 description like keyboard navigation. Sims in progress are also included in this list.
 
+**npm-update (manually maintained)** - lists the repos that need to have npm dependencies maintained in order for core
+codebase functionality to work on main. For example if type-checking won't pass until the repo is npm-installed. This 
+list does not include sim repos or any repos that require npm install only for `grunt` to work correctly.
+
 **phet-io (auto-generated)** - is the list of all simulations that are instrumented with PhET-iO features. This list is
 automatically fuzz tested and is used by phetmarks to dictate which sims have wrapper links. See the
 [PhET-iO Instrumentation Technical Guide](https://github.com/phetsims/phet-io/blob/main/doc/phet-io-instrumentation-technical-guide.md)
