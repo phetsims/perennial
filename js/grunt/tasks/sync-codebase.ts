@@ -24,6 +24,7 @@
 import fs from 'fs';
 import _ from 'lodash';
 import winston from 'winston';
+import { IntentionalPerennialAny } from '../../browser-and-node/PerennialTypes.js';
 import cloneMissingRepos from '../../common/cloneMissingRepos.js';
 import execute from '../../common/execute.js';
 import getActiveRepos from '../../common/getActiveRepos.js';
@@ -98,11 +99,11 @@ const updateRepo = async ( repo: string ) => {
         await gitPullRebase( repo );
       }
     }
-    else if ( repo === 'perennial' ) {
-      console.log( `${red}perennial is not clean, skipping pull${reset}` );
+    else if ( repo === PERENNIAL_REPO_NAME ) {
+      console.log( `${red}${PERENNIAL_REPO_NAME} is not clean, skipping pull${reset}` );
     }
 
-    if ( repo === 'perennial' ) {
+    if ( repo === PERENNIAL_REPO_NAME ) {
       await cloneMissingRepos();
     }
 
