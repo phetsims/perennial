@@ -5,13 +5,18 @@
  * - clone missing repos
  * - pull all repos
  * - set up tracking to the remote (only if needed)
- * - npm update in chipper/perennial/perennial-alias
+ * - npm update in chipper/perennial/perennial-alias/cwd-repo
  * - transpile (see --transpile)
  * - Conduct pull and tracking on all branches associated with the repo (see --allBranches) (useful for doing batch MRs)
  *
  * usage:
  * cd perennial/
- * sage run js/scripts/main-pull-status.js
+ * sage run js/grunt/tasks/sync-codebase.ts
+ *
+ * # or...
+ * grunt sync-codebase
+ *
+ * NOTE: Cannot be run from git repo root, must be from inside a repo
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
@@ -29,6 +34,7 @@ import gitIsClean from '../../common/gitIsClean.js';
 import gitPullRebase from '../../common/gitPullRebase.js';
 import gitRevParse from '../../common/gitRevParse.js';
 import npmUpdate from '../../common/npmUpdate.js';
+import { PERENNIAL_REPO_NAME } from '../../common/perennialRepoUtils.js';
 import transpileAll from '../../common/transpileAll.js';
 import chunkDelayed from '../../common/util/chunkDelayed.js';
 import getOption from './util/getOption.js';
@@ -132,6 +138,14 @@ const updateRepo = async ( repo: string ) => {
 
 // Main iife
 ( async () => {
+
+  // If pulling all branches, we need to clone before going through all
+  if ( allBranches ) {
+    await gitIsClean( PERENNIAL_REPO_NAME ) && await gitPullRebase( PERENNIAL_REPO_NAME );
+    await cloneMissingRepos();
+  }
+
+  // load active repos after the above cloneMissingRepos
   const repos = getActiveRepos();
 
   if ( slowPull ) {
