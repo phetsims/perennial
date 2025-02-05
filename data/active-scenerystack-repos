@@ -3,7 +3,9 @@ create-scenerystack
 demo-sim
 scenery-template-parcel
 scenery-template-vite
+scenery-template-webpack
 scenerystack
 scenerystack-tests
 sim-template-parcel
 sim-template-vite
+sim-template-webpack
