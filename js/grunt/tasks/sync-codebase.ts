@@ -168,10 +168,13 @@ const updateRepo = async ( repo: string ) => {
   let npmUpdateProblems = false;
   try {
 
-    await npmUpdate( 'chipper' );
-    await npmUpdate( 'perennial' );
-    await npmUpdate( 'perennial-alias' );
-    repo && !repo.startsWith( 'perennial' ) && fs.existsSync( `../${repo}/package.json` ) && await npmUpdate( repo );
+    const promises: Promise<IntentionalPerennialAny>[] = [
+      npmUpdate( 'chipper' ),
+      npmUpdate( 'perennial' ),
+      npmUpdate( 'perennial-alias' )
+    ];
+    repo && !repo.startsWith( 'perennial' ) && fs.existsSync( `../${repo}/package.json` ) && promises.push( npmUpdate( repo ) );
+    await Promise.all( promises );
   }
   catch( e ) {
     npmUpdateProblems = true;
