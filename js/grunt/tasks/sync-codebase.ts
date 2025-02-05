@@ -16,34 +16,35 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const cloneMissingRepos = require( '../common/cloneMissingRepos' );
-const execute = require( '../common/execute' ).default;
-const getActiveRepos = require( '../common/getActiveRepos' );
-const getBranches = require( '../common/getBranches' );
-const gitCheckout = require( '../common/gitCheckout' );
-const gitFetch = require( '../common/gitFetch' );
-const gitIsClean = require( '../common/gitIsClean' );
-const gitPullRebase = require( '../common/gitPullRebase' );
-const gitRevParse = require( '../common/gitRevParse' );
-const npmUpdate = require( '../common/npmUpdate' );
-const transpileAll = require( '../common/transpileAll' );
-const winston = require( 'winston' );
-const _ = require( 'lodash' );
-const chunkDelayed = require( '../common/util/chunkDelayed' ).default;
+import _ from 'lodash';
+import winston from 'winston';
+import cloneMissingRepos from '../../common/cloneMissingRepos.js';
+import execute from '../../common/execute.js';
+import getActiveRepos from '../../common/getActiveRepos.js';
+import getBranches from '../../common/getBranches.js';
+import gitCheckout from '../../common/gitCheckout.js';
+import gitFetch from '../../common/gitFetch.js';
+import gitIsClean from '../../common/gitIsClean.js';
+import gitPullRebase from '../../common/gitPullRebase.js';
+import gitRevParse from '../../common/gitRevParse.js';
+import npmUpdate from '../../common/npmUpdate.js';
+import transpileAll from '../../common/transpileAll.js';
+import chunkDelayed from '../../common/util/chunkDelayed.js';
+import getOption from './util/getOption.js';
 
 winston.default.transports.console.level = 'error';
 
 // If this is provided, we'll track ALL remote branches, check them out, and pull them (with rebase)
-const allBranches = process.argv.includes( '--allBranches' );
+const allBranches = getOption( 'allBranches' );
 
 // Additionally run the transpiler after pulling
-const transpile = process.argv.includes( '--transpile' );
+const transpile = getOption( 'transpile' );
 
 // Log all repos, even if nothing changed with them.
-const allRepos = process.argv.includes( '--all' );
+const allRepos = getOption( 'all' );
 
 // Pulling repos in parallel doesn't work on Windows git.  This is a workaround for that.
-const slowPull = process.argv.includes( '--slowPull' );
+const slowPull = getOption( 'slowPull' );
 
 // ANSI escape sequences to move to the right (in the same line) or to apply or reset colors
 const moveRight = ' \u001b[42G';
@@ -52,9 +53,9 @@ const green = '\u001b[32m';
 const reset = '\u001b[0m';
 
 const repos = getActiveRepos();
-const data = {};
+const data: Record<string, string> = {};
 
-const getStatus = async repo => {
+const getStatus = async ( repo: string ) => {
   data[ repo ] = '';
 
   try {
