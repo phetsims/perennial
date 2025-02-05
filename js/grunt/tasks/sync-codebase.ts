@@ -29,6 +29,7 @@ import cloneMissingRepos from '../../common/cloneMissingRepos.js';
 import execute from '../../common/execute.js';
 import getActiveRepos from '../../common/getActiveRepos.js';
 import getBranches from '../../common/getBranches.js';
+import getRepoList from '../../common/getRepoList.js';
 import gitCheckout from '../../common/gitCheckout.js';
 import gitFetch from '../../common/gitFetch.js';
 import gitIsClean from '../../common/gitIsClean.js';
@@ -166,14 +167,13 @@ const updateRepo = async ( repo: string ) => {
   console.log( `${_.every( repos, repo => !data[ repo ].length ) ? green : red}-----=====] finished pulls [=====-----${reset}\n` );
 
   let npmUpdateProblems = false;
+  const npmUpdatesNeeded = getRepoList( 'npm-update' );
   try {
 
-    const promises: Promise<IntentionalPerennialAny>[] = [
-      npmUpdate( 'chipper' ),
-      npmUpdate( 'perennial' ),
-      npmUpdate( 'perennial-alias' )
-    ];
-    repo && !repo.startsWith( 'perennial' ) && fs.existsSync( `../${repo}/package.json` ) && promises.push( npmUpdate( repo ) );
+    const promises: Promise<IntentionalPerennialAny>[] = npmUpdatesNeeded.map( repo => npmUpdate( repo ) );
+
+    repo && !npmUpdatesNeeded.includes( repo ) && fs.existsSync( `../${repo}/package.json` ) && promises.push( npmUpdate( repo ) );
+
     await Promise.all( promises );
   }
   catch( e ) {
