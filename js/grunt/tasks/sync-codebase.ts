@@ -16,6 +16,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
+import fs from 'fs';
 import _ from 'lodash';
 import winston from 'winston';
 import cloneMissingRepos from '../../common/cloneMissingRepos.js';
@@ -45,6 +46,9 @@ const allRepos = getOption( 'all' );
 
 // Pulling repos in parallel doesn't work on Windows git.  This is a workaround for that.
 const slowPull = getOption( 'slowPull' );
+
+// If running as a grunt task, you will be running from a particular repo
+const repo = getOption( 'repo' );
 
 // ANSI escape sequences to move to the right (in the same line) or to apply or reset colors
 const moveRight = ' \u001b[42G';
@@ -148,6 +152,7 @@ const getStatus = async ( repo: string ) => {
   await npmUpdate( 'chipper' );
   await npmUpdate( 'perennial' );
   await npmUpdate( 'perennial-alias' );
+  repo && !repo.startsWith( 'perennial' ) && fs.existsSync( `../${repo}/package.json` ) && await npmUpdate( repo );
 
   console.log( `${_.every( repos, repo => !data[ repo ].length ) ? green : red}-----=====] finished npm [=====-----${reset}\n` );
 
