@@ -59,6 +59,61 @@ function parseImportJsFile( importJsPath: string ): ReExportInfo[] {
   return results;
 }
 
+function addDirectivesInFile( sourceFile: SourceFile ) {
+
+  // 1) Grab the file's content as a string, split it by lines
+  const text = sourceFile.getFullText();
+  const lines = text.split( '\n' );
+
+  // 2) Loop through each line
+  for ( let i = 0; i < lines.length; i++ ) {
+    // Trim just for the quick match check
+    const trimmed = lines[ i ].trim();
+
+    // This simple pattern looks for:
+    //   import <anything> from 'some/path/import.js'
+    //   import <anything> from "some/path/import.js"
+    //   with optional semicolon at the end
+    // If your project sometimes uses "imports.js", you can tweak the pattern likewise.
+    if ( trimmed.includes( 'import' ) && trimmed.endsWith( 'imports.js\';' ) ) {
+
+      console.log( 'found' )
+
+      // Insert a line above it. Then move our index
+      lines.splice( i, 0, '\'PLEASE_IMPORT_DIRECTLY\';' );
+      // We inserted a new line at index i. That means
+      //   the `import` line now lives at i+1.
+      // We'll increment i to skip re-checking that same import line
+      i += 1;
+    }
+  }
+
+  // 3) Rejoin and replace the source text
+  sourceFile.replaceWithText( lines.join( '\n' ) );
+
+  // 4) Save
+  sourceFile.saveSync(); // or save() if async
+  console.log( `Added directives in ${sourceFile.getFilePath()}` );
+}
+
+function removeDirectivesInFile( sourceFile: SourceFile ) {
+
+  // 1) Grab the file's content as a string, split it by lines
+  const text = sourceFile.getFullText();
+  let lines = text.split( '\n' );
+
+  // delete any line that contains 'PLEASE_IMPORT_DIRECTLY'
+  lines = lines.filter( line => !line.includes( 'PLEASE_IMPORT_DIRECTLY' ) );
+
+  // 3) Rejoin and replace the source text
+  sourceFile.replaceWithText( lines.join( '\n' ) );
+
+  // 4) Save
+  sourceFile.saveSync(); // or save() if async
+  console.log( `Added directives in ${sourceFile.getFilePath()}` );
+}
+
+
 function rewriteImportsInFile( sourceFile: SourceFile ) {
   console.log( `Processing ${sourceFile.getFilePath()}` );
 
@@ -161,7 +216,20 @@ async function main() {
   const sourceFiles = project.getSourceFiles();
   for ( const sf of sourceFiles ) {
     if ( sf.getFilePath().includes( `/${repo}/` ) ) {
-      rewriteImportsInFile( sf );
+
+      if ( Deno.args.includes( '--phase1' ) ) {
+        addDirectivesInFile( sf );
+      }
+
+      if ( Deno.args.includes( '--phase2' ) ) {
+        rewriteImportsInFile( sf );
+      }
+
+      if ( Deno.args.includes( '--phase3' ) ) {
+        removeDirectivesInFile( sf );
+      }
+
+
     }
   }
 
