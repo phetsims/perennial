@@ -11,23 +11,24 @@ const winston = require( 'winston' );
 // added later.
 const PASSWORD_PROTECTED_SUB_DIRS = [ 'wrappers', 'doc' ];
 
+// If isProductionDeploy is true, then we are publishing to production. We then write the /latest/ redirect
+// .htaccess file. This is only to be used for production deploys by the build-server. directory is the write
+// destination.
+type LatestOption = {
+  checkoutDir: string;  // checkoutDir is where the release branch repos live locally.
+} & ( {
+  isProductionDeploy: false;
+} | {
+  isProductionDeploy: true;
+  simName: string;
+  version: string;
+  directory: string;
+} );
+
 /**
  * Writes the htaccess file to password protect the exclusive content for phet-io sims
- * @param {string} passwordProtectPath - deployment location, with no trailing slash
- * @param {
- *  {
- *    [simName]:string,
- *    [version]:string,
- *    [directory]:string,
- *    checkoutDir: string,
- *    isProductionDeploy: boolean
- *  } | null } [latestOption]
- *      if isProductionDeploy is true, then we are publishing to production. We then write the /latest/ redirect .htaccess file.
- *      This is only to be used for production deploys by the build-server. directory is the write destination.
- *      checkoutDir is where the release branch repos live locally.
- *      simName, version, and directory are required if isProductionDeploy is true
  */
-module.exports = async function writePhetioHtaccess( passwordProtectPath, latestOption = null ) {
+export default async function writePhetioHtaccess( passwordProtectPath: string, latestOption: LatestOption | null = null ): Promise<void> {
   const authFilepath = '/etc/httpd/conf/phet-io_pw';
 
   const isProductionDeploy = latestOption?.isProductionDeploy;
@@ -65,17 +66,23 @@ module.exports = async function writePhetioHtaccess( passwordProtectPath, latest
   const simPackage = isProductionDeploy ? JSON.parse( fs.readFileSync( `${latestOption.checkoutDir}/${latestOption.simName}/package.json` ) ) : null;
 
   const htaccessFilename = '.htaccess';
-  const getSubdirHtaccessPath = subdir => `${subdir}/${htaccessFilename}`;
-  const getSubdirHtaccessFullPath = subdir => `${passwordProtectPath}/${getSubdirHtaccessPath( subdir )}`;
+  const getSubdirHtaccessPath = ( subdir: string ) => `${subdir}/${htaccessFilename}`;
+  const getSubdirHtaccessFullPath = ( subdir: string ) => `${passwordProtectPath}/${getSubdirHtaccessPath( subdir )}`;
   const rootHtaccessFullPath = `${passwordProtectPath}/${htaccessFilename}`;
 
   // Only allow public accessibility with htaccess mutation if in production deploy when the "allowPublicAccess" flag
   // is present. Commented out lines keep password protection, but comment them in with `allowPublicAccess`.
   let commentSymbol = '#';
 
-  if ( simPackage && simPackage.phet && simPackage.phet[ 'phet-io' ] && simPackage.phet[ 'phet-io' ].allowPublicAccess ) {
+  if ( isProductionDeploy && simPackage?.phet && simPackage.phet[ 'phet-io' ]?.allowPublicAccess ) {
     commentSymbol = '';
   }
+
+  const publicAccessDirective = `
+# Editing these directly is not supported and will be overwritten by maintenance releases. Please change by modifying 
+# the sim's package.json allowPublicAccess flag followed by a re-deploy.
+${commentSymbol} Satisfy Any
+${commentSymbol} Allow from all`;
   try {
     const basePasswordProtectContents = `
 AuthType Basic
@@ -86,12 +93,10 @@ AuthUserFile ${authFilepath}
 </LimitExcept>
 `;
 
-    const passwordProtectWrapperContents = `${basePasswordProtectContents}
+    const passwordProtectWrapperContents = `
+${basePasswordProtectContents}
 
-# Editing these directly is not supported and will be overwritten by maintenance releases. Please change by modifying 
-# the sim's package.json allowPublicAccess flag followed by a re-deploy.
-${commentSymbol} Satisfy Any
-${commentSymbol} Allow from all
+${publicAccessDirective}
 `;
 
     // Write a file to add authentication to subdirectories like wrappers/ or doc/
@@ -126,12 +131,10 @@ ${commentSymbol} Allow from all
       }</FilesMatch>
       
 ${cachingDirective}
-                        
-# Editing these directly is not supported and will be overwritten by maintenance releases. Please change by modifying 
-# the sim's package.json allowPublicAccess flag followed by a re-deploy.
-${commentSymbol} Satisfy Any
-${commentSymbol} Allow from all
+
+${publicAccessDirective}
 `;
+
       await writeFile( rootHtaccessFullPath, rootHtaccessContent );
     }
     winston.debug( 'phetio authentication htaccess written' );
@@ -140,4 +143,4 @@ ${commentSymbol} Allow from all
     winston.debug( 'phetio authentication htaccess not written' );
     throw err;
   }
-};
+}
