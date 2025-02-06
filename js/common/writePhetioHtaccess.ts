@@ -41,17 +41,14 @@ export default async function writePhetioHtaccess( simName: string, passwordProt
   // is present. Commented out lines keep password protection, but comment them in with `allowPublicAccess`.
   let commentSymbol = '#';
 
-  if ( isProductionDeploy && simPackage?.phet && simPackage.phet[ 'phet-io' ]?.allowPublicAccess ) {
+  const phetioPackageBlock = simPackage?.phet && simPackage.phet[ 'phet-io' ];
+  if ( isProductionDeploy && phetioPackageBlock?.allowPublicAccess ) {
     commentSymbol = '';
   }
 
   ///////////////////////////
   // start htaccess content
-  const publicAccessDirective = `
-# Editing these directly is not supported and will be overwritten by maintenance releases. Please change by modifying 
-# the sim's package.json allowPublicAccess flag followed by a re-deploy.
-${commentSymbol} Satisfy Any
-${commentSymbol} Allow from all`;
+  const publicAccessDirective = getPublicAccessDirective( commentSymbol, 'allowPublicAccess' );
 
   const basePasswordProtectContents = `
 AuthType Basic
@@ -102,6 +99,16 @@ ${publicAccessDirective}
 
         // if the directory exists
         fs.existsSync( fullSubdirPath ) && await writeFile( `${fullSubdirPath}/${htaccessFilename}`, passwordProtectWrapperContents );
+
+        // Add an additional .htaccess to individual wrappers that are marked as public
+        if ( subdir === 'wrappers' && phetioPackageBlock?.publicWrappers ) {
+          for ( const publicWrapper of phetioPackageBlock.publicWrappers ) {
+
+            const publicWrapperContents = getPublicAccessDirective( '', 'publicWrappers' );
+            const publicWrapperPath = `${fullSubdirPath}/${publicWrapper}`;
+            fs.existsSync( publicWrapperPath ) && await writeFile( `${publicWrapperPath}/${htaccessFilename}`, publicWrapperContents );
+          }
+        }
       }
 
       // Root path
@@ -143,4 +150,13 @@ ${publicAccessDirective}
       throw new Error( 'latestOption is missing one of the required parameters (simName, version, directory, or checkoutDir)' );
     }
   }
+}
+
+function getPublicAccessDirective( commentSymbol: string, packageKey: string ): string {
+  return `
+# Editing these directly is not supported and will be overwritten by maintenance releases. Please change by modifying 
+# the sim's package.json ${packageKey} property followed by a re-deploy.
+${commentSymbol} Satisfy Any
+${commentSymbol} Allow from all
+`;
 }
