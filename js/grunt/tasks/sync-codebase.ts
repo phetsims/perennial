@@ -210,7 +210,7 @@ const updateRepo = async ( repo: string ) => {
 
     // Log pull result after the status section, for formatting
     if ( pullResult ) {
-      append( repo, pullResult );
+      append( repo, ' ' + pullResult );
     }
   }
   catch( e ) {
