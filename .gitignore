@@ -16,3 +16,4 @@ logs/
 temp.js
 temp.ts
 .scenerystack
+deno.lock
