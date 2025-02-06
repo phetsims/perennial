@@ -13,7 +13,7 @@
 # for-each.sh active-repos git checkout main
 #
 # // you can also string multiple commands together by putting everything inside quotes:
-# for-each.sh active-sims "npm install && grunt update"
+# for-each.sh active-sims "npm prune && grunt update"
 #
 # Author: Sam Reid
 # Author: Chris Malley
