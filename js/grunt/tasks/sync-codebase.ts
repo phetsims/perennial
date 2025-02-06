@@ -236,6 +236,7 @@ async function cloneMissingReposInternal(): Promise<void> {
 ( async () => {
 
   const startPullStatus = Date.now();
+  console.log(); // extra space before the first logging
 
   // If pulling all branches, or printing all repos, we need to clone before going through the parallel loop.
   if ( cloneFirst ) {
