@@ -43,20 +43,26 @@ import getOption from './util/getOption.js';
 
 winston.default.transports.console.level = 'error';
 
-// If this is provided, we'll track ALL remote branches, check them out, and pull them (with rebase)
-const allBranches = getOption( 'allBranches' );
+const options = {
 
-// Additionally run the transpiler after pulling
-const transpile = getOption( 'transpile' );
+  // If this is provided, we'll track ALL remote branches, check them out, and pull them (with rebase)
+  allBranches: getOption( 'allBranches' ),
 
-// Log all repos, even if nothing changed with them.
-const allRepos = getOption( 'all' );
+  // Additionally run the transpiler after pulling
+  transpile: getOption( 'transpile' ),
 
-// Pulling repos in parallel doesn't work on Windows git.  This is a workaround for that.
-const slowPull = getOption( 'slowPull' );
+  // Log all repos, even if nothing changed with them.
+  allRepos: getOption( 'all' ),
 
-// If running as a grunt task, you will be running from a particular repo
-const repo = getOption( 'repo' );
+  // Pulling repos in parallel doesn't work on Windows git.  This is a workaround for that. It will also log as it
+  // completes individual repo updates, since it takes more time.
+  slowPull: getOption( 'slowPull' ),
+
+  // If running as a grunt task, you will be running from a particular repo
+  repo: getOption( 'repo' )
+};
+
+const cloneFirst = options.allBranches || options.allRepos;
 
 // ANSI escape sequences to move to the right (in the same line) or to apply or reset colors
 const moveRight = ' \u001b[42G';
@@ -95,21 +101,28 @@ const updateRepo = async ( repo: string ) => {
   data[ repo ] = '';
 
   try {
-    if ( await gitIsClean( repo ) ) {
-      if ( allBranches ) {
-        await pullAllBranches( repo );
+    if ( fs.existsSync( `../${repo}` ) ) {
+
+      if ( await gitIsClean( repo ) ) {
+        if ( options.allBranches ) {
+          await pullAllBranches( repo );
+        }
+        else {
+          await gitCheckout( repo, 'main' );
+          await gitPullRebase( repo );
+        }
       }
-      else {
-        await gitCheckout( repo, 'main' );
-        await gitPullRebase( repo );
+      else if ( repo === PERENNIAL_REPO_NAME ) {
+        console.log( `${red}${PERENNIAL_REPO_NAME} is not clean, skipping pull${reset}` );
       }
     }
-    else if ( repo === PERENNIAL_REPO_NAME ) {
-      console.log( `${red}${PERENNIAL_REPO_NAME} is not clean, skipping pull${reset}` );
+    else {
+      // This will be handled later when perennial gets around to cloneMissingRepos
+      return;
     }
 
-    if ( repo === PERENNIAL_REPO_NAME ) {
-      await cloneMissingRepos();
+    if ( !cloneFirst && repo === PERENNIAL_REPO_NAME ) {
+      await cloneMissingReposInternal();
     }
 
     const symbolicRef = ( await execute( 'git', [ 'symbolic-ref', '-q', 'HEAD' ], `../${repo}` ) ).trim();
@@ -122,7 +135,7 @@ const updateRepo = async ( repo: string ) => {
     if ( branch ) {
       isGreen = !status && branch === 'main' && !track.length;
 
-      if ( !isGreen || allRepos ) {
+      if ( !isGreen || options.allRepos ) {
         data[ repo ] += `${repo}${moveRight}${isGreen ? green : red}${branch}${reset} ${track}\n`;
       }
     }
@@ -132,7 +145,7 @@ const updateRepo = async ( repo: string ) => {
     }
 
     if ( status ) {
-      if ( !isGreen || allRepos ) {
+      if ( !isGreen || options.allRepos ) {
         data[ repo ] += status + '\n';
       }
     }
@@ -140,36 +153,46 @@ const updateRepo = async ( repo: string ) => {
   catch( e ) {
     data[ repo ] += `${repo} ERROR: ${e}`;
   }
+
+  // Print progress as we go during slowPull, because it is slow
+  if ( options.slowPull ) {
+    ( options.allRepos || data[ repo ].length ) && process.stdout.write( data[ repo ] );
+  }
 };
 
-///////////////////////////
+// Bundles a call to cloneMissingRepos with logging what repos were cloned
+async function cloneMissingReposInternal(): Promise<void> {
+  const missingRepos = await cloneMissingRepos();
+  if ( missingRepos.length ) {
+    console.log( `${green}Cloned:\n\t${missingRepos.join( '\n\t' )}${reset}` );
+  }
+}
+
+///////////////////////////////
 // Main iife
 ( async () => {
 
-  // If pulling all branches, we need to clone before going through all
-  if ( allBranches ) {
+  // If pulling all branches, or printing all repos, we need to clone before going through the parallel loop.
+  if ( cloneFirst ) {
     await gitIsClean( PERENNIAL_REPO_NAME ) && await gitPullRebase( PERENNIAL_REPO_NAME );
-    await cloneMissingRepos();
+    await cloneMissingReposInternal();
   }
 
   // load active repos after the above cloneMissingRepos
   const repos = getActiveRepos();
 
-  if ( slowPull ) {
+  if ( options.slowPull ) {
     await chunkDelayed( repos, repo => updateRepo( repo ), {
-      waitPerItem: allBranches ? 1000 : 100,
-      chunkSize: allBranches ? 20 : 10
+      waitPerItem: options.allBranches ? 1000 : 100,
+      chunkSize: options.allBranches ? 20 : 10
     } );
   }
   else {
     await Promise.all( repos.map( repo => updateRepo( repo ) ) );
+    repos.forEach( repo => process.stdout.write( data[ repo ] ) );
   }
 
-  repos.forEach( repo => {
-    process.stdout.write( data[ repo ] );
-  } );
-
-  console.log( `${_.every( repos, repo => !data[ repo ].length ) ? green : red}-----=====] finished pulls [=====-----${reset}\n` );
+  console.log( `\n${_.every( repos, repo => !data[ repo ].length ) ? green : red}-----=====] finished pulls [=====-----${reset}\n` );
 
   let npmUpdateProblems = false;
   const npmUpdatesNeeded = getRepoList( 'npm-update' );
@@ -177,7 +200,8 @@ const updateRepo = async ( repo: string ) => {
 
     const promises: Promise<IntentionalPerennialAny>[] = npmUpdatesNeeded.map( repo => npmUpdate( repo ) );
 
-    repo && !npmUpdatesNeeded.includes( repo ) && fs.existsSync( `../${repo}/package.json` ) && promises.push( npmUpdate( repo ) );
+    const cwdRepo = options.repo;
+    cwdRepo && !npmUpdatesNeeded.includes( cwdRepo ) && fs.existsSync( `../${cwdRepo}/package.json` ) && promises.push( npmUpdate( cwdRepo ) );
 
     await Promise.all( promises );
   }
@@ -188,7 +212,7 @@ const updateRepo = async ( repo: string ) => {
 
   console.log( `${npmUpdateProblems ? red : green}-----=====] finished npm [=====-----${reset}\n` );
 
-  if ( transpile ) {
+  if ( options.transpile ) {
     let transpileProblems = false;
 
     try {
