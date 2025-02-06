@@ -246,8 +246,8 @@ async function cloneMissingReposInternal(): Promise<void> {
 
   if ( options.slowPull ) {
     await chunkDelayed( repos, repo => updateRepo( repo ), {
-      waitPerItem: options.allBranches ? 1000 : 100,
-      chunkSize: options.allBranches ? 20 : 10
+      waitPerItem: options.allBranches ? 1000 : 110,
+      chunkSize: options.allBranches ? 20 : 15
     } );
   }
   else {
