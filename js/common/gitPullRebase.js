@@ -17,7 +17,7 @@ const winston = require( 'winston' );
  * @returns {Promise.<string>} - Stdout
  * @rejects {ExecuteError}
  */
-module.exports = function( repo ) {
+module.exports = function gitPullRebase( repo ) {
   winston.info( `git pull --rebase on ${repo}` );
 
   return execute( 'git', [ 'pull', '--rebase' ], `../${repo}` );
