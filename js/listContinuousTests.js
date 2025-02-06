@@ -422,7 +422,6 @@ unitTestRepos.forEach( repo => {
     'doc/',
     'doc/accessibility/accessibility.html',
     'doc/accessibility/voicing.html',
-    'doc/a-tour-of-scenery.html',
     'doc/implementation-notes.html',
     'doc/user-input.html',
     'examples/',
