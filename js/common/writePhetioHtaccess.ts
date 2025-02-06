@@ -37,10 +37,6 @@ export default async function writePhetioHtaccess( simName: string, passwordProt
   const simPackage = JSON.parse( fs.readFileSync( `${latestOption.checkoutDir}/${simName}/package.json` ) );
   const phetioPackage = JSON.parse( fs.readFileSync( `${latestOption.checkoutDir}/phet-io/package.json` ) );
 
-  const getSubdirHtaccessPath = ( subdir: string ) => `${subdir}/${htaccessFilename}`;
-  const getSubdirHtaccessFullPath = ( subdir: string ) => `${passwordProtectPath}/${getSubdirHtaccessPath( subdir )}`;
-  const rootHtaccessFullPath = `${passwordProtectPath}/${htaccessFilename}`;
-
   // Only allow public accessibility with htaccess mutation if in production deploy when the "allowPublicAccess" flag
   // is present. Commented out lines keep password protection, but comment them in with `allowPublicAccess`.
   let commentSymbol = '#';
@@ -102,15 +98,14 @@ ${publicAccessDirective}
 
       // Write a file to add authentication to subdirectories like wrappers/ or doc/
       for ( const subdir of PASSWORD_PROTECTED_SUB_DIRS ) {
-        const htaccessPathToDir = getSubdirHtaccessFullPath( subdir );
+        const fullSubdirPath = `${passwordProtectPath}/${subdir}`;
 
         // if the directory exists
-        if ( fs.existsSync( htaccessPathToDir.replace( htaccessFilename, '' ) ) ) {
-          await writeFile( htaccessPathToDir, passwordProtectWrapperContents );
-        }
+        fs.existsSync( fullSubdirPath ) && await writeFile( `${fullSubdirPath}/${htaccessFilename}`, passwordProtectWrapperContents );
       }
 
-      await writeFile( rootHtaccessFullPath, rootHtaccessContent );
+      // Root path
+      await writeFile( `${passwordProtectPath}/${htaccessFilename}`, rootHtaccessContent );
     }
     winston.debug( 'phetio authentication htaccess written' );
   }
