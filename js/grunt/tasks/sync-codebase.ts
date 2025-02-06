@@ -235,6 +235,8 @@ async function cloneMissingReposInternal(): Promise<void> {
 // Main iife
 ( async () => {
 
+  const startPullStatus = Date.now();
+
   // If pulling all branches, or printing all repos, we need to clone before going through the parallel loop.
   if ( cloneFirst ) {
     await gitIsClean( PERENNIAL_REPO_NAME ) && await gitPullRebase( PERENNIAL_REPO_NAME );
@@ -255,9 +257,11 @@ async function cloneMissingReposInternal(): Promise<void> {
     repos.forEach( repo => data[ repo ].length > 0 && console.log( data[ repo ] ) );
   }
 
-  console.log( `\n${_.every( repos, repo => !data[ repo ].length ) ? green : red}-----=====] finished pull/status [=====-----${reset}\n` );
+  const color = _.every( repos, repo => !data[ repo ].length ) ? green : red;
+  console.log( `\n${color}-----=====] finished pull/status (${Date.now() - startPullStatus}ms) [=====-----${reset}\n` );
 
   if ( options.npmUpdate ) {
+    const startNPM = Date.now();
 
     let npmUpdateProblems = false;
     const npmUpdatesNeeded = getRepoList( 'npm-update' );
@@ -275,10 +279,12 @@ async function cloneMissingReposInternal(): Promise<void> {
       console.error( 'Error npm updating:', e );
     }
 
-    console.log( `${npmUpdateProblems ? red : green}-----=====] finished npm [=====-----${reset}\n` );
+    console.log( `${npmUpdateProblems ? red : green}-----=====] finished npm (${Date.now() - startNPM}ms) [=====-----${reset}\n` );
   }
 
   if ( options.transpile ) {
+    const startTranspile = Date.now();
+
     let transpileProblems = false;
 
     try {
@@ -288,6 +294,8 @@ async function cloneMissingReposInternal(): Promise<void> {
       transpileProblems = true;
       console.error( 'Error transpiling:', e );
     }
-    console.log( `${transpileProblems ? red : green}-----=====] finished transpile [=====-----${reset}\n` );
+    console.log( `${transpileProblems ? red : green}-----=====] finished transpile (${Date.now() - startTranspile}ms) [=====-----${reset}\n` );
   }
+
+  console.log( `\nFinished in ${Date.now() - startPullStatus}ms` );
 } )();
