@@ -32,7 +32,7 @@ const htaccessFilename = '.htaccess';
 export default async function writePhetioHtaccess( simName: string, passwordProtectPath: string, latestOption: LatestOption ): Promise<void> {
   const authFilepath = '/etc/httpd/conf/phet-io_pw';
 
-  const isProductionDeploy = latestOption?.isProductionDeploy;
+  const isProductionDeploy = latestOption.isProductionDeploy;
 
   const simPackage = JSON.parse( fs.readFileSync( `${latestOption.checkoutDir}/${simName}/package.json` ) );
   const phetioPackage = JSON.parse( fs.readFileSync( `${latestOption.checkoutDir}/phet-io/package.json` ) );
