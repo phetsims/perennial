@@ -84,20 +84,6 @@ module.exports = {
         regex: /(window\.| )setInterval\(/
       },
 
-      // Decided on during developer meeting, in regards to https://github.com/phetsims/scenery/issues/1324, use `{ Type }`
-      // import syntax from SCENERY/imports.js
-      {
-        id: 'should import from SCENERY/imports.js instead of directly',
-        regex: /import.*from.*\/scenery\/(?!js\/imports.js)/
-      },
-
-      // Decided on during developer meeting, in regards to https://github.com/phetsims/scenery/issues/1324, use `{ Type }`
-      // import syntax from KITE/imports.js
-      {
-        id: 'should import from KITE/imports.js instead of directly',
-        regex: /import.*from.*\/kite\/(?!js\/imports.js)/
-      },
-
       // See https://github.com/phetsims/tandem/issues/302. We don't want to duplicate this type everywhere. Also use 2
       // spaces to prevent false positive for class fields like `public tandem: Tandem;` (which is fine).
       {
