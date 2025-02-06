@@ -66,34 +66,38 @@ const reset = '\u001b[0m';
 
 const data: Record<string, string> = {};
 
+async function pullAllBranches( repo: string ): Promise<void> {
+  const branches = await getBranches( repo );
+  for ( const branch of branches ) {
+    // Only track the remote branch if it hasn't been tracked yet
+    if ( ( await execute( 'git', [ 'rev-parse', '--verify', branch ], `../${repo}`, { errors: 'resolve' } ) ).code !== 0 ) {
+      await gitFetch( repo );
+      await execute( 'git', [ 'branch', '--track', branch, `origin/${branch}` ], `../${repo}` );
+    }
+    await gitCheckout( repo, branch );
+
+    try {
+      await gitPullRebase( repo );
+    }
+    catch( e ) {
+
+      // Likely there is no tracking info set up on the local branch
+      await execute( 'git', [ 'branch', `--set-upstream-to=origin/${branch}`, branch ], `../${repo}` );
+      await gitPullRebase( repo );
+    }
+  }
+
+  // Go back to main
+  await gitCheckout( repo, 'main' );
+}
+
 const updateRepo = async ( repo: string ) => {
   data[ repo ] = '';
 
   try {
     if ( await gitIsClean( repo ) ) {
       if ( allBranches ) {
-        const branches = await getBranches( repo );
-        for ( const branch of branches ) {
-          // Only track the remote branch if it hasn't been tracked yet
-          if ( ( await execute( 'git', [ 'rev-parse', '--verify', branch ], `../${repo}`, { errors: 'resolve' } ) ).code !== 0 ) {
-            await gitFetch( repo );
-            await execute( 'git', [ 'branch', '--track', branch, `origin/${branch}` ], `../${repo}` );
-          }
-          await gitCheckout( repo, branch );
-
-          try {
-            await gitPullRebase( repo );
-          }
-          catch( e ) {
-
-            // Likely there is no tracking info set up on the local branch
-            await execute( 'git', [ 'branch', `--set-upstream-to=origin/${branch}`, branch ], `../${repo}` );
-            await gitPullRebase( repo );
-          }
-        }
-
-        // Go back to main
-        await gitCheckout( repo, 'main' );
+        await pullAllBranches( repo );
       }
       else {
         await gitCheckout( repo, 'main' );
@@ -138,6 +142,7 @@ const updateRepo = async ( repo: string ) => {
   }
 };
 
+///////////////////////////
 // Main iife
 ( async () => {
 
