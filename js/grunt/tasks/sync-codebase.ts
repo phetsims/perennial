@@ -79,6 +79,9 @@ const options = {
   // Log status of all repos, even if nothing changed with them. (only does something when --status is true)
   allRepos: getOption( 'all' ),
 
+  // When closing missing repos, by default private repos are included, use this to opt out
+  omitPrivate: getOption( 'omitPrivate' ),
+
   // Pulling repos in parallel doesn't work on Windows git.  This is a workaround for that. It will also log as it
   // completes individual repo updates, since it takes more time. See https://github.com/phetsims/perennial/issues/361
   slowPull: getOption( 'slowPull' ),
@@ -222,7 +225,7 @@ const updateRepo = async ( repo: string ) => {
 
 // Bundles a call to cloneMissingRepos with logging what repos were cloned
 async function cloneMissingReposInternal(): Promise<void> {
-  const missingRepos = await cloneMissingRepos();
+  const missingRepos = await cloneMissingRepos( options.omitPrivate );
   if ( missingRepos.length ) {
     console.log( `${green}Cloned:\n\t${missingRepos.join( '\n\t' )}${reset}` );
   }
