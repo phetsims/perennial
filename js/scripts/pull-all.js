@@ -44,6 +44,7 @@ const repos = contents.split( '\n' ).map( sim => sim.trim() );
     const repo = repos[ i ];
     const result = results[ i ];
 
+    // DUPLICATION ALERT: these hard coded strings are also listed in sync-codebase.parsePullResult(), please change both cases.
     if ( result.code === 0 && result.stderr === '' && ( result.stdout === 'Already up to date.\nCurrent branch main is up to date.\n' ||
                                                         result.stdout === 'Already up to date.\n' ||
                                                         result.stdout === 'Current branch main is up to date.\n' ) ) {
