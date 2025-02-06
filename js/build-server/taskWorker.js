@@ -200,7 +200,7 @@ async function runTask( options ) {
         const htaccessLocation = ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) ?
                                  `${buildDir}/phet-io` :
                                  buildDir;
-        await writePhetioHtaccess( htaccessLocation, {
+        await writePhetioHtaccess( simName, htaccessLocation, {
           checkoutDir: checkoutDir,
           isProductionDeploy: false
         } );
@@ -342,8 +342,7 @@ async function runTask( options ) {
             } );
 
             winston.debug( 'server notified' );
-            await writePhetioHtaccess( targetVersionDir, {
-              simName: simName,
+            await writePhetioHtaccess( simName, targetVersionDir, {
               version: originalVersion,
               directory: constants.PHET_IO_SIMS_DIRECTORY,
               checkoutDir: checkoutDir,

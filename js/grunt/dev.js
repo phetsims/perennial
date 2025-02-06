@@ -134,7 +134,9 @@ module.exports = async function dev( repo, brands, noninteractive, branch, messa
   // https://github.com/phetsims/phet-io/issues/641
   if ( brands.includes( 'phet-io' ) && buildLocal.devDeployServer === 'bayes.colorado.edu' ) {
     const htaccessLocation = `../${repo}/build/phet-io`;
-    await writePhetioHtaccess( htaccessLocation );
+    await writePhetioHtaccess( repo, htaccessLocation, {
+      checkoutDir: '../'
+    } );
   }
 
   // Create (and fix permissions for) the main simulation directory, if it didn't already exist

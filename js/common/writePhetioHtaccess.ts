@@ -17,31 +17,117 @@ const PASSWORD_PROTECTED_SUB_DIRS = [ 'wrappers', 'doc' ];
 type LatestOption = {
   checkoutDir: string;  // checkoutDir is where the release branch repos live locally.
 } & ( {
-  isProductionDeploy: false;
+  isProductionDeploy?: false;
 } | {
   isProductionDeploy: true;
-  simName: string;
   version: string;
   directory: string;
 } );
 
+const htaccessFilename = '.htaccess';
+
 /**
  * Writes the htaccess file to password protect the exclusive content for phet-io sims
  */
-export default async function writePhetioHtaccess( passwordProtectPath: string, latestOption: LatestOption | null = null ): Promise<void> {
+export default async function writePhetioHtaccess( simName: string, passwordProtectPath: string, latestOption: LatestOption ): Promise<void> {
   const authFilepath = '/etc/httpd/conf/phet-io_pw';
 
   const isProductionDeploy = latestOption?.isProductionDeploy;
+
+  const simPackage = JSON.parse( fs.readFileSync( `${latestOption.checkoutDir}/${simName}/package.json` ) );
+  const phetioPackage = JSON.parse( fs.readFileSync( `${latestOption.checkoutDir}/phet-io/package.json` ) );
+
+  const getSubdirHtaccessPath = ( subdir: string ) => `${subdir}/${htaccessFilename}`;
+  const getSubdirHtaccessFullPath = ( subdir: string ) => `${passwordProtectPath}/${getSubdirHtaccessPath( subdir )}`;
+  const rootHtaccessFullPath = `${passwordProtectPath}/${htaccessFilename}`;
+
+  // Only allow public accessibility with htaccess mutation if in production deploy when the "allowPublicAccess" flag
+  // is present. Commented out lines keep password protection, but comment them in with `allowPublicAccess`.
+  let commentSymbol = '#';
+
+  if ( isProductionDeploy && simPackage?.phet && simPackage.phet[ 'phet-io' ]?.allowPublicAccess ) {
+    commentSymbol = '';
+  }
+
+  ///////////////////////////
+  // start htaccess content
+  const publicAccessDirective = `
+# Editing these directly is not supported and will be overwritten by maintenance releases. Please change by modifying 
+# the sim's package.json allowPublicAccess flag followed by a re-deploy.
+${commentSymbol} Satisfy Any
+${commentSymbol} Allow from all`;
+
+  const basePasswordProtectContents = `
+AuthType Basic
+AuthName "PhET-iO Password Protected Area"
+AuthUserFile ${authFilepath}
+<LimitExcept OPTIONS>
+  Require valid-user
+</LimitExcept>
+`;
+
+  const passwordProtectWrapperContents = `
+${basePasswordProtectContents}
+
+${publicAccessDirective}
+`;
+
+  // We only want to cache for a production deploy, and not on the dev server
+  const cachingDirective = !isProductionDeploy ? '' : `
+# If the request is for a SIM, anything in the /lib or /xhtml dirs, or is the api.json file, then allow it to be cached
+<If "-f %{REQUEST_FILENAME} && %{REQUEST_FILENAME} =~ m#(${simName}_all.*\\.html|api\\.json|/lib/.*|/xhtml/.*)$#">
+  ExpiresActive on
+  ExpiresDefault "access plus 1 day"
+  Header append Cache-Control "public"
+  Header append Cache-Control "stale-while-revalidate=5184000"
+  Header append Cache-Control "stale-if-error=5184000"
+</If>
+`;
+
+  const rootHtaccessContent = `<FilesMatch "(index\\.\\w+)$">\n${
+    basePasswordProtectContents
+  }</FilesMatch>
+      
+${cachingDirective}
+
+${publicAccessDirective}
+`;
+
+  // end htaccess content
+  ///////////////////////////
+
+  try {
+    // Write a file to add authentication to the top level index pages
+    if ( phetioPackage.phet && phetioPackage.phet.addRootHTAccessFile ) {
+
+      // Write a file to add authentication to subdirectories like wrappers/ or doc/
+      for ( const subdir of PASSWORD_PROTECTED_SUB_DIRS ) {
+        const htaccessPathToDir = getSubdirHtaccessFullPath( subdir );
+
+        // if the directory exists
+        if ( fs.existsSync( htaccessPathToDir.replace( htaccessFilename, '' ) ) ) {
+          await writeFile( htaccessPathToDir, passwordProtectWrapperContents );
+        }
+      }
+
+      await writeFile( rootHtaccessFullPath, rootHtaccessContent );
+    }
+    winston.debug( 'phetio authentication htaccess written' );
+  }
+  catch( err ) {
+    winston.debug( 'phetio authentication htaccess not written' );
+    throw err;
+  }
 
   // This option is for production deploys by the build-server
   // If we are provided a simName and version then write a .htaccess file to redirect
   // https://phet-io.colorado.edu/sims/{{sim-name}}/{{major}}.{{minor}} to https://phet-io.colorado.edu/sims/{{sim-name}}/{{major}}.{{minor}}.{{latest}}{{[-suffix]}}
   if ( isProductionDeploy ) {
-    if ( latestOption.simName && latestOption.version && latestOption.directory && latestOption.checkoutDir ) {
-      const redirectFilepath = `${latestOption.directory + latestOption.simName}/.htaccess`;
+    if ( simName && latestOption.version && latestOption.directory && latestOption.checkoutDir ) {
+      const redirectFilepath = `${latestOption.directory + simName}/${htaccessFilename}`;
       let latestRedirectContents = 'RewriteEngine on\n' +
-                                   `RewriteBase /sims/${latestOption.simName}/\n`;
-      const versions = ( await axios( `${buildLocal.productionServerURL}/services/metadata/phetio?name=${latestOption.simName}&latest=true` ) ).data;
+                                   `RewriteBase /sims/${simName}/\n`;
+      const versions = ( await axios( `${buildLocal.productionServerURL}/services/metadata/phetio?name=${simName}&latest=true` ) ).data;
       for ( const v of versions ) {
         // Add a trailing slash to /sims/sim-name/x.y
         latestRedirectContents += `RewriteRule ^${v.versionMajor}.${v.versionMinor}$ ${v.versionMajor}.${v.versionMinor}/ [R=301,L]\n`;
@@ -55,92 +141,11 @@ export default async function writePhetioHtaccess( passwordProtectPath: string, 
       await writeFile( redirectFilepath, latestRedirectContents );
     }
     else {
-      winston.error( `simName: ${latestOption.simName}` );
+      winston.error( `simName: ${simName}` );
       winston.error( `version: ${latestOption.version}` );
       winston.error( `directory: ${latestOption.directory}` );
       winston.error( `checkoutDir: ${latestOption.checkoutDir}` );
       throw new Error( 'latestOption is missing one of the required parameters (simName, version, directory, or checkoutDir)' );
     }
-  }
-
-  const simPackage = isProductionDeploy ? JSON.parse( fs.readFileSync( `${latestOption.checkoutDir}/${latestOption.simName}/package.json` ) ) : null;
-
-  const htaccessFilename = '.htaccess';
-  const getSubdirHtaccessPath = ( subdir: string ) => `${subdir}/${htaccessFilename}`;
-  const getSubdirHtaccessFullPath = ( subdir: string ) => `${passwordProtectPath}/${getSubdirHtaccessPath( subdir )}`;
-  const rootHtaccessFullPath = `${passwordProtectPath}/${htaccessFilename}`;
-
-  // Only allow public accessibility with htaccess mutation if in production deploy when the "allowPublicAccess" flag
-  // is present. Commented out lines keep password protection, but comment them in with `allowPublicAccess`.
-  let commentSymbol = '#';
-
-  if ( isProductionDeploy && simPackage?.phet && simPackage.phet[ 'phet-io' ]?.allowPublicAccess ) {
-    commentSymbol = '';
-  }
-
-  const publicAccessDirective = `
-# Editing these directly is not supported and will be overwritten by maintenance releases. Please change by modifying 
-# the sim's package.json allowPublicAccess flag followed by a re-deploy.
-${commentSymbol} Satisfy Any
-${commentSymbol} Allow from all`;
-  try {
-    const basePasswordProtectContents = `
-AuthType Basic
-AuthName "PhET-iO Password Protected Area"
-AuthUserFile ${authFilepath}
-<LimitExcept OPTIONS>
-  Require valid-user
-</LimitExcept>
-`;
-
-    const passwordProtectWrapperContents = `
-${basePasswordProtectContents}
-
-${publicAccessDirective}
-`;
-
-    // Write a file to add authentication to subdirectories like wrappers/ or doc/
-    for ( const subdir of PASSWORD_PROTECTED_SUB_DIRS ) {
-      const htaccessPathToDir = getSubdirHtaccessFullPath( subdir );
-
-      // if the directory exists
-      if ( fs.existsSync( htaccessPathToDir.replace( htaccessFilename, '' ) ) ) {
-        await writeFile( htaccessPathToDir, passwordProtectWrapperContents );
-      }
-    }
-
-    const phetioParentDir = latestOption?.checkoutDir || '..';
-    const phetioPackage = JSON.parse( fs.readFileSync( `${phetioParentDir}/phet-io/package.json` ) );
-
-    // We only want to cache for a production deploy, and not on the dev server
-    const cachingDirective = isProductionDeploy ? `
-# If the request is for a SIM, anything in the /lib or /xhtml dirs, or is the api.json file, then allow it to be cached
-<If "-f %{REQUEST_FILENAME} && %{REQUEST_FILENAME} =~ m#(${latestOption.simName}_all.*\\.html|api\\.json|/lib/.*|/xhtml/.*)$#">
-  ExpiresActive on
-  ExpiresDefault "access plus 1 day"
-  Header append Cache-Control "public"
-  Header append Cache-Control "stale-while-revalidate=5184000"
-  Header append Cache-Control "stale-if-error=5184000"
-</If>
-` : '';
-
-    // Write a file to add authentication to the top level index pages
-    if ( phetioPackage.phet && phetioPackage.phet.addRootHTAccessFile ) {
-      const rootHtaccessContent = `<FilesMatch "(index\\.\\w+)$">\n${
-        basePasswordProtectContents
-      }</FilesMatch>
-      
-${cachingDirective}
-
-${publicAccessDirective}
-`;
-
-      await writeFile( rootHtaccessFullPath, rootHtaccessContent );
-    }
-    winston.debug( 'phetio authentication htaccess written' );
-  }
-  catch( err ) {
-    winston.debug( 'phetio authentication htaccess not written' );
-    throw err;
   }
 }
