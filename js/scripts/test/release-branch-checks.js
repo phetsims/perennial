@@ -43,10 +43,10 @@ const TEST_FROM_MAIN = false;
 const VERBOSE_LOG_SUCCESS = false;
 
 // Specific tests to run
-const TEST_LOCALES = true; // general locale feature upgrade
+const TEST_LOCALES = false; // general locale feature upgrade
 const TEST_ANALYTICS = false; // GA analytics testing
-const TEST_PHET_IO_LOCALE = true; // phet-io + standard wrapper locale testing
-const SKIP_TITLE_STRING_PATTERN = true;
+const TEST_PHET_IO_LOCALE = false; // phet-io + standard wrapper locale testing
+const TEST_TITLE_STRING_PATTERN = false;
 ///////////////////////////////////////////////
 
 const localeData = JSON.parse( fs.readFileSync( '../babel/localeData.json', 'utf8' ) );
@@ -251,7 +251,7 @@ const logResult = ( success, message, url ) => {
               const partialPotentialTitleStringKey = `${repo}.title`;
               const fullPotentialTitleStringKey = `${repoPackageObject.phet.requirejsNamespace}/${partialPotentialTitleStringKey}`;
 
-              const hasTitleKey = SKIP_TITLE_STRING_PATTERN ? true : await evaluate( url, `!!phet.chipper.strings.en[ "${fullPotentialTitleStringKey}" ]` );
+              const hasTitleKey = TEST_TITLE_STRING_PATTERN ? await evaluate( url, `!!phet.chipper.strings.en[ "${fullPotentialTitleStringKey}" ]` ) : true;
 
               if ( hasTitleKey ) {
                 const getTitle = async locale => evaluate( getUrlWithLocale( locale ), () => document.title, {
