@@ -75,7 +75,8 @@ module.exports = async function production( repo, branch, brands, noninteractive
 
   const published = await isPublished( repo );
 
-  await checkoutTarget( repo, branch, true ); // include npm update
+  // npm updates are below, after all interactive prompts
+  await checkoutTarget( repo, branch, false );
 
   try {
     const previousVersion = await getRepoVersion( repo );

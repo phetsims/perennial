@@ -69,7 +69,8 @@ module.exports = async function rc( repo, branch, brands, noninteractive, messag
     }
   }
 
-  await checkoutTarget( repo, branch, true ); // include npm update
+  // npm updates are below, after all interactive prompts
+  await checkoutTarget( repo, branch, false );
 
   try {
     const previousVersion = await getRepoVersion( repo );
