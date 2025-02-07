@@ -1,0 +1,8 @@
+{
+	"detectiveOptions": {
+		"ts": {
+			"skipTypeImports": true
+		}
+	},
+	"tsConfig": "./tsconfig/tsconfig-browser.json"
+}

@@ -47,6 +47,7 @@
     "html-differ": "~1.4.0",
     "http-server": "^14.1.1",
     "lodash": "~4.17.10",
+    "madge": "~8.0.0",
     "mimelib": "~0.2.19",
     "minimist": "~1.2.8",
     "ncp": "~2.0.0",
