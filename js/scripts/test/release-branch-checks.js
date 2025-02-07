@@ -121,25 +121,26 @@ const logResult = ( success, message, url ) => {
         ...( await getUnbuiltURLs( releaseBranch ) )
       ];
     };
-
-    const getLoadedURLs = async url => {
-      const urls = [];
-
-      await puppeteerLoad( url, {
-        onPageCreation: page => page.on( 'request', request => {
-          const url = request.url();
-
-          if ( !url.startsWith( 'data:' ) ) {
-            urls.push( url );
-          }
-        } ),
-        gotoTimeout: 60000,
-        waitAfterLoad: 3000,
-        browser: browser
-      } );
-
-      return urls;
-    };
+    //
+    // // What URLS were called during sim load
+    // const getLoadedURLs = async url => {
+    //   const urls = [];
+    //
+    //   await puppeteerLoad( url, {
+    //     onPageCreation: page => page.on( 'request', request => {
+    //       const url = request.url();
+    //
+    //       if ( !url.startsWith( 'data:' ) ) {
+    //         urls.push( url );
+    //       }
+    //     } ),
+    //     gotoTimeout: 60000,
+    //     waitAfterLoad: 3000,
+    //     browser: browser
+    //   } );
+    //
+    //   return urls;
+    // };
 
     const evaluate = async ( url, evaluate, options ) => {
       try {
@@ -161,15 +162,23 @@ const logResult = ( success, message, url ) => {
       }
     };
 
+    const needsRegionAndCulture = releaseBranch => {
+      return !!_.find( [
+        [ 'area-model-algebra', '1.3' ],
+        [ 'area-model-decimals', '1.3' ],
+        [ 'area-model-introduction', '1.3' ],
+        [ 'area-model-multiplication', '1.3' ],
+        [ 'energy-skate-park', '1.3' ],
+        [ 'number-line-integers', '1.2' ],
+        [ 'number-line-distance', '1.1' ]
+      ], x => releaseBranch.repo === x[ 0 ] && releaseBranch.branch === x[ 1 ] );
+    };
+
     for ( const releaseBranch of releaseBranches ) {
 
       // releaseBranch=== null when running on main
       const isUnbultOnMain = !releaseBranch;
-
       const repo = isUnbultOnMain ? 'acid-base-solutions' : releaseBranch.repo;
-      const branch = isUnbultOnMain ? 'main' : releaseBranch.branch;
-      const releaseBranchPath = isUnbultOnMain ? '' : `release-branches/${repo}-${branch}/`;
-
       const urls = await getAllURLs( releaseBranch );
 
       console.log( '-', releaseBranch ? releaseBranch.toString() : repo );
@@ -182,20 +191,12 @@ const logResult = ( success, message, url ) => {
           logResult( status, message, loggedURL );
         };
 
-
-        if ( TEST_REGION_AND_CULTURE_GRACE ) {
-          const toTest = [
-            [ 'area-model-algebra', '1.3' ],
-            [ 'area-model-decimals', '1.3' ],
-            [ 'area-model-introduction', '1.3' ],
-            [ 'area-model-multiplication', '1.3' ],
-            [ 'energy-skate-park', '1.3' ],
-            [ 'number-line-integers', '1.2' ],
-            [ 'number-line-distance', '1.1' ]
-          ];
-          if ( _.includes( toTest, x => x[ 0 ] === releaseBranch.repo && x[ 1 ] === releaseBranch.branch ) ) {
-            console.log( releaseBranch.toString() );
-          }
+        if ( TEST_REGION_AND_CULTURE_GRACE && needsRegionAndCulture( releaseBranch ) ) {
+          await evaluate( 'https://phet-dev.colorado.edu/html/area-model-algebra/1.3.5-rc.1/phet/area-model-algebra_all_phet.html?regionAndCulture=', '' ); // This does fail
+          await evaluate( getUrlWithRegionAndCulture( '' ), 'true' );
+          const regionAndCultureID = await evaluate( getUrlWithRegionAndCulture( 'africa' ),
+            'phet.joist.sim?.preferencesModel?.localizationModel?.regionAndCulturePortrayalProperty?.value?.regionAndCultureID' );
+          logStatus( regionAndCultureID === 'africa', 'regionAndCultureID=africa' );
         }
       }
     }
