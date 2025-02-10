@@ -24,7 +24,7 @@ const repos = getActiveRepos();
 const data = {};
 let ok = true;
 
-const rebasePushNeeded = async repo => {
+const pushAll = async repo => {
   data[ repo ] = '';
 
   try {
@@ -58,7 +58,7 @@ const rebasePushNeeded = async repo => {
 };
 
 ( async () => {
-  await Promise.all( repos.map( repo => rebasePushNeeded( repo ) ) );
+  await Promise.all( repos.map( repo => pushAll( repo ) ) );
 
   repos.forEach( repo => {
     process.stdout.write( data[ repo ] );
