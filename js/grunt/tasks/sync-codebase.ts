@@ -32,7 +32,6 @@
 
 import assert from 'assert';
 import fs from 'fs';
-import _ from 'lodash';
 import winston from 'winston';
 import { IntentionalPerennialAny } from '../../browser-and-node/PerennialTypes.js';
 import cloneMissingRepos from '../../common/cloneMissingRepos.js';
@@ -102,6 +101,7 @@ const green = '\u001b[32m';
 const reset = '\u001b[0m';
 
 const data: Record<string, string> = {};
+let hasNoPullProblems = true;
 
 async function pullAllBranches( repo: string ): Promise<void> {
   const branches = await getBranches( repo );
@@ -206,6 +206,8 @@ const updateRepo = async ( repo: string ) => {
           append( repo, status );
         }
       }
+
+      hasNoPullProblems = hasNoPullProblems && isGreen;
     }
 
     // Log pull result after the status section, for formatting
@@ -214,6 +216,7 @@ const updateRepo = async ( repo: string ) => {
     }
   }
   catch( e ) {
+    hasNoPullProblems = false;
     append( repo, ` ERROR: ${e}` );
   }
 
@@ -258,7 +261,7 @@ async function cloneMissingReposInternal(): Promise<void> {
     repos.forEach( repo => data[ repo ].length > 0 && console.log( data[ repo ] ) );
   }
 
-  const color = _.every( repos, repo => !data[ repo ].length ) ? green : red;
+  const color = hasNoPullProblems ? green : red;
   console.log( `\n${color}-----=====] finished pull/status (${Date.now() - startPullStatus}ms) [=====-----${reset}\n` );
 
   if ( options.npmUpdate ) {
