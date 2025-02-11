@@ -119,7 +119,11 @@ module.exports = {
       'COMBOBOX', // prefer COMBO_BOX
 
       // Converted to a module in https://github.com/phetsims/tandem/issues/316
-      'phetio.PhetioIDUtils'
+      'phetio.PhetioIDUtils',
+
+      // Disallow the Ohm Unicode character because it is not "normalized". Use capitalized greek omega instead (\u03A9).
+      // See https://github.com/phetsims/scenery/issues/1687.
+      '\\u2126'
     ];
 
     return {
