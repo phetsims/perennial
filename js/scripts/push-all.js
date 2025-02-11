@@ -13,6 +13,9 @@ const gitPullRebase = require( '../common/gitPullRebase' );
 const gitPush = require( '../common/gitPush' );
 const winston = require( 'winston' );
 
+// Change directory to top level of this repo
+process.chdir( `${__dirname}/../../` );
+
 winston.default.transports.console.level = 'error';
 
 // ANSI escape sequences to move to the right (in the same line) or to apply or reset colors
