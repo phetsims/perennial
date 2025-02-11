@@ -247,7 +247,7 @@ phetioRepos.forEach( repo => {
     test: [ repo, 'phet-io-api-compatibility', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'ea&brand=phet-io&phetioStandalone&phetioCompareAPI&randomSeed=332211&locales=*&webgl=false', // NOTE: DUPLICATION ALERT: random seed must match that of API generation, see generatePhetioMacroAPI
+    queryParameters: 'ea&brand=phet-io&phetioStandalone&phetioCompareAPI&randomSeed=332211&webgl=false', // NOTE: DUPLICATION ALERT: random seed must match that of API generation, see generatePhetioMacroAPI
     priority: 1.5 // more often than the average test
   } );
 
@@ -275,7 +275,7 @@ phetioRepos.forEach( repo => {
     }
 
     const testName = `phet-io-${wrapperName}-fuzz`;
-    const wrapperQueryParameters = `sim=${repo}&locales=*&phetioWrapperDebug=true&fuzz`;
+    const wrapperQueryParameters = `sim=${repo}&phetioWrapperDebug=true&fuzz`;
 
     if ( wrapperName === 'studio' ) {
 
@@ -549,7 +549,7 @@ phetioHydrogenSims.forEach( testData => {
       type: 'wrapper-test',
       testQueryParameters: 'duration=80000', // Loading 2 studios takes time!
       url: `phet-io-wrappers/migration/?sim=${simName}&oldVersion=${oldVersion}&phetioMigrationReport=${reportContext}` +
-           '&locales=*&phetioDebug=true&phetioWrapperDebug=true&fuzz&migrationRate=5000&'
+           '&phetioDebug=true&phetioWrapperDebug=true&fuzz&migrationRate=5000&'
     };
   };
   tests.push( getTest( 'assert' ) );
@@ -632,7 +632,7 @@ tests.push( {
   test: [ 'number-play', 'second-language-fuzz', 'unbuilt', 'query-parameters' ],
   type: 'sim-test',
   url: 'number-play/number-play_en.html',
-  queryParameters: 'brand=phet&ea&fuzz&locales=*&secondLocale=es'
+  queryParameters: 'brand=phet&ea&fuzz&secondLocale=es'
 } );
 
 // number-compare: test the second language preference
@@ -640,7 +640,7 @@ tests.push( {
   test: [ 'number-compare', 'second-language-fuzz', 'unbuilt', 'query-parameters' ],
   type: 'sim-test',
   url: 'number-compare/number-compare_en.html',
-  queryParameters: 'brand=phet&ea&fuzz&locales=*&secondLocale=es'
+  queryParameters: 'brand=phet&ea&fuzz&secondLocale=es'
 } );
 
 // quadrilateral: tests the public query parameters for configurations that cannot be changed during runtime
