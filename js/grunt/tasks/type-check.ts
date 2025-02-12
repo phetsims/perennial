@@ -46,4 +46,9 @@ if ( isOptionKeyProvided( 'silent' ) ) {
 const defaultOptions = {
   repo: getRepo()
 };
-export const typeCheckPromise = ( async () => typeCheck( _.assignIn( defaultOptions, checkCLIOptions ) ) )();
+export const typeCheckPromise = ( async () => {
+  const success = await typeCheck( _.assignIn( defaultOptions, checkCLIOptions ) );
+  if ( !success ) {
+    process.exit( 1 );
+  }
+} )();
