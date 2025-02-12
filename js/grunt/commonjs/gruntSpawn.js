@@ -31,11 +31,7 @@ module.exports = function spawn( grunt, command, args, cwd, preHook ) {
   process.stdin.pipe( spawned.stdin );
 
   spawned.on( 'close', code => {
-    if ( code !== 0 ) {
-      throw new Error( `spawn: ${command} ${argsString} failed with code ${code}` );
-    }
-    else {
-      done();
-    }
+    done();
+    process.exit( code );
   } );
 };
