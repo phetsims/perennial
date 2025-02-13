@@ -15,7 +15,7 @@
  *
  * NOTE: refresh release branches if not doing an active MR:
  * cd perennial;
- * sage run js/grunt/tasks/sync-codebase.ts --allBranches
+ * sage run js/grunt/tasks/sync.ts --allBranches
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */

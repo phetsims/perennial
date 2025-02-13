@@ -19,10 +19,10 @@
  *
  *
  * usage:
- * grunt sync-codebase
+ * grunt sync
  * ## or
  * cd perennial/
- * sage run js/grunt/tasks/sync-codebase.ts
+ * sage run js/grunt/tasks/sync.ts
  *
  * NOTE: Cannot be run from git repo root, must be from inside a repo (like most grunt commands).
  *
