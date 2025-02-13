@@ -55,13 +55,13 @@ winston.default.transports.console.level = 'error';
 const options = {
 
   // git pull repos, default to true. When false, will also skip checking out main.
-  gitPull: isOptionKeyProvided( 'pull' ) ? getOption( 'pull' ) : true,
+  pull: isOptionKeyProvided( 'pull' ) ? getOption( 'pull' ) : true,
 
   // git checkout main before pulling each repo. This option is ignored if --pull=false. Default to true.
   checkoutMain: isOptionKeyProvided( 'checkoutMain' ) ? getOption( 'checkoutMain' ) : true,
 
   // git-status-styled output, default to true
-  gitStatus: isOptionKeyProvided( 'status' ) ? getOption( 'status' ) : true,
+  status: isOptionKeyProvided( 'status' ) ? getOption( 'status' ) : true,
 
   // npm update on all repos in perennial/data/npm-update, and the `--repo` option (if provided), defaults to true.
   // MK wishes this options was called "npm", but this option is recognized by node instead.
@@ -89,7 +89,7 @@ const options = {
   repo: getOption( 'repo' )
 };
 
-options.allRepos && assert( options.gitStatus, '--all is only supported with --status=true, otherwise not all repos have something to report' );
+options.allRepos && assert( options.status, '--all is only supported with --status=true, otherwise not all repos have something to report' );
 
 // Some options require a slower form of this program, where we clone repos first, before running parallel pull/status
 const cloneFirst = options.allBranches || options.allRepos;
@@ -156,7 +156,7 @@ const updateRepo = async ( repo: string ) => {
     let pullResult: null | string = null;
 
     if ( fs.existsSync( `../${repo}` ) ) {
-      if ( options.gitPull ) {
+      if ( options.pull ) {
         if ( await gitIsClean( repo ) ) {
           if ( options.allBranches ) {
             await pullAllBranches( repo );
@@ -181,7 +181,7 @@ const updateRepo = async ( repo: string ) => {
       await cloneMissingReposInternal();
     }
 
-    if ( options.gitStatus ) {
+    if ( options.status ) {
       const symbolicRef = ( await execute( 'git', [ 'symbolic-ref', '-q', 'HEAD' ], `../${repo}` ) ).trim();
       const branch = symbolicRef.replace( 'refs/heads/', '' ); // might be empty string
       const sha = await gitRevParse( repo, 'HEAD' );
