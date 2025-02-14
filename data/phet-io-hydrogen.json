@@ -104,6 +104,10 @@
     "version": "1.0"
   },
   {
+    "sim": "mean-share-and-balance",
+    "version": "1.1"
+  },
+  {
     "sim": "molecule-polarity",
     "version": "1.3"
   },
