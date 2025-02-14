@@ -24,7 +24,14 @@
  * cd perennial/
  * sage run js/grunt/tasks/sync.ts
  *
- * NOTE: Cannot be run from git repo root, must be from inside a repo (like most grunt commands).
+ * Common use cases:
+ * Pull all repos:
+ *      grunt sync --status=false --npmUpdate=false --checkoutMain=false
+ * Print status for all repos:
+ *      grunt sync --npmUpdate=false --pull=false --all
+ * Running on windows:
+ *      grunt sync --slowPull
+ *
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  * @author Michael Kauzmann (PhET Interactive Simulations)
@@ -32,9 +39,11 @@
 
 import assert from 'assert';
 import fs from 'fs';
+import path from 'path';
 import winston from 'winston';
 import { IntentionalPerennialAny } from '../../browser-and-node/PerennialTypes.js';
 import cloneMissingRepos from '../../common/cloneMissingRepos.js';
+import dirname from '../../common/dirname.js';
 import execute from '../../common/execute.js';
 import getActiveRepos from '../../common/getActiveRepos.js';
 import getBranches from '../../common/getBranches.js';
@@ -51,6 +60,11 @@ import chunkDelayed from '../../common/util/chunkDelayed.js';
 import getOption, { isOptionKeyProvided } from './util/getOption.js';
 
 winston.default.transports.console.level = 'error';
+
+const previousCWD = process.cwd();
+// @ts-expect-error - until we have "type": "module" in our package.json
+const scriptDirectory = dirname( import.meta.url );
+process.chdir( path.join( scriptDirectory, '../../../' ) );
 
 const options = {
 
@@ -128,7 +142,6 @@ async function pullAllBranches( repo: string ): Promise<void> {
   await gitCheckout( repo, 'main' );
 }
 
-// DUPLICATION ALERT: these hard coded strings are also listed in pull-all.js, please change both cases.
 function parsePullResult( stdout: string ): string | null {
   if ( stdout === 'Already up to date.\nCurrent branch main is up to date.\n' ||
        stdout === 'Already up to date.\n' ||
@@ -170,7 +183,6 @@ const updateRepo = async ( repo: string ) => {
           console.log( `${red}${PERENNIAL_REPO_NAME} is not clean, skipping pull${reset}` );
         }
       }
-
     }
     else {
       // This will be handled later when perennial gets around to cloneMissingRepos
@@ -236,7 +248,7 @@ async function cloneMissingReposInternal(): Promise<void> {
 
 ///////////////////////////////
 // Main iife
-( async () => {
+export const syncPromise = ( async () => {
 
   const startPullStatus = Date.now();
   console.log(); // extra space before the first logging
@@ -301,5 +313,7 @@ async function cloneMissingReposInternal(): Promise<void> {
     console.log( `${transpileProblems ? red : green}-----=====] finished transpile (${Date.now() - startTranspile}ms) [=====-----${reset}\n` );
   }
 
-  console.log( `\nFinished in ${Date.now() - startPullStatus}ms` );
+  console.log( `\nsync complete in ${Date.now() - startPullStatus}ms` );
+
+  process.chdir( previousCWD );
 } )();
