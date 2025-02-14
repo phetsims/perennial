@@ -179,8 +179,14 @@ const updateRepo = async ( repo: string ) => {
             pullResult = parsePullResult( await gitPullRebase( repo ) );
           }
         }
-        else if ( repo === PERENNIAL_REPO_NAME && !options.slowPull ) {
-          console.log( `${red}${PERENNIAL_REPO_NAME} is not clean, skipping pull${reset}` );
+        else {
+          hasNoPullProblems = false;
+          if ( !options.status ) {
+            append( repo, `${moveRight}${red}not clean, skipping pull${reset}` );
+          }
+          else if ( repo === PERENNIAL_REPO_NAME && !options.slowPull ) {
+            console.log( `${red}${PERENNIAL_REPO_NAME} is not clean, skipping pull${reset}\n` );
+          }
         }
       }
     }
