@@ -64,7 +64,7 @@ const npxCommand = process.platform.startsWith( 'win' ) ? 'npx.cmd' : 'npx';
       if ( fs.existsSync( `./.scenerystack/${repo}/vite.config.js` ) ) {
         const viteConfig = fs.readFileSync( `./.scenerystack/${repo}/vite.config.js`, 'utf8' );
         if ( !viteConfig.includes( 'server: { watch: null }' ) ) {
-          fs.writeFileSync( `./.scenerystack/${repo}/vite.config.js`, viteConfig.replace( 'base: "./",', 'base: "./", server: { watch: null }' ) );
+          fs.writeFileSync( `./.scenerystack/${repo}/vite.config.js`, viteConfig.replace( 'base: "./",', 'base: "./", server: { watch: null },' ) );
         }
       }
 
