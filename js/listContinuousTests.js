@@ -450,11 +450,6 @@ unitTestRepos.forEach( repo => {
     'tests/text-quality-test.html'
   ]
 }, {
-  repo: 'phet-lib',
-  urls: [
-    'doc/layout-exemplars.html'
-  ]
-}, {
   repo: 'phet-io-wrappers',
   urls: [
     'tests/FAMB-2.2-phetio-wrapper-test.html'
