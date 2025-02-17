@@ -43,9 +43,6 @@ is published, when its API starts to stabilize. Add `phet["phet-io"].compareDesi
 **phet-io-state-unsupported (manually maintained)** - A manually supported list of sims that do not support state, and
 shouldn't be tested as such. Any sim in this list will not have its state wrapper fuzzed on CT.
 
-**pixelzoom-repos (manually maintained)** - A list of repos for which @pixelzoom is the responsible dev for, see
-`../phet-info/sim-info/responsible_dev.json` but without the common code repos.
-
 **unit-tests (auto-generated)** - A list of repos that support qunit tests with a committed harness for testing.
 
 **voicing (auto-generated)** - is the list of all simulations that have the voicing feature. This is noted in package
