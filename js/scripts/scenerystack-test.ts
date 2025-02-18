@@ -22,7 +22,7 @@ import puppeteerLoad from '../common/puppeteerLoad.js';
 import npmCommand from '../common/npmCommand.js';
 import os from 'os';
 
-winston.default.transports.console.level = 'debug';
+winston.default.transports.console.level = 'error';
 
 const SKIP_REFRESH = false;
 
@@ -270,7 +270,7 @@ const npxCommand = process.platform.startsWith( 'win' ) ? 'npx.cmd' : 'npx';
       }
 
       // build
-      {
+      if ( os.platform() !== 'linux' ) {
         console.log( `parcel build ${repo}` );
         await parcelBuild( `./.scenerystack/${repo}` );
         console.log( 'built' );
