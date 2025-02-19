@@ -399,7 +399,6 @@ unitTestRepos.forEach( repo => {
   repo: 'dot',
   urls: [
     '', // the root URL
-    'doc/',
     'examples/',
     'examples/convex-hull-2.html',
     'tests/',
