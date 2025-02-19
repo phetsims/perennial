@@ -139,6 +139,10 @@ export default class SimVersion {
     return !this.isSimNotPublished;
   }
 
+  public get majorMinor(): string {
+    return `${this.major}.${this.minor}`;
+  }
+
   /**
    * Takes a serialized form of the SimVersion and returns an actual instance.
    * @public
