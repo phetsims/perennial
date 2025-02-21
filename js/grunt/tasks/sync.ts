@@ -112,6 +112,7 @@ const cloneFirst = options.allBranches || options.allRepos;
 const moveRight = ' \u001b[42G';
 const red = '\u001b[31m';
 const green = '\u001b[32m';
+const bold = '\u001b[1m';
 const reset = '\u001b[0m';
 
 const data: Record<string, string> = {};
@@ -158,7 +159,7 @@ function append( repo: string, message: string ): void {
     data[ repo ] += '\n' + message;
   }
   else {
-    data[ repo ] += repo + message;
+    data[ repo ] += `${bold}${repo}${reset}${message}`;
   }
 }
 
