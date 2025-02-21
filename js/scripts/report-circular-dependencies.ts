@@ -22,9 +22,9 @@ import { isOptionKeyProvided } from '../grunt/tasks/util/getOption.js';
   const runnableRepos = getRepoList( 'active-runnables' );
 
   const potentialRepos = _.uniq( [
-      ...commonRepos,
+    ...commonRepos,
 
-      ...( isCommonOnly ? [] : [ ...simRepos, ...runnableRepos ] )
+    ...( isCommonOnly ? [] : [ ...simRepos, ...runnableRepos ] )
   ] ).sort();
 
   const repos = potentialRepos.filter( repo => {
@@ -35,13 +35,15 @@ import { isOptionKeyProvided } from '../grunt/tasks/util/getOption.js';
 
   const result = await execute( npxCommand, [ 'madge', '--warning', '--circular', ...repos.map( repo => `../${repo}/js` ) ], '.', { errors: 'resolve' } );
 
-  const endIndex = result.stdout.indexOf( '✖ Skipped ' );
-  const trimmed = result.stdout.slice( 0, endIndex );
-  console.log( trimmed );
-  console.log( result.stderr );
+  // Regex allows for "circular dependency" and "circular dependencies"
+  const regExp = /Found \d+ circular dependen/;
+  const success = !regExp.test( result.stderr );
+  if ( !success ) {
+    const endIndex = result.stdout.indexOf( '✖ Skipped ' );
+    const trimmed = result.stdout.slice( 0, endIndex );
+    console.log( trimmed );
+    console.log( result.stderr );
+  }
 
-  // if ( result.code !== 0 ) {
-  //   console.error( 'madge failed - likely has circular dependencies' );
-  //   process.exit( 1 );
-  // }
+  process.exit( result.code );
 } )();

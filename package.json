@@ -11,6 +11,7 @@
     "test-long": "npm run test && bash bin/sage run node_modules/qunit/bin/qunit.js js/test/perennialGruntTest.js",
     "type-check-all": "grunt type-check --all",
     "lint-all": "grunt lint --all",
+    "test-circular-dependencies": "bash bin/sage run js/scripts/report-circular-dependencies.ts --common",
     "scenerystack-test": "bash bin/sage run js/scripts/scenerystack-test.ts",
     "init-v1": "bash bin/v1/init.sh"
   },

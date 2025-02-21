@@ -51,54 +51,65 @@ const REPOS_EXCLUDED_FROM_LISTENER_ORDER_RANDOM = [
  */
 const tests = [];
 
-tests.push( {
-  test: [ 'perennial', 'lint', 'all' ],
-  type: 'npm-run',
-  command: 'lint-all',
-  repo: 'perennial',
-  priority: 100
-} );
+/////////////////////////////////////////
+// npm-run tests
+{
+  tests.push( {
+    test: [ 'perennial', 'lint', 'all' ],
+    type: 'npm-run',
+    command: 'lint-all',
+    repo: 'perennial',
+    priority: 100
+  } );
 
-tests.push( {
-  test: [ 'perennial', 'type-check', 'all' ],
-  type: 'npm-run',
-  command: 'type-check-all',
-  repo: 'perennial',
-  priority: 100
-} );
+  tests.push( {
+    test: [ 'perennial', 'type-check', 'all' ],
+    type: 'npm-run',
+    command: 'type-check-all',
+    repo: 'perennial',
+    priority: 100
+  } );
 
-tests.push( {
-  test: [ 'perennial', 'scenerystack-test' ],
-  type: 'npm-run',
-  command: 'scenerystack-test',
-  repo: 'perennial',
-  priority: 20 // Is this too much or too little?
-} );
-
+  tests.push( {
+    test: [ 'perennial', 'scenerystack-test' ],
+    type: 'npm-run',
+    command: 'scenerystack-test',
+    repo: 'perennial',
+    priority: 20 // Is this too much or too little?
+  } );
 
 // Node unit tests
-[ 'chipper', 'perennial', 'perennial-alias' ].forEach( repo => {
-  tests.push( {
-    test: [ repo, 'qunit', 'node' ],
-    type: 'npm-run',
-    command: 'test', // run like "npm run test"
-    repo: repo
+  [ 'chipper', 'perennial', 'perennial-alias' ].forEach( repo => {
+    tests.push( {
+      test: [ repo, 'qunit', 'node' ],
+      type: 'npm-run',
+      command: 'test', // run like "npm run test"
+      repo: repo
+    } );
   } );
-} );
 
-tests.push( {
-  test: [ 'chipper', 'test-string-keys' ],
-  type: 'npm-run',
-  command: 'test-string-keys',
-  repo: 'chipper'
-} );
+  tests.push( {
+    test: [ 'chipper', 'test-string-keys' ],
+    type: 'npm-run',
+    command: 'test-string-keys',
+    repo: 'chipper'
+  } );
 
-tests.push( {
-  test: [ 'chipper', 'test-deprecated-string-keys' ],
-  type: 'npm-run',
-  command: 'test-deprecated-string-keys',
-  repo: 'chipper'
-} );
+  tests.push( {
+    test: [ 'chipper', 'test-deprecated-string-keys' ],
+    type: 'npm-run',
+    command: 'test-deprecated-string-keys',
+    repo: 'chipper'
+  } );
+
+  tests.push( {
+    test: [ 'perennial', 'circular-dependencies', 'common-repos' ],
+    type: 'npm-run',
+    command: 'test-circular-dependencies',
+    repo: 'perennial'
+  } );
+
+}
 
 // phet and phet-io brand builds
 [
