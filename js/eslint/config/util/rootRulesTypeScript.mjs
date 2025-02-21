@@ -127,7 +127,11 @@ export default {
   '@typescript-eslint/consistent-type-exports': 'off', // We did not observe a performance boost, nor do we see a significant benefit from this rule. See https://github.com/phetsims/chipper/issues/1283
 
   // Enforce consistent usage of type imports  🔧
-  '@typescript-eslint/consistent-type-imports': 'off', // We did not observe a performance boost, nor do we see a significant benefit from this rule. See https://github.com/phetsims/chipper/issues/1283
+  // This rule can be helpful with --fix for cleaning up circular dependencies, but since webstorm doesn't have an easy
+  // way of importing as just a type, we will leave this off. See https://github.com/phetsims/perennial/issues/432
+  // NOTE: To fix many circular dependencies from type imports, use --fix with this error setting: [ 'error', { fixStyle: 'inline-type-imports' } ]
+  // We did not observe a performance boost with this rule on in https://github.com/phetsims/chipper/issues/1283
+  '@typescript-eslint/consistent-type-imports': 'off',
 
   // Require explicit return types on functions and class methods
   '@typescript-eslint/explicit-function-return-type': 'off', // We want to use inference on local arrow functions. We use explicit-method-return-type for the important cases.
