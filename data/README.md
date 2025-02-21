@@ -2,7 +2,7 @@ NOTE: These should be regenerated whenever certain flags in package.json (for re
 simulation/runnable/accessible/supportedBrands. To do so, run `grunt generate-data` in perennial, then check in the
 modified files (although the task will likely commit and push for you).
 
-**active-common-sim-repos (manually maintained)** - a list of the "common" repos
+**active-common-sim-repos (manually maintained)** - a list of the "common" repos used to run simulations.
 
 **active-repos (manually maintained)** - a list of all repositories that you should have checked out if doing
 common-code refactoring.

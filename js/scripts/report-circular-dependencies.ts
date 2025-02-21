@@ -7,7 +7,10 @@ import getRepoList from '../common/getRepoList.js';
 import { isOptionKeyProvided } from '../grunt/tasks/util/getOption.js';
 
 /**
- * Checks out circular dependencies within PhET repositories
+ * Checks on circular dependencies within PhET repositories, ignoring type-space loops
+ *
+ * Usage: cd perennial; sage run js/scripts/report-circular-dependencies.ts
+ *
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
@@ -19,10 +22,9 @@ import { isOptionKeyProvided } from '../grunt/tasks/util/getOption.js';
   const runnableRepos = getRepoList( 'active-runnables' );
 
   const potentialRepos = _.uniq( [
-    ...commonRepos,
+      ...commonRepos,
 
-    ...( isCommonOnly ? [] : simRepos ),
-    ...( isCommonOnly ? [] : runnableRepos )
+      ...( isCommonOnly ? [] : [ ...simRepos, ...runnableRepos ] )
   ] ).sort();
 
   const repos = potentialRepos.filter( repo => {
@@ -33,7 +35,9 @@ import { isOptionKeyProvided } from '../grunt/tasks/util/getOption.js';
 
   const result = await execute( npxCommand, [ 'madge', '--warning', '--circular', ...repos.map( repo => `../${repo}/js` ) ], '.', { errors: 'resolve' } );
 
-  console.log( result.stdout );
+  const endIndex = result.stdout.indexOf( '✖ Skipped ' );
+  const trimmed = result.stdout.slice( 0, endIndex );
+  console.log( trimmed );
   console.log( result.stderr );
 
   // if ( result.code !== 0 ) {
