@@ -92,7 +92,7 @@ const options = {
   // Log status of all repos, even if nothing changed with them. (only does something when --status is true)
   allRepos: getOption( 'all' ),
 
-  // When closing missing repos, by default private repos are included, use this to opt out
+  // When cloning missing repos, by default private repos are included, use this to opt out
   omitPrivate: getOption( 'omitPrivate' ),
 
   // Pulling repos in parallel doesn't work on Windows git.  This is a workaround for that. It will also log as it
