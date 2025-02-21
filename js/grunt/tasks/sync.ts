@@ -105,7 +105,10 @@ const options = {
 
 options.allRepos && assert( options.status, '--all is only supported with --status=true, otherwise not all repos have something to report' );
 
-// Some options require a slower form of this program, where we clone repos first, before running parallel pull/status
+// The fastest way to update the codebase is to run clone-missing-repos as part of the parallel repoUpdate (for perennial)
+// Some options mandate that we clone repos first for correctness, before running parallel pull/status. If pulling all
+// branches, or printing all repos, it would be buggy to not have all repos checked out before kicking off the update
+// step. That said, don't default to the slower behavior unless we need to.
 const cloneFirst = options.allBranches || options.allRepos;
 
 // ANSI escape sequences to move to the right (in the same line) or to apply or reset colors
@@ -116,7 +119,7 @@ const bold = '\u001b[1m';
 const reset = '\u001b[0m';
 
 const data: Record<string, string> = {};
-let hasNoPullProblems = true;
+let hasNoPullStatusProblems = true;
 
 async function pullAllBranches( repo: string ): Promise<void> {
   const branches = await getBranches( repo );
@@ -181,7 +184,7 @@ const updateRepo = async ( repo: string ) => {
           }
         }
         else {
-          hasNoPullProblems = false;
+          hasNoPullStatusProblems = false;
           if ( !options.status ) {
             append( repo, `${moveRight}${red}not clean, skipping pull${reset}` );
           }
@@ -196,6 +199,7 @@ const updateRepo = async ( repo: string ) => {
       return;
     }
 
+    // Inline cloneMissingRepos so it can run in parallel with other repoUpdate steps.
     if ( !cloneFirst && repo === PERENNIAL_REPO_NAME ) {
       await cloneMissingReposInternal();
     }
@@ -226,7 +230,7 @@ const updateRepo = async ( repo: string ) => {
         }
       }
 
-      hasNoPullProblems = hasNoPullProblems && isGreen;
+      hasNoPullStatusProblems = hasNoPullStatusProblems && isGreen;
     }
 
     // Log pull result after the status section, for formatting
@@ -235,7 +239,7 @@ const updateRepo = async ( repo: string ) => {
     }
   }
   catch( e ) {
-    hasNoPullProblems = false;
+    hasNoPullStatusProblems = false;
     append( repo, ` ERROR: ${e}` );
   }
 
@@ -256,37 +260,39 @@ async function cloneMissingReposInternal(): Promise<void> {
 ///////////////////////////////
 // Main iife
 export const syncPromise = ( async () => {
-
   const startPullStatus = Date.now();
   console.log(); // extra space before the first logging
 
-  // If pulling all branches, or printing all repos, we need to clone before going through the parallel loop.
-  if ( cloneFirst ) {
-    await gitIsClean( PERENNIAL_REPO_NAME ) && await gitPullRebase( PERENNIAL_REPO_NAME );
-    await cloneMissingReposInternal();
+  if ( options.pull || options.status ) {
+
+    // See doc for "clone first"
+    if ( cloneFirst ) {
+      await gitIsClean( PERENNIAL_REPO_NAME ) && await gitPullRebase( PERENNIAL_REPO_NAME );
+      await cloneMissingReposInternal();
+    }
+
+    // load active repos after the above cloneMissingRepos
+    const repos = getActiveRepos();
+
+    if ( options.slowPull ) {
+      await chunkDelayed( repos, repo => updateRepo( repo ), {
+        waitPerItem: options.allBranches ? 1000 : 110,
+        chunkSize: options.allBranches ? 20 : 15
+      } );
+    }
+    else {
+      await Promise.all( repos.map( repo => updateRepo( repo ) ) );
+      repos.forEach( repo => data[ repo ].length > 0 && console.log( data[ repo ] ) );
+    }
+
+    const color = hasNoPullStatusProblems ? green : red;
+    console.log( `\n${color}-----=====] finished pull/status (${Date.now() - startPullStatus}ms) [=====-----${reset}\n` );
   }
 
-  // load active repos after the above cloneMissingRepos
-  const repos = getActiveRepos();
-
-  if ( options.slowPull ) {
-    await chunkDelayed( repos, repo => updateRepo( repo ), {
-      waitPerItem: options.allBranches ? 1000 : 110,
-      chunkSize: options.allBranches ? 20 : 15
-    } );
-  }
-  else {
-    await Promise.all( repos.map( repo => updateRepo( repo ) ) );
-    repos.forEach( repo => data[ repo ].length > 0 && console.log( data[ repo ] ) );
-  }
-
-  const color = hasNoPullProblems ? green : red;
-  console.log( `\n${color}-----=====] finished pull/status (${Date.now() - startPullStatus}ms) [=====-----${reset}\n` );
-
+  let npmUpdateProblems = false;
   if ( options.npmUpdate ) {
     const startNPM = Date.now();
 
-    let npmUpdateProblems = false;
     const npmUpdatesNeeded = getRepoList( 'npm-update' );
     try {
 
@@ -305,10 +311,10 @@ export const syncPromise = ( async () => {
     console.log( `${npmUpdateProblems ? red : green}-----=====] finished npm (${Date.now() - startNPM}ms) [=====-----${reset}\n` );
   }
 
+  let transpileProblems = false;
   if ( options.transpile ) {
     const startTranspile = Date.now();
 
-    let transpileProblems = false;
 
     try {
       await transpileAll();
@@ -323,4 +329,7 @@ export const syncPromise = ( async () => {
   console.log( `\nsync complete in ${Date.now() - startPullStatus}ms` );
 
   process.chdir( previousCWD );
+
+  const success = hasNoPullStatusProblems && !npmUpdateProblems && !transpileProblems;
+  process.exitCode = success ? 0 : 1;
 } )();
