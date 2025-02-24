@@ -1,16 +1,31 @@
 Visit each constructor, instance method, and static method and move the parameters from the JSDoc to the function signature.
 * Move the JSDoc annotations to the method signature.
-* Preserve any documentation in @param annotations, but remove the curly braces around the type (i.e. remove {Type}).
+* Preserve any documentation in @param annotations, but remove the curly braces and type (i.e. remove {Type}).
 * If none of the @param annotations have any descriptive documentation (only types), then remove the @param annotations entirely.
-* Do not add, remove, or change any of the existing documentation text—preserve it exactly as it is.
 * If any @param annotation specifies a type of {Object}, change the type declaration to IntentionalAny in the TypeScript signature (this will be fixed later).
-* Do not modify any imports—ignore them, as they will be handled later.
-
-The following examples illustrate the transformation:
+* Constructors should be made public.
 
 ####################
-# Example 1:
+# Example 1: NOTE that the leading whitespace is critically important! Do not omit the leading whitespace on each line.
 
+Input:
+  /**
+   * @override
+   * @public
+   */
+  displayCorrectAnswer() {
+    this.challengeStateProperty.set( BAAChallengeState.DISPLAYING_CORRECT_ANSWER );
+  }
+
+Output:
+  /**
+  */
+  public override displayCorrectAnswer(): void {
+    this.challengeStateProperty.set( BAAChallengeState.DISPLAYING_CORRECT_ANSWER );
+  }
+
+###################
+# Example 2:
 Input:
 /**
  *	Step the model (automatically called by joist)
@@ -30,7 +45,7 @@ Output:
 public step( dt: number ): void
 
 ###################
-# Example 2:
+# Example 3:
 Input:
 /**
  *	The skater moves along the ground with the same coefficient of fraction as the tracks, see #11. Returns a

@@ -34,7 +34,17 @@ def main():
     # Setting yes=False means that any confirmation prompt will auto-answer "no".
     io = InputOutput(yes=False)
 
-    model = Model("openrouter/deepseek/deepseek-chat")
+    # model = Model("openrouter/nvidia/llama-3.1-nemotron-70b-instruct") #cannot understand whitespace
+    # model = Model("openrouter/qwen/qwen-2-72b-instruct") #got one partially right
+    # model = Model("openrouter/perplexity/r1-1776") # smart but slow
+    # model = Model("openrouter/deepseek/deepseek-r1-distill-qwen-32b") # Worked well on VisualPreferencesNode. Failed on many details.
+    # model = Model("openrouter/deepseek/deepseek-r1-distill-llama-70b") # Worked well on VisualPreferencesNode and some parts of BAAGameChallenge. Did not follow instructions or examples well.
+    # model = Model("openrouter/openai/o3-mini") # Worked well, cost more
+    # model = Model("openrouter/qwen/qwen-2.5-coder-32b-instruct") # Worked pretty well, just forgot some documentation
+    # model = Model("lm_studio/deepseek-r1-14b-cot-math-reasoning-full-i1") # too slow
+    # model = Model("openrouter/cognitivecomputations/dolphin3.0-r1-mistral-24b:free") # incapable
+    model = Model("openrouter/openai/o3-mini-high") # fast, smart, more expensive
+
 
     # Create the coder object. The io object is passed so that prompts are handled automatically.
     coder = Coder.create(
