@@ -8,42 +8,9 @@
 #
 #====================================================================================================
 
-pullCommand="git push"
-parallel="false"
-
-# cd to the directory where your git repositories live
-binDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-workingDir=${binDir}/../..
+binDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+workingDir=${binDir}/../
 cd ${workingDir}
 
-# parse command line options
-while getopts ":p" opt; do
-  case ${opt} in
-  p)
-    parallel="true"
-    ;;
-  \?)
-    echo "Invalid option: -$OPTARG" >&2
-    exit
-    ;;
-  esac
-done
+bin/sage run js/scripts/push-all
 
-# push each repository
-for repo in $(cat perennial/data/active-repos | xargs | tr -d '\r'); do
-  if [ -d "${repo}" ]; then
-    echo ${repo}
-    cd ${repo} >/dev/null
-
-    if [[ $(git log origin/main..main) ]]; then
-      if [ ${parallel} == "true" ]; then
-        # run in the background
-        ${pullCommand} &
-      else
-        ${pullCommand}
-      fi
-    fi
-
-    cd ..
-  fi
-done

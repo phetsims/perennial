@@ -41,8 +41,8 @@ npm prune && npm update
 grunt checkout-main-all
 cd ..
 
-perennial/bin/sage run perennial/js/grunt/tasks/sync.ts --npmUpdate=false
-perennial/bin/sage run perennial/js/scripts/push-all.js
+perennial/bin/sage run perennial/js/grunt/tasks/sync --npmUpdate=false
+perennial/bin/sage run perennial/js/scripts/push-all
 
 perennial/bin/for-each.sh perennial/data/active-repos "npm prune && npm update"
 

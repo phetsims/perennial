@@ -12,4 +12,4 @@ binDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 workingDir=${binDir}/../
 cd ${workingDir}
 
-bin/sage run js/grunt/tasks/sync.ts --npmUpdate=false --status=false --checkoutMain=false $@
+bin/sage run js/grunt/tasks/sync --npmUpdate=false --status=false --checkoutMain=false $@

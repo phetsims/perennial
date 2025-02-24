@@ -48,11 +48,29 @@ fi
 SCRIPT_FILE="$1"
 shift
 
-# Check if the script file has a .js, .ts, .mjs, or .cjs extension
+# Check if the script file has a .js, .ts, .mjs, or .cjs extension, if it doesn't, see if one can be auto filled in
 if [[ ! "$SCRIPT_FILE" =~ \.(js|ts|mjs|cjs)$ ]]; then
-  echo "Script file must have a .js, .ts, .mjs, or .cjs extension: $SCRIPT_FILE" >&2
-  exit 1
+
+  declare -a array=("ts" "js" "mjs" "cjs")
+  arraylength=${#array[@]} # get length of an array
+  found=false
+
+  for (( i=0; i<${arraylength}; i++ ));
+  do
+     ext=${array[$i]}
+     if test -f "${SCRIPT_FILE}.${ext}"; then
+        SCRIPT_FILE="${SCRIPT_FILE}.${ext}"
+        i=$arraylength # exit loop early
+        found=true
+     fi
+  done
+
+  if [[ $found = false ]]; then
+      echo "Script file must have a .js, .ts, .mjs, or .cjs extension: $SCRIPT_FILE" >&2
+      exit 1
+  fi
 fi
+
 
 # If the script path is not absolute, resolve it relative to current directory, myScript.ts -> ./myScript.ts
 if [[ ! "$SCRIPT_FILE" = /* ]]; then
