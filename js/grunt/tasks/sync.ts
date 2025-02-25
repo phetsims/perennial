@@ -39,13 +39,13 @@
 
 import assert from 'assert';
 import fs from 'fs';
+import _ from 'lodash';
 import path from 'path';
 import winston from 'winston';
 import { IntentionalPerennialAny } from '../../browser-and-node/PerennialTypes.js';
 import cloneMissingRepos from '../../common/cloneMissingRepos.js';
 import dirname from '../../common/dirname.js';
 import execute from '../../common/execute.js';
-import getActiveRepos from '../../common/getActiveRepos.js';
 import getBranches from '../../common/getBranches.js';
 import getRepoList from '../../common/getRepoList.js';
 import gitCheckout from '../../common/gitCheckout.js';
@@ -99,8 +99,15 @@ const options = {
   // completes individual repo updates, since it takes more time. See https://github.com/phetsims/perennial/issues/361
   slowPull: getOption( 'slowPull' ),
 
-  // Run npm update on this repo as well. Automatically filled in if running as a grunt task.
-  repo: getOption( 'repo' )
+  // Run npm update on this repo as well. Automatically filled in if running as a grunt task. This repo to update will
+  // be combined with the repos in `options.repoList`, and please note that the perennial repo that `sync` is run
+  // from is ALWAYS included in script.
+  repo: getOption( 'repo' ) || PERENNIAL_REPO_NAME,
+
+  // Name of the file of repos in perennial/data/ to use for the update, defaults to "active-repos".
+  // For example, `grunt sync --repoList=active-website-repos`. This list will be combined with `options.repo`, and please
+  // note that the perennial repo that sync is run from is ALWAYS included in script.
+  repoList: getOption( 'repoList' ) || 'active-repos'
 };
 
 options.allRepos && assert( options.status, '--all is only supported with --status=true, otherwise not all repos have something to report' );
@@ -166,7 +173,7 @@ function append( repo: string, message: string ): void {
   }
 }
 
-const updateRepo = async ( repo: string ) => {
+const updateRepo = async ( repo: string, allRepos: string[] ) => {
   data[ repo ] = '';
 
   try {
@@ -201,7 +208,7 @@ const updateRepo = async ( repo: string ) => {
 
     // Inline cloneMissingRepos so it can run in parallel with other repoUpdate steps.
     if ( !cloneFirst && repo === PERENNIAL_REPO_NAME ) {
-      await cloneMissingReposInternal();
+      await cloneMissingReposInternal( allRepos );
     }
 
     if ( options.status ) {
@@ -250,11 +257,19 @@ const updateRepo = async ( repo: string ) => {
 };
 
 // Bundles a call to cloneMissingRepos with logging what repos were cloned
-async function cloneMissingReposInternal(): Promise<void> {
-  const missingRepos = await cloneMissingRepos( options.omitPrivate );
+async function cloneMissingReposInternal( reposToCheck: string[] ): Promise<void> {
+  const missingRepos = await cloneMissingRepos( options.omitPrivate, reposToCheck );
   if ( missingRepos.length ) {
     console.log( `${green}Cloned:\n\t${missingRepos.join( '\n\t' )}${reset}` );
   }
+}
+
+// Get the list of repos that will be updated. Instead of having certain options override each other, just include the subset.
+function getRepos(): string[] {
+  const repoList = getRepoList( options.repoList );
+
+  // Always update perennial, to make sure cloning can happen
+  return _.uniq( [ ...repoList, PERENNIAL_REPO_NAME, options.repo ] );
 }
 
 ///////////////////////////////
@@ -262,26 +277,27 @@ async function cloneMissingReposInternal(): Promise<void> {
 export const syncPromise = ( async () => {
   const startPullStatus = Date.now();
   console.log(); // extra space before the first logging
+  let repos = getRepos();
 
   if ( options.pull || options.status ) {
 
     // See doc for "clone first"
     if ( cloneFirst ) {
       await gitIsClean( PERENNIAL_REPO_NAME ) && await gitPullRebase( PERENNIAL_REPO_NAME );
-      await cloneMissingReposInternal();
+      await cloneMissingReposInternal( repos );
+
+      // reload repo list after the above cloneMissingRepos changes
+      repos = getRepos(); // eslint-disable-line require-atomic-updates
     }
 
-    // load active repos after the above cloneMissingRepos
-    const repos = getActiveRepos();
-
     if ( options.slowPull ) {
-      await chunkDelayed( repos, repo => updateRepo( repo ), {
+      await chunkDelayed( repos, repo => updateRepo( repo, repos ), {
         waitPerItem: options.allBranches ? 1000 : 110,
         chunkSize: options.allBranches ? 20 : 15
       } );
     }
     else {
-      await Promise.all( repos.map( repo => updateRepo( repo ) ) );
+      await Promise.all( repos.map( repo => updateRepo( repo, repos ) ) );
       repos.forEach( repo => data[ repo ].length > 0 && console.log( data[ repo ] ) );
     }
 
@@ -293,7 +309,7 @@ export const syncPromise = ( async () => {
   if ( options.npmUpdate ) {
     const startNPM = Date.now();
 
-    const npmUpdatesNeeded = getRepoList( 'npm-update' );
+    const npmUpdatesNeeded = getRepoList( 'npm-update' ).filter( repo => repos.includes( repo ) );
     try {
 
       const promises: Promise<IntentionalPerennialAny>[] = npmUpdatesNeeded.map( repo => npmUpdate( repo ) );

@@ -16,12 +16,13 @@ const execute = require( './execute' ).default;
  * Clones missing repositories
  * @public
  * @param [omitPrivate]
+ * @param [reposToCheck] - will default to active-repos
  * @returns {Promise.<string[]>} - The names of the repos cloned
  */
-module.exports = async omitPrivate => {
+module.exports = async ( omitPrivate, reposToCheck ) => {
   winston.info( 'Cloning missing repos' );
 
-  const missingRepos = getMissingRepos( omitPrivate );
+  const missingRepos = getMissingRepos( omitPrivate, reposToCheck );
 
   for ( const repo of missingRepos ) {
     try {
