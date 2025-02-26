@@ -72,6 +72,7 @@ module.exports = async function( browserCreator, url, options ) {
       cachePages: true,
       logConsoleOutput: false, // if true, this process will log all messages that come from page.on( 'console' )
       logNavigation: false, // if true, this process will log all messages that come from page.on( 'frame*' )
+      logLifeCycleOutput: true, // if true, log URL and LOAD logs
       logger: winston.info // {function(message)} pass in `console.log` if you are running in a context that doesn't use winston
     }, options );
 
@@ -205,7 +206,7 @@ module.exports = async function( browserCreator, url, options ) {
         options.onLoadTimeout( localResolve, localReject );
       }, options.allowedTimeToLoad );
 
-      options.logger( `[URL] ${url}` );
+      options.logLifeCycleOutput && options.logger( `[URL] ${url}` );
 
       // Await both at the same time, because all rejection is hooked up to the `promise`, but that could cause an error
       // during the goto call (not afterward), see https://github.com/phetsims/aqua/issues/197
@@ -214,7 +215,7 @@ module.exports = async function( browserCreator, url, options ) {
       } );
       if ( rejected ) { return; }
 
-      options.logger( `[LOADED] ${url}` );
+      options.logLifeCycleOutput && options.logger( `[LOADED] ${url}` );
       pageLoaded = true;
 
       await sleep( options.waitAfterLoad );
