@@ -25,6 +25,7 @@ module.exports = function( asyncCallback, options ) {
 
   options = _.merge( {
     path: '../',
+    cache: true,
     port: 0 // 0 means it will find an open port
   }, options );
 
@@ -73,7 +74,7 @@ module.exports = function( asyncCallback, options ) {
 
       // Check the cache
       const cachedEntry = cache.get( fullPath );
-      if ( cachedEntry ) {
+      if ( options.cache && cachedEntry ) {
         // Serve from cache
         res.writeHead( 200, { 'Content-Type': cachedEntry.mimeType } );
         res.end( cachedEntry.data );
