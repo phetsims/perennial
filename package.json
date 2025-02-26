@@ -39,7 +39,7 @@
     "csv-parser": "~3.0.0",
     "emailjs": "~3.8.0",
     "eslint": "~9.15.0",
-    "eslint-plugin-html": "~8.1.2",
+    "eslint-plugin-html": "8.1.1",
     "eslint-plugin-react": "~7.37.2",
     "express": "~4.16.2",
     "globals": "~15.9.0",
