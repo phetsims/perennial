@@ -225,7 +225,7 @@ runnableRepos.forEach( repo => {
 
   if ( phetioRepos.includes( repo ) ) {
     tests.push( {
-      test: [ repo, 'fuzz', 'built-phet-io' ],
+      test: [ repo, 'fuzz', 'phet-io', 'built' ],
       type: 'sim-test',
       url: `${repo}/build/phet-io/${repo}_all_phet-io.html`,
       queryParameters: 'fuzz&phetioStandalone',
@@ -234,23 +234,48 @@ runnableRepos.forEach( repo => {
       brand: 'phet-io',
       buildDependencies: [ repo ]
     } );
+    tests.push( {
+      test: [ repo, 'fuzz', 'phet-io', 'built', 'fuzzValues' ],
+      type: 'sim-test',
+      url: `${repo}/build/phet-io/${repo}_all_phet-io.html`,
+      queryParameters: 'fuzz&phetioStandalone&phetioFuzzValues',
+      testQueryParameters: 'duration=80000',
+
+      brand: 'phet-io',
+      buildDependencies: [ repo ]
+    } );
+
   }
 } );
 
 phetioRepos.forEach( repo => {
 
   tests.push( {
-    test: [ repo, 'phet-io-fuzz', 'unbuilt' ],
+    test: [ repo, 'fuzz', 'phet-io', 'unbuilt' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'ea&brand=phet-io&phetioStandalone&fuzz&phetioLogFuzzedValues'
+    queryParameters: 'ea&brand=phet-io&phetioStandalone&fuzz'
   } );
 
   tests.push( {
-    test: [ repo, 'phet-io-fuzz', 'unbuilt', 'assertSlow' ],
+    test: [ repo, 'fuzz', 'phet-io', 'unbuilt', 'assertSlow' ],
     type: 'sim-test',
     url: `${repo}/${repo}_en.html`,
-    queryParameters: 'eall&brand=phet-io&phetioStandalone&fuzz&phetioLogFuzzedValues'
+    queryParameters: 'eall&brand=phet-io&phetioStandalone&fuzz'
+  } );
+
+  tests.push( {
+    test: [ repo, 'fuzz', 'phet-io', 'unbuilt', 'fuzzValues' ],
+    type: 'sim-test',
+    url: `${repo}/${repo}_en.html`,
+    queryParameters: 'ea&brand=phet-io&phetioStandalone&fuzz&phetioFuzzValues&phetioLogFuzzedValues'
+  } );
+
+  tests.push( {
+    test: [ repo, 'fuzz', 'phet-io', 'unbuilt', 'fuzzValues', 'assertSlow' ],
+    type: 'sim-test',
+    url: `${repo}/${repo}_en.html`,
+    queryParameters: 'eall&brand=phet-io&phetioStandalone&fuzz&phetioFuzzValues&phetioLogFuzzedValues'
   } );
 
   // Test for API compatibility, for sims that support it
