@@ -18,3 +18,7 @@ export default function getOption( keyName: string ): IntentionalPerennialAny {
 export function isOptionKeyProvided( keyName: string ): boolean {
   return options[ keyName ] !== undefined;
 }
+
+export function getOptionIfProvided( keyName: string ): IntentionalPerennialAny {
+  return isOptionKeyProvided( keyName ) ? getOption( keyName ) : undefined;
+}

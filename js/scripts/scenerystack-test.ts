@@ -11,22 +11,21 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-import fs from 'fs';
-import execute from '../common/execute.js';
-import winston from 'winston';
 import { spawn } from 'child_process';
-import npmUpdateDirectory from '../common/npmUpdateDirectory.js';
-import puppeteerEvaluate from '../common/puppeteerEvaluate.js';
-import withServer from '../common/withServer.js';
-import puppeteerLoad from '../common/puppeteerLoad.js';
-import npmCommand from '../common/npmCommand.js';
+import fs from 'fs';
 import os from 'os';
+import winston from 'winston';
+import execute from '../common/execute.js';
+import npmCommand from '../common/npmCommand.js';
+import npmUpdateDirectory from '../common/npmUpdateDirectory.js';
+import { npxCommand } from '../common/npxCommand.js';
+import puppeteerEvaluate from '../common/puppeteerEvaluate.js';
+import puppeteerLoad from '../common/puppeteerLoad.js';
+import withServer from '../common/withServer.js';
 
 winston.default.transports.console.level = 'error';
 
 const SKIP_REFRESH = false;
-
-const npxCommand = process.platform.startsWith( 'win' ) ? 'npx.cmd' : 'npx';
 
 ( async () => {
   fs.mkdirSync( './.scenerystack', { recursive: true } );
