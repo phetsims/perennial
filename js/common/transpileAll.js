@@ -20,5 +20,5 @@ const winston = require( 'winston' );
  */
 module.exports = async function() {
   winston.info( 'running transpileAll' );
-  await execute( gruntCommand, [ 'transpile', '--silent' ], '../chipper' );
+  await execute( gruntCommand, [ 'transpile', '--all', '--silent' ], '../chipper' );
 };
