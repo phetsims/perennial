@@ -4,17 +4,19 @@
 # Bash script to run node/tsx code.
 #
 # Supported commands:
-# * sage run [--node-options] <script-file> [args] - Run a *.js or *.ts file with tsx
+# * sage run [--node-options] <script-file> [args]
+#     - Run a "*.ts", "*.js", "*.mjs", "*.cjs" or file with tsx.
+#     - You can omit the extension and it will find the script in the above order, starting with *.ts
 #
 # @author Sam Reid (PhET Interactive Simulations)
 # @author Michael Kauzmann (PhET Interactive Simulations)
-#
+###
 
 # Like __dirname, get the directory where this script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 TSX_EXEC="$SCRIPT_DIR/../node_modules/.bin/tsx"
 
-# Check if command was provided (only "run" supported now), , "sage" is $0
+# Check if command was provided (only "run" supported now) "sage" is $0
 if [[ -z "$1" ]]; then
   echo "No command specified" >&2
   exit 1
@@ -51,21 +53,21 @@ shift
 # Check if the script file has a .js, .ts, .mjs, or .cjs extension, if it doesn't, see if one can be auto filled in
 if [[ ! "$SCRIPT_FILE" =~ \.(js|ts|mjs|cjs)$ ]]; then
 
-  declare -a array=("ts" "js" "mjs" "cjs")
-  arraylength=${#array[@]} # get length of an array
+  declare -a extensions=("ts" "js" "mjs" "cjs")
+  arraylength=${#extensions[@]} # get length of an array
   found=false
 
   for (( i=0; i<${arraylength}; i++ ));
   do
-     ext=${array[$i]}
-     if test -f "${SCRIPT_FILE}.${ext}"; then
+     ext=${extensions[$i]}
+     if [[ -f "${SCRIPT_FILE}.${ext}" ]]; then
         SCRIPT_FILE="${SCRIPT_FILE}.${ext}"
-        i=$arraylength # exit loop early
         found=true
+        break
      fi
   done
 
-  if [[ $found = false ]]; then
+  if [[ "$found" == false ]]; then
       echo "Script file must have a .js, .ts, .mjs, or .cjs extension: $SCRIPT_FILE" >&2
       exit 1
   fi
@@ -86,6 +88,7 @@ fi
 # Remaining arguments are script arguments
 SCRIPT_ARGS=("$@")
 
+# Uncomment for debugging
 #echo "$TSX_EXEC" "${NODE_ARGS[@]}" "$SCRIPT_FILE" "${SCRIPT_ARGS[@]}"
 
 # Execute the script with tsx
