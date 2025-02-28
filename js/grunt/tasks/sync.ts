@@ -28,7 +28,7 @@
  * Pull all repos:
  *      grunt sync --status=false --npmUpdate=false --checkoutMain=false
  * Print status for all repos:
- *      grunt sync --npmUpdate=false --pull=false --all
+ *      grunt sync --npmUpdate=false --pull=false --logAll
  * Running on windows:
  *      grunt sync --slowPull
  *
@@ -90,7 +90,7 @@ const options = {
   transpile: getOption( 'transpile' ),
 
   // Log status of all repos, even if nothing changed with them. (only does something when --status is true)
-  allRepos: getOption( 'all' ),
+  logAll: getOption( 'logAll' ),
 
   // When cloning missing repos, by default private repos are included, use this to opt out
   omitPrivate: getOption( 'omitPrivate' ),
@@ -110,13 +110,13 @@ const options = {
   repoList: getOption( 'repoList' ) || 'active-repos'
 };
 
-options.allRepos && assert( options.status, '--all is only supported with --status=true, otherwise not all repos have something to report' );
+options.logAll && assert( options.status, '--logAll is only supported with --status=true, otherwise not all repos have something to report' );
 
 // The fastest way to update the codebase is to run clone-missing-repos as part of the parallel repoUpdate (for perennial)
 // Some options mandate that we clone repos first for correctness, before running parallel pull/status. If pulling all
 // branches, or printing all repos, it would be buggy to not have all repos checked out before kicking off the update
 // step. That said, don't default to the slower behavior unless we need to.
-const cloneFirst = options.allBranches || options.allRepos;
+const cloneFirst = options.allBranches || options.logAll;
 
 // ANSI escape sequences to move to the right (in the same line) or to apply or reset colors
 const moveRight = ' \u001b[42G';
@@ -173,7 +173,7 @@ function append( repo: string, message: string ): void {
   }
 }
 
-const updateRepo = async ( repo: string, allRepos: string[] ) => {
+const updateRepo = async ( repo: string, logAll: string[] ) => {
   data[ repo ] = '';
 
   try {
@@ -208,7 +208,7 @@ const updateRepo = async ( repo: string, allRepos: string[] ) => {
 
     // Inline cloneMissingRepos so it can run in parallel with other repoUpdate steps.
     if ( !cloneFirst && repo === PERENNIAL_REPO_NAME ) {
-      await cloneMissingReposInternal( allRepos );
+      await cloneMissingReposInternal( logAll );
     }
 
     if ( options.status ) {
@@ -222,7 +222,7 @@ const updateRepo = async ( repo: string, allRepos: string[] ) => {
       if ( branch ) {
         isGreen = !status && branch === 'main' && !track.length;
 
-        if ( !isGreen || options.allRepos ) {
+        if ( !isGreen || options.logAll ) {
           append( repo, `${moveRight}${isGreen ? green : red}${branch}${reset} ${track}` );
         }
       }
@@ -232,7 +232,7 @@ const updateRepo = async ( repo: string, allRepos: string[] ) => {
       }
 
       if ( status ) {
-        if ( !isGreen || options.allRepos ) {
+        if ( !isGreen || options.logAll ) {
           append( repo, status );
         }
       }
@@ -252,7 +252,7 @@ const updateRepo = async ( repo: string, allRepos: string[] ) => {
 
   // Print progress as we go during slowPull, because it is slow
   if ( options.slowPull ) {
-    ( options.allRepos || data[ repo ].length ) && console.log( data[ repo ] );
+    ( options.logAll || data[ repo ].length ) && console.log( data[ repo ] );
   }
 };
 
