@@ -74,7 +74,7 @@ class ModifiedBranch {
    * For "patches" param, we only want to store patches in one location, so don't fully save the info.
    *
    */
-  public static deserialize( { releaseBranch, changedDependencies, neededPatches, pendingMessages, pushedMessages, deployedVersion }: ModifiedBranchSerialized, patches: Patch[] ): ModifiedBranch {
+  public static deserialize( { releaseBranch, changedDependencies, neededPatches = [], pendingMessages, pushedMessages, deployedVersion }: ModifiedBranchSerialized, patches: Patch[] ): ModifiedBranch {
     return new ModifiedBranch(
       ReleaseBranch.deserialize( releaseBranch ),
       changedDependencies,
