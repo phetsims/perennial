@@ -48,8 +48,16 @@ type SimVersionOptions = {
   buildTimestamp?: string | null;
 };
 
-// eslint-disable-next-line phet/default-export-class-should-register-namespace
-export default class SimVersion {
+type SimVersionSerialized = {
+  major: number;
+  minor: number;
+  maintenance: number;
+  testType: string | null;
+  testNumber: number | null;
+  buildTimestamp: string | null;
+};
+
+export default class SimVersion implements SimVersionSerialized {
   public readonly major: number;
   public readonly minor: number;
   public readonly maintenance: number;
@@ -106,11 +114,8 @@ export default class SimVersion {
 
   /**
    * Convert into a plain JS object meant for JSON serialization.
-   * @public
-   *
-   * @returns {Object} - with properties like major, minor, maintenance, testType, testNumber, and buildTimestamp
    */
-  public serialize(): Record<string, unknown> {
+  public serialize(): SimVersionSerialized {
     return {
       major: this.major,
       minor: this.minor,
@@ -145,15 +150,8 @@ export default class SimVersion {
 
   /**
    * Takes a serialized form of the SimVersion and returns an actual instance.
-   * @public
-   *
-   * @param {Object} - with properties like major, minor, maintenance, testType, testNumber, and buildTimestamp
-   * @returns {SimVersion}
    */
-  public static deserialize(
-    // @ts-expect-error
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    { major, minor, maintenance, testType, testNumber, buildTimestamp } ): SimVersion {
+  public static deserialize( { major, minor, maintenance, testType, testNumber, buildTimestamp }: SimVersionSerialized ): SimVersion {
     return new SimVersion( major, minor, maintenance, {
       testType: testType,
       testNumber: testNumber,
@@ -164,7 +162,6 @@ export default class SimVersion {
   /**
    * Compares versions, returning -1 if this version is before the passed in version, 0 if equal, or 1 if this version
    * is after.
-   * @public
    *
    * This function only compares major/minor/maintenance, leaving other details to the client.
    *
@@ -178,7 +175,6 @@ export default class SimVersion {
    * Compares versions in standard "comparator" static format, returning -1 if the first parameter SimVersion is
    * before the second parameter SimVersion in version-string, 0 if equal, or 1 if the first parameter SimVersion is
    * after.
-   * @public
    *
    * This function only compares major/minor/maintenance, leaving other details to the client.
    *
@@ -199,7 +195,6 @@ export default class SimVersion {
    * Returns true if the specified version is strictly after this version
    * @param {SimVersion} version
    * @returns {boolean}
-   * @public
    */
   public isAfter( version: SimVersion ): boolean {
     return this.compareNumber( version ) === 1;
@@ -209,7 +204,6 @@ export default class SimVersion {
    * Returns true if the specified version matches or comes before this version.
    * @param version
    * @returns {boolean}
-   * @public
    */
   public isBeforeOrEqualTo( version: SimVersion ): boolean {
     return this.compareNumber( version ) <= 0;
@@ -217,7 +211,6 @@ export default class SimVersion {
 
   /**
    * Returns the string form of the version. Like "1.3.5".
-   * @public
    *
    * @returns {string}
    */
@@ -231,7 +224,6 @@ export default class SimVersion {
 
   /**
    * Parses a sim version from a string form.
-   * @public
    *
    * @param {string} versionString - e.g. '1.0.0', '1.0.1-dev.3', etc.
    * @param {string} [buildTimestamp] - Optional build timestamp, like '2015-06-12 16:05:03 UTC' (phet.chipper.buildTimestamp)
@@ -259,7 +251,6 @@ export default class SimVersion {
 
   /**
    * Parses a branch in the form {{MAJOR}}.{{MINOR}} and returns a corresponding version. Uses 0 for the maintenance version (unknown).
-   * @public
    *
    * @param {string} branch - e.g. '1.0'
    * @returns {SimVersion}
@@ -276,7 +267,6 @@ export default class SimVersion {
 
   /**
    * Ensures that a branch name is ok to be a release branch.
-   * @public
    *
    * @param {string} branch - e.g. '1.0'
    * @ignore - not needed by PhET-iO Clients

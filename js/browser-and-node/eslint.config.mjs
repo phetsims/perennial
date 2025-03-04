@@ -8,5 +8,10 @@ import browserAndNodeEslintConfig from '../eslint/config/browser-and-node.eslint
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 export default [
-  ...browserAndNodeEslintConfig
+  ...browserAndNodeEslintConfig,
+  {
+    rules: {
+      'phet/default-export-class-should-register-namespace': 'off'
+    }
+  }
 ];

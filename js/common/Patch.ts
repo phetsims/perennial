@@ -6,62 +6,34 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const assert = require( 'assert' );
+type PatchSerialized = {
+  repo: string;
+  name: string;
+  message: string;
+  shas: string[];
+};
 
-module.exports = ( function() {
+class Patch implements PatchSerialized {
+  public constructor( public readonly repo: string, public readonly name: string, public readonly message: string, public readonly shas: string[] = [] ) {}
 
-  class Patch {
-    /**
-     * @public
-     * @constructor
-     *
-     * @param {string} repo
-     * @param {string} name
-     * @param {string} message - Usually an issue URL, but can include other things
-     * @param {Array.<string>} shas - SHAs used to cherry-pick
-     */
-    constructor( repo, name, message, shas = [] ) {
-      assert( typeof repo === 'string' );
-      assert( typeof name === 'string' );
-      assert( typeof message === 'string' );
-      assert( Array.isArray( shas ) );
-      shas.forEach( sha => assert( typeof sha === 'string' ) );
-
-      // @public {string}
-      this.repo = repo;
-      this.name = name;
-      this.message = message;
-
-      // @public {Array.<string>}
-      this.shas = shas;
-    }
-
-    /**
-     * Convert into a plain JS object meant for JSON serialization.
-     * @public
-     *
-     * @returns {Object}
-     */
-    serialize() {
-      return {
-        repo: this.repo,
-        name: this.name,
-        message: this.message,
-        shas: this.shas
-      };
-    }
-
-    /**
-     * Takes a serialized form of the Patch and returns an actual instance.
-     * @public
-     *
-     * @param {Object}
-     * @returns {Patch}
-     */
-    static deserialize( { repo, name, message, shas } ) {
-      return new Patch( repo, name, message, shas );
-    }
+  /**
+   * Convert into a plain JS object meant for JSON serialization.
+   */
+  public serialize(): PatchSerialized {
+    return {
+      repo: this.repo,
+      name: this.name,
+      message: this.message,
+      shas: this.shas
+    };
   }
 
-  return Patch;
-} )();
+  /**
+   * Takes a serialized form of the Patch and returns an actual instance.
+   */
+  public static deserialize( { repo, name, message, shas }: PatchSerialized ): Patch {
+    return new Patch( repo, name, message, shas );
+  }
+}
+
+export default Patch;

@@ -4,19 +4,31 @@
  * Returns a list of arguments to use with `grunt` to build a specific simulation
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-const assert = require( 'assert' );
+import assert from 'assert';
+import type ChipperVersion from './ChipperVersion.js';
+
+export type BuildOptions = {
+  brands: string[];
+  locales: string;
+  allHTML: boolean;
+  debugHTML: boolean;
+  uglify: boolean;
+  mangle: boolean;
+  minify: boolean;
+  lint: boolean;
+  clean: boolean;
+  thumbnails: boolean;
+  twitterCard: boolean;
+  buildForServer: boolean;
+};
 
 /**
  * Returns a list of arguments to use with `grunt` to build a specific simulation
- * @public
- *
- * @param {ChipperVersion} chipperVersion
- * @param {Object} [options]
- * @returns {string[]}
  */
-module.exports = function( chipperVersion, options ) {
+function getBuildArguments( chipperVersion: ChipperVersion, options: Partial<BuildOptions> ): string[] {
   const {
     brands = [ 'phet' ],
     locales = 'en',
@@ -99,4 +111,6 @@ module.exports = function( chipperVersion, options ) {
   }
 
   return args;
-};
+}
+
+export default getBuildArguments;
