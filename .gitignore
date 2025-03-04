@@ -10,10 +10,9 @@ node_modules/
 build-server.log
 lintreport.txt
 js/build-server/tmp*
+js/scripts/maintenance/temp/
 .maintenance.json
 logs/
 .build-server-queue
-temp.js
-temp.ts
 .scenerystack
 deno.lock

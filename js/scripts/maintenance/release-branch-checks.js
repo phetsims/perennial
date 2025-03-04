@@ -11,7 +11,7 @@
  *
  * USAGE:
  * cd perennial;
- * sage run js/scripts/test/release-branch-checks.js
+ * sage run js/scripts/maintenance/release-branch-checks.js
  *
  * NOTE: refresh release branches if not doing an active MR:
  * cd perennial;
@@ -24,7 +24,7 @@
 
 const _ = require( 'lodash' );
 const puppeteerLoad = require( '../../common/puppeteerLoad' );
-const Maintenance = require( '../../common/Maintenance' );
+const Maintenance = require( '../../common/Maintenance' ).default;
 const withServer = require( '../../common/withServer' );
 const winston = require( 'winston' );
 const puppeteer = require( 'puppeteer' );

@@ -6,7 +6,7 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const Maintenance = require( '../../common/Maintenance' );
+const Maintenance = require( '../../common/Maintenance' ).default;
 const winston = require( 'winston' );
 const fs = require( 'fs' );
 
