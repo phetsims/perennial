@@ -22,12 +22,13 @@
 
 // Used for evaluating browser-side code in puppeteer tests.
 
-const _ = require( 'lodash' );
+// const _ = require( 'lodash' );
 const puppeteerLoad = require( '../../common/puppeteerLoad' );
 const Maintenance = require( '../../common/Maintenance' ).default;
 const withServer = require( '../../common/withServer' );
 const winston = require( 'winston' );
 const puppeteer = require( 'puppeteer' );
+const fs = require( 'fs' );
 
 winston.default.transports.console.level = 'error';
 
@@ -40,7 +41,6 @@ const TEST_FROM_MAIN = false;
 // Log tests that pass in addition to failures.
 const VERBOSE_LOG_SUCCESS = false;
 
-const TEST_REGION_AND_CULTURE_GRACE = true; // https://github.com/phetsims/joist/issues/974
 ///////////////////////////////////////////////
 
 const logResult = ( success, message, url ) => {
@@ -61,66 +61,67 @@ const logResult = ( success, message, url ) => {
 
   // Use withServer for cross-dev environment execution.
   await withServer( async port => {
-
+    const server = `http://localhost:${port}`;
+    // await Maintenance.loadAllMaintenanceBranches();
     const releaseBranches = TEST_FROM_MAIN ? [ null ] : await Maintenance.loadAllMaintenanceBranches();
-
-    const getBuiltURLs = async releaseBranch => {
-      const urls = [];
-      const repo = releaseBranch ? releaseBranch.repo : 'acid-base-solutions';
-      const branch = releaseBranch ? releaseBranch.branch : 'main';
-      const releaseBranchPath = releaseBranch ? `release-branches/${repo}-${branch}/` : '';
-      const buildDir = `http://localhost:${port}/${releaseBranchPath}${repo}/build`;
-
-      if ( !releaseBranch ) {
-        urls.push( `${buildDir}/phet/${repo}_all_phet_debug.html?webgl=false` );
-        urls.push( `${buildDir}/phet-io/${repo}_all_phet-io.html?webgl=false&phetioStandalone` );
-        return urls;
-      }
-
-      const usesChipper2 = await releaseBranch.usesChipper2();
-
-      if ( releaseBranch.brands.includes( 'phet' ) ) {
-        urls.push( `${buildDir}/${usesChipper2 ? 'phet/' : ''}${repo}_all${usesChipper2 ? '_phet' : ''}.html?webgl=false` );
-      }
-      if ( releaseBranch.brands.includes( 'phet-io' ) ) {
-        const standaloneParams = await releaseBranch.getPhetioStandaloneQueryParameter();
-
-        const phetioSuffix = usesChipper2 ? '_all_phet-io' : '_en-phetio';
-
-        urls.push( `${buildDir}/${usesChipper2 ? 'phet-io/' : ''}${repo}${phetioSuffix}.html?${standaloneParams}&webgl=false` );
-      }
-
-      return urls;
-    };
-
-    const getUnbuiltURLs = async releaseBranch => {
-      const urls = [];
-
-      if ( !releaseBranch ) {
-        const repo = 'acid-base-solutions';
-        urls.push( `http://localhost:${port}/${repo}/${repo}_en.html?webgl=false` );
-        urls.push( `http://localhost:${port}/${repo}/${repo}_en.html?webgl=false&brand=phet-io&phetioStandalone` );
-        return urls;
-      }
-
-      const repo = releaseBranch.repo;
-      const branch = releaseBranch.branch;
-      urls.push( `http://localhost:${port}/release-branches/${repo}-${branch}/${repo}/${repo}_en.html?webgl=false` );
-
-      if ( releaseBranch.brands.includes( 'phet-io' ) ) {
-        const standaloneParams = await releaseBranch.getPhetioStandaloneQueryParameter();
-        urls.push( `http://localhost:${port}/release-branches/${repo}-${branch}/${repo}/${repo}_en.html?webgl=false&${standaloneParams}&brand=phet-io` );
-      }
-
-      return urls;
-    };
-
-    const getAllURLs = async releaseBranch => {
-      return [
-        ...( await getBuiltURLs( releaseBranch ) ),
-        ...( await getUnbuiltURLs( releaseBranch ) )
-      ];
-    };
+    // const releaseBranches = [];
+    // const getBuiltURLs = async releaseBranch => {
+    //   const urls = [];
+    //   const repo = releaseBranch ? releaseBranch.repo : 'acid-base-solutions';
+    //   const branch = releaseBranch ? releaseBranch.branch : 'main';
+    //   const releaseBranchPath = releaseBranch ? `release-branches/${repo}-${branch}/` : '';
+    //   const buildDir = `${server}/${releaseBranchPath}${repo}/build`;
+    //
+    //   if ( !releaseBranch ) {
+    //     urls.push( `${buildDir}/phet/${repo}_all_phet_debug.html?webgl=false` );
+    //     urls.push( `${buildDir}/phet-io/${repo}_all_phet-io.html?webgl=false&phetioStandalone` );
+    //     return urls;
+    //   }
+    //
+    //   const usesChipper2 = await releaseBranch.usesChipper2();
+    //
+    //   if ( releaseBranch.brands.includes( 'phet' ) ) {
+    //     // urls.push( `${buildDir}/${usesChipper2 ? 'phet/' : ''}${repo}_all${usesChipper2 ? '_phet' : ''}.html?webgl=false` );
+    //   }
+    //   if ( releaseBranch.brands.includes( 'phet-io' ) ) {
+    //     const standaloneParams = await releaseBranch.getPhetioStandaloneQueryParameter();
+    //
+    //     const phetioSuffix = usesChipper2 ? '_all_phet-io' : '_en-phetio';
+    //
+    //     urls.push( `${buildDir}/${usesChipper2 ? 'phet-io/' : ''}${repo}${phetioSuffix}.html?${standaloneParams}&webgl=false` );
+    //   }
+    //
+    //   return urls;
+    // };
+    //
+    // const getUnbuiltURLs = async releaseBranch => {
+    //   const urls = [];
+    //
+    //   if ( !releaseBranch ) {
+    //     const repo = 'acid-base-solutions';
+    //     urls.push( `${server}/${repo}/${repo}_en.html?webgl=false` );
+    //     urls.push( `${server}/${repo}/${repo}_en.html?webgl=false&brand=phet-io&phetioStandalone` );
+    //     return urls;
+    //   }
+    //
+    //   const repo = releaseBranch.repo;
+    //   const branch = releaseBranch.branch;
+    //   urls.push( `${server}/release-branches/${repo}-${branch}/${repo}/${repo}_en.html?webgl=false` );
+    //
+    //   if ( releaseBranch.brands.includes( 'phet-io' ) ) {
+    //     const standaloneParams = await releaseBranch.getPhetioStandaloneQueryParameter();
+    //     urls.push( `${server}/release-branches/${repo}-${branch}/${repo}/${repo}_en.html?webgl=false&${standaloneParams}&brand=phet-io` );
+    //   }
+    //
+    //   return urls;
+    // };
+    //
+    // const getAllURLs = async releaseBranch => {
+    //   return [
+    //     ...( await getBuiltURLs( releaseBranch ) )
+    //     // ...( await getUnbuiltURLs( releaseBranch ) )
+    //   ];
+    // };
     //
     // // What URLS were called during sim load
     // const getLoadedURLs = async url => {
@@ -151,9 +152,9 @@ const logResult = ( success, message, url ) => {
           waitAfterLoad: 2000,
           allowedTimeToLoad: 40000,
           browser: browser
-          // , // eslint-disable-line comma-style
-          // logConsoleOutput: true,
-          // logger: console.log
+          , // eslint-disable-line comma-style
+          logConsoleOutput: true,
+          logger: console.log
         } );
       }
       catch( e ) {
@@ -161,46 +162,88 @@ const logResult = ( success, message, url ) => {
         return `error running ${url}`;
       }
     };
-
-    const needsRegionAndCulture = releaseBranch => {
-      return !!_.find( [
-        [ 'area-model-algebra', '1.3' ],
-        [ 'area-model-decimals', '1.3' ],
-        [ 'area-model-introduction', '1.3' ],
-        [ 'area-model-multiplication', '1.3' ],
-        [ 'energy-skate-park', '1.3' ],
-        [ 'number-line-integers', '1.2' ],
-        [ 'number-line-distance', '1.1' ]
-      ], x => releaseBranch.repo === x[ 0 ] && releaseBranch.branch === x[ 1 ] );
-    };
+    //
+    // const evaluateSimLoad = async ( url, options ) => {
+    //   return evaluate( url, 'phet.joist.sim.isConstructionCompleteProperty.value', {
+    //     waitForFunction: 'window.phet?.joist?.sim && phet.joist.sim.isConstructionCompleteProperty.value',
+    //     waitAfterLoad: 0,
+    //     ...options
+    //   } );
+    // };
+    const wrapperTestTemplate = fs.readFileSync( '../sandbox/html.html', 'utf-8' );
 
     for ( const releaseBranch of releaseBranches ) {
+
+      if ( !await releaseBranch.isPhetioHydrogen() ) {
+        continue;
+      }
 
       // releaseBranch=== null when running on main
       const isUnbultOnMain = !releaseBranch;
       const repo = isUnbultOnMain ? 'acid-base-solutions' : releaseBranch.repo;
-      const urls = await getAllURLs( releaseBranch );
+      // const urls = await getAllURLs( releaseBranch );
 
       console.log( '-', releaseBranch ? releaseBranch.toString() : repo );
 
-      for ( const url of urls ) {
+      const libs = [
+        // `https://phet-io.colorado.edu/sims/${repo}/${releaseBranch.branch}/lib/phet-io.js`
+        `${server}/release-branches/${repo}-${releaseBranch.branch}/${repo}/build/phet-io/lib/phet-io.js`
+      ];
 
-        const getUrlWithRegionAndCulture = regionAndCulture => url.includes( '?' ) ? `${url}&regionAndCulture=${regionAndCulture}` : `${url}?regionAndCulture=${regionAndCulture}`;
+      for ( const urlLib of libs ) {
 
-        const logStatus = ( status, message, loggedURL = url ) => {
-          logResult( status, message, loggedURL );
-        };
+        fs.writeFileSync( '../sandbox/html2.html', wrapperTestTemplate.replace( /\{\{LIB}}/g, urlLib ) );
+        const wrapperName = `sandbox/testWrapper-${repo}.html`;
+        await puppeteerLoad( `${server}/sandbox/html2.html`, {
+          // logConsoleOutput: true,
+          // logNavigation: true,
+          // logLifeCycleOutput: true,
+          browser: browser,
+          logger: console.log,
+          resolveFromLoad: false,
+          cachePages: false,
+          onPageCreation: async ( page, resolve ) => {
+            await page.exposeFunction( 'giveStandardWrapperHTML', html => {
+              fs.writeFileSync( `../${wrapperName}`, html );
+              resolve();
+            } );
+          },
+          waitAfterLoad: 1000000
+        } );
 
-        if ( TEST_REGION_AND_CULTURE_GRACE && needsRegionAndCulture( releaseBranch ) ) {
-          await evaluate( 'https://phet-dev.colorado.edu/html/area-model-algebra/1.3.5-rc.1/phet/area-model-algebra_all_phet.html?regionAndCulture=', '' ); // This does fail
-          await evaluate( getUrlWithRegionAndCulture( '' ), 'true' );
-          const regionAndCultureID = await evaluate( getUrlWithRegionAndCulture( 'africa' ),
-            'phet.joist.sim?.preferencesModel?.localizationModel?.regionAndCulturePortrayalProperty?.value?.regionAndCultureID' );
-          logStatus( regionAndCultureID === 'africa', 'regionAndCultureID=africa' );
+        const regionAndCultures = [
+          '&regionAndCulture=',
+          '&regionAndCulture=usa',
+          '&regionAndCulture=africa',
+          '&regionAndCulture=fjdskalfjdskla'
+        ];
+        for ( const regionAndCulture of regionAndCultures ) {
+          const regionURL = `${server}/${wrapperName}?${regionAndCulture}`;
+          console.log( regionURL );
+          const loaded = await evaluate( regionURL, 'true', {
+            cachePages: false,
+            waitForFunction: 'phetioClient.simStarted',
+            onPageCreation: page => {
+              page.on( 'dialog', async dialog => {
+                await dialog.accept();
+              } );
+            }
+          } );
+          logResult( loaded, regionAndCulture, regionURL );
         }
+
+        // for ( const url of urls ) {
+
+        // const logStatus = ( status, message, loggedURL = url ) => {
+        //   logResult( status, message, loggedURL );
+        // };
+        //
+        // const loaded = await evaluateSimLoad( url );
+        // logStatus( loaded, 'sim loaded' );
+        // }
       }
     }
   } );
 
-  browser.close();
+  await browser.close();
 } )();
