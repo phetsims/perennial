@@ -31,6 +31,7 @@ import getBranchVersion from './getBranchVersion.js';
 import getBuildArguments from './getBuildArguments.js';
 import getDependencies from './getDependencies.js';
 import getFileAtBranch from './getFileAtBranch.js';
+import getGitFile from './getGitFile.js';
 import getRepoVersion from './getRepoVersion.js';
 import gitCatFile from './gitCatFile.js';
 import gitCheckout from './gitCheckout.js';
@@ -295,16 +296,12 @@ class ReleaseBranch implements ReleaseBranchSerialized {
   public async includesSHA( repo: string, sha: string ): Promise<boolean> {
     let result = false;
 
-    await gitCheckout( this.repo, this.branch );
-
-    const dependencies = await getDependencies( this.repo );
+    const dependencies = JSON.parse( await getGitFile( this.repo, this.branch, 'dependencies.json' ) );
 
     if ( dependencies[ repo ] ) {
       const currentSHA = dependencies[ repo ].sha;
       result = sha === currentSHA || await gitIsAncestor( repo, sha, currentSHA );
     }
-
-    await gitCheckout( this.repo, 'main' );
 
     return result;
   }
@@ -317,16 +314,12 @@ class ReleaseBranch implements ReleaseBranchSerialized {
   public async isMissingSHA( repo: string, sha: string ): Promise<boolean> {
     let result = false;
 
-    await gitCheckout( this.repo, this.branch );
-
-    const dependencies = await getDependencies( this.repo );
+    const dependencies = JSON.parse( await getGitFile( this.repo, this.branch, 'dependencies.json' ) );
 
     if ( dependencies[ repo ] ) {
       const currentSHA = dependencies[ repo ].sha;
       result = sha !== currentSHA && !( await gitIsAncestor( repo, sha, currentSHA ) );
     }
-
-    await gitCheckout( this.repo, 'main' );
 
     return result;
   }
