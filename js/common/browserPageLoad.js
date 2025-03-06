@@ -129,7 +129,10 @@ module.exports = async function( browserCreator, url, options ) {
       if ( username && password ) {
         if ( browserCreator === puppeteer ) {
           // puppeteer has its own authentication method, thanks!
-          await page.authenticate( { username: username, password: password } );
+          await page.authenticate( {
+            username: username,
+            password: password
+          } );
         }
         else {
           // Handle playwright browsers, see https://github.com/phetsims/aqua/issues/188
@@ -160,14 +163,17 @@ module.exports = async function( browserCreator, url, options ) {
           }
         }
       } );
-      options.logConsoleOutput && page.on( 'console', msg => {
+      page.on( 'console', msg => {
         let messageTxt = msg.text();
 
         // Append the location to messages that would benefit from it.
         if ( messageTxt.includes( 'net:' ) || messageTxt.includes( 'Failed to load resource' ) ) {
           messageTxt += `: \t ${msg.location().url}`;
         }
-        options.logger( `[CONSOLE] ${messageTxt}` );
+
+        if ( options.logConsoleOutput || ( msg.type() === 'error' && options.rejectPageErrors ) ) {
+          options.logger( `[CONSOLE] ${messageTxt}` );
+        }
       } );
 
       page.on( 'error', async message => {
