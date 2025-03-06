@@ -89,6 +89,9 @@ const options = {
   // Run the transpile step (without watching). Runs at the end of the process (after pulls and npm updates)
   transpile: getOption( 'transpile' ),
 
+  // By default, the output of "git pull" in a repo will be logged, use this option to turn it off.
+  logPullOutput: isOptionKeyProvided( 'logPull' ) ? getOption( 'logPull' ) : true,
+
   // Log status of all repos, even if nothing changed with them. (only does something when --status is true)
   logAll: getOption( 'logAll' ),
 
@@ -241,7 +244,7 @@ const updateRepo = async ( repo: string, logAll: string[] ) => {
     }
 
     // Log pull result after the status section, for formatting
-    if ( pullResult ) {
+    if ( options.logPullOutput && pullResult ) {
       append( repo, ' ' + pullResult );
     }
   }
