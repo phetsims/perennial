@@ -4,6 +4,7 @@ Visit each constructor, instance method, and static method and move the paramete
 * If none of the @param annotations have any descriptive documentation (only types), then remove the @param annotations entirely.
 * If any @param annotation specifies a type of {Object}, change the type declaration to IntentionalAny in the TypeScript signature (this will be fixed later).
 * Constructors should be made public.
+* DO NOT make any value space or runtime changes. All changes should be in type space or comments.
 
 ####################
 # Example 1: NOTE that the leading whitespace is critically important! Do not omit the leading whitespace on each line.
