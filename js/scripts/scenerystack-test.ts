@@ -187,7 +187,14 @@ const SKIP_REFRESH = false;
     const served = await viteServe( './.scenerystack/demo-sim' );
 
     console.log( 'launching puppeteer' );
-    const hasDisplay = await puppeteerEvaluate( served.url, '!!phet.joist.sim.display' );
+    let hasDisplay = false;
+    try {
+      hasDisplay = await puppeteerEvaluate( served.url, '!!phet.joist.sim.display' );
+    }
+    catch( e ) {
+      served.close();
+      throw e;
+    }
 
     if ( !hasDisplay ) {
       onError( 'demo-sim vite serve runtime failure' );
@@ -264,7 +271,13 @@ const SKIP_REFRESH = false;
         console.log( `parcel serve ${repo}` );
         const served = await parcelServe( `./.scenerystack/${repo}` );
         console.log( 'served' );
-        await puppeteerLoad( served.url );
+        try {
+          await puppeteerLoad( served.url );
+        }
+        catch( e ) {
+          served.close();
+          throw e;
+        }
         served.close();
       }
 
