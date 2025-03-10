@@ -299,7 +299,7 @@ phetioRepos.forEach( repo => {
     } );
   } );
 
-  const wrappersToIgnore = [ 'migration', 'playback', 'login', 'input-record-and-playback' ];
+  const wrappersToIgnore = [ 'migration', 'playback', 'login' ];
 
   phetioWrapperSuiteWrappers.forEach( wrapperPath => {
 
