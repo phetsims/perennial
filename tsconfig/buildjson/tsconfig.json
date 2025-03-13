@@ -27,6 +27,7 @@
     "../../../chipper/js/browser/sim-tests/qunitStart.js",
     "../../../chipper/js/browser/**/*",
     "../../../chipper/js/grunt/tasks/util/getOption.ts",
+    "../../../query-string-machine/js/QueryStringMachineModule.ts",
     "../../../dot/js/**/*",
     "../../../joist/images/**/*",
     "../../../joist/js/**/*",
