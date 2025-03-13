@@ -26,7 +26,7 @@ declare var sceneryLog: null | false | ( Record<string, ( ob: Any, style?: strin
 } );
 declare var phet: Record<string, Any>;
 
-// TODO: This can be moved to QueryStringMachine when it is moved to TypeScript, see https://github.com/phetsims/query-string-machine/issues/49
+// TODO: This can be moved to QueryStringMachine when it is moved to TypeScript, see https://github.com/phetsims/query-string-machine/issues/45
 declare type Warning = {
   key: string;
   value: string;
