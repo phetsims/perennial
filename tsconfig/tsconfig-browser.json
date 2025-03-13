@@ -12,7 +12,7 @@
   },
   "files": [
     "../js/browser-and-node/phet-types.d.ts",
-    "../js/browser-and-node/phet-types-module.d.ts",
+    "../../chipper/js/browser-and-node/phet-types-module.d.ts",
     "../node_modules/@types/jquery/index.d.ts",
     "../node_modules/@types/lodash/index.d.ts",
     "../node_modules/@types/p2/index.d.ts",
