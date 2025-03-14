@@ -30,8 +30,16 @@ function matchesCamelCase( localName, filenameWithoutExtension ) {
  * @returns {boolean}
  */
 function isCompatible( localName, filename ) {
-  return localName === removeExtension( filename ) ||
-         matchesCamelCase( localName, removeExtension( filename ) ) ||
+
+  const fileWithoutExtension = removeExtension( filename );
+
+  // if they are different, but only by case, that likely indicates a problem
+  if ( localName !== fileWithoutExtension && localName.toLowerCase() === fileWithoutExtension.toLowerCase() ) {
+    return false;
+  }
+
+  return localName === fileWithoutExtension ||
+         matchesCamelCase( localName, fileWithoutExtension ) ||
          localName === '_'; // lodash is allowed to be named differently
 }
 
