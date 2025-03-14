@@ -1,14 +1,14 @@
 // Copyright 2021, University of Colorado Boulder
 
 /**
+ * The main logic behind the sync grunt task (js/grunt/tasks/sync.ts).
+ *
  * Generally a "one-stop shop" for all things needed to update the PhET Codebase. By default, this will:
  * - clone missing repos
  * - pull all repos
  * - set up tracking to the remote (only if needed)
  * - npm update all repos in perennial/data/npm-update (and --repo if provided)
  * - log working copy changes in repos that have them
- *
- * This script uses perennial/data/active-repos as the list of repos.
  *
  * There are a variety of options listed below to customize this process to your development needs. The default behavior
  * is meant to remain the list of items that are needed to ensure that, no matter what, your local codebase is up to
@@ -17,22 +17,6 @@
  * - starting a server: devs have a variety of ways to host the PhET codebase locally, this goes beyond the scope of
  *   this file.
  *
- *
- * usage:
- * grunt sync
- * ## or
- * cd perennial/
- * sage run js/grunt/tasks/sync.ts
- *
- * Common use cases:
- * Pull all repos:
- *      grunt sync --status=false --npmUpdate=false --checkoutMain=false
- * Print status for all repos:
- *      grunt sync --npmUpdate=false --pull=false --logAll
- * Running on windows:
- *      grunt sync --slowPull
- *
- *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
@@ -40,244 +24,303 @@
 import assert from 'assert';
 import fs from 'fs';
 import _ from 'lodash';
-import path from 'path';
-import winston from 'winston';
-import { IntentionalPerennialAny } from '../../browser-and-node/PerennialTypes.js';
-import cloneMissingRepos from '../../common/cloneMissingRepos.js';
-import dirname from '../../common/dirname.js';
-import execute from '../../common/execute.js';
-import getBranches from '../../common/getBranches.js';
-import getRepoList from '../../common/getRepoList.js';
-import gitCheckout from '../../common/gitCheckout.js';
-import gitFetch from '../../common/gitFetch.js';
-import gitIsClean from '../../common/gitIsClean.js';
-import gitPullRebase from '../../common/gitPullRebase.js';
-import gitRevParse from '../../common/gitRevParse.js';
-import npmUpdate from '../../common/npmUpdate.js';
-import { PERENNIAL_REPO_NAME } from '../../common/perennialRepoUtils.js';
-import transpileAll from '../../common/transpileAll.js';
-import chunkDelayed from '../../common/util/chunkDelayed.js';
-import getOption, { isOptionKeyProvided } from './util/getOption.js';
+import { IntentionalPerennialAny } from '../browser-and-node/PerennialTypes.js';
+import { getOptionIfProvided } from '../grunt/tasks/util/getOption.js';
+import cloneMissingRepos from './cloneMissingRepos.js';
+import execute from './execute.js';
+import getBranches from './getBranches.js';
+import getRepoList from './getRepoList.js';
+import gitCheckout from './gitCheckout.js';
+import gitFetch from './gitFetch.js';
+import gitIsClean from './gitIsClean.js';
+import gitPullRebase from './gitPullRebase.js';
+import gitRevParse from './gitRevParse.js';
+import npmUpdate from './npmUpdate.js';
+import { PERENNIAL_REPO_NAME } from './perennialRepoUtils.js';
+import transpileAll from './transpileAll.js';
+import chunkDelayed from './util/chunkDelayed.js';
 
-winston.default.transports.console.level = 'error';
-
-const previousCWD = process.cwd();
-// @ts-expect-error - until we have "type": "module" in our package.json
-const scriptDirectory = dirname( import.meta.url );
-process.chdir( path.join( scriptDirectory, '../../../' ) );
-
-const options = {
-
+export type SyncOptions = {
   // git pull repos, default to true. When false, will also skip checking out main.
-  pull: isOptionKeyProvided( 'pull' ) ? getOption( 'pull' ) : true,
+  pull: boolean;
 
   // git checkout main before pulling each repo. This option is ignored if --pull=false. Default to true.
-  checkoutMain: isOptionKeyProvided( 'checkoutMain' ) ? getOption( 'checkoutMain' ) : true,
+  checkoutMain: boolean;
 
   // git-status-styled output, default to true
-  status: isOptionKeyProvided( 'status' ) ? getOption( 'status' ) : true,
+  status: boolean;
 
   // npm update on all repos in perennial/data/npm-update, and the `--repo` option (if provided), defaults to true.
   // MK wishes this options was called "npm", but this option is recognized by node instead.
-  npmUpdate: isOptionKeyProvided( 'npmUpdate' ) ? getOption( 'npmUpdate' ) : true,
+  npmUpdate: boolean;
 
   // Track ALL remote branches on all repos locally, check them out, and pull them (with rebase). It is recommended to
   // close webstorm and turn off the transpiler watch process before running with this option. Useful for doing batch
   // maintenance releases.
-  allBranches: getOption( 'allBranches' ),
+  allBranches: boolean;
 
   // Run the transpile step (without watching). Runs at the end of the process (after pulls and npm updates)
-  transpile: getOption( 'transpile' ),
+  transpile: boolean;
 
   // By default, the output of "git pull" in a repo will be logged, use this option to turn it off.
-  logPullOutput: isOptionKeyProvided( 'logPull' ) ? getOption( 'logPull' ) : true,
+  logPull: boolean;
 
   // Log status of all repos, even if nothing changed with them. (only does something when --status is true)
-  logAll: getOption( 'logAll' ),
+  logAll: boolean;
 
   // When cloning missing repos, by default private repos are included, use this to opt out
-  omitPrivate: getOption( 'omitPrivate' ),
+  omitPrivate: boolean;
 
   // Pulling repos in parallel doesn't work on Windows git.  This is a workaround for that. It will also log as it
   // completes individual repo updates, since it takes more time. See https://github.com/phetsims/perennial/issues/361
-  slowPull: getOption( 'slowPull' ),
+  slowPull: boolean;
 
   // Run npm update on this repo as well. Automatically filled in if running as a grunt task. This repo to update will
   // be combined with the repos in `options.repoList`, and please note that the perennial repo that `sync` is run
   // from is ALWAYS included in script.
-  repo: getOption( 'repo' ) || PERENNIAL_REPO_NAME,
+  repo: string;
 
   // Name of the file of repos in perennial/data/ to use for the update, defaults to "active-repos".
   // For example, `grunt sync --repoList=active-website-repos`. This list will be combined with `options.repo`, and please
   // note that the perennial repo that sync is run from is ALWAYS included in script.
-  repoList: getOption( 'repoList' ) || 'active-repos'
+  repoList: string;
 };
 
-options.logAll && assert( options.status, '--logAll is only supported with --status=true, otherwise not all repos have something to report' );
+const DEFAULTS = {
+  pull: true,
+  checkoutMain: true,
+  status: true,
+  npmUpdate: true,
+  allBranches: false,
+  transpile: false,
+  logPull: true,
+  logAll: false,
+  omitPrivate: false,
+  slowPull: false,
+  repo: PERENNIAL_REPO_NAME,
+  repoList: 'active-repos'
+};
 
-// The fastest way to update the codebase is to run clone-missing-repos as part of the parallel repoUpdate (for perennial)
-// Some options mandate that we clone repos first for correctness, before running parallel pull/status. If pulling all
-// branches, or printing all repos, it would be buggy to not have all repos checked out before kicking off the update
-// step. That said, don't default to the slower behavior unless we need to.
-const cloneFirst = options.allBranches || options.logAll;
+export const getSyncCLIOptions = (): SyncOptions => {
 
-// ANSI escape sequences to move to the right (in the same line) or to apply or reset colors
-const moveRight = ' \u001b[42G';
-const red = '\u001b[31m';
-const green = '\u001b[32m';
-const bold = '\u001b[1m';
-const reset = '\u001b[0m';
+  return {
+    // git pull repos, default to true. When false, will also skip checking out main.
+    pull: getOptionIfProvided( 'pull', DEFAULTS.pull ),
 
-const data: Record<string, string> = {};
-let hasNoPullStatusProblems = true;
+    // git checkout main before pulling each repo. This option is ignored if --pull=false. Default to true.
+    checkoutMain: getOptionIfProvided( 'checkoutMain', DEFAULTS.checkoutMain ),
 
-async function pullAllBranches( repo: string ): Promise<void> {
-  const branches = await getBranches( repo );
-  for ( const branch of branches ) {
-    // Only track the remote branch if it hasn't been tracked yet
-    if ( ( await execute( 'git', [ 'rev-parse', '--verify', branch ], `../${repo}`, { errors: 'resolve' } ) ).code !== 0 ) {
-      await gitFetch( repo );
-      await execute( 'git', [ 'branch', '--track', branch, `origin/${branch}` ], `../${repo}` );
-    }
-    await gitCheckout( repo, branch );
+    // git-status-styled output, default to true
+    status: getOptionIfProvided( 'status', DEFAULTS.status ),
 
-    try {
-      await gitPullRebase( repo );
-    }
-    catch( e ) {
+    // npm update on all repos in perennial/data/npm-update, and the `--repo` option (if provided), defaults to true.
+    // MK wishes this options was called "npm", but this option is recognized by node instead.
+    npmUpdate: getOptionIfProvided( 'npmUpdate', DEFAULTS.npmUpdate ),
 
-      // Likely there is no tracking info set up on the local branch
-      await execute( 'git', [ 'branch', `--set-upstream-to=origin/${branch}`, branch ], `../${repo}` );
-      await gitPullRebase( repo );
-    }
-  }
+    // Track ALL remote branches on all repos locally, check them out, and pull them (with rebase). It is recommended to
+    // close webstorm and turn off the transpiler watch process before running with this option. Useful for doing batch
+    // maintenance releases.
+    allBranches: getOptionIfProvided( 'allBranches', DEFAULTS.allBranches ),
 
-  // Go back to main
-  await gitCheckout( repo, 'main' );
-}
+    // Run the transpile step (without watching). Runs at the end of the process (after pulls and npm updates)
+    transpile: getOptionIfProvided( 'transpile', DEFAULTS.transpile ),
 
-function parsePullResult( stdout: string ): string | null {
-  if ( stdout === 'Already up to date.\nCurrent branch main is up to date.\n' ||
-       stdout === 'Already up to date.\n' ||
-       stdout === 'Current branch main is up to date.\n' ) {
-    return null;
-  }
-  else {
-    return stdout.trim();
-  }
-}
+    // By default, the output of "git pull" in a repo will be logged, use this option to turn it off.
+    logPull: getOptionIfProvided( 'logPull', DEFAULTS.logPull ),
 
-function append( repo: string, message: string ): void {
-  if ( data[ repo ] ) {
-    data[ repo ] += '\n' + message;
-  }
-  else {
-    data[ repo ] += `${bold}${repo}${reset}${message}`;
-  }
-}
+    // Log status of all repos, even if nothing changed with them. (only does something when --status is true)
+    logAll: getOptionIfProvided( 'logAll', DEFAULTS.logAll ),
 
-const updateRepo = async ( repo: string, logAll: string[] ) => {
-  data[ repo ] = '';
+    // When cloning missing repos, by default private repos are included, use this to opt out
+    omitPrivate: getOptionIfProvided( 'omitPrivate', DEFAULTS.omitPrivate ),
 
-  try {
-    let pullResult: null | string = null;
+    // Pulling repos in parallel doesn't work on Windows git.  This is a workaround for that. It will also log as it
+    // completes individual repo updates, since it takes more time. See https://github.com/phetsims/perennial/issues/361
+    slowPull: getOptionIfProvided( 'slowPull', DEFAULTS.slowPull ),
 
-    if ( fs.existsSync( `../${repo}` ) ) {
-      if ( options.pull ) {
-        if ( await gitIsClean( repo ) ) {
-          if ( options.allBranches ) {
-            await pullAllBranches( repo );
-          }
-          else {
-            options.checkoutMain && await gitCheckout( repo, 'main' );
-            pullResult = parsePullResult( await gitPullRebase( repo ) );
-          }
-        }
-        else {
-          hasNoPullStatusProblems = false;
-          if ( !options.status ) {
-            append( repo, `${moveRight}${red}not clean, skipping pull${reset}` );
-          }
-          else if ( repo === PERENNIAL_REPO_NAME && !options.slowPull ) {
-            console.log( `${red}${PERENNIAL_REPO_NAME} is not clean, skipping pull${reset}\n` );
-          }
-        }
+    // Run npm update on this repo as well. Automatically filled in if running as a grunt task. This repo to update will
+    // be combined with the repos in `options.repoList`, and please note that the perennial repo that `sync` is run
+    // from is ALWAYS included in script.
+    repo: getOptionIfProvided( 'repo', DEFAULTS.repo ),
+
+    // Name of the file of repos in perennial/data/ to use for the update, defaults to "active-repos".
+    // For example, `grunt sync --repoList=active-website-repos`. This list will be combined with `options.repo`, and please
+    // note that the perennial repo that sync is run from is ALWAYS included in script.
+    repoList: getOptionIfProvided( 'repoList', DEFAULTS.repoList )
+  };
+};
+
+/**
+ * Returns success boolean
+ */
+export const sync = async ( providedOptions?: Partial<SyncOptions> ): Promise<boolean> => {
+
+  const options = _.merge( DEFAULTS, providedOptions );
+
+  options.logAll && assert( options.status, '--logAll is only supported with --status=true, otherwise not all repos have something to report' );
+
+
+  // The fastest way to update the codebase is to run clone-missing-repos as part of the parallel repoUpdate (for perennial)
+  // Some options mandate that we clone repos first for correctness, before running parallel pull/status. If pulling all
+  // branches, or printing all repos, it would be buggy to not have all repos checked out before kicking off the update
+  // step. That said, don't default to the slower behavior unless we need to.
+  const cloneFirst = options.allBranches || options.logAll;
+
+  // ANSI escape sequences to move to the right (in the same line) or to apply or reset colors
+  const moveRight = ' \u001b[42G';
+  const red = '\u001b[31m';
+  const green = '\u001b[32m';
+  const bold = '\u001b[1m';
+  const reset = '\u001b[0m';
+
+  const data: Record<string, string> = {};
+  let hasNoPullStatusProblems = true;
+
+  async function pullAllBranches( repo: string ): Promise<void> {
+    const branches = await getBranches( repo );
+    for ( const branch of branches ) {
+      // Only track the remote branch if it hasn't been tracked yet
+      if ( ( await execute( 'git', [ 'rev-parse', '--verify', branch ], `../${repo}`, { errors: 'resolve' } ) ).code !== 0 ) {
+        await gitFetch( repo );
+        await execute( 'git', [ 'branch', '--track', branch, `origin/${branch}` ], `../${repo}` );
+      }
+      await gitCheckout( repo, branch );
+
+      try {
+        await gitPullRebase( repo );
+      }
+      catch( e ) {
+
+        // Likely there is no tracking info set up on the local branch
+        await execute( 'git', [ 'branch', `--set-upstream-to=origin/${branch}`, branch ], `../${repo}` );
+        await gitPullRebase( repo );
       }
     }
+
+    // Go back to main
+    await gitCheckout( repo, 'main' );
+  }
+
+  function parsePullResult( stdout: string ): string | null {
+    if ( stdout === 'Already up to date.\nCurrent branch main is up to date.\n' ||
+         stdout === 'Already up to date.\n' ||
+         stdout === 'Current branch main is up to date.\n' ) {
+      return null;
+    }
     else {
-      // This will be handled later when perennial gets around to cloneMissingRepos
-      return;
+      return stdout.trim();
     }
+  }
 
-    // Inline cloneMissingRepos so it can run in parallel with other repoUpdate steps.
-    if ( !cloneFirst && repo === PERENNIAL_REPO_NAME ) {
-      await cloneMissingReposInternal( logAll );
+  function append( repo: string, message: string ): void {
+    if ( data[ repo ] ) {
+      data[ repo ] += '\n' + message;
     }
+    else {
+      data[ repo ] += `${bold}${repo}${reset}${message}`;
+    }
+  }
 
-    if ( options.status ) {
-      const symbolicRef = ( await execute( 'git', [ 'symbolic-ref', '-q', 'HEAD' ], `../${repo}` ) ).trim();
-      const branch = symbolicRef.replace( 'refs/heads/', '' ); // might be empty string
-      const sha = await gitRevParse( repo, 'HEAD' );
-      const status = await execute( 'git', [ 'status', '--porcelain' ], `../${repo}` );
-      const track = branch ? ( await execute( 'git', [ 'for-each-ref', '--format=%(push:track,nobracket)', symbolicRef ], `../${repo}` ) ).trim() : '';
+  const updateRepo = async ( repo: string, logAll: string[] ) => {
+    data[ repo ] = '';
 
-      let isGreen = false;
-      if ( branch ) {
-        isGreen = !status && branch === 'main' && !track.length;
+    try {
+      let pullResult: null | string = null;
 
-        if ( !isGreen || options.logAll ) {
-          append( repo, `${moveRight}${isGreen ? green : red}${branch}${reset} ${track}` );
+      if ( fs.existsSync( `../${repo}` ) ) {
+        if ( options.pull ) {
+          if ( await gitIsClean( repo ) ) {
+            if ( options.allBranches ) {
+              await pullAllBranches( repo );
+            }
+            else {
+              options.checkoutMain && await gitCheckout( repo, 'main' );
+              pullResult = parsePullResult( await gitPullRebase( repo ) );
+            }
+          }
+          else {
+            hasNoPullStatusProblems = false;
+            if ( !options.status ) {
+              append( repo, `${moveRight}${red}not clean, skipping pull${reset}` );
+            }
+            else if ( repo === PERENNIAL_REPO_NAME && !options.slowPull ) {
+              console.log( `${red}${PERENNIAL_REPO_NAME} is not clean, skipping pull${reset}\n` );
+            }
+          }
         }
       }
       else {
-        // if no branch, print our SHA (detached head)
-        append( repo, `${moveRight}${red}${sha}${reset}` );
+        // This will be handled later when perennial gets around to cloneMissingRepos
+        return;
       }
 
-      if ( status ) {
-        if ( !isGreen || options.logAll ) {
-          append( repo, status );
+      // Inline cloneMissingRepos so it can run in parallel with other repoUpdate steps.
+      if ( !cloneFirst && repo === PERENNIAL_REPO_NAME ) {
+        await cloneMissingReposInternal( logAll );
+      }
+
+      if ( options.status ) {
+        const symbolicRef = ( await execute( 'git', [ 'symbolic-ref', '-q', 'HEAD' ], `../${repo}` ) ).trim();
+        const branch = symbolicRef.replace( 'refs/heads/', '' ); // might be empty string
+        const sha = await gitRevParse( repo, 'HEAD' );
+        const status = await execute( 'git', [ 'status', '--porcelain' ], `../${repo}` );
+        const track = branch ? ( await execute( 'git', [ 'for-each-ref', '--format=%(push:track,nobracket)', symbolicRef ], `../${repo}` ) ).trim() : '';
+
+        let isGreen = false;
+        if ( branch ) {
+          isGreen = !status && branch === 'main' && !track.length;
+
+          if ( !isGreen || options.logAll ) {
+            append( repo, `${moveRight}${isGreen ? green : red}${branch}${reset} ${track}` );
+          }
         }
+        else {
+          // if no branch, print our SHA (detached head)
+          append( repo, `${moveRight}${red}${sha}${reset}` );
+        }
+
+        if ( status ) {
+          if ( !isGreen || options.logAll ) {
+            append( repo, status );
+          }
+        }
+
+        hasNoPullStatusProblems = hasNoPullStatusProblems && isGreen;
       }
 
-      hasNoPullStatusProblems = hasNoPullStatusProblems && isGreen;
+      // Log pull result after the status section, for formatting
+      if ( options.logPull && pullResult ) {
+        append( repo, ' ' + pullResult );
+      }
+    }
+    catch( e ) {
+      hasNoPullStatusProblems = false;
+      append( repo, ` ERROR: ${e}` );
     }
 
-    // Log pull result after the status section, for formatting
-    if ( options.logPullOutput && pullResult ) {
-      append( repo, ' ' + pullResult );
+    // Print progress as we go during slowPull, because it is slow
+    if ( options.slowPull ) {
+      ( options.logAll || data[ repo ].length ) && console.log( data[ repo ] );
+    }
+  };
+
+  // Bundles a call to cloneMissingRepos with logging what repos were cloned
+  async function cloneMissingReposInternal( reposToCheck: string[] ): Promise<void> {
+    const missingRepos = await cloneMissingRepos( options.omitPrivate, reposToCheck );
+    if ( missingRepos.length ) {
+      console.log( `${green}Cloned:\n\t${missingRepos.join( '\n\t' )}${reset}` );
     }
   }
-  catch( e ) {
-    hasNoPullStatusProblems = false;
-    append( repo, ` ERROR: ${e}` );
+
+  // Get the list of repos that will be updated. Instead of having certain options override each other, just include the subset.
+  function getRepos(): string[] {
+    const repoList = getRepoList( options.repoList );
+
+    // Always update perennial, to make sure cloning can happen
+    return _.uniq( [ ...repoList, PERENNIAL_REPO_NAME, options.repo ] );
   }
 
-  // Print progress as we go during slowPull, because it is slow
-  if ( options.slowPull ) {
-    ( options.logAll || data[ repo ].length ) && console.log( data[ repo ] );
-  }
-};
 
-// Bundles a call to cloneMissingRepos with logging what repos were cloned
-async function cloneMissingReposInternal( reposToCheck: string[] ): Promise<void> {
-  const missingRepos = await cloneMissingRepos( options.omitPrivate, reposToCheck );
-  if ( missingRepos.length ) {
-    console.log( `${green}Cloned:\n\t${missingRepos.join( '\n\t' )}${reset}` );
-  }
-}
-
-// Get the list of repos that will be updated. Instead of having certain options override each other, just include the subset.
-function getRepos(): string[] {
-  const repoList = getRepoList( options.repoList );
-
-  // Always update perennial, to make sure cloning can happen
-  return _.uniq( [ ...repoList, PERENNIAL_REPO_NAME, options.repo ] );
-}
-
-///////////////////////////////
-// Main iife
-export const syncPromise = ( async () => {
   const startPullStatus = Date.now();
   console.log(); // extra space before the first logging
   let repos = getRepos();
@@ -347,8 +390,5 @@ export const syncPromise = ( async () => {
 
   console.log( `\nsync complete in ${Date.now() - startPullStatus}ms` );
 
-  process.chdir( previousCWD );
-
-  const success = hasNoPullStatusProblems && !npmUpdateProblems && !transpileProblems;
-  process.exitCode = success ? 0 : 1;
-} )();
+  return hasNoPullStatusProblems && !npmUpdateProblems && !transpileProblems;
+};

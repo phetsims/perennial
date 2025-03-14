@@ -11,7 +11,7 @@ import { IntentionalPerennialAny } from '../../../browser-and-node/PerennialType
 
 const options = nopt( {}, {}, process.argv, 2 );
 
-export default function getOption( keyName: string ): IntentionalPerennialAny {
+export default function getOption<T = IntentionalPerennialAny>( keyName: string ): T {
   return options[ keyName ];
 }
 
@@ -19,6 +19,6 @@ export function isOptionKeyProvided( keyName: string ): boolean {
   return options[ keyName ] !== undefined;
 }
 
-export function getOptionIfProvided( keyName: string ): IntentionalPerennialAny {
-  return isOptionKeyProvided( keyName ) ? getOption( keyName ) : undefined;
+export function getOptionIfProvided<T>( keyName: string, defaultValue?: T ): T {
+  return isOptionKeyProvided( keyName ) ? getOption<T>( keyName ) : defaultValue!;
 }
