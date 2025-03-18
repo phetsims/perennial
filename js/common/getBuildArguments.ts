@@ -19,6 +19,7 @@ export type BuildOptions = {
   mangle: boolean;
   minify: boolean;
   lint: boolean;
+  typeCheck: boolean;
   clean: boolean;
   thumbnails: boolean;
   twitterCard: boolean;
@@ -38,6 +39,7 @@ function getBuildArguments( chipperVersion: ChipperVersion, options: Partial<Bui
     mangle = true,
     minify = true,
     lint = true,
+    typeCheck = true,
     clean = true,
     thumbnails = false,
     twitterCard = false,
@@ -98,6 +100,9 @@ function getBuildArguments( chipperVersion: ChipperVersion, options: Partial<Bui
     }
     if ( !lint ) {
       args.push( '--lint=false' );
+    }
+    if ( !typeCheck ) {
+      args.push( '--type-check=false' );
     }
     if ( allHTML ) {
       args.push( '--allHTML' ); // This option doesn't exist on main as of 8/22/24, but this is kept for backwards compatibility
