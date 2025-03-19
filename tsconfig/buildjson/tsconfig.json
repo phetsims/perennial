@@ -27,7 +27,6 @@
     "../../../chipper/js/browser/sim-tests/qunitStart.js",
     "../../../chipper/js/browser/**/*",
     "../../../chipper/js/grunt/tasks/util/getOption.ts",
-    "../../../query-string-machine/js/QueryStringMachineModule.ts",
     "../../../dot/js/**/*",
     "../../../joist/images/**/*",
     "../../../joist/js/**/*",
@@ -73,6 +72,9 @@
     {
       // This doesn't include phet-core testing code
       "path": "../../../phet-core/tsconfig-module.json"
+    },
+    {
+      "path": "../../../query-string-machine/tsconfig.json"
     }
   ]
 }
