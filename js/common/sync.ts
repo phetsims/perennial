@@ -68,6 +68,10 @@ export type SyncOptions = {
   // Log status of all repos, even if nothing changed with them. (only does something when --status is true)
   logAll: boolean;
 
+  // Include command line formatting markings, useful for running from a terminal, but less so when running from another
+  // script and javascript logging stdout.
+  logFormatting: boolean;
+
   // When cloning missing repos, by default private repos are included, use this to opt out
   omitPrivate: boolean;
 
@@ -95,6 +99,7 @@ const DEFAULTS = {
   transpile: false,
   logPull: true,
   logAll: false,
+  logFormatting: true,
   omitPrivate: false,
   slowPull: false,
   repo: PERENNIAL_REPO_NAME,
@@ -104,48 +109,18 @@ const DEFAULTS = {
 export const getSyncCLIOptions = (): SyncOptions => {
 
   return {
-    // git pull repos, default to true. When false, will also skip checking out main.
     pull: getOptionIfProvided( 'pull', DEFAULTS.pull ),
-
-    // git checkout main before pulling each repo. This option is ignored if --pull=false. Default to true.
     checkoutMain: getOptionIfProvided( 'checkoutMain', DEFAULTS.checkoutMain ),
-
-    // git-status-styled output, default to true
     status: getOptionIfProvided( 'status', DEFAULTS.status ),
-
-    // npm update on all repos in perennial/data/npm-update, and the `--repo` option (if provided), defaults to true.
-    // MK wishes this options was called "npm", but this option is recognized by node instead.
     npmUpdate: getOptionIfProvided( 'npmUpdate', DEFAULTS.npmUpdate ),
-
-    // Track ALL remote branches on all repos locally, check them out, and pull them (with rebase). It is recommended to
-    // close webstorm and turn off the transpiler watch process before running with this option. Useful for doing batch
-    // maintenance releases.
     allBranches: getOptionIfProvided( 'allBranches', DEFAULTS.allBranches ),
-
-    // Run the transpile step (without watching). Runs at the end of the process (after pulls and npm updates)
     transpile: getOptionIfProvided( 'transpile', DEFAULTS.transpile ),
-
-    // By default, the output of "git pull" in a repo will be logged, use this option to turn it off.
     logPull: getOptionIfProvided( 'logPull', DEFAULTS.logPull ),
-
-    // Log status of all repos, even if nothing changed with them. (only does something when --status is true)
     logAll: getOptionIfProvided( 'logAll', DEFAULTS.logAll ),
-
-    // When cloning missing repos, by default private repos are included, use this to opt out
+    logFormatting: getOptionIfProvided( 'logFormatting', DEFAULTS.logFormatting ),
     omitPrivate: getOptionIfProvided( 'omitPrivate', DEFAULTS.omitPrivate ),
-
-    // Pulling repos in parallel doesn't work on Windows git.  This is a workaround for that. It will also log as it
-    // completes individual repo updates, since it takes more time. See https://github.com/phetsims/perennial/issues/361
     slowPull: getOptionIfProvided( 'slowPull', DEFAULTS.slowPull ),
-
-    // Run npm update on this repo as well. Automatically filled in if running as a grunt task. This repo to update will
-    // be combined with the repos in `options.repoList`, and please note that the perennial repo that `sync` is run
-    // from is ALWAYS included in script.
     repo: getOptionIfProvided( 'repo', DEFAULTS.repo ),
-
-    // Name of the file of repos in perennial/data/ to use for the update, defaults to "active-repos".
-    // For example, `grunt sync --repoList=active-website-repos`. This list will be combined with `options.repo`, and please
-    // note that the perennial repo that sync is run from is ALWAYS included in script.
     repoList: getOptionIfProvided( 'repoList', DEFAULTS.repoList )
   };
 };
@@ -155,7 +130,7 @@ export const getSyncCLIOptions = (): SyncOptions => {
  */
 export const sync = async ( providedOptions?: Partial<SyncOptions> ): Promise<boolean> => {
 
-  const options = _.merge( DEFAULTS, providedOptions );
+  const options = _.merge( {}, DEFAULTS, providedOptions );
 
   options.logAll && assert( options.status, '--logAll is only supported with --status=true, otherwise not all repos have something to report' );
 
@@ -167,11 +142,11 @@ export const sync = async ( providedOptions?: Partial<SyncOptions> ): Promise<bo
   const cloneFirst = options.allBranches || options.logAll;
 
   // ANSI escape sequences to move to the right (in the same line) or to apply or reset colors
-  const moveRight = ' \u001b[42G';
-  const red = '\u001b[31m';
-  const green = '\u001b[32m';
-  const bold = '\u001b[1m';
-  const reset = '\u001b[0m';
+  const moveRight = options.logFormatting ? ' \u001b[42G' : '\t';
+  const red = options.logFormatting ? '\u001b[31m' : '';
+  const green = options.logFormatting ? '\u001b[32m' : '';
+  const bold = options.logFormatting ? '\u001b[1m' : '';
+  const reset = options.logFormatting ? '\u001b[0m' : '';
 
   const data: Record<string, string> = {};
   let hasNoPullStatusProblems = true;
