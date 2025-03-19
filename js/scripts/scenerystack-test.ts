@@ -40,11 +40,13 @@ const SKIP_REFRESH = false;
   ];
 
   if ( !SKIP_REFRESH ) {
+    console.log( 'checking out scenerystack' );
     await execute( npxCommand, [ 'scenerystack', 'checkout' ], './.scenerystack' );
 
     // NOTE: Consider dependency sync, so that SHAs are identical to what we have checked out.
     // Not done here, since we won't have a scenerystack sha at the moment.
 
+    console.log( 'building scenerystack' );
     await execute( npxCommand, [ 'scenerystack', 'build' ], './.scenerystack' );
 
     for ( const repo of scenerystackRepos ) {
