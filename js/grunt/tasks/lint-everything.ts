@@ -1,7 +1,7 @@
 // Copyright 2024, University of Colorado Boulder
 
 /**
- * lint all js files for all repos
+ * lint all supported files for all repos
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 

@@ -20,7 +20,7 @@ const gitIsClean = require( '../common/gitIsClean' );
 const getDependencyRepos = require( '../common/getDependencyRepos' );
 const gitPush = require( '../common/gitPush' );
 const gitRevParse = require( '../common/gitRevParse' );
-const lintAllRunnable = require( '../common/lintAllRunnable' );
+const lintProject = require( '../common/lintProject' );
 const npmUpdate = require( '../common/npmUpdate' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
@@ -91,7 +91,7 @@ module.exports = async function dev( repo, brands, noninteractive, branch, messa
 
   // Ensure that the repository and its dependencies pass lint before continuing.
   // See https://github.com/phetsims/perennial/issues/76
-  await lintAllRunnable( repo );
+  await lintProject( repo );
 
   // Bump the version
   const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, {

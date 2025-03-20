@@ -40,7 +40,7 @@ const getBrands = ( repo: string ): Brand[] => {
 
     // Ensure all listed brands are valid
     brands.forEach( brand => assert( supportedBrands.includes( brand ), `Unsupported brand: ${brand}` ) );
-    assert( brands.length > 0, 'must have one or more brands to build' );
+    assert( brands.length > 0, `must have one or more brands, but found none for ${repo}` );
   }
 
   return brands;

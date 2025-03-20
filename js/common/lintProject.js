@@ -21,5 +21,5 @@ const winston = require( 'winston' );
 module.exports = async function( repo ) {
   winston.info( `linting ${repo}` );
 
-  return execute( gruntCommand, [ 'lint-all' ], `../${repo}` );
+  return execute( gruntCommand, [ 'lint-project' ], `../${repo}` );
 };

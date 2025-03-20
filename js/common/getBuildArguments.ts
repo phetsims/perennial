@@ -52,7 +52,7 @@ function getBuildArguments( chipperVersion: ChipperVersion, options: Partial<Bui
   if ( chipperVersion.major === 0 && chipperVersion.minor === 0 ) {
     assert( brands.length === 1, 'chipper 0.0.0 cannot build multiple brands at a time' );
     if ( lint ) {
-      args.push( 'lint-all' );
+      args.push( 'lint-all' ); // Should be "lint-all", not "lint-project", for backwards compatibility
     }
     if ( clean ) {
       args.push( 'clean' );
