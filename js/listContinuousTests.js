@@ -71,7 +71,7 @@ const tests = [];
   } );
 
   tests.push( {
-    test: [ 'perennial', 'scenerystack-test' ],
+    test: [ 'scenerystack', 'checkout-build-and-test' ],
     type: 'npm-run',
     command: 'scenerystack-test',
     repo: 'perennial',
