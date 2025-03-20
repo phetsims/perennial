@@ -74,7 +74,7 @@
       "path": "../../../phet-core/tsconfig-module.json"
     },
     {
-      "path": "../../../query-string-machine/tsconfig.json"
+      "path": "../../../query-string-machine/tsconfig-module.json"
     }
   ]
 }
