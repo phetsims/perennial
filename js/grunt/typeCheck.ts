@@ -96,9 +96,15 @@ const typeCheck = async ( providedOptions?: Partial<CheckOptions> ): Promise<boo
   const tscArgs = [
     tscCommand,
     '-b', // always, because we use project references.
-    '--verbose', `${options.verbose}`,
     '--pretty', `${options.pretty}`
   ];
+  if ( options.verbose ) {
+    tscArgs.push( ...[
+      '--verbose', 'true',
+      '--traceResolution',
+      '--extendedDiagnostics'
+    ] );
+  }
   const tscResults = await runCommand( 'node', tscArgs, cwd, options.absolute );
 
   options.absolute && handleAbsolute( tscResults.stdout, cwd, startTime );
