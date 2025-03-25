@@ -17,6 +17,7 @@ import path from 'path';
 import { Repo } from '../browser-and-node/PerennialTypes.js';
 import dirname from '../common/dirname.js';
 import tsxCommand from '../common/tsxCommand.js';
+import getOption from '../grunt/tasks/util/getOption.js';
 import divideIntoBatches from './divideIntoBatches.js';
 import { DEFAULT_MAX_PROCESSES, LintOptions } from './getLintCLIOptions.js';
 
@@ -26,7 +27,7 @@ const __dirname = dirname( import.meta.url );
 const lintMainPath = path.join( __dirname, 'lint-main.ts' );
 
 // For debugging the options and making sure they pass through correctly
-export const DEBUG_PHET_LINT = false;
+export const DEBUG_PHET_LINT = getOption( 'debug' );
 
 export default async function lint( repos: Repo[], providedOptions?: LintOptions ): Promise<boolean> {
   repos = _.uniq( repos ); // Don't double lint repos
@@ -47,11 +48,11 @@ export default async function lint( repos: Repo[], providedOptions?: LintOptions
   const repoBatches = divideIntoBatches( repos, options.processes );
 
   if ( DEBUG_PHET_LINT ) {
-    console.log( 'lint.js repos', repos );
-    console.log( 'lint.js clean', options.clean );
-    console.log( 'lint.js fix', options.fix );
-    console.log( 'lint.js processes', options.processes );
-    console.log( 'lint.js repoBatches', repoBatches );
+    console.error( 'lint.js repos', repos );
+    console.error( 'lint.js clean', options.clean );
+    console.error( 'lint.js fix', options.fix );
+    console.error( 'lint.js processes', options.processes );
+    console.error( 'lint.js repoBatches', repoBatches );
   }
 
   // spawn node lint-main.js for each batch and wait for all to complete using child process
@@ -65,10 +66,15 @@ export default async function lint( repos: Repo[], providedOptions?: LintOptions
           `--fix=${options.fix}`
         ], {
           stdio: [ 'ignore', 'pipe', 'pipe' ],
-          shell: process.platform.startsWith( 'win' )
+          shell: process.platform.startsWith( 'win' ),
+          env: {
+
+            // HARD-CODED ALERT: this is the same exact debug line as the eslint runnable uses https://github.com/eslint/eslint/blob/129882d/bin/eslint.js#L19
+            DEBUG: DEBUG_PHET_LINT ? 'eslint:*,-eslint:code-path,eslintrc:*' : ''
+          }
         }
       );
-      DEBUG_PHET_LINT && console.log( 'SPAWN ONCE on batch', batch );
+      DEBUG_PHET_LINT && console.error( 'SPAWN ONCE on batch', batch );
 
       let stdout = '';
       let stderr = '';

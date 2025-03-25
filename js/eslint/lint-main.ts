@@ -83,8 +83,8 @@ async function lintWithNodeAPI( repo: Repo, fix: boolean ): Promise<number> {
   };
 
   if ( DEBUG_PHET_LINT ) {
-    console.log( 'lint-main: fix: ', eslintOptions.fix );
-    console.log( 'lint-main: repo', repo );
+    console.error( 'lint-main: repo', repo );
+    console.error( 'lint-main: fix: ', eslintOptions.fix );
   }
 
   // Create ESLint instance
@@ -130,7 +130,7 @@ async function lintWithNodeAPI( repo: Repo, fix: boolean ): Promise<number> {
 }
 
 const cleanCaches = ( originalRepos: Repo[] ) => {
-  DEBUG_PHET_LINT && console.log( 'lint-main clearing: ', originalRepos );
+  DEBUG_PHET_LINT && console.error( 'lint-main clearing: ', originalRepos );
   originalRepos.forEach( async repo => {
     const cacheFile = getCacheLocation( repo );
 
@@ -207,9 +207,9 @@ void ( async () => {
   const fix = fixArg ? fixArg.split( '=' )[ 1 ] === 'true' : false;
 
   if ( DEBUG_PHET_LINT ) {
-    console.log( 'lint-main.ts repos', repos );
-    console.log( 'lint-main.ts clean', clean );
-    console.log( 'lint-main.ts fix', fix );
+    console.error( 'lint-main.ts repos', repos );
+    console.error( 'lint-main.ts clean', clean );
+    console.error( 'lint-main.ts fix', fix );
   }
 
   const success = await lintMain( _.uniq( repos ), clean, fix );
