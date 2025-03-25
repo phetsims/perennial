@@ -71,7 +71,7 @@ export default async function lint( repos: Repo[], providedOptions?: LintOptions
             ...process.env, // eslint-disable-line phet/no-object-spread-on-non-literals
 
             // HARD-CODED ALERT: this is the same exact debug line as the eslint runnable uses https://github.com/eslint/eslint/blob/129882d/bin/eslint.js#L19
-            DEBUG: DEBUG_PHET_LINT ? 'eslint:*,-eslint:code-path,eslintrc:*' : undefined
+            DEBUG: DEBUG_PHET_LINT ? 'eslint:*,-eslint:code-path,eslintrc:*' : ''
           }
         }
       );
