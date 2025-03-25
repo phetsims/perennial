@@ -31,6 +31,13 @@ const vpnCheck = require( '../common/vpnCheck' );
 const buildLocal = require( '../common/buildLocal' );
 const assert = require( 'assert' );
 
+const cancelLog = problem => grunt.log.writeln( 'Cancelling production deployment: ' + problem );
+
+function handleError( problem ) {
+  cancelLog( problem );
+  throw new Error( 'Aborted production deployment: ' + problem );
+}
+
 /**
  * Deploys a production version after incrementing the test version number.
  * @public
@@ -47,28 +54,28 @@ module.exports = async function production( repo, branch, brands, noninteractive
   SimVersion.ensureReleaseBranch( branch );
 
   if ( !( await vpnCheck() ) ) {
-    throw new Error( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
+    handleError( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
   }
 
   const isClean = await gitIsClean( repo );
   if ( !isClean ) {
-    throw new Error( `Unclean status in ${repo}, cannot create release branch` );
+    handleError( `Unclean status in ${repo}, cannot create release branch` );
   }
 
   if ( !( await hasRemoteBranch( repo, branch ) ) ) {
-    throw new Error( `Cannot find release branch ${branch} for ${repo}` );
+    handleError( `Cannot find release branch ${branch} for ${repo}` );
   }
 
   if ( !grunt.file.exists( `../${repo}/assets/${repo}-screenshot.png` ) && brands.includes( 'phet' ) ) {
-    throw new Error( `Missing screenshot file (${repo}/assets/${repo}-screenshot.png), aborting production deployment` );
+    handleError( `Missing screenshot file (${repo}/assets/${repo}-screenshot.png)` );
   }
 
   if ( !await booleanPrompt( 'Are QA credits up-to-date?', noninteractive ) ) {
-    throw new Error( 'Aborted production deployment' );
+    handleError( 'QA credits not up-to-date' );
   }
 
   if ( !await booleanPrompt( 'Have all maintenance patches that need spot checks been tested? (An issue would be created in the sim repo)', noninteractive ) ) {
-    throw new Error( 'Aborted production deployment' );
+    handleError( 'Maintenance patches are not tested' );
   }
 
   redeploy && assert( noninteractive, 'redeploy can only be specified with noninteractive:true' );
@@ -87,7 +94,7 @@ module.exports = async function production( repo, branch, brands, noninteractive
 
       // redeploy flag can bypass this prompt and error
       if ( !redeploy && ( noninteractive || !await booleanPrompt( `The last deployment was a production deployment (${previousVersion.toString()}) and an RC version is required between production versions. Would you like to redeploy ${previousVersion.toString()} (y) or cancel this process and revert to main (N)`, false ) ) ) {
-        throw new Error( 'Aborted production deployment: It appears that the last deployment was for production.' );
+        handleError( 'It appears that the last deployment was for production' );
       }
 
       version = previousVersion;
@@ -98,7 +105,7 @@ module.exports = async function production( repo, branch, brands, noninteractive
       versionChanged = true;
     }
     else {
-      throw new Error( 'Aborted production deployment since the version number cannot be incremented safely' );
+      handleError( `The version number cannot be incremented safely: ${previousVersion}` );
     }
 
     const isFirstVersion = !( await simMetadata( {
@@ -108,7 +115,7 @@ module.exports = async function production( repo, branch, brands, noninteractive
     // Initial deployment nags
     if ( isFirstVersion ) {
       if ( !await booleanPrompt( 'Is the main checklist complete (e.g. are screenshots added to assets, etc.)', noninteractive ) ) {
-        throw new Error( 'Aborted production deployment' );
+        handleError( 'Main checklist not complete' );
       }
     }
 
@@ -117,7 +124,7 @@ module.exports = async function production( repo, branch, brands, noninteractive
     // caps-lock should hopefully shout this at people. do we have a text-to-speech synthesizer we can shout out of their speakers?
     // SECOND THOUGHT: this would be horrible during automated maintenance releases.
     if ( !await booleanPrompt( `DEPLOY ${repo} ${versionString} (brands: ${brands.join( ',' )}) to PRODUCTION`, noninteractive ) ) {
-      throw new Error( 'Aborted production deployment' );
+      handleError( '"DEPLOY" user request' );
     }
 
     if ( versionChanged ) {
@@ -163,10 +170,9 @@ module.exports = async function production( repo, branch, brands, noninteractive
 
     /**
      * The necessary clean up steps to do if aborting after the build
-     * @param {string} message - message to error out with
-     * @returns {Promise.<void>}
      */
-    const postBuildAbort = async message => {
+    const postBuildAbort = async problem => {
+      cancelLog( problem );
 
       // Abort version update
       if ( versionChanged ) {
@@ -174,13 +180,13 @@ module.exports = async function production( repo, branch, brands, noninteractive
         await gitPush( repo, branch );
       }
 
-      // Abort checkout, (will be caught and main will be checked out
-      throw new Error( message );
+      // Abort checkout, (will be caught and main will be checked out)
+      handleError( problem );
     };
 
 
     if ( !await booleanPrompt( `Please test the built version of ${repo}.\nIs it ready to deploy?`, noninteractive ) ) {
-      await postBuildAbort( 'Aborted production deployment (aborted version change too).' );
+      await postBuildAbort( `Built sim test, reverting back to ${previousVersion}` );
     }
 
     // Move over dependencies.json and commit/push

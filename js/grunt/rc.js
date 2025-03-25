@@ -28,6 +28,12 @@ const vpnCheck = require( '../common/vpnCheck' );
 const createRelease = require( './createRelease' );
 const grunt = require( 'grunt' );
 
+const cancelLog = problem => grunt.log.writeln( 'Cancelling RC deployment: ' + problem );
+const handleError = problem => {
+  cancelLog( problem );
+  throw new Error( 'Aborted RC deployment: ' + problem );
+};
+
 /**
  * Deploys an rc version after incrementing the test version number.
  * @public
@@ -43,17 +49,17 @@ module.exports = async function rc( repo, branch, brands, noninteractive, messag
   SimVersion.ensureReleaseBranch( branch );
 
   if ( !( await vpnCheck() ) ) {
-    throw new Error( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
+    handleError( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
   }
 
   const isClean = await gitIsClean( repo );
   if ( !isClean ) {
-    throw new Error( `Unclean status in ${repo}, cannot create release branch` );
+    handleError( `Unclean status in ${repo}, cannot create release branch` );
   }
 
   if ( !( await hasRemoteBranch( repo, branch ) ) ) {
     if ( noninteractive || !await booleanPrompt( `Release branch ${branch} does not exist. Create it?`, false ) ) {
-      throw new Error( 'Aborted rc deployment due to non-existing branch' );
+      handleError( 'Release branch does not exist' );
     }
 
     await createRelease( repo, branch, brands );
@@ -65,7 +71,7 @@ module.exports = async function rc( repo, branch, brands, noninteractive, messag
     const packageObject = await loadJSON( `../${repo}/package.json` );
     if ( packageObject.phet[ 'phet-io' ] && packageObject.phet[ 'phet-io' ].hasOwnProperty( 'validation' ) &&
          !packageObject.phet[ 'phet-io' ].validation ) {
-      throw new Error( 'PhET-iO simulations require validation for RCs' );
+      handleError( 'PhET-iO simulations require validation for RCs' );
     }
   }
 
@@ -76,7 +82,7 @@ module.exports = async function rc( repo, branch, brands, noninteractive, messag
     const previousVersion = await getRepoVersion( repo );
 
     if ( previousVersion.testType !== 'rc' && previousVersion.testType !== null ) {
-      throw new Error( `Aborted rc deployment since the version number cannot be incremented safely (testType:${previousVersion.testType})` );
+      handleError( `RC version number cannot be incremented safely: ${previousVersion}` );
     }
 
     const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance + ( previousVersion.testType === null ? 1 : 0 ), {
@@ -91,11 +97,11 @@ module.exports = async function rc( repo, branch, brands, noninteractive, messag
     const versionPathExists = await devDirectoryExists( versionPath );
 
     if ( versionPathExists ) {
-      throw new Error( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
+      handleError( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
     }
 
     if ( !await booleanPrompt( `Deploy ${versionString} to ${buildLocal.devDeployServer}`, noninteractive ) ) {
-      throw new Error( 'Aborted rc deployment' );
+      handleError( '"Deploy" user request' );
     }
 
     await setRepoVersion( repo, version, message );
@@ -112,14 +118,22 @@ module.exports = async function rc( repo, branch, brands, noninteractive, messag
       minify: !noninteractive
     } ) );
 
-    if ( !await booleanPrompt( `Please test the built version of ${repo}.\nIs it ready to deploy`, noninteractive ) ) {
+    /**
+     * The necessary clean up steps to do if aborting after the build
+     */
+    const postBuildAbort = async problem => {
+      cancelLog( problem );
+
       // Abort version update
       await setRepoVersion( repo, previousVersion, message );
       await gitPush( repo, branch );
 
-      // Abort checkout
-      await checkoutMain( repo, true );
-      throw new Error( 'Aborted rc deployment (aborted version change too).' );
+      // Abort checkout, (will be caught and main will be checked out)
+      handleError( problem );
+    };
+
+    if ( !await booleanPrompt( `Please test the built version of ${repo}.\nIs it ready to deploy`, noninteractive ) ) {
+      await postBuildAbort( `Built sim test failed, reverting back to ${previousVersion}` );
     }
 
     // Move over dependencies.json and commit/push
@@ -150,7 +164,7 @@ module.exports = async function rc( repo, branch, brands, noninteractive, messag
     return version;
   }
   catch( e ) {
-    grunt.log.warn( 'Detected failure during deploy, reverting to main' );
+    grunt.log.warn( 'Detected failure during deploy, reverting to main.' );
     await checkoutMain( repo, true );
     throw e;
   }
