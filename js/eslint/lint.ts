@@ -70,7 +70,7 @@ export default async function lint( repos: Repo[], providedOptions?: LintOptions
           env: {
 
             // HARD-CODED ALERT: this is the same exact debug line as the eslint runnable uses https://github.com/eslint/eslint/blob/129882d/bin/eslint.js#L19
-            DEBUG: DEBUG_PHET_LINT ? 'eslint:*,-eslint:code-path,eslintrc:*' : ''
+            DEBUG: DEBUG_PHET_LINT ? 'eslint:*,-eslint:code-path,eslintrc:*' : undefined
           }
         }
       );
