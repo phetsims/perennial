@@ -78,6 +78,17 @@ module.exports = async function production( repo, branch, brands, noninteractive
     handleError( 'Maintenance patches are not tested' );
   }
 
+  const isFirstVersion = !( await simMetadata( {
+    simulation: repo
+  } ) ).projects;
+
+  // Initial deployment nags
+  if ( isFirstVersion ) {
+    if ( !await booleanPrompt( 'Is the main checklist complete (e.g. are screenshots added to assets, etc.)', noninteractive ) ) {
+      handleError( 'Main checklist not complete' );
+    }
+  }
+
   redeploy && assert( noninteractive, 'redeploy can only be specified with noninteractive:true' );
 
   const published = await isPublished( repo );
@@ -106,17 +117,6 @@ module.exports = async function production( repo, branch, brands, noninteractive
     }
     else {
       handleError( `The version number cannot be incremented safely: ${previousVersion}` );
-    }
-
-    const isFirstVersion = !( await simMetadata( {
-      simulation: repo
-    } ) ).projects;
-
-    // Initial deployment nags
-    if ( isFirstVersion ) {
-      if ( !await booleanPrompt( 'Is the main checklist complete (e.g. are screenshots added to assets, etc.)', noninteractive ) ) {
-        handleError( 'Main checklist not complete' );
-      }
     }
 
     const versionString = version.toString();
