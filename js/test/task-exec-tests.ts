@@ -12,6 +12,7 @@ import fs from 'fs';
 import _ from 'lodash';
 import qunit from 'qunit';
 import gruntCommand from '../common/gruntCommand.js';
+import { PERENNIAL_REPO_NAME } from '../common/perennialRepoUtils.js';
 import tsxCommand from '../common/tsxCommand.js';
 
 const SIM = 'acid-base-solutions';
@@ -57,11 +58,13 @@ qunit.test( 'sage run', assert => {
   checkOutput( result, assert );
 } );
 
-// Sim-specific
-qunit.test( `grunt ${SIM}`, ( assert: Assert ) => {
-  const result = spawnSync( `${gruntCommand} --brands=a,b,c --lint=false --type-check=false --test-options`, SPAWN_FOR_SIM_OPTIONS );
-  checkOutput( result, assert );
-} );
+// Sim specific test, but perennial shouldn't depend on a sim checkout
+if ( fs.existsSync( `../${SIM}/package.json` ) ) {
+  qunit.test( `sage run ${SIM}`, ( assert: Assert ) => {
+    const result = spawnSync( `bash ../${PERENNIAL_REPO_NAME}/bin/sage run ../${PERENNIAL_REPO_NAME}/js/grunt/tasks/test-grunt.ts --brands=a,b,c --lint=false --type-check=false --test-options`, SPAWN_FOR_SIM_OPTIONS );
+    checkOutput( result, assert );
+  } );
+}
 
 const sageTestFilename = 'do-not-commit.ts';
 const warningCode = 'CUSTOM_WARNING';
