@@ -238,7 +238,7 @@ runnableRepos.forEach( repo => {
       test: [ repo, 'fuzz', 'phet-io', 'built', 'fuzzValues' ],
       type: 'sim-test',
       url: `${repo}/build/phet-io/${repo}_all_phet-io.html`,
-      queryParameters: 'fuzz&phetioStandalone&phetioFuzzValues',
+      queryParameters: 'fuzz&phetioStandalone&phetioFuzzValues&phetioLogFuzzedValues',
       testQueryParameters: 'duration=80000',
 
       brand: 'phet-io',
