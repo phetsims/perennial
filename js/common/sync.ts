@@ -333,10 +333,10 @@ export const sync = async ( providedOptions?: Partial<SyncOptions> ): Promise<bo
     const npmUpdatesNeeded = getRepoList( 'npm-update' ).filter( repo => repos.includes( repo ) );
     try {
 
-      const promises: Promise<IntentionalPerennialAny>[] = npmUpdatesNeeded.map( repo => npmUpdate( repo ) );
+      const promises: Promise<IntentionalPerennialAny>[] = npmUpdatesNeeded.map( repo => npmUpdate( repo, false ) );
 
       const cwdRepo = options.repo;
-      cwdRepo && !npmUpdatesNeeded.includes( cwdRepo ) && fs.existsSync( `../${cwdRepo}/package.json` ) && promises.push( npmUpdate( cwdRepo ) );
+      cwdRepo && !npmUpdatesNeeded.includes( cwdRepo ) && fs.existsSync( `../${cwdRepo}/package.json` ) && promises.push( npmUpdate( cwdRepo, false ) );
 
       await Promise.all( promises );
     }

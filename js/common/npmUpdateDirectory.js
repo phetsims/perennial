@@ -18,14 +18,15 @@ const mutex = new asyncMutex.Mutex();
  * @public
  *
  * @param {string} directory
+ * @param {boolean} prune - `npm prune` first before running `npm update`
  * @returns {Promise}
  */
-module.exports = async function( directory ) {
+module.exports = async function( directory, prune = true ) {
   winston.info( `npm update in ${directory}` );
 
   // NOTE: Run these synchronously across all instances!
   await mutex.runExclusive( async () => {
-    await execute( npmCommand, [ 'prune' ], directory );
+    prune && await execute( npmCommand, [ 'prune' ], directory );
     await execute( npmCommand, [ 'update' ], directory );
   } );
 };
