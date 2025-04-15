@@ -537,6 +537,9 @@ export default {
   // Variables that are Properties should end in "Property", like const myProperty = new Property();
   'phet/require-property-suffix': 'error',
 
+  // Documentation should come before imports. Rule disabled for now since there are 171 failing cases.
+  'phet/documentation-before-imports': 'off',
+
   // Static fields should have the 'readonly' modifier
   'phet/uppercase-statics-should-be-readonly': 'error',
 

@@ -11,6 +11,7 @@ import copyright from '../../phet-rules/copyright.js';
 import defaultExportClassShouldRegisterNamespace from '../../phet-rules/default-export-class-should-register-namespace.js';
 import defaultExportMatchFilename from '../../phet-rules/default-export-match-filename.js';
 import defaultImportMatchFilename from '../../phet-rules/default-import-match-filename.js';
+import documentationBeforeImports from '../../phet-rules/documentation-before-imports.js';
 import explicitMethodReturnType from '../../phet-rules/explicit-method-return-type.js';
 import gruntTaskKebabCase from '../../phet-rules/grunt-task-kebab-case.js';
 import importStatementExtensionJs from '../../phet-rules/import-statement-extension-js.js';
@@ -124,6 +125,8 @@ export default {
 
     // Used for kebab-case convention for grunt tasks
     'grunt-task-kebab-case': gruntTaskKebabCase,
+
+    'documentation-before-imports': documentationBeforeImports,
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Type checking rules. Documentation is at the usage site below
