@@ -13,9 +13,8 @@ const npmUpdateDirectory = require( './npmUpdateDirectory' );
  * @public
  *
  * @param {string} repo - The repository name
- * @param {boolean} prune - `npm prune` first before running `npm update`
  * @returns {Promise}
  */
-module.exports = async function( repo, prune = true ) {
-  await npmUpdateDirectory( `../${repo}`, prune );
+module.exports = async function( repo ) {
+  await npmUpdateDirectory( `../${repo}` );
 };
