@@ -13,7 +13,8 @@ export default [
     rules: {
 
       // Overrides so that perennial can import its own node_modules directly instead of using npm-dependencies/
-      'no-restricted-imports': 'off'
+      'no-restricted-imports': 'off',
+      'phet/documentation-before-imports': 'off'
     }
   },
   {
