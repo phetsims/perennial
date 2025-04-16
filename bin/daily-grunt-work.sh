@@ -158,7 +158,7 @@ cd ..
 # No grunt work below this point.
 # Final clean up steps, just to be sure
 logWithStderr "TASK - PUSH ALL CLEANUP:"
-perennial/bin/sage run perennial/js/scripts/pull-all.js
+./perennial/bin/pull-all.sh
 perennial/bin/sage run perennial/js/scripts/push-all.js
 date
 logWithStderr "TASK - DAILY GRUNT WORK COMPLETE"
