@@ -1,5 +1,12 @@
 // Copyright 2024, University of Colorado Boulder
 
+/**
+ * Detect uncommitted changes in each repo.
+ *
+ * @author Sam Reid (PhET Interactive Simulations)
+ * @author Michael Kauzmann (PhET Interactive Simulations)
+ */
+
 import assert from 'assert';
 import _ from 'lodash';
 import path from 'path';
@@ -14,12 +21,6 @@ const __dirname = dirname( import.meta.url );
 
 const RESOLVE_ERRORS = { errors: 'resolve' } as const;
 
-/**
- * Detect uncommitted changes in each repo.
- *
- * @author Sam Reid (PhET Interactive Simulations)
- * @author Michael Kauzmann (PhET Interactive Simulations)
- */
 export default async function getReposWithWorkingCopyChanges(): Promise<Repo[]> {
 
   const repos = getActiveRepos();

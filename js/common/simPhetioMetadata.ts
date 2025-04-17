@@ -1,5 +1,11 @@
 // Copyright 2018, University of Colorado Boulder
 
+/**
+ * Returns phet-io metadata from the production website
+ *
+ * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ */
+
 import axios from 'axios';
 import _ from 'lodash';
 import winston from 'winston';
@@ -20,11 +26,6 @@ type SimPhetioMetadata = {
   timestamp: string;
 };
 
-/**
- * Returns phet-io metadata from the production website
- *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
- */
 async function simPhetioMetadata( providedOptions?: Partial<SimPhetioMetadataOptions> ): Promise<SimPhetioMetadata[]> {
   const options = _.assignIn( {
     active: null, // {boolean|null} - If set, will only include active branches

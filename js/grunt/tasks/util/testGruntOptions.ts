@@ -1,12 +1,13 @@
 // Copyright 2024, University of Colorado Boulder
 
-import getOption from './getOption.js';
-
 /**
  * Test that grunt parses options as expected.
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */
+
+import getOption from './getOption.js';
+
 export default function testGruntOptions(): void {
 
 // grunt test-grunt --brands=a,b,c --lint=false --type-check=false

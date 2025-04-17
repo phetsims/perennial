@@ -1,5 +1,11 @@
 // Copyright 2013-2024, University of Colorado Boulder
 
+/**
+ * Get the repo by processing from multiple locations (command line options and package).
+ * @author Sam Reid (PhET Interactive Simulations)
+ * @author Michael Kauzmann (PhET Interactive Simulations)
+ */
+
 import path from 'path';
 import process from 'process';
 import affirm from '../../../browser-and-node/affirm.js';
@@ -12,11 +18,6 @@ const __dirname = dirname( import.meta.url );
 
 const gitRoot = path.resolve( `${__dirname}/../../../../../` );
 
-/**
- * Get the repo by processing from multiple locations (command line options and package).
- * @author Sam Reid (PhET Interactive Simulations)
- * @author Michael Kauzmann (PhET Interactive Simulations)
- */
 export default function getRepo(): Repo {
 
   const repoOption = getOption( 'repo' );

@@ -1,8 +1,5 @@
 // Copyright 2021, University of Colorado Boulder
 
-import booleanPrompt from '../common/booleanPrompt.js';
-import execute from '../common/execute.js';
-
 /**
  * Copy the history of a file or directory to a different repo.
  *
@@ -38,6 +35,10 @@ import execute from '../common/execute.js';
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Chris Klusendorf (PhET Interactive Simulations)
  */
+
+import booleanPrompt from '../common/booleanPrompt.js';
+import execute from '../common/execute.js';
+
 ( async () => {
   const args = process.argv.slice( 2 );
 

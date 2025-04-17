@@ -1,7 +1,5 @@
 // Copyright 2024, University of Colorado Boulder
 
-import { IntentionalPerennialAny } from '../../browser-and-node/PerennialTypes.js';
-
 /**
  * Generates the lists under perennial/data/, and if there were changes, will commit and push.
  *
@@ -18,6 +16,8 @@ import { IntentionalPerennialAny } from '../../browser-and-node/PerennialTypes.j
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
+
+import { IntentionalPerennialAny } from '../../browser-and-node/PerennialTypes.js';
 
 const getActiveRepos = require( '../../common/getActiveRepos.js' );
 const getBranch = require( '../../common/getBranch.js' );

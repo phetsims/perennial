@@ -1,5 +1,12 @@
 // Copyright 2025, University of Colorado Boulder
 
+/**
+ * Instead of mapping an entire list to an async task all in one sync step, split it up into chunk sizes, with a sleep
+ * step. Solves a bug in OpenSSL for windows git pulling, see https://github.com/phetsims/perennial/issues/361
+ *
+ * @author Michael Kauzmann (PhET Interactive Simulations)
+ */
+
 import _ from 'lodash';
 import sleep from '../sleep.js';
 
@@ -10,12 +17,6 @@ type ChunkDelayedOptions = {
   waitPerItem: number; // in ms
 };
 
-/**
- * Instead of mapping an entire list to an async task all in one sync step, split it up into chunk sizes, with a sleep
- * step. Solves a bug in OpenSSL for windows git pulling, see https://github.com/phetsims/perennial/issues/361
- *
- * @author Michael Kauzmann (PhET Interactive Simulations)
- */
 const chunkDelayed = async <T, K>( list: T[],
                                    callback: ( item: T ) => Promise<K>,
                                    providedOptions?: Partial<ChunkDelayedOptions> ): Promise<Awaited<K>[]> => {

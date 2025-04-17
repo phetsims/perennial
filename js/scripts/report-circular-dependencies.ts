@@ -1,11 +1,5 @@
 // Copyright 2025, University of Colorado Boulder
 
-import fs from 'fs';
-import _ from 'lodash';
-import execute from '../common/execute.js';
-import getRepoList from '../common/getRepoList.js';
-import { isOptionKeyProvided } from '../grunt/tasks/util/getOption.js';
-
 /**
  * Checks on circular dependencies within PhET repositories, ignoring type-space loops
  *
@@ -14,6 +8,13 @@ import { isOptionKeyProvided } from '../grunt/tasks/util/getOption.js';
  *
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
+
+import fs from 'fs';
+import _ from 'lodash';
+import execute from '../common/execute.js';
+import getRepoList from '../common/getRepoList.js';
+import { isOptionKeyProvided } from '../grunt/tasks/util/getOption.js';
+
 ( async () => {
   const isCommonOnly = isOptionKeyProvided( 'common' );
 

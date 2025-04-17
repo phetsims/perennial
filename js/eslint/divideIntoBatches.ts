@@ -1,10 +1,5 @@
 // Copyright 2024, University of Colorado Boulder
 
-import os from 'os';
-import { Repo } from '../browser-and-node/PerennialTypes.js';
-
-const MAX_BATCH_SIZE = 50;
-
 /**
  * Divides an array of repository names into batches based on specified rules:
  * - No batch contains more than MAX_BATCH_SIZE repositories.
@@ -15,6 +10,12 @@ const MAX_BATCH_SIZE = 50;
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */
+
+import os from 'os';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
+
+const MAX_BATCH_SIZE = 50;
+
 export default function divideIntoBatches( originalRepos: Repo[], maxProcesses: number ): Repo[][] {
 
   const N = originalRepos.length;

@@ -1,17 +1,5 @@
 // Copyright 2024, University of Colorado Boulder
 
-import Octokit from '@octokit/rest';
-import fs from 'fs';
-import _ from 'lodash';
-import process from 'process';
-import buildLocal from '../common/buildLocal.js';
-import createDirectory from '../common/createDirectory.js';
-import getRepoList from '../common/getRepoList.js';
-import lint from '../eslint/lint.js';
-
-const CHIPPER_DIST_ESLINT = '../chipper/dist/eslint/';
-const TODOsFilename = `${CHIPPER_DIST_ESLINT}/issuesFromTODOs.txt`;
-
 /**
  * This script is meant to ensure that all todos pointing to a github issue are pointing to open issues.
  *
@@ -27,6 +15,19 @@ const TODOsFilename = `${CHIPPER_DIST_ESLINT}/issuesFromTODOs.txt`;
  *
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
+
+import Octokit from '@octokit/rest';
+import fs from 'fs';
+import _ from 'lodash';
+import process from 'process';
+import buildLocal from '../common/buildLocal.js';
+import createDirectory from '../common/createDirectory.js';
+import getRepoList from '../common/getRepoList.js';
+import lint from '../eslint/lint.js';
+
+const CHIPPER_DIST_ESLINT = '../chipper/dist/eslint/';
+const TODOsFilename = `${CHIPPER_DIST_ESLINT}/issuesFromTODOs.txt`;
+
 ( async () => {
 
   // Mark an environment variable that tells lint's to-do-should-have-issue rule to have a side-effect of saving a file

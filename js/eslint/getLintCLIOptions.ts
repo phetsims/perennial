@@ -1,13 +1,14 @@
 // Copyright 2024, University of Colorado Boulder
 
-import getRepoList from '../common/getRepoList.js';
-import { Repo } from '../browser-and-node/PerennialTypes.js';
 /**
  * Parse command line options for linting.
  *
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
+
+import getRepoList from '../common/getRepoList.js';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
 import getOption, { isOptionKeyProvided } from '../grunt/tasks/util/getOption.js';
 
 export type LintOptions = {
