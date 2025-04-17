@@ -58,7 +58,12 @@ module.exports = async function( repo, branch, message ) {
 
   const brand = 'phet';
   await build( repo, {
-    brands: [ brand ]
+    brands: [ brand ],
+
+    // We just need the dependencies.json generated.
+    minify: false,
+    lint: false,
+    typeCheck: false
   } );
   await copyFile( `../${repo}/build/${brand}/dependencies.json`, `../${repo}/dependencies.json` );
   await gitAdd( repo, 'dependencies.json' );

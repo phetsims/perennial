@@ -18,7 +18,7 @@ const winston = require( 'winston' );
  *
  * @param {string} repo - The repository name
  * @param {string} target - branch or SHA
- * @param {boolean} includeNpmUpdate
+ * @param {boolean} [includeNpmUpdate]
  * @returns {Promise.<Array.<string>>} - Resolves with checkedOutRepos
  */
 module.exports = async function( repo, target, includeNpmUpdate ) {
