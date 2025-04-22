@@ -36,6 +36,8 @@ module.exports = async function( repo, version, message ) {
   packageObject.version = version.toString();
 
   await writeJSON( packageFile, packageObject );
-  await gitAdd( repo, 'package.json' );
-  await gitCommit( repo, `Bumping version to ${version.toString()}${message ? `, ${message}` : ''}` );
+  if ( !await gitIsClean( repo ) ) {
+    await gitAdd( repo, 'package.json' );
+    await gitCommit( repo, `Bumping version to ${version.toString()}${message ? `, ${message}` : ''}` );
+  }
 };

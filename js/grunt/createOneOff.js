@@ -31,6 +31,8 @@ const setRepoVersion = require( '../common/setRepoVersion' );
 module.exports = async function( repo, branch, message ) {
   const hasBranchAlready = await hasRemoteBranch( repo, branch );
   if ( hasBranchAlready ) {
+
+    // Comment this line out if you know, because you just created the branch on accident.
     throw new Error( 'Branch already exists, aborting' );
   }
 
@@ -46,8 +48,12 @@ module.exports = async function( repo, branch, message ) {
     throw new Error( `Unclean status in ${repo}, cannot create release branch` );
   }
 
+  const checkoutArgs = [ 'checkout' ];
+  !hasBranchAlready && checkoutArgs.push( '-b' );
+  checkoutArgs.push( branch );
+
   // Create the branch, update the version info
-  await execute( 'git', [ 'checkout', '-b', branch ], `../${repo}` );
+  await execute( 'git', checkoutArgs, `../${repo}` );
   await setRepoVersion( repo, newVersion, message );
   await gitPush( repo, branch );
 
@@ -66,7 +72,9 @@ module.exports = async function( repo, branch, message ) {
     typeCheck: false
   } );
   await copyFile( `../${repo}/build/${brand}/dependencies.json`, `../${repo}/dependencies.json` );
-  await gitAdd( repo, 'dependencies.json' );
-  await gitCommit( repo, `updated dependencies.json for version ${newVersion.toString()}` );
+  if ( !await gitIsClean( repo ) ) {
+    await gitAdd( repo, 'dependencies.json' );
+    await gitCommit( repo, `updated dependencies.json for version ${newVersion.toString()}` );
+  }
   await gitPush( repo, branch );
 };
