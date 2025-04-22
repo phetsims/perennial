@@ -16,7 +16,7 @@ const winston = require( 'winston' );
  * @public
  *
  * @param {string} repo - The repository name
- * @param {boolean} includeNpmUpdate - Whether npm updates should be done to repositories.
+ * @param {boolean} [includeNpmUpdate] - Whether npm updates should be done to repositories.
  * @returns {Promise}
  */
 module.exports = async function( repo, includeNpmUpdate ) {
