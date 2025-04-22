@@ -12,6 +12,7 @@
 
 import assert from 'assert';
 import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
+import checkoutMain from '../../common/checkoutMain.js';
 import checkoutTarget from '../../common/checkoutTarget.js';
 import getBranch from '../../common/getBranch.js';
 import dev from '../dev.js';
@@ -35,6 +36,7 @@ import getOption from './util/getOption.js';
 
   await checkoutTarget( repo, branch );
   await dev( repo, brands.split( ',' ), !!getOption( 'noninteractive' ), branch, getOption( 'message' ) );
+  await checkoutMain( repo );
 
   // When running tsx in combination with readline, the process does not exit properly, so we need to force it. See https://github.com/phetsims/perennial/issues/389
   process.exit( 0 );
