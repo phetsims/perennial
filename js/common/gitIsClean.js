@@ -18,7 +18,7 @@ const winston = require( 'winston' );
  * @returns {Promise.<boolean>} - Whether it is clean or not
  * @rejects {ExecuteError}
  */
-module.exports = function( repo, file ) {
+module.exports = function gitIsClean( repo, file ) {
   winston.debug( `git status check on ${repo}` );
 
   const gitArgs = [ 'status', '--porcelain' ];
