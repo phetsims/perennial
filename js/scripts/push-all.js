@@ -7,11 +7,12 @@
  */
 
 const execute = require( '../common/execute' ).default;
-const getActiveRepos = require( '../common/getActiveRepos' );
+const getRepoList = require( '../common/getRepoList' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPullRebase = require( '../common/gitPullRebase' );
 const gitPush = require( '../common/gitPush' );
 const winston = require( 'winston' );
+const { getOption } = require( '../grunt/tasks/util/getOption' );
 
 // Change directory to top level of this repo
 process.chdir( `${__dirname}/../../` );
@@ -23,7 +24,9 @@ const red = '\u001b[31m';
 const green = '\u001b[32m';
 const reset = '\u001b[0m';
 
-const repos = getActiveRepos();
+const repoList = getOption( 'repoList' ) || 'active-repos';
+
+const repos = getRepoList( repoList );
 const data = {};
 let ok = true;
 
