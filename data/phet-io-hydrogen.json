@@ -116,6 +116,10 @@
     "version": "1.1"
   },
   {
+    "sim": "models-of-the-hydrogen-atom",
+    "version": "1.0"
+  },
+  {
     "sim": "molecule-polarity",
     "version": "1.3"
   },
