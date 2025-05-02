@@ -243,7 +243,8 @@ export const sync = async ( providedOptions?: Partial<SyncOptions> ): Promise<bo
 
         let isGreen = false;
         if ( branch ) {
-          isGreen = !status && branch === 'main' && !track.length;
+          const correctBranch = !options.checkoutMain || branch === 'main';
+          isGreen = !status && correctBranch && !track.length;
 
           if ( !isGreen || options.logAll ) {
             append( repo, `${moveRight}${isGreen ? green : red}${branch}${reset} ${track}` );
