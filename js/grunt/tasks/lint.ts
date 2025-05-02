@@ -5,6 +5,7 @@
  * --clean or --disable-eslint-cache: cache will not be read from, and cache will be cleared for next run.
  * --fix: autofixable changes will be written to disk
  * --repos: comma separated list of repos to lint in addition to the repo from running
+ * --all: lint all repos in the phet-info repo. This is a convenience for running lint on all repos.
  * see getLintCLIOptions() for more information.
  *
  * @author Sam Reid (PhET Interactive Simulations)
