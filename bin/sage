@@ -50,10 +50,10 @@ fi
 SCRIPT_FILE="$1"
 shift
 
-# Check if the script file has a .js, .ts, .mjs, or .cjs extension, if it doesn't, see if one can be auto filled in
-if [[ ! "$SCRIPT_FILE" =~ \.(js|ts|mjs|cjs)$ ]]; then
+# Check if the script file has a .js, .ts, .mjs, .cjs, or .mts extension, if it doesn't, see if one can be auto filled in
+if [[ ! "$SCRIPT_FILE" =~ \.(js|ts|mjs|cjs|mts)$ ]]; then
 
-  declare -a extensions=("ts" "js" "mjs" "cjs")
+  declare -a extensions=("ts" "js" "mjs" "cjs" "mts")
   arraylength=${#extensions[@]} # get length of an array
   found=false
 
@@ -68,7 +68,7 @@ if [[ ! "$SCRIPT_FILE" =~ \.(js|ts|mjs|cjs)$ ]]; then
   done
 
   if [[ "$found" == false ]]; then
-      echo "Script file must have a .js, .ts, .mjs, or .cjs extension: $SCRIPT_FILE" >&2
+      echo "Script file must have a .js, .ts, .mjs, .mts, or .cjs extension: $SCRIPT_FILE" >&2
       exit 1
   fi
 fi
