@@ -154,5 +154,9 @@
   {
     "sim": "projectile-sampling-distributions",
     "version": "1.0"
+  },
+  {
+    "sim": "quantum-measurement",
+    "version": "1.0"
   }
 ]
