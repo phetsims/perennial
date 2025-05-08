@@ -140,6 +140,10 @@
     "version": "1.5"
   },
   {
+    "sim": "number-pairs",
+    "version": "1.0"
+  },
+  {
     "sim": "ph-scale",
     "version": "1.6"
   },
