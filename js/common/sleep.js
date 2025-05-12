@@ -13,7 +13,7 @@
  * @param {number} milliseconds
  * @returns {Promise}
  */
-module.exports = async function( milliseconds ) {
+module.exports = async function sleep( milliseconds ) {
   return new Promise( ( resolve, reject ) => {
     setTimeout( resolve, milliseconds );
   } );
