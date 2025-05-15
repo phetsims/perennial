@@ -85,7 +85,7 @@ module.exports = async function( repo, author, options ) {
     if ( abspath.indexOf( '../simula-rasa/README.md' ) === 0 ||
          abspath.indexOf( '../simula-rasa/node_modules/' ) === 0 ||
          //TODO https://github.com/phetsims/simula-rasa/issues/31 Remove release-notes.md when it is no longer a draft.
-         abspath.indexOf( '../simula-rasa/release-notes.md' ) === 0 ||
+         abspath.indexOf( '../simula-rasa/doc/release-notes.md' ) === 0 ||
          abspath.indexOf( '../simula-rasa/.git/' ) === 0 ||
          abspath.indexOf( '../simula-rasa/build/' ) === 0 ) {
 
