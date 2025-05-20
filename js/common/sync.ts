@@ -125,6 +125,19 @@ export const getSyncCLIOptions = (): SyncOptions => {
   };
 };
 
+// A consistent way to know if a git pulling command pulled changes. Returns the stdout output
+// of the pull command.
+export function parsePullResult( stdout: string ): string | null {
+  if ( stdout === 'Already up to date.\nCurrent branch main is up to date.\n' ||
+       stdout === 'Already up to date.\n' ||
+       stdout === 'Current branch main is up to date.\n' ) {
+    return null;
+  }
+  else {
+    return stdout.trim();
+  }
+}
+
 /**
  * Returns success boolean
  */
@@ -176,17 +189,6 @@ export const sync = async ( providedOptions?: Partial<SyncOptions> ): Promise<bo
     await gitCheckout( repo, 'main' );
   }
 
-  function parsePullResult( stdout: string ): string | null {
-    if ( stdout === 'Already up to date.\nCurrent branch main is up to date.\n' ||
-         stdout === 'Already up to date.\n' ||
-         stdout === 'Current branch main is up to date.\n' ) {
-      return null;
-    }
-    else {
-      return stdout.trim();
-    }
-  }
-
   function append( repo: string, message: string ): void {
     if ( data[ repo ] ) {
       data[ repo ] += '\n' + message;
@@ -196,7 +198,7 @@ export const sync = async ( providedOptions?: Partial<SyncOptions> ): Promise<bo
     }
   }
 
-  const updateRepo = async ( repo: string, logAll: string[] ) => {
+  const updateRepo = async ( repo: string, allRepos: string[] ) => {
     data[ repo ] = '';
 
     try {
@@ -231,7 +233,7 @@ export const sync = async ( providedOptions?: Partial<SyncOptions> ): Promise<bo
 
       // Inline cloneMissingRepos so it can run in parallel with other repoUpdate steps.
       if ( !cloneFirst && repo === PERENNIAL_REPO_NAME ) {
-        await cloneMissingReposInternal( logAll );
+        await cloneMissingReposInternal( allRepos );
       }
 
       if ( options.status ) {

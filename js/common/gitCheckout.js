@@ -22,5 +22,5 @@ module.exports = async function gitCheckout( repo, target ) {
   assert( typeof repo === 'string' );
   assert( typeof target === 'string' );
 
-  await gitCheckoutDirectory( target, `../${repo}` );
+  return gitCheckoutDirectory( target, `../${repo}` );
 };
