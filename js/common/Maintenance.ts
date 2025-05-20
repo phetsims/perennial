@@ -541,16 +541,16 @@ class Maintenance {
     let count = 0;
 
     for ( const modifiedBranch of maintenance.modifiedBranches ) {
+      // Check if there's actually something to remove (for running the potentially-expensive filter function)
+      const index = modifiedBranch.neededPatches.indexOf( patch );
+      if ( index < 0 ) {
+        continue;
+      }
+
       const needsRemoval = await filter( modifiedBranch.releaseBranch );
 
       if ( !needsRemoval ) {
         console.log( `  skipping ${modifiedBranch.repo} ${modifiedBranch.branch}` );
-        continue;
-      }
-
-      // Check if there's actually something to remove
-      const index = modifiedBranch.neededPatches.indexOf( patch );
-      if ( index < 0 ) {
         continue;
       }
 
