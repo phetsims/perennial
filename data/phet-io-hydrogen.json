@@ -4,6 +4,10 @@
     "version": "1.3"
   },
   {
+    "sim": "balancing-chemical-equations",
+    "version": "2.0"
+  },
+  {
     "sim": "beers-law-lab",
     "version": "1.7"
   },
