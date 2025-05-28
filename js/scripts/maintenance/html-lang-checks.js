@@ -12,7 +12,6 @@
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  */
 
-const _ = require( 'lodash' );
 const puppeteerLoad = require( '../../common/puppeteerLoad' );
 const Maintenance = require( '../../common/Maintenance' ).default;
 const withServer = require( '../../common/withServer' );
