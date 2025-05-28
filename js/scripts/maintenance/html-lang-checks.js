@@ -63,7 +63,7 @@ const logResult = ( success, message, url ) => {
       const usesChipper2 = await releaseBranch.usesChipper2();
 
       if ( releaseBranch.brands.includes( 'phet' ) ) {
-        // urls.push( `${buildDir}/${usesChipper2 ? 'phet/' : ''}${repo}_all${usesChipper2 ? '_phet' : ''}.html?webgl=false` );
+        urls.push( `${buildDir}/${usesChipper2 ? 'phet/' : ''}${repo}_all${usesChipper2 ? '_phet' : ''}.html?webgl=false` );
       }
       if ( releaseBranch.brands.includes( 'phet-io' ) ) {
         const standaloneParams = await releaseBranch.getPhetioStandaloneQueryParameter();
@@ -76,54 +76,54 @@ const logResult = ( success, message, url ) => {
       return urls;
     };
 
-    const getUnbuiltURLs = async releaseBranch => {
-      const urls = [];
-
-      if ( !releaseBranch ) {
-        const repo = 'acid-base-solutions';
-        urls.push( `${server}/${repo}/${repo}_en.html?webgl=false` );
-        urls.push( `${server}/${repo}/${repo}_en.html?webgl=false&brand=phet-io&phetioStandalone` );
-        return urls;
-      }
-
-      const repo = releaseBranch.repo;
-      const branch = releaseBranch.branch;
-      urls.push( `${server}/release-branches/${repo}-${branch}/${repo}/${repo}_en.html?webgl=false` );
-
-      if ( releaseBranch.brands.includes( 'phet-io' ) ) {
-        const standaloneParams = await releaseBranch.getPhetioStandaloneQueryParameter();
-        urls.push( `${server}/release-branches/${repo}-${branch}/${repo}/${repo}_en.html?webgl=false&${standaloneParams}&brand=phet-io` );
-      }
-
-      return urls;
-    };
-
-    const getAllURLs = async releaseBranch => {
-      return [
-        ...( await getBuiltURLs( releaseBranch ) )
-        // ...( await getUnbuiltURLs( releaseBranch ) )
-      ];
-    };
-
-    // What URLS were called during sim load
-    const getLoadedURLs = async url => {
-      const urls = [];
-
-      await puppeteerLoad( url, {
-        onPageCreation: page => page.on( 'request', request => {
-          const url = request.url();
-
-          if ( !url.startsWith( 'data:' ) ) {
-            urls.push( url );
-          }
-        } ),
-        gotoTimeout: 60000,
-        waitAfterLoad: 3000,
-        browser: browser
-      } );
-
-      return urls;
-    };
+    // const getUnbuiltURLs = async releaseBranch => {
+    //   const urls = [];
+    //
+    //   if ( !releaseBranch ) {
+    //     const repo = 'acid-base-solutions';
+    //     urls.push( `${server}/${repo}/${repo}_en.html?webgl=false` );
+    //     urls.push( `${server}/${repo}/${repo}_en.html?webgl=false&brand=phet-io&phetioStandalone` );
+    //     return urls;
+    //   }
+    //
+    //   const repo = releaseBranch.repo;
+    //   const branch = releaseBranch.branch;
+    //   urls.push( `${server}/release-branches/${repo}-${branch}/${repo}/${repo}_en.html?webgl=false` );
+    //
+    //   if ( releaseBranch.brands.includes( 'phet-io' ) ) {
+    //     const standaloneParams = await releaseBranch.getPhetioStandaloneQueryParameter();
+    //     urls.push( `${server}/release-branches/${repo}-${branch}/${repo}/${repo}_en.html?webgl=false&${standaloneParams}&brand=phet-io` );
+    //   }
+    //
+    //   return urls;
+    // };
+    //
+    // const getAllURLs = async releaseBranch => {
+    //   return [
+    //     ...( await getBuiltURLs( releaseBranch ) )
+    //     // ...( await getUnbuiltURLs( releaseBranch ) )
+    //   ];
+    // };
+    //
+    // // What URLS were called during sim load
+    // const getLoadedURLs = async url => {
+    //   const urls = [];
+    //
+    //   await puppeteerLoad( url, {
+    //     onPageCreation: page => page.on( 'request', request => {
+    //       const url = request.url();
+    //
+    //       if ( !url.startsWith( 'data:' ) ) {
+    //         urls.push( url );
+    //       }
+    //     } ),
+    //     gotoTimeout: 60000,
+    //     waitAfterLoad: 3000,
+    //     browser: browser
+    //   } );
+    //
+    //   return urls;
+    // };
 
     const evaluate = async ( url, evaluate, options ) => {
       try {
