@@ -3,6 +3,7 @@
 import additionalBadText from '../../phet-rules/additional-bad-text.js';
 import authorAnnotation from '../../phet-rules/author-annotation.js';
 import badChipperText from '../../phet-rules/bad-chipper-text.js';
+import requireFluent from '../../phet-rules/require-fluent.js';
 import badPhetLibraryText from '../../phet-rules/bad-phet-library-text.js';
 import badSimText from '../../phet-rules/bad-sim-text.js';
 import badText from '../../phet-rules/bad-text.js';
@@ -55,6 +56,7 @@ export default {
     'bad-chipper-text': badChipperText,
     'bad-phet-library-text': badPhetLibraryText,
     'bad-sim-text': badSimText,
+    'require-fluent': requireFluent,
     'bad-typescript-text': badTypescriptText,
 
     copyright: copyright,
