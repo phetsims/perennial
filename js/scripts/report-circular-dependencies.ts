@@ -62,7 +62,7 @@ import { isOptionKeyProvided } from '../grunt/tasks/util/getOption.js';
       }
 
       // Logging cyclesWithoutSherpa because we do want to see the leading madge lines.
-      console.log( cyclesWithoutSherpa.join( '\n\n' ) );
+      console.log( cyclesWithoutSherpa.join( '\n' ) );
       console.log( result.stderr );
     }
     else {
