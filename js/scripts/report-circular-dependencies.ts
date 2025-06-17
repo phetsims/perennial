@@ -42,19 +42,24 @@ import { isOptionKeyProvided } from '../grunt/tasks/util/getOption.js';
   if ( !success ) {
     const endIndex = result.stdout.indexOf( '✖ Skipped ' );
     const trimmed = result.stdout.slice( 0, endIndex );
-    const cycles = trimmed.split( /\n\s*\n/ );
+
+    // Extracts each circular dependency entry by matching lines that start with a number, a parenthesis, and a space ((e.g., "3) ..."))
+    // This ensures each cycle is captured as a separate string in the array.
+    const cycles = trimmed.match( /\d+\)\s[^\n]+/g ) || [];
 
     // Filter cycles reported by madge to exclude cycles that involve 'sherpa/' dependencies,
-    // since those are not maintained by PhET
-    const cyclesWithoutSherpa = cycles
-      .filter( cycle => !cycle.includes( 'sherpa/' ) )
-      .filter( cycle => cycle.length > 0 );
+    // since those are not maintained by PhET.
+    const cyclesWithoutSherpa = cycles.filter( cycle => !cycle.includes( 'sherpa/' ) );
 
     // Filter cycles reported by madge to include only lines that represent circular dependencies
-    // (contain '>'). This removes leading lines in the madge output.
+    // (contain '>').
     const filteredCycles = cyclesWithoutSherpa.filter( cycle => cycle.includes( '>' ) );
 
     if ( filteredCycles.length > 0 ) {
+
+      if ( cycles.length > cyclesWithoutSherpa.length ) {
+        console.log( '\nIgnoring cycles that involve "sherpa/" dependencies...\n' );
+      }
 
       // Logging cyclesWithoutSherpa because we do want to see the leading madge lines.
       console.log( cyclesWithoutSherpa.join( '\n\n' ) );
