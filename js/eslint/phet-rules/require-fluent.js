@@ -28,7 +28,7 @@ module.exports = {
     const repoNameMatch = filename.match( /[\\/]([^\\/]+)[\\/]js[\\/]/ );
 
     // The repository may be null if linting a file that is not under the js directory,
-    // such as a Gruntile or config file. Its OK to skip those.
+    // such as a Gruntfile or config file. It's OK to skip those.
     const repoName = repoNameMatch ? repoNameMatch[ 1 ] : null;
     const stringsModuleName = repoName ? `${toPascalCase( repoName )}Strings` : null;
 
