@@ -28,7 +28,11 @@ const TOP_LEVEL_IGNORES = {
     '*_en.html',
     '*-tests.html',
     '*_a11y_view.html',
-    '.scenerystack/'
+    '.scenerystack/',
+
+    // For Playwright, these are the default directories that it creates for reports and test results.
+    'playwright-report/',
+    'test-results/'
   ]
 };
 
