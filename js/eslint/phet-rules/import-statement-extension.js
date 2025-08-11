@@ -20,38 +20,46 @@ module.exports = {
     schema: [] // no options
   },
   create: function( context ) {
+
+    const handler = node => {
+      const source = node.source.value;
+
+      // Only process relative import paths
+      if ( source.startsWith( '.' ) ) {
+        // Regular expression to check for a file extension
+        const hasExtension = /\.[^./\\]+$/.test( source );
+
+        if ( !hasExtension ) {
+          context.report( {
+            node: node,
+            message: 'Relative import paths must include a file extension.',
+            fix: function( fixer ) {
+              const importSource = node.source;
+              const raw = importSource.raw;
+
+              // Determine which quote is used (single or double)
+              const quote = raw[ 0 ]; // Assumes the first character is the quote
+
+              // Append the default extension (.js) to the current source value
+              const newValue = source + '.js';
+
+              // Construct the new import path with the original quotes
+              const newImportPath = `${quote}${newValue}${quote}`;
+
+              // Replace the entire source node with the new import path
+              return fixer.replaceText( importSource, newImportPath );
+            }
+          } );
+        }
+      }
+    };
+
     return {
       ImportDeclaration( node ) {
-        const source = node.source.value;
-
-        // Only process relative import paths
-        if ( source.startsWith( '.' ) ) {
-          // Regular expression to check for a file extension
-          const hasExtension = /\.[^./\\]+$/.test( source );
-
-          if ( !hasExtension ) {
-            context.report( {
-              node: node,
-              message: 'Relative import paths must include a file extension.',
-              fix: function( fixer ) {
-                const importSource = node.source;
-                const raw = importSource.raw;
-
-                // Determine which quote is used (single or double)
-                const quote = raw[ 0 ]; // Assumes the first character is the quote
-
-                // Append the default extension (.js) to the current source value
-                const newValue = source + '.js';
-
-                // Construct the new import path with the original quotes
-                const newImportPath = `${quote}${newValue}${quote}`;
-
-                // Replace the entire source node with the new import path
-                return fixer.replaceText( importSource, newImportPath );
-              }
-            } );
-          }
-        }
+        handler( node );
+      },
+      ImportExpression( node ) {
+        handler( node );
       }
     };
   }

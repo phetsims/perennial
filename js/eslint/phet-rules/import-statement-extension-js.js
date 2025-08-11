@@ -30,42 +30,49 @@ module.exports = {
     // Create a regular expression to match the disallowed extensions
     const disallowedExtensionsRegex = /\.(ts|tsx|mts)$/;
 
-    return {
-      ImportDeclaration( node ) {
-        const source = node.source.value;
+    const handler = node => {
+      const source = node.source.value;
 
-        // Only process relative import paths
-        if ( source.startsWith( '.' ) ) {
-          const match = source.match( disallowedExtensionsRegex );
+      // Only process relative import paths
+      if ( source.startsWith( '.' ) ) {
+        const match = source.match( disallowedExtensionsRegex );
 
-          if ( match ) {
-            const currentExtension = match[ 0 ];
-            const newExtension = extensionMapping[ currentExtension ];
+        if ( match ) {
+          const currentExtension = match[ 0 ];
+          const newExtension = extensionMapping[ currentExtension ];
 
-            if ( newExtension ) {
-              context.report( {
-                node: node.source,
-                message: `Importing "${currentExtension}" files is not allowed. Use "${newExtension}" instead.`,
-                fix: function( fixer ) {
-                  const importSource = node.source;
-                  const raw = importSource.raw;
+          if ( newExtension ) {
+            context.report( {
+              node: node.source,
+              message: `Importing "${currentExtension}" files is not allowed. Use "${newExtension}" instead.`,
+              fix: function( fixer ) {
+                const importSource = node.source;
+                const raw = importSource.raw;
 
-                  // Determine which quote is used (single or double)
-                  const quote = raw[ 0 ]; // Assumes the first character is the quote
+                // Determine which quote is used (single or double)
+                const quote = raw[ 0 ]; // Assumes the first character is the quote
 
-                  // Replace the disallowed extension with the new extension
-                  const newValue = source.replace( disallowedExtensionsRegex, newExtension );
+                // Replace the disallowed extension with the new extension
+                const newValue = source.replace( disallowedExtensionsRegex, newExtension );
 
-                  // Construct the new import path with the original quotes
-                  const newImportPath = `${quote}${newValue}${quote}`;
+                // Construct the new import path with the original quotes
+                const newImportPath = `${quote}${newValue}${quote}`;
 
-                  // Replace the entire source node with the new import path
-                  return fixer.replaceText( importSource, newImportPath );
-                }
-              } );
-            }
+                // Replace the entire source node with the new import path
+                return fixer.replaceText( importSource, newImportPath );
+              }
+            } );
           }
         }
+      }
+    };
+
+    return {
+      ImportDeclaration( node ) {
+        handler( node );
+      },
+      ImportExpression( node ) {
+        handler( node );
       }
     };
   }
