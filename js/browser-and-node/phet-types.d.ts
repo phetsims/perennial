@@ -17,6 +17,9 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Any = any;
 
+/**
+ * @deprecated - please use affirm instead.
+ */
 declare var assert: undefined | ( ( x: Any, ...messages: Any[] ) => void );
 declare var assertSlow: undefined | ( ( x: Any, ...messages: Any[] ) => void );
 declare var sceneryLog: null | false | ( Record<string, ( ob: Any, style?: string ) => void> & {
