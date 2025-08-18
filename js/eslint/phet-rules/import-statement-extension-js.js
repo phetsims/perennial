@@ -31,10 +31,10 @@ module.exports = {
     const disallowedExtensionsRegex = /\.(ts|tsx|mts)$/;
 
     const handler = node => {
-      const source = node.source.value;
+      const source = node.source?.value;
 
       // Only process relative import paths
-      if ( source.startsWith( '.' ) ) {
+      if ( source?.startsWith( '.' ) ) {
         const match = source.match( disallowedExtensionsRegex );
 
         if ( match ) {

@@ -22,10 +22,10 @@ module.exports = {
   create: function( context ) {
 
     const handler = node => {
-      const source = node.source.value;
+      const source = node.source?.value;
 
       // Only process relative import paths
-      if ( source.startsWith( '.' ) ) {
+      if ( source?.startsWith( '.' ) ) {
         // Regular expression to check for a file extension
         const hasExtension = /\.[^./\\]+$/.test( source );
 
