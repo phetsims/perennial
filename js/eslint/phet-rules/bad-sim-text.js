@@ -53,6 +53,10 @@ module.exports = {
       'new Enumeration<',
       'new EnumerationProperty<',
 
+      // Voicing utterances should be registered with a Node for "voicing visibility", using Voicing.alertUtterance asserts
+      // that. See https://github.com/phetsims/scenery/issues/1403
+      'voicingUtteranceQueue.addToBack',
+
       // Please use Text/RichText.STRING_PROPERTY_TANDEM_NAME when appropriate (though not all usages apply here, and
       // you can ignore this rule), https://github.com/phetsims/scenery/issues/1451#issuecomment-1270576831
       '\'stringProperty\'',
