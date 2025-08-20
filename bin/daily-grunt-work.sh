@@ -91,6 +91,7 @@ cd ..
 logWithStderr "TASK - REOPEN ISSUES LINKED IN TODOS:"
 cd perennial || exit
 bin/sage run js/scripts/reopen-issues-from-todos.ts
+bin/sage run js/scripts/reopen-issues-from-todos.ts --repoList=active-website-repos
 cd ..
 
 ##########################################################################################################
