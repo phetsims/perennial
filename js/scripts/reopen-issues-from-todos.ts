@@ -4,7 +4,7 @@
  * This script is meant to ensure that all todos pointing to a github issue are pointing to open issues.
  *
  * This script works by. . .
- * - Running lint --all with a flag to specify a side effect to the to-do-should-have-issue rule which will keep
+ * - Running lint on active repos with a flag to specify a side effect to the to-do-should-have-issue rule which will keep
  * track of all to-do issues.
  * - Use that list to ping github to see if the issue is open
  * - If not open, reopen it and send a comment noting that there is still at least one to-do pointing here.
@@ -24,9 +24,12 @@ import buildLocal from '../common/buildLocal.js';
 import createDirectory from '../common/createDirectory.js';
 import getRepoList from '../common/getRepoList.js';
 import lint from '../eslint/lint.js';
+import { getOption } from '../grunt/tasks/util/getOption.js';
 
 const CHIPPER_DIST_ESLINT = '../chipper/dist/eslint/';
 const TODOsFilename = `${CHIPPER_DIST_ESLINT}/issuesFromTODOs.txt`;
+
+const repoList = getOption( 'repoList' ) || 'active-repos';
 
 ( async () => {
 
@@ -41,7 +44,7 @@ const TODOsFilename = `${CHIPPER_DIST_ESLINT}/issuesFromTODOs.txt`;
 
   console.log( 'grunt lint --all started' );
   try {
-    await lint( getRepoList( 'active-repos' ).filter( repo => repo !== 'perennial' ), {
+    await lint( getRepoList( repoList ).filter( repo => repo !== 'perennial' ), {
       clean: true
     } );
   }
