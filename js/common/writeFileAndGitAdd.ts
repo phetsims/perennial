@@ -3,8 +3,6 @@
 /**
  * Writes a file with grunt and adds it to git.
  *
- * TODO: Rename preserving history, see https://github.com/phetsims/chipper/issues/1624
- *
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 
