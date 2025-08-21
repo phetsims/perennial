@@ -25,7 +25,6 @@ export default async function( repo: string, filePath: string, content: string )
 
   const fixedContent = fixEOL( content );
 
-  // TODO: https://github.com/phetsims/chipper/issues/1624 double check on windows after push
   const fromDiskContent = fixEOL( fs.readFileSync( `../${repo}/${filePath}`, 'utf8' ) );
 
   if ( fromDiskContent.trim() !== fixedContent.trim() ) {
