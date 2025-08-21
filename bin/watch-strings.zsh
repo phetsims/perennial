@@ -28,7 +28,7 @@ watch_one() {
   (
     print -r -- "$target" | entr -n zsh -c '
       cd "$1" || exit 1
-      if sage run ../chipper/js/grunt/modulify.ts --targets=strings; then
+      if sage run ../chipper/js/grunt/tasks/modulify.ts --targets=strings; then
         (afplay "$SUCCESS_SOUND" >/dev/null 2>&1 &)
       else
         (afplay "$FAIL_SOUND" >/dev/null 2>&1 &)
