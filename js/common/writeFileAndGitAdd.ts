@@ -17,7 +17,6 @@ import isGitRepo from './isGitRepo.js';
  * @param repo - The repository name
  * @param filePath - File name and potentially path relative to the repo
  * @param content - The content of the file as a string
- * @param [skipWorkIfUnchanged=false] - If true, the file will not be written and gitAdd will be skipped if the content is identical to the existing file.
  * @returns - stdout
  * @rejects {ExecuteError}
  */
@@ -25,9 +24,16 @@ export default async function( repo: string, filePath: string, content: string )
 
   const fixedContent = fixEOL( content );
 
-  const fromDiskContent = fixEOL( fs.readFileSync( `../${repo}/${filePath}`, 'utf8' ) );
+  let writeFile = true;
+  if ( fs.existsSync( `../${repo}/${filePath}` ) ) {
+    const fromDiskContent = fixEOL( fs.readFileSync( `../${repo}/${filePath}`, 'utf8' ) );
 
-  if ( fromDiskContent.trim() !== fixedContent.trim() ) {
+    if ( fromDiskContent.trim() === fixedContent.trim() ) {
+      writeFile = false;
+    }
+  }
+
+  if ( writeFile ) {
 
     const outputFile = `../${repo}/${filePath}`;
     grunt.file.write( outputFile, fixedContent );
