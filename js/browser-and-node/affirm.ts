@@ -26,7 +26,6 @@ type GlobalWithAssert = {
 const isBrowser = globalThis.hasOwnProperty( 'window' );
 const isNode = !isBrowser;
 
-// NOTE: DO NOT export this function! At this time, there is no way to strip out usages of this boolean when building. Instead, see affirmLazy() or, if you must, use `if( window.assert ){...}`. See https://github.com/phetsims/assert/issues/5
 // Use this as a boolean like window.assert to write code that is stripped out when assertions are disabled
 export function isAffirmEnabled(): boolean {
 
