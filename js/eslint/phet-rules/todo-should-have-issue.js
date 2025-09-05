@@ -11,7 +11,8 @@ const path = require( 'path' );
 const fs = require( 'fs' );
 
 const issueShorthandRegex = /#(\d+)/;
-const urlRegex = /https:\/\/github.com\/phetsims\/[-\w]+\/issues\/\d+/;
+const githubURLRegex = /https:\/\/github.com\/phetsims\/[-\w]+\/issues\/\d+/;
+const shortcutURLRegex = /https:\/\/app.shortcut.com\/phetsims\/story\/\d+/;
 const filename = 'issuesFromTODOs.txt';
 const todoIssuesFilepath = path.resolve( __dirname, `../../../../chipper/dist/eslint/${filename}` );
 
@@ -23,8 +24,9 @@ const hasIssueLink = string => {
 
   // '#' followed by any number of digits
   const missingIssueNumber = !issueShorthandRegex.test( string );
-  const missingLink = !urlRegex.test( string );
-  return !( missingLink && missingIssueNumber );
+  const missingGithubLink = !githubURLRegex.test( string );
+  const missingShortcutLink = !shortcutURLRegex.test( string );
+  return !( missingGithubLink && missingIssueNumber && missingShortcutLink );
 };
 
 /**
@@ -107,7 +109,7 @@ module.exports = {
               }
               else if ( process.env.saveTODOIssues ) {
                 let url = null;
-                const urlMatch = comment.value.match( urlRegex );
+                const urlMatch = comment.value.match( githubURLRegex );
                 if ( urlMatch ) {
                   url = urlMatch[ 0 ];
                 }
