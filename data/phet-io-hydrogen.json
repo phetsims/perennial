@@ -12,6 +12,10 @@
     "version": "1.7"
   },
   {
+    "sim": "beers-law-lab",
+    "version": "1.8"
+  },
+  {
     "sim": "buoyancy",
     "version": "1.2"
   },
@@ -46,6 +50,10 @@
   {
     "sim": "concentration",
     "version": "1.7"
+  },
+  {
+    "sim": "concentration",
+    "version": "1.8"
   },
   {
     "sim": "density",
