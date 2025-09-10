@@ -232,12 +232,9 @@ module.exports = async function production( repo, branch, brands, noninteractive
 
     // phet-io nags from the checklist
     if ( brands.includes( 'phet-io' ) ) {
-      const phetioLogText = `
-PhET-iO deploys involve a couple of extra steps after production. Please ensure the following are accomplished:
-- [ ] Make sure the sim is listed in perennial/data/phet-io-hydrogen.json. It is almost certainly part of this featureset. 
-- [ ] Make sure on the package.json: Add "phet-io": { "compareDesignedAPIChanges": true } and remove "phet-io": { "validation": false }.
-- [ ] Create an issue in the phet-io repo using the "New PhET-iO Simulation Publication" issue template.
-      `;
+      const phetioLogText = 'PhET-iO deploys involve a couple of extra steps after production. Create an issue in the ' +
+                            'phet-io repo using the "New PhET-iO Simulation Publication" issue template to make sure ' +
+                            'these are accomplished.';
       grunt.log.writeln( phetioLogText );
     }
 
