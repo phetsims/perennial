@@ -233,8 +233,8 @@ module.exports = async function production( repo, branch, brands, noninteractive
     // phet-io nags from the checklist
     if ( brands.includes( 'phet-io' ) ) {
       const phetioLogText = 'PhET-iO deploys involve a couple of extra steps after production. Create an issue in the ' +
-                            'phet-io repo using the "New PhET-iO Simulation Publication" issue template to make sure ' +
-                            'these are accomplished. Assign yourself for "developer" steps.';
+                            'phet-io repo using the "New or Republished PhET-iO Simulation Publication" issue template ' +
+                            'to make sure these are accomplished. Assign yourself for "developer" steps.';
       grunt.log.writeln( phetioLogText );
     }
 
