@@ -38,6 +38,10 @@ const REPOS_EXCLUDED_FROM_LISTENER_ORDER_RANDOM = [
   'fourier-making-waves' // see https://github.com/phetsims/fourier-making-waves/issues/240
 ];
 
+const REPOS_EXCLUDED_FROM_MIGRATION = [
+  'number-pairs'
+];
+
 /**
  * {Array.<Object>} test
  * {string} type
@@ -572,6 +576,11 @@ Object.keys( commonQueryParameters ).forEach( name => {
 // PhET-iO migration testing
 phetioHydrogenSims.forEach( testData => {
   const simName = testData.sim;
+
+  if ( REPOS_EXCLUDED_FROM_MIGRATION.includes( simName ) ) {
+    return;
+  }
+
   const oldVersion = testData.version;
   const getTest = reportContext => {
     return {
