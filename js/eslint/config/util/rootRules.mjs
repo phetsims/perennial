@@ -722,7 +722,7 @@ export default {
   'dot-location': 'off', // We use WebStorm formatting which moves lower dots to the left
 
   // Require or disallow newline at the end of files
-  // NOTE: This is off in the main config because it doesn't behave well with HTML files, see overrides for usage.
+  // We permit any eol style, see https://github.com/phetsims/perennial/issues/463
   'eol-last': 'off',
 
   // Require or disallow spacing between function identifiers and their invocations
