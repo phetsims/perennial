@@ -5,6 +5,7 @@ const execute = require( '../common/execute' ).default;
 const gitCheckoutDirectory = require( '../common/gitCheckoutDirectory' );
 const gitCloneOrFetchDirectory = require( '../common/gitCloneOrFetchDirectory' );
 const gitPullDirectory = require( '../common/gitPullDirectory' );
+const npmUpdateDirectory = require( '../common/npmUpdateDirectory' );
 const constants = require( './constants' );
 const fs = require( 'fs' );
 const axios = require( 'axios' );
@@ -67,8 +68,7 @@ const updateRepoDir = async ( repo, dir ) => {
   await gitCloneOrFetchDirectory( repo, imagesReposDir );
   await gitCheckoutDirectory( 'main', dir );
   await gitPullDirectory( dir );
-  await execute( 'npm', [ 'prune' ], dir );
-  await execute( 'npm', [ 'update' ], dir );
+  await npmUpdateDirectory( dir );
 };
 
 /**

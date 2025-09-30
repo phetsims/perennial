@@ -10,22 +10,43 @@ const execute = require( './execute' ).default;
 const npmCommand = require( './npmCommand' );
 const winston = require( 'winston' );
 const asyncMutex = require( 'async-mutex' );
+const fs = require( 'fs' );
 
 const mutex = new asyncMutex.Mutex();
 
 /**
- * Executes an effective "npm update" (with pruning because it's required).
+ * Executes an effective "npm install", ensuring that the node_modules versions match package.json (and the lock file if present).
  * @public
  *
  * @param {string} directory
+ * @param {{ clean?: boolean, preferOffline?: boolean, minimal?: boolean }} [options]
  * @returns {Promise}
  */
-module.exports = async function( directory ) {
+module.exports = async function( directory, options ) {
   winston.info( `npm update in ${directory}` );
+
+  const clean = options?.clean ?? false;
+  const preferOffline = options?.preferOffline ?? true;
+  const minimal = options?.minimal ?? true;
+
+  const hasPackageLock = fs.existsSync( `${directory}/package-lock.json` );
+
+  const flags = [
+    ...( preferOffline ? [ '--prefer-offline=true' ] : [] ),
+    ...( minimal ? [ '--audit=false', '--fund=false' ] : [] )
+  ];
 
   // NOTE: Run these synchronously across all instances!
   await mutex.runExclusive( async () => {
-    await execute( npmCommand, [ 'prune' ], directory );
-    await execute( npmCommand, [ 'update' ], directory );
+
+    // If we have a package-lock.json, we can do the more efficient 'npm ci' (if clean is requested) or 'npm install'.
+    if ( hasPackageLock ) {
+      await execute( npmCommand, [ clean ? 'ci' : 'install', ...flags ], directory );
+    }
+    // Otherwise use the legacy method.
+    else {
+      await execute( npmCommand, [ 'prune', ...flags ], directory );
+      await execute( npmCommand, [ 'update', ...flags ], directory );
+    }
   } );
 };
