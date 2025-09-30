@@ -7,7 +7,7 @@ PhET build and deploy server.
 The production version of the build server runs on **phet-server2.int.colorado.edu**, the same host as the PhET
 production website.
 
-A test version of the server runs on **phet-server-dev.int.colorado.edu**.
+A test version of the server runs on **phet-server-dev.int.colorado.edu** (for https://ox-dev.colorado.edu).
 
 ## Starting and Stopping the Server
 
@@ -113,6 +113,11 @@ input a JSON object with the following properties:
 - `email` - optional parameter, used to send success/failure notifications
 - `translatorId` - optional parameter for production/rc deploys, required for translation deploys from rosetta to add
   the user's credit to the website.
+
+## Using the ox-dev (phet-server-dev) Build Server for Testing
+
+- Put `"productionServerURL": "https://ox-dev.colorado.edu"` in build-local.json (to point to the dev server)
+- Do deploys as normal
 
 ## What the Build Server Does
 
