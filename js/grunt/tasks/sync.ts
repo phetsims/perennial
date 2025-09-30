@@ -32,6 +32,7 @@ winston.default.transports.console.level = 'error';
 
 ( async () => {
   const previousCWD = process.cwd();
+
   // @ts-expect-error - until we have "type": "module" in our package.json
   const scriptDirectory = dirname( import.meta.url );
   process.chdir( path.join( scriptDirectory, '../../..' ) );
