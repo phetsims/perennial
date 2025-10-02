@@ -13,6 +13,7 @@ const loadJSON = require( './loadJSON' );
 const writeJSON = require( './writeJSON' );
 const winston = require( 'winston' );
 const fs = require( 'fs' );
+const os = require( 'os' );
 
 /**
  * Sets the version for a current checked-in repo, creating a commit with the change
@@ -44,7 +45,7 @@ module.exports = async function( repo, version, message ) {
     const packageLockObject = await loadJSON( packageLockFile );
     packageLockObject.version = versionString;
     packageLockObject.packages[ '' ].version = versionString;
-    await writeJSON( packageLockFile, packageLockObject );
+    fs.writeFileSync( packageLockFile, JSON.stringify( packageLockObject, null, 2 ) + os.EOL );
   }
 
   if ( !await gitIsClean( repo ) ) {
