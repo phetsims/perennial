@@ -12,6 +12,7 @@ const gitIsClean = require( './gitIsClean' );
 const loadJSON = require( './loadJSON' );
 const writeJSON = require( './writeJSON' );
 const winston = require( 'winston' );
+const fs = require( 'fs' );
 
 /**
  * Sets the version for a current checked-in repo, creating a commit with the change
@@ -26,6 +27,9 @@ module.exports = async function( repo, version, message ) {
   winston.info( `Setting version from package.json for ${repo} to ${version.toString()}` );
 
   const packageFile = `../${repo}/package.json`;
+  const packageLockFile = `../${repo}/package-lock.json`;
+
+  const versionString = version.toString();
 
   const isClean = await gitIsClean( repo );
   if ( !isClean ) {
@@ -33,11 +37,21 @@ module.exports = async function( repo, version, message ) {
   }
 
   const packageObject = await loadJSON( packageFile );
-  packageObject.version = version.toString();
-
+  packageObject.version = versionString;
   await writeJSON( packageFile, packageObject );
+
+  if ( fs.existsSync( packageLockFile ) ) {
+    const packageLockObject = await loadJSON( packageLockFile );
+    packageLockObject.version = versionString;
+    packageLockObject.packages[ '' ].version = versionString;
+    await writeJSON( packageLockFile, packageLockObject );
+  }
+
   if ( !await gitIsClean( repo ) ) {
     await gitAdd( repo, 'package.json' );
+    if ( fs.existsSync( packageLockFile ) ) {
+      await gitAdd( repo, 'package-lock.json' );
+    }
     await gitCommit( repo, `Bumping version to ${version.toString()}${message ? `, ${message}` : ''}` );
   }
 };
