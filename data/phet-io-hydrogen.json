@@ -176,8 +176,16 @@
     "version": "1.6"
   },
   {
+    "sim": "ph-scale",
+    "version": "1.7"
+  },
+  {
     "sim": "ph-scale-basics",
     "version": "1.6"
+  },
+  {
+    "sim": "ph-scale-basics",
+    "version": "1.7"
   },
   {
     "sim": "projectile-data-lab",
