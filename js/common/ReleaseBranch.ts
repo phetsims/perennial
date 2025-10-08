@@ -50,7 +50,8 @@ import puppeteerLoad from './puppeteerLoad.js';
 import simMetadata from './simMetadata.js';
 import simPhetioMetadata from './simPhetioMetadata.js';
 import withServer from './withServer.js';
-
+// @ts-expect-error
+import pLimit from 'p-limit';
 
 const MAINTENANCE_DIRECTORY = '../release-branches';
 
@@ -658,15 +659,18 @@ class ReleaseBranch implements ReleaseBranchSerialized {
       return new ReleaseBranch( simData.name, branch, [ 'phet-io' ], true );
     } );
 
-    const unreleasedBranches = [];
+    const unreleasedBranches: ReleaseBranch[] = [];
     if ( unreleased ) {
 
       winston.info( 'loading unreleased ReleaseBranches' );
-      for ( const repo of getActiveSims() ) {
+
+      const limit = pLimit( 15 ); // limit concurrency to avoid excessive resource usage
+
+      await Promise.all( getActiveSims().map( repo => limit( async () => {
 
         // Exclude explicitly excluded repos
         if ( JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) ).phet.ignoreForAutomatedMaintenanceReleases ) {
-          continue;
+          return;
         }
 
         const branches = await getBranches( repo );
@@ -708,7 +712,7 @@ class ReleaseBranch implements ReleaseBranchSerialized {
             }
           }
         }
-      }
+      } ) ) );
     }
 
     const allReleaseBranches = ReleaseBranch.combineLists( [ ...phetBranches, ...phetioBranches, ...unreleasedBranches ] );

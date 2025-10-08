@@ -55,6 +55,7 @@
     "nopt": "~4.0.1",
     "playwright": "~1.33.0",
     "puppeteer": "~19.2.2",
+    "p-limit": "^7.1.1",
     "qunit": "~2.20.0",
     "rimraf": "~2.5.4",
     "rsync": "~0.6.1",
