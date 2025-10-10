@@ -25,6 +25,7 @@ const green = '\u001b[32m';
 const reset = '\u001b[0m';
 
 const repoList = getOption( 'repoList' ) || 'active-repos';
+const ignorePull = getOption( 'noPull' );
 
 const repos = getRepoList( repoList );
 const data = {};
@@ -41,7 +42,7 @@ const pushAll = async repo => {
     // If it's ahead at all
     if ( trackShort.includes( '>' ) ) {
       if ( await gitIsClean( repo ) ) {
-        await gitPullRebase( repo );
+        !ignorePull && await gitPullRebase( repo );
       }
       else {
         data[ repo ] += `${red}${repo} not clean, skipping pull${reset}\n`;
