@@ -15,7 +15,7 @@ import winston from 'winston';
 
 type ErrorsHandled = 'resolve' | 'reject';
 
-type ExecuteOptions = {
+export type ExecuteOptions = {
 
   // Options passed directly to child_process.spawn command
   // We cannot use phet-core, so we need Omit
@@ -30,6 +30,10 @@ type ExecuteOptions = {
   // Provide to allow the child process to be killed (with SIGINT) before it is completed, with the "kill" event.
   // Run like `killEmitter.emit( 'kill' )`. The listener in execute() will be removed after the first emit of "kill".
   killEmitter?: EventEmitter | null;
+
+  // Callbacks to be called with partial output as it is streamed
+  onStdout?: ( ( str: string ) => void ) | null;
+  onStderr?: ( ( str: string ) => void ) | null;
 };
 export type ExecuteResult = { code: number; stdout: string; stderr: string; cwd: string; error?: Error; time: number };
 
@@ -77,7 +81,10 @@ function execute( cmd: string, args: string[], cwd: string, providedOptions?: Ex
 
       // options.shell value to the child_process.spawn.
       shell: getShellOption( cmd )
-    }
+    },
+
+    onStdout: null,
+    onStderr: null
   }, providedOptions );
 
   assert( options.errors === 'reject' || options.errors === 'resolve', 'Errors must reject or resolve' );
@@ -108,10 +115,13 @@ function execute( cmd: string, args: string[], cwd: string, providedOptions?: Ex
 
     childProcess.stderr && childProcess.stderr.on( 'data', data => {
       stderr += data;
+      options.onStdout && options.onStdout( data.toString() );
+
       winston.debug( `stderr: ${data}` );
     } );
     childProcess.stdout && childProcess.stdout.on( 'data', data => {
       stdout += data;
+      options.onStderr && options.onStderr( data.toString() );
 
       winston.debug( `stdout: ${data}` );
     } );

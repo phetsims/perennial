@@ -22,13 +22,13 @@ import checkoutTarget from './checkoutTarget.js';
 import chipperSupportsOutputJSGruntTasks from './chipperSupportsOutputJSGruntTasks.js';
 import ChipperVersion from './ChipperVersion.js';
 import createDirectory from './createDirectory.js';
-import execute from './execute.js';
+import execute, { ExecuteOptions } from './execute.js';
 import getActiveSims from './getActiveSims.js';
 import getBranchDependencies from './getBranchDependencies.js';
 import getBranches from './getBranches.js';
 import getBranchMap from './getBranchMap.js';
 import getBranchVersion from './getBranchVersion.js';
-import getBuildArguments from './getBuildArguments.js';
+import getBuildArguments, { BuildOptions } from './getBuildArguments.js';
 import getDependencies from './getDependencies.js';
 import getFileAtBranch from './getFileAtBranch.js';
 import getGitFile from './getGitFile.js';
@@ -208,8 +208,7 @@ class ReleaseBranch implements ReleaseBranchSerialized {
     await gitPullDirectory( `${checkoutDirectory}/perennial` );
   }
 
-  // TODO: Better type once getBuildArguments is in TypeScript, https://github.com/phetsims/perennial/issues/369
-  public async build( options?: object ): Promise<void> {
+  public async build( options?: Partial<BuildOptions>, executeOptions?: ExecuteOptions & { errors?: 'reject' } ): Promise<void> {
     const checkoutDirectory = ReleaseBranch.getCheckoutDirectory( this.repo, this.branch );
     const repoDirectory = `${checkoutDirectory}/${this.repo}`;
 
@@ -222,7 +221,7 @@ class ReleaseBranch implements ReleaseBranchSerialized {
     }, options ) );
 
     winston.info( `building ${checkoutDirectory} with grunt ${args.join( ' ' )}` );
-    await execute( gruntCommand, args, repoDirectory );
+    await execute( gruntCommand, args, repoDirectory, executeOptions );
   }
 
   public async transpile(): Promise<void> {
