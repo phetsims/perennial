@@ -187,7 +187,9 @@ class ReleaseBranch implements ReleaseBranchSerialized {
       await gitCloneOrFetchDirectory( repo, checkoutDirectory );
 
       const sha = overrideDependencies[ repo ] ? overrideDependencies[ repo ].sha : dependenciesOnBranchTip[ repo ].sha;
-      await gitCheckoutDirectory( sha, repoPwd );
+
+      // For our sim repo itself, check out the branch explicitly (so we have the latest commit, not the second-to-latest).
+      await gitCheckoutDirectory( repo === this.repo ? this.branch : sha, repoPwd );
 
       // Pull babel, since we don't give it a specific SHA (just a branch),
       // see https://github.com/phetsims/perennial/issues/326
