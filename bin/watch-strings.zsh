@@ -27,6 +27,7 @@ watch_one() {
   echo "[watch-strings] watching: $target"
   (
     print -r -- "$target" | entr -n zsh -c '
+      [[ -e "$HOME/.phet/sync-semaphore.txt" ]] && exit 0
       cd "$1" || exit 1
       if sage run ../chipper/js/grunt/tasks/modulify.ts --targets=strings; then
         (afplay "$SUCCESS_SOUND" >/dev/null 2>&1 &)
