@@ -14,7 +14,7 @@ const fs = require( 'fs' );
 
 const mutex = new asyncMutex.Mutex();
 
-export function getNpmInstallFlags( options ) {
+function getNpmInstallFlags( options ) {
   const preferOffline = options?.preferOffline ?? true;
   const minimal = options?.minimal ?? true;
 
@@ -32,7 +32,7 @@ export function getNpmInstallFlags( options ) {
  * @param {{ clean?: boolean, preferOffline?: boolean, minimal?: boolean }} [options]
  * @returns {Promise}
  */
-async function npmUpdateDirectory( directory, options ) {
+module.exports = async function npmUpdateDirectory( directory, options ) {
   winston.info( `npm update in ${directory}` );
 
   const clean = options?.clean ?? false;
@@ -54,9 +54,7 @@ async function npmUpdateDirectory( directory, options ) {
       await execute( npmCommand, [ 'update', ...flags ], directory );
     }
   } );
-}
+};
 
 // Oh how I wish for esm syntax
-npmUpdateDirectory.getNpmInstallFlags = getNpmInstallFlags;
-
-module.exports = npmUpdateDirectory;
+module.exports.getNpmInstallFlags = getNpmInstallFlags;
