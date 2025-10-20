@@ -14,6 +14,16 @@ const fs = require( 'fs' );
 
 const mutex = new asyncMutex.Mutex();
 
+export function getNpmInstallFlags( options ) {
+  const preferOffline = options?.preferOffline ?? true;
+  const minimal = options?.minimal ?? true;
+
+  return [
+    ...( preferOffline ? [ '--prefer-offline=true' ] : [] ),
+    ...( minimal ? [ '--audit=false', '--fund=false' ] : [] )
+  ];
+}
+
 /**
  * Executes an effective "npm install", ensuring that the node_modules versions match package.json (and the lock file if present).
  * @public
@@ -22,19 +32,14 @@ const mutex = new asyncMutex.Mutex();
  * @param {{ clean?: boolean, preferOffline?: boolean, minimal?: boolean }} [options]
  * @returns {Promise}
  */
-module.exports = async function( directory, options ) {
+async function npmUpdateDirectory( directory, options ) {
   winston.info( `npm update in ${directory}` );
 
   const clean = options?.clean ?? false;
-  const preferOffline = options?.preferOffline ?? true;
-  const minimal = options?.minimal ?? true;
 
   const hasPackageLock = fs.existsSync( `${directory}/package-lock.json` );
 
-  const flags = [
-    ...( preferOffline ? [ '--prefer-offline=true' ] : [] ),
-    ...( minimal ? [ '--audit=false', '--fund=false' ] : [] )
-  ];
+  const flags = getNpmInstallFlags( options );
 
   // NOTE: Run these synchronously across all instances!
   await mutex.runExclusive( async () => {
@@ -49,4 +54,9 @@ module.exports = async function( directory, options ) {
       await execute( npmCommand, [ 'update', ...flags ], directory );
     }
   } );
-};
+}
+
+// Oh how I wish for esm syntax
+npmUpdateDirectory.getNpmInstallFlags = getNpmInstallFlags;
+
+module.exports = npmUpdateDirectory;
