@@ -55,8 +55,8 @@ module.exports = async function npmUpdateDirectory( directory, options ) {
     }
     // Otherwise use the legacy method.
     else {
-      await execute( npmCommand, [ 'prune', ...flags ], directory );
-      await execute( npmCommand, [ 'update', ...flags ], directory );
+      await execute( npmCommand, [ 'prune' ], directory );
+      await execute( npmCommand, [ 'update' ], directory );
     }
   } );
 };
