@@ -14,6 +14,11 @@ const fs = require( 'fs' );
 
 const mutex = new asyncMutex.Mutex();
 
+
+/**
+ * @public
+ * @param {{ preferOffline?: boolean, minimal?: boolean }} [options]
+ */
 function getNpmInstallFlags( options ) {
   const preferOffline = options?.preferOffline ?? true;
   const minimal = options?.minimal ?? true;
