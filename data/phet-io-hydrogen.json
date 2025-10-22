@@ -112,6 +112,10 @@
     "version": "1.3"
   },
   {
+    "sim": "graphing-quadratics",
+    "version": "1.4"
+  },
+  {
     "sim": "gravity-and-orbits",
     "version": "1.6"
   },
