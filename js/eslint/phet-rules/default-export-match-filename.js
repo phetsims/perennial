@@ -16,11 +16,13 @@ module.exports = {
           // Get the class name from the export default declaration
           const exportName = node.declaration.id.name;
 
+          const filenameWithExtension = context.filename;
+
           // Get the filename without extension
-          const filename = context.getFilename().replace( /^.*[\\/]/, '' ).replace( /\.[^/.]+$/, '' );
+          const filename = filenameWithExtension.replace( /^.*[\\/]/, '' ).replace( /\.[^/.]+$/, '' );
 
           // Check if the exported class or function name and filename match
-          if ( exportName !== filename ) {
+          if ( !filenameWithExtension.endsWith( '.d.ts' ) && exportName !== filename ) {
             context.report( {
               node: node,
               message: `The default exported member "${exportName}" does not match the filename "${filename}". They should be identical.`
