@@ -17,16 +17,12 @@ const mutex = new asyncMutex.Mutex();
 
 /**
  * @public
- * @param {{ preferOffline?: boolean, minimal?: boolean }} [options]
+ * @param {{ minimal?: boolean }} [options]
  */
 function getNpmInstallFlags( options ) {
-  const preferOffline = options?.preferOffline ?? true;
   const minimal = options?.minimal ?? true;
 
-  return [
-    ...( preferOffline ? [ '--prefer-offline=true' ] : [] ),
-    ...( minimal ? [ '--audit=false', '--fund=false' ] : [] )
-  ];
+  return minimal ? [ '--audit=false', '--fund=false' ] : [];
 }
 
 /**
@@ -34,7 +30,7 @@ function getNpmInstallFlags( options ) {
  * @public
  *
  * @param {string} directory
- * @param {{ clean?: boolean, preferOffline?: boolean, minimal?: boolean }} [options]
+ * @param {{ clean?: boolean, minimal?: boolean }} [options]
  * @returns {Promise}
  */
 module.exports = async function npmUpdateDirectory( directory, options ) {

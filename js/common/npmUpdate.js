@@ -13,7 +13,7 @@ const npmUpdateDirectory = require( './npmUpdateDirectory' );
  * @public
  *
  * @param {string} repo - The repository name
- * @param {{ clean?: boolean, preferOffline?: boolean, minimal?: boolean }} [options]
+ * @param {{ clean?: boolean, minimal?: boolean }} [options]
  * @returns {Promise}
  */
 module.exports = async function( repo, options ) {
