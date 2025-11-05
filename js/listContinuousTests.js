@@ -36,7 +36,8 @@ const REPOS_EXCLUDED_FROM_LISTENER_ORDER_RANDOM = [
   'buoyancy',
   'buoyancy-basics',
   'fourier-making-waves', // see https://github.com/phetsims/fourier-making-waves/issues/240
-  'vector-addition' // see https://github.com/phetsims/vector-addition/issues/349
+  'vector-addition', // see https://github.com/phetsims/vector-addition/issues/349
+  'vector-addition-equations' // see https://github.com/phetsims/vector-addition/issues/349
 ];
 
 const REPOS_EXCLUDED_FROM_MIGRATION = [
