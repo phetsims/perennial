@@ -37,7 +37,11 @@ const REPOS_EXCLUDED_FROM_LISTENER_ORDER_RANDOM = [
   'buoyancy-basics',
   'fourier-making-waves', // see https://github.com/phetsims/fourier-making-waves/issues/240
   'vector-addition', // see https://github.com/phetsims/vector-addition/issues/349
-  'vector-addition-equations' // see https://github.com/phetsims/vector-addition/issues/349
+  'vector-addition-equations', // see https://github.com/phetsims/vector-addition/issues/349
+  'circuit-construction-kit-dc', // see https://github.com/phetsims/circuit-construction-kit-common/issues/1040
+  'circuit-construction-kit-ac', // see https://github.com/phetsims/circuit-construction-kit-common/issues/1040
+  'circuit-construction-kit-dc-virtual-lab', // see https://github.com/phetsims/circuit-construction-kit-common/issues/1040
+  'circuit-construction-kit-ac-virtual-lab' // see https://github.com/phetsims/circuit-construction-kit-common/issues/1040
 ];
 
 const REPOS_EXCLUDED_FROM_MIGRATION = [
