@@ -225,7 +225,8 @@ be flagged.
 ## #0a: Pull all branches of all repos
 
 One way to do this in perennial is `cd perennial; grunt sync --allBranches`. Otherwise the next step will
-show incorrect failures.
+show incorrect failures. On Windows, run with `--slowPull` because git bash sometimes has issues with many parallel
+pulls.
 
 ## #0b: Stop your transpiler
 
