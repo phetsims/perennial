@@ -47,8 +47,12 @@ module.exports = {
       'respones',
       'Respones',
 
-      // Avoid string literal in assert predicate, see https://github.com/phetsims/assert/issues/7
-      'assert( \'',
+      // Avoid string literal as the only arg in assert predicate, see https://github.com/phetsims/assert/issues/7
+      // This allows assert( 'key' in myObject ) and assert( 'hello' + 'world') but not assert( 'message' )
+      {
+        id: 'assert predicate string literal',
+        regex: /assert\(\s*'[^']+'\s*\)/
+      },
 
       // In ES6, extending object causes methods to be dropped
       { id: 'extends Object ', codeTokens: [ 'extends', 'Object' ] },
