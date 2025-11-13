@@ -106,8 +106,11 @@ class Maintenance {
    * .maintenance.json. Generally this should be done before any new maintenance release.
    */
   public static reset( keepCachedReleaseBranches = false ): void {
-    console.log( 'Make sure to check on the active PhET-iO Deploy Status on phet.colorado.edu to ensure that the ' +
-                 'right PhET-iO sims are included in this maintenance release.' );
+    console.log(
+      'PhET-iO simulations require maintaining older release branches. ' +
+      'If you are patching specific simulations, use `grunt release-branch-list` ' +
+      'in perennial to generate the list of branches that require patching.'
+    );
 
     const allReleaseBranches = [];
     if ( keepCachedReleaseBranches ) {
