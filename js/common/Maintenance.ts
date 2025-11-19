@@ -157,6 +157,7 @@ class Maintenance {
         console.log( `${releaseBranch.repo} ${releaseBranch.branch} (skipping due to filter)` );
       }
     }
+    console.log( 'Checks completed' );
   }
 
   /**
