@@ -7,9 +7,9 @@
  */
 import AxeBuilder from '@axe-core/playwright';
 
-import getOption, { getOptionIfProvided } from '../../../../perennial-alias/js/grunt/tasks/util/getOption.js';
-import getRepo from '../../../../perennial-alias/js/grunt/tasks/util/getRepo.js';
-import playwright from '../../../../perennial-alias/js/npm-dependencies/playwright.js';
+import getOption, { getOptionIfProvided } from './util/getOption.js';
+import getRepo from './util/getRepo.js';
+import playwright from '../../npm-dependencies/playwright.js';
 
 const { chromium } = playwright;
 

@@ -16,6 +16,7 @@
     "init-v1": "bash bin/v1/init.sh"
   },
   "devDependencies": {
+    "@axe-core/playwright": "~4.11.0",
     "@octokit/rest": "~16.33.1",
     "@stylistic/eslint-plugin": "~2.11.0",
     "@types/grunt": "~0.4.31",
