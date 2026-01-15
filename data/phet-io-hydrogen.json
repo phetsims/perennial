@@ -184,6 +184,10 @@
     "version": "1.0"
   },
   {
+    "sim": "number-pairs",
+    "version": "2.0"
+  },
+  {
     "sim": "ph-scale",
     "version": "1.6"
   },
