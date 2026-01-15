@@ -50,7 +50,6 @@ import puppeteerLoad from './puppeteerLoad.js';
 import simMetadata from './simMetadata.js';
 import simPhetioMetadata from './simPhetioMetadata.js';
 import withServer from './withServer.js';
-// @ts-expect-error
 import pLimit from 'p-limit';
 
 const MAINTENANCE_DIRECTORY = '../release-branches';
