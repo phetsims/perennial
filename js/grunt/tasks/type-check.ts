@@ -12,6 +12,7 @@
  * --pretty=false: Use pretty formatting (default is true)
  * --verbose: Provide extra output from tsc
  * --silent: Prevent all output, even if verbose or absolute flags are set
+ * --native: Use the native TypeScript compiler (tsgo) instead of tsc
  *
  * @author Sam Reid (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
@@ -41,6 +42,9 @@ if ( isOptionKeyProvided( 'verbose' ) ) {
 }
 if ( isOptionKeyProvided( 'silent' ) ) {
   checkCLIOptions.silent = true;
+}
+if ( isOptionKeyProvided( 'native' ) ) {
+  checkCLIOptions.native = true;
 }
 
 const defaultOptions = {

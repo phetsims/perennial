@@ -17,9 +17,13 @@ import fixEOL from '../common/fixEOL.js';
 import { PERENNIAL_ROOT } from '../common/perennialRepoUtils.js';
 
 const ALL_CONFIG_PATH = `${PERENNIAL_ROOT}/../chipper/dist/tsconfig/all/`;
-const tscCommand = `${PERENNIAL_ROOT}/node_modules/typescript/bin/tsc`;
+const TSC_COMMAND = `${PERENNIAL_ROOT}/node_modules/typescript/bin/tsc`;
+const NATIVE_TSC_COMMAND = `${PERENNIAL_ROOT}/node_modules/@typescript/native-preview/bin/tsgo`;
 
 export type CheckOptions = {
+
+  // Use the native TypeScript compiler (tsgo) instead of tsc.
+  native: boolean;
 
   // The repo to use as the entrypoint for type checking. The repo provided MUST have a tsconfig.json at the top level.
   repo: Repo;
@@ -55,6 +59,8 @@ const typeCheck = async ( providedOptions?: Partial<CheckOptions> ): Promise<boo
 
   const options: CheckOptions = _.assignIn( {
 
+    native: false,
+
     // Either repo or all must be provided. "all" will take precedent if both are provided
     repo: null,
     all: false,
@@ -88,9 +94,11 @@ const typeCheck = async ( providedOptions?: Partial<CheckOptions> ): Promise<boo
 
   const cwd = options.all ? ALL_CONFIG_PATH : repoEntryPoint;
 
+  const tscCommand = options.native ? NATIVE_TSC_COMMAND : TSC_COMMAND;
+
   const startTime = Date.now();
   if ( options.clean ) {
-    await tscClean( cwd );
+    await tscClean( cwd, tscCommand );
   }
 
   const tscArgs = [
@@ -116,15 +124,16 @@ function getRepoCWD( repo: string ): string {
   return `${PERENNIAL_ROOT}/../${repo}`;
 }
 
-async function tscClean( cwd: string ): Promise<void> {
+async function tscClean( cwd: string, tscCommand: string ): Promise<void> {
   const cleanResults = await runCommand( 'node', [ tscCommand, '-b', '--clean' ], cwd, false );
   if ( !cleanResults.success ) {
     throw new Error( `Checking failed to clean, ${cleanResults.stderr}` );
   }
 }
 
-export async function tscCleanRepo( repo: string ): Promise<void> {
-  return tscClean( getRepoCWD( repo ) );
+export async function tscCleanRepo( repo: string, native = false ): Promise<void> {
+  const tscCommand = native ? NATIVE_TSC_COMMAND : TSC_COMMAND;
+  return tscClean( getRepoCWD( repo ), tscCommand );
 }
 
 // Utility function to execute with inherited stdio.
