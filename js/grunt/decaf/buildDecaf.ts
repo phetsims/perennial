@@ -76,7 +76,7 @@ export default async function( project: string ): Promise<void> {
   }
 
   console.log( `awaiting preloads via puppeteer at url = ${url}` );
-  const preloadResources = await getPreloads( url );
+  const preloadResources = await getPreloads( url ) as string;
   console.log( `We have the preloads!\n${preloadResources}` );
 
   const packageFileRelative = `projects/${project}/package.json`;
