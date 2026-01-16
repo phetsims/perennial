@@ -1,13 +1,5 @@
 // Copyright 2017, University of Colorado Boulder
 
-const http = require( 'http' );
-const fs = require( 'fs' );
-const _ = require( 'lodash' );
-const winston = require( 'winston' );
-
-// Memory cache: key is the fullPath, value is { mimeType: string, data: Buffer }
-const cache = new Map();
-
 /**
  * A simple webserver that will serve the git root on a specific port for the duration of an async callback,
  * now with an in-memory cache to speed up repeated requests.
@@ -15,13 +7,32 @@ const cache = new Map();
  * @author Jonathan Olson <jonathan.olson@colorado.edu>
  * @author Michael Kauzmann (PhET Interactive Simulations)
  * @author Sam Reid (PhET Interactive Simulations)
+ */
+
+import affirm from '../browser-and-node/affirm.js';
+
+import _ from 'lodash';
+import fs from 'fs';
+import winston from 'winston';
+import http from 'http';
+
+// Memory cache: key is the fullPath, value is { mimeType: string, data: Buffer }
+const cache = new Map();
+
+type WithServerOptions = {
+  path?: string; // root path to serve, relative to process.cwd()
+  cache?: boolean; // whether to use the in-memory cache
+  port?: number; // port to listen on, 0 means find an open port
+};
+
+/**
  *
- * @param {function(number)} asyncCallback
- * @param {Object} [options]
- * @returns {Promise<*>} - Returns the result of the asyncCallback
+ * @param asyncCallback
+ * @param [options]
+ * @returns Returns the result of the asyncCallback
  *
  */
-module.exports = function( asyncCallback, options ) {
+export default function <T>( asyncCallback: ( port: number ) => T, options?: WithServerOptions ): Promise<T> {
 
   options = _.merge( {
     path: '../',
@@ -29,18 +40,20 @@ module.exports = function( asyncCallback, options ) {
     port: 0 // 0 means it will find an open port
   }, options );
 
+  affirm( options, 'Options are required for withServer' );
+
   return new Promise( ( resolve, reject ) => {
 
     const server = http.createServer( async ( req, res ) => {
-      const path = req.url.split( '?' )[ 0 ];
-      let url = req.url;
+      const path = req.url!.split( '?' )[ 0 ];
+      let url = req.url!;
       if ( path.endsWith( '/' ) ) {
         const newPath = path + 'index.html';
         url = url.replace( path, newPath );
       }
 
       // Trim query string
-      const tail = url.indexOf( '?' ) >= 0 ? url.substring( 0, url.indexOf( '?' ) ) : url;
+      const tail = url.includes( '?' ) ? url.substring( 0, url.indexOf( '?' ) ) : url;
       const fullPath = `${process.cwd()}/${options.path}${tail}`;
 
       // Mime types
@@ -59,7 +72,9 @@ module.exports = function( asyncCallback, options ) {
         json: 'application/json',
         ico: 'image/x-icon'
       };
-      const fileExtension = fullPath.split( '.' ).pop();
+      const fileExtension = fullPath.split( '.' ).pop()!;
+
+      // @ts-expect-error
       let mimeType = mimeTypes[ fileExtension ];
 
       if ( !mimeType && ( fullPath.includes( 'active-runnables' ) || fullPath.includes( 'active-repos' ) ) ) {
@@ -97,7 +112,8 @@ module.exports = function( asyncCallback, options ) {
     } );
 
     server.on( 'listening', async () => {
-      const port = server.address().port;
+      // @ts-expect-error
+      const port = server.address()!.port;
       winston.debug( 'info', `Server listening on port ${port}` );
 
       let result;
@@ -117,4 +133,4 @@ module.exports = function( asyncCallback, options ) {
 
     server.listen( options.port );
   } );
-};
+}
