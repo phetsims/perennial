@@ -102,11 +102,16 @@ ${publicAccessDirective}
 
         // Add an additional .htaccess to individual wrappers that are marked as public
         if ( subdir === 'wrappers' && phetioPackageBlock?.publicWrappers ) {
+          const publicWrapperContents = getPublicAccessDirective( '', 'publicWrappers' );
           for ( const publicWrapper of phetioPackageBlock.publicWrappers ) {
-
-            const publicWrapperContents = getPublicAccessDirective( '', 'publicWrappers' );
             const publicWrapperPath = `${fullSubdirPath}/${publicWrapper}`;
             fs.existsSync( publicWrapperPath ) && await writeFile( `${publicWrapperPath}/${htaccessFilename}`, publicWrapperContents );
+          }
+
+          const commonWrapperPaths = [ `${fullSubdirPath}/common/css`, `${fullSubdirPath}/common/js/codap` ];
+          for ( let i = 0; i < commonWrapperPaths.length; i++ ) {
+            const commonWrapperPath = commonWrapperPaths[ i ];
+            fs.existsSync( commonWrapperPath ) && await writeFile( `${commonWrapperPath}/${htaccessFilename}`, publicWrapperContents );
           }
         }
       }
