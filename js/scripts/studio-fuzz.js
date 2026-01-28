@@ -8,7 +8,7 @@
  */
 
 const puppeteerLoad = require( '../common/puppeteerLoad' );
-const withServer = require( '../common/withServer' );
+const withServer = require( '../common/withServer' ).default;
 const path = require( 'path' );
 
 ( async () => {

@@ -25,7 +25,7 @@
 // const _ = require( 'lodash' );
 const puppeteerLoad = require( '../../common/puppeteerLoad' );
 const Maintenance = require( '../../common/Maintenance' ).default;
-const withServer = require( '../../common/withServer' );
+const withServer = require( '../../common/withServer' ).default;
 const winston = require( 'winston' );
 const puppeteer = require( 'puppeteer' );
 const fs = require( 'fs' );
