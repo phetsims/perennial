@@ -85,3 +85,17 @@ declare class FlatQueue<T> {
 
   public shrink(): void;
 }
+
+// Minimal typing for numeric-1.2.6.js preload, as it is used in energy-skate-park. These few lines seemed preferable to @types
+declare type NumericSpline = {
+  x: number[];
+  yl: number[];
+  yr: number[];
+  kl: number[];
+  kr: number[];
+  diff(): NumericSpline;
+};
+declare var numeric: {
+  linspace( a: number, b: number, n?: number ): number[];
+  spline( x: ArrayLike<number>, y: ArrayLike<number>, k1?: number | string, kn?: number | string ): NumericSpline;
+};
