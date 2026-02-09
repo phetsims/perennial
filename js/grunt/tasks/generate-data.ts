@@ -25,6 +25,7 @@ const gitAdd = require( '../../common/gitAdd.js' );
 const gitCommit = require( '../../common/gitCommit.js' );
 const gitIsClean = require( '../../common/gitIsClean.js' );
 const gitPush = require( '../../common/gitPush.js' );
+const gitPull = require( '../../common/gitPull.js' );
 const assert = require( 'assert' );
 const fs = require( 'fs' );
 const grunt = require( 'grunt' );
@@ -84,6 +85,15 @@ async function generateData(): Promise<void> {
     winston.info( 'Changes to data files detected, will push' );
     await gitCommit( 'perennial', 'Automated update of perennial data files' );
     await gitPush( 'perennial', 'main' );
+
+    const perennialAliasClean = await gitIsClean( 'perennial-alias' );
+    if ( perennialAliasClean ) {
+      await gitPull( 'perennial-alias', 'main' );
+    }
+    else {
+      winston.info( 'perennial-alias has changes, skipping pull' );
+    }
+
   }
   else {
     winston.info( 'No changes detected' );
