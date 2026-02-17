@@ -3,7 +3,7 @@
 /**
  * git rev-list -1 --before="{{TIMESTAMP}}" {{BRANCH}}
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const execute = require( './execute' ).default;

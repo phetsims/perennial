@@ -3,7 +3,7 @@
 /**
  * Deploys a production version after incrementing the test version number.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const SimVersion = require( '../browser-and-node/SimVersion' ).default;

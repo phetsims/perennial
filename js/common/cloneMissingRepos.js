@@ -4,7 +4,7 @@
  * Clones missing repositories
  * Expects to be run with CWD in the top level of a repo.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const cloneRepo = require( './cloneRepo' );

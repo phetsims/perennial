@@ -3,7 +3,7 @@
 /**
  * Creates an issue in a phetsims github repository
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const buildLocal = require( './buildLocal' );

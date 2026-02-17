@@ -3,7 +3,7 @@
 /**
  * The repos (keys) from dependencies.json of a repository
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 

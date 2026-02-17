@@ -3,7 +3,7 @@
 /**
  * Returns a list of repositories based on data in perennial/data.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const fs = require( 'fs' );

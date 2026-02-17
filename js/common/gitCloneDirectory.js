@@ -3,7 +3,7 @@
 /**
  * git clones one of our repositories
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const winston = require( 'winston' );

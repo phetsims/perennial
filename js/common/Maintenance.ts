@@ -3,7 +3,7 @@
 /**
  * The main persistent state-bearing object for maintenance releases. Can be loaded from or saved to a dedicated file.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 import assert from 'assert';

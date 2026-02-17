@@ -34,7 +34,7 @@
  * 1.5.0-dev.1          - Example of a dev build that would be from main.
  * 1.5.0-sonification.1 - Example of a one-off build (which would be from the branch 'sonification')
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 // Include @param and @returns in the JSDoc comments for JSDoc api documentation

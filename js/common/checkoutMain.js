@@ -3,7 +3,7 @@
 /**
  * Checks out main for a repository and all of its dependencies.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const getDependencies = require( './getDependencies' );

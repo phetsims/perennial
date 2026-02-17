@@ -3,7 +3,7 @@
 /**
  * Represents a specific patch being applied to a repository for maintenance purposes.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 type PatchSerialized = {

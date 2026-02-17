@@ -3,7 +3,7 @@
 /**
  * Provides the SHA of the last shared ancestor commit between two targets (branches/SHAs)
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const execute = require( './execute' ).default;

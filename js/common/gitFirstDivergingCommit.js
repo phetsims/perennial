@@ -3,7 +3,7 @@
 /**
  * Provides the SHA of the first SHA from a target that diverges from the second target
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const execute = require( './execute' ).default;

@@ -4,7 +4,7 @@
  * Runs `grunt transpile --all` in current version of chipper. Will hard fail if on old shas that predate this task
  * creation in 10/2024.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  * @author Sam Reid (PhET Interactive Simulations)
  */
 

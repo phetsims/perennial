@@ -3,7 +3,7 @@
 /**
  * Prompts the user to confirm a message (or enter a specific string or message).
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const readline = require( 'readline' );

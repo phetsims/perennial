@@ -3,7 +3,7 @@
 /**
  * Returns a list of simulation repos that have been published (does NOT include prototypes)
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const simMetadata = require( './simMetadata' ).default;

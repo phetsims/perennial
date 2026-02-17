@@ -3,7 +3,7 @@
 /**
  * Updates the top-level dependencies.json, given the result of a build in the build directory.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const ChipperVersion = require( './ChipperVersion' );

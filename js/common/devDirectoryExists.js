@@ -3,7 +3,7 @@
 /**
  * Checks to see whether a directory on the dev server exists.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 

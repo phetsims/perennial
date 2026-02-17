@@ -3,7 +3,7 @@
 /**
  * git rev-parse
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const execute = require( './execute' ).default;

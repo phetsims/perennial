@@ -3,7 +3,7 @@
 /**
  * Lints and typechecks, reporting any errors
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const execute = require( '../common/execute' ).default;

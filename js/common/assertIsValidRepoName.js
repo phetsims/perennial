@@ -3,7 +3,7 @@
 /**
  * Fails with an assertion if the string is not a valid repo name. See https://github.com/phetsims/chipper/issues/1034.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const assert = require( 'assert' );

@@ -13,7 +13,7 @@
  * But we decided to change it to a manual step with a daily fallback, see
  * https://github.com/phetsims/perennial/issues/213
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 

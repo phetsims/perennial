@@ -3,7 +3,7 @@
 /**
  * Rebases and pushes repos that are ahead of origin, with consolidated status/error output.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const execute = require( '../common/execute' ).default;

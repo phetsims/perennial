@@ -3,7 +3,7 @@
 /**
  * Whether there is a remote branch for a given repo.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const execute = require( './execute' ).default;

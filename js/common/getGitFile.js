@@ -3,7 +3,7 @@
 /**
  * Gets the contents of a file at a specific git branch/SHA/object
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const execute = require( './execute' ).default;

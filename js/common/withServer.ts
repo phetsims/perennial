@@ -4,7 +4,7 @@
  * A simple webserver that will serve the git root on a specific port for the duration of an async callback,
  * now with an in-memory cache to speed up repeated requests.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  * @author Sam Reid (PhET Interactive Simulations)
  */

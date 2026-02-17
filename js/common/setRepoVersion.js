@@ -3,7 +3,7 @@
 /**
  * Sets the version of the current checked-in repo's package.json, creating a commit with the change
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const gitAdd = require( './gitAdd' );

@@ -3,7 +3,7 @@
 /**
  * git checkout, for SHAs only, but will fetch if the sha doesn't exist locally
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const gitCheckout = require( './gitCheckout' );

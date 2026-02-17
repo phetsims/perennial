@@ -4,7 +4,7 @@
  * Unit tests, run with `npm run test-long` at the top-level of perennial.
  * NOTE! This task will change shas in many repos. Do not run in parallel and do not run outside of main.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 

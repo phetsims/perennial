@@ -17,7 +17,7 @@
  * cd perennial;
  * sage run js/grunt/tasks/sync.ts --allBranches
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 // Used for evaluating browser-side code in puppeteer tests.

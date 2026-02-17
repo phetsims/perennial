@@ -3,7 +3,7 @@
 /**
  * Copies a directory (recursively) to another location
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const ncp = require( 'ncp' );

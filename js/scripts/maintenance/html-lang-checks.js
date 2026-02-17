@@ -9,7 +9,7 @@
  * cd perennial;
  * sage run js/grunt/tasks/sync.ts --allBranches
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const puppeteerLoad = require( '../../common/puppeteerLoad' );

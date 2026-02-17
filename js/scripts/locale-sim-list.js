@@ -3,7 +3,7 @@
 /**
  * Prints out a report (with links) for active sims/translation for each locale
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const localeInfo = require( '../../../chipper/js/data/localeInfo' );

@@ -4,7 +4,7 @@
  * git pull the specified path. Needs to work for repos relative to this copy of
  * perennial, AND in ../release-branches/REPO-VERSION/REPO/
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const execute = require( './execute' ).default;

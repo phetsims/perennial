@@ -3,7 +3,7 @@
 /**
  * Checks out a snapshot of a repo (and its dependencies) for a given timestamp/branch.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const checkoutDependencies = require( './checkoutDependencies' );

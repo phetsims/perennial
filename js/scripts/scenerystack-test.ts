@@ -8,7 +8,7 @@
  * 1. Use the scenerystack method of checking out and building scenerystack.
  * 2. Clone a bunch of demo/template repos, point them to the local scenerystack copy, and test them.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 import { spawn } from 'child_process';

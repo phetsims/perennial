@@ -3,7 +3,7 @@
 /**
  * Uses puppeteer to load a page, evaluate some Javascript, and then returns the result
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const puppeteerLoad = require( './puppeteerLoad' );

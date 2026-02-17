@@ -3,7 +3,7 @@
 /**
  * Checks whether access to the dev server is available (usually unavailable if not on VPN or on campus)
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const devSsh = require( './devSsh' );

@@ -3,7 +3,7 @@
 /**
  * Gets a map of branch names (from the origin) to their remote SHAs
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const execute = require( './execute' ).default;

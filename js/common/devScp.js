@@ -3,7 +3,7 @@
 /**
  * Transfers a file (or directory recursively) to the dev server
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const buildLocal = require( './buildLocal' );

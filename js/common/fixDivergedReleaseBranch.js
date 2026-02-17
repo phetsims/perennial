@@ -7,7 +7,7 @@
  * named 'gravity-and-orbits-1.6', it SHOULD point at X. If it doesn't, we'll change it to point at X. If we change it,
  * we also want to not have the old SHAs garbage collected, so we create 'gravity-and-orbits-1.6-old' to point to it.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const execute = require( './execute' ).default;

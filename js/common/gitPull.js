@@ -3,7 +3,7 @@
 /**
  * git pull with an assumption that your cwd is in the top of a repo, like perennial/ or chipper/.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const gitPullDirectory = require( './gitPullDirectory' );

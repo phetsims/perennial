@@ -3,7 +3,7 @@
 /**
  * Returns a list of repositories (that can be run) actively handled by tooling for PhET
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const getRepoList = require( './getRepoList' );

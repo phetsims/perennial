@@ -3,7 +3,7 @@
 /**
  * Sends a request to the build server.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const buildLocal = require( './buildLocal' );

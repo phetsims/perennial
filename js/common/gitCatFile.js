@@ -4,7 +4,7 @@
  * retrieve the contents of a file without changing the git tree via checkouts.
  *
  * @author Michael Kauzmann (PhET Interactive Simulations)
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const assert = require( 'assert' );

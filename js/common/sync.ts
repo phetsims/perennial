@@ -17,7 +17,7 @@
  * - starting a server: devs have a variety of ways to host the PhET codebase locally, this goes beyond the scope of
  *   this file.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 

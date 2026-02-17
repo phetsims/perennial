@@ -4,7 +4,7 @@
  * Continuously running Studio fuzzing for testing
  *
  * @author Chris Klusendorf (PhET Interactive Simulations)
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const puppeteerLoad = require( '../common/puppeteerLoad' );

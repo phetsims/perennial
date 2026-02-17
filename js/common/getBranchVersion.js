@@ -3,7 +3,7 @@
 /**
  * Returns the version of the repo's package.json on a given branch
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const SimVersion = require( '../browser-and-node/SimVersion' ).default;

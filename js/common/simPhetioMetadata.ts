@@ -3,7 +3,7 @@
 /**
  * Returns phet-io metadata from the production website
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 import axios from 'axios';

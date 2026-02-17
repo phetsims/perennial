@@ -3,7 +3,7 @@
 /**
  * For `grunt create-release`, see Gruntfile for details
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const SimVersion = require( '../browser-and-node/SimVersion' ).default;

@@ -3,7 +3,7 @@
 /**
  * Checks whether we are somewhere that would have access to phet-server2.int.colorado.edu (implies access to bayes).
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const dns = require( 'dns' );

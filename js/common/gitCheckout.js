@@ -3,7 +3,7 @@
 /**
  * git checkout
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const gitCheckoutDirectory = require( './gitCheckoutDirectory' );

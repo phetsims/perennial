@@ -2,7 +2,7 @@
 
 /**
  * Updates the gh-pages branches for various repos, including building of dot/kite/scenery
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 import winston from 'winston';

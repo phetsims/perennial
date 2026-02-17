@@ -6,7 +6,7 @@
 # and all other repos to be siblings of perennial.
 #
 # Author: Chris Malley (PixelZoom, Inc.)
-# Author: Jonathan Olson <jonathan.olson@colorado.edu>
+# Author: Jonathan Olson (PhET Interactive Simulations)
 #
 #=======================================================================================
 

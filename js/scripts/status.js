@@ -3,7 +3,7 @@
 /**
  * Checks status for repos, and prints it out to the console
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const getActiveRepos = require( '../common/getActiveRepos' );

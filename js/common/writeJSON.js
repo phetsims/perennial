@@ -3,7 +3,7 @@
 /**
  * Handling for writing JSON to a file.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const fs = require( 'fs' );

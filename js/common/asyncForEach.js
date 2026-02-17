@@ -3,7 +3,7 @@
 /**
  * Executes async functions on each element in an array.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 /**

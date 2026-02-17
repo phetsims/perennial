@@ -3,7 +3,7 @@
 /**
  * Whether the current branch's remote SHA differs from the current SHA
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const assert = require( 'assert' );

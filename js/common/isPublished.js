@@ -3,7 +3,7 @@
 /**
  * Returns whether a repo is published (not a prototype)
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const gitCheckout = require( './gitCheckout' );

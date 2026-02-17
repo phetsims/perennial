@@ -3,7 +3,7 @@
 /**
  * Asynchronously checks whether a repo is not up-to-date with origin/main
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const getRemoteBranchSHAs = require( './getRemoteBranchSHAs' );

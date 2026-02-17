@@ -3,7 +3,7 @@
 /**
  * Returns an inverse string map (stringMap[ stringKey ][ locale ]) for all strings in all dependencies for a given repo
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const getDependencyRepos = require( '../common/getDependencyRepos' );

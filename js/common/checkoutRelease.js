@@ -3,7 +3,7 @@
 /**
  * Checks out the latest deployed production release branch (and dependencies) for a repository.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const checkoutTarget = require( './checkoutTarget' );

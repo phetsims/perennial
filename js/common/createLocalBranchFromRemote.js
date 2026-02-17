@@ -5,7 +5,7 @@
  * This script will start and end on the same, current branch the repo is on, but checkouts the `branch` param while
  * running.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  * @author Sam Reid (PhET Interactive Simulations)
  */

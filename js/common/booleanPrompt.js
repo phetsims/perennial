@@ -3,7 +3,7 @@
 /**
  * Gives a yes-or-no prompt that the user should respond to.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const prompt = require( './prompt' );

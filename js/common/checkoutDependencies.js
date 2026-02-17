@@ -3,7 +3,7 @@
 /**
  * Checks out the given dependencies (for a given repository) without modifying the given repository.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const gitFetchCheckout = require( './gitFetchCheckout' );

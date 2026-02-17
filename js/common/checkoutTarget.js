@@ -3,7 +3,7 @@
 /**
  * Checks out a SHA/branch for a repository, and also checks out all of its dependencies.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const checkoutDependencies = require( './checkoutDependencies' );

@@ -3,7 +3,7 @@
 /**
  * git cherry-pick (but if it fails, it will back out of the cherry-pick)
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const execute = require( './execute' ).default;

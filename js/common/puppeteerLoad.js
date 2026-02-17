@@ -3,7 +3,7 @@
 /**
  * Uses puppeteer to see whether a page loads without an error. Throws errors it receives
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 

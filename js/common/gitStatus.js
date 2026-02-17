@@ -3,7 +3,7 @@
 /**
  * Returns a combination of status information for the repository's git status
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const execute = require( './execute' ).default;

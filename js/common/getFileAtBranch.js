@@ -3,7 +3,7 @@
 /**
  * Gets the dependencies.json from a given branch of a repo
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const getGitFile = require( './getGitFile' );

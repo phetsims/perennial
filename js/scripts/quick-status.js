@@ -4,7 +4,7 @@
  * A fast-running status check. NOTE: Only checks the local status, does NOT check the server. Use the full status for
  * that if needed.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const execute = require( '../common/execute' ).default;

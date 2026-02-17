@@ -3,7 +3,7 @@
 /**
  * Returns the list of repos listed in active-repos that are not checked out.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const getRepoList = require( './getRepoList' );

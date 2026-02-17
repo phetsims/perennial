@@ -3,7 +3,7 @@
 /**
  * Whether a git commit is an ancestor of another.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const execute = require( './execute' ).default;

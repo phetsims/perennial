@@ -3,7 +3,7 @@
 /**
  * Ensures that a simulation is marked as published in its package.json
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const gitAdd = require( './gitAdd' );

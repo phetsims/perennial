@@ -3,7 +3,7 @@
 /**
  * Clones the given repo name into the working copy
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const gitCloneDirectory = require( './gitCloneDirectory' );

@@ -3,7 +3,7 @@
 /**
  * For testing for https://github.com/phetsims/joist/issues/963.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const Maintenance = require( '../../common/Maintenance' ).default;

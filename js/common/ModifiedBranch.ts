@@ -3,7 +3,7 @@
 /**
  * Represents a modified simulation release branch, with either pending or applied (and not published) changes.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 

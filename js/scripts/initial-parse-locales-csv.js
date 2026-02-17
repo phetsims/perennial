@@ -8,7 +8,7 @@ const filePath = process.argv[ 2 ];
 /**
  * Read in the CSV export from the locales spreadsheet ("Final(dev)" format) and parse it into a localeJSON format.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const parseCSV = ( filePath, callback ) => {

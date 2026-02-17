@@ -3,7 +3,7 @@
 /**
  * Checks whether a sim branch's dependency has an ancestor commit in its tree.
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const getDependencies = require( './getDependencies' );

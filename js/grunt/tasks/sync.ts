@@ -19,7 +19,7 @@
  *
  * NOTE: This will CHANGE THE CURRENT WORKING DIRECTORY temporarily while this is running
  *
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 

@@ -4,7 +4,7 @@
  * Sets the supported brands of the current checked-in repo's package.json, creating a commit with the change
  *
  * @author Michael Kauzmann (PhET Interactive Simulations)
- * @author Jonathan Olson <jonathan.olson@colorado.edu>
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 const gitAdd = require( './gitAdd' );
