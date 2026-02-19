@@ -54,7 +54,7 @@ shouldn't be tested as such. Any sim in this list will not have its state wrappe
 **voicing (auto-generated)** - is the list of all simulations that have the voicing feature. This is noted in package
 json "phetFeatures.supportsVoicing".
 
-**website-git-flow-repos (manually maintained)** - List of website repos that require special management for releasing 
-the phet website. All repos in this list MUST be in active-website-repos.
+**website-deployed-repos (manually maintained)** - List of website repos that require special management for releasing 
+the phet website. These repos are versioned separately to support website deploys. All repos in this list MUST be in active-website-repos.
 
 **wrappers (manually maintained)** - list of PhET-iO "wrapper suite" wrappers that are published with every PhET-iO build.
