@@ -13,7 +13,7 @@ const execute = require( './execute' ).default;
  * @public
  *
  * @param {string} repo - The repository name
- * @returns {Promise} - Resolves to the branch name (or the empty string if not on a branch)
+ * @returns {Promise<string>} - Resolves to the branch name (or the empty string if not on a branch)
  */
 module.exports = function( repo ) {
   return execute( 'git', [ 'symbolic-ref', '-q', 'HEAD' ], `../${repo}` ).then( stdout => stdout.trim().replace( 'refs/heads/', '' ) );
