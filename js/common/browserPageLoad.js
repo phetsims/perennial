@@ -26,7 +26,7 @@ const assert = require( 'assert' );
  *
  * Rejects if encountering an error loading the page OR (with option provided within the puppeteer page itself).
  *
- * @param {Browser} browserCreator - either `puppeteer` or a specific Browser from playright
+ * @param {Browser} browserCreator - either `puppeteer` or a specific Browser from playwright
  * @param {string} url
  * @param {Object} [options]
  * @returns {Promise.<null|*>} - The eval result/null
