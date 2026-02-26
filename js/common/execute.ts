@@ -115,13 +115,13 @@ function execute( cmd: string, args: string[], cwd: string, providedOptions?: Ex
 
     childProcess.stderr && childProcess.stderr.on( 'data', data => {
       stderr += data;
-      options.onStdout && options.onStdout( data.toString() );
+      options.onStderr && options.onStderr( data.toString() );
 
       winston.debug( `stderr: ${data}` );
     } );
     childProcess.stdout && childProcess.stdout.on( 'data', data => {
       stdout += data;
-      options.onStderr && options.onStderr( data.toString() );
+      options.onStdout && options.onStdout( data.toString() );
 
       winston.debug( `stdout: ${data}` );
     } );
