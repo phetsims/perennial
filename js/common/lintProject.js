@@ -21,5 +21,6 @@ const winston = require( 'winston' );
 module.exports = async function( repo ) {
   winston.info( `linting ${repo}` );
 
-  return execute( gruntCommand, [ 'lint-project' ], `../${repo}` );
+  // Lint from chipper in case sim repo doesn't have node_modules, see https://github.com/phetsims/totality/issues/27
+  return execute( gruntCommand, [ 'lint-project', `--repo=${repo}` ], '../chipper' );
 };
