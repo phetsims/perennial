@@ -14,14 +14,23 @@ const getActiveRepos = require( './common/getActiveRepos' );
 const getRepoList = require( './common/getRepoList' );
 const fs = require( 'fs' );
 
-const repos = getActiveRepos();
-const phetioRepos = getRepoList( 'phet-io' );
-const phetioAPIStableRepos = getRepoList( 'phet-io-api-stable' );
-const runnableRepos = getRepoList( 'active-runnables' );
-const interactiveDescriptionRepos = getRepoList( 'interactive-description' );
+// --importedRepos=repo1,repo2,... restricts all repo lists to this set (for totality monorepo).
+// Default behavior (no flag) uses the full active-repos list as before.
+const importedReposArg = process.argv.find( arg => arg.startsWith( '--importedRepos=' ) );
+const importedRepoSet = importedReposArg
+  ? new Set( importedReposArg.slice( '--importedRepos='.length ).split( ',' ) )
+  : null;
+
+const filterToImported = list => importedRepoSet ? list.filter( r => importedRepoSet.has( r ) ) : list;
+
+const repos = filterToImported( getActiveRepos() );
+const phetioRepos = filterToImported( getRepoList( 'phet-io' ) );
+const phetioAPIStableRepos = filterToImported( getRepoList( 'phet-io-api-stable' ) );
+const runnableRepos = filterToImported( getRepoList( 'active-runnables' ) );
+const interactiveDescriptionRepos = filterToImported( getRepoList( 'interactive-description' ) );
 const phetioNoUnsupportedRepos = getRepoList( 'phet-io-state-unsupported' );
-const unitTestRepos = getRepoList( 'unit-tests' );
-const voicingRepos = getRepoList( 'voicing' );
+const unitTestRepos = filterToImported( getRepoList( 'unit-tests' ) );
+const voicingRepos = filterToImported( getRepoList( 'voicing' ) );
 const phetioWrapperSuiteWrappers = getRepoList( 'wrappers' );
 const phetioHydrogenSims = JSON.parse( fs.readFileSync( `${__dirname}/../data/phet-io-hydrogen.json`, 'utf8' ).trim() );
 
@@ -140,13 +149,13 @@ const tests = [];
 // lints
 repos.forEach( repo => {
   // Support eslint.config.js and eslint.config.mjs
-  if ( fs.readdirSync( `../${repo}` ).some( path => path.includes( 'eslint.config.' ) ) ) {
-    tests.push( {
-      test: [ repo, 'lint' ],
-      type: 'lint',
-      repo: repo,
-      priority: 8
-    } );
+    if ( fs.readdirSync( `../${repo}` ).some( path => path.includes( 'eslint.config.' ) ) ) {
+      tests.push( {
+        test: [ repo, 'lint' ],
+        type: 'lint',
+        repo: repo,
+        priority: 8
+      } );
   }
 } );
 
