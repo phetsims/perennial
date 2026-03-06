@@ -53,6 +53,6 @@ module.exports = async function( repo, version, message ) {
     if ( fs.existsSync( packageLockFile ) ) {
       await gitAdd( repo, 'package-lock.json' );
     }
-    await gitCommit( repo, `Bumping version to ${version.toString()}${message ? `, ${message}` : ''}` );
+    await gitCommit( repo, `Bumping ${repo} version to ${version.toString()}${message ? `, ${message}` : ''}` );
   }
 };

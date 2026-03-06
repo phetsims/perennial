@@ -21,6 +21,7 @@ const getDependencyRepos = require( '../common/getDependencyRepos' );
 const gitPush = require( '../common/gitPush' );
 const gitRevParse = require( '../common/gitRevParse' );
 const lintProject = require( '../common/lintProject' );
+const isTotality = require( '../common/isTotality' );
 const npmUpdate = require( '../common/npmUpdate' );
 const setRepoVersion = require( '../common/setRepoVersion' );
 const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
@@ -114,8 +115,10 @@ module.exports = async function dev( repo, brands, noninteractive, branch, messa
     throw new Error( `Aborted ${testType} deploy` );
   }
 
-  // Make sure our correct npm dependencies are set
-  await npmUpdate( repo );
+  // Make sure our correct npm dependencies are set. In the monorepo, you can run without node_modules in the sim repo, see https://github.com/phetsims/totality/issues/27
+  if ( !isTotality ) {
+    await npmUpdate( repo );
+  }
   await npmUpdate( 'chipper' );
   await npmUpdate( 'perennial-alias' );
 

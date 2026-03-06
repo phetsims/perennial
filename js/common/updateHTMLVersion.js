@@ -42,6 +42,6 @@ module.exports = async function( repo ) {
     await gitAdd( repo, `${repo}-tests.html` );
   }
   if ( !( await gitIsClean( repo ) ) ) {
-    await gitCommit( repo, `Bumping dev${packageObject.phet.generatedUnitTests ? '/test' : ''} HTML with new version` );
+    await gitCommit( repo, `Bumping ${repo} dev${packageObject.phet.generatedUnitTests ? '/test' : ''} HTML with new version` );
   }
 };
