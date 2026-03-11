@@ -39,6 +39,8 @@ import gruntCommand from './gruntCommand.js';
 import ModifiedBranch from './ModifiedBranch.js';
 import Patch from './Patch.js';
 import ReleaseBranch from './ReleaseBranch.js';
+import gitFirstDivergingCommit from './gitFirstDivergingCommit.js';
+import gitTimestamp from './gitTimestamp.js';
 
 // constants
 const MAINTENANCE_FILE = '.maintenance.json';
@@ -192,8 +194,11 @@ class Maintenance {
 
   /**
    * Displays a listing of the current maintenance status.
+   *
+   * If timestamp:true is provided, it will include timestamps for when the branches diverged from main, and sort by those timestamps.
+   * This is useful for prioritizing which branches to patch first.
    */
-  public static async list(): Promise<void> {
+  public static async list( options?: { timestamp?: boolean } ): Promise<void> {
     const maintenance = Maintenance.load();
 
     // At the top so that the important items are right above your cursor after calling the function
@@ -226,6 +231,7 @@ class Maintenance {
     }
 
     console.log( '\nMaintenance Patches in MR:', maintenance.patches.length === 0 ? 'None' : '' );
+
     for ( const patch of maintenance.patches ) {
       const count = maintenance.patches.indexOf( patch ) + 1;
       const indexAndSpacing = `${count}. ` + ( count > 9 ? '' : ' ' );
@@ -234,12 +240,40 @@ class Maintenance {
       for ( const sha of patch.shas ) {
         console.log( `      ${sha}` );
       }
-      for ( const modifiedBranch of maintenance.modifiedBranches ) {
+
+      let modifiedBranches = maintenance.modifiedBranches;
+      if ( options?.timestamp ) {
+        // Do a parallel update of cached timestamps on the modified branches, so that we can sort by them.
+        await Promise.all( modifiedBranches.map( modifiedBranch => {
+          return ( async () => {
+            if ( !modifiedBranch.releaseBranch.cachedTimestampString ) {
+              const divergingCommit = await gitFirstDivergingCommit( modifiedBranch.repo, modifiedBranch.branch, 'main' );
+              const timestamp = await gitTimestamp( modifiedBranch.repo, divergingCommit );
+              const timestampString = new Date( timestamp ).toISOString().split( 'T' )[ 0 ];
+              // eslint-disable-next-line require-atomic-updates
+              modifiedBranch.releaseBranch.cachedTimestampString = timestampString;
+            }
+          } )();
+        } ) );
+
+        modifiedBranches = _.sortBy( modifiedBranches, modifiedBranch => {
+          return modifiedBranch.releaseBranch.cachedTimestampString;
+        } );
+      }
+
+      for ( const modifiedBranch of modifiedBranches ) {
         if ( modifiedBranch.neededPatches.includes( patch ) ) {
-          console.log( `        ${modifiedBranch.repo} ${modifiedBranch.branch} ${modifiedBranch.brands.join( ',' )}` );
+          const timestampPrefix = options?.timestamp ? `${modifiedBranch.releaseBranch.cachedTimestampString} ` : '';
+          console.log( `        ${timestampPrefix}${modifiedBranch.repo} ${modifiedBranch.branch} ${modifiedBranch.brands.join( ',' )}` );
         }
       }
     }
+
+    console.log( '\n(list complete)' );
+  }
+
+  public static async timestampList(): Promise<void> {
+    await this.list( { timestamp: true } );
   }
 
   /**

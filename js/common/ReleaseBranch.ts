@@ -62,6 +62,10 @@ type ReleaseBranchSerialized = {
 };
 
 class ReleaseBranch implements ReleaseBranchSerialized {
+
+  // Cache for the timestamp string of the diverging commit, since it can be expensive to calculate and is used in multiple places.
+  public cachedTimestampString: string | null = null;
+
   public constructor( public readonly repo: string, public readonly branch: string, public readonly brands: string[],
                       public readonly isReleased: boolean ) {
     assert( Array.isArray( brands ) );
