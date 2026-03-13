@@ -26,6 +26,11 @@ fi
 COMMAND="$1"
 shift
 
+if [[ "$COMMAND" == "repl" ]]; then
+  exec "$TSX_EXEC"
+  exit 0
+fi
+
 if [[ "$COMMAND" != "run" ]]; then
   echo "Command not supported: $COMMAND" >&2
   exit 1
