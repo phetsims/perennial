@@ -4,6 +4,10 @@
 # Bash script to run node/tsx code.
 #
 # Supported commands:
+#
+# * sage repl
+#     - Open a node command prompt that is compatible with TS
+#
 # * sage run [--node-options] <script-file> [args]
 #     - Run a "*.ts", "*.js", "*.mjs", "*.cjs" or file with tsx.
 #     - You can omit the extension and it will find the script in the above order, starting with *.ts
@@ -16,13 +20,13 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 TSX_EXEC="$SCRIPT_DIR/../node_modules/.bin/tsx"
 
-# Check if command was provided (only "run" supported now) "sage" is $0
+# Check if command was provided "sage" is $0
 if [[ -z "$1" ]]; then
   echo "No command specified" >&2
   exit 1
 fi
 
-# Handle "run"
+# Handle "run" or "repl"
 COMMAND="$1"
 shift
 
