@@ -57,6 +57,20 @@ const REPOS_EXCLUDED_FROM_MIGRATION = [
   'number-pairs'
 ];
 
+// XHTML list based on usage metrics: these are the sims with the most known XHTML usage in the wild.
+// We only test a subset to avoid adding too much time to each column.
+const XHTML_FUZZ_REPOS = [
+  'reactants-products-and-leftovers',
+  'states-of-matter',
+  'molarity',
+  'gravity-force-lab',
+  'gravity-force-lab-basics',
+  'build-a-molecule',
+  'gravity-and-orbits',
+  'my-solar-system',
+  'natural-selection'
+];
+
 /**
  * {Array.<Object>} test
  * {string} type
@@ -241,6 +255,32 @@ runnableRepos.forEach( repo => {
     brand: 'phet',
     buildDependencies: [ repo ]
   } );
+
+  if ( XHTML_FUZZ_REPOS.includes( repo ) ) {
+    tests.push( {
+      test: [ repo, 'fuzz', 'xhtml', 'built' ],
+      type: 'sim-test',
+      url: `${repo}/build/phet/xhtml/${repo}_all.xhtml`,
+      queryParameters: 'fuzz',
+      testQueryParameters: 'duration=80000',
+      priority: 2,
+      brand: 'phet',
+      buildDependencies: [ repo ]
+    } );
+
+    if ( phetioRepos.includes( repo ) ) {
+      tests.push( {
+        test: [ repo, 'fuzz', 'xhtml', 'phet-io', 'built' ],
+        type: 'sim-test',
+        url: `${repo}/build/phet-io/xhtml/${repo}_all_phet-io.xhtml`,
+        queryParameters: 'fuzz&phetioStandalone',
+        testQueryParameters: 'duration=80000',
+        priority: 2,
+        brand: 'phet-io',
+        buildDependencies: [ repo ]
+      } );
+    }
+  }
 
   if ( phetioRepos.includes( repo ) ) {
     tests.push( {
