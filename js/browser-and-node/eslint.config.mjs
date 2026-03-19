@@ -10,8 +10,6 @@ import browserAndNodeEslintConfig from '../eslint/config/browser-and-node.eslint
 export default [
   ...browserAndNodeEslintConfig,
   {
-    rules: {
-      'phet/default-export-class-should-register-namespace': 'off'
-    }
+    rules: {}
   }
 ];

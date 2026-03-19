@@ -9,7 +9,6 @@ import badSimText from '../../phet-rules/bad-sim-text.js';
 import badText from '../../phet-rules/bad-text.js';
 import badTypescriptText from '../../phet-rules/bad-typescript-text.js';
 import copyright from '../../phet-rules/copyright.js';
-import defaultExportClassShouldRegisterNamespace from '../../phet-rules/default-export-class-should-register-namespace.js';
 import defaultExportMatchFilename from '../../phet-rules/default-export-match-filename.js';
 import defaultImportMatchFilename from '../../phet-rules/default-import-match-filename.js';
 import documentationBeforeImports from '../../phet-rules/documentation-before-imports.js';
@@ -100,9 +99,6 @@ export default {
 
     // a default import variable name should be the same as the filename
     'default-import-match-filename': defaultImportMatchFilename,
-
-    // When the default export of a file is a class, it should have a namespace register call
-    'default-export-class-should-register-namespace': defaultExportClassShouldRegisterNamespace,
 
     // Importing the view from the model, uh oh. TODO: This is still in discussion, numerous repos opt out, see: https://github.com/phetsims/chipper/issues/1385
     'no-view-imported-from-model': noViewImportedFromModel,

@@ -929,9 +929,6 @@ export default {
   // a default import variable name should be the same as the filename
   'phet/default-import-match-filename': 'error',
 
-  // When the default export of a file is a class, it should have a namespace register call
-  'phet/default-export-class-should-register-namespace': 'error',
-
   // Importing the view from the model, uh oh. TODO: This is still in discussion, numerous repos opt out, see: https://github.com/phetsims/chipper/issues/1385
   'phet/no-view-imported-from-model': 'error',
 
