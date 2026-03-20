@@ -21,13 +21,13 @@ nuclear-decay-common
 number-line-common
 number-suite-common
 perennial-alias
-phetcommon
 phet-core
 phet-io
+phetcommon
 phetmarks
 query-string-machine
-scenery-phet
 scenery
+scenery-phet
 sherpa
 shred
 soccer-common

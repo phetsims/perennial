@@ -1,12 +1,12 @@
 phet-io-wrappers/active
-phet-io-wrappers/diff
 phet-io-wrappers/data-stream
+phet-io-wrappers/diff
 phet-io-wrappers/index
 phet-io-wrappers/login
+phet-io-wrappers/migration
 phet-io-wrappers/multi
-phet-io-wrappers/record
 phet-io-wrappers/playback
+phet-io-wrappers/record
 phet-io-wrappers/screenshot
 phet-io-wrappers/state
-phet-io-wrappers/migration
 studio
