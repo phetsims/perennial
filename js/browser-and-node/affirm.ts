@@ -52,8 +52,9 @@ export default function affirm( predicate: unknown, ...messages: IntentionalPere
     const stackTraceWritable = descriptor && ( descriptor.writable || ( descriptor.set && typeof descriptor.set === 'function' ) );
 
     if ( stackTraceWritable ) {
-      // @ts-expect-error - At some point this will no longer be experimental for the Browser error constructor, but not this day.
-      Error.stackTraceLimit = 20;
+
+      // There were some inconsistencies as to whether Error had an attribute stackTraceLimit, that seems to differ from machine to machine.
+      ( Error as IntentionalPerennialAny ).stackTraceLimit = 20;
     }
 
     throw new Error( affirmPrefix + messages.join( '\n ' ) );
