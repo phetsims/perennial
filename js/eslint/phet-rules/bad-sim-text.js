@@ -123,7 +123,11 @@ module.exports = {
 
       // Disallow the Ohm Unicode character because it is not "normalized". Use capitalized greek omega instead (\u03A9).
       // See https://github.com/phetsims/scenery/issues/1687.
-      '\\u2126'
+      '\\u2126',
+
+      // namespace.register() is no longer needed outside of core repos, see https://github.com/phetsims/phet-core/issues/100
+      // Allowed namespaces: listed in the regex
+      { id: 'namespace.register()', regex: /(?<!alpenglow|axon|brand|dot|joist|kite|phetCore|phetio|sceneryPhet|scenery|tandemNamespace|tandem)\.register\(\s*'/ }
     ];
 
     return {
