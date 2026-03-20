@@ -70,7 +70,7 @@ export function affirmCallback( predicate: () => unknown, ...messages: Intention
   isAffirmEnabled() && affirm( predicate(), ...messages );
 }
 
-const affirmationHooks: VoidFunction[] = [];
+const affirmationHooks: Array<() => void> = [];
 
 export function addAffirmationHook( hook: () => void ): void {
   affirmationHooks.push( hook );
