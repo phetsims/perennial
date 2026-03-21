@@ -11,6 +11,7 @@ import assert from 'assert';
 import asyncQ from 'async-q';
 import fs from 'fs';
 import _ from 'lodash';
+import path from 'path';
 import repl from 'repl';
 import winston from 'winston';
 import production from '../grunt/production.js';
@@ -38,6 +39,7 @@ import gitRevParse from './gitRevParse.js';
 import gruntCommand from './gruntCommand.js';
 import ModifiedBranch from './ModifiedBranch.js';
 import Patch from './Patch.js';
+import { PERENNIAL_ROOT } from './perennialRepoUtils.js';
 import ReleaseBranch from './ReleaseBranch.js';
 import gitFirstDivergingCommit from './gitFirstDivergingCommit.js';
 import gitTimestamp from './gitTimestamp.js';
@@ -272,6 +274,9 @@ class Maintenance {
     console.log( '\n(list complete)' );
   }
 
+  /**
+   * A convenience function for list() with timestamp: true. Sorts needed-patch branches by branch date
+   */
   public static async timestampList(): Promise<void> {
     await this.list( { timestamp: true } );
   }
@@ -449,9 +454,10 @@ class Maintenance {
 
     const patch = maintenance.findPatch( patchName );
 
-    const modifiedBranch = new ModifiedBranch( releaseBranch );
-    maintenance.modifiedBranches.push( modifiedBranch );
+    // Use an ensured modified branch instead of creating one directly.
+    const modifiedBranch = await maintenance.ensureModifiedBranch( releaseBranch.repo, releaseBranch.branch );
     modifiedBranch.neededPatches.push( patch );
+
     maintenance.save();
 
     console.log( `Added patch ${patchName} as needed for ${releaseBranch.repo} ${releaseBranch.branch}` );
@@ -861,6 +867,21 @@ class Maintenance {
   }
 
   /**
+   * Cleans chipper/dist, see https://github.com/phetsims/perennial/issues/461#issuecomment-3837518242
+   *
+   * Our TypeScript setup is now unreliable, and we need to clear out temporary files to prevent it from bugging out
+   * (having stale TS data from OTHER release branches being used in DIFFERENT release branches --- can trigger or hide
+   * errors).
+   */
+  public static async cleanChipperDist(): Promise<void> {
+    const distPath = path.resolve( PERENNIAL_ROOT, '..', 'chipper', 'dist' );
+
+    console.log( 'cleaning chipper/dist' );
+
+    await fs.promises.rm( distPath, { recursive: true, force: true } );
+  }
+
+  /**
    * Deploys RC versions of the modified branches that need it.
    *
    *
@@ -883,6 +904,8 @@ class Maintenance {
 
       try {
         console.log( `Running RC deploy for ${modifiedBranch.repo} ${modifiedBranch.branch}` );
+
+        await Maintenance.cleanChipperDist();
 
         const version = await rc( modifiedBranch.repo, modifiedBranch.branch, modifiedBranch.brands, true, modifiedBranch.pushedMessages.join( ', ' ) );
         modifiedBranch.deployedVersion = version;
@@ -919,6 +942,8 @@ class Maintenance {
 
       try {
         console.log( `Running production deploy for ${modifiedBranch.repo} ${modifiedBranch.branch}` );
+
+        await Maintenance.cleanChipperDist();
 
         const version = await production( modifiedBranch.repo, modifiedBranch.branch, modifiedBranch.brands, true, false, modifiedBranch.pushedMessages.join( ', ' ) );
         modifiedBranch.deployedVersion = version;
@@ -1116,6 +1141,42 @@ class Maintenance {
     }
 
     return releaseBranches;
+  }
+
+  /**
+   * Used to fix BUGGY situations (multiple ModifiedBranch objects for the same actual release branch).
+   * NOT NEEDED FOR NORMAL USE.
+   *
+   * Don't use this unless you've talked with JO about the consequences. He had horribly duplicated ModifiedBranches due
+   * to addNeededPatchReleaseBranch creating many copies. This may be useful in the future if similar types of issues
+   * happen. Fun fact, you can't remove needed patches if this happens. RIP the 2026 CC BY-NC release, you will be missed.
+   * Never forget "deduplicated from 933 to 151".
+   */
+  public static fixDuplicatedModifiedBranches(): void {
+    const maintenance = Maintenance.load();
+
+    const modifiedBranchMap: Record<string, ModifiedBranch> = {};
+
+    const startingCount = maintenance.modifiedBranches.length;
+
+    for ( const modifiedBranch of maintenance.modifiedBranches ) {
+      // Does not include brands. Will fail out on purpose in the combine() later if we have brand mismatches
+      const key = `${modifiedBranch.releaseBranch.repo}-${modifiedBranch.releaseBranch.branch}`;
+
+      if ( modifiedBranchMap[ key ] ) {
+        modifiedBranchMap[ key ] = modifiedBranchMap[ key ].combine( modifiedBranch );
+      }
+      else {
+        modifiedBranchMap[ key ] = modifiedBranch;
+      }
+    }
+
+    maintenance.modifiedBranches.length = 0;
+    maintenance.modifiedBranches.push( ...Object.values( modifiedBranchMap ) );
+
+    maintenance.save();
+
+    console.log( `deduplicated from ${startingCount} to ${maintenance.modifiedBranches.length}` );
   }
 
   /**

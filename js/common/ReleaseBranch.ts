@@ -409,6 +409,57 @@ class ReleaseBranch implements ReleaseBranchSerialized {
   }
 
   /**
+   * Returns the file contents for ${repo}/${relativeFile} if it exists on this release branch,
+   * or if it doesn't exist, returns an empty string (for convenience of branch string handling).
+   *
+   * This will be more performant than getSourceFileOptionalContents, but getSourceFileOptionalContents is recommended
+   * for in-general use due to its flexibility.
+   */
+  public async getFileOptionalContents( repo: string, relativeFile: string ): Promise<string> {
+    const dependencies = await this.getDependencies();
+
+    const sha = dependencies[ repo ].sha;
+
+    if ( !sha ) {
+      throw new Error( `Need a sha for getFileOptionalContents: ${repo} ${relativeFile}` );
+    }
+
+    try {
+      return await getGitFile( repo, sha, relativeFile );
+    }
+    catch( e ) {
+      return '';
+    }
+  }
+
+  /**
+   * Returns the file contents for ${repo}/${relativeFile} (with optional .ts and .js suffixes added),
+   * or if none of them exist, returns an empty string (for convenience of branch string handling).
+   *
+   * Allows e.g. releaseBranch.getSourceFileOptionalContents( 'joist', 'js/AboutDialog' ),
+   * without having to worry about (a) the suffix of AboutDialog (.js, .ts) and (b) whether the file exists at all on this branch.
+   *
+   * This is useful, because usually for maintenance we are doing a substring search (so an empty string if it doesn't
+   * exist is perfect).
+   *
+   * If multiple paths potentially exist, those can be concatenated together without having to use conditionals.
+   */
+  public async getSourceFileOptionalContents( repo: string, relativeFile: string ): Promise<string> {
+
+    let fileContents = await this.getFileOptionalContents( repo, relativeFile );
+
+    if ( !fileContents.length ) {
+      fileContents = await this.getFileOptionalContents( repo, `${relativeFile}.ts` );
+    }
+
+    if ( !fileContents.length ) {
+      fileContents = await this.getFileOptionalContents( repo, `${relativeFile}.js` );
+    }
+
+    return fileContents;
+  }
+
+  /**
    * Returns whether the sim is compatible with ES6 features
    */
   public async usesES6(): Promise<boolean> {

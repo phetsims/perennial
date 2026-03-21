@@ -54,6 +54,10 @@ function getBuildArguments( chipperVersion: ChipperVersion, options: Partial<Bui
     if ( lint ) {
       args.push( 'lint-all' ); // Should be "lint-all", not "lint-project", for backwards compatibility
     }
+    else {
+      // 1.0 sims need this to turn linting off if needed
+      args.push( '--lint=false' );
+    }
     if ( clean ) {
       args.push( 'clean' );
     }

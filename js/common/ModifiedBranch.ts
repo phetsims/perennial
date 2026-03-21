@@ -16,6 +16,7 @@ import githubCreateIssue from './githubCreateIssue.js';
 import gitPull from './gitPull.js';
 import Patch from './Patch.js';
 import ReleaseBranch from './ReleaseBranch.js';
+import _ from 'lodash';
 
 // Keys are repo names, values are SHAs
 type Dependencies = Record<string, string>;
@@ -82,6 +83,38 @@ class ModifiedBranch {
       pendingMessages,
       pushedMessages,
       deployedVersion ? SimVersion.deserialize( deployedVersion ) : null
+    );
+  }
+
+  /**
+   * Only use this for advanced internal reasons if you are fixing many duplicated ModifiedBranch objects.
+   *
+   * Clears out deployed versions.
+   */
+  public combine( other: ModifiedBranch ): ModifiedBranch {
+    if ( !this.releaseBranch.equals( other.releaseBranch ) ) {
+      throw new Error( 'Cannot combine ModifiedBranches' );
+    }
+
+    return new ModifiedBranch(
+      this.releaseBranch,
+      {
+        ...this.changedDependencies, // eslint-disable-line phet/no-object-spread-on-non-literals
+        ...other.changedDependencies // eslint-disable-line phet/no-object-spread-on-non-literals
+      },
+      _.uniq( [
+        ...this.neededPatches,
+        ...other.neededPatches
+      ] ),
+      _.uniq( [
+        ...this.pendingMessages,
+        ...other.pendingMessages
+      ] ),
+      _.uniq( [
+        ...this.pushedMessages,
+        ...other.pushedMessages
+      ] ),
+      null
     );
   }
 

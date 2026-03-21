@@ -30,13 +30,11 @@ function getNpmInstallFlags( options ) {
  * @public
  *
  * @param {string} directory
- * @param {{ clean?: boolean, minimal?: boolean }} [options]
+ * @param {{ minimal?: boolean }} [options]
  * @returns {Promise}
  */
 module.exports = async function npmUpdateDirectory( directory, options ) {
   winston.info( `npm update in ${directory}` );
-
-  const clean = options?.clean ?? false;
 
   const hasPackageLock = fs.existsSync( `${directory}/package-lock.json` );
 
@@ -45,9 +43,9 @@ module.exports = async function npmUpdateDirectory( directory, options ) {
   // NOTE: Run these synchronously across all instances!
   await mutex.runExclusive( async () => {
 
-    // If we have a package-lock.json, we can do the more efficient 'npm ci' (if clean is requested) or 'npm install'.
+    // If we have a package-lock.json, we can do the more efficient 'npm ci'
     if ( hasPackageLock ) {
-      await execute( npmCommand, [ clean ? 'ci' : 'install', ...flags ], directory );
+      await execute( npmCommand, [ 'ci', ...flags ], directory );
     }
     // Otherwise use the legacy method.
     else {
