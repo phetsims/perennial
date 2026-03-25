@@ -587,7 +587,10 @@ class ReleaseBranch implements ReleaseBranchSerialized {
    * Returns whether an additional folder exists in the build directory of the sim based on the brand.
    */
   public async usesChipper2(): Promise<boolean> {
-    const chipperVersion = ChipperVersion.getFromPackageJSON( await this.getPackageJSON() );
+    const dependencies = await this.getDependencies();
+
+    const chipperPackageJSON = JSON.parse( await gitCatFile( 'chipper', 'package.json', dependencies.chipper.sha ) );
+    const chipperVersion = ChipperVersion.getFromPackageJSON( chipperPackageJSON );
 
     return chipperVersion.major !== 0 || chipperVersion.minor !== 0;
   }
