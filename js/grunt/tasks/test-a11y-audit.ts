@@ -183,6 +183,8 @@ async function runAxeDevTests(): Promise<void> {
     const testStartTimeMs = Date.now();
 
     while ( Date.now() - testStartTimeMs < durationMs ) {
+      const sampleStartTimeMs = Date.now();
+
       const results = await new AxeBuilder( { page: page } ).analyze();
       const filteredViolations = results.violations.filter( violation => {
         if ( SUPPRESSED_VIOLATION_IDS.has( violation.id ) ) {
@@ -199,8 +201,13 @@ async function runAxeDevTests(): Promise<void> {
         return;
       }
 
-      // Wait between samples so fuzzing continues to exercise new states.
-      await page.waitForTimeout( intervalMs );
+      const sampleElapsedMs = Date.now() - sampleStartTimeMs;
+      const remainingIntervalMs = Math.max( 0, intervalMs - sampleElapsedMs );
+
+      // Wait only the remaining interval so sampling cadence is faster.
+      if ( remainingIntervalMs > 0 ) {
+        await page.waitForTimeout( remainingIntervalMs );
+      }
     }
 
     // Report success so CI logs show completion without violations.
