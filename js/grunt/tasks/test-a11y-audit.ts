@@ -10,6 +10,14 @@
  *   grunt test-a11y-audit --port=8080 (run from the simulation directory)
  *   grunt test-a11y-audit --repo=membrane-transport --port=8080 --impact=serious
  *
+ * Supported CLI options:
+ *   --repo=<repoName>         Simulation repo name (defaults to cwd repo name).
+ *   --host=<http(s)://host>   Base host for the sim URL.
+ *   --port=<number>           Dev server port.
+ *   --impact=<level>          Minimum axe impact to report (minor|moderate|serious|critical).
+ *   --testDuration=<ms>       Total fuzz sampling duration in ms.
+ *   --testInterval=<ms>       Minimum delay between samples in ms.
+ *
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
@@ -37,6 +45,7 @@ const AXE_IMPACT_PRIORITY: AxeImpact[] = [ ...AXE_IMPACT_VALUES ];
 
 // Default query flags appended to the sim URL for the a11y audit.
 // postMessageOnLoad lets us wait for an explicit "load" signal from the sim.
+// voicing is disabled because that feature purposefully uses unusual markup.
 const DEFAULT_QUERY_FLAGS = [ 'ea', 'postMessageOnLoad', 'fuzz', 'supportsVoicing=false' ] as const;
 
 // Default test duration in ms for repeated Axe sampling.
@@ -50,7 +59,15 @@ const DEFAULT_TEST_INTERVAL_MS = 500;
 const DEFAULT_MIN_IMPACT: AxeImpact = 'minor';
 
 // Axe rule IDs suppressed from reporting.
-const SUPPRESSED_VIOLATION_IDS = new Set( [ 'meta-viewport', 'region' ] );
+const SUPPRESSED_VIOLATION_IDS = new Set( [
+
+  // PhET uses a custom solution for pan and zoom, the meta-viewport error is expected.
+  'meta-viewport',
+
+  // The region rule is too strict, and hidden under "best practices" in the axe DevTools UI.
+  // We decided to ignore it.
+  'region'
+] );
 
 // Sim name derived from --repo or the current working directory.
 const sim = getRepo();
