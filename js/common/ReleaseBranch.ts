@@ -460,6 +460,18 @@ class ReleaseBranch implements ReleaseBranchSerialized {
   }
 
   /**
+   * Checks whether it is likely that the given file has an import for something. Used for convenience during
+   * complicated maintenance releases.
+   */
+  public async hasLikelyImport( repo: string, relativeFile: string, name: string ): Promise<boolean> {
+    const contents = await this.getSourceFileOptionalContents( repo, relativeFile );
+
+    return contents.split( '\n' ).some( line => {
+      return ( line.includes( 'import' ) || line.includes( 'require' ) ) && line.includes( name );
+    } );
+  }
+
+  /**
    * Returns whether the sim is compatible with ES6 features
    */
   public async usesES6(): Promise<boolean> {
@@ -551,7 +563,6 @@ class ReleaseBranch implements ReleaseBranchSerialized {
 
   /**
    * Returns whether the sim is a "Hydrogen" phet-io sim.
-   *
    */
   public async isPhetioHydrogen(): Promise<boolean> {
     return this.brands.includes( 'phet-io' ) &&
@@ -559,14 +570,24 @@ class ReleaseBranch implements ReleaseBranchSerialized {
   }
 
   /**
+   * Returns whether the sim is built with XHTML
+   */
+  public async hasXHTML(): Promise<boolean> {
+    return this.includesSHA( 'chipper', '70c2d4b0cb0cb0cb457190e3ca889c406b663686' );
+  }
+
+  /**
+   * Returns the package.json parsed as a plain JS object.
+   */
+  public async getPackageJSON(): Promise<any> { // eslint-disable-line @typescript-eslint/no-explicit-any
+    return JSON.parse( await gitCatFile( this.repo, 'package.json', this.branch ) );
+  }
+
+  /**
    * Returns whether an additional folder exists in the build directory of the sim based on the brand.
-   *
    */
   public async usesChipper2(): Promise<boolean> {
-    const dependencies = await this.getDependencies();
-
-    const chipperPackageJSON = JSON.parse( await gitCatFile( 'chipper', 'package.json', dependencies.chipper.sha ) );
-    const chipperVersion = ChipperVersion.getFromPackageJSON( chipperPackageJSON );
+    const chipperVersion = ChipperVersion.getFromPackageJSON( await this.getPackageJSON() );
 
     return chipperVersion.major !== 0 || chipperVersion.minor !== 0;
   }
@@ -574,7 +595,6 @@ class ReleaseBranch implements ReleaseBranchSerialized {
   /**
    * Runs a predicate function with the contents of a specific file's contents in the release branch (with false if
    * it doesn't exist).
-   *
    */
   public async withFile( file: string, predicate: ( contents: string ) => boolean ): Promise<boolean> {
     await this.checkout( false );

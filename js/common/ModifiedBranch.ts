@@ -170,6 +170,32 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
   }
 
   /**
+   * Returns a string that prints out the supported features for the release branch
+   */
+  public async getSupportedFeaturesLine(): Promise<string> {
+    const packageJSON = await this.releaseBranch.getPackageJSON();
+
+    const simFeatures = packageJSON?.phet?.simFeatures ?? {};
+
+    const nonDefaultColorProfiles = simFeatures.colorProfiles?.filter( profile => profile !== 'default' ) ?? [];
+    const colorProfilesString = nonDefaultColorProfiles.length ? ` colorProfiles: ${nonDefaultColorProfiles.join( ',' )}` : '';
+
+    const supportedRegionsAndCultures = simFeatures.supportedRegionsAndCultures ?? [];
+    const regionsAndCulturesString = supportedRegionsAndCultures.length ? ` supportedRegionsAndCultures: ${simFeatures.supportedRegionsAndCultures.join( ',' )}` : '';
+
+    const features = Object.keys( simFeatures ).filter( feature => feature !== 'colorProfiles' && feature !== 'supportedRegionsAndCultures' );
+
+    // console.log( 'features', features );
+    // console.log( 'nonDefaultColorProfiles', nonDefaultColorProfiles );
+    // console.log( 'simFeatures', simFeatures );
+    // console.log( 'packageJSON', packageJSON );
+
+    const mainString = features.join( ', ' ) + colorProfilesString + regionsAndCulturesString;
+
+    return mainString.length ? `- ${mainString}` : '';
+  }
+
+  /**
    * Returns a list of deployed links for testing (depending on the brands deployed).
    */
   public async getDeployedLinkLines( includeMessages = true ): Promise<string[]> {
@@ -183,6 +209,7 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
     const studioName = ( this.brands.includes( 'phet-io' ) && await this.releaseBranch.usesPhetioStudio() ) ? 'studio' : 'instance-proxies';
     const studioNameBeautified = studioName === 'studio' ? 'Studio' : 'Instance Proxies';
     const usesChipper2 = await this.releaseBranch.usesChipper2();
+    const hasXHTML = await this.releaseBranch.hasXHTML();
     const phetFolder = usesChipper2 ? '/phet' : '';
     const phetioFolder = usesChipper2 ? '/phet-io' : '';
     const phetSuffix = usesChipper2 ? '_phet' : '';
@@ -194,6 +221,9 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
     if ( this.deployedVersion.testType === 'rc' ) {
       if ( this.brands.includes( 'phet' ) ) {
         linkSuffixes.push( `](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}${phetFolder}/${this.repo}_all${phetSuffix}.html)` );
+        if ( hasXHTML ) {
+          linkSuffixes.push( ` xhtml](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}${phetFolder}/xhtml/${this.repo}_all.html)` );
+        }
       }
       if ( this.brands.includes( 'phet-io' ) ) {
         linkSuffixes.push( ` phet-io](https://phet-dev.colorado.edu/html/${this.repo}/${phetioDevVersion}${phetioFolder}/${this.repo}${phetioSuffix}.html?${standaloneParams})` );
@@ -203,6 +233,9 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
     else {
       if ( this.brands.includes( 'phet' ) ) {
         linkSuffixes.push( `](https://phet.colorado.edu/sims/html/${this.repo}/${versionString}/${this.repo}_all.html)` );
+        if ( hasXHTML ) {
+          linkSuffixes.push( ` xhtml](https://phet.colorado.edu/sims/html/${this.repo}/${versionString}/xhtml/${this.repo}_all.html)` );
+        }
       }
       if ( this.brands.includes( 'phet-io' ) ) {
         linkSuffixes.push( ` phet-io](https://phet-io.colorado.edu/sims/${this.repo}/${versionString}${phetioBrandSuffix}/${this.repo}${phetioSuffix}.html?${standaloneParams})` );
@@ -212,6 +245,10 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
 
     const results = linkSuffixes.map( link => `- [ ] [${this.repo} ${versionString}${link}` );
     if ( includeMessages ) {
+      const featuresLine = await this.getSupportedFeaturesLine();
+      if ( featuresLine.length ) {
+        results.unshift( featuresLine );
+      }
       results.unshift( `\n**${this.repo} ${this.branch}** (${this.pushedMessages.join( ', ' )})\n` );
     }
     return results;
