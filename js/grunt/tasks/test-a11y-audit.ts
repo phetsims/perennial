@@ -37,7 +37,13 @@ const AXE_IMPACT_PRIORITY: AxeImpact[] = [ ...AXE_IMPACT_VALUES ];
 
 // Default query flags appended to the sim URL for the a11y audit.
 // postMessageOnLoad lets us wait for an explicit "load" signal from the sim.
-const DEFAULT_QUERY_FLAGS = [ 'ea', 'postMessageOnLoad' ] as const;
+const DEFAULT_QUERY_FLAGS = [ 'ea', 'postMessageOnLoad', 'fuzz', 'supportsVoicing=false' ] as const;
+
+// Default test duration in ms for repeated Axe sampling.
+const DEFAULT_TEST_DURATION_MS = 10000;
+
+// Default delay between test samples in ms.
+const DEFAULT_TEST_INTERVAL_MS = 500;
 
 // Minimum impact level reported when no --impact is supplied.
 const DEFAULT_MIN_IMPACT: AxeImpact = 'minor';
@@ -87,6 +93,30 @@ function getMinimumImpact(): AxeImpact {
   }
   console.warn( `[test-a11y-audit] Unsupported impact "${impactOption}", defaulting to "${DEFAULT_MIN_IMPACT}"` );
   return DEFAULT_MIN_IMPACT;
+}
+
+/**
+ * Reads fuzz options from CLI flags with sensible defaults and validation so
+ * automated runs can tune sampling consistently.
+ */
+function getFuzzOptions(): { durationMs: number; intervalMs: number } {
+  const durationOption = Number( getOptionIfProvided( 'testDuration', DEFAULT_TEST_DURATION_MS ) );
+  const intervalOption = Number( getOptionIfProvided( 'testInterval', DEFAULT_TEST_INTERVAL_MS ) );
+
+  const durationMs = Number.isFinite( durationOption ) && durationOption > 0 ? durationOption : DEFAULT_TEST_DURATION_MS;
+  const intervalMs = Number.isFinite( intervalOption ) && intervalOption > 0 ? intervalOption : DEFAULT_TEST_INTERVAL_MS;
+
+  if ( durationMs !== durationOption ) {
+    console.warn( `[test-a11y-audit] Invalid testDuration "${durationOption}", defaulting to "${DEFAULT_TEST_DURATION_MS}"` );
+  }
+  if ( intervalMs !== intervalOption ) {
+    console.warn( `[test-a11y-audit] Invalid testInterval "${intervalOption}", defaulting to "${DEFAULT_TEST_INTERVAL_MS}"` );
+  }
+
+  return {
+    durationMs: durationMs,
+    intervalMs: intervalMs
+  };
 }
 
 /**
@@ -149,20 +179,32 @@ async function runAxeDevTests(): Promise<void> {
     await page.waitForFunction( 'window.__phetSimulationLoadComplete === true', undefined, { timeout: 10000 } );
 
     const minimumImpact = getMinimumImpact();
-    const results = await new AxeBuilder( { page: page } ).analyze();
-    const filteredViolations = results.violations.filter( violation => {
-      if ( SUPPRESSED_VIOLATION_IDS.has( violation.id ) ) {
-        return false;
+    const { durationMs, intervalMs } = getFuzzOptions();
+    const testStartTimeMs = Date.now();
+
+    while ( Date.now() - testStartTimeMs < durationMs ) {
+      const results = await new AxeBuilder( { page: page } ).analyze();
+      const filteredViolations = results.violations.filter( violation => {
+        if ( SUPPRESSED_VIOLATION_IDS.has( violation.id ) ) {
+          return false;
+        }
+        return includeViolation( violation.impact, minimumImpact );
+      } );
+
+      if ( filteredViolations.length > 0 ) {
+        console.log( 'Violations:', JSON.stringify( filteredViolations, null, 2 ) );
+
+        // Non-zero exit if there are violations (for CI)
+        process.exitCode = 1;
+        return;
       }
-      return includeViolation( violation.impact, minimumImpact );
-    } );
 
-    console.log( 'Violations:', JSON.stringify( filteredViolations, null, 2 ) );
-
-    // Non-zero exit if there are violations (for CI)
-    if ( filteredViolations.length > 0 ) {
-      process.exitCode = 1;
+      // Wait between samples so fuzzing continues to exercise new states.
+      await page.waitForTimeout( intervalMs );
     }
+
+    // Report success so CI logs show completion without violations.
+    console.log( '[test-a11y-audit] No violations detected after fuzz sampling.' );
   }
   finally {
     await browser.close();
