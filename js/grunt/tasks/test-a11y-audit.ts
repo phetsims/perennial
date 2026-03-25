@@ -7,8 +7,8 @@
  * locally suppressed rules, then printed to stdout with a non-zero exit code on violations.
  *
  * Usage examples:
- *   grunt test-a11y --port=8080 (run from the simulation directory)
- *   grunt test-a11y --repo=membrane-transport --port=8080 --impact=serious
+ *   grunt test-a11y-audit --port=8080 (run from the simulation directory)
+ *   grunt test-a11y-audit --repo=membrane-transport --port=8080 --impact=serious
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */
@@ -84,7 +84,7 @@ function getMinimumImpact(): AxeImpact {
   if ( AXE_IMPACT_PRIORITY.includes( normalized as AxeImpact ) ) {
     return normalized as AxeImpact;
   }
-  console.warn( `[test-a11y] Unsupported impact "${impactOption}", defaulting to "${DEFAULT_MIN_IMPACT}"` );
+  console.warn( `[test-a11y-audit] Unsupported impact "${impactOption}", defaulting to "${DEFAULT_MIN_IMPACT}"` );
   return DEFAULT_MIN_IMPACT;
 }
 
@@ -117,7 +117,7 @@ async function runAxeDevTests(): Promise<void> {
     const page = await context.newPage();
 
     const url = buildTargetUrl();
-    console.log( `[test-a11y] Launching ${url}` );
+    console.log( `[test-a11y-audit] Launching ${url}` );
     await page.goto( url, {
       waitUntil: 'networkidle'
     } );
