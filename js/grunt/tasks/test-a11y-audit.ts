@@ -39,7 +39,7 @@ const AXE_IMPACT_PRIORITY: AxeImpact[] = [ ...AXE_IMPACT_VALUES ];
 const DEFAULT_QUERY_FLAGS = [ 'ea' ] as const;
 
 // Minimum impact level reported when no --impact is supplied.
-const DEFAULT_MIN_IMPACT: AxeImpact = 'critical';
+const DEFAULT_MIN_IMPACT: AxeImpact = 'minor';
 
 // Axe rule IDs suppressed from reporting.
 const SUPPRESSED_VIOLATION_IDS = new Set( [ 'meta-viewport' ] );
