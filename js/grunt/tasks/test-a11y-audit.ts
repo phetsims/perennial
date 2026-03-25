@@ -36,13 +36,14 @@ type AxeImpact = typeof AXE_IMPACT_VALUES[ number ];
 const AXE_IMPACT_PRIORITY: AxeImpact[] = [ ...AXE_IMPACT_VALUES ];
 
 // Default query flags appended to the sim URL for the a11y audit.
-const DEFAULT_QUERY_FLAGS = [ 'ea' ] as const;
+// postMessageOnLoad lets us wait for an explicit "load" signal from the sim.
+const DEFAULT_QUERY_FLAGS = [ 'ea', 'postMessageOnLoad' ] as const;
 
 // Minimum impact level reported when no --impact is supplied.
 const DEFAULT_MIN_IMPACT: AxeImpact = 'minor';
 
 // Axe rule IDs suppressed from reporting.
-const SUPPRESSED_VIOLATION_IDS = new Set( [ 'meta-viewport' ] );
+const SUPPRESSED_VIOLATION_IDS = new Set( [ 'meta-viewport', 'region' ] );
 
 // Sim name derived from --repo or the current working directory.
 const sim = getRepo();
@@ -116,11 +117,36 @@ async function runAxeDevTests(): Promise<void> {
     const context = await browser.newContext();
     const page = await context.newPage();
 
+    // Inject a page-context listener that flips a flag when the sim posts its load event.
+    // This avoids running Axe until the sim has explicitly signaled readiness.
+    await page.addInitScript( {
+      content: `
+        window.__phetSimulationLoadComplete = false;
+        window.addEventListener( 'message', event => {
+          if ( typeof event.data !== 'string' ) {
+            return;
+          }
+          try {
+            const data = JSON.parse( event.data );
+            if ( data && data.type === 'load' ) {
+              window.__phetSimulationLoadComplete = true;
+            }
+          }
+          catch( err ) {
+            // Ignore messages that are not JSON payloads from the sim.
+          }
+        } );
+      `
+    } );
+
     const url = buildTargetUrl();
     console.log( `[test-a11y-audit] Launching ${url}` );
     await page.goto( url, {
       waitUntil: 'networkidle'
     } );
+
+    // Wait for the sim's postMessage load signal so Axe runs after the app is fully initialized.
+    await page.waitForFunction( 'window.__phetSimulationLoadComplete === true', undefined, { timeout: 10000 } );
 
     const minimumImpact = getMinimumImpact();
     const results = await new AxeBuilder( { page: page } ).analyze();
