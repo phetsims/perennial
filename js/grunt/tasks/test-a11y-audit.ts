@@ -42,7 +42,8 @@ const DEFAULT_QUERY_FLAGS = [ 'ea', 'postMessageOnLoad', 'fuzz', 'supportsVoicin
 // Default test duration in ms for repeated Axe sampling.
 const DEFAULT_TEST_DURATION_MS = 10000;
 
-// Default delay between test samples in ms.
+// Default delay between test samples in ms. This is a minimum value and the interval may take
+// longer if axe tests take longer.
 const DEFAULT_TEST_INTERVAL_MS = 500;
 
 // Minimum impact level reported when no --impact is supplied.
