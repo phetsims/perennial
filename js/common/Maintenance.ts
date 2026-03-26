@@ -41,8 +41,6 @@ import ModifiedBranch from './ModifiedBranch.js';
 import Patch from './Patch.js';
 import { PERENNIAL_ROOT } from './perennialRepoUtils.js';
 import ReleaseBranch from './ReleaseBranch.js';
-import gitFirstDivergingCommit from './gitFirstDivergingCommit.js';
-import gitTimestamp from './gitTimestamp.js';
 
 // constants
 const MAINTENANCE_FILE = '.maintenance.json';
@@ -249,11 +247,8 @@ class Maintenance {
         await Promise.all( modifiedBranches.map( modifiedBranch => {
           return ( async () => {
             if ( !modifiedBranch.releaseBranch.cachedTimestampString ) {
-              const divergingCommit = await gitFirstDivergingCommit( modifiedBranch.repo, modifiedBranch.branch, 'main' );
-              const timestamp = await gitTimestamp( modifiedBranch.repo, divergingCommit );
-              const timestampString = new Date( timestamp ).toISOString().split( 'T' )[ 0 ];
               // eslint-disable-next-line require-atomic-updates
-              modifiedBranch.releaseBranch.cachedTimestampString = timestampString;
+              modifiedBranch.releaseBranch.cachedTimestampString = await modifiedBranch.releaseBranch.getDivergingTimestampString();
             }
           } )();
         } ) );

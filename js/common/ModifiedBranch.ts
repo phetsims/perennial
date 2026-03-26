@@ -177,7 +177,7 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
 
     const simFeatures = packageJSON?.phet?.simFeatures ?? {};
 
-    const nonDefaultColorProfiles = simFeatures.colorProfiles?.filter( profile => profile !== 'default' ) ?? [];
+    const nonDefaultColorProfiles = simFeatures.colorProfiles?.filter( ( profile: string ) => profile !== 'default' ) ?? [];
     const colorProfilesString = nonDefaultColorProfiles.length ? ` colorProfiles: ${nonDefaultColorProfiles.join( ',' )}` : '';
 
     const supportedRegionsAndCultures = simFeatures.supportedRegionsAndCultures ?? [];
@@ -249,7 +249,7 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
       if ( featuresLine.length ) {
         results.unshift( featuresLine );
       }
-      results.unshift( `\n**${this.repo} ${this.branch}** (${this.pushedMessages.join( ', ' )})\n` );
+      results.unshift( `\n**${this.repo} ${this.branch}** ${await this.releaseBranch.getDivergingTimestampString()} (${this.pushedMessages.join( ', ' )})\n` );
     }
     return results;
   }

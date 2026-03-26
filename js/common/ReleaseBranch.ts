@@ -596,6 +596,15 @@ class ReleaseBranch implements ReleaseBranchSerialized {
   }
 
   /**
+   * Returns the timestamp string with the date of when this release branch diverged from main.
+   */
+  public async getDivergingTimestampString(): Promise<string> {
+    const divergingCommit = await gitFirstDivergingCommit( this.repo, this.branch, 'main' );
+    const timestamp = await gitTimestamp( this.repo, divergingCommit );
+    return new Date( timestamp ).toISOString().split( 'T' )[ 0 ];
+  }
+
+  /**
    * Runs a predicate function with the contents of a specific file's contents in the release branch (with false if
    * it doesn't exist).
    */
