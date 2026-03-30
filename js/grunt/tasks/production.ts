@@ -12,7 +12,6 @@
  */
 import assert from 'assert';
 import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
-import booleanPrompt from '../../common/booleanPrompt.js';
 import markSimAsPublished from '../../common/markSimAsPublished.js';
 import production from '../production.js';
 import getOption from './util/getOption.js';
@@ -20,20 +19,14 @@ import getOption from './util/getOption.js';
 ( async () => {
 
   const repo = getOption( 'repo' );
-  const noninteractive = !!getOption( 'noninteractive' );
   assert( getOption( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
   assert( getOption( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
   assert( getOption( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
   assertIsValidRepoName( repo );
 
-  const shouldContinue = await booleanPrompt( 'Please hold off on production releases until late in March 2026, see https://github.com/phetsims/special-ops/issues/320. Continue anyways?', noninteractive );
-  if ( !shouldContinue ) {
-    process.exit( 0 );
-  }
-
   await markSimAsPublished( repo );
 
-  await production( repo, getOption( 'branch' ), getOption( 'brands' ).split( ',' ), noninteractive,
+  await production( repo, getOption( 'branch' ), getOption( 'brands' ).split( ',' ), !!getOption( 'noninteractive' ),
     getOption( 'redeploy' ), getOption( 'message' ) );
 
   // When running tsx in combination with readline, the process does not exit properly, so we need to force it. See https://github.com/phetsims/perennial/issues/389

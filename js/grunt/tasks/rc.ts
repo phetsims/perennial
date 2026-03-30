@@ -12,25 +12,18 @@
 
 import assert from 'assert';
 import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
-import booleanPrompt from '../../common/booleanPrompt.js';
 import rc from '../rc.js';
 import getOption from './util/getOption.js';
 
 ( async () => {
   const repo = getOption( 'repo' );
-  const noninteractive = !!getOption( 'noninteractive' );
   assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
   assert( getOption( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
   assert( getOption( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
   assertIsValidRepoName( repo );
 
-  const shouldContinue = await booleanPrompt( 'Please list all new RC branches in https://github.com/phetsims/special-ops/issues/320 until late March 2026 or so. Continue?', noninteractive );
-  if ( !shouldContinue ) {
-    process.exit( 0 );
-  }
-
   await rc( repo, getOption( 'branch' ), getOption( 'brands' ).split( ',' ),
-    noninteractive, getOption( 'message' ) );
+    !!getOption( 'noninteractive' ), getOption( 'message' ) );
 
   // When running tsx in combination with readline, the process does not exit properly, so we need to force it. See https://github.com/phetsims/perennial/issues/389
   process.exit( 0 );
