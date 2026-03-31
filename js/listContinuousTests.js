@@ -71,6 +71,38 @@ const XHTML_FUZZ_REPOS = [
   'natural-selection'
 ];
 
+// A hard-coded list of simulations to run accessibility audit against.
+// In the future, we will want to include any sims that reach a certain level of accessibility
+// instrumentation, but at this time we have no such feature flags.
+const ACCESSIBILITY_AUDIT_REPOS = [
+  'balancing-chemical-equations',
+  'balloons-and-static-electricity',
+  'beers-law-lab',
+  'build-an-atom',
+  'calculus-grapher',
+  'center-and-variability',
+  'circuit-construction-kit-dc',
+  'circuit-construction-kit-dc-virtual-lab',
+  'concentration',
+  'forces-and-motion-basics',
+  'friction',
+  'graphing-quadratics',
+  'gravity-force-lab-basics',
+  'greenhouse-effect',
+  'john-travoltage',
+  'mean-share-and-balance',
+  'membrane-transport',
+  'models-of-the-hydrogen-atom',
+  'number-pairs',
+  'ph-scale',
+  'ph-scale-basics',
+  'ratio-and-proportion',
+  'trig-tour',
+  'vector-addition',
+  'vector-addition-equations',
+  'wave-on-a-string'
+];
+
 /**
  * {Array.<Object>} test
  * {string} type
@@ -398,6 +430,24 @@ phetioRepos.forEach( repo => {
         testQueryParameters: `duration=${wrapperName === 'multi' ? '60000' : '15000'}`
       } );
     }
+  } );
+} );
+
+ACCESSIBILITY_AUDIT_REPOS.forEach( repo => {
+  tests.push( {
+    test: [ repo, 'a11y-audit', 'unbuilt' ],
+    type: 'a11y-audit',
+    url: `${repo}/${repo}_en.html`,
+
+    // Lower priority to allow higher priority tests to run more frequently.
+    priority: 0.1,
+
+    // Query parameters for a11y audit ensure that:
+    //   - description is enabled
+    //   - fuzz to create random states,
+    //   - disable voicing (because that feature uses unconventional markup)
+    //   - posts a message on load to indicate the sim is ready for auditing
+    queryParameters: 'brand=phet&ea&supportsInteractiveDescription=true&supportsVoicing=false&fuzz&postMessageOnLoad'
   } );
 } );
 
