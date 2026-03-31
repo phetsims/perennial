@@ -440,7 +440,9 @@ ACCESSIBILITY_AUDIT_REPOS.forEach( repo => {
     url: `${repo}/${repo}_en.html`,
 
     // Lower priority to allow higher priority tests to run more frequently.
-    priority: 0.1,
+    // TODO: Reduce priority back down to 0.1 once we confirm it is running on CT.
+    //   See https://github.com/phetsims/aqua/issues/235
+    priority: 5000,
 
     // Query parameters for a11y audit ensure that:
     //   - description is enabled
