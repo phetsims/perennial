@@ -595,10 +595,6 @@ class ReleaseBranch implements ReleaseBranchSerialized {
     return chipperVersion.major !== 0 || chipperVersion.minor !== 0;
   }
 
-  public async hasMigrationWrapper(): Promise<boolean> {
-    return this.brands.includes( 'phet-io' ) && this.includesSHA( 'phet-io-wrappers', 'd8ad7267614d1b7cf3fc2d0d9cc11e3c592ac1ce' );
-  }
-
   /**
    * Returns the timestamp string with the date of when this release branch diverged from main.
    */
