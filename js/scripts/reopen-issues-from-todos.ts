@@ -1,4 +1,4 @@
-// Copyright 2024, University of Colorado Boulder
+// Copyright 2024-2026, University of Colorado Boulder
 
 /**
  * This script is meant to ensure that all todos pointing to a github issue are pointing to open issues.
