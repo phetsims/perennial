@@ -26,6 +26,7 @@ const gitCommit = require( '../../common/gitCommit.js' );
 const gitIsClean = require( '../../common/gitIsClean.js' );
 const gitPush = require( '../../common/gitPush.js' );
 const gitPull = require( '../../common/gitPull.js' );
+const isTotality = require( '../../common/isTotality.js' );
 const assert = require( 'assert' );
 const fs = require( 'fs' );
 const grunt = require( 'grunt' );
@@ -36,8 +37,13 @@ const winston = require( 'winston' );
  * Generates the lists under perennial/data/, and if there were changes, will commit and push.
  */
 async function generateData(): Promise<void> {
-  if ( await getBranch( 'perennial' ) !== 'main' || !await gitIsClean( 'perennial' ) ) {
-    throw new Error( 'Data will only be generated if perennial is on main with no working-copy changes.' );
+
+  // In the monorepo, there is no separate perennial repo to check branch/clean status on.
+  // The shell script handles git operations instead, in daily-grunt-work
+  if ( !isTotality ) {
+    if ( await getBranch( 'perennial' ) !== 'main' || !await gitIsClean( 'perennial' ) ) {
+      throw new Error( 'Data will only be generated if perennial is on main with no working-copy changes.' );
+    }
   }
 
   const activeRepos: string[] = getActiveRepos();
@@ -72,31 +78,34 @@ async function generateData(): Promise<void> {
            phet[ 'phet-io' ] && phet[ 'phet-io' ].compareDesignedAPIChanges;
   } );
 
-  await gitAdd( 'perennial', 'data/interactive-description' );
-  await gitAdd( 'perennial', 'data/voicing' );
-  await gitAdd( 'perennial', 'data/active-runnables' );
-  await gitAdd( 'perennial', 'data/active-sims' );
-  await gitAdd( 'perennial', 'data/unit-tests' );
-  await gitAdd( 'perennial', 'data/phet-io' );
-  await gitAdd( 'perennial', 'data/phet-io-api-stable' );
+  // In the monorepo, the shell script handles git add/commit/push for data file changes, in daily-grunt-work
+  if ( !isTotality ) {
+    await gitAdd( 'perennial', 'data/interactive-description' );
+    await gitAdd( 'perennial', 'data/voicing' );
+    await gitAdd( 'perennial', 'data/active-runnables' );
+    await gitAdd( 'perennial', 'data/active-sims' );
+    await gitAdd( 'perennial', 'data/unit-tests' );
+    await gitAdd( 'perennial', 'data/phet-io' );
+    await gitAdd( 'perennial', 'data/phet-io-api-stable' );
 
-  const hasChanges = !await gitIsClean( 'perennial' );
-  if ( hasChanges ) {
-    winston.info( 'Changes to data files detected, will push' );
-    await gitCommit( 'perennial', 'Automated update of perennial data files' );
-    await gitPush( 'perennial', 'main' );
+    const hasChanges = !await gitIsClean( 'perennial' );
+    if ( hasChanges ) {
+      winston.info( 'Changes to data files detected, will push' );
+      await gitCommit( 'perennial', 'Automated update of perennial data files' );
+      await gitPush( 'perennial', 'main' );
 
-    const perennialAliasClean = await gitIsClean( 'perennial-alias' );
-    if ( perennialAliasClean ) {
-      await gitPull( 'perennial-alias', 'main' );
+      const perennialAliasClean = await gitIsClean( 'perennial-alias' );
+      if ( perennialAliasClean ) {
+        await gitPull( 'perennial-alias', 'main' );
+      }
+      else {
+        winston.info( 'perennial-alias has changes, skipping pull' );
+      }
+
     }
     else {
-      winston.info( 'perennial-alias has changes, skipping pull' );
+      winston.info( 'No changes detected' );
     }
-
-  }
-  else {
-    winston.info( 'No changes detected' );
   }
 }
 
