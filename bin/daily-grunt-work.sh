@@ -44,15 +44,15 @@ git commit -m "Update copyright dates from daily grunt work" --no-verify && git 
 
 ###########################################################################################################
 # report third party
-# Commented out because it stalls out, see https://github.com/phetsims/chipper/issues/1669
-#logWithStderr "TASK - THIRD PARTY REPORT:"
-#cd chipper && npx grunt report-third-party && cd ..
-#git add sherpa/third-party-licenses.md
-#git commit -m "Update third-party-licenses from daily grunt work" --no-verify && git push || true
+logWithStderr "TASK - THIRD PARTY REPORT:"
+cd chipper && npx grunt report-third-party && cd ..
+git add sherpa/third-party-licenses.md
+git commit -m "Update third-party-licenses from daily grunt work" --no-verify && git push || true
 
 ##########################################################################################################
 # Update responsible dev/designer markdown output
 logWithStderr "TASK - RESPONSIBLE DEV MARKDOWN:"
+(cd phet-info && npm ci)
 perennial-alias/bin/sage run ./phet-info/sim-info/generateMarkdownOutput.mjs
 git add phet-info/
 git commit -m "Update responsible_dev markdown output from daily grunt work" --no-verify && git push || true
@@ -60,7 +60,7 @@ git commit -m "Update responsible_dev markdown output from daily grunt work" --n
 ##########################################################################################################
 # Update perennial-alias/data/ lists
 logWithStderr "TASK - GENERATE DATA LISTS:"
-cd perennial-alias && npx grunt generate-data && cd ..
+(cd perennial-alias && npx grunt generate-data)
 git add perennial-alias/data/
 git commit -m "Update data lists from daily grunt work" --no-verify && git push || true
 

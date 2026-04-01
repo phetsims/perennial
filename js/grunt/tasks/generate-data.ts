@@ -50,8 +50,14 @@ async function generateData(): Promise<void> {
 
   function writeList( name: string, packageFilter: ( repo: IntentionalPerennialAny ) => void ): void {
     const repos = activeRepos.filter( repo => {
-      // Make sure that if someone doesn't have all repositories checked out that this will FAIL. Otherwise bad things.
-      assert( grunt.file.exists( `../${repo}` ) );
+      // In the monorepo, not all active repos are imported, so skip missing ones.
+      // In polyrepo, assert that all repos are checked out.
+      if ( !grunt.file.exists( `../${repo}` ) ) {
+        if ( isTotality ) {
+          return false;
+        }
+        assert( false, `Missing repo: ${repo}` );
+      }
 
       let packageObject;
       try {
