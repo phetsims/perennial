@@ -1,4 +1,4 @@
-// Copyright 2021, University of Colorado Boulder
+// Copyright 2021-2026, University of Colorado Boulder
 
 /**
  * Generally a "one-stop shop" for all things needed to update the PhET Codebase. See js/common/sync for detailed doc.

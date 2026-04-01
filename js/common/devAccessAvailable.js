@@ -1,4 +1,4 @@
-// Copyright 2018, University of Colorado Boulder
+// Copyright 2018-2026, University of Colorado Boulder
 
 /**
  * Checks whether access to the dev server is available (usually unavailable if not on VPN or on campus)

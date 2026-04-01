@@ -1,4 +1,4 @@
-// Copyright 2017, University of Colorado Boulder
+// Copyright 2017-2026, University of Colorado Boulder
 
 /**
  * git pull with an assumption that your cwd is in the top of a repo, like perennial/ or chipper/.

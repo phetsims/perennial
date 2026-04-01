@@ -1,4 +1,4 @@
-// Copyright 2021, University of Colorado Boulder
+// Copyright 2021-2026, University of Colorado Boulder
 
 /**
  * Provides the SHA of the last shared ancestor commit between two targets (branches/SHAs)

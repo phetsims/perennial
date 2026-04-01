@@ -1,4 +1,4 @@
-// Copyright 2018, University of Colorado Boulder
+// Copyright 2018-2026, University of Colorado Boulder
 
 /**
  * git rev-list -1 --before="{{TIMESTAMP}}" {{BRANCH}}

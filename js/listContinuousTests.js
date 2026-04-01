@@ -1,4 +1,4 @@
-// Copyright 2020, University of Colorado Boulder
+// Copyright 2020-2026, University of Colorado Boulder
 
 /**
  * This prints out (in JSON form) the tests and operations requested for continuous testing for whatever is in main

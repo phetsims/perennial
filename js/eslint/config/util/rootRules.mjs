@@ -1,4 +1,4 @@
-// Copyright 2015-2021, University of Colorado Boulder
+// Copyright 2015-2026, University of Colorado Boulder
 
 /**
  * The rules are organized like they are in the list at https://eslint.org/docs/rules/

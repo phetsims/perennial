@@ -1,5 +1,4 @@
-// Copyright 2024, University of Colorado Boulder
-
+// Copyright 2024-2026, University of Colorado Boulder
 
 import browserAndNodeEslintConfig from '../eslint/config/browser-and-node.eslint.config.mjs';
 

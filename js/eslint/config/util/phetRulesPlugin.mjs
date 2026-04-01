@@ -1,4 +1,4 @@
-// Copyright 2015-2021, University of Colorado Boulder
+// Copyright 2015-2026, University of Colorado Boulder
 
 import additionalBadText from '../../phet-rules/additional-bad-text.js';
 import authorAnnotation from '../../phet-rules/author-annotation.js';

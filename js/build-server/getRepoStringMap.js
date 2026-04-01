@@ -1,4 +1,4 @@
-// Copyright 2023, University of Colorado Boulder
+// Copyright 2023-2026, University of Colorado Boulder
 
 /**
  * Returns an inverse string map (stringMap[ stringKey ][ locale ]) for all strings in a given repo.

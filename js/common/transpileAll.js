@@ -1,4 +1,4 @@
-// Copyright 2017, University of Colorado Boulder
+// Copyright 2017-2026, University of Colorado Boulder
 
 /**
  * Runs `grunt transpile --all` in current version of chipper. Will hard fail if on old shas that predate this task

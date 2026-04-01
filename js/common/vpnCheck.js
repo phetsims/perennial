@@ -1,4 +1,4 @@
-// Copyright 2018, University of Colorado Boulder
+// Copyright 2018-2026, University of Colorado Boulder
 
 /**
  * Checks whether we are somewhere that would have access to phet-server2.int.colorado.edu (implies access to bayes).

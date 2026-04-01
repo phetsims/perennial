@@ -1,4 +1,4 @@
-// Copyright 2021, University of Colorado Boulder
+// Copyright 2021-2026, University of Colorado Boulder
 
 /**
  * The main logic behind the sync grunt task (js/grunt/tasks/sync.ts).

@@ -1,4 +1,4 @@
-// Copyright 2018, University of Colorado Boulder
+// Copyright 2018-2026, University of Colorado Boulder
 
 /**
  * The main persistent state-bearing object for maintenance releases. Can be loaded from or saved to a dedicated file.

@@ -1,4 +1,4 @@
-// Copyright 2017-2019, University of Colorado Boulder
+// Copyright 2017-2026, University of Colorado Boulder
 // @author Matt Pennington (PhET Interactive Simulations)
 
 const buildLocal = require( './buildLocal' );

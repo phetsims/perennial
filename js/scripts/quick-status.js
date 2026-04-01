@@ -1,4 +1,4 @@
-// Copyright 2021, University of Colorado Boulder
+// Copyright 2021-2026, University of Colorado Boulder
 
 /**
  * A fast-running status check. NOTE: Only checks the local status, does NOT check the server. Use the full status for

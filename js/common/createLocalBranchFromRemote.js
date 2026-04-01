@@ -1,4 +1,4 @@
-// Copyright 2023, University of Colorado Boulder
+// Copyright 2023-2026, University of Colorado Boulder
 
 /**
  * If your local repo does not have a remote branch, this script will grab it and set up tracking on it.

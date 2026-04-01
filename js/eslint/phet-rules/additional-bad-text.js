@@ -1,4 +1,4 @@
-// Copyright 2019-2022, University of Colorado Boulder
+// Copyright 2019-2026, University of Colorado Boulder
 
 /**
  * Lint detector for invalid text, where repo-specific text can be identified. We were unable to find a way to combine

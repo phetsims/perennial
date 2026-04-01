@@ -1,4 +1,4 @@
-// Copyright 2021, University of Colorado Boulder
+// Copyright 2021-2026, University of Colorado Boulder
 
 /**
  * git checkout, for SHAs only, but will fetch if the sha doesn't exist locally

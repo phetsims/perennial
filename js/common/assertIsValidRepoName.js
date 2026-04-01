@@ -1,4 +1,4 @@
-// Copyright 2021, University of Colorado Boulder
+// Copyright 2021-2026, University of Colorado Boulder
 
 /**
  * Fails with an assertion if the string is not a valid repo name. See https://github.com/phetsims/chipper/issues/1034.
