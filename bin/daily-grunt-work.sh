@@ -38,9 +38,7 @@ npm install
 ###########################################################################################################
 # update-copyright-dates
 logWithStderr "TASK - COPYRIGHT UPDATES:"
-for repo in $(git ls-tree --name-only -d HEAD | grep -v -e '^\.' -e '^node_modules$' -e '^_totality$'); do
-  (cd chipper && npx grunt update-copyright-dates --repo=$repo)
-done
+node _totality/scripts/update-copyright-dates.mjs
 git add -A
 git commit -m "Update copyright dates from daily grunt work" --no-verify && git push || true
 
