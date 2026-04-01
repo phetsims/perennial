@@ -44,10 +44,11 @@ git commit -m "Update copyright dates from daily grunt work" --no-verify && git 
 
 ###########################################################################################################
 # report third party
-logWithStderr "TASK - THIRD PARTY REPORT:"
-cd chipper && npx grunt report-third-party && cd ..
-git add sherpa/third-party-licenses.md
-git commit -m "Update third-party-licenses from daily grunt work" --no-verify && git push || true
+# Commented out because it stalls out, see https://github.com/phetsims/chipper/issues/1669
+#logWithStderr "TASK - THIRD PARTY REPORT:"
+#cd chipper && npx grunt report-third-party && cd ..
+#git add sherpa/third-party-licenses.md
+#git commit -m "Update third-party-licenses from daily grunt work" --no-verify && git push || true
 
 ##########################################################################################################
 # Update responsible dev/designer markdown output
