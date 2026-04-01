@@ -44,7 +44,8 @@ const repoList = getOption( 'repoList' ) || 'active-repos';
 
   console.log( 'grunt lint --all started' );
   try {
-    await lint( getRepoList( repoList ).filter( repo => repo !== 'perennial' ), {
+    // TODO: https://github.com/phetsims/totality/issues/35 aqua can't type check in totality/ since it needs to point to perennial-alias
+    await lint( getRepoList( repoList ).filter( repo => repo !== 'perennial' && repo !== 'aqua' ), {
       clean: true
     } );
   }
