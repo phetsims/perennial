@@ -8,6 +8,10 @@
     "version": "2.0"
   },
   {
+    "sim": "balancing-chemical-equations",
+    "version": "2.1"
+  },
+  {
     "sim": "beers-law-lab",
     "version": "1.7"
   },
