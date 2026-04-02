@@ -41,12 +41,6 @@ function clone_if_missing(){
   fi
 }
 
-# Ensure a polyrepo chipper checkout exists as a sibling (needed by skiffle, binder, etc.)
-function ensure_polyrepo_chipper() {
-  clone_if_missing "${EXTERNAL_DIR}/chipper" "https://github.com/phetsims/chipper.git"
-  (cd ${EXTERNAL_DIR}/chipper && git pull && npm ci && npx grunt transpile --all)
-}
-
 # Log to both out and err, so that it shows up in the error logs
 function logWithStderr(){
   echo $1 | tee >(cat >&2)
@@ -102,9 +96,8 @@ function task_update() {
 
 function task_skiffle() {
   logWithStderr "TASK - BUILD SKIFFLE:"
-  ensure_polyrepo_chipper
   clone_if_missing "${EXTERNAL_DIR}/skiffle" "https://github.com/phetsims/skiffle.git"
-  cd ${EXTERNAL_DIR}/skiffle && git pull && npm prune && npm update && npx grunt && git add . && (git commit -am "Update skiffle build from daily grunt work" --no-verify || true) && git push
+  cd ${EXTERNAL_DIR}/skiffle && git pull && npm prune && npm update && TOTALITY_PATH=${workingDir} npm run build && git add . && (git commit -am "Update skiffle build from daily grunt work" --no-verify || true) && git push
   cd ${workingDir}
 }
 
