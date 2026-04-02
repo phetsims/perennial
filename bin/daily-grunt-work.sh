@@ -23,7 +23,7 @@ workingDir=${binDir}/../..
 cd ${workingDir} || exit
 
 # External polyrepos that are not part of the monorepo
-EXTERNAL_DIR="/data/share/phet/automated-grunt-work"
+EXTERNAL_DIR="${workingDir}/../automated-grunt-work"
 
 # Clone a repo if it doesn't already exist
 function clone_if_missing(){
