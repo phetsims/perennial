@@ -27,8 +27,8 @@ binDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 workingDir=${binDir}/../..
 cd ${workingDir} || exit
 
-# External polyrepos that are not part of the monorepo
-EXTERNAL_DIR="${workingDir}/../automated-grunt-work"
+# External polyrepos live as siblings of the monorepo (e.g. alongside totality/)
+EXTERNAL_DIR="${workingDir}/.."
 
 # Clone a repo if it doesn't already exist
 function clone_if_missing(){
@@ -38,6 +38,12 @@ function clone_if_missing(){
     mkdir -p "$(dirname "$dir")"
     git clone "$repo_url" "$dir"
   fi
+}
+
+# Ensure a polyrepo chipper checkout exists as a sibling (needed by skiffle, binder, etc.)
+function ensure_polyrepo_chipper() {
+  clone_if_missing "${EXTERNAL_DIR}/chipper" "https://github.com/phetsims/chipper.git"
+  (cd ${EXTERNAL_DIR}/chipper && git pull && npm ci)
 }
 
 # Log to both out and err, so that it shows up in the error logs
@@ -95,6 +101,7 @@ function task_update() {
 
 function task_skiffle() {
   logWithStderr "TASK - BUILD SKIFFLE:"
+  ensure_polyrepo_chipper
   clone_if_missing "${EXTERNAL_DIR}/skiffle" "https://github.com/phetsims/skiffle.git"
   cd ${EXTERNAL_DIR}/skiffle && git pull && npm prune && npm update && npx grunt && git add . && git commit -am "Update skiffle build from daily grunt work" --no-verify && git push
   cd ${workingDir}
@@ -119,6 +126,7 @@ function task_locale-info() {
 function task_binder() {
   # Binder is less important, and it also has been known to have a hard failure (rarely). So put it towards the end.
   logWithStderr "TASK - BINDER DOC:"
+  ensure_polyrepo_chipper
   clone_if_missing "${EXTERNAL_DIR}/binder" "https://github.com/phetsims/binder.git"
   cd ${EXTERNAL_DIR}/binder && git pull && npm prune && npm update && npm run build && git add . && git commit -am "Update binder doc from daily grunt work" --no-verify && git push
   cd ${workingDir}
