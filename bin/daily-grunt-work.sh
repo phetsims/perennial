@@ -24,11 +24,14 @@ trap "exit 1" SIGINT
 
 # cd to the directory where your git repositories live (monorepo root)
 binDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-workingDir=${binDir}/../..
+workingDir=$(cd "${binDir}/../.." && pwd)
 cd ${workingDir} || exit
 
 # External polyrepos live as siblings of the monorepo (e.g. alongside totality/)
-EXTERNAL_DIR="${workingDir}/.."
+EXTERNAL_DIR=$(cd "${workingDir}/.." && pwd)
+
+echo "workingDir=${workingDir}"
+echo "EXTERNAL_DIR=${EXTERNAL_DIR}"
 
 # Clone a repo if it doesn't already exist
 function clone_if_missing(){
