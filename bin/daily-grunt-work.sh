@@ -67,8 +67,8 @@ git commit -m "Update data lists from daily grunt work" --no-verify && git push 
 ##########################################################################################################
 # Reopen any github issues that still have TODOs in the codebase linking to them
 logWithStderr "TASK - REOPEN ISSUES LINKED IN TODOS:"
-perennial-alias/bin/sage run perennial-alias/js/scripts/reopen-issues-from-todos.ts
-perennial-alias/bin/sage run perennial-alias/js/scripts/reopen-issues-from-todos.ts --repoList=active-website-repos
+(cd perennial-alias && bin/sage run js/scripts/reopen-issues-from-todos.ts)
+(cd perennial-alias && bin/sage run js/scripts/reopen-issues-from-todos.ts --repoList=active-website-repos)
 
 ##########################################################################################################
 
