@@ -103,7 +103,7 @@ function task_skiffle() {
   logWithStderr "TASK - BUILD SKIFFLE:"
   ensure_polyrepo_chipper
   clone_if_missing "${EXTERNAL_DIR}/skiffle" "https://github.com/phetsims/skiffle.git"
-  cd ${EXTERNAL_DIR}/skiffle && git pull && npm prune && npm update && npx grunt && git add . && git commit -am "Update skiffle build from daily grunt work" --no-verify && git push
+  cd ${EXTERNAL_DIR}/skiffle && git pull && npm prune && npm update && npx grunt && git add . && (git commit -am "Update skiffle build from daily grunt work" --no-verify || true) && git push
   cd ${workingDir}
 }
 
@@ -128,7 +128,7 @@ function task_binder() {
   logWithStderr "TASK - BINDER DOC:"
   ensure_polyrepo_chipper
   clone_if_missing "${EXTERNAL_DIR}/binder" "https://github.com/phetsims/binder.git"
-  cd ${EXTERNAL_DIR}/binder && git pull && npm prune && npm update && npm run build && git add . && git commit -am "Update binder doc from daily grunt work" --no-verify && git push
+  cd ${EXTERNAL_DIR}/binder && git pull && npm prune && npm update && npm run build && git add . && (git commit -am "Update binder doc from daily grunt work" --no-verify || true) && git push
   cd ${workingDir}
 }
 
