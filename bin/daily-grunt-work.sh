@@ -129,7 +129,7 @@ function task_binder() {
   # Binder runs sims via chipper's dev-server from totality (no polyrepo chipper needed).
   logWithStderr "TASK - BINDER DOC:"
   clone_if_missing "${EXTERNAL_DIR}/binder" "https://github.com/phetsims/binder.git"
-  cd ${EXTERNAL_DIR}/binder && git pull && npm prune && npm update && TOTALITY_PATH=${workingDir} npm run build && git add . && (git commit -am "Update binder doc from daily grunt work" --no-verify || true) && git push
+  cd ${EXTERNAL_DIR}/binder && git pull && npm prune && npm update && npx playwright install chromium && TOTALITY_PATH=${workingDir} npm run build && git add . && (git commit -am "Update binder doc from daily grunt work" --no-verify || true) && git push
   cd ${workingDir}
 }
 
