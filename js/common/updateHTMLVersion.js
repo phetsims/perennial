@@ -34,11 +34,11 @@ module.exports = async function( repo ) {
 
   // We'll want to update development/test HTML as necessary, since they'll include the version
   const packageObject = await loadJSON( `../${repo}/package.json` );
-  await execute( gruntCommand, [ 'generate-development-html' ], `../${repo}` );
+  await execute( gruntCommand, [ 'generate-development-html', `--repo=${repo}` ], '../chipper' );
   await gitAdd( repo, `${repo}_en.html` );
 
   if ( packageObject.phet.generatedUnitTests ) {
-    await execute( gruntCommand, [ 'generate-test-html' ], `../${repo}` );
+    await execute( gruntCommand, [ 'generate-test-html', `--repo=${repo}` ], '../chipper' );
     await gitAdd( repo, `${repo}-tests.html` );
   }
   if ( !( await gitIsClean( repo ) ) ) {
