@@ -126,10 +126,10 @@ function task_locale-info() {
 
 function task_binder() {
   # Binder is less important, and it also has been known to have a hard failure (rarely). So put it towards the end.
+  # Binder runs sims via chipper's dev-server from totality (no polyrepo chipper needed).
   logWithStderr "TASK - BINDER DOC:"
-  ensure_polyrepo_chipper
   clone_if_missing "${EXTERNAL_DIR}/binder" "https://github.com/phetsims/binder.git"
-  cd ${EXTERNAL_DIR}/binder && git pull && npm prune && npm update && npm run build && git add . && (git commit -am "Update binder doc from daily grunt work" --no-verify || true) && git push
+  cd ${EXTERNAL_DIR}/binder && git pull && npm prune && npm update && TOTALITY_PATH=${workingDir} npm run build && git add . && (git commit -am "Update binder doc from daily grunt work" --no-verify || true) && git push
   cd ${workingDir}
 }
 
