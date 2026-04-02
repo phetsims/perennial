@@ -161,11 +161,11 @@ fi
 
 if [ -n "$TASK_ARG" ]; then
   # Run a single task
-  task_func="task_$1"
+  task_func="task_$TASK_ARG"
   if declare -f "$task_func" > /dev/null; then
     $task_func
   else
-    echo "Unknown task: $1" >&2
+    echo "Unknown task: $TASK_ARG" >&2
     echo "Run with --list to see available tasks" >&2
     exit 1
   fi
