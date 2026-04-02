@@ -25,6 +25,16 @@ cd ${workingDir} || exit
 # External polyrepos that are not part of the monorepo
 EXTERNAL_DIR="/data/share/phet/automated-grunt-work"
 
+# Clone a repo if it doesn't already exist
+function clone_if_missing(){
+  local dir=$1
+  local repo_url=$2
+  if [ ! -d "$dir" ]; then
+    mkdir -p "$(dirname "$dir")"
+    git clone "$repo_url" "$dir"
+  fi
+}
+
 # Log to both out and err, so that it shows up in the error logs
 function logWithStderr(){
   echo $1 | tee >(cat >&2)
@@ -82,13 +92,16 @@ git commit -m "grunt update from daily grunt work" --no-verify && git push || tr
 ##########################################################################################################
 
 logWithStderr "TASK - BUILD SKIFFLE:"
+clone_if_missing "${EXTERNAL_DIR}/skiffle" "https://github.com/phetsims/skiffle.git"
 cd ${EXTERNAL_DIR}/skiffle && git pull && npm prune && npm update && npx grunt && git add . && git commit -am "Update skiffle build from daily grunt work" --no-verify && git push
 cd ${workingDir}
 
 ##########################################################################################################
 
-logWithStderr "TASK - PUBLISH LATEST PHET_IO LINKS:"
-perennial-alias/bin/sage run perennial-alias/js/scripts/publish-phet-io-latest-links.js /data/web/htdocs/dev/phet-io/latest
+# TODO: publish-phet-io-latest-links requires per-repo git branches (e.g. 1.3) which don't exist in totality.
+# This task must be run from the polyrepo layout. See https://github.com/phetsims/totality/issues/35
+# logWithStderr "TASK - PUBLISH LATEST PHET_IO LINKS:"
+# perennial-alias/bin/sage run perennial-alias/js/scripts/publish-phet-io-latest-links.js /data/web/htdocs/dev/phet-io/latest
 
 ##########################################################################################################
 
@@ -112,6 +125,7 @@ git commit -m "Update locale info from daily grunt work" --no-verify && git push
 # regenerate documentation
 # Binder is less important, and it also has been known to have a hard failure (rarely). So put it towards the end.
 logWithStderr "TASK - BINDER DOC:"
+clone_if_missing "${EXTERNAL_DIR}/binder" "https://github.com/phetsims/binder.git"
 cd ${EXTERNAL_DIR}/binder && git pull && npm prune && npm update && npm run build && git add . && git commit -am "Update binder doc from daily grunt work" --no-verify && git push
 cd ${workingDir}
 

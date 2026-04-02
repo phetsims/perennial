@@ -20,7 +20,7 @@ module.exports = function( path ) {
   winston.info( `Creating directory ${path}` );
 
   return new Promise( ( resolve, reject ) => {
-    fs.mkdir( path, err => {
+    fs.mkdir( path, { recursive: true }, err => {
       if ( err ) {
         reject( new Error( `createDirectory: ${err}` ) );
       }
