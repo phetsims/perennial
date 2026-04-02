@@ -131,20 +131,35 @@ ALL_TASKS="copyright third-party responsible-dev data-lists reopen-todos update 
 # Dispatch
 ###########################################################################################################
 
-if [ "$1" == "--list" ]; then
-  echo "Available tasks:"
-  for task in $ALL_TASKS; do
-    echo "  $task"
-  done
-  exit 0
-fi
+SKIP_INSTALL=false
+TASK_ARG=""
+
+for arg in "$@"; do
+  case $arg in
+    --list)
+      echo "Available tasks:"
+      for task in $ALL_TASKS; do
+        echo "  $task"
+      done
+      exit 0
+      ;;
+    --skip-install)
+      SKIP_INSTALL=true
+      ;;
+    *)
+      TASK_ARG="$arg"
+      ;;
+  esac
+done
 
 logWithStderr "Daily Grunt Work on `date`"
 logWithStderr "node@`node --version`, npm@`npm --version`"
 
-npm install
+if [ "$SKIP_INSTALL" = false ]; then
+  npm install
+fi
 
-if [ -n "$1" ]; then
+if [ -n "$TASK_ARG" ]; then
   # Run a single task
   task_func="task_$1"
   if declare -f "$task_func" > /dev/null; then
