@@ -44,7 +44,7 @@ function clone_if_missing(){
 # Ensure a polyrepo chipper checkout exists as a sibling (needed by skiffle, binder, etc.)
 function ensure_polyrepo_chipper() {
   clone_if_missing "${EXTERNAL_DIR}/chipper" "https://github.com/phetsims/chipper.git"
-  (cd ${EXTERNAL_DIR}/chipper && git pull && npm ci)
+  (cd ${EXTERNAL_DIR}/chipper && git pull && npm ci && npx grunt transpile --all)
 }
 
 # Log to both out and err, so that it shows up in the error logs
