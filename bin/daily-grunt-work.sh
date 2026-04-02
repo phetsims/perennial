@@ -30,8 +30,6 @@ cd ${workingDir} || exit
 # External polyrepos live as siblings of the monorepo (e.g. alongside totality/)
 EXTERNAL_DIR=$(cd "${workingDir}/.." && pwd)
 
-echo "workingDir=${workingDir}"
-echo "EXTERNAL_DIR=${EXTERNAL_DIR}"
 
 # Clone a repo if it doesn't already exist
 function clone_if_missing(){
