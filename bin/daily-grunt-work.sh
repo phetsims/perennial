@@ -98,10 +98,12 @@ cd ${workingDir}
 
 ##########################################################################################################
 
-# TODO: publish-phet-io-latest-links requires per-repo git branches (e.g. 1.3) which don't exist in totality.
-# This task must be run from the polyrepo layout. See https://github.com/phetsims/totality/issues/35
-# logWithStderr "TASK - PUBLISH LATEST PHET_IO LINKS:"
-# perennial-alias/bin/sage run perennial-alias/js/scripts/publish-phet-io-latest-links.js /data/web/htdocs/dev/phet-io/latest
+# publish-phet-io-latest-links requires per-repo git branches (e.g. 1.3) which don't exist in totality.
+# Run from the polyrepo perennial-alias checkout. See https://github.com/phetsims/totality/issues/35
+logWithStderr "TASK - PUBLISH LATEST PHET_IO LINKS:"
+clone_if_missing "${EXTERNAL_DIR}/perennial-alias" "https://github.com/phetsims/perennial.git"
+(cd ${EXTERNAL_DIR}/perennial-alias && git pull && npm ci)
+${EXTERNAL_DIR}/perennial-alias/bin/sage run ${EXTERNAL_DIR}/perennial-alias/js/scripts/publish-phet-io-latest-links.js /data/web/htdocs/dev/phet-io/latest
 
 ##########################################################################################################
 
