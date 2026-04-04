@@ -18,8 +18,8 @@ const fs = require( 'fs' );
 // Default behavior (no flag) uses the full active-repos list as before.
 const importedReposArg = process.argv.find( arg => arg.startsWith( '--importedRepos=' ) );
 const importedRepoSet = importedReposArg
-  ? new Set( importedReposArg.slice( '--importedRepos='.length ).split( ',' ) )
-  : null;
+                        ? new Set( importedReposArg.slice( '--importedRepos='.length ).split( ',' ) )
+                        : null;
 
 const filterToImported = list => importedRepoSet ? list.filter( r => importedRepoSet.has( r ) ) : list;
 
@@ -120,18 +120,18 @@ const tests = [];
 // npm-run tests
 {
   tests.push( {
-    test: [ 'perennial', 'lint', 'all' ],
+    test: [ 'perennial-alias', 'lint', 'all' ],
     type: 'npm-run',
     command: 'lint-all',
-    repo: 'perennial',
+    repo: 'perennial-alias',
     priority: 100
   } );
 
   tests.push( {
-    test: [ 'perennial', 'type-check', 'all' ],
+    test: [ 'perennial-alias', 'type-check', 'all' ],
     type: 'npm-run',
     command: 'type-check-all',
-    repo: 'perennial',
+    repo: 'perennial-alias',
     priority: 100
   } );
 
@@ -139,12 +139,12 @@ const tests = [];
     test: [ 'scenerystack', 'checkout-build-and-test' ],
     type: 'npm-run',
     command: 'scenerystack-test',
-    repo: 'perennial',
+    repo: 'perennial-alias',
     priority: 20 // Is this too much or too little?
   } );
 
 // Node unit tests
-  [ 'chipper', 'perennial', 'perennial-alias' ].forEach( repo => {
+  [ 'chipper', 'perennial-alias' ].forEach( repo => {
     tests.push( {
       test: [ repo, 'qunit', 'node' ],
       type: 'npm-run',
@@ -195,13 +195,13 @@ const tests = [];
 // lints
 repos.forEach( repo => {
   // Support eslint.config.js and eslint.config.mjs
-    if ( fs.readdirSync( `../${repo}` ).some( path => path.includes( 'eslint.config.' ) ) ) {
-      tests.push( {
-        test: [ repo, 'lint' ],
-        type: 'lint',
-        repo: repo,
-        priority: 8
-      } );
+  if ( fs.readdirSync( `../${repo}` ).some( path => path.includes( 'eslint.config.' ) ) ) {
+    tests.push( {
+      test: [ repo, 'lint' ],
+      type: 'lint',
+      repo: repo,
+      priority: 8
+    } );
   }
 } );
 
