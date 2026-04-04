@@ -168,10 +168,10 @@ const tests = [];
   } );
 
   tests.push( {
-    test: [ 'perennial', 'circular-dependencies', 'common-repos' ],
+    test: [ 'perennial-alias', 'circular-dependencies', 'common-repos' ],
     type: 'npm-run',
     command: 'test-circular-dependencies',
-    repo: 'perennial'
+    repo: 'perennial-alias'
   } );
 
 }
