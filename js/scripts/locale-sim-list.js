@@ -13,7 +13,6 @@ const winston = require( 'winston' );
 winston.default.transports.console.level = 'error';
 
 const production = process.argv.includes( '--production' );
-const phettest = process.argv.includes( '--phettest' );
 const local = process.argv.includes( '--local' );
 
 const limitString = process.argv.find( arg => arg.startsWith( '--limit=' ) );
@@ -55,9 +54,6 @@ const limit = limitString ? Number( limitString.substring( '--limit='.length ) )
       const links = [];
       if ( production ) {
         links.push( `[production](https://phet.colorado.edu/sims/html/${simName}/latest/${simName}_all.html?locale=${locale})` );
-      }
-      if ( phettest ) {
-        links.push( `[phettest](https://bayes.colorado.edu/dev/phettest/${simName}/${simName}_en.html?ea&brand=phet&locale=${locale})` );
       }
       if ( local ) {
         links.push( `[local](http://localhost/${simName}/${simName}_en.html?brand=phet&ea&debugger&locale=${locale})` );
