@@ -10,7 +10,6 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-const getActiveRepos = require( './common/getActiveRepos' );
 const getRepoList = require( './common/getRepoList' );
 const fs = require( 'fs' );
 
@@ -23,7 +22,6 @@ const importedRepoSet = importedReposArg
 
 const filterToImported = list => importedRepoSet ? list.filter( r => importedRepoSet.has( r ) ) : list;
 
-const repos = filterToImported( getActiveRepos() );
 const phetioRepos = filterToImported( getRepoList( 'phet-io' ) );
 const phetioAPIStableRepos = filterToImported( getRepoList( 'phet-io-api-stable' ) );
 const runnableRepos = filterToImported( getRepoList( 'active-runnables' ) );
@@ -190,19 +188,6 @@ const tests = [];
     repo: repo,
     priority: 1
   } );
-} );
-
-// lints
-repos.forEach( repo => {
-  // Support eslint.config.js and eslint.config.mjs
-  if ( fs.readdirSync( `../${repo}` ).some( path => path.includes( 'eslint.config.' ) ) ) {
-    tests.push( {
-      test: [ repo, 'lint' ],
-      type: 'lint',
-      repo: repo,
-      priority: 8
-    } );
-  }
 } );
 
 runnableRepos.forEach( repo => {
