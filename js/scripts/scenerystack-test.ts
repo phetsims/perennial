@@ -213,7 +213,7 @@ const SKIP_REFRESH = false;
 
     const hasDisplay = await withServer( async port => {
       console.log( 'launching puppeteer' );
-      return puppeteerEvaluate( `http://localhost:${port}/perennial/.scenerystack/demo-sim/dist/index.html`, '!!phet.joist.sim.display' );
+      return puppeteerEvaluate( `http://localhost:${port}/perennial-alias/.scenerystack/demo-sim/dist/index.html`, '!!phet.joist.sim.display' );
     } );
 
     if ( !hasDisplay ) {
@@ -259,7 +259,7 @@ const SKIP_REFRESH = false;
         console.log( `vite build ${repo}` );
         await viteBuild( `./.scenerystack/${repo}` );
         await withServer( async port => {
-          await puppeteerLoad( `http://localhost:${port}/perennial/.scenerystack/${repo}/dist/index.html` );
+          await puppeteerLoad( `http://localhost:${port}/perennial-alias/.scenerystack/${repo}/dist/index.html` );
         } );
       }
     }
@@ -289,7 +289,7 @@ const SKIP_REFRESH = false;
         await parcelBuild( `./.scenerystack/${repo}` );
         console.log( 'built' );
         await withServer( async port => {
-          await puppeteerLoad( `http://localhost:${port}/perennial/.scenerystack/${repo}/dist/index.html` );
+          await puppeteerLoad( `http://localhost:${port}/perennial-alias/.scenerystack/${repo}/dist/index.html` );
         } );
       }
     }
