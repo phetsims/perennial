@@ -36,6 +36,10 @@
     "version": "1.0"
   },
   {
+    "sim": "calculus-grapher",
+    "version": "1.1"
+  },
+  {
     "sim": "center-and-variability",
     "version": "1.1"
   },
