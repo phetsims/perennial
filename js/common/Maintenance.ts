@@ -58,6 +58,7 @@ const MAINTENANCE_FILE = '.maintenance.json';
 //   'buildAll',
 //   'checkBranchStatus',
 //   'checkoutBranch',
+//   'checkoutAndBuild',
 //   'createPatch',
 //   'deployProduction',
 //   'deployReleaseCandidates',
@@ -671,6 +672,30 @@ class Maintenance {
   }
 
   /**
+   * Checks out a single branch for a repo, then builds it.
+   * @param repo
+   * @param branch
+   * @param buildOptions - Optional build options forwarded to build()
+   */
+  public static async checkoutAndBuild( repo: string, branch: string, buildOptions?: Partial<BuildOptions> ): Promise<void> {
+    await Maintenance.checkoutBranch( repo, branch );
+    await Maintenance.cleanBuildDirectory( repo );
+    await build( repo, buildOptions );
+    console.log( `Built ${repo} ${branch}` );
+  }
+
+  /**
+   * Deletes the build/ directory for a repo to avoid legacy grunt clean issues that
+   * attempt to delete outside the current working directory.
+   * See https://github.com/phetsims/perennial/issues/480
+   */
+  private static async cleanBuildDirectory( repo: string ): Promise<void> {
+    console.log( 'Cleaning repo build directory' );
+    const buildDirectory = path.resolve( PERENNIAL_ROOT, '..', repo, 'build' );
+    await fs.promises.rm( buildDirectory, { recursive: true, force: true } );
+  }
+
+  /**
    * Attempts to apply patches to the modified branches that are marked as needed.
    */
   public static async applyPatches(): Promise<boolean> {
@@ -901,6 +926,7 @@ class Maintenance {
         console.log( `Running RC deploy for ${modifiedBranch.repo} ${modifiedBranch.branch}` );
 
         await Maintenance.cleanChipperDist();
+        await Maintenance.cleanBuildDirectory( modifiedBranch.repo );
 
         const version = await rc( modifiedBranch.repo, modifiedBranch.branch, modifiedBranch.brands, true, modifiedBranch.pushedMessages.join( ', ' ) );
         modifiedBranch.deployedVersion = version;
@@ -939,6 +965,7 @@ class Maintenance {
         console.log( `Running production deploy for ${modifiedBranch.repo} ${modifiedBranch.branch}` );
 
         await Maintenance.cleanChipperDist();
+        await Maintenance.cleanBuildDirectory( modifiedBranch.repo );
 
         const version = await production( modifiedBranch.repo, modifiedBranch.branch, modifiedBranch.brands, true, false, modifiedBranch.pushedMessages.join( ', ' ) );
         modifiedBranch.deployedVersion = version;
