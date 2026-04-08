@@ -211,6 +211,10 @@ yet had applied patches), e.g.:
 
 This is essentially a pretty-printed version of what is in your `.maintenance.json` file.
 
+If you want release branches grouped by when they diverged from main, use `Maintenance.timestampList()`. It adds a
+timestamp prefix and sorts needed-patch branches by that date, making it easy to target the newest/oldest unpatched
+branch first and minimize cherry-pick deltas.
+
 ## Prerequisites
 
 It is assumed that your `~/.phet/build.json` file will be properly configured so that simulations can be deployed. The
