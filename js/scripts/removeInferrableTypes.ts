@@ -167,7 +167,10 @@ const repoPath = process.argv[ 2 ];
  */
 function isBuildSuccessful( repoPath: string ): boolean {
   try {
-    const result = execSync( `grunt type-check --repo=${repoPath}`, {
+
+    // Use gruntCommand.js so this works on Windows (grunt.cmd) as well as macOS/Linux (grunt).
+    const gruntCommand = require( '../../../perennial-alias/js/common/gruntCommand.js' );
+    const result = execSync( `${gruntCommand} type-check --repo=${repoPath}`, {
       cwd: CHIPPER,
       stdio: 'pipe',
       encoding: 'utf-8'
