@@ -8,6 +8,7 @@
  */
 
 import assert from 'assert';
+import _ from 'lodash';
 import SimVersion from '../browser-and-node/SimVersion.js';
 import checkoutDependencies from './checkoutDependencies.js';
 import getDependencies from './getDependencies.js';
@@ -16,7 +17,6 @@ import githubCreateIssue from './githubCreateIssue.js';
 import gitPull from './gitPull.js';
 import Patch from './Patch.js';
 import ReleaseBranch from './ReleaseBranch.js';
-import _ from 'lodash';
 
 // Keys are repo names, values are SHAs
 type Dependencies = Record<string, string>;
@@ -28,6 +28,18 @@ type ModifiedBranchSerialized = {
   pendingMessages: string[];
   pushedMessages: string[];
   deployedVersion: ReturnType<SimVersion['serialize']> | null;
+};
+
+export type DeployedLinkOptions = {
+
+  // Whether to include the header line with pushed messages and supported features.
+  includeMessages?: boolean;
+
+  // Whether to include XHTML links when the sim supports them.
+  xhtml?: boolean;
+
+  // Whether to include a11y view links when the sim supports them.
+  a11yView?: boolean;
 };
 
 class ModifiedBranch {
@@ -198,8 +210,14 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
   /**
    * Returns a list of deployed links for testing (depending on the brands deployed).
    */
-  public async getDeployedLinkLines( includeMessages = true ): Promise<string[]> {
+  public async getDeployedLinkLines( providedOptions?: DeployedLinkOptions ): Promise<string[]> {
     assert( this.deployedVersion !== null );
+
+    const options = _.merge( {
+      includeMessages: true,
+      xhtml: true,
+      a11yView: false
+    }, providedOptions );
 
     const linkSuffixes = [];
     const versionString = this.deployedVersion.toString();
@@ -218,11 +236,15 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
     const studioPathSuffix = ( await this.releaseBranch.usesPhetioStudioIndex() ) ? '' : `/${studioName}.html?sim=${this.repo}&${proxiesParams}`;
     const phetioDevVersion = usesChipper2 ? versionString : versionString.split( '-' ).join( '-phetio' );
     const hasMigrationWrapper = await this.releaseBranch.hasMigrationWrapper();
+    const supportsInteractiveDescription = options.a11yView ? await this.releaseBranch.supportsInteractiveDescription() : false;
 
     if ( this.deployedVersion.testType === 'rc' ) {
       if ( this.brands.includes( 'phet' ) ) {
         linkSuffixes.push( `](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}${phetFolder}/${this.repo}_all${phetSuffix}.html)` );
-        if ( hasXHTML ) {
+        if ( options.a11yView && supportsInteractiveDescription ) {
+          linkSuffixes.push( ` a11y view](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}${phetFolder}/${this.repo}_a11y_view.html)` );
+        }
+        if ( options.xhtml && hasXHTML ) {
           linkSuffixes.push( ` xhtml](https://phet-dev.colorado.edu/html/${this.repo}/${versionString}${phetFolder}/xhtml/${this.repo}_all.xhtml)` );
         }
       }
@@ -237,7 +259,10 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
     else {
       if ( this.brands.includes( 'phet' ) ) {
         linkSuffixes.push( `](https://phet.colorado.edu/sims/html/${this.repo}/${versionString}/${this.repo}_all.html)` );
-        if ( hasXHTML ) {
+        if ( options.a11yView && supportsInteractiveDescription ) {
+          linkSuffixes.push( ` a11y view](https://phet.colorado.edu/sims/html/${this.repo}/${versionString}/${this.repo}_a11y_view.html)` );
+        }
+        if ( options.xhtml && hasXHTML ) {
           linkSuffixes.push( ` xhtml](https://phet.colorado.edu/sims/html/${this.repo}/${versionString}/xhtml/${this.repo}_all.xhtml)` );
         }
       }
@@ -248,7 +273,7 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
     }
 
     const results = linkSuffixes.map( link => `- [ ] [${this.repo} ${versionString}${link}` );
-    if ( includeMessages ) {
+    if ( options.includeMessages ) {
       const featuresLine = await this.getSupportedFeaturesLine();
       if ( featuresLine.length ) {
         results.unshift( featuresLine );

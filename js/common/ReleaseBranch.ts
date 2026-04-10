@@ -577,6 +577,14 @@ class ReleaseBranch implements ReleaseBranchSerialized {
   }
 
   /**
+   * Returns whether the sim supports interactive description.
+   */
+  public async supportsInteractiveDescription(): Promise<boolean> {
+    const packageJSON = await this.getPackageJSON();
+    return !!packageJSON?.phet?.simFeatures?.supportsInteractiveDescription;
+  }
+
+  /**
    * Returns the package.json parsed as a plain JS object.
    */
   public async getPackageJSON(): Promise<any> { // eslint-disable-line @typescript-eslint/no-explicit-any

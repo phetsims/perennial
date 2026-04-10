@@ -37,7 +37,7 @@ import gitPull from './gitPull.js';
 import gitPush from './gitPush.js';
 import gitRevParse from './gitRevParse.js';
 import gruntCommand from './gruntCommand.js';
-import ModifiedBranch from './ModifiedBranch.js';
+import ModifiedBranch, { type DeployedLinkOptions } from './ModifiedBranch.js';
 import Patch from './Patch.js';
 import { PERENNIAL_ROOT } from './perennialRepoUtils.js';
 import ReleaseBranch from './ReleaseBranch.js';
@@ -280,8 +280,9 @@ class Maintenance {
   /**
    * Shows any required testing links for the simulations.
    * @param filter - Control which branches are shown
+   * @param options - options for including specific links
    */
-  public static async listLinks( filter: FilterSyncMB = () => true ): Promise<void> {
+  public static async listLinks( filter: FilterSyncMB = () => true, options?: DeployedLinkOptions ): Promise<void> {
     const maintenance = Maintenance.load();
 
     const deployedBranches = maintenance.modifiedBranches.filter( modifiedBranch => !!modifiedBranch.deployedVersion && filter( modifiedBranch ) );
@@ -292,7 +293,7 @@ class Maintenance {
       console.log( '\nProduction links\n' );
 
       for ( const modifiedBranch of productionBranches ) {
-        const links = await modifiedBranch.getDeployedLinkLines();
+        const links = await modifiedBranch.getDeployedLinkLines( options );
         for ( const link of links ) {
           console.log( link );
         }
@@ -303,7 +304,7 @@ class Maintenance {
       console.log( '\nRelease Candidate links\n' );
 
       for ( const modifiedBranch of releaseCandidateBranches ) {
-        const links = await modifiedBranch.getDeployedLinkLines();
+        const links = await modifiedBranch.getDeployedLinkLines( options );
         for ( const link of links ) {
           console.log( link );
         }
