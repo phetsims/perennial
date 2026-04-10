@@ -16,12 +16,73 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
-import { Node, Project } from 'ts-morph';
+import { Node, Project, Type } from 'ts-morph';
+
+// Standard Property API methods — accessing these on a Property/TReadOnlyProperty is expected usage,
+// not a coupling concern.
+const PROPERTY_API_METHODS = new Set( [
+  'value', 'link', 'lazyLink', 'unlink', 'unlinkAll', 'dispose', 'set', 'get',
+  'addListener', 'removeListener', 'hasListener'
+] );
+
+// Standard array methods — accessing these on an array parameter is just using the array API.
+const ARRAY_METHODS = new Set( [
+  'map', 'filter', 'forEach', 'find', 'some', 'every', 'reduce', 'reduceRight',
+  'includes', 'indexOf', 'lastIndexOf', 'flat', 'flatMap', 'sort', 'reverse',
+  'slice', 'splice', 'concat', 'join', 'push', 'pop', 'shift', 'unshift',
+  'length', 'entries', 'keys', 'values', 'at', 'fill', 'copyWithin', 'findIndex'
+] );
+
+/**
+ * Returns true if the type should be skipped entirely — primitives, Tandem, literal unions, etc.
+ */
+function isSkippedType( typeText: string, type: Type ): boolean {
+
+  // Skip primitives
+  if ( typeText === 'number' || typeText === 'string' || typeText === 'boolean' ) {
+    return true;
+  }
+
+  // Skip Tandem
+  if ( typeText === 'Tandem' ) {
+    return true;
+  }
+
+  // Skip literal types and unions of literals (e.g., "left" | "right", 1 | 2)
+  if ( type.isUnion() ) {
+    const allLiterals = type.getUnionTypes().every( t =>
+      t.isStringLiteral() || t.isNumberLiteral() || t.isBooleanLiteral() || t.isNull() || t.isUndefined()
+    );
+    if ( allLiterals ) {
+      return true;
+    }
+  }
+  if ( type.isStringLiteral() || type.isNumberLiteral() || type.isBooleanLiteral() ) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Returns true if the type looks like a Property type (Property, TReadOnlyProperty, etc.)
+ */
+function isPropertyType( typeText: string ): boolean {
+  return /^(Property|TReadOnlyProperty|TProperty|ReadOnlyProperty|PhetioProperty|TinyProperty|NumberProperty|BooleanProperty|StringProperty|DerivedProperty|EnumerationProperty|DynamicProperty)\b/.test( typeText );
+}
+
+/**
+ * Returns true if the type is an array type.
+ */
+function isArrayType( typeText: string, type: Type ): boolean {
+  return type.isArray() || typeText.endsWith( '[]' );
+}
 
 type ParamReport = {
   paramName: string;
   paramType: string;
   properties: string[];
+  passedTo: string[];
 };
 
 type ConstructorReport = {
@@ -61,7 +122,13 @@ async function reportConstructorCoupling( repoPath: string ): Promise<void> {
           continue;
         }
 
-        const paramType = param.getType().getText( param );
+        const type = param.getType();
+        const paramType = type.getText( param );
+
+        // Skip primitives, Tandem, literal unions
+        if ( isSkippedType( paramType, type ) ) {
+          continue;
+        }
 
         // Find all property access expressions in the constructor body that use this parameter.
         // We look for `paramName.something` patterns.
@@ -71,6 +138,7 @@ async function reportConstructorCoupling( repoPath: string ): Promise<void> {
         }
 
         const accessedProperties = new Set<string>();
+        const passedTo = new Set<string>();
 
         body.forEachDescendant( node => {
           if ( Node.isPropertyAccessExpression( node ) ) {
@@ -81,15 +149,57 @@ async function reportConstructorCoupling( repoPath: string ): Promise<void> {
               accessedProperties.add( node.getName() );
             }
           }
+
+          // Detect when the parameter is passed as an argument to a function/constructor call.
+          if ( Node.isCallExpression( node ) || Node.isNewExpression( node ) ) {
+            const args = node.getArguments();
+            for ( const arg of args ) {
+              if ( Node.isIdentifier( arg ) && arg.getText() === paramName ) {
+
+                // Get the name of the function/constructor being called.
+                const expression = node.getExpression();
+                if ( Node.isIdentifier( expression ) ) {
+                  passedTo.add( expression.getText() );
+                }
+                else if ( Node.isPropertyAccessExpression( expression ) ) {
+                  passedTo.add( expression.getText() );
+                }
+              }
+            }
+          }
         } );
 
-        if ( accessedProperties.size > 0 ) {
-          paramReports.push( {
-            paramName: paramName,
-            paramType: paramType,
-            properties: [ ...accessedProperties ].sort()
-          } );
+        // For Property types, filter out standard Property API accesses. Only report if there are
+        // non-standard accesses (which would indicate reaching through the Property to something else).
+        if ( isPropertyType( paramType ) ) {
+          for ( const prop of accessedProperties ) {
+            if ( PROPERTY_API_METHODS.has( prop ) ) {
+              accessedProperties.delete( prop );
+            }
+          }
         }
+
+        // For array types, filter out standard array method accesses.
+        if ( isArrayType( paramType, type ) ) {
+          for ( const prop of accessedProperties ) {
+            if ( ARRAY_METHODS.has( prop ) ) {
+              accessedProperties.delete( prop );
+            }
+          }
+        }
+
+        // Skip parameters that only have pass-through usage with no direct property access.
+        // The coupling concern, if any, lives in the child class, not here.
+        if ( accessedProperties.size === 0 ) {
+          continue;
+        }
+
+        paramReports.push( {
+          paramName: paramName,
+          paramType: paramType,
+          properties: [ ...accessedProperties ].sort(),
+          passedTo: [ ...passedTo ].sort()
+        } );
       }
 
       if ( paramReports.length > 0 ) {
@@ -103,7 +213,7 @@ async function reportConstructorCoupling( repoPath: string ): Promise<void> {
     }
   }
 
-  // Sort by most-coupled first (highest total property count)
+  // Sort by fewest properties first — those are the most actionable (big object, few accesses).
   reports.sort( ( a, b ) => {
     const totalA = a.params.reduce( ( sum, p ) => sum + p.properties.length, 0 );
     const totalB = b.params.reduce( ( sum, p ) => sum + p.properties.length, 0 );
@@ -116,9 +226,19 @@ async function reportConstructorCoupling( repoPath: string ): Promise<void> {
   for ( const report of reports ) {
     console.log( `${report.className} (${report.filePath})` );
     for ( const param of report.params ) {
-      console.log( `  ${param.paramName}: ${param.paramType} — ${param.properties.length} propert${param.properties.length === 1 ? 'y' : 'ies'} used` );
+      const parts: string[] = [];
+      if ( param.properties.length > 0 ) {
+        parts.push( `${param.properties.length} propert${param.properties.length === 1 ? 'y' : 'ies'} accessed` );
+      }
+      if ( param.passedTo.length > 0 ) {
+        parts.push( `passed to ${param.passedTo.length} function${param.passedTo.length === 1 ? '' : 's'}` );
+      }
+      console.log( `  ${param.paramName}: ${param.paramType} — ${parts.join( ', ' )}` );
       for ( const prop of param.properties ) {
         console.log( `    .${prop}` );
+      }
+      for ( const fn of param.passedTo ) {
+        console.log( `    -> ${fn}()` );
       }
     }
     console.log();
