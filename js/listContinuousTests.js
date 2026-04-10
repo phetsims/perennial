@@ -48,7 +48,8 @@ const REPOS_EXCLUDED_FROM_LISTENER_ORDER_RANDOM = [
   'circuit-construction-kit-dc', // see https://github.com/phetsims/circuit-construction-kit-common/issues/1040
   'circuit-construction-kit-ac', // see https://github.com/phetsims/circuit-construction-kit-common/issues/1040
   'circuit-construction-kit-dc-virtual-lab', // see https://github.com/phetsims/circuit-construction-kit-common/issues/1040
-  'circuit-construction-kit-ac-virtual-lab' // see https://github.com/phetsims/circuit-construction-kit-common/issues/1040
+  'circuit-construction-kit-ac-virtual-lab', // see https://github.com/phetsims/circuit-construction-kit-common/issues/1040
+  'quantum-bound-states' //TODO https://github.com/phetsims/quantum-bound-states/issues/19
 ];
 
 const REPOS_EXCLUDED_FROM_MIGRATION = [
