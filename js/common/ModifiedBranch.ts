@@ -40,6 +40,9 @@ export type DeployedLinkOptions = {
 
   // Whether to include a11y view links when the sim supports them.
   a11yView?: boolean;
+
+  // Whether to include migration wrapper links when the sim supports them.
+  migration?: boolean;
 };
 
 class ModifiedBranch {
@@ -215,8 +218,9 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
 
     const options = _.merge( {
       includeMessages: true,
-      xhtml: true,
-      a11yView: false
+      xhtml: false,
+      a11yView: false,
+      migration: false
     }, providedOptions );
 
     const linkSuffixes = [];
@@ -251,7 +255,7 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
       if ( this.brands.includes( 'phet-io' ) ) {
         linkSuffixes.push( ` phet-io](https://phet-dev.colorado.edu/html/${this.repo}/${phetioDevVersion}${phetioFolder}/${this.repo}${phetioSuffix}.html?${standaloneParams})` );
         linkSuffixes.push( ` phet-io ${studioNameBeautified}](https://phet-dev.colorado.edu/html/${this.repo}/${phetioDevVersion}${phetioFolder}/wrappers/${studioName}${studioPathSuffix})` );
-        if ( hasMigrationWrapper ) {
+        if ( options.migration && hasMigrationWrapper ) {
           linkSuffixes.push( ` phet-io migration](https://phet-dev.colorado.edu/html/${this.repo}/${phetioDevVersion}${phetioFolder}/wrappers/migration/)` );
         }
       }
