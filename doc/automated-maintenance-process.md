@@ -519,7 +519,12 @@ done. I always recommend 10-30 seconds of general testing per sim to make sure n
 there is almost always testing related to the specific fixed issue (e.g. "does this bad behavior happen still").
 
 `Maintenance.listLinks()` will show both production and release candidate links for release branches that have a
-deployed version.
+deployed version; pass a branch filter and an optional second argument when QA needs extra checklist lines for the a11y
+view, XHTML, or PhET-iO migration. For example in the REPL:
+
+```js
+Maintenance.listLinks( () => true, { xhtml: true, a11yView: true, migration: true } );
+```
 
 ## #14: Deploying changes to production: `Maintenance.deployProduction()`
 
