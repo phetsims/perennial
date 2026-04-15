@@ -32,7 +32,7 @@ export type CreateReleaseMonorepoOptions = {
   branch: string;       // "{major}.{minor}" e.g. "1.7"
   brands: string[];     // e.g. [ 'phet' ] or [ 'phet', 'phet-io' ]
   message?: string;     // Optional freeform message appended to the commit message.
-  noPush?: boolean;     // If true, do everything locally but skip the push; leave the worktree for inspection.
+  skipPush?: boolean;   // If true, do everything locally but skip the push; leave the worktree for inspection.
 };
 
 // Tooling repos we always keep on a release branch, even if phetLibs wouldn't list them.
@@ -77,7 +77,7 @@ async function git( args: string[], cwd: string ): Promise<string> {
 }
 
 export default async function createReleaseMonorepo( options: CreateReleaseMonorepoOptions ): Promise<void> {
-  const { repo, branch, brands, message, noPush } = options;
+  const { repo, branch, brands, message, skipPush } = options;
 
   assert( /^\d+\.\d+$/.test( branch ), `Branch should be {{MAJOR}}.{{MINOR}}, got: ${branch}` );
   assert( Array.isArray( brands ) && brands.length >= 1, 'At least one brand required' );
@@ -150,9 +150,9 @@ export default async function createReleaseMonorepo( options: CreateReleaseMonor
     const commitMessage = `Create release branch ${releaseBranch} with brands=[${brands.join( ',' )}], version ${rcVersion.toString()}${message ? `, ${message}` : ''}`;
     await git( [ 'commit', '-m', commitMessage ], worktreePath );
 
-    if ( noPush ) {
+    if ( skipPush ) {
       winston.info( [
-        '--no-push set: skipping remote push.',
+        '--skip-push set: skipping remote push.',
         `Worktree left at: ${worktreePath}`,
         'To finish manually:',
         `  git -C ${worktreePath} push -u origin ${releaseBranch}`,
@@ -167,7 +167,7 @@ export default async function createReleaseMonorepo( options: CreateReleaseMonor
       await git( [ 'worktree', 'remove', worktreePath ], TOTALITY_ROOT );
     }
 
-    winston.info( `Done. Release branch ${releaseBranch} created${noPush ? ' (not pushed)' : ' and pushed'}.` );
+    winston.info( `Done. Release branch ${releaseBranch} created${skipPush ? ' (not pushed)' : ' and pushed'}.` );
   }
   catch( error ) {
     winston.error( `Failure during release creation. Worktree left in place for debugging: ${worktreePath}` );

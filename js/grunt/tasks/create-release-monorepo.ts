@@ -6,7 +6,7 @@
  * --branch : The branch name, which should be {{MAJOR}}.{{MINOR}}, e.g. 1.0
  * --brands : The supported brands for the release, comma separated
  * --message : An optional message appended to the commit message
- * --no-push : If set, do everything locally but skip pushing to origin; leaves the worktree for inspection
+ * --skip-push : If set, do everything locally but skip pushing to origin; leaves the worktree for inspection
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */
@@ -21,7 +21,7 @@ import getOption from './util/getOption.js';
   const branch = getOption( 'branch' );
   const brands = getOption( 'brands' );
   const message = getOption( 'message' );
-  const noPush = !!getOption( 'no-push' );
+  const skipPush = !!getOption( 'skip-push' );
 
   assert( repo, 'Requires --repo={{REPO}}' );
   assert( branch, 'Requires --branch={{MAJOR}}.{{MINOR}}' );
@@ -33,7 +33,7 @@ import getOption from './util/getOption.js';
     branch: branch,
     brands: brands.split( ',' ),
     message: message,
-    noPush: noPush
+    skipPush: skipPush
   } );
 
   process.exit( 0 );
