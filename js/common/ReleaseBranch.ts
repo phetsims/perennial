@@ -581,7 +581,15 @@ class ReleaseBranch implements ReleaseBranchSerialized {
    */
   public async supportsInteractiveDescription(): Promise<boolean> {
     const packageJSON = await this.getPackageJSON();
-    return !!packageJSON?.phet?.simFeatures?.supportsInteractiveDescription;
+    const phet = packageJSON?.phet ?? {};
+    const simFeatures = phet.simFeatures ?? {};
+
+    // The name and location of the a11y flag in package.json has changed
+    // over time,
+    const accessibilityInFeatures = simFeatures.supportsInteractiveDescription || simFeatures.supportsDescription;
+    const accessibilityInPhet = phet.supportsInteractiveDescriptions || phet.accessible || phet.supportsInteractiveDescription;
+
+    return !!( accessibilityInFeatures || accessibilityInPhet );
   }
 
   /**
