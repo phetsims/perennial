@@ -7,7 +7,7 @@
  * transitive phetLibs for the given brands, with the sim's package.json bumped to {major}.{minor}.0-rc.0
  * and phet.supportedBrands set. Operates entirely in a git worktree so the primary checkout is untouched.
  *
- * See `grunt create-release-monorepo`. The rc.ts, build-server, and main-bump flows are deliberately
+ * See `grunt create-release-monorepo`. The rc.ts and build-server flows are deliberately
  * left out of this first slice and will be wired in follow-up tasks.
  *
  * @author Sam Reid (PhET Interactive Simulations)
@@ -33,6 +33,7 @@ export type CreateReleaseMonorepoOptions = {
   brands: string[];     // e.g. [ 'phet' ] or [ 'phet', 'phet-io' ]
   message?: string;     // Optional freeform message appended to the commit message.
   skipPush?: boolean;   // If true, do everything locally but skip the push; leave the worktree for inspection.
+  skipVersionBump?: boolean; // If true, skip bumping main's version to the next dev version.
 };
 
 // Tooling repos we always keep on a release branch, even if phetLibs wouldn't list them.
@@ -77,7 +78,7 @@ async function git( args: string[], cwd: string ): Promise<string> {
 }
 
 export default async function createReleaseMonorepo( options: CreateReleaseMonorepoOptions ): Promise<void> {
-  const { repo, branch, brands, message, skipPush } = options;
+  const { repo, branch, brands, message, skipPush, skipVersionBump } = options;
 
   assert( /^\d+\.\d+$/.test( branch ), `Branch should be {{MAJOR}}.{{MINOR}}, got: ${branch}` );
   assert( Array.isArray( brands ) && brands.length >= 1, 'At least one brand required' );
@@ -165,6 +166,32 @@ export default async function createReleaseMonorepo( options: CreateReleaseMonor
 
       winston.info( `Removing worktree ${worktreePath}` );
       await git( [ 'worktree', 'remove', worktreePath ], TOTALITY_ROOT );
+    }
+
+    if ( !skipVersionBump ) {
+      const currentBranch = ( await git( [ 'rev-parse', '--abbrev-ref', 'HEAD' ], TOTALITY_ROOT ) ).trim();
+      assert( currentBranch === 'main', `Primary checkout must be on main to bump version, but is on: ${currentBranch}. Use --skip-version-bump to skip.` );
+
+      const devVersion = new SimVersion( major, minor + 1, 0, { testType: 'dev', testNumber: 0 } );
+      const mainPackagePath = path.join( TOTALITY_ROOT, repo, 'package.json' );
+      const mainPackage = JSON.parse( fs.readFileSync( mainPackagePath, 'utf8' ) );
+      mainPackage.version = devVersion.toString();
+      fs.writeFileSync( mainPackagePath, `${JSON.stringify( mainPackage, null, 2 )}\n` );
+
+      const mainLockPath = path.join( TOTALITY_ROOT, repo, 'package-lock.json' );
+      if ( fs.existsSync( mainLockPath ) ) {
+        const mainLock = JSON.parse( fs.readFileSync( mainLockPath, 'utf8' ) );
+        mainLock.version = devVersion.toString();
+        if ( mainLock.packages && mainLock.packages[ '' ] ) {
+          mainLock.packages[ '' ].version = devVersion.toString();
+        }
+        fs.writeFileSync( mainLockPath, `${JSON.stringify( mainLock, null, 2 )}\n` );
+      }
+
+      winston.info( `Bumped ${repo} to ${devVersion.toString()} on main (not committed). Next steps:` );
+      winston.info( `  1. Inspect changes in ${repo}/package.json` );
+      winston.info( `  2. Run: npm run grunt -- update --repo=${repo}` );
+      winston.info( '  3. Review, commit, and push main' );
     }
 
     winston.info( `Done. Release branch ${releaseBranch} created${skipPush ? ' (not pushed)' : ' and pushed'}.` );

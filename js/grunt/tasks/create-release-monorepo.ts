@@ -7,6 +7,7 @@
  * --brands : The supported brands for the release, comma separated
  * --message : An optional message appended to the commit message
  * --skip-push : If set, do everything locally but skip pushing to origin; leaves the worktree for inspection
+ * --skip-version-bump : If set, skip bumping main's version to the next dev version
  *
  * @author Sam Reid (PhET Interactive Simulations)
  */
@@ -22,6 +23,7 @@ import getOption from './util/getOption.js';
   const brands = getOption( 'brands' );
   const message = getOption( 'message' );
   const skipPush = !!getOption( 'skip-push' );
+  const skipVersionBump = !!getOption( 'skip-version-bump' );
 
   assert( repo, 'Requires --repo={{REPO}}' );
   assert( branch, 'Requires --branch={{MAJOR}}.{{MINOR}}' );
@@ -33,7 +35,8 @@ import getOption from './util/getOption.js';
     branch: branch,
     brands: brands.split( ',' ),
     message: message,
-    skipPush: skipPush
+    skipPush: skipPush,
+    skipVersionBump: skipVersionBump
   } );
 
   process.exit( 0 );
