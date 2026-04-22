@@ -45,7 +45,7 @@ const ALWAYS_DROP_REPOS = [ 'babel' ];
 
 /**
  * Computes the set of repo directories to keep on a release branch for the given sim + brands.
- * Mirrors the essence of chipper/js/grunt/getPhetLibs.ts without inheriting its cwd assumptions.
+ * Reimplements the logic from chipper/js/grunt/getPhetLibs.ts because perennial cannot depend on chipper.
  */
 function computeKeepRepos( repo: string, brands: string[] ): Set<string> {
   const packageObject = JSON.parse( fs.readFileSync( path.join( TOTALITY_ROOT, repo, 'package.json' ), 'utf8' ) );
