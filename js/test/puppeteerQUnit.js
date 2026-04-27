@@ -60,7 +60,7 @@ module.exports = function( browser, targetURL ) {
       assertionErrors.push( msg );
     } );
 
-    await page.exposeFunction( 'harness_done', async context => {
+    await page.exposeFunction( 'harness_done', async ( context, runEndData ) => {
       // console.log( '\n' );
 
       if ( moduleErrors.length > 0 ) {
@@ -71,10 +71,17 @@ module.exports = function( browser, targetURL ) {
 
       end( {
         ok: context.passed === context.total,
-        time: context.runtime,
+        time: runEndData ? runEndData.runtime : context.runtime,
         totalTests: context.total,
         passed: context.passed,
         failed: context.failed,
+        status: runEndData ? runEndData.status : ( context.failed === 0 ? 'passed' : 'failed' ),
+        tests: runEndData ? runEndData.testCounts : null,
+        assertions: {
+          total: context.total,
+          passed: context.passed,
+          failed: context.failed
+        },
         errors: moduleErrors
       } );
     } );
@@ -89,6 +96,7 @@ module.exports = function( browser, targetURL ) {
 
         const launch = () => {
           QUnit.config.testTimeout = 10000;
+          let runEndData = null;
 
           // Cannot pass the window.harness_blah methods directly, because they are
           // automatically defined as async methods, which QUnit does not support
@@ -97,7 +105,20 @@ module.exports = function( browser, targetURL ) {
 
           // This context could contain objects that can't be sent over to harness_log, so just take the parts we need.
           QUnit.log( context => window.harness_log( context.result, context.message, context.source ) );
-          QUnit.done( context => window.harness_done( context ) );
+          QUnit.on( 'runEnd', context => {
+            runEndData = {
+              status: context.status,
+              runtime: context.runtime,
+              testCounts: {
+                total: context.testCounts.total,
+                passed: context.testCounts.passed,
+                failed: context.testCounts.failed,
+                skipped: context.testCounts.skipped,
+                todo: context.testCounts.todo
+              }
+            };
+          } );
+          QUnit.done( context => window.harness_done( context, runEndData ) );
 
           // Launch the qunit tests now that listeners are wired up
           window.qunitLaunchAfterHooks();
