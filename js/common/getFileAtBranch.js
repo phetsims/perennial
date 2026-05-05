@@ -1,7 +1,7 @@
 // Copyright 2023-2026, University of Colorado Boulder
 
 /**
- * Gets the dependencies.json from a given branch of a repo
+ * Gets the given file from a given branch of a repo
  *
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
@@ -10,7 +10,7 @@ const getGitFile = require( './getGitFile' );
 const createLocalBranchFromRemote = require( './createLocalBranchFromRemote' );
 
 /**
- * Gets the dependencies.json from a given branch of a repo
+ * Gets the given file from a given branch of a repo
  * @public
  *
  * @param {string} repo - The repository name

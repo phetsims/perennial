@@ -25,12 +25,10 @@ import createDirectory from './createDirectory.js';
 import execute, { ExecuteOptions } from './execute.js';
 import getActiveSims from './getActiveSims.js';
 import getBranchDependencies from './getBranchDependencies.js';
-import getBranches from './getBranches.js';
 import getBranchMap from './getBranchMap.js';
 import getBranchVersion from './getBranchVersion.js';
 import getBuildArguments, { BuildOptions } from './getBuildArguments.js';
 import getDependencies from './getDependencies.js';
-import getFileAtBranch from './getFileAtBranch.js';
 import getGitFile from './getGitFile.js';
 import getRepoVersion from './getRepoVersion.js';
 import gitCatFile from './gitCatFile.js';
@@ -50,9 +48,13 @@ import puppeteerLoad from './puppeteerLoad.js';
 import simMetadata from './simMetadata.js';
 import simPhetioMetadata from './simPhetioMetadata.js';
 import withServer from './withServer.js';
-import pLimit from 'p-limit';
+import { gitCreateWorktree } from './gitCreateWorktree.js';
+import { getTotalityBranches } from './getTotalityBranches.js';
+import { getTotalityFileAtBranch } from './getTotalityFileAtBranch.js';
+import { createTotalityLocalBranchFromRemote } from './createTotalityLocalBranchFromRemote.js';
 
 const MAINTENANCE_DIRECTORY = '../release-branches';
+const WORKTREE_DIRECTORY = '../release-branches';
 
 type ReleaseBranchSerialized = {
   repo: string;
@@ -66,9 +68,13 @@ class ReleaseBranch implements ReleaseBranchSerialized {
   // Cache for the timestamp string of the diverging commit, since it can be expensive to calculate and is used in multiple places.
   public cachedTimestampString: string | null = null;
 
+  public readonly totalityBranch: string;
+
   public constructor( public readonly repo: string, public readonly branch: string, public readonly brands: string[],
                       public readonly isReleased: boolean ) {
     assert( Array.isArray( brands ) );
+
+    this.totalityBranch = `releases/${repo}/${branch}`;
   }
 
   /**
@@ -114,6 +120,10 @@ class ReleaseBranch implements ReleaseBranchSerialized {
    */
   public static getCheckoutDirectory( repo: string, branch: string ): string {
     return `${MAINTENANCE_DIRECTORY}/${repo}-${branch}`;
+  }
+
+  public static getWorktreeDirectory( repo: string, branch: string ): string {
+    return `${WORKTREE_DIRECTORY}/${repo}-${branch}`;
   }
 
   /**
@@ -639,6 +649,58 @@ class ReleaseBranch implements ReleaseBranchSerialized {
     return false;
   }
 
+  public async updateWorktree(): Promise<void> {
+    winston.info( `updating worktree for ${this.toString()}` );
+
+    // Create the container directory
+    if ( !fs.existsSync( WORKTREE_DIRECTORY ) ) {
+      winston.info( `creating directory ${WORKTREE_DIRECTORY}` );
+      await createDirectory( WORKTREE_DIRECTORY );
+    }
+
+    const worktreeDirectory = ReleaseBranch.getWorktreeDirectory( this.repo, this.branch );
+
+    // Ensure our remote tracking is set up properly
+    await createTotalityLocalBranchFromRemote( this.totalityBranch );
+
+    // Create the worktree itself if needed
+    if ( !fs.existsSync( worktreeDirectory ) ) {
+      winston.info( `creating worktree at ${worktreeDirectory}` );
+      await gitCreateWorktree( worktreeDirectory, this.totalityBranch );
+    }
+    else {
+      winston.info( `pulling worktree at ${worktreeDirectory}` );
+      await gitPullDirectory( worktreeDirectory );
+    }
+
+    if ( fs.existsSync( `${worktreeDirectory}/babel` ) ) {
+      winston.info( 'pulling babel in worktree' );
+      await execute( 'git', [ 'pull' ], `${worktreeDirectory}/babel` );
+    }
+    else {
+      winston.info( 'cloning babel into worktree' );
+      await execute( 'git', [ 'clone', 'https://github.com/phetsims/babel.git' ], worktreeDirectory );
+    }
+
+    for ( const npmRepo of [ 'chipper', 'perennial-alias', this.repo ] ) {
+      if ( fs.existsSync( `${worktreeDirectory}/${npmRepo}` ) ) {
+        winston.info( `npm update ${npmRepo} in worktree` );
+        await npmUpdateDirectory( `${worktreeDirectory}/${npmRepo}` );
+      }
+    }
+  }
+
+  public async removeWorktree(): Promise<void> {
+    const worktreeDirectory = ReleaseBranch.getWorktreeDirectory( this.repo, this.branch );
+
+    if ( fs.existsSync( worktreeDirectory ) ) {
+      winston.info( `removing worktree at ${worktreeDirectory}` );
+
+      // double-force for babel
+      await execute( 'git', [ 'worktree', 'remove', worktreeDirectory, '--force', '--force' ], '.' );
+    }
+  }
+
   /**
    * Re-runs a production deploy for a specific branch (based on the SHAs at the tip of the release branch)
    */
@@ -771,55 +833,62 @@ class ReleaseBranch implements ReleaseBranchSerialized {
 
       winston.info( 'loading unreleased ReleaseBranches' );
 
-      const limit = pLimit( 15 ); // limit concurrency to avoid excessive resource usage
+      const releasedBranches = phetBranches.concat( phetioBranches );
 
-      await Promise.all( getActiveSims().map( repo => limit( async () => {
+      const activeSims = getActiveSims();
+      const branches = await getTotalityBranches();
+      for ( const totalityBranch of branches ) {
+        const match = totalityBranch.match( /^releases\/([^/]+)\/(\d+)\.(\d+)$/ );
 
-        // Exclude explicitly excluded repos
-        if ( JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) ).phet.ignoreForAutomatedMaintenanceReleases ) {
-          return;
+        // Ignore all of the other branches
+        if ( !match ) {
+          continue;
         }
 
-        const branches = await getBranches( repo );
-        const releasedBranches = phetBranches.concat( phetioBranches );
+        const repo = match[ 1 ];
+        const major = Number( match[ 2 ] );
+        const minor = Number( match[ 3 ] );
+        const branch = `${major}.${minor}`;
 
-        for ( const branch of branches ) {
-          // We aren't unreleased if we're included in either phet or phet-io metadata.
-          // See https://github.com/phetsims/balancing-act/issues/118
-          if ( releasedBranches.filter( releaseBranch => releaseBranch.repo === repo && releaseBranch.branch === branch ).length ) {
-            continue;
-          }
+        if ( repo === 'chains' ) {
+          continue; // chains was used as a special case, so we need to ignore those for now
+        }
 
-          const match = branch.match( /^(\d+)\.(\d+)$/ );
+        // Only look for active sim repos
+        if ( !activeSims.includes( repo ) ) {
+          continue;
+        }
 
-          if ( match ) {
-            const major = Number( match[ 1 ] );
-            const minor = Number( match[ 2 ] );
+        // We aren't unreleased if we're included in either phet or phet-io metadata.
+        // See https://github.com/phetsims/balancing-act/issues/118
+        if ( releasedBranches.filter( releaseBranch => releaseBranch.repo === repo && releaseBranch.branch === branch ).length ) {
+          continue;
+        }
 
-            // Assumption that there is no phet-io brand sim that isn't also released with phet brand
-            const projectMetadata = simMetadataResult.projects.find( project => project.name === `html/${repo}` ) || null;
-            const productionVersion = projectMetadata ? projectMetadata.version : null;
+        console.log( `checking unreleased branch ${repo} ${branch}` );
 
-            if ( !productionVersion ||
-                 major > productionVersion.major ||
-                 ( major === productionVersion.major && minor > productionVersion.minor ) ) {
+        // Assumption that there is no phet-io brand sim that isn't also released with phet brand
+        const projectMetadata = simMetadataResult.projects.find( project => project.name === `html/${repo}` ) || null;
+        const productionVersion = projectMetadata ? projectMetadata.version : null;
 
-              // Do a checkout so we can determine supported brands
-              const packageObject = JSON.parse( await getFileAtBranch( repo, branch, 'package.json' ) );
-              const includesPhetio = packageObject.phet && packageObject.phet.supportedBrands && packageObject.phet.supportedBrands.includes( 'phet-io' );
+        if ( !productionVersion ||
+             major > productionVersion.major ||
+             ( major === productionVersion.major && minor > productionVersion.minor ) ) {
 
-              const brands = [
-                'phet', // Assumption that there is no phet-io brand sim that isn't also released with phet brand
-                ...( includesPhetio ? [ 'phet-io' ] : [] )
-              ];
+          // Determine supported brands
+          const packageObject = JSON.parse( await getTotalityFileAtBranch( totalityBranch, `${repo}/package.json` ) );
+          const includesPhetio = packageObject.phet && packageObject.phet.supportedBrands && packageObject.phet.supportedBrands.includes( 'phet-io' );
 
-              if ( !packageObject.phet.ignoreForAutomatedMaintenanceReleases ) {
-                unreleasedBranches.push( new ReleaseBranch( repo, branch, brands, false ) );
-              }
-            }
+          const brands = [
+            'phet', // Assumption that there is no phet-io brand sim that isn't also released with phet brand
+            ...( includesPhetio ? [ 'phet-io' ] : [] )
+          ];
+
+          if ( !packageObject.phet.ignoreForAutomatedMaintenanceReleases ) {
+            unreleasedBranches.push( new ReleaseBranch( repo, branch, brands, false ) );
           }
         }
-      } ) ) );
+      }
     }
 
     const allReleaseBranches = ReleaseBranch.combineLists( [ ...phetBranches, ...phetioBranches, ...unreleasedBranches ] );

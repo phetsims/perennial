@@ -13,20 +13,22 @@
 const getRepoList = require( './common/getRepoList' );
 const fs = require( 'fs' );
 
-// --repos=repo1,repo2,... restricts all repo lists to this set (for totality monorepo).
+// --importedRepos=repo1,repo2,... restricts all repo lists to this set (for totality monorepo).
 // Default behavior (no flag) uses the full active-repos list as before.
-const reposArg = process.argv.find( arg => arg.startsWith( '--repos=' ) );
-const repoSet = reposArg ? new Set( reposArg.slice( '--repos='.length ).split( ',' ) ) : null;
+const importedReposArg = process.argv.find( arg => arg.startsWith( '--importedRepos=' ) );
+const importedRepoSet = importedReposArg
+                        ? new Set( importedReposArg.slice( '--importedRepos='.length ).split( ',' ) )
+                        : null;
 
-const filterToRepos = list => repoSet ? list.filter( r => repoSet.has( r ) ) : list;
+const filterToImported = list => importedRepoSet ? list.filter( r => importedRepoSet.has( r ) ) : list;
 
-const phetioRepos = filterToRepos( getRepoList( 'phet-io' ) );
-const phetioAPIStableRepos = filterToRepos( getRepoList( 'phet-io-api-stable' ) );
-const runnableRepos = filterToRepos( getRepoList( 'active-runnables' ) );
-const interactiveDescriptionRepos = filterToRepos( getRepoList( 'interactive-description' ) );
+const phetioRepos = filterToImported( getRepoList( 'phet-io' ) );
+const phetioAPIStableRepos = filterToImported( getRepoList( 'phet-io-api-stable' ) );
+const runnableRepos = filterToImported( getRepoList( 'active-runnables' ) );
+const interactiveDescriptionRepos = filterToImported( getRepoList( 'interactive-description' ) );
 const phetioNoUnsupportedRepos = getRepoList( 'phet-io-state-unsupported' );
-const unitTestRepos = filterToRepos( getRepoList( 'unit-tests' ) );
-const voicingRepos = filterToRepos( getRepoList( 'voicing' ) );
+const unitTestRepos = filterToImported( getRepoList( 'unit-tests' ) );
+const voicingRepos = filterToImported( getRepoList( 'voicing' ) );
 const phetioWrapperSuiteWrappers = getRepoList( 'wrappers' );
 const phetioHydrogenSims = JSON.parse( fs.readFileSync( `${__dirname}/../data/phet-io-hydrogen.json`, 'utf8' ).trim() );
 
