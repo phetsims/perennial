@@ -54,7 +54,7 @@ import { getTotalityFileAtBranch } from './getTotalityFileAtBranch.js';
 import { createTotalityLocalBranchFromRemote } from './createTotalityLocalBranchFromRemote.js';
 
 const MAINTENANCE_DIRECTORY = '../release-branches';
-const WORKTREE_DIRECTORY = '../release-branches';
+const WORKTREE_DIRECTORY = buildLocal.releaseBranchesDirectory;
 
 type ReleaseBranchSerialized = {
   repo: string;

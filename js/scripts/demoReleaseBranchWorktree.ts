@@ -11,7 +11,7 @@ import ReleaseBranch from '../common/ReleaseBranch.js';
 ( async () => {
   const releaseBranches = await ReleaseBranch.getAllMaintenanceBranches();
 
-  const releaseBranch = releaseBranches[ 0 ];
+  const releaseBranch = releaseBranches.filter( rb => rb.repo === 'area-builder' )[ 0 ];
 
   console.log( `Testing out worktree for ${releaseBranch.repo} ${releaseBranch.branch}` );
 

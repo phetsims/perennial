@@ -69,6 +69,9 @@ module.exports = {
   productionServerURL: buildLocalObject.productionServerURL || 'https://phet.colorado.edu',
   babelBranch: buildLocalObject.babelBranch || 'main',
 
+  // This is relative to perennial/perennial-alias
+  releaseBranchesDirectory: buildLocalObject.releaseBranchesDirectory || '../release-branches',
+
   brands: buildLocalObject.brands || [ 'adapted-from-phet' ],
 
   // By default, run all tasks
