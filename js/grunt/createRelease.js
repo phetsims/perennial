@@ -18,8 +18,8 @@ const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
-const setRepoVersion = require( '../common/setRepoVersion' );
-const setRepoSupportedBrands = require( '../common/setRepoSupportedBrands' );
+const setRunnableVersion = require( '../common/setRunnableVersion' );
+const setRunnableSupportedBrands = require( '../common/setRunnableSupportedBrands' );
 const updateHTMLVersion = require( '../common/updateHTMLVersion' );
 const assert = require( 'assert' );
 const winston = require( 'winston' );
@@ -67,8 +67,8 @@ module.exports = async function createRelease( repo, branch, brands, message ) {
 
   // Create the branch, update the version info
   await gitCreateBranch( repo, branch );
-  await setRepoSupportedBrands( repo, brands );
-  await setRepoVersion( repo, newVersion, message );
+  await setRunnableSupportedBrands( repo, brands );
+  await setRunnableVersion( repo, newVersion, message );
   await gitPush( repo, branch );
 
   // Update dependencies.json for the release branch
@@ -87,7 +87,7 @@ module.exports = async function createRelease( repo, branch, brands, message ) {
 
   // Update the version info in main
   await gitCheckout( repo, 'main' );
-  await setRepoVersion( repo, new SimVersion( major, minor + 1, 0, {
+  await setRunnableVersion( repo, new SimVersion( major, minor + 1, 0, {
     testType: 'dev',
     testNumber: 0
   } ), message );

@@ -159,7 +159,7 @@ async function runTask( options ) {
     const releaseBranch = new ReleaseBranch( simName, branch, brands, true );
     await releaseBranch.updateCheckout( dependencies );
 
-    const chipperVersion = releaseBranch.getChipperVersion();
+    const chipperVersion = await releaseBranch.getChipperVersion();
     winston.debug( `Chipper version detected: ${chipperVersion.toString()}` );
     if ( !( chipperVersion.major === 2 && chipperVersion.minor === 0 ) && !( chipperVersion.major === 0 && chipperVersion.minor === 0 ) ) {
       await abortBuild( 'Unsupported chipper version' );
@@ -167,6 +167,7 @@ async function runTask( options ) {
 
     if ( chipperVersion.major !== 1 ) {
       const checkoutDirectory = ReleaseBranch.getCheckoutDirectory( simName, branch );
+      // TODO: replace with getWorktreePackageJSON
       const packageJSON = JSON.parse( fs.readFileSync( `${checkoutDirectory}/${simName}/package.json`, 'utf8' ) );
       const packageVersion = packageJSON.version;
 
@@ -324,6 +325,7 @@ async function runTask( options ) {
             const suffix = originalVersion.split( '-' ).length >= 2 ? originalVersion.split( '-' )[ 1 ] :
                            ( chipperVersion.major < 2 ? 'phetio' : '' );
             const parsedVersion = SimVersion.parse( version, '' );
+            // TODO: replace with getWorktreePackageJSON
             const simPackage = await loadJSON( `${simRepoDir}/package.json` );
             const ignoreForAutomatedMaintenanceReleases = !!( simPackage && simPackage.phet && simPackage.phet.ignoreForAutomatedMaintenanceReleases );
 

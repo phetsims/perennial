@@ -27,6 +27,7 @@ module.exports = async function getRepoStringMap( repo, checkoutDir ) {
     return {};
   }
 
+  // TODO: replace with getWorktreePackageJSON
   const packageJSON = await loadJSON( `${checkoutDir}/${repo}/package.json` );
   const requirejsNamespace = packageJSON.phet.requirejsNamespace;
 

@@ -14,8 +14,8 @@ const devDirectoryExists = require( '../common/devDirectoryExists' );
 const devScp = require( '../common/devScp' );
 const devSsh = require( '../common/devSsh' );
 const getBranch = require( '../common/getBranch' );
-const getRemoteBranchSHAs = require( '../common/getRemoteBranchSHAs' );
-const getRepoVersion = require( '../common/getRepoVersion' );
+const getBranchSHAMap = require( '../common/getBranchSHAMap' );
+const { getRunnableVersion } = require( '../common/getRunnableVersion' );
 const gitIsClean = require( '../common/gitIsClean' );
 const getDependencyRepos = require( '../common/getDependencyRepos' );
 const gitPush = require( '../common/gitPush' );
@@ -23,8 +23,7 @@ const gitRevParse = require( '../common/gitRevParse' );
 const lintProject = require( '../common/lintProject' );
 const isTotality = require( '../common/isTotality' );
 const npmUpdate = require( '../common/npmUpdate' );
-const setRepoVersion = require( '../common/setRepoVersion' );
-const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
+const setRunnableVersion = require( '../common/setRunnableVersion' );
 const updateHTMLVersion = require( '../common/updateHTMLVersion' );
 const vpnCheck = require( '../common/vpnCheck' );
 const writePhetioHtaccess = require( '../common/writePhetioHtaccess' ).default;
@@ -59,7 +58,7 @@ module.exports = async function dev( repo, brands, noninteractive, branch, messa
     throw new Error( `${testType} deployment should be on the branch ${branch}, not: ${currentBranch ? currentBranch : '(detached head)'}` );
   }
 
-  const previousVersion = await getRepoVersion( repo );
+  const previousVersion = await getRunnableVersion( repo );
 
   if ( previousVersion.testType !== testType ) {
     if ( isOneOff ) {
@@ -80,7 +79,7 @@ module.exports = async function dev( repo, brands, noninteractive, branch, messa
   }
 
   const currentSHA = await gitRevParse( repo, 'HEAD' );
-  const latestSHA = ( await getRemoteBranchSHAs( repo ) )[ branch ];
+  const latestSHA = ( await getBranchSHAMap( repo ) )[ branch ];
   if ( currentSHA !== latestSHA ) {
     // See https://github.com/phetsims/chipper/issues/699
     throw new Error( `Out of date with remote, please push or pull repo. Current SHA: ${currentSHA}, latest SHA: ${latestSHA}` );
@@ -122,7 +121,7 @@ module.exports = async function dev( repo, brands, noninteractive, branch, messa
   await npmUpdate( 'chipper' );
   await npmUpdate( 'perennial-alias' );
 
-  await setRepoVersion( repo, version, message );
+  await setRunnableVersion( repo, version, message );
   await updateHTMLVersion( repo );
   await gitPush( repo, branch );
 
@@ -154,9 +153,6 @@ module.exports = async function dev( repo, brands, noninteractive, branch, messa
   for ( const brand of brands ) {
     await devScp( `../${repo}/build/${brand}`, `${versionPath}/` );
   }
-
-  // Move over dependencies.json and commit/push
-  await updateDependenciesJSON( repo, brands, versionString, branch );
 
   const versionURL = `https://phet-dev.colorado.edu/html/${repo}/${versionString}`;
 

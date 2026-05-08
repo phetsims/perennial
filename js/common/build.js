@@ -29,6 +29,7 @@ module.exports = async function build( repo, options ) {
 
   const result = await execute( gruntCommand, [ ...args, `--repo=${repo}` ], '../chipper' );
 
+  // TODO: replace with getWorktreePackageJSON
   const packageObject = JSON.parse( fs.readFileSync( `../${repo}/package.json`, 'utf8' ) );
   const includesPhetio = packageObject.phet && packageObject.phet.supportedBrands && packageObject.phet.supportedBrands.includes( 'phet-io' );
 

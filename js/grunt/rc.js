@@ -15,15 +15,14 @@ const checkoutMain = require( '../common/checkoutMain' );
 const checkoutTarget = require( '../common/checkoutTarget' );
 const devDirectoryExists = require( '../common/devDirectoryExists' );
 const getDependencies = require( '../common/getDependencies' );
-const getRepoVersion = require( '../common/getRepoVersion' );
+const { getRunnableVersion } = require( '../common/getRunnableVersion' );
 const gitCheckout = require( '../common/gitCheckout' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const loadJSON = require( '../common/loadJSON' );
 const npmUpdate = require( '../common/npmUpdate' );
-const setRepoVersion = require( '../common/setRepoVersion' );
-const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
+const setRunnableVersion = require( '../common/setRunnableVersion' );
 const vpnCheck = require( '../common/vpnCheck' );
 const createRelease = require( './createRelease' );
 const grunt = require( 'grunt' );
@@ -79,7 +78,7 @@ module.exports = async function rc( repo, branch, brands, noninteractive, messag
   await checkoutTarget( repo, branch, false );
 
   try {
-    const previousVersion = await getRepoVersion( repo );
+    const previousVersion = await getRunnableVersion( repo );
 
     if ( previousVersion.testType !== 'rc' && previousVersion.testType !== null ) {
       handleError( `RC version number cannot be incremented safely: ${previousVersion}` );
@@ -104,7 +103,7 @@ module.exports = async function rc( repo, branch, brands, noninteractive, messag
       handleError( '"Deploy" user request' );
     }
 
-    await setRepoVersion( repo, version, message );
+    await setRunnableVersion( repo, version, message );
     await gitPush( repo, branch );
 
     // Make sure our correct npm dependencies are set
@@ -125,7 +124,7 @@ module.exports = async function rc( repo, branch, brands, noninteractive, messag
       cancelLog( problem );
 
       // Abort version update
-      await setRepoVersion( repo, previousVersion, message );
+      await setRunnableVersion( repo, previousVersion, message );
       await gitPush( repo, branch );
 
       // Abort checkout, (will be caught and main will be checked out)
@@ -135,9 +134,6 @@ module.exports = async function rc( repo, branch, brands, noninteractive, messag
     if ( !await booleanPrompt( `Please test the built version of ${repo}.\nIs it ready to deploy`, noninteractive ) ) {
       await postBuildAbort( `Built sim test failed, reverting back to ${previousVersion}` );
     }
-
-    // Move over dependencies.json and commit/push
-    await updateDependenciesJSON( repo, brands, versionString, branch );
 
     // Send the build request
     await buildServerRequest( repo, version, branch, await getDependencies( repo ), {

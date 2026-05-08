@@ -1,6 +1,9 @@
 // Copyright 2018-2026, University of Colorado Boulder
 
 /**
+ * TODO: REMOVE
+ * @deprecated
+ *
  * Returns a combination of status information for the repository's git status
  *
  * @author Jonathan Olson (PhET Interactive Simulations)
@@ -8,7 +11,7 @@
 
 const execute = require( './execute' ).default;
 const getBranch = require( './getBranch' );
-const getRemoteBranchSHAs = require( './getRemoteBranchSHAs' );
+const getBranchSHAMap = require( './getBranchSHAMap' );
 const gitRevParse = require( './gitRevParse' );
 const assert = require( 'assert' );
 
@@ -34,7 +37,7 @@ module.exports = async function( repo ) {
   if ( result.branch ) {
     // Safe method to get ahead/behind counts, see http://stackoverflow.com/questions/2969214/git-programmatically-know-by-how-much-the-branch-is-ahead-behind-a-remote-branc
 
-    result.remoteSHA = ( await getRemoteBranchSHAs( repo ) )[ result.branch ];
+    result.remoteSHA = ( await getBranchSHAMap( repo ) )[ result.branch ];
 
     // get the tracking-branch name
     result.trackingBranch = await execute( 'git', [ 'for-each-ref', '--format=\'%(upstream:short)\'', result.symbolicRef ], `../${repo}` );

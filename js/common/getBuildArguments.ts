@@ -8,7 +8,7 @@
  */
 
 import assert from 'assert';
-import type ChipperVersion from './ChipperVersion.js';
+import type { ChipperVersion } from './ChipperVersion.js';
 
 export type BuildOptions = {
   brands: string[];
@@ -29,7 +29,7 @@ export type BuildOptions = {
 /**
  * Returns a list of arguments to use with `grunt` to build a specific simulation
  */
-function getBuildArguments( chipperVersion: ChipperVersion, options: Partial<BuildOptions> ): string[] {
+export const getBuildArguments = ( chipperVersion: ChipperVersion, options: Partial<BuildOptions> ): string[] => {
   const {
     brands = [ 'phet' ],
     locales = 'en',
@@ -120,6 +120,4 @@ function getBuildArguments( chipperVersion: ChipperVersion, options: Partial<Bui
   }
 
   return args;
-}
-
-export default getBuildArguments;
+};

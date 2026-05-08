@@ -6,7 +6,7 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-const getRemoteBranchSHAs = require( './getRemoteBranchSHAs' );
+const getBranchSHAMap = require( './getBranchSHAMap' );
 const gitRevParse = require( './gitRevParse' );
 
 /**
@@ -19,7 +19,7 @@ const gitRevParse = require( './gitRevParse' );
  */
 module.exports = async function( repo ) {
   const currentSHA = await gitRevParse( repo, 'main' );
-  const remoteSHA = ( await getRemoteBranchSHAs( repo ) ).main;
+  const remoteSHA = ( await getBranchSHAMap( repo ) ).main;
 
   return currentSHA !== remoteSHA;
 };

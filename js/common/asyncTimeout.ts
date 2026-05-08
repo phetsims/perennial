@@ -13,7 +13,7 @@ import sleep from './sleep.js';
 // problem from the provided Promise.
 export const timeoutErrorMessage = 'TIMEOUT_ERROR';
 
-const asyncTimeout = async <T>( timeout: number, promise: Promise<T> ): Promise<T> => {
+export const asyncTimeout = async <T>( timeout: number, promise: Promise<T> ): Promise<T> => {
 
   const timeoutPromise = ( async () => {
     await sleep( timeout );
@@ -22,5 +22,3 @@ const asyncTimeout = async <T>( timeout: number, promise: Promise<T> ): Promise<
 
   return Promise.race( [ promise, timeoutPromise ] );
 };
-
-export default asyncTimeout;

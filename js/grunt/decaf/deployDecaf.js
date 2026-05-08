@@ -14,7 +14,7 @@ const devDirectoryExists = require( '../../common/devDirectoryExists' );
 const devScp = require( '../../common/devScp' );
 const devSsh = require( '../../common/devSsh' );
 const getBranch = require( '../../common/getBranch' );
-const getRemoteBranchSHAs = require( '../../common/getRemoteBranchSHAs' );
+const getBranchSHAMap = require( '../../common/getBranchSHAMap' );
 const gitIsClean = require( '../../common/gitIsClean' );
 const gitRevParse = require( '../../common/gitRevParse' );
 const loadJSON = require( '../../common/loadJSON' );
@@ -78,7 +78,7 @@ module.exports = async function( project, dev, production ) {
 
   const currentSHA = await gitRevParse( 'decaf', 'HEAD' );
 
-  const latestSHA = ( await getRemoteBranchSHAs( 'decaf' ) ).main;
+  const latestSHA = ( await getBranchSHAMap( 'decaf' ) ).main;
   if ( currentSHA !== latestSHA ) {
     // See https://github.com/phetsims/chipper/issues/699
     throw new Error( `Out of date with remote, please push or pull repo. Current SHA: ${currentSHA}, latest SHA: ${latestSHA}` );

@@ -28,7 +28,7 @@ import { IntentionalPerennialAny } from '../browser-and-node/PerennialTypes.js';
 import { getOptionIfProvided } from '../grunt/tasks/util/getOption.js';
 import cloneMissingRepos from './cloneMissingRepos.js';
 import execute from './execute.js';
-import getBranches from './getBranches.js';
+import { getBranches } from './getBranches.js';
 import getRepoList from './getRepoList.js';
 import gitCheckout from './gitCheckout.js';
 import gitFetch from './gitFetch.js';
@@ -165,7 +165,7 @@ export const sync = async ( providedOptions?: Partial<SyncOptions> ): Promise<bo
   let hasNoPullStatusProblems = true;
 
   async function pullAllBranches( repo: string ): Promise<void> {
-    const branches = await getBranches( repo );
+    const branches = await getBranches(); // TODO: handle syncing here
     for ( const branch of branches ) {
       // Only track the remote branch if it hasn't been tracked yet
       if ( ( await execute( 'git', [ 'rev-parse', '--verify', branch ], `../${repo}`, { errors: 'resolve' } ) ).code !== 0 ) {

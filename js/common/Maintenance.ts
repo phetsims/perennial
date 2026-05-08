@@ -23,8 +23,8 @@ import chipperSupportsOutputJSGruntTasks from './chipperSupportsOutputJSGruntTas
 import ChipperVersion from './ChipperVersion.js';
 import execute from './execute.js';
 import getActiveRepos from './getActiveRepos.js';
-import getBranches from './getBranches.js';
-import getBranchMap from './getBranchMap.js';
+import { getBranches } from './getBranches.js';
+import getBranchSHAMap from './getBranchSHAMap.js';
 import type { BuildOptions } from './getBuildArguments.js';
 import getDependencies from './getDependencies.js';
 import gitAdd from './gitAdd.js';
@@ -141,10 +141,10 @@ class Maintenance {
 
     // Set up a cache of branchMaps so that we don't make multiple requests
     const branchMaps: Record<string, Record<string, string>> = {};
-    const getBranchMapAsyncCallback = async ( repo: string ) => {
+    const getBranchSHAMapAsyncCallback = async ( repo: string ) => {
       if ( !branchMaps[ repo ] ) {
         // eslint-disable-next-line require-atomic-updates
-        branchMaps[ repo ] = await getBranchMap( repo );
+        branchMaps[ repo ] = await getBranchSHAMap( repo );
       }
       return branchMaps[ repo ];
     };
@@ -152,7 +152,7 @@ class Maintenance {
     for ( const releaseBranch of releaseBranches ) {
       if ( !filter || filter( releaseBranch ) ) {
         console.log( `${releaseBranch.repo} ${releaseBranch.branch}` );
-        for ( const line of await releaseBranch.getStatus( getBranchMapAsyncCallback ) ) {
+        for ( const line of await releaseBranch.getStatus( getBranchSHAMapAsyncCallback ) ) {
           console.log( `  ${line}` );
         }
       }
@@ -510,11 +510,8 @@ class Maintenance {
    * Adds a needed patch to all release branches that do NOT include the given commit on the repo
    */
   public static async addNeededPatchesBefore( patchName: string, sha: string ): Promise<void> {
-    const maintenance = Maintenance.load();
-    const patch = maintenance.findPatch( patchName );
-
     await Maintenance.addNeededPatches( patchName, async releaseBranch => {
-      return releaseBranch.isMissingSHA( patch.repo, sha );
+      return releaseBranch.isMissingSHA( sha );
     } );
   }
 
@@ -522,11 +519,8 @@ class Maintenance {
    * Adds a needed patch to all release branches that DO include the given commit on the repo
    */
   public static async addNeededPatchesAfter( patchName: string, sha: string ): Promise<void> {
-    const maintenance = Maintenance.load();
-    const patch = maintenance.findPatch( patchName );
-
     await Maintenance.addNeededPatches( patchName, async releaseBranch => {
-      return releaseBranch.includesSHA( patch.repo, sha );
+      return releaseBranch.includesSHA( sha );
     } );
   }
 
@@ -609,11 +603,8 @@ class Maintenance {
    * Removes a needed patch from all release branches that do NOT include the given commit on the repo
    */
   public static async removeNeededPatchesBefore( patchName: string, sha: string ): Promise<void> {
-    const maintenance = Maintenance.load();
-    const patch = maintenance.findPatch( patchName );
-
     await Maintenance.removeNeededPatches( patchName, async releaseBranch => {
-      return releaseBranch.isMissingSHA( patch.repo, sha );
+      return releaseBranch.isMissingSHA( sha );
     } );
   }
 
@@ -621,11 +612,8 @@ class Maintenance {
    * Removes a needed patch from all release branches that DO include the given commit on the repo
    */
   public static async removeNeededPatchesAfter( patchName: string, sha: string ): Promise<void> {
-    const maintenance = Maintenance.load();
-    const patch = maintenance.findPatch( patchName );
-
     await Maintenance.removeNeededPatches( patchName, async releaseBranch => {
-      return releaseBranch.includesSHA( patch.repo, sha );
+      return releaseBranch.includesSHA( sha );
     } );
   }
 
@@ -829,7 +817,7 @@ class Maintenance {
 
         for ( const dependency of changedRepos ) {
           const dependencyBranch = modifiedBranch.dependencyBranch;
-          const branches = await getBranches( dependency );
+          const branches = await getBranches(); // TODO
           const sha = modifiedBranch.changedDependencies[ dependency ];
 
           dependenciesJSON[ dependency ].sha = sha;

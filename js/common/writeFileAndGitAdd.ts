@@ -10,8 +10,8 @@ import fs from 'fs';
 import grunt from '../npm-dependencies/grunt.js';
 import fixEOL from './fixEOL.js';
 import gitAdd from './gitAdd.js';
-import gitIsClean from './gitIsClean.js';
-import isGitRepo from './isGitRepo.js';
+import { gitIsClean } from './gitIsClean.js';
+import { hasPolyRepoDirectory } from './hasPolyRepoDirectory.js';
 
 /**
  * @param repo - The repository name
@@ -21,6 +21,8 @@ import isGitRepo from './isGitRepo.js';
  * @rejects {ExecuteError}
  */
 export default async function( repo: string, filePath: string, content: string ): Promise<void> {
+
+  const combinedRelativePath = `${repo}/${filePath}`;
 
   const fixedContent = fixEOL( content );
 
@@ -38,8 +40,8 @@ export default async function( repo: string, filePath: string, content: string )
     const outputFile = `../${repo}/${filePath}`;
     grunt.file.write( outputFile, fixedContent );
 
-    if ( await isGitRepo( repo ) ) {
-      const fileClean = await gitIsClean( repo, filePath );
+    if ( await hasPolyRepoDirectory( repo ) ) {
+      const fileClean = await gitIsClean( combinedRelativePath );
       if ( !fileClean ) {
         await gitAdd( repo, filePath );
       }

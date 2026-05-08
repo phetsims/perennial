@@ -25,18 +25,17 @@ import createDirectory from './createDirectory.js';
 import execute, { ExecuteOptions } from './execute.js';
 import getActiveSims from './getActiveSims.js';
 import getBranchDependencies from './getBranchDependencies.js';
-import getBranchMap from './getBranchMap.js';
-import getBranchVersion from './getBranchVersion.js';
+import getBranchSHAMap from './getBranchSHAMap.js';
+import { getBranchVersion } from './getBranchVersion.js';
 import getBuildArguments, { BuildOptions } from './getBuildArguments.js';
 import getDependencies from './getDependencies.js';
 import getGitFile from './getGitFile.js';
-import getRepoVersion from './getRepoVersion.js';
+import { getRunnableVersion } from './getRunnableVersion.js';
 import gitCatFile from './gitCatFile.js';
 import gitCheckout from './gitCheckout.js';
 import gitCheckoutDirectory from './gitCheckoutDirectory.js';
 import gitCloneOrFetchDirectory from './gitCloneOrFetchDirectory.js';
-import gitFirstDivergingCommit from './gitFirstDivergingCommit.js';
-import gitIsAncestor from './gitIsAncestor.js';
+import { gitFirstDivergingCommit } from './gitFirstDivergingCommit.js';
 import gitPull from './gitPull.js';
 import gitPullDirectory from './gitPullDirectory.js';
 import gitRevParse from './gitRevParse.js';
@@ -49,12 +48,13 @@ import simMetadata from './simMetadata.js';
 import simPhetioMetadata from './simPhetioMetadata.js';
 import withServer from './withServer.js';
 import { gitCreateWorktree } from './gitCreateWorktree.js';
-import { getTotalityBranches } from './getTotalityBranches.js';
-import { getTotalityFileAtBranch } from './getTotalityFileAtBranch.js';
-import { createTotalityLocalBranchFromRemote } from './createTotalityLocalBranchFromRemote.js';
+import { getBranches } from './getBranches.js';
+import { getFileAtBranch } from './getFileAtBranch.js';
+import { createLocalBranchFromRemote } from './createLocalBranchFromRemote.js';
+import { Branch, WORKTREE_DIRECTORY } from './Branch.js';
+import { gitIsAncestor } from './gitIsAncestor.js';
 
 const MAINTENANCE_DIRECTORY = '../release-branches';
-const WORKTREE_DIRECTORY = buildLocal.releaseBranchesDirectory;
 
 type ReleaseBranchSerialized = {
   repo: string;
@@ -63,18 +63,20 @@ type ReleaseBranchSerialized = {
   isReleased: boolean;
 };
 
-class ReleaseBranch implements ReleaseBranchSerialized {
+class ReleaseBranch extends Branch implements ReleaseBranchSerialized {
 
   // Cache for the timestamp string of the diverging commit, since it can be expensive to calculate and is used in multiple places.
   public cachedTimestampString: string | null = null;
 
-  public readonly totalityBranch: string;
-
-  public constructor( public readonly repo: string, public readonly branch: string, public readonly brands: string[],
-                      public readonly isReleased: boolean ) {
+  public constructor(
+    public readonly repo: string,
+    public readonly branch: string,
+    public readonly brands: string[],
+    public readonly isReleased: boolean
+  ) {
     assert( Array.isArray( brands ) );
 
-    this.totalityBranch = `releases/${repo}/${branch}`;
+    super( `releases/${repo}/${branch}` );
   }
 
   /**
@@ -109,11 +111,13 @@ class ReleaseBranch implements ReleaseBranchSerialized {
   /**
    * Converts it to a (debuggable) string form.
    */
-  public toString(): string {
+  public override toString(): string {
     return `${this.repo} ${this.branch} ${this.brands.join( ',' )}${this.isReleased ? '' : ' (unpublished)'}`;
   }
 
   /**
+   * TODO: remove
+   * @deprecated
    *
    * @param repo {string}
    * @param branch {string}
@@ -122,11 +126,10 @@ class ReleaseBranch implements ReleaseBranchSerialized {
     return `${MAINTENANCE_DIRECTORY}/${repo}-${branch}`;
   }
 
-  public static getWorktreeDirectory( repo: string, branch: string ): string {
-    return `${WORKTREE_DIRECTORY}/${repo}-${branch}`;
-  }
-
   /**
+   * TODO: remove
+   * @deprecated
+   *
    * Returns the maintenance directory, for things that want to use it directly.
    *
    */
@@ -161,14 +164,16 @@ class ReleaseBranch implements ReleaseBranchSerialized {
     return ( await this.usesOldPhetioStandalone() ) ? 'phet-io.standalone' : 'phetioStandalone';
   }
 
-  public getChipperVersion(): ChipperVersion {
-    const checkoutDirectory = ReleaseBranch.getCheckoutDirectory( this.repo, this.branch );
+  public async getChipperVersion(): Promise<ChipperVersion> {
+    const packageJSONString = await getFileAtBranch( this.totalityBranch, 'chipper/package.json' );
 
-    return ChipperVersion.getFromPackageJSON(
-      JSON.parse( fs.readFileSync( `${checkoutDirectory}/chipper/package.json`, 'utf8' ) )
-    );
+    return ChipperVersion.getFromPackageJSON( JSON.parse( packageJSONString ) );
   }
 
+  /**
+   * @deprecated
+   * TODO: Remove
+   */
   public async updateCheckout( overrideDependencies: Dependencies = {} ): Promise<void> {
     winston.info( `updating checkout for ${this.toString()}` );
 
@@ -224,10 +229,10 @@ class ReleaseBranch implements ReleaseBranchSerialized {
   }
 
   public async build( options?: Partial<BuildOptions>, executeOptions?: ExecuteOptions & { errors?: 'reject' } ): Promise<void> {
-    const checkoutDirectory = ReleaseBranch.getCheckoutDirectory( this.repo, this.branch );
-    const repoDirectory = `${checkoutDirectory}/${this.repo}`;
+    const worktreeDirectory = this.getWorktreeDirectory();
+    const repoDirectory = `${worktreeDirectory}/${this.repo}`;
 
-    const args = getBuildArguments( this.getChipperVersion(), _.merge( {
+    const args = getBuildArguments( await this.getChipperVersion(), _.merge( {
       brands: this.brands,
       allHTML: true,
       debugHTML: true,
@@ -235,16 +240,16 @@ class ReleaseBranch implements ReleaseBranchSerialized {
       locales: '*'
     }, options ) );
 
-    winston.info( `building ${checkoutDirectory} with grunt ${args.join( ' ' )}` );
+    winston.info( `building ${worktreeDirectory} with grunt ${args.join( ' ' )}` );
     await execute( gruntCommand, args, repoDirectory, executeOptions );
   }
 
   public async transpile(): Promise<void> {
-    const checkoutDirectory = ReleaseBranch.getCheckoutDirectory( this.repo, this.branch );
-    const repoDirectory = `${checkoutDirectory}/${this.repo}`;
+    const worktreeDirectory = this.getWorktreeDirectory();
+    const repoDirectory = `${worktreeDirectory}/${this.repo}`;
 
     if ( chipperSupportsOutputJSGruntTasks() ) {
-      winston.info( `transpiling ${checkoutDirectory}` );
+      winston.info( `transpiling ${worktreeDirectory}` );
 
       // We might not be able to run this command!
       await execute( gruntCommand, [ 'output-js-project', '--silent' ], repoDirectory, {
@@ -266,7 +271,7 @@ class ReleaseBranch implements ReleaseBranchSerialized {
           return `Failure for ${url}: ${e}`;
         }
       }, {
-        path: ReleaseBranch.getCheckoutDirectory( this.repo, this.branch )
+        path: this.getWorktreeDirectory()
       } );
     }
     catch( e ) {
@@ -289,7 +294,7 @@ class ReleaseBranch implements ReleaseBranchSerialized {
           return `Failure for ${url}: ${error}`;
         }
       }, {
-        path: ReleaseBranch.getCheckoutDirectory( this.repo, this.branch )
+        path: this.getWorktreeDirectory()
       } );
     }
     catch( e ) {
@@ -298,6 +303,9 @@ class ReleaseBranch implements ReleaseBranchSerialized {
   }
 
   /**
+   * @deprecated
+   * TODO: Remove
+   *
    * Checks this release branch out.
    */
   public async checkout( includeNpmUpdate: boolean ): Promise<void> {
@@ -305,50 +313,32 @@ class ReleaseBranch implements ReleaseBranchSerialized {
   }
 
   /**
-   * Whether this release branch includes the given SHA for the given repo dependency. Will be false if it doesn't
-   * depend on this repository.
+   * Whether the totality branch for this release branch includes the given SHA.
+   * NOTE: octopus merges were done for legacy release branches, so ideally finding the totality SHA of an older polyrepo
+   * commit will allow this to work.
    */
-  public async includesSHA( repo: string, sha: string ): Promise<boolean> {
-    let result = false;
-
-    const dependencies = JSON.parse( await getGitFile( this.repo, this.branch, 'dependencies.json' ) );
-
-    if ( dependencies[ repo ] ) {
-      const currentSHA = dependencies[ repo ].sha;
-      result = sha === currentSHA || await gitIsAncestor( repo, sha, currentSHA );
-    }
-
-    return result;
+  public async includesSHA( sha: string ): Promise<boolean> {
+    return gitIsAncestor( sha, this.totalityBranch );
   }
 
   /**
-   * Whether this release branch does NOT include the given SHA for the given repo dependency. Will be false if it doesn't
-   * depend on this repository.
-   *
+   * Whether the totality branch for this release branch is missing the given SHA.
+   * NOTE: octopus merges were done for legacy release branches, so ideally finding the totality SHA of an older polyrepo
+   * commit will allow this to work.
    */
-  public async isMissingSHA( repo: string, sha: string ): Promise<boolean> {
-    let result = false;
+  public async isMissingSHA( sha: string ): Promise<boolean> {
+    const currentSHA = await gitRevParse( this.repo, this.branch );
 
-    const dependencies = JSON.parse( await getGitFile( this.repo, this.branch, 'dependencies.json' ) );
-
-    if ( dependencies[ repo ] ) {
-      const currentSHA = dependencies[ repo ].sha;
-      result = sha !== currentSHA && !( await gitIsAncestor( repo, sha, currentSHA ) );
-    }
-
-    return result;
+    return sha !== currentSHA && !( await this.includesSHA( sha ) );
   }
 
   /**
    * The SHA at which this release branch's main repository diverged from main.
-   *
    */
   public async getDivergingSHA(): Promise<string> {
-    await gitCheckout( this.repo, this.branch );
-    await gitPull( this.repo );
-    await gitCheckout( this.repo, 'main' );
+    await createLocalBranchFromRemote( this.totalityBranch );
 
-    return gitFirstDivergingCommit( this.repo, this.branch, 'main' );
+    return gitFirstDivergingCommit( this.totalityBranch, 'main' );
   }
 
   /**
@@ -359,6 +349,9 @@ class ReleaseBranch implements ReleaseBranchSerialized {
   }
 
   /**
+   * TODO: Remove
+   * @deprecated
+   *
    * Returns the dependencies.json for this release branch
    */
   public async getDependencies(): Promise<Dependencies> {
@@ -373,47 +366,13 @@ class ReleaseBranch implements ReleaseBranchSerialized {
   }
 
   /**
+   * // TODO: UPDATE THIS so it only checks for the last SHA whether it is an "update" deployed message!
    * Returns a list of status messages of anything out-of-the-ordinary
    */
-  public async getStatus( getBranchMapAsyncCallback = getBranchMap ): Promise<string[]> {
+  public async getStatus( getBranchSHAMapAsyncCallback = getBranchSHAMap ): Promise<string[]> {
     const results = [];
 
-    const dependencies = await this.getDependencies();
-    const dependencyNames = Object.keys( dependencies ).filter( key => {
-      return key !== 'comment' && key !== this.repo && key !== 'phet-io-wrapper-sonification';
-    } );
-
-    // Check our own dependency
-    if ( dependencies[ this.repo ] ) {
-      try {
-        const currentCommit = await gitRevParse( this.repo, this.branch );
-        const previousCommit = await gitRevParse( this.repo, `${currentCommit}^` );
-        if ( dependencies[ this.repo ].sha !== previousCommit ) {
-          results.push( '[INFO] Potential changes (dependency is not previous commit)' );
-          results.push( `[INFO] ${currentCommit} ${previousCommit} ${dependencies[ this.repo ].sha}` );
-        }
-        if ( ( await this.getSimVersion() ).testType === 'rc' && this.isReleased ) {
-          results.push( '[INFO] Release candidate version detected (see if there is a QA issue)' );
-        }
-      }
-      catch( e ) {
-        e instanceof Error && results.push( `[ERROR] Failure to check current/previous commit: ${e.message}` );
-      }
-    }
-    else {
-      results.push( '[WARNING] Own repository not included in dependencies' );
-    }
-
-    for ( const dependency of dependencyNames ) {
-      const potentialReleaseBranch = `${this.repo}-${this.branch}`;
-      const branchMap = await getBranchMapAsyncCallback( dependency );
-
-      if ( Object.keys( branchMap ).includes( potentialReleaseBranch ) ) {
-        if ( dependencies[ dependency ].sha !== branchMap[ potentialReleaseBranch ] ) {
-          results.push( `[WARNING] Dependency mismatch for ${dependency} on branch ${potentialReleaseBranch}` );
-        }
-      }
-    }
+    throw new Error( 'unimplemented' );
 
     return results;
   }
@@ -485,11 +444,8 @@ class ReleaseBranch implements ReleaseBranchSerialized {
    * Returns whether the sim is compatible with ES6 features
    */
   public async usesES6(): Promise<boolean> {
-    const dependencies = await this.getDependencies();
-
-    const sha = dependencies.chipper.sha;
-
-    return gitIsAncestor( 'chipper', '80b4ad62cd8f2057b844f18d3c00cf5c0c89ed8d', sha );
+    // chipper polyrepo 80b4ad62cd8f2057b844f18d3c00cf5c0c89ed8d
+    return gitIsAncestor( 'be95288d3a5867fb38fd43936d5c8a473c2f0e17', this.totalityBranch );
   }
 
   /**
@@ -504,42 +460,27 @@ class ReleaseBranch implements ReleaseBranchSerialized {
    *   FLAGS should use !!phet.chipper.getQueryParameter( 'WHATEVER' )
    */
   public async usesInitializeGlobalsQueryParameters(): Promise<boolean> {
-    const dependencies = await this.getDependencies();
-
-    const sha = dependencies.chipper.sha;
-
-    return gitIsAncestor( 'chipper', 'e454f88ff51d1e3fabdb3a076d7407a2a9e9133c', sha );
+    // chipper polyrepo e454f88ff51d1e3fabdb3a076d7407a2a9e9133c
+    return gitIsAncestor( '24dae95fdc221af4513684112b1addb8a1f7c10d', this.totalityBranch );
   }
 
   /**
    * Returns whether phet-io.standalone is the correct phet-io query parameter (otherwise it's the newer
    * phetioStandalone).
-   * Looks for the presence of https://github.com/phetsims/chipper/commit/4814d6966c54f250b1c0f3909b71f2b9cfcc7665.
    *
    */
   public async usesOldPhetioStandalone(): Promise<boolean> {
-    const dependencies = await this.getDependencies();
-
-    const sha = dependencies.chipper.sha;
-
-    return !( await gitIsAncestor( 'chipper', '4814d6966c54f250b1c0f3909b71f2b9cfcc7665', sha ) );
+    // chipper polyrepo 4814d6966c54f250b1c0f3909b71f2b9cfcc7665
+    return gitIsAncestor( '6aa2943d55f673921609b7e76b6a808e033e439c', this.totalityBranch );
   }
 
   /**
    * Returns whether the relativeSimPath query parameter is used for wrappers (instead of launchLocalVersion).
-   * Looks for the presence of https://github.com/phetsims/phet-io/commit/e3fc26079358d86074358a6db3ebaf1af9725632
    *
    */
   public async usesRelativeSimPath(): Promise<boolean> {
-    const dependencies = await this.getDependencies();
-
-    if ( !dependencies[ 'phet-io' ] ) {
-      return true; // Doesn't really matter now, does it?
-    }
-
-    const sha = dependencies[ 'phet-io' ].sha;
-
-    return gitIsAncestor( 'phet-io', 'e3fc26079358d86074358a6db3ebaf1af9725632', sha );
+    // phet-io polyrepo e3fc26079358d86074358a6db3ebaf1af9725632
+    return !this.brands.includes( 'phet-io' ) || await gitIsAncestor( '7f1f7a9470d9ced8edcb26837ff431cd61afa517', this.totalityBranch );;
   }
 
   /**
@@ -547,11 +488,8 @@ class ReleaseBranch implements ReleaseBranchSerialized {
    *
    */
   public async usesPhetioStudio(): Promise<boolean> {
-    const dependencies = await this.getDependencies();
-
-    const sha = dependencies.chipper.sha;
-
-    return gitIsAncestor( 'chipper', '7375f6a57b5874b6bbf97a54c9a908f19f88d38f', sha );
+    // chipper polyrepo 7375f6a57b5874b6bbf97a54c9a908f19f88d38f
+    return gitIsAncestor( 'fc479b2d8eb2ff354543e6cebe5c1bfbb44bb1cc', this.totalityBranch );
   }
 
   /**
@@ -559,31 +497,24 @@ class ReleaseBranch implements ReleaseBranchSerialized {
    *
    */
   public async usesPhetioStudioIndex(): Promise<boolean> {
-    const dependencies = await this.getDependencies();
-
-    const dependency = dependencies[ 'phet-io-wrappers' ];
-    if ( !dependency ) {
-      return false;
-    }
-
-    const sha = dependency.sha;
-
-    return gitIsAncestor( 'phet-io-wrappers', '7ec1a04a70fb9707b381b8bcab3ad070815ef7fe', sha );
+    // phet-io-wrappers polyrepo 7ec1a04a70fb9707b381b8bcab3ad070815ef7fe
+    return !this.brands.includes( 'phet-io' ) || await gitIsAncestor( '46fdcc098ba3b84e6f39d8506828c4ad629ef206', this.totalityBranch );;
   }
 
   /**
    * Returns whether the sim is a "Hydrogen" phet-io sim.
    */
   public async isPhetioHydrogen(): Promise<boolean> {
-    return this.brands.includes( 'phet-io' ) &&
-           this.includesSHA( 'phet-io-wrappers', '7e8d97020c6451f68e898ae83aa43593b555137f' );
+    // phet-io-wrappers polyrepo 7e8d97020c6451f68e898ae83aa43593b555137f
+    return !this.brands.includes( 'phet-io' ) || await gitIsAncestor( '8c175d14c0d467d0e457f47a5f496455d2370b31', this.totalityBranch );;
   }
 
   /**
    * Returns whether the sim is built with XHTML
    */
   public async hasXHTML(): Promise<boolean> {
-    return this.includesSHA( 'chipper', '70c2d4b0cb0cb0cb457190e3ca889c406b663686' );
+    // chipper polyrepo 70c2d4b0cb0cb0cb457190e3ca889c406b663686
+    return gitIsAncestor( '8a26d07ea32b04ec3fbe7efa60c180ec45c99273', this.totalityBranch );
   }
 
   /**
@@ -622,14 +553,15 @@ class ReleaseBranch implements ReleaseBranchSerialized {
   }
 
   public async hasMigrationWrapper(): Promise<boolean> {
-    return this.brands.includes( 'phet-io' ) && this.includesSHA( 'phet-io-wrappers', 'd8ad7267614d1b7cf3fc2d0d9cc11e3c592ac1ce' );
+    // phet-io-wrappers polyrepo d8ad7267614d1b7cf3fc2d0d9cc11e3c592ac1ce
+    return !this.brands.includes( 'phet-io' ) || await gitIsAncestor( '2328bdd8bacff4bf3858c8eef1bcc3c1dc648cad', this.totalityBranch );;
   }
 
   /**
    * Returns the timestamp string with the date of when this release branch diverged from main.
    */
   public async getDivergingTimestampString(): Promise<string> {
-    const divergingCommit = await gitFirstDivergingCommit( this.repo, this.branch, 'main' );
+    const divergingCommit = await gitFirstDivergingCommit( this.totalityBranch, 'main' );
     const timestamp = await gitTimestamp( this.repo, divergingCommit );
     return new Date( timestamp ).toISOString().split( 'T' )[ 0 ];
   }
@@ -653,15 +585,12 @@ class ReleaseBranch implements ReleaseBranchSerialized {
     winston.info( `updating worktree for ${this.toString()}` );
 
     // Create the container directory
-    if ( !fs.existsSync( WORKTREE_DIRECTORY ) ) {
-      winston.info( `creating directory ${WORKTREE_DIRECTORY}` );
-      await createDirectory( WORKTREE_DIRECTORY );
-    }
+    await this.ensureWorktreeParentDirectory();
 
-    const worktreeDirectory = ReleaseBranch.getWorktreeDirectory( this.repo, this.branch );
+    const worktreeDirectory = this.getWorktreeDirectory();
 
     // Ensure our remote tracking is set up properly
-    await createTotalityLocalBranchFromRemote( this.totalityBranch );
+    await createLocalBranchFromRemote( this.totalityBranch );
 
     // Create the worktree itself if needed
     if ( !fs.existsSync( worktreeDirectory ) ) {
@@ -691,7 +620,7 @@ class ReleaseBranch implements ReleaseBranchSerialized {
   }
 
   public async removeWorktree(): Promise<void> {
-    const worktreeDirectory = ReleaseBranch.getWorktreeDirectory( this.repo, this.branch );
+    const worktreeDirectory = this.getWorktreeDirectory();
 
     if ( fs.existsSync( worktreeDirectory ) ) {
       winston.info( `removing worktree at ${worktreeDirectory}` );
@@ -708,7 +637,7 @@ class ReleaseBranch implements ReleaseBranchSerialized {
     if ( this.isReleased ) {
       await checkoutTarget( this.repo, this.branch, false );
 
-      const version = await getRepoVersion( this.repo );
+      const version = await getRunnableVersion( this.repo );
       const dependencies = await getDependencies( this.repo );
 
       await checkoutMain( this.repo, false );
@@ -836,7 +765,7 @@ class ReleaseBranch implements ReleaseBranchSerialized {
       const releasedBranches = phetBranches.concat( phetioBranches );
 
       const activeSims = getActiveSims();
-      const branches = await getTotalityBranches();
+      const branches = await getBranches();
       for ( const totalityBranch of branches ) {
         const match = totalityBranch.match( /^releases\/([^/]+)\/(\d+)\.(\d+)$/ );
 
@@ -876,7 +805,7 @@ class ReleaseBranch implements ReleaseBranchSerialized {
              ( major === productionVersion.major && minor > productionVersion.minor ) ) {
 
           // Determine supported brands
-          const packageObject = JSON.parse( await getTotalityFileAtBranch( totalityBranch, `${repo}/package.json` ) );
+          const packageObject = JSON.parse( await getFileAtBranch( totalityBranch, `${repo}/package.json` ) );
           const includesPhetio = packageObject.phet && packageObject.phet.supportedBrands && packageObject.phet.supportedBrands.includes( 'phet-io' );
 
           const brands = [

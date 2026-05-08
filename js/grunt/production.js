@@ -14,7 +14,7 @@ const checkoutMain = require( '../common/checkoutMain' );
 const checkoutTarget = require( '../common/checkoutTarget' );
 const execute = require( '../common/execute' ).default;
 const getDependencies = require( '../common/getDependencies' );
-const getRepoVersion = require( '../common/getRepoVersion' );
+const { getRunnableVersion } = require( '../common/getRunnableVersion' );
 const gitAdd = require( '../common/gitAdd' );
 const gitCommit = require( '../common/gitCommit' );
 const gitIsClean = require( '../common/gitIsClean' );
@@ -24,9 +24,8 @@ const gruntCommand = require( '../common/gruntCommand' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const isPublished = require( '../common/isPublished' );
 const npmUpdate = require( '../common/npmUpdate' );
-const setRepoVersion = require( '../common/setRepoVersion' );
+const setRunnableVersion = require( '../common/setRunnableVersion' );
 const simMetadata = require( '../common/simMetadata' ).default;
-const updateDependenciesJSON = require( '../common/updateDependenciesJSON' );
 const vpnCheck = require( '../common/vpnCheck' );
 const buildLocal = require( '../common/buildLocal' );
 const assert = require( 'assert' );
@@ -97,7 +96,7 @@ module.exports = async function production( repo, branch, brands, noninteractive
   await checkoutTarget( repo, branch, false );
 
   try {
-    const previousVersion = await getRepoVersion( repo );
+    const previousVersion = await getRunnableVersion( repo );
     let version;
     let versionChanged;
 
@@ -128,7 +127,7 @@ module.exports = async function production( repo, branch, brands, noninteractive
     }
 
     if ( versionChanged ) {
-      await setRepoVersion( repo, version, message );
+      await setRunnableVersion( repo, version, message );
       await gitPush( repo, branch );
     }
 
@@ -176,7 +175,7 @@ module.exports = async function production( repo, branch, brands, noninteractive
 
       // Abort version update
       if ( versionChanged ) {
-        await setRepoVersion( repo, previousVersion, message );
+        await setRunnableVersion( repo, previousVersion, message );
         await gitPush( repo, branch );
       }
 
@@ -188,9 +187,6 @@ module.exports = async function production( repo, branch, brands, noninteractive
     if ( !await booleanPrompt( `Please test the built version of ${repo}.\nIs it ready to deploy?`, noninteractive ) ) {
       await postBuildAbort( `Built sim test, reverting back to ${previousVersion}` );
     }
-
-    // Move over dependencies.json and commit/push
-    await updateDependenciesJSON( repo, brands, versionString, branch );
 
     // Send the build request
     await buildServerRequest( repo, version, branch, await getDependencies( repo ), {

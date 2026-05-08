@@ -48,6 +48,7 @@ async function usesTopLevelIndex( repo, branch ) {
   const dependencies = JSON.parse( await getFileAtBranch( repo, branch, 'dependencies.json' ) );
   const sha = dependencies.chipper.sha;
 
+  // TODO: find sha (totality looks like bdff4df5dbf0d0bbdd7ad1d949bd7acf1dec05b7)
   return gitIsAncestor( 'chipper', '8db0653ee0cbb6ed716fa3b4d4759bcb75d8118a', sha );
 }
 

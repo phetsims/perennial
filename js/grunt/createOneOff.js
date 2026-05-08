@@ -10,14 +10,14 @@ const SimVersion = require( '../browser-and-node/SimVersion' ).default;
 const build = require( '../common/build' );
 const copyFile = require( '../common/copyFile' );
 const execute = require( '../common/execute' ).default;
-const getRepoVersion = require( '../common/getRepoVersion' );
+const { getRunnableVersion } = require( '../common/getRunnableVersion' );
 const gitAdd = require( '../common/gitAdd' );
 const gitCommit = require( '../common/gitCommit' );
 const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
-const setRepoVersion = require( '../common/setRepoVersion' );
+const setRunnableVersion = require( '../common/setRunnableVersion' );
 
 /**
  * For `grunt create-one-off`, see Gruntfile for details
@@ -36,7 +36,7 @@ module.exports = async function( repo, branch, message ) {
     throw new Error( 'Branch already exists, aborting' );
   }
 
-  const branchedVersion = await getRepoVersion( repo );
+  const branchedVersion = await getRunnableVersion( repo );
 
   const newVersion = new SimVersion( branchedVersion.major, branchedVersion.minor, 0, {
     testType: branch,
@@ -54,7 +54,7 @@ module.exports = async function( repo, branch, message ) {
 
   // Create the branch, update the version info
   await execute( 'git', checkoutArgs, `../${repo}` );
-  await setRepoVersion( repo, newVersion, message );
+  await setRunnableVersion( repo, newVersion, message );
   await gitPush( repo, branch );
 
   // Update dependencies.json for the release branch
