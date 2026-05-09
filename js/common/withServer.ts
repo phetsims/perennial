@@ -32,7 +32,7 @@ type WithServerOptions = {
  * @returns Returns the result of the asyncCallback
  *
  */
-export default function <T>( asyncCallback: ( port: number ) => T, options?: WithServerOptions ): Promise<T> {
+export default function <T>( asyncCallback: ( port: number ) => Promise<T>, options?: WithServerOptions ): Promise<T> {
 
   options = _.merge( {
     path: '../',

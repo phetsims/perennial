@@ -26,10 +26,12 @@ export type BuildOptions = {
   buildForServer: boolean;
 };
 
+export type GetBuildArgumentsOptions = Partial<BuildOptions>;
+
 /**
  * Returns a list of arguments to use with `grunt` to build a specific simulation
  */
-export const getBuildArguments = ( chipperVersion: ChipperVersion, options: Partial<BuildOptions> ): string[] => {
+export const getBuildArguments = ( chipperVersion: ChipperVersion, options?: GetBuildArgumentsOptions ): string[] => {
   const {
     brands = [ 'phet' ],
     locales = 'en',

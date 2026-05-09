@@ -6,57 +6,83 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-const SimVersion = require( '../browser-and-node/SimVersion' ).default;
-const booleanPrompt = require( '../common/booleanPrompt' );
-const build = require( '../common/build' );
-const buildLocal = require( '../common/buildLocal' );
-const buildServerRequest = require( '../common/buildServerRequest' );
-const checkoutMain = require( '../common/checkoutMain' );
-const checkoutTarget = require( '../common/checkoutTarget' );
-const devDirectoryExists = require( '../common/devDirectoryExists' );
-const getDependencies = require( '../common/getDependencies' );
-const { getRunnableVersion } = require( '../common/getRunnableVersion' );
-const gitCheckout = require( '../common/gitCheckout' );
-const gitIsClean = require( '../common/gitIsClean' );
-const gitPush = require( '../common/gitPush' );
-const hasRemoteBranch = require( '../common/hasRemoteBranch' );
-const loadJSON = require( '../common/loadJSON' );
-const npmUpdate = require( '../common/npmUpdate' );
-const setRunnableVersion = require( '../common/setRunnableVersion' );
-const vpnCheck = require( '../common/vpnCheck' );
-const createRelease = require( './createRelease' );
-const grunt = require( 'grunt' );
+import grunt from 'grunt';
+import SimVersion from '../browser-and-node/SimVersion';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
+import { vpnCheck } from '../common/vpnCheck';
+import { gitIsClean } from '../common/gitIsClean';
+import { hasRemoteBranch } from '../common/hasRemoteBranch.js';
+import ReleaseBranch from '../common/ReleaseBranch';
+import { booleanPrompt } from '../common/booleanPrompt';
+import createRelease from './createRelease';
+import { loadJSON } from '../common/loadJSON.js';
+import { getPackageJSON } from '../common/getPackageJSON.js';
+import { getBranchPackageJSON } from '../common/getBranchPackageJSON.js';
+import { getBranchRunnableVersion } from '../common/getBranchRunnableVersion';
+import { buildLocal } from '../common/buildLocal.js';
+import { devDirectoryExists } from '../common/devDirectoryExists';
 
-const cancelLog = problem => grunt.log.writeln( 'Cancelling RC deployment: ' + problem );
-const handleError = problem => {
+// const SimVersion = require( '../browser-and-node/SimVersion' ).default;
+// const booleanPrompt = require( '../common/booleanPrompt' );
+// const build = require( '../common/build' );
+// const buildLocal = require( '../common/buildLocal' );
+// const buildServerRequest = require( '../common/buildServerRequest' );
+// const checkoutMain = require( '../common/checkoutMain' );
+// const checkoutTarget = require( '../common/checkoutTarget' );
+// const devDirectoryExists = require( '../common/devDirectoryExists' );
+// const getDependencies = require( '../common/getDependencies' );
+// const { getRunnableVersion } = require( '../common/getRunnableVersion' );
+// const gitCheckout = require( '../common/gitCheckout' );
+// const gitIsClean = require( '../common/gitIsClean' );
+// const gitPush = require( '../common/gitPush' );
+// const hasRemoteBranch = require( '../common/hasRemoteBranch' );
+// const loadJSON = require( '../common/loadJSON' );
+// const npmUpdate = require( '../common/npmUpdate' );
+// const setRunnableVersion = require( '../common/setRunnableVersion' );
+// const vpnCheck = require( '../common/vpnCheck' );
+// const createRelease = require( './createRelease' );
+// const grunt = require( 'grunt' );
+
+const cancelLog = ( problem: unknown ) => grunt.log.writeln( 'Cancelling RC deployment: ' + problem );
+const handleError = ( problem: unknown ) => {
   cancelLog( problem );
   throw new Error( 'Aborted RC deployment: ' + problem );
 };
 
 /**
  * Deploys an rc version after incrementing the test version number.
- * @public
  *
- * @param {string} repo
- * @param {string} branch
- * @param {Array.<string>} brands
- * @param {boolean} noninteractive
- * @param {string} [message] - Optional message to append to the version-increment commit.
+ * @param repo
+ * @param branch
+ * @param brands
+ * @param noninteractive
+ * @param [message] - Optional message to append to the version-increment commit.
  * @returns {Promise.<SimVersion>}
  */
-module.exports = async function rc( repo, branch, brands, noninteractive, message ) {
+export const rc = async (
+  repo: Repo,
+  branch: string,
+  brands: string[],
+  noninteractive: boolean,
+  message?: string
+): Promise<SimVersion> => {
   SimVersion.ensureReleaseBranch( branch );
+
+  // TODO: determine whether it has been released, before we get this object(!)
+  const releaseBranch = new ReleaseBranch( repo, branch, brands, );
+
+  const totalityBranch = releaseBranch.totalityBranch;
 
   if ( !( await vpnCheck() ) ) {
     handleError( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
   }
 
-  const isClean = await gitIsClean( repo );
+  const isClean = await gitIsClean();
   if ( !isClean ) {
-    handleError( `Unclean status in ${repo}, cannot create release branch` );
+    handleError( `Unclean status, cannot create release branch` );
   }
 
-  if ( !( await hasRemoteBranch( repo, branch ) ) ) {
+  if ( !( await hasRemoteBranch( totalityBranch ) ) ) {
     if ( noninteractive || !await booleanPrompt( `Release branch ${branch} does not exist. Create it?`, false ) ) {
       handleError( 'Release branch does not exist' );
     }
@@ -65,20 +91,19 @@ module.exports = async function rc( repo, branch, brands, noninteractive, messag
   }
 
   // PhET-iO simulations require validation for RCs. Error out if "phet.phet-io.validation=false" is in package.json.
-  await gitCheckout( repo, branch );
+  // TODO (FROM HERE)
   if ( brands.includes( 'phet-io' ) ) {
-    const packageObject = await loadJSON( `../${repo}/package.json` );
-    if ( packageObject.phet[ 'phet-io' ] && packageObject.phet[ 'phet-io' ].hasOwnProperty( 'validation' ) &&
-         !packageObject.phet[ 'phet-io' ].validation ) {
+    const packageJSON = await getBranchPackageJSON( repo, totalityBranch );
+    if ( packageJSON?.phet?.[ 'phet-io' ] && packageJSON.phet[ 'phet-io' ].hasOwnProperty( 'validation' ) &&
+         !packageJSON.phet[ 'phet-io' ].validation ) {
       handleError( 'PhET-iO simulations require validation for RCs' );
     }
   }
 
-  // npm updates are below, after all interactive prompts
-  await checkoutTarget( repo, branch, false );
+  await releaseBranch.updateWorktree();
 
   try {
-    const previousVersion = await getRunnableVersion( repo );
+    const previousVersion = await getBranchRunnableVersion( repo, totalityBranch );
 
     if ( previousVersion.testType !== 'rc' && previousVersion.testType !== null ) {
       handleError( `RC version number cannot be incremented safely: ${previousVersion}` );
@@ -103,6 +128,7 @@ module.exports = async function rc( repo, branch, brands, noninteractive, messag
       handleError( '"Deploy" user request' );
     }
 
+    // * TODO: support for alternative worktrees
     await setRunnableVersion( repo, version, message );
     await gitPush( repo, branch );
 

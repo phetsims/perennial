@@ -6,19 +6,14 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-const ncp = require( 'ncp' );
-const winston = require( 'winston' );
+import ncp from 'ncp';
+import winston from 'winston';
 
-/**
- * Copies a directory (recursively) to another location
- * @public
- *
- * @param {string} path
- * @param {string} location
- * @param {Object} [options]
- * @returns {Promise}
- */
-module.exports = function( pathToCopy, location, options ) {
+export const copyDirectory = (
+  pathToCopy: string,
+  location: string,
+  options: ncp.Options & { stopOnErr: true }
+): Promise<void> => {
   winston.info( `copying ${pathToCopy} into ${location}` );
 
   return new Promise( ( resolve, reject ) => {

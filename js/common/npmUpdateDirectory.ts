@@ -6,34 +6,30 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-const execute = require( './execute' ).default;
-const npmCommand = require( './npmCommand' );
-const winston = require( 'winston' );
-const asyncMutex = require( 'async-mutex' );
-const fs = require( 'fs' );
+import execute from './execute.js';
+import { npmCommand } from './npmCommand.js';
+import winston from 'winston';
+import asyncMutex from 'async-mutex';
+import fs from 'fs';
 
 const mutex = new asyncMutex.Mutex();
 
+export type NPMUpdateOptions = {
+  minimal?: boolean;
+};
 
-/**
- * @public
- * @param {{ minimal?: boolean }} [options]
- */
-function getNpmInstallFlags( options ) {
+export const getNpmInstallFlags = (
+  options?: NPMUpdateOptions
+): string[] => {
   const minimal = options?.minimal ?? true;
 
   return minimal ? [ '--audit=false', '--fund=false' ] : [];
-}
+};
 
 /**
  * Executes an effective "npm install", ensuring that the node_modules versions match package.json (and the lock file if present).
- * @public
- *
- * @param {string} directory
- * @param {{ minimal?: boolean }} [options]
- * @returns {Promise}
  */
-module.exports = async function npmUpdateDirectory( directory, options ) {
+export const npmUpdateDirectory = async ( directory: string, options?: NPMUpdateOptions ): Promise<void> => {
   winston.info( `npm update in ${directory}` );
 
   const hasPackageLock = fs.existsSync( `${directory}/package-lock.json` );
@@ -54,6 +50,3 @@ module.exports = async function npmUpdateDirectory( directory, options ) {
     }
   } );
 };
-
-// Oh how I wish for esm syntax
-module.exports.getNpmInstallFlags = getNpmInstallFlags;

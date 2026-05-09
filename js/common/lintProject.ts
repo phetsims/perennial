@@ -6,19 +6,18 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-const execute = require( './execute' ).default;
-const gruntCommand = require( './gruntCommand' );
-const winston = require( 'winston' );
+import execute from './execute.js';
+import { gruntCommand } from './gruntCommand.js';
+import winston from 'winston';
 
 /**
  * Builds a repository.
- * @public
  *
- * @param {string} repo
- * @returns {Promise.<string>} - The stdout of the process
+ * @param repo
+ * @returns - The stdout of the process
  * @rejects {ExecuteError}
  */
-module.exports = async function( repo ) {
+export const lintProject = async ( repo: string ): Promise<string> => {
   winston.info( `linting ${repo}` );
 
   // Lint from chipper in case sim repo doesn't have node_modules, see https://github.com/phetsims/totality/issues/27

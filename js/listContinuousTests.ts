@@ -10,8 +10,8 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-const getRepoList = require( './common/getRepoList' );
-const fs = require( 'fs' );
+import { getRepoList } from './common/getRepoList.js';
+import fs from 'fs';
 
 // --importedRepos=repo1,repo2,... restricts all repo lists to this set (for totality monorepo).
 // Default behavior (no flag) uses the full active-repos list as before.
@@ -20,7 +20,7 @@ const importedRepoSet = importedReposArg
                         ? new Set( importedReposArg.slice( '--importedRepos='.length ).split( ',' ) )
                         : null;
 
-const filterToImported = list => importedRepoSet ? list.filter( r => importedRepoSet.has( r ) ) : list;
+const filterToImported = ( list: string[] ) => importedRepoSet ? list.filter( r => importedRepoSet.has( r ) ) : list;
 
 const phetioRepos = filterToImported( getRepoList( 'phet-io' ) );
 const phetioAPIStableRepos = filterToImported( getRepoList( 'phet-io-api-stable' ) );
@@ -651,9 +651,9 @@ const commonQueryParameters = {
   wrongScreens1: 'brand=phet&fuzz&screens=3',
   wrongScreens2: 'brand=phet&fuzz&screens=1,2,3',
   screensOther: 'brand=phet&fuzz&screens=1.1,Screen2'
-};
+} as const;
 Object.keys( commonQueryParameters ).forEach( name => {
-  const queryString = commonQueryParameters[ name ];
+  const queryString = commonQueryParameters[ name as keyof typeof commonQueryParameters ];
 
   // randomly picked multi-screen sim to test query parameters (hence calling it a joist test)
   tests.push( {
@@ -666,7 +666,7 @@ Object.keys( commonQueryParameters ).forEach( name => {
 
 /////////////////////////////////////////////////////
 // PhET-iO migration testing
-phetioHydrogenSims.forEach( testData => {
+phetioHydrogenSims.forEach( ( testData: { sim: string; version: string } ) => {
   const simName = testData.sim;
 
   if ( REPOS_EXCLUDED_FROM_MIGRATION.includes( simName ) ) {
@@ -674,7 +674,7 @@ phetioHydrogenSims.forEach( testData => {
   }
 
   const oldVersion = testData.version;
-  const getTest = reportContext => {
+  const getTest = ( reportContext: string ) => {
     return {
       test: [ 'phet-io-migration', simName, `${oldVersion}->main`, reportContext ],
       type: 'wrapper-test',

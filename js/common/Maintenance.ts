@@ -533,7 +533,7 @@ class Maintenance {
       await checkoutTarget( releaseBranch.repo, releaseBranch.branch, true );
       await gitPull( releaseBranch.repo );
       await build( releaseBranch.repo );
-      const chipperVersion = ChipperVersion.getFromRepository();
+      const chipperVersion = await ChipperVersion.getFromRepository();
       let filename;
       if ( chipperVersion.major !== 0 ) {
         filename = `../${releaseBranch.repo}/build/phet/${releaseBranch.repo}_en_phet.html`;
@@ -647,7 +647,7 @@ class Maintenance {
     const modifiedBranch = await maintenance.ensureModifiedBranch( repo, branch, true );
     await modifiedBranch.checkout( npmUpdate );
 
-    if ( outputJS && chipperSupportsOutputJSGruntTasks() ) {
+    if ( outputJS && await chipperSupportsOutputJSGruntTasks() ) {
       console.log( 'Running output-js-project' );
 
       // We might not be able to run this command!

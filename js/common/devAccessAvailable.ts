@@ -6,15 +6,14 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-const devSsh = require( './devSsh' );
+import { devSsh } from './devSsh.js';
 
 /**
  * Checks whether access to the dev server is available (usually unavailable if not on VPN or on campus)
- * @public
  *
- * @returns {Promise.<boolean>} - Whether the directory exists
+ * @returns Whether the directory exists
  */
-module.exports = async function() {
+export const devAccessAvailable = async (): Promise<boolean> => {
   try {
     await devSsh( 'ls' );
     return true;

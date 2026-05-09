@@ -6,17 +6,12 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-
-const devSsh = require( './devSsh' );
+import { devSsh } from './devSsh.js';
 
 /**
  * Checks to see whether a directory on the dev server exists.
- * @public
- *
- * @param {string} directory
- * @returns {Promise.<boolean>} - Whether the directory exists
  */
-module.exports = function( directory ) {
+export const devDirectoryExists = async ( directory: string ): Promise<boolean> => {
   return devSsh( `[[ -d "${directory}" ]] && echo exists || echo not` ).then( stdout => {
     if ( stdout.trim() === 'exists' ) {
       return true;

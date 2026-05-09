@@ -8,4 +8,4 @@
 
 import { getRepoList } from './getRepoList.js';
 
-export const getActiveRepos = (): string[] => getRepoList( 'active-sims' );
+export const getActiveSims = (): string[] => getRepoList( 'active-sims' );

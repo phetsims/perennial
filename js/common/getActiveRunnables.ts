@@ -8,4 +8,4 @@
 
 import { getRepoList } from './getRepoList.js';
 
-export const getActiveRepos = (): string[] => getRepoList( 'active-runnables' );
+export const getActiveRunnables = (): string[] => getRepoList( 'active-runnables' );

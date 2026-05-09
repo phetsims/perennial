@@ -8,4 +8,4 @@
 
 import { getRepoList } from './getRepoList.js';
 
-export const getActiveRepos = (): string[] => getRepoList( 'active-scenerystack-repos' );
+export const getActiveSceneryStackRepos = (): string[] => getRepoList( 'active-scenerystack-repos' );

@@ -10,10 +10,10 @@ import winston from 'winston';
 import { gitIsClean } from './gitIsClean.js';
 import { gitAdd } from './gitAdd.js';
 import { gitCommit } from './gitCommit.js';
-import loadJSON from './loadJSON.js';
-import writeJSON from './writeJSON.js';
 import fs from 'fs';
 import SimVersion from '../browser-and-node/SimVersion.js';
+import { loadJSON } from './loadJSON.js';
+import { writeJSON } from './writeJSON.js';
 
 /**
  * Sets the version for a current checked-in repo, creating a commit with the change
@@ -23,6 +23,8 @@ import SimVersion from '../browser-and-node/SimVersion.js';
  * @param {SimVersion} version
  * @param {string} [message] - Optional. If provided, appended at the end
  * @returns {Promise}
+ *
+ * TODO: support for alternative worktrees
  */
 export const setRunnableVersion = async( repo: string, version: SimVersion, message?: string ): Promise<void> => {
   winston.info( `Setting version from package.json for ${repo} to ${version.toString()}` );

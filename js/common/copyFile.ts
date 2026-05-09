@@ -6,18 +6,13 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-const fs = require( 'fs' );
-const winston = require( 'winston' );
+import fs from 'fs';
+import winston from 'winston';
 
-/**
- * Copies a single file.
- * @public
- *
- * @param {string} sourceFilename
- * @param {string} destinationFilename
- * @returns {Promise} - Resolves with no value
- */
-module.exports = function( sourceFilename, destinationFilename ) {
+export const copyFile = (
+  sourceFilename: string,
+  destinationFilename: string
+): Promise<void> => {
   return new Promise( ( resolve, reject ) => {
     winston.info( `Copying ${sourceFilename} to ${destinationFilename}` );
 
@@ -25,7 +20,7 @@ module.exports = function( sourceFilename, destinationFilename ) {
     const writeStream = fs.createWriteStream( destinationFilename );
     readStream.pipe( writeStream );
     readStream.on( 'end', () => resolve() );
-    readStream.on( 'error', err => reject( new Error( err ) ) );
-    writeStream.on( 'error', err => reject( new Error( err ) ) );
+    readStream.on( 'error', err => reject( new Error( `${err}` ) ) );
+    writeStream.on( 'error', err => reject( new Error( `${err}` ) ) );
   } );
 };

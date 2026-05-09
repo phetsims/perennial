@@ -15,35 +15,33 @@ import winston from 'winston';
 import affirm from '../browser-and-node/affirm.js';
 import SimVersion from '../browser-and-node/SimVersion.js';
 import Dependencies from '../browser-and-node/types/Dependencies.js';
-import buildLocal from './buildLocal.js';
+import { buildLocal } from './buildLocal.js';
 import buildServerRequest from './buildServerRequest.js';
 import checkoutMain from './checkoutMain.js';
 import checkoutTarget from './checkoutTarget.js';
-import chipperSupportsOutputJSGruntTasks from './chipperSupportsOutputJSGruntTasks.js';
-import ChipperVersion from './ChipperVersion.js';
-import createDirectory from './createDirectory.js';
+import { chipperSupportsOutputJSGruntTasks } from './chipperSupportsOutputJSGruntTasks.js';
+import { ChipperVersion } from './ChipperVersion.js';
+import { createDirectory } from './createDirectory.js';
 import execute, { ExecuteOptions } from './execute.js';
-import getActiveSims from './getActiveSims.js';
+import { getActiveSims } from './getActiveSims.js';
 import getBranchDependencies from './getBranchDependencies.js';
-import getBranchSHAMap from './getBranchSHAMap.js';
+import { getBranchSHAMap } from './getBranchSHAMap.js';
 import { getBranchVersion } from './getBranchVersion.js';
-import getBuildArguments, { BuildOptions } from './getBuildArguments.js';
+import { BuildOptions, getBuildArguments } from './getBuildArguments.js';
 import getDependencies from './getDependencies.js';
-import getGitFile from './getGitFile.js';
+import { getGitFile } from './getGitFile.js';
 import { getRunnableVersion } from './getRunnableVersion.js';
-import gitCatFile from './gitCatFile.js';
-import gitCheckout from './gitCheckout.js';
+import { gitCatFile } from './gitCatFile.js';
 import gitCheckoutDirectory from './gitCheckoutDirectory.js';
 import gitCloneOrFetchDirectory from './gitCloneOrFetchDirectory.js';
 import { gitFirstDivergingCommit } from './gitFirstDivergingCommit.js';
-import gitPull from './gitPull.js';
-import gitPullDirectory from './gitPullDirectory.js';
-import gitRevParse from './gitRevParse.js';
-import gitTimestamp from './gitTimestamp.js';
-import gruntCommand from './gruntCommand.js';
-import loadJSON from './loadJSON.js';
-import npmUpdateDirectory from './npmUpdateDirectory.js';
-import puppeteerLoad from './puppeteerLoad.js';
+import { gitPullDirectory } from './gitPullDirectory.js';
+import { gitRevParse } from './gitRevParse.js';
+import { gitTimestamp } from './gitTimestamp.js';
+import { gruntCommand } from './gruntCommand.js';
+import { loadJSON } from './loadJSON.js';
+import { npmUpdateDirectory } from './npmUpdateDirectory.js';
+import { puppeteerLoad } from './puppeteerLoad.js';
 import simMetadata from './simMetadata.js';
 import simPhetioMetadata from './simPhetioMetadata.js';
 import withServer from './withServer.js';
@@ -51,8 +49,8 @@ import { gitCreateWorktree } from './gitCreateWorktree.js';
 import { getBranches } from './getBranches.js';
 import { getFileAtBranch } from './getFileAtBranch.js';
 import { createLocalBranchFromRemote } from './createLocalBranchFromRemote.js';
-import { Branch, WORKTREE_DIRECTORY } from './Branch.js';
 import { gitIsAncestor } from './gitIsAncestor.js';
+import { getBranchBrands } from './getBranchBrands.js';
 
 const MAINTENANCE_DIRECTORY = '../release-branches';
 
@@ -63,10 +61,12 @@ type ReleaseBranchSerialized = {
   isReleased: boolean;
 };
 
-class ReleaseBranch extends Branch implements ReleaseBranchSerialized {
+class ReleaseBranch implements ReleaseBranchSerialized {
 
   // Cache for the timestamp string of the diverging commit, since it can be expensive to calculate and is used in multiple places.
   public cachedTimestampString: string | null = null;
+
+  public readonly totalityBranch: string;
 
   public constructor(
     public readonly repo: string,
@@ -76,7 +76,20 @@ class ReleaseBranch extends Branch implements ReleaseBranchSerialized {
   ) {
     assert( Array.isArray( brands ) );
 
-    super( `releases/${repo}/${branch}` );
+    this.totalityBranch = ReleaseBranch.getTotalityBranch( repo, branch );
+  }
+
+  // TODO: use this where needed! It will excell at things, and make it easier
+  public static async get( repo: string, branch: string ): Promise<ReleaseBranch> {
+    const totalityBranch = ReleaseBranch.getTotalityBranch( repo, branch );
+
+    const simVersion = await getBranchVersion( repo, totalityBranch );
+    const brands = await getBranchBrands( repo, totalityBranch );
+    return new ReleaseBranch( repo, branch, brands, simVersion.isSimPublished );
+  }
+
+  public static getTotalityBranch( repo: string, branch: string ): string {
+    return `releases/${repo}/${branch}`;
   }
 
   /**
@@ -229,7 +242,7 @@ class ReleaseBranch extends Branch implements ReleaseBranchSerialized {
   }
 
   public async build( options?: Partial<BuildOptions>, executeOptions?: ExecuteOptions & { errors?: 'reject' } ): Promise<void> {
-    const worktreeDirectory = this.getWorktreeDirectory();
+    const worktreeDirectory = this.getWorkingDirectory();
     const repoDirectory = `${worktreeDirectory}/${this.repo}`;
 
     const args = getBuildArguments( await this.getChipperVersion(), _.merge( {
@@ -245,10 +258,10 @@ class ReleaseBranch extends Branch implements ReleaseBranchSerialized {
   }
 
   public async transpile(): Promise<void> {
-    const worktreeDirectory = this.getWorktreeDirectory();
+    const worktreeDirectory = this.getWorkingDirectory();
     const repoDirectory = `${worktreeDirectory}/${this.repo}`;
 
-    if ( chipperSupportsOutputJSGruntTasks() ) {
+    if ( await chipperSupportsOutputJSGruntTasks() ) {
       winston.info( `transpiling ${worktreeDirectory}` );
 
       // We might not be able to run this command!
@@ -263,15 +276,16 @@ class ReleaseBranch extends Branch implements ReleaseBranchSerialized {
       return await withServer( async port => {
         const url = `http://localhost:${port}/${this.repo}/${this.repo}_en.html?brand=phet&ea&fuzzMouse&fuzzTouch`;
         try {
-          return await puppeteerLoad( url, {
+          await puppeteerLoad( url, {
             waitAfterLoad: 20000
           } );
+          return null;
         }
         catch( e ) {
           return `Failure for ${url}: ${e}`;
         }
       }, {
-        path: this.getWorktreeDirectory()
+        path: this.getWorkingDirectory()
       } );
     }
     catch( e ) {
@@ -286,15 +300,16 @@ class ReleaseBranch extends Branch implements ReleaseBranchSerialized {
       return await withServer( async port => {
         const url = `http://localhost:${port}/${this.repo}/build/${usesChipper2 ? 'phet/' : ''}${this.repo}_en${usesChipper2 ? '_phet' : ''}.html?fuzzMouse&fuzzTouch`;
         try {
-          return puppeteerLoad( url, {
+          await puppeteerLoad( url, {
             waitAfterLoad: 20000
           } );
+          return null;
         }
         catch( error ) {
           return `Failure for ${url}: ${error}`;
         }
       }, {
-        path: this.getWorktreeDirectory()
+        path: this.getWorkingDirectory()
       } );
     }
     catch( e ) {
@@ -327,7 +342,7 @@ class ReleaseBranch extends Branch implements ReleaseBranchSerialized {
    * commit will allow this to work.
    */
   public async isMissingSHA( sha: string ): Promise<boolean> {
-    const currentSHA = await gitRevParse( this.repo, this.branch );
+    const currentSHA = await gitRevParse( this.totalityBranch );
 
     return sha !== currentSHA && !( await this.includesSHA( sha ) );
   }
@@ -345,7 +360,7 @@ class ReleaseBranch extends Branch implements ReleaseBranchSerialized {
    * The timestamp at which this release branch's main repository diverged from main.
    */
   public async getDivergingTimestamp(): Promise<number> {
-    return gitTimestamp( this.repo, await this.getDivergingSHA() );
+    return gitTimestamp( await this.getDivergingSHA() );
   }
 
   /**
@@ -394,7 +409,7 @@ class ReleaseBranch extends Branch implements ReleaseBranchSerialized {
     }
 
     try {
-      return await getGitFile( repo, sha, relativeFile );
+      return await getGitFile( sha, `${repo}/${relativeFile}` );
     }
     catch( e ) {
       return '';
@@ -537,7 +552,7 @@ class ReleaseBranch extends Branch implements ReleaseBranchSerialized {
    * Returns the package.json parsed as a plain JS object.
    */
   public async getPackageJSON(): Promise<any> { // eslint-disable-line @typescript-eslint/no-explicit-any
-    return JSON.parse( await gitCatFile( this.repo, 'package.json', this.branch ) );
+    return JSON.parse( await gitCatFile( `${this.repo}/package.json`, this.branch ) );
   }
 
   /**
@@ -546,7 +561,7 @@ class ReleaseBranch extends Branch implements ReleaseBranchSerialized {
   public async usesChipper2(): Promise<boolean> {
     const dependencies = await this.getDependencies();
 
-    const chipperPackageJSON = JSON.parse( await gitCatFile( 'chipper', 'package.json', dependencies.chipper.sha ) );
+    const chipperPackageJSON = JSON.parse( await gitCatFile( 'chipper/package.json', dependencies.chipper.sha ) );
     const chipperVersion = ChipperVersion.getFromPackageJSON( chipperPackageJSON );
 
     return chipperVersion.major !== 0 || chipperVersion.minor !== 0;
@@ -562,7 +577,7 @@ class ReleaseBranch extends Branch implements ReleaseBranchSerialized {
    */
   public async getDivergingTimestampString(): Promise<string> {
     const divergingCommit = await gitFirstDivergingCommit( this.totalityBranch, 'main' );
-    const timestamp = await gitTimestamp( this.repo, divergingCommit );
+    const timestamp = await gitTimestamp( divergingCommit );
     return new Date( timestamp ).toISOString().split( 'T' )[ 0 ];
   }
 
@@ -587,7 +602,7 @@ class ReleaseBranch extends Branch implements ReleaseBranchSerialized {
     // Create the container directory
     await this.ensureWorktreeParentDirectory();
 
-    const worktreeDirectory = this.getWorktreeDirectory();
+    const worktreeDirectory = this.getWorkingDirectory();
 
     // Ensure our remote tracking is set up properly
     await createLocalBranchFromRemote( this.totalityBranch );
@@ -620,7 +635,7 @@ class ReleaseBranch extends Branch implements ReleaseBranchSerialized {
   }
 
   public async removeWorktree(): Promise<void> {
-    const worktreeDirectory = this.getWorktreeDirectory();
+    const worktreeDirectory = this.getWorkingDirectory();
 
     if ( fs.existsSync( worktreeDirectory ) ) {
       winston.info( `removing worktree at ${worktreeDirectory}` );

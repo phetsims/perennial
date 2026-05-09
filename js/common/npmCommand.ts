@@ -6,5 +6,5 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-// {string} - needs to be a slightly different command for Windows
-module.exports = /^win/.test( process.platform ) ? 'npm.cmd' : 'npm';
+// needs to be a slightly different command for Windows
+export const npmCommand = /^win/.test( process.platform ) ? 'npm.cmd' : 'npm';

@@ -6,8 +6,8 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import { PackageJSON } from './perennial-types.js';
 import { getFileAtBranch } from './getFileAtBranch.js';
+import { PackageJSON } from '../browser-and-node/PerennialTypes.js';
 
 export const getBranchPackageJSON = async (
   directory: string, // e.g. 'scenery', or 'acid-base-solutions'

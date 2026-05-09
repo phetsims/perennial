@@ -11,8 +11,8 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';
-import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
-import markSimAsPublished from '../../common/markSimAsPublished.js';
+import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
+import { markRunnableAsPublished } from '../../common/markRunnableAsPublished.js';
 import production from '../production.js';
 import getOption from './util/getOption.js';
 
@@ -24,7 +24,7 @@ import getOption from './util/getOption.js';
   assert( getOption( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
   assertIsValidRepoName( repo );
 
-  await markSimAsPublished( repo );
+  await markRunnableAsPublished( repo );
 
   await production( repo, getOption( 'branch' ), getOption( 'brands' ).split( ',' ), !!getOption( 'noninteractive' ),
     getOption( 'redeploy' ), getOption( 'message' ) );

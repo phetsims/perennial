@@ -6,17 +6,11 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-const ChipperVersion = require( './ChipperVersion' );
-const winston = require( 'winston' );
+import { ChipperVersion } from './ChipperVersion.js';
+import winston from 'winston';
 
-/**
- * Returns if chipperSupportsOutputJSGruntTasks
- * @public
- *
- * @returns {boolean}
- */
-module.exports = function() {
-  const chipperVersion = ChipperVersion.getFromRepository();
+export const chipperSupportsOutputJSGruntTasks = async (): Promise<boolean> => {
+  const chipperVersion = await ChipperVersion.getFromRepository();
   const chipperSupportsOutputJSGruntTasks = chipperVersion.chipperSupportsOutputJSGruntTasks;
   winston.info( `chipperSupportsOutputJSGruntTasks: ${chipperSupportsOutputJSGruntTasks}` );
   return chipperSupportsOutputJSGruntTasks;
