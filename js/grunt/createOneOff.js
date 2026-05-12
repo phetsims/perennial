@@ -54,7 +54,7 @@ module.exports = async function( repo, branch, message ) {
 
   // Create the branch, update the version info
   await execute( 'git', checkoutArgs, `../${repo}` );
-  await setRunnableVersion( repo, newVersion, message );
+  await runnableBranch.setSimVersion( newVersion, message );
   await gitPush( repo, branch );
 
   // Update dependencies.json for the release branch

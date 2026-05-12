@@ -11,7 +11,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';
-import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
+import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
 import production from '../production.js';
 import getOption from './util/getOption.js';
 

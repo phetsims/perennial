@@ -6,7 +6,7 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import buildLocal from './buildLocal.js';
+import { buildLocal } from './buildLocal.js';
 import Octokit from '@octokit/rest'; // eslint-disable-line phet/require-statement-match
 import _ from 'lodash';
 import winston from 'winston';

@@ -11,7 +11,7 @@
  */
 
 import assert from 'assert';
-import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
+import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
 import checkoutMain from '../../common/checkoutMain.js';
 import checkoutTarget from '../../common/checkoutTarget.js';
 import getBranch from '../../common/getBranch.js';
@@ -19,6 +19,9 @@ import dev from '../dev.js';
 import getOption from './util/getOption.js';
 
 ( async () => {
+
+  // TODO: (... how will we handle branch naming and stuff?)
+  throw new Error( 'unimplemented' );
 
   const repo = getOption( 'repo' );
   const brands = getOption( 'brands' );

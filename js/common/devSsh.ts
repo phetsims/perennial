@@ -6,7 +6,7 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import buildLocal from './buildLocal.js';
+import { buildLocal } from './buildLocal.js';
 import { ssh } from './ssh.js';
 
 export const devSsh = ( cmd: string ): Promise<string> => {

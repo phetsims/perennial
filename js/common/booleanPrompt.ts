@@ -6,7 +6,7 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import prompt from './prompt.js';
+import { prompt } from './prompt.js';
 
 /**
  * Gives a yes-or-no prompt that the user should respond to.

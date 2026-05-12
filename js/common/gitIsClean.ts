@@ -12,6 +12,8 @@ import winston from 'winston';
 /**
  * Checks to see if the git state/status is clean
  *
+ * TODO: replace with checkout.isClean() unless we are specifying the file
+ *
  * @param [file] - Optional file or path if you only want to check state of a single file or subdirectory
  * @returns - Whether it is clean or not
  * @rejects {ExecuteError}

@@ -8,50 +8,9 @@
  */
 
 import assert from 'assert';
-import axios from 'axios';
-import fs from 'fs';
-import _ from 'lodash';
 import winston from 'winston';
-import affirm from '../browser-and-node/affirm.js';
-import SimVersion from '../browser-and-node/SimVersion.js';
-import Dependencies from '../browser-and-node/types/Dependencies.js';
-import { buildLocal } from './buildLocal.js';
-import buildServerRequest from './buildServerRequest.js';
-import checkoutMain from './checkoutMain.js';
-import checkoutTarget from './checkoutTarget.js';
-import { chipperSupportsOutputJSGruntTasks } from './chipperSupportsOutputJSGruntTasks.js';
-import { ChipperVersion } from './ChipperVersion.js';
-import { createDirectory } from './createDirectory.js';
-import execute, { ExecuteOptions } from './execute.js';
-import { getActiveSims } from './getActiveSims.js';
-import getBranchDependencies from './getBranchDependencies.js';
 import { getBranchSHAMap } from './getBranchSHAMap.js';
-import { getBranchVersion } from './getBranchVersion.js';
-import { BuildOptions, getBuildArguments } from './getBuildArguments.js';
-import getDependencies from './getDependencies.js';
-import { getGitFile } from './getGitFile.js';
-import { getRunnableVersion } from './getRunnableVersion.js';
-import { gitCatFile } from './gitCatFile.js';
-import { gitCheckoutDirectory } from './gitCheckoutDirectory.js';
-import gitCloneOrFetchDirectory from './gitCloneOrFetchDirectory.js';
-import { gitFirstDivergingCommit } from './gitFirstDivergingCommit.js';
-import { gitPullDirectory } from './gitPullDirectory.js';
-import { gitRevParse } from './gitRevParse.js';
-import { gitTimestamp } from './gitTimestamp.js';
-import { gruntCommand } from './gruntCommand.js';
-import { loadJSON } from './loadJSON.js';
-import { npmUpdateDirectory } from './npmUpdateDirectory.js';
-import { puppeteerLoad } from './puppeteerLoad.js';
-import simMetadata from './simMetadata.js';
-import simPhetioMetadata from './simPhetioMetadata.js';
-import withServer from './withServer.js';
-import { gitCreateWorktree } from './gitCreateWorktree.js';
-import { getBranches } from './getBranches.js';
-import { getFileAtBranch } from './getFileAtBranch.js';
-import { createLocalBranchFromRemote } from './createLocalBranchFromRemote.js';
-import { gitIsAncestor } from './gitIsAncestor.js';
-import { getBranchBrands } from './getBranchBrands.js';
-import type { Checkout } from './Checkout.js';
+import { Checkout } from './Checkout.js';
 import { RunnableBranch } from './RunnableBranch.js';
 
 type ReleaseBranchSerialized = {
@@ -124,18 +83,20 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
    */
   public async redeployBranchTipToProduction( locales = '*' ): Promise<void> {
     if ( this.isReleased ) {
-      await checkoutTarget( this.repo, this.branch, false );
-
-      const version = await getRunnableVersion( this.repo );
-      const dependencies = await getDependencies( this.repo );
-
-      await checkoutMain( this.repo, false );
-
-      await buildServerRequest( this.repo, version, this.branch, dependencies, {
-        locales: locales,
-        brands: this.brands,
-        servers: [ 'production' ]
-      } );
+      // TODO: needs recoding
+      throw new Error( 'unimplemented' );
+      // await checkoutTarget( this.repo, this.branch, false );
+      //
+      // const version = await getRunnableVersion( this.repo );
+      // const dependencies = await getDependencies( this.repo );
+      //
+      // await checkoutMain( this.repo, false );
+      //
+      // await buildServerRequest( this.repo, version, this.branch, dependencies, {
+      //   locales: locales,
+      //   brands: this.brands,
+      //   servers: [ 'production' ]
+      // } );
     }
     else {
       throw new Error( 'Should not redeploy a non-released branch' );
@@ -146,61 +107,63 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
    * Re-runs a production deploy for a specific branch (based on the SHAs that were most recently production deployed)
    */
   public async redeployLastDeployedSHAsToProduction( locales = '*' ): Promise<void> {
-    if ( !this.isReleased ) {
-      throw new Error( 'Should not redeploy a non-released branch' );
-    }
-    if ( this.branch.includes( '-phetio' ) ) {
-      throw new Error( 'unsupported suffix -phetio' );
-    }
-
-    let url; // string
-    let version; // SimVersion
-    if ( this.brands.includes( 'phet' ) ) {
-      const metadata = await simMetadata( {
-        locale: 'en',
-        simulation: this.repo
-      } );
-
-      const project = metadata.projects.find( project => project.name === `html/${this.repo}` );
-      assert( project );
-      version = SimVersion.parse( project.version.string );
-      url = `https://phet.colorado.edu/sims/html/${this.repo}/${version.toString()}/dependencies.json`;
-    }
-    else if ( this.brands.includes( 'phet-io' ) ) {
-      const metadata = await simPhetioMetadata( {
-        active: true
-      } );
-
-      const localVersion = await this.getSimVersion();
-      const simData = metadata.find( simData => simData.name === this.repo && simData.versionMajor === localVersion.major && simData.versionMinor === localVersion.minor );
-
-      affirm( simData );
-      version = new SimVersion( simData.versionMajor, simData.versionMinor, simData.versionMaintenance );
-      url = `https://phet-io.colorado.edu/sims/${this.repo}/${version.major}.${version.minor}/dependencies.json`;
-    }
-    else {
-      throw new Error( 'unknown deployed brand' );
-    }
-
-    const dependencies = ( await axios.get( url ) ).data;
-
-    if ( dependencies ) {
-      await buildServerRequest( this.repo, version, this.branch, dependencies, {
-        locales: locales,
-        brands: this.brands,
-        servers: [ 'production' ]
-      } );
-    }
-    else {
-      throw new Error( 'no dependencies' );
-    }
+    // TODO: needs recoding
+    throw new Error( 'unimplemented' );
+    // if ( !this.isReleased ) {
+    //   throw new Error( 'Should not redeploy a non-released branch' );
+    // }
+    // if ( this.branch.includes( '-phetio' ) ) {
+    //   throw new Error( 'unsupported suffix -phetio' );
+    // }
+    //
+    // let url; // string
+    // let version; // SimVersion
+    // if ( this.brands.includes( 'phet' ) ) {
+    //   const metadata = await simMetadata( {
+    //     locale: 'en',
+    //     simulation: this.repo
+    //   } );
+    //
+    //   const project = metadata.projects.find( project => project.name === `html/${this.repo}` );
+    //   assert( project );
+    //   version = SimVersion.parse( project.version.string );
+    //   url = `https://phet.colorado.edu/sims/html/${this.repo}/${version.toString()}/dependencies.json`;
+    // }
+    // else if ( this.brands.includes( 'phet-io' ) ) {
+    //   const metadata = await simPhetioMetadata( {
+    //     active: true
+    //   } );
+    //
+    //   const localVersion = await this.getSimVersion();
+    //   const simData = metadata.find( simData => simData.name === this.repo && simData.versionMajor === localVersion.major && simData.versionMinor === localVersion.minor );
+    //
+    //   affirm( simData );
+    //   version = new SimVersion( simData.versionMajor, simData.versionMinor, simData.versionMaintenance );
+    //   url = `https://phet-io.colorado.edu/sims/${this.repo}/${version.major}.${version.minor}/dependencies.json`;
+    // }
+    // else {
+    //   throw new Error( 'unknown deployed brand' );
+    // }
+    //
+    // const dependencies = ( await axios.get( url ) ).data;
+    //
+    // if ( dependencies ) {
+    //   await buildServerRequest( this.repo, version, this.branch, dependencies, {
+    //     locales: locales,
+    //     brands: this.brands,
+    //     servers: [ 'production' ]
+    //   } );
+    // }
+    // else {
+    //   throw new Error( 'no dependencies' );
+    // }
   }
 
   /**
    * Redeploys all last deployed SHAs to production for all maintenance branches.
    */
   public static async redeployAllLastDeployedSHAsToProduction( locales = '*' ): Promise<void> {
-    const releaseBranches = await ReleaseBranch.getAllMaintenanceBranches();
+    const releaseBranches = await Checkout.getMaintainedReleaseBranches();
 
     for ( const releaseBranch of releaseBranches ) {
       winston.info( releaseBranch.toString() );
@@ -209,41 +172,5 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
         await releaseBranch.redeployLastDeployedSHAsToProduction( locales );
       }
     }
-  }
-
-  /**
-   * Combines multiple matching ReleaseBranches into one where appropriate, and sorts. For example, two ReleaseBranches
-   * of the same repo but for different brands are combined into a single ReleaseBranch with multiple brands.
-   */
-  public static combineLists( simBranches: ReleaseBranch[] ): ReleaseBranch[] {
-    const resultBranches = [];
-
-    for ( const simBranch of simBranches ) {
-      let foundBranch = false;
-      for ( const resultBranch of resultBranches ) {
-        if ( simBranch.repo === resultBranch.repo && simBranch.branch === resultBranch.branch ) {
-          foundBranch = true;
-          const resultBrands = [ ...resultBranch.brands ];
-          resultBranch.brands.length = 0;
-          resultBranch.brands.push( ..._.uniq( [ ...resultBrands, ...simBranch.brands ] ) );
-          break;
-        }
-      }
-      if ( !foundBranch ) {
-        resultBranches.push( simBranch );
-      }
-    }
-
-    resultBranches.sort( ( a, b ) => {
-      if ( a.repo !== b.repo ) {
-        return a.repo < b.repo ? -1 : 1;
-      }
-      if ( a.branch !== b.branch ) {
-        return a.branch < b.branch ? -1 : 1;
-      }
-      return 0;
-    } );
-
-    return resultBranches;
   }
 }

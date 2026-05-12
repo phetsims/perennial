@@ -24,7 +24,6 @@ const lintProject = require( '../common/lintProject' );
 const isTotality = require( '../common/isTotality' );
 const npmUpdate = require( '../common/npmUpdate' );
 const setRunnableVersion = require( '../common/setRunnableVersion' );
-const updateHTMLVersion = require( '../common/updateHTMLVersion' );
 const vpnCheck = require( '../common/vpnCheck' );
 const writePhetioHtaccess = require( '../common/writePhetioHtaccess' ).default;
 const assert = require( 'assert' );
@@ -121,8 +120,8 @@ module.exports = async function dev( repo, brands, noninteractive, branch, messa
   await npmUpdate( 'chipper' );
   await npmUpdate( 'perennial-alias' );
 
-  await setRunnableVersion( repo, version, message );
-  await updateHTMLVersion( repo );
+  await runnableBranch.setSimVersion( version, message );
+  await runnableBranch.updateHTMLVersion();
   await gitPush( repo, branch );
 
   grunt.log.writeln( await build( repo, {

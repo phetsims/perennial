@@ -16,7 +16,7 @@ import _ from 'lodash';
 import path from 'path';
 import { Repo } from '../browser-and-node/PerennialTypes.js';
 import dirname from '../common/dirname.js';
-import tsxCommand from '../common/tsxCommand.js';
+import { tsxCommand } from '../common/tsxCommand.js';
 import getOption from '../grunt/tasks/util/getOption.js';
 import divideIntoBatches from './divideIntoBatches.js';
 import { DEFAULT_MAX_PROCESSES, LintOptions } from './getLintCLIOptions.js';

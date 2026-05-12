@@ -13,7 +13,7 @@
  */
 
 import assert from 'assert';
-import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
+import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
 import createReleaseMonorepo from '../createReleaseMonorepo.js';
 import getOption from './util/getOption.js';
 
@@ -38,6 +38,8 @@ import getOption from './util/getOption.js';
     skipPush: skipPush,
     skipVersionBump: skipVersionBump
   } );
+
+  // TODO: adjust this!
 
   process.exit( 0 );
 } )();

@@ -8,8 +8,10 @@ import { BuildOptions, getBuildArguments } from './getBuildArguments.js';
 import _ from 'lodash';
 import SimVersion from '../browser-and-node/SimVersion.js';
 import { getBranchVersion } from './getBranchVersion.js';
-import { PackageJSON } from '../browser-and-node/PerennialTypes.js';
+import { IntentionalPerennialAny, PackageJSON } from '../browser-and-node/PerennialTypes.js';
 import { getBranchPackageJSON } from './getBranchPackageJSON.js';
+import { writeJSON } from './writeJSON.js';
+import fs from 'fs';
 
 export class RunnableBranch {
 
@@ -77,12 +79,90 @@ export class RunnableBranch {
       brands: this.brands,
       allHTML: true,
       debugHTML: true,
-      lint: false,
+      // lint: false, TODO: when replacing usages, remember to turn off linting when not needed
       locales: '*'
     }, options ) );
 
     winston.info( `building ${this.checkout.workingDirectory} with grunt ${args.join( ' ' )}` );
-    await execute( gruntCommand, args, `${this.checkout.workingDirectory}/${this.repo}`, executeOptions );
+    const result = await execute( gruntCommand, args, `${this.checkout.workingDirectory}/${this.repo}`, executeOptions );
+
+    // TODO: note we should --repo=${repo} potentially with newer chipper versions (!)
+    // TODO: MR patch to older sims to support this, THEN get rid of "npm ci"-ing the sim repo itself(!)
+    // TODO: (or... detected chipper version and run in different places, potentially do that first)
+
+    // Examine output to see if getDependencies (in chipper) notices any missing phet-io things.
+    // Fail out if so. Detects that specific error message.
+    if ( this.brands.includes( 'phet-io' ) && result.includes( 'WARNING404' ) ) {
+      throw new Error( 'phet-io dependencies missing' );
+    }
+
+  }
+
+  public async updateHTMLVersion(): Promise<void> {
+    winston.info( `Updating HTML for ${this.repo} with the new version strings` );
+
+    const isClean = await this.checkout.isClean();
+    if ( !isClean ) {
+      throw new Error( `Unclean status in ${this.repo}, cannot clean up HTML` );
+    }
+
+    const packageJSON = await this.getPackageJSON();
+
+    // We'll want to update development/test HTML as necessary, since they'll include the version
+    await execute( gruntCommand, [ 'generate-development-html', `--repo=${this.repo}` ], `${this.checkout.workingDirectory}/chipper` );
+    await this.checkout.gitAdd( `${this.repo}/${this.repo}_en.html` );
+
+    if ( packageJSON.phet?.generatedUnitTests ) {
+      await execute( gruntCommand, [ 'generate-test-html', `--repo=${this.repo}` ], '../chipper' );
+      await this.checkout.gitAdd( `${this.repo}/${this.repo}-tests.html` );
+    }
+    if ( !( await this.checkout.isClean() ) ) {
+      await this.checkout.gitCommit( `Bumping ${this.repo} dev${packageJSON.phet?.generatedUnitTests ? '/test' : ''} HTML with new version` );
+    }
+  };
+
+  public async setSupportedBrands( brands: string[], message?: string ): Promise<void> {
+    winston.info( `Setting supported brands from package.json for ${this.repo} at ${this.checkout.branch} to ${brands}` );
+
+    const isClean = await this.checkout.isClean();
+    if ( !isClean ) {
+      throw new Error( `Unclean status, cannot increment version` );
+    }
+
+    const packageJSON = await this.getPackageJSON();
+    packageJSON.phet = packageJSON.phet || {};
+    packageJSON.phet.supportedBrands = brands;
+
+    await this.setPackageJSONAndCommit( packageJSON, `Updating supported brands to [${brands}]${message ? `, ${message}` : ''}`);
+  }
+
+  public async setSimVersion( version: SimVersion, message?: string ): Promise<void> {
+    winston.info( `Setting version from package.json for ${this.repo} to ${version.toString()}` );
+
+    const packageFile = `${this.repo}/package.json`;
+    const packageLockFile = `${this.repo}/package-lock.json`;
+
+    const versionString = version.toString();
+
+    const isClean = await this.checkout.isClean();
+    if ( !isClean ) {
+      throw new Error( `Unclean status in ${this.repo}, cannot increment version` );
+    }
+
+    const packageJSON = await this.getPackageJSON();
+    packageJSON.version = versionString;
+    await this.checkout.writeAddRelativeJSON( packageFile, packageJSON );
+
+    if ( fs.existsSync( `${this.checkout.workingDirectory}/${packageLockFile}` ) ) {
+      const packageLockObject = await this.checkout.getRelativeJSON( packageLockFile );
+      packageLockObject.version = versionString;
+      packageLockObject.packages[ '' ].version = versionString;
+      await this.checkout.writeAddRelativeJSON( packageLockFile, packageLockObject );
+    }
+
+    if ( !( this.checkout.isClean() ) ) {
+      await this.checkout.gitCommit( `Bumping ${this.repo} version to ${version.toString()}${message ? `, ${message}` : ''}` );
+    }
   }
 
   public async checkUnbuilt(): Promise<string | null> {
@@ -143,5 +223,19 @@ export class RunnableBranch {
    */
   public async getPackageJSON(): Promise<PackageJSON> {
     return getBranchPackageJSON( this.repo, this.checkout.branch );
+  }
+
+  public async setPackageJSONAndCommit( packageJSON: PackageJSON, message: string ): Promise<void> {
+    const isClean = await this.checkout.isClean();
+    if ( !isClean ) {
+      throw new Error( `Unclean status, set package.json` );
+    }
+
+    await this.checkout.writeAddRelativeJSON( `${this.repo}/package.json`, packageJSON );
+
+    // Only commit if there was actually something changed
+    if ( !( await this.checkout.isClean() ) ) {
+      await this.checkout.gitCommit( message );
+    }
   }
 }

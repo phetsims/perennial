@@ -28,7 +28,7 @@ import path from 'path';
 import process from 'process';
 import { Repo } from '../browser-and-node/PerennialTypes.js';
 import callbackOnWorkers from '../common/callbackOnWorkers.js';
-import getActiveSceneryStackRepos from '../common/getActiveSceneryStackRepos.js';
+import { getActiveSceneryStackRepos } from '../common/getActiveSceneryStackRepos.js';
 import { tscCleanRepo } from '../grunt/typeCheck.js';
 import { DEBUG_PHET_LINT } from './lint.js';
 

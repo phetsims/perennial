@@ -39,7 +39,7 @@ export type BrowserPageLoadOptions = {
  * @param {Object} [options]
  * @returns The eval result/null
  */
-export const browserPageLoad = async ( browserCreator: Browser, url: string, options ): Promise<unknown> => {
+export const browserPageLoad = async ( browserCreator: Browser, url: string, options?: BrowserPageLoadOptions ): Promise<unknown> => {
 
   return new Promise( async ( resolve, reject ) => { // eslint-disable-line no-async-promise-executor
 

@@ -7,9 +7,8 @@
  */
 
 import assert from 'assert';
-import fs from 'fs';
-import { PackageJSON } from './perennial-types.js';
 import { getPackageJSON } from './getPackageJSON.js';
+import { PackageJSON } from '../browser-and-node/PerennialTypes.js';
 
 export class ChipperVersion {
   /**

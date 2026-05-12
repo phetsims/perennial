@@ -18,4 +18,6 @@ import getOption from './util/getOption.js';
   assertIsValidRepoName( repo );
 
   await checkoutRelease( repo, !getOption( 'skipNpmUpdate' ) );
+
+  // TODO: get Checkout/ReleaseBranch and update()
 } )();

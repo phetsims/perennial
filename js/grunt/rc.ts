@@ -12,7 +12,7 @@ import { Repo } from '../browser-and-node/PerennialTypes.js';
 import { vpnCheck } from '../common/vpnCheck';
 import { gitIsClean } from '../common/gitIsClean';
 import { hasRemoteBranch } from '../common/hasRemoteBranch.js';
-import ReleaseBranch from '../common/ReleaseBranch';
+import { ReleaseBranch } from '../common/ReleaseBranch';
 import { booleanPrompt } from '../common/booleanPrompt';
 import createRelease from './createRelease';
 import { loadJSON } from '../common/loadJSON.js';
@@ -129,7 +129,7 @@ export const rc = async (
     }
 
     // * TODO: support for alternative worktrees
-    await setRunnableVersion( repo, version, message );
+    await runnableBranch.setSimVersion( version, message );
     await gitPush( repo, branch );
 
     // Make sure our correct npm dependencies are set
@@ -150,7 +150,7 @@ export const rc = async (
       cancelLog( problem );
 
       // Abort version update
-      await setRunnableVersion( repo, previousVersion, message );
+      await runnableBranch.setSimVersion( previousVersion, message );
       await gitPush( repo, branch );
 
       // Abort checkout, (will be caught and main will be checked out)

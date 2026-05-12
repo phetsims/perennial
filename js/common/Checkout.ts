@@ -18,9 +18,6 @@ import { gitPullDirectory } from './gitPullDirectory.js';
 import execute from './execute.js';
 import { npmUpdateDirectory } from './npmUpdateDirectory.js';
 import { ReleaseBranch } from './ReleaseBranch.js';
-import { getBranch } from './getBranch.js';
-import { gitIsClean } from './gitIsClean.js';
-import { gitCheckout } from './gitCheckout.js';
 import { getBranchVersion } from './getBranchVersion.js';
 import { getBranchBrands } from './getBranchBrands.js';
 import { ChipperVersion } from './ChipperVersion.js';
@@ -35,6 +32,8 @@ import simPhetioMetadata, { SimPhetioMetadata } from './simPhetioMetadata.js';
 import { getActiveSims } from './getActiveSims';
 import { getBranches } from './getBranches.js';
 import _ from 'lodash';
+import os from 'os';
+import { IntentionalPerennialAny } from '../browser-and-node/PerennialTypes.js';
 
 export const WORKTREE_DIRECTORY = buildLocal.releaseBranchesDirectory;
 
@@ -249,6 +248,30 @@ export class Checkout {
     }
 
     return Promise.all( stubs.map( stub => Checkout.getReleaseBranch( stub.repo, stub.branch ) ) );
+  }
+
+  public async gitAdd( file: string ): Promise<string> {
+    winston.info( `git add ${file}` );
+
+    return execute( 'git', [ 'add', file ], this.workingDirectory );
+  }
+
+  public async gitCommit( message: string ): Promise<string> {
+    winston.info( `git commit with message:\n${message}` );
+
+    return execute( 'git', [ 'commit', '--no-verify', '-m', message ], this.workingDirectory );
+  }
+
+  public async isClean( file?: string ): Promise<boolean> {
+    winston.debug( 'git status check' );
+
+    const gitArgs = [ 'status', '--porcelain' ];
+
+    if ( file ) {
+      gitArgs.push( file );
+    }
+
+    return execute( 'git', gitArgs, this.workingDirectory ).then( stdout => Promise.resolve( stdout.length === 0 ) );
   }
 
   public async update(): Promise<void> {
@@ -533,5 +556,33 @@ export class Checkout {
     return contents.split( '\n' ).some( line => {
       return ( line.includes( 'import' ) || line.includes( 'require' ) ) && line.includes( name );
     } );
+  }
+
+  public async writeRelativeFile( relativeFile: string, contents: string ): Promise<void> {
+    winston.info( `writing file ${this.workingDirectory}/${relativeFile}` );
+
+    return fsPromises.writeFile( `${this.workingDirectory}/${relativeFile}`, contents, 'utf-8' );
+  }
+
+  public async writeRelativeJSON( relativeFile: string, json: Object ): Promise<void> {
+    return this.writeRelativeFile( relativeFile, JSON.stringify( json, null, 2 ) );
+  }
+
+  public async writeAddRelativeFile( relativeFile: string, contents: string ): Promise<void> {
+    await this.writeRelativeFile( relativeFile, contents );
+    await this.gitAdd( relativeFile );
+  }
+
+  public async writeAddRelativeJSON( relativeFile: string, json: Object ): Promise<void> {
+    await this.writeRelativeJSON( relativeFile, json );
+    await this.gitAdd( relativeFile );
+  }
+
+  public async getRelativeFileContents( relativeFile: string ): Promise<string> {
+    return getFileAtBranch( this.branch, relativeFile );
+  }
+
+  public async getRelativeJSON<T extends Object = IntentionalPerennialAny>( relativeFile: string ): Promise<T> {
+    return JSON.parse( await getFileAtBranch( this.branch, relativeFile ) ) + os.EOL;
   }
 }

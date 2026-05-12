@@ -8,7 +8,7 @@
  */
 
 import _ from 'lodash';
-import sleep from '../sleep.js';
+import { sleep } from '../sleep.js';
 
 // Use these parameters to prevent the `OpenSSL SSL_read: SSL_ERROR_SYSCALL, errno 0` for your case. It will often
 // depend on the exact git commands you are running, and how many commands you are trying to run in parallel.

@@ -32,7 +32,6 @@ import gitCheckout from './gitCheckout.js';
 import gitCherryPick from './gitCherryPick.js';
 import gitCommit from './gitCommit.js';
 import gitCreateBranch from './gitCreateBranch.js';
-import gitIsClean from './gitIsClean.js';
 import gitPull from './gitPull.js';
 import gitPush from './gitPush.js';
 import gitRevParse from './gitRevParse.js';
@@ -132,7 +131,7 @@ class Maintenance {
    */
   public static async checkBranchStatus( filter?: FilterSyncRB ): Promise<void> {
     for ( const repo of getActiveRepos() ) {
-      if ( repo !== 'perennial' && !( await gitIsClean( repo ) ) ) {
+      if ( repo !== 'perennial' && !( await runnableBranch.isClean() ) ) {
         console.log( `Unclean repository: ${repo}, please resolve this and then run checkBranchStatus again` );
         return;
       }

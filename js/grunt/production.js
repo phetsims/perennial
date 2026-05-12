@@ -127,7 +127,7 @@ module.exports = async function production( repo, branch, brands, noninteractive
     }
 
     if ( versionChanged ) {
-      await setRunnableVersion( repo, version, message );
+      await runnableBranch.setSimVersion( version, message );
       await gitPush( repo, branch );
     }
 
@@ -175,7 +175,7 @@ module.exports = async function production( repo, branch, brands, noninteractive
 
       // Abort version update
       if ( versionChanged ) {
-        await setRunnableVersion( repo, previousVersion, message );
+        await runnableBranch.setSimVersion( previousVersion, message );
         await gitPush( repo, branch );
       }
 

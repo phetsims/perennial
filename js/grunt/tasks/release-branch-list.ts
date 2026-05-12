@@ -16,6 +16,8 @@ import getOption from './util/getOption.js';
 
 ( async () => {
 
+  // TODO: rewrite (!!!), shouldn't be too bad
+
   winston.default.transports.console.level = 'error';
 
   const repo = getOption( 'repo' )?.startsWith( 'perennial' ) ? null : getOption( 'repo' );

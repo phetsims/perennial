@@ -7,7 +7,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import sleep from './sleep.js';
+import { sleep } from './sleep.js';
 
 // When using "catch" around asyncTimeout, you can see if this is the error message and handle it differently than a
 // problem from the provided Promise.

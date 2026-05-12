@@ -19,8 +19,6 @@ const gitPush = require( '../common/gitPush' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
 const setRunnableVersion = require( '../common/setRunnableVersion' );
-const setRunnableSupportedBrands = require( '../common/setRunnableSupportedBrands' );
-const updateHTMLVersion = require( '../common/updateHTMLVersion' );
 const assert = require( 'assert' );
 const winston = require( 'winston' );
 
@@ -67,8 +65,8 @@ module.exports = async function createRelease( repo, branch, brands, message ) {
 
   // Create the branch, update the version info
   await gitCreateBranch( repo, branch );
-  await setRunnableSupportedBrands( repo, brands );
-  await setRunnableVersion( repo, newVersion, message );
+  await runnableBranch.setSupportedBrands( brands );
+  await runnableBranch.setSimVersion( newVersion, message );
   await gitPush( repo, branch );
 
   // Update dependencies.json for the release branch
@@ -87,11 +85,11 @@ module.exports = async function createRelease( repo, branch, brands, message ) {
 
   // Update the version info in main
   await gitCheckout( repo, 'main' );
-  await setRunnableVersion( repo, new SimVersion( major, minor + 1, 0, {
+  await runnableBranch.setSimVersion( new SimVersion( major, minor + 1, 0, {
     testType: 'dev',
     testNumber: 0
   } ), message );
-  await updateHTMLVersion( repo );
+  await runnableBranch.updateHTMLVersion();
   await gitPush( repo, 'main' );
 
   // Go back to the branch (as they may want to do a deploy)

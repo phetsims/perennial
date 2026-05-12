@@ -14,7 +14,7 @@ import { Repo } from '../browser-and-node/PerennialTypes.js';
 import winston from '../npm-dependencies/winston.js';
 import dirname from './dirname.js';
 import execute, { ExecuteResult } from './execute.js';
-import getActiveRepos from './getActiveRepos.js';
+import { getActiveRepos } from './getActiveRepos.js';
 
 // @ts-expect-error ok to use import meta here
 const __dirname = dirname( import.meta.url );

@@ -6,7 +6,7 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import buildLocal from './buildLocal.js';
+import { buildLocal } from './buildLocal.js';
 import { scp } from './scp.js';
 
 /**
