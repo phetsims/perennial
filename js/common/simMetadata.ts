@@ -29,7 +29,7 @@ type ProjectType = {
     timestamp: number;
   };
 };
-type SimMetadata = {
+export type SimMetadata = {
   projects: ProjectType[];
 };
 

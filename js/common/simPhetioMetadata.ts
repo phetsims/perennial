@@ -15,7 +15,7 @@ type SimPhetioMetadataOptions = {
   latest: boolean | null;
 };
 
-type SimPhetioMetadata = {
+export type SimPhetioMetadata = {
   versionMaintenance: number;
   name: string;
   active: boolean;

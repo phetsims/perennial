@@ -26,6 +26,7 @@ export type PackageJSON = {
       validation?: boolean;
     };
     supportedBrands?: string[];
+    ignoreForAutomatedMaintenanceReleases?: boolean;
     simFeatures?: {
       supportsGestureControl?: boolean;
       supportsInteractiveDescription?: boolean;
@@ -41,8 +42,16 @@ export type PackageJSON = {
       defaultRegionAndCulture?: string;
       preventMultitouch?: boolean;
       interruptMultitouch?: boolean;
+
+      // Potentially older variants that we need to parse out
+      supportsDescription?: boolean; // @deprecated
     };
     chipperSupportsOutputJSGruntTasks?: boolean;
+
+    // Potentially older variants that we need to parse out
+    supportsInteractiveDescriptions?: boolean; // @deprecated
+    supportsInteractiveDescription?: boolean; // @deprecated
+    accessible?: boolean; // @deprecated
   };
 };
 

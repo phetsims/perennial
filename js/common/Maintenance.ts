@@ -41,6 +41,7 @@ import ModifiedBranch, { type DeployedLinkOptions } from './ModifiedBranch.js';
 import Patch from './Patch.js';
 import { PERENNIAL_ROOT } from './perennialRepoUtils.js';
 import ReleaseBranch from './ReleaseBranch.js';
+import { Checkout } from './Checkout.js';
 
 // constants
 const MAINTENANCE_FILE = '.maintenance.json';
@@ -117,7 +118,7 @@ class Maintenance {
 
     const allReleaseBranches = [];
     if ( keepCachedReleaseBranches ) {
-      const maintenance = Maintenance.load();
+      const maintenance = await Maintenance.load();
       allReleaseBranches.push( ...maintenance.allReleaseBranches );
     }
     new Maintenance( [], [], allReleaseBranches ).save();
@@ -200,7 +201,7 @@ class Maintenance {
    * This is useful for prioritizing which branches to patch first.
    */
   public static async list( options?: { timestamp?: boolean } ): Promise<void> {
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
 
     // At the top so that the important items are right above your cursor after calling the function
     if ( maintenance.allReleaseBranches.length > 0 ) {
@@ -283,7 +284,7 @@ class Maintenance {
    * @param options - options for including specific links
    */
   public static async listLinks( filter: FilterSyncMB = () => true, options?: DeployedLinkOptions ): Promise<void> {
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
 
     const deployedBranches = maintenance.modifiedBranches.filter( modifiedBranch => !!modifiedBranch.deployedVersion && filter( modifiedBranch ) );
     const productionBranches = deployedBranches.filter( modifiedBranch => modifiedBranch.deployedVersion?.testType === null );
@@ -316,7 +317,7 @@ class Maintenance {
    * Creates an issue to note patches on all unreleased branches that include a pushed message.
    */
   public static async createUnreleasedIssues( additionalNotes = '' ): Promise<void> {
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
 
     for ( const modifiedBranch of maintenance.modifiedBranches ) {
       if ( !modifiedBranch.releaseBranch.isReleased && modifiedBranch.pushedMessages.length > 0 ) {
@@ -333,7 +334,7 @@ class Maintenance {
    * @param [patchName] - If no name is provided, the repo string will be used.
    */
   public static async createPatch( repo: string, message: string, patchName?: string ): Promise<void> {
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
 
     patchName = patchName || repo;
 
@@ -354,7 +355,7 @@ class Maintenance {
    * Removes a patch
    */
   public static async removePatch( patchName: string ): Promise<void> {
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
 
     const patch = maintenance.findPatch( patchName );
 
@@ -375,7 +376,7 @@ class Maintenance {
    * Adds a particular SHA (to cherry-pick) to a patch.
    */
   public static async addPatchSHA( patchName: string, sha?: string ): Promise<void> {
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
 
     const patch = maintenance.findPatch( patchName );
 
@@ -395,7 +396,7 @@ class Maintenance {
    * Removes a particular SHA (to cherry-pick) from a patch.
    */
   public static async removePatchSHA( patchName: string, sha: string ): Promise<void> {
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
 
     const patch = maintenance.findPatch( patchName );
 
@@ -413,7 +414,7 @@ class Maintenance {
    * Removes all patch SHAs for a particular patch.
    */
   public static async removeAllPatchSHAs( patchName: string ): Promise<void> {
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
 
     const patch = maintenance.findPatch( patchName );
 
@@ -430,7 +431,7 @@ class Maintenance {
    * Adds a needed patch to a given modified branch.
    */
   public static async addNeededPatch( repo: string, branch: string, patchName: string ): Promise<void> {
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
     assert( repo !== patchName, 'Cannot patch a release branch repo, yet.' ); // TODO: remove in https://github.com/phetsims/perennial/issues/312
 
     const patch = maintenance.findPatch( patchName );
@@ -447,7 +448,7 @@ class Maintenance {
    * Adds a needed patch to a given release branch
    */
   public static async addNeededPatchReleaseBranch( releaseBranch: ReleaseBranch, patchName: string ): Promise<void> {
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
 
     const patch = maintenance.findPatch( patchName );
 
@@ -468,7 +469,7 @@ class Maintenance {
     // getMaintenanceBranches needs to cache its branches and maintenance.save() them, so do it before loading
     // Maintenance for this function.
     const releaseBranches = await Maintenance.getMaintenanceBranches();
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
 
     const patch = maintenance.findPatch( patchName );
 
@@ -549,7 +550,7 @@ class Maintenance {
    * Removes a needed patch from a given modified branch.
    */
   public static async removeNeededPatch( repo: string, branch: string, patchName: string ): Promise<void> {
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
 
     const patch = maintenance.findPatch( patchName );
 
@@ -569,7 +570,7 @@ class Maintenance {
    * Removes a needed patch from whatever subset of (current) release branches match the filter.
    */
   public static async removeNeededPatches( patchName: string, filter: FilterRB ): Promise<void> {
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
 
     const patch = maintenance.findPatch( patchName );
 
@@ -642,19 +643,12 @@ class Maintenance {
    * @param npmUpdate - do a npm update after checking out shas
    */
   public static async checkoutBranch( repo: string, branch: string, outputJS = false, npmUpdate = true ): Promise<void> {
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
 
     const modifiedBranch = await maintenance.ensureModifiedBranch( repo, branch, true );
     await modifiedBranch.checkout( npmUpdate );
 
-    if ( outputJS && await chipperSupportsOutputJSGruntTasks() ) {
-      console.log( 'Running output-js-project' );
-
-      // We might not be able to run this command!
-      await execute( gruntCommand, [ 'output-js-project', '--silent' ], `../${repo}`, {
-        errors: 'resolve'
-      } );
-    }
+    await modifiedBranch.releaseBranch.transpile();
 
     // No need to save, shouldn't be changing things
     console.log( `Checked out ${repo} ${branch}` );
@@ -691,7 +685,7 @@ class Maintenance {
     winston.info( 'applying patches' );
 
     let success = true;
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
     let numApplied = 0;
 
     for ( const modifiedBranch of maintenance.modifiedBranches ) {
@@ -791,7 +785,7 @@ class Maintenance {
   public static async updateDependencies( filter?: FilterMB ): Promise<void> {
     winston.info( 'update dependencies' );
 
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
 
     for ( const modifiedBranch of maintenance.modifiedBranches ) {
       const changedRepos = Object.keys( modifiedBranch.changedDependencies );
@@ -897,7 +891,7 @@ class Maintenance {
    * @param filter - Optional filter, modified branches will be skipped if this resolves to false
    */
   public static async deployReleaseCandidates( filter?: FilterMB ): Promise<void> {
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
 
     for ( const modifiedBranch of maintenance.modifiedBranches ) {
       if ( !modifiedBranch.isReadyForReleaseCandidate || !modifiedBranch.releaseBranch.isReleased ) {
@@ -938,7 +932,7 @@ class Maintenance {
    * @param filter - Optional filter, modified branches will be skipped if this resolves to false
    */
   public static async deployProduction( filter: FilterMB ): Promise<void> {
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
 
     for ( const modifiedBranch of maintenance.modifiedBranches ) {
       if ( !modifiedBranch.isReadyForProduction || !modifiedBranch.releaseBranch.isReleased ) {
@@ -1115,7 +1109,7 @@ class Maintenance {
   public static async getMaintenanceBranches( filter: FilterSyncRB = () => true,
                                               checkUnreleasedBranches = true,
                                               forceCacheBreak = false,
-                                              maintenance = Maintenance.load() ): Promise<ReleaseBranch[]> {
+                                              maintenance = await Maintenance.load() ): Promise<ReleaseBranch[]> {
     const releaseBranches = await Maintenance.loadAllMaintenanceBranches( forceCacheBreak, maintenance );
 
     return releaseBranches.filter( releaseBranch => {
@@ -1135,7 +1129,7 @@ class Maintenance {
    * @param forceCacheBreak - true if you want to force a recalculation of all ReleaseBranches
    * @param maintenance - by default load from saved file the current maintenance instance.
    */
-  public static async loadAllMaintenanceBranches( forceCacheBreak = false, maintenance = Maintenance.load() ): Promise<ReleaseBranch[]> {
+  public static async loadAllMaintenanceBranches( forceCacheBreak = false, maintenance = await Maintenance.load() ): Promise<ReleaseBranch[]> {
 
     let releaseBranches = null;
     if ( maintenance.allReleaseBranches.length > 0 && !forceCacheBreak ) {
@@ -1164,7 +1158,7 @@ class Maintenance {
    * Never forget "deduplicated from 933 to 151".
    */
   public static fixDuplicatedModifiedBranches(): void {
-    const maintenance = Maintenance.load();
+    const maintenance = await Maintenance.load();
 
     const modifiedBranchMap: Record<string, ModifiedBranch> = {};
 
@@ -1203,11 +1197,13 @@ class Maintenance {
 
   /**
    * Takes a serialized form of the Maintenance and returns an actual instance.
+   *
+   * TODO: ensure this is awaited everywhere
    */
-  public static deserialize( { patches = [], modifiedBranches = [], allReleaseBranches = [] }: MaintenanceSerialized ): Maintenance {
+  public static async deserialize( { patches = [], modifiedBranches = [], allReleaseBranches = [] }: MaintenanceSerialized ): Promise<Maintenance> {
     // Pass in patch references to branch deserialization
     const deserializedPatches = patches.map( Patch.deserialize );
-    const modifiedBranchesDeserialized = modifiedBranches.map( modifiedBranch => ModifiedBranch.deserialize( modifiedBranch, deserializedPatches ) );
+    const modifiedBranchesDeserialized = await Promise.all( modifiedBranches.map( modifiedBranch => ModifiedBranch.deserialize( modifiedBranch, deserializedPatches ) ) );
     modifiedBranchesDeserialized.sort( ( a, b ) => {
       if ( a.repo !== b.repo ) {
         return a.repo < b.repo ? -1 : 1;
@@ -1217,7 +1213,7 @@ class Maintenance {
       }
       return 0;
     } );
-    const deserializedReleaseBranches = allReleaseBranches.map( releaseBranch => ReleaseBranch.deserialize( releaseBranch ) );
+    const deserializedReleaseBranches = await Promise.all( allReleaseBranches.map( releaseBranch => Checkout.getReleaseBranch( releaseBranch.repo, releaseBranch.branch ) ) );
 
     return new Maintenance( deserializedPatches, modifiedBranchesDeserialized, deserializedReleaseBranches );
   }
@@ -1231,8 +1227,10 @@ class Maintenance {
 
   /**
    * Loads a new Maintenance object (if possible) from the maintenance file.
+   *
+   * TODO: await everything that uses this
    */
-  public static load(): Maintenance {
+  public static async load(): Promise<Maintenance> {
     if ( fs.existsSync( MAINTENANCE_FILE ) ) {
       return Maintenance.deserialize( JSON.parse( fs.readFileSync( MAINTENANCE_FILE, 'utf8' ) ) );
     }

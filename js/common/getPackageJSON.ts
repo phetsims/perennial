@@ -8,7 +8,7 @@
 
 
 import { loadJSON } from './loadJSON.js';
-import { PackageJSON } from './perennial-types.js';
+import { PackageJSON } from '../browser-and-node/PerennialTypes.js';
 
 export const getPackageJSON = async ( runnable: string ): Promise<PackageJSON> => {
   return loadJSON( `../${runnable}/package.json` );

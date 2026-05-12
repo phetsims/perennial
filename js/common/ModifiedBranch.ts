@@ -17,6 +17,7 @@ import githubCreateIssue from './githubCreateIssue.js';
 import gitPull from './gitPull.js';
 import Patch from './Patch.js';
 import ReleaseBranch from './ReleaseBranch.js';
+import { Checkout } from './Checkout.js';
 
 // Keys are repo names, values are SHAs
 type Dependencies = Record<string, string>;
@@ -90,9 +91,10 @@ class ModifiedBranch {
    * For "patches" param, we only want to store patches in one location, so don't fully save the info.
    *
    */
-  public static deserialize( { releaseBranch, changedDependencies, neededPatches = [], pendingMessages, pushedMessages, deployedVersion }: ModifiedBranchSerialized, patches: Patch[] ): ModifiedBranch {
+  public static async deserialize( { releaseBranch, changedDependencies, neededPatches = [], pendingMessages, pushedMessages, deployedVersion }: ModifiedBranchSerialized, patches: Patch[] ): Promise<ModifiedBranch> {
+    // TODO: handle await everywhere for this
     return new ModifiedBranch(
-      ReleaseBranch.deserialize( releaseBranch ),
+      await Checkout.getReleaseBranch( releaseBranch.repo, releaseBranch.branch ),
       changedDependencies,
       neededPatches.map( name => patches.find( patch => patch.name === name )! ),
       pendingMessages,
