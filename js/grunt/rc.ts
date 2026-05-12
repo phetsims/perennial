@@ -15,33 +15,11 @@ import { hasRemoteBranch } from '../common/hasRemoteBranch.js';
 import { ReleaseBranch } from '../common/ReleaseBranch';
 import { booleanPrompt } from '../common/booleanPrompt';
 import createRelease from './createRelease';
-import { loadJSON } from '../common/loadJSON.js';
-import { getPackageJSON } from '../common/getPackageJSON.js';
 import { getBranchPackageJSON } from '../common/getBranchPackageJSON.js';
 import { getBranchRunnableVersion } from '../common/getBranchRunnableVersion';
 import { buildLocal } from '../common/buildLocal.js';
 import { devDirectoryExists } from '../common/devDirectoryExists';
-
-// const SimVersion = require( '../browser-and-node/SimVersion' ).default;
-// const booleanPrompt = require( '../common/booleanPrompt' );
-// const build = require( '../common/build' );
-// const buildLocal = require( '../common/buildLocal' );
-// const buildServerRequest = require( '../common/buildServerRequest' );
-// const checkoutMain = require( '../common/checkoutMain' );
-// const checkoutTarget = require( '../common/checkoutTarget' );
-// const devDirectoryExists = require( '../common/devDirectoryExists' );
-// const getDependencies = require( '../common/getDependencies' );
-// const { getRunnableVersion } = require( '../common/getRunnableVersion' );
-// const gitCheckout = require( '../common/gitCheckout' );
-// const gitIsClean = require( '../common/gitIsClean' );
-// const gitPush = require( '../common/gitPush' );
-// const hasRemoteBranch = require( '../common/hasRemoteBranch' );
-// const loadJSON = require( '../common/loadJSON' );
-// const npmUpdate = require( '../common/npmUpdate' );
-// const setRunnableVersion = require( '../common/setRunnableVersion' );
-// const vpnCheck = require( '../common/vpnCheck' );
-// const createRelease = require( './createRelease' );
-// const grunt = require( 'grunt' );
+import { Checkout } from '../common/Checkout';
 
 const cancelLog = ( problem: unknown ) => grunt.log.writeln( 'Cancelling RC deployment: ' + problem );
 const handleError = ( problem: unknown ) => {
@@ -66,12 +44,16 @@ export const rc = async (
   noninteractive: boolean,
   message?: string
 ): Promise<SimVersion> => {
+  // Assertions for the version.
   SimVersion.ensureReleaseBranch( branch );
 
-  // TODO: determine whether it has been released, before we get this object(!)
-  const releaseBranch = new ReleaseBranch( repo, branch, brands, );
+  const releaseBranch = await Checkout.getReleaseBranch( repo, branch );
 
-  const totalityBranch = releaseBranch.totalityBranch;
+  // TODO: why are we passing in brands, since we auto-detect based on the release branch?
+
+  if ( brands.length !== releaseBranch.brands.length || !brands.every( brand => releaseBranch.brands.includes( brand ) ) ) {
+    throw new Error( `Provided brands ${brands} do not match expected brands ${releaseBranch.brands} for release branch ${branch}` );
+  }
 
   if ( !( await vpnCheck() ) ) {
     handleError( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
@@ -82,7 +64,7 @@ export const rc = async (
     handleError( `Unclean status, cannot create release branch` );
   }
 
-  if ( !( await hasRemoteBranch( totalityBranch ) ) ) {
+  if ( !( await hasRemoteBranch( releaseBranch.checkout.branch ) ) ) {
     if ( noninteractive || !await booleanPrompt( `Release branch ${branch} does not exist. Create it?`, false ) ) {
       handleError( 'Release branch does not exist' );
     }

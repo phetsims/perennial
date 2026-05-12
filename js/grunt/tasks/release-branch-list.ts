@@ -10,13 +10,13 @@
 import assert from 'assert';
 import _ from 'lodash';
 import winston from 'winston';
-import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
+import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
 import Maintenance from '../../common/Maintenance.js';
 import getOption from './util/getOption.js';
+import { Checkout } from '../../common/Checkout.js';
 
 ( async () => {
 
-  // TODO: rewrite (!!!), shouldn't be too bad
 
   winston.default.transports.console.level = 'error';
 
@@ -29,6 +29,8 @@ import getOption from './util/getOption.js';
 
   assert( order === 'alphabetical' || order === 'date', `unsupported order type: ${order}` );
 
+  // TODO: rewrite (!!!), shouldn't be too bad
+  // TODO: Need to rewrite the maintenance bits first
   const branches = await Maintenance.getMaintenanceBranches( releaseBranch => !repo || releaseBranch.repo === repo,
     true, true );
 

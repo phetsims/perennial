@@ -16,7 +16,7 @@ import fsPromises from 'fs/promises';
 import { gitCreateWorktree } from './gitCreateWorktree.js';
 import { gitPullDirectory } from './gitPullDirectory.js';
 import execute from './execute.js';
-import { npmUpdateDirectory } from './npmUpdateDirectory.js';
+import { npmUpdateDirectory, NPMUpdateOptions } from './npmUpdateDirectory.js';
 import { ReleaseBranch } from './ReleaseBranch.js';
 import { getBranchVersion } from './getBranchVersion.js';
 import { getBranchBrands } from './getBranchBrands.js';
@@ -34,6 +34,12 @@ import { getBranches } from './getBranches.js';
 import _ from 'lodash';
 import os from 'os';
 import { IntentionalPerennialAny } from '../browser-and-node/PerennialTypes.js';
+import assert from 'assert';
+import { getBranch } from './getBranch.js';
+import { hasRemoteBranch } from './hasRemoteBranch.js';
+import SimVersion from '../browser-and-node/SimVersion.js';
+import { gitIsClean } from './gitIsClean';
+import { RunnableBranch } from './RunnableBranch.js';
 
 export const WORKTREE_DIRECTORY = buildLocal.releaseBranchesDirectory;
 
@@ -140,6 +146,10 @@ export class Checkout {
     return checkout.releaseBranch;
   }
 
+  public static async getMainRunnableBranch( repo: string ): Promise<RunnableBranch> {
+    return ( await Checkout.getMainCheckout() ).getRunnableBranch( repo );
+  }
+
   public static getReleaseBranchName( repo: string, legacyBranch: string ): string {
     return `releases/${repo}/${legacyBranch}`;
   }
@@ -147,6 +157,80 @@ export class Checkout {
   public static getWorktreeDirectory( branch: string ): string {
     // TODO: do we need escaping at all, if one branch is a substring of another? (e.g. feature/foo, feature/foo/bar)
     return `${WORKTREE_DIRECTORY}/${branch}`;
+  }
+
+  public static async createReleaseBranchCheckout(
+    repo: string,
+    legacyBranch: string,
+    brands: string[],
+    message?: string // appended to the commit message for the initial release branch commit, if provided
+  ): Promise<Checkout> {
+    const branch = Checkout.getReleaseBranchName( repo, legacyBranch );
+
+    const major = Number( legacyBranch.split( '.' )[ 0 ] );
+    const minor = Number( legacyBranch.split( '.' )[ 1 ] );
+    assert( major > 0, 'Major version for a branch should be greater than zero' );
+    assert( minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
+
+    assert( Array.isArray( brands ), 'supported brands required' );
+    assert( brands.length >= 1, 'must have a supported brand' );
+
+    const currentBranch = await getBranch();
+    if ( currentBranch !== 'main' ) {
+      throw new Error( `Should be on main to create a release branch, not: ${currentBranch ? currentBranch : '(detached head)'}` );
+    }
+
+    const hasBranchAlready = await hasRemoteBranch( branch );
+    if ( hasBranchAlready ) {
+      throw new Error( 'Branch already exists, aborting' );
+    }
+
+    const newVersion = new SimVersion( major, minor, 0, {
+      testType: 'rc',
+      testNumber: 0
+    } );
+
+    const isClean = await gitIsClean();
+    if ( !isClean ) {
+      throw new Error( `Unclean status, cannot create release branch` );
+    }
+
+    const checkout = new Checkout( branch, Checkout.getWorktreeDirectory( branch ) );
+
+    const releaseBranch = new ReleaseBranch( checkout, repo, legacyBranch, brands, false );
+    checkout.releaseBranch = releaseBranch;
+
+    winston.info( 'Setting the release branch version to rc.0 so it will auto-increment to rc.1 for the first RC deployment' );
+
+    // Create the branch in git, and push it directly (not using the other helpers, since we are doing this from the MAIN directory)
+    await execute( 'git', [ 'checkout', '-b', branch ], '..' );
+    await execute( 'git', [ 'push', '-u', 'origin', branch ], '..' ); // not using this.gitPush, since this is our first
+    await execute( 'git', [ 'checkout', 'main' ], '..' );
+
+    // Ensure that we are remotely tracked now (sanity check)
+    await createLocalBranchFromRemote( branch );
+
+    // Ensure we have a checkout (so we can modify and push from that region).
+    await checkout.update();
+
+    // Update the version info
+    await releaseBranch.setSupportedBrands( brands );
+    await releaseBranch.setSimVersion( newVersion, message );
+    await checkout.gitPush();
+
+    // TODO: WE NEED TO SUBSET THINGS, so we remove unneeded repos. We'll need to get dependencies.
+
+    // Update the version info in main
+    const mainRunnableBranch = await Checkout.getMainRunnableBranch( repo );
+    await mainRunnableBranch.setSimVersion( new SimVersion( major, minor + 1, 0, {
+      testType: 'dev',
+      testNumber: 0
+    } ), message );
+    await mainRunnableBranch.updateHTMLVersion();
+    await mainRunnableBranch.checkout.gitPullRebase();
+    await mainRunnableBranch.checkout.gitPush();
+
+    return checkout;
   }
 
   /**
@@ -250,6 +334,12 @@ export class Checkout {
     return Promise.all( stubs.map( stub => Checkout.getReleaseBranch( stub.repo, stub.branch ) ) );
   }
 
+  public async getRunnableBranch( repo: string ): Promise<RunnableBranch> {
+    const brands = await getBranchBrands( repo, this.branch );
+
+    return new RunnableBranch( this, repo, brands );
+  }
+
   public async gitAdd( file: string ): Promise<string> {
     winston.info( `git add ${file}` );
 
@@ -262,6 +352,24 @@ export class Checkout {
     return execute( 'git', [ 'commit', '--no-verify', '-m', message ], this.workingDirectory );
   }
 
+  public async gitPush(): Promise<string> {
+    winston.info( `git push to ${this.branch}` );
+
+    return execute( 'git', [ 'push', '-u', 'origin', this.branch ], this.workingDirectory );
+  }
+
+  public async gitPull(): Promise<string> {
+    winston.info( `git pull in ${this.workingDirectory}` );
+
+    return execute( 'git', [ 'pull' ], this.workingDirectory );
+  }
+
+  public async gitPullRebase(): Promise<string> {
+    winston.info( `git pull --rebase in ${this.workingDirectory}` );
+
+    return execute( 'git', [ 'pull', '--rebase' ], this.workingDirectory );
+  }
+
   public async isClean( file?: string ): Promise<boolean> {
     winston.debug( 'git status check' );
 
@@ -272,6 +380,10 @@ export class Checkout {
     }
 
     return execute( 'git', gitArgs, this.workingDirectory ).then( stdout => Promise.resolve( stdout.length === 0 ) );
+  }
+
+  public async npmUpdateRepo( repo: string, options?: NPMUpdateOptions ): Promise<void> {
+    return npmUpdateDirectory( `${this.workingDirectory}/${repo}`, options );
   }
 
   public async update(): Promise<void> {
@@ -306,7 +418,8 @@ export class Checkout {
       for ( const npmRepo of [ 'chipper', 'perennial-alias', this.releaseBranch.repo ] ) {
         if ( fs.existsSync( `${this.workingDirectory}/${npmRepo}` ) ) {
           winston.info( `npm update ${npmRepo} in worktree` );
-          await npmUpdateDirectory( `${this.workingDirectory}/${npmRepo}` );
+
+          await this.npmUpdateRepo( npmRepo );
         }
       }
     }
@@ -565,7 +678,7 @@ export class Checkout {
   }
 
   public async writeRelativeJSON( relativeFile: string, json: Object ): Promise<void> {
-    return this.writeRelativeFile( relativeFile, JSON.stringify( json, null, 2 ) );
+    return this.writeRelativeFile( relativeFile, JSON.stringify( json, null, 2 ) + os.EOL );
   }
 
   public async writeAddRelativeFile( relativeFile: string, contents: string ): Promise<void> {
@@ -583,6 +696,6 @@ export class Checkout {
   }
 
   public async getRelativeJSON<T extends Object = IntentionalPerennialAny>( relativeFile: string ): Promise<T> {
-    return JSON.parse( await getFileAtBranch( this.branch, relativeFile ) ) + os.EOL;
+    return JSON.parse( await getFileAtBranch( this.branch, relativeFile ) );
   }
 }
