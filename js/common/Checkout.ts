@@ -110,8 +110,11 @@ export class Checkout {
       return releaseRepo === repo && releaseBranch === legacyBranch;
     } );
 
+    let isReleased = simVersion.isSimPublished;
+
     if ( simVersion.isSimPublished && !includePublishedPhetBrand && !includePublishedPhetioBrand ) {
-      throw new Error( `Expected published sim ${repo} ${legacyBranch} to be included in metadata, but it was not` );
+      // Marking an unreleased sim
+      isReleased = false;
     }
     if ( !simVersion.isSimPublished && ( includePublishedPhetBrand || includePublishedPhetioBrand ) ) {
       throw new Error( `Expected unpublished sim ${repo} ${legacyBranch} to not be included in metadata, but it was` );
@@ -136,7 +139,7 @@ export class Checkout {
       throw new Error( `Expected supported brands ${supportedBrands.join( ', ' )} on branch ${repo} ${legacyBranch} to include all of the published brands ${brands.join( ', ' )}` );
     }
 
-    checkout.releaseBranch = new ReleaseBranch( checkout, repo, branch, brands, simVersion.isSimPublished );
+    checkout.releaseBranch = new ReleaseBranch( checkout, repo, branch, brands, isReleased );
 
     return checkout;
   }
