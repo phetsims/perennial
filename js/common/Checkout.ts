@@ -42,6 +42,7 @@ import { getBranchSimVersion } from './getBranchSimVersion.js';
 import { getActiveRunnables } from './getActiveRunnables.js';
 import { tsxCommand } from './tsxCommand.js';
 import pLimit from "p-limit";
+import { gitImmutableExecute, gitMutableExecute } from './gitMutex.js';
 
 export const WORKTREE_DIRECTORY = buildLocal.releaseBranchesDirectory;
 
@@ -68,17 +69,28 @@ export class Checkout {
   // Protected so we can do async initialization in static methods
   protected constructor(
     public readonly branch: string,
-    public readonly workingDirectory: string
+    public readonly workingDirectory: string,
+    public isCheckedOut: boolean // will be mutated to true on a checkout. We need to track that for various operations
   ) {
 
   }
 
-  public static async getMainCheckout(): Promise<Checkout> {
-    return new Checkout( 'main', '..' );
+  public static async hasWorktree( branch: string ): Promise<boolean> {
+    const worktreeData = await execute( 'git', [
+      'worktree',
+      'list',
+      '--porcelain'
+    ], '..' );
+
+    return !!worktreeData.match( new RegExp( `^branch refs/heads/${branch}$`, 'm' ) );
   }
 
-  public static async getOneOffCheckout( branch: string): Promise<Checkout> {
-    return new Checkout( branch, '..' );
+  public static async getMainCheckout(): Promise<Checkout> {
+    return new Checkout( 'main', '..', true );
+  }
+
+  public static async getOneOffCheckout( branch: string ): Promise<Checkout> {
+    return new Checkout( branch, '..', true ); // TODO: is isCheckedOut:true safe here?
   }
 
   public static async getReleaseBranchCheckout( repo: string, legacyBranch: string ): Promise<Checkout> {
@@ -86,7 +98,14 @@ export class Checkout {
 
     const branch = Checkout.getReleaseBranchName( repo, legacyBranch );
 
-    const checkout = new Checkout( branch, Checkout.getWorktreeDirectory( branch ) );
+    const directoryExists = fs.existsSync( Checkout.getWorktreeDirectory( branch ) );
+    const worktreeExists = await Checkout.hasWorktree( branch );
+
+    if ( directoryExists !== worktreeExists ) {
+      throw new Error( `Expected worktree existence (${worktreeExists}) to match directory existence (${directoryExists}) for ${branch}` );
+    }
+
+    const checkout = new Checkout( branch, Checkout.getWorktreeDirectory( branch ), worktreeExists );
 
     const simVersion = await getBranchSimVersion( repo, branch );
 
@@ -207,7 +226,7 @@ export class Checkout {
       throw new Error( `Unclean status, cannot create release branch` );
     }
 
-    const checkout = new Checkout( branch, Checkout.getWorktreeDirectory( branch ) );
+    const checkout = new Checkout( branch, Checkout.getWorktreeDirectory( branch ), false );
 
     // get dependencies from main
     const dependencies = await ( await checkout.getRunnableBranch( repo ) ).getDependencies();
@@ -443,6 +462,9 @@ export class Checkout {
       // Create the worktree itself if needed
       if ( !fs.existsSync( this.workingDirectory ) ) {
         winston.info( `creating worktree at ${this.workingDirectory}` );
+
+        this.isCheckedOut = true;
+
         await gitCreateWorktree( this.workingDirectory, this.branch );
       }
       else {
@@ -617,14 +639,8 @@ export class Checkout {
     return new Date( timestamp ).toISOString().split( 'T' )[ 0 ];
   }
 
-  public async fetchOrigin(): Promise<void> {
-    winston.info( `fetching origin for ${this.branch}` );
-
-    await execute( 'git', [ 'fetch', 'origin' ], this.workingDirectory );
-  }
-
   public async hasUpstreamBranch( branch: string ): Promise<boolean> {
-    return ( await execute( 'git', [
+    return ( await gitImmutableExecute( [
       'rev-parse',
       '--abbrev-ref',
       '--symbolic-full-name',
@@ -634,13 +650,19 @@ export class Checkout {
 
   public async hasLocalBranch( branch: string ): Promise<boolean> {
     return (
-      await execute( 'git', [
+      await gitImmutableExecute( [
         'show-ref',
         '--verify',
         '--quiet',
         `refs/heads/${branch}`
       ], this.workingDirectory, { errors: 'resolve' } )
     ).code === 0;
+  }
+
+  public async fetchOrigin(): Promise<void> {
+    winston.info( `fetching origin for ${this.branch}` );
+
+    await gitMutableExecute( [ 'fetch', 'origin' ], this.workingDirectory );
   }
 
   /**

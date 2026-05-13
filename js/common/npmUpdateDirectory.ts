@@ -9,10 +9,8 @@
 import execute from './execute.js';
 import { npmCommand } from './npmCommand.js';
 import winston from 'winston';
-import { Mutex } from 'async-mutex';
 import fs from 'fs';
-
-const mutex = new Mutex();
+import { npmExclusive } from './npmMutex.js';
 
 export type NPMUpdateOptions = {
   minimal?: boolean;
@@ -37,7 +35,7 @@ export const npmUpdateDirectory = async ( directory: string, options?: NPMUpdate
   const flags = getNpmInstallFlags( options );
 
   // NOTE: Run these synchronously across all instances!
-  await mutex.runExclusive( async () => {
+  await npmExclusive( async () => {
 
     // If we have a package-lock.json, we can do the more efficient 'npm ci'
     if ( hasPackageLock ) {
