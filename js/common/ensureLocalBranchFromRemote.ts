@@ -9,8 +9,11 @@
  */
 
 import execute from './execute.js';
+import winston from 'winston';
 
-export const createLocalBranchFromRemote = async ( branch: string ): Promise<void> => {
+export const ensureLocalBranchFromRemote = async ( branch: string ): Promise<void> => {
+  winston.info( `ensuring local branch from remote: ${branch}` );
+
   await execute( 'git', [
     'fetch',
     'origin',

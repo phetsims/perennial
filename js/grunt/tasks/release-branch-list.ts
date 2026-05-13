@@ -18,8 +18,7 @@ import { ReleaseBranch } from '../../common/ReleaseBranch.js';
 
 ( async () => {
 
-
-  winston.default.transports.console.level = 'error';
+  // winston.default.transports.console.level = 'error';
 
   const repo = getOption( 'repo' )?.startsWith( 'perennial' ) ? null : getOption( 'repo' );
   const order = getOption( 'order' ) || 'alphabetical';
@@ -31,6 +30,8 @@ import { ReleaseBranch } from '../../common/ReleaseBranch.js';
   assert( order === 'alphabetical' || order === 'date', `unsupported order type: ${order}` );
 
   const releaseBranches = await Checkout.getMaintainedReleaseBranches();
+
+  console.log( `Found ${releaseBranches.length} release branches, inspecting for divergence dates` );
 
   let structures: { releaseBranch: ReleaseBranch; timestamp: number }[] = [];
   for ( const releaseBranch of releaseBranches ) {

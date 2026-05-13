@@ -10,7 +10,7 @@ import winston from 'winston';
 import { buildLocal } from './buildLocal';
 import { createDirectory } from './createDirectory';
 import path from 'path';
-import { createLocalBranchFromRemote } from './createLocalBranchFromRemote.js';
+import { ensureLocalBranchFromRemote } from './ensureLocalBranchFromRemote.js';
 import fs from 'fs';
 import fsPromises from 'fs/promises';
 import { gitCreateWorktree } from './gitCreateWorktree.js';
@@ -41,6 +41,7 @@ import { RunnableBranch } from './RunnableBranch.js';
 import { getBranchSimVersion } from './getBranchSimVersion.js';
 import { getActiveRunnables } from './getActiveRunnables.js';
 import { tsxCommand } from './tsxCommand.js';
+import pLimit from "p-limit";
 
 export const WORKTREE_DIRECTORY = buildLocal.releaseBranchesDirectory;
 
@@ -81,6 +82,8 @@ export class Checkout {
   }
 
   public static async getReleaseBranchCheckout( repo: string, legacyBranch: string ): Promise<Checkout> {
+    winston.info( `getting release branch checkout for ${repo} ${legacyBranch}` );
+
     const branch = Checkout.getReleaseBranchName( repo, legacyBranch );
 
     const checkout = new Checkout( branch, Checkout.getWorktreeDirectory( branch ) );
@@ -220,7 +223,7 @@ export class Checkout {
     await execute( 'git', [ 'checkout', 'main' ], '..' );
 
     // Ensure that we are remotely tracked now (sanity check)
-    await createLocalBranchFromRemote( branch );
+    await ensureLocalBranchFromRemote( branch );
 
     // Ensure we have a checkout (so we can modify and push from that region).
     await checkout.update();
@@ -269,6 +272,8 @@ export class Checkout {
    * @rejects {ExecuteError}
    */
   public static async getMaintainedReleaseBranches( unreleased = true ): Promise<ReleaseBranch[]> {
+    winston.info( `Getting maintained release branches (unreleased: ${unreleased})` );
+
     type Stub = { repo: string; branch: string; };
 
     const stubs: Stub[] = [];
@@ -358,7 +363,9 @@ export class Checkout {
       }
     }
 
-    return Promise.all( stubs.map( stub => Checkout.getReleaseBranch( stub.repo, stub.branch ) ) );
+    const limit = pLimit( 1 ); // limit to 5 concurrent requests
+
+    return Promise.all( stubs.map( stub => limit( () => Checkout.getReleaseBranch( stub.repo, stub.branch ) ) ) );
   }
 
   public async getRunnableBranch( repo: string ): Promise<RunnableBranch> {
@@ -431,7 +438,7 @@ export class Checkout {
       await this.ensureWorktreeParentDirectory();
 
       // Ensure our remote tracking is set up properly
-      await createLocalBranchFromRemote( this.branch );
+      await ensureLocalBranchFromRemote( this.branch );
 
       // Create the worktree itself if needed
       if ( !fs.existsSync( this.workingDirectory ) ) {
@@ -614,8 +621,9 @@ export class Checkout {
    * The SHA at which this release branch's main repository diverged from main.
    */
   public async getDivergingSHA(): Promise<string> {
-    await createLocalBranchFromRemote( this.branch );
+    await ensureLocalBranchFromRemote( this.branch );
 
+    winston.info( 'getting first diverging commit' );
     return gitFirstDivergingCommit( this.branch, 'main' );
   }
 

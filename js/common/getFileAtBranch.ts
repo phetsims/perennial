@@ -8,7 +8,7 @@
 
 import execute from './execute.js';
 import { IntentionalPerennialAny } from '../browser-and-node/PerennialTypes.js';
-import { createLocalBranchFromRemote } from './createLocalBranchFromRemote.js';
+import { ensureLocalBranchFromRemote } from './ensureLocalBranchFromRemote.js';
 import { gitCatFile } from './gitCatFile.js';
 
 export const getFileAtBranch = async (
@@ -21,7 +21,7 @@ export const getFileAtBranch = async (
   catch( e ) {
     if ( ( e as IntentionalPerennialAny ).message.includes( 'invalid object name' ) && ( e as IntentionalPerennialAny ).message.includes( branch ) ) {
 
-      await createLocalBranchFromRemote( branch );
+      await ensureLocalBranchFromRemote( branch );
       return gitCatFile( branch, file );
     }
     else {

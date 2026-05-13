@@ -21,7 +21,14 @@ export const gitFirstDivergingCommit = async (
   primaryTarget: string,
   secondaryTarget: string
 ): Promise<string> => {
-  return execute( 'git', [ 'log', `${secondaryTarget}...${primaryTarget}`, '--reverse', '--pretty=oneline' ], '..' ).then( stdout => {
+  // NOTE: This was switched from `git log secondary..primary --reverse --pretty=oneline` due to totality performance
+  // being horrible
+  return execute( 'git', [
+    'rev-list',
+    '--topo-order',
+    '--reverse',
+    `${secondaryTarget}...${primaryTarget}`
+  ], '..' ).then( stdout => {
     return Promise.resolve( stdout.trim().split( '\n' )[ 0 ].trim().split( ' ' )[ 0 ] );
   } );
 };
