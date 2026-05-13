@@ -98,6 +98,9 @@ export class RunnableBranch {
     return result;
   }
 
+  /**
+   * Updates the HTML with new versions, and commits/pushes
+   */
   public async updateHTMLVersion(): Promise<void> {
     winston.info( `Updating HTML for ${this.repo} with the new version strings` );
 
@@ -118,9 +121,13 @@ export class RunnableBranch {
     }
     if ( !( await this.checkout.isClean() ) ) {
       await this.checkout.gitCommit( `Bumping ${this.repo} dev${packageJSON.phet?.generatedUnitTests ? '/test' : ''} HTML with new version` );
+      await this.checkout.gitPush();
     }
   };
 
+  /**
+   * Sets the supported brands, and commits/pushes
+   */
   public async setSupportedBrands( brands: string[], message?: string ): Promise<void> {
     winston.info( `Setting supported brands from package.json for ${this.repo} at ${this.checkout.branch} to ${brands}` );
 
@@ -133,9 +140,12 @@ export class RunnableBranch {
     packageJSON.phet = packageJSON.phet || {};
     packageJSON.phet.supportedBrands = brands;
 
-    await this.setPackageJSONAndCommit( packageJSON, `Updating supported brands to [${brands}]${message ? `, ${message}` : ''}`);
+    await this.setPackageJSON( packageJSON, `Updating supported brands to [${brands}]${message ? `, ${message}` : ''}`);
   }
 
+  /**
+   * Sets the sim version, and commits/pushes
+   */
   public async setSimVersion( version: SimVersion, message?: string ): Promise<void> {
     winston.info( `Setting version from package.json for ${this.repo} to ${version.toString()}` );
 
@@ -160,8 +170,51 @@ export class RunnableBranch {
       await this.checkout.writeAddRelativeJSON( packageLockFile, packageLockObject );
     }
 
-    if ( !( this.checkout.isClean() ) ) {
+    if ( !await this.checkout.isClean() ) {
       await this.checkout.gitCommit( `Bumping ${this.repo} version to ${version.toString()}${message ? `, ${message}` : ''}` );
+      await this.checkout.gitPush();
+    }
+  }
+
+  /**
+   * Sets the package.json, and commits/pushes
+   */
+  public async setPackageJSON( packageJSON: PackageJSON, message: string ): Promise<void> {
+    const isClean = await this.checkout.isClean();
+    if ( !isClean ) {
+      throw new Error( `Unclean status, set package.json` );
+    }
+
+    await this.checkout.writeAddRelativeJSON( `${this.repo}/package.json`, packageJSON );
+
+    // Only commit if there was actually something changed
+    if ( !( await this.checkout.isClean() ) ) {
+      await this.checkout.gitCommit( message );
+      await this.checkout.gitPush();
+    }
+  }
+
+  public async updateProductionREADME(): Promise<void> {
+    winston.info( 'Updating branch README' );
+
+    try {
+      await execute( gruntCommand, [ 'published-readme', `--repo=${this.repo}` ], this.checkout.workingDirectory );
+    }
+    catch( e ) {
+      winston.info( 'published-readme error, may not exist, will try generate-published-README' );
+      try {
+        await execute( gruntCommand, [ 'generate-published-README', `--repo=${this.repo}` ], this.checkout.workingDirectory );
+      }
+      catch( e ) {
+        winston.info( 'No published README generation found' );
+      }
+    }
+
+    await this.checkout.gitAdd( `${this.repo}/README.md` );
+
+    if ( !await this.checkout.isClean() ) {
+      await this.checkout.gitCommit( `Generated published README.md for ${this.checkout.branch} as part of a production deploy` );
+      await this.checkout.gitPush();
     }
   }
 
@@ -225,17 +278,15 @@ export class RunnableBranch {
     return getBranchPackageJSON( this.repo, this.checkout.branch );
   }
 
-  public async setPackageJSONAndCommit( packageJSON: PackageJSON, message: string ): Promise<void> {
-    const isClean = await this.checkout.isClean();
-    if ( !isClean ) {
-      throw new Error( `Unclean status, set package.json` );
-    }
+  /**
+   * Returns the package.json parsed as a plain JS object.
+   */
+  public async getMainPackageJSON(): Promise<PackageJSON> {
+    return getBranchPackageJSON( this.repo, 'main' );
+  }
 
-    await this.checkout.writeAddRelativeJSON( `${this.repo}/package.json`, packageJSON );
-
-    // Only commit if there was actually something changed
-    if ( !( await this.checkout.isClean() ) ) {
-      await this.checkout.gitCommit( message );
-    }
+  public async isPublished(): Promise<boolean> {
+    // NOTE: we check on main here
+    return ( await this.getMainPackageJSON() ).phet?.published ?? false;
   }
 }

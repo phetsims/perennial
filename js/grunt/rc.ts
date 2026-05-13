@@ -6,7 +6,6 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import grunt from 'grunt';
 import SimVersion from '../browser-and-node/SimVersion';
 import { Repo } from '../browser-and-node/PerennialTypes.js';
 import { vpnCheck } from '../common/vpnCheck';
@@ -18,14 +17,16 @@ import { buildLocal } from '../common/buildLocal.js';
 import { devDirectoryExists } from '../common/devDirectoryExists';
 import { Checkout } from '../common/Checkout';
 import buildServerRequest from '../common/buildServerRequest';
+import winston from 'winston';
 
-const cancelLog = ( problem: unknown ) => grunt.log.writeln( 'Cancelling RC deployment: ' + problem );
-const handleError = ( problem: unknown ) => {
-  cancelLog( problem );
-  throw new Error( 'Aborted RC deployment: ' + problem );
-};
+class RCDeployError extends Error {
+  public constructor( message: string ) {
+    super( `Cancelling RC deployment: ${message}` );
+    this.name = 'RCDeployError';
+  }
+}
 
-export type RCOptions = {
+export type RCDeployOptions = {
   // Whether to skip user prompts and assume "yes" for all questions. Useful for maintenance/CI/etc.
   noninteractive?: boolean;
 
@@ -42,7 +43,7 @@ export type RCOptions = {
 export const rc = async (
   repo: Repo,
   branch: string,
-  options?: RCOptions
+  options?: RCDeployOptions
 ): Promise<SimVersion> => {
   const noninteractive = options?.noninteractive ?? false;
   const message = options?.message;
@@ -52,17 +53,16 @@ export const rc = async (
   SimVersion.ensureReleaseBranch( branch );
 
   if ( !( await vpnCheck() ) ) {
-    handleError( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
+    throw new RCDeployError( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
   }
 
-  const isClean = await gitIsClean();
-  if ( !isClean ) {
-    handleError( `Unclean status, cannot create release branch` );
+  if ( !await gitIsClean() ) {
+    throw new RCDeployError( `Unclean status on main checkout, cannot create release branch` );
   }
 
   if ( !( await hasRemoteBranch( Checkout.getReleaseBranchName( repo, branch ) ) ) ) {
     if ( noninteractive || !await booleanPrompt( `Release branch ${branch} does not exist. Create it?`, false ) ) {
-      handleError( 'Release branch does not exist' );
+      throw new RCDeployError( 'Release branch does not exist' );
     }
 
     const includePhetIO = await booleanPrompt( 'Include phet-io brand in release branch?', noninteractive );
@@ -79,16 +79,20 @@ export const rc = async (
     const packageJSON = await releaseBranch.getPackageJSON();
     if ( packageJSON?.phet?.[ 'phet-io' ] && packageJSON.phet[ 'phet-io' ].hasOwnProperty( 'validation' ) &&
          !packageJSON.phet[ 'phet-io' ].validation ) {
-      handleError( 'PhET-iO simulations require validation for RCs' );
+      throw new RCDeployError( 'PhET-iO simulations require validation for RCs' );
     }
   }
 
   await checkout.update();
 
+  if ( !await checkout.isClean() ) {
+    throw new RCDeployError( `Unclean status in ${checkout.branch}, cannot deploy` );
+  }
+
   const previousVersion = await releaseBranch.getSimVersion();
 
   if ( previousVersion.testType !== 'rc' && previousVersion.testType !== null ) {
-    handleError( `RC version number cannot be incremented safely: ${previousVersion}` );
+    throw new RCDeployError( `RC version number cannot be incremented safely: ${previousVersion}` );
   }
 
   const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance + ( previousVersion.testType === null ? 1 : 0 ), {
@@ -103,29 +107,27 @@ export const rc = async (
   const versionPathExists = await devDirectoryExists( versionPath );
 
   if ( versionPathExists ) {
-    handleError( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
+    throw new RCDeployError( `Directory ${versionPath} already exists.  If you intend to replace the content then remove the directory manually from ${buildLocal.devDeployServer}.` );
   }
 
   if ( !await booleanPrompt( `Deploy ${versionString} to ${buildLocal.devDeployServer}`, noninteractive ) ) {
-    handleError( '"Deploy" user request' );
+    throw new RCDeployError( '"Deploy" user request' );
   }
 
   // Now this is just a sanity check to ensure that we don't have errors that we're sending to the build server
   if ( !skipBuild ) {
     // No special options required here, as we send the main request to the build server
-    grunt.log.writeln( await releaseBranch.build( {
+    winston.info( await releaseBranch.build( {
       minify: !noninteractive
     } ) );
   }
 
   await releaseBranch.setSimVersion( version, message );
-  await checkout.gitPush();
 
   if ( !skipBuild && !await booleanPrompt( `Please test the built version of ${repo}.\nIs it ready to deploy`, noninteractive ) ) {
     await releaseBranch.setSimVersion( previousVersion, `Reverting deploy version for: ${message}` );
-    await checkout.gitPush();
 
-    handleError( `Built sim test failed, reverted back to ${previousVersion}` );
+    throw new RCDeployError( `Built sim test failed, reverted back to ${previousVersion}` );
   }
 
   // Send the build request
@@ -137,14 +139,14 @@ export const rc = async (
   const versionURL = `https://phet-dev.colorado.edu/html/${repo}/${versionString}`;
 
   if ( releaseBranch.brands.includes( 'phet' ) ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_all_phet.html` );
+    winston.info( `Deployed: ${versionURL}/phet/${repo}_all_phet.html` );
   }
   if ( releaseBranch.brands.includes( 'phet-io' ) ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/phet-io/` );
+    winston.info( `Deployed: ${versionURL}/phet-io/` );
   }
 
-  grunt.log.writeln( 'Please wait for the build-server to complete the deployment, and then test!' );
-  grunt.log.writeln( `To view the current build status, visit ${buildLocal.productionServerURL}/deploy-status` );
+  winston.info( 'Please wait for the build-server to complete the deployment, and then test!' );
+  winston.info( `To view the current build status, visit ${buildLocal.productionServerURL}/deploy-status` );
 
   return version;
 };

@@ -33,6 +33,9 @@ const winston = require( 'winston' );
  * @returns {Promise}
  */
 module.exports = async function createRelease( repo, branch, brands, message ) {
+
+  // TODO: REMOVE THIS, just call createReleaseBranchCheckout ??? ---- check compatibility
+
   const major = Number( branch.split( '.' )[ 0 ] );
   const minor = Number( branch.split( '.' )[ 1 ] );
   assert( major > 0, 'Major version for a branch should be greater than zero' );

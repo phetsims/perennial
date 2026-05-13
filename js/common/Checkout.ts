@@ -212,21 +212,20 @@ export class Checkout {
     // Ensure we have a checkout (so we can modify and push from that region).
     await checkout.update();
 
-    // Update the version info
+    // Update the version info (will push)
     await releaseBranch.setSupportedBrands( brands );
     await releaseBranch.setSimVersion( newVersion, message );
-    await checkout.gitPush();
 
     // TODO: WE NEED TO SUBSET THINGS, so we remove unneeded repos. We'll need to get dependencies.
 
     // Update the version info in main
     const mainRunnableBranch = await Checkout.getMainRunnableBranch( repo );
+    await mainRunnableBranch.checkout.gitPullRebase();
     await mainRunnableBranch.setSimVersion( new SimVersion( major, minor + 1, 0, {
       testType: 'dev',
       testNumber: 0
     } ), message );
     await mainRunnableBranch.updateHTMLVersion();
-    await mainRunnableBranch.checkout.gitPullRebase();
     await mainRunnableBranch.checkout.gitPush();
 
     return checkout;
@@ -700,5 +699,9 @@ export class Checkout {
 
   public async getRelativeJSON<T extends Object = IntentionalPerennialAny>( relativeFile: string ): Promise<T> {
     return JSON.parse( await getFileAtBranch( this.branch, relativeFile ) );
+  }
+
+  public existsRelative( relativeFile: string ): boolean {
+    return fs.existsSync( `${this.workingDirectory}/${relativeFile}` );
   }
 }

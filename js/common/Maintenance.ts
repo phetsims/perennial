@@ -14,8 +14,8 @@ import _ from 'lodash';
 import path from 'path';
 import repl from 'repl';
 import winston from 'winston';
-import production from '../grunt/production.js';
-import rc from '../grunt/rc.js';
+import { production } from '../grunt/production.js';
+import { rc } from '../grunt/rc.js';
 import build from './build.js';
 import checkoutMain from './checkoutMain.js';
 import checkoutTarget from './checkoutTarget.js';
@@ -952,7 +952,11 @@ class Maintenance {
         await Maintenance.cleanChipperDist();
         await Maintenance.cleanBuildDirectory( modifiedBranch.repo );
 
-        const version = await production( modifiedBranch.repo, modifiedBranch.branch, modifiedBranch.brands, true, false, modifiedBranch.pushedMessages.join( ', ' ) );
+        const version = await production( modifiedBranch.repo, modifiedBranch.branch, {
+          noninteractive: true,
+          message: modifiedBranch.pushedMessages.join( ', ' ),
+          // TODO: skipBuild?
+        } );
         modifiedBranch.deployedVersion = version;
         modifiedBranch.pushedMessages.length = 0;
         maintenance.save(); // save here in case a future failure would "revert" things
@@ -1084,7 +1088,8 @@ class Maintenance {
         message: message
         // TODO: skip build?
       } );
-      await production( releaseBranch.repo, releaseBranch.branch, releaseBranch.brands, true, false, {
+      await production( releaseBranch.repo, releaseBranch.branch, {
+        noninteractive: true,
         message: message
         // TODO: skip build?
       } );
