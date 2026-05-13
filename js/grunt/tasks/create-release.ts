@@ -11,8 +11,8 @@
 
 import assert from 'assert';
 import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
-import createRelease from '../createRelease.js';
 import getOption from './util/getOption.js';
+import { Checkout } from '../../common/Checkout.js';
 
 ( async () => {
 
@@ -28,5 +28,5 @@ import getOption from './util/getOption.js';
   assert( branch.split( '.' ).length === 2, 'Branch should be {{MAJOR}}.{{MINOR}}' );
 
   assertIsValidRepoName( repo );
-  await createRelease( repo, branch, brands.split( ',' ), message );
+  await Checkout.createReleaseBranchCheckout( repo, branch, brands.split( ',' ), message );
 } )();

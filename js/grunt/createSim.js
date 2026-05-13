@@ -33,6 +33,9 @@ const { readFileSync } = require( 'fs' );
  * @param {Object} [options]
  */
 module.exports = async function( repo, author, options ) {
+
+  // TODO: update for totality
+
   const {
     title = toTitle( repo ),
     clean = false

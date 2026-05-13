@@ -39,6 +39,8 @@ import SimVersion from '../browser-and-node/SimVersion.js';
 import { gitIsClean } from './gitIsClean';
 import { RunnableBranch } from './RunnableBranch.js';
 import { getBranchSimVersion } from './getBranchSimVersion.js';
+import { getActiveRunnables } from './getActiveRunnables.js';
+import { tsxCommand } from './tsxCommand.js';
 
 export const WORKTREE_DIRECTORY = buildLocal.releaseBranchesDirectory;
 
@@ -188,6 +190,7 @@ export class Checkout {
       throw new Error( 'Branch already exists, aborting' );
     }
 
+    winston.info( 'Setting the release branch version to rc.0 so it will auto-increment to rc.1 for the first RC deployment' );
     const newVersion = new SimVersion( major, minor, 0, {
       testType: 'rc',
       testNumber: 0
@@ -200,10 +203,13 @@ export class Checkout {
 
     const checkout = new Checkout( branch, Checkout.getWorktreeDirectory( branch ) );
 
+    // get dependencies from main
+    const dependencies = await ( await checkout.getRunnableBranch( repo ) ).getDependencies();
+
     const releaseBranch = new ReleaseBranch( checkout, repo, legacyBranch, brands, false );
     checkout.releaseBranch = releaseBranch;
 
-    winston.info( 'Setting the release branch version to rc.0 so it will auto-increment to rc.1 for the first RC deployment' );
+    winston.info( `Creating branch ${branch}` );
 
     // Create the branch in git, and push it directly (not using the other helpers, since we are doing this from the MAIN directory)
     await execute( 'git', [ 'checkout', '-b', branch ], '..' );
@@ -215,6 +221,19 @@ export class Checkout {
 
     // Ensure we have a checkout (so we can modify and push from that region).
     await checkout.update();
+
+    // Remove everything except for dependencies, '.git' (so our worktree works), and babel (since we just directly checked it out)
+    const topLevelFilesToRemove = ( await fsPromises.readdir( checkout.workingDirectory ) ).filter( file => {
+      return !dependencies.includes( file ) && file !== 'git' && file !== 'babel';
+    } );
+    for ( const file of topLevelFilesToRemove ) {
+      winston.info( `Removing ${file} from release branch worktree` );
+
+      await fsPromises.rm( `${checkout.workingDirectory}/${file}`, { recursive: true, force: true } );
+    }
+    await checkout.gitAddAll();
+    await checkout.gitCommit( `Initial commit for release branch ${branch}${message ? `: ${message}` : ''}` );
+    await checkout.gitPush();
 
     // Update the version info (will push)
     await releaseBranch.setSupportedBrands( brands );
@@ -230,7 +249,6 @@ export class Checkout {
       testNumber: 0
     } ), message );
     await mainRunnableBranch.updateHTMLVersion();
-    await mainRunnableBranch.checkout.gitPush();
 
     return checkout;
   }
@@ -346,6 +364,12 @@ export class Checkout {
     winston.info( `git add ${file}` );
 
     return execute( 'git', [ 'add', file ], this.workingDirectory );
+  }
+
+  public async gitAddAll(): Promise<string> {
+    winston.info( `git add ${file}` );
+
+    return execute( 'git', [ 'add', '-A' ], this.workingDirectory );
   }
 
   public async gitCommit( message: string ): Promise<string> {
@@ -664,6 +688,23 @@ export class Checkout {
     return fileContents;
   }
 
+  /**
+   * Returns a map of runnable => all dependency "repos" (including itself)
+   *
+   * NOTE: This will only work on "newer" checkouts (not old release branches), since it depends on print-multiple-dependencies
+   *
+   * NOTE: This does not include babel
+   */
+  public async getDependenciesMap( runnables: string[] = getActiveRunnables() ): Promise<Record<string, string[]>> {
+    return JSON.parse( await execute(
+      tsxCommand,
+      [
+        'js/scripts/print-multiple-dependencies.ts',
+        runnables.join( ',' )
+      ],
+      `${this.workingDirectory}/chipper`
+    ) );
+  }
 
   /**
    * Checks whether it is likely that the given file has an import for something. Used for convenience during

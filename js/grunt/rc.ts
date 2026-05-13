@@ -68,7 +68,7 @@ export const rc = async (
     const includePhetIO = await booleanPrompt( 'Include phet-io brand in release branch?', noninteractive );
     const brands = includePhetIO ? [ 'phet', 'phet-io' ] : [ 'phet' ];
 
-    await createRelease( repo, branch, brands );
+    await Checkout.createReleaseBranchCheckout( repo, branch, brands );
   }
 
   const releaseBranch = await Checkout.getReleaseBranch( repo, branch );

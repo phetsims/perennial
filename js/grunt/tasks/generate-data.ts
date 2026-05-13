@@ -17,46 +17,24 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
+import winston from 'winston';
 import { IntentionalPerennialAny } from '../../browser-and-node/PerennialTypes.js';
-
-const getActiveRepos = require( '../../common/getActiveRepos.js' );
-const getBranch = require( '../../common/getBranch.js' );
-const gitAdd = require( '../../common/gitAdd.js' );
-const gitCommit = require( '../../common/gitCommit.js' );
-const gitIsClean = require( '../../common/gitIsClean.js' );
-const gitPush = require( '../../common/gitPush.js' );
-const gitPull = require( '../../common/gitPull.js' );
-const isTotality = require( '../../common/isTotality.js' );
-const assert = require( 'assert' );
-const fs = require( 'fs' );
-const grunt = require( 'grunt' );
-const os = require( 'os' );
-const winston = require( 'winston' );
+import { getActiveRepos } from '../../common/getActiveRepos.js';
+import fs from 'fs';
+import os from 'os';
 
 /**
  * Generates the lists under perennial/data/, and if there were changes, will commit and push.
  */
 async function generateData(): Promise<void> {
 
-  // In the monorepo, there is no separate perennial repo to check branch/clean status on.
-  // The shell script handles git operations instead, in daily-grunt-work
-  if ( !isTotality ) {
-    if ( await getBranch( 'perennial' ) !== 'main' || !await gitIsClean( 'perennial' ) ) {
-      throw new Error( 'Data will only be generated if perennial is on main with no working-copy changes.' );
-    }
-  }
-
   const activeRepos: string[] = getActiveRepos();
 
   function writeList( name: string, packageFilter: ( repo: IntentionalPerennialAny ) => void ): void {
     const repos = activeRepos.filter( repo => {
       // In the monorepo, not all active repos are imported, so skip missing ones.
-      // In polyrepo, assert that all repos are checked out.
-      if ( !grunt.file.exists( `../${repo}` ) ) {
-        if ( isTotality ) {
-          return false;
-        }
-        assert( false, `Missing repo: ${repo}` );
+      if ( !fs.existsSync( `../${repo}` ) ) {
+        return false;
       }
 
       let packageObject;
@@ -69,7 +47,7 @@ async function generateData(): Promise<void> {
       return packageObject.phet && packageFilter( packageObject.phet );
     } );
 
-    grunt.log.writeln( `Writing to data/${name}` );
+    winston.info( `Writing to data/${name}` );
     fs.writeFileSync( `data/${name}`, repos.join( os.EOL ) + os.EOL );
   }
 
@@ -85,34 +63,6 @@ async function generateData(): Promise<void> {
   } );
 
   // In the monorepo, the shell script handles git add/commit/push for data file changes, in daily-grunt-work
-  if ( !isTotality ) {
-    await gitAdd( 'perennial', 'data/interactive-description' );
-    await gitAdd( 'perennial', 'data/voicing' );
-    await gitAdd( 'perennial', 'data/active-runnables' );
-    await gitAdd( 'perennial', 'data/active-sims' );
-    await gitAdd( 'perennial', 'data/unit-tests' );
-    await gitAdd( 'perennial', 'data/phet-io' );
-    await gitAdd( 'perennial', 'data/phet-io-api-stable' );
-
-    const hasChanges = !await gitIsClean( 'perennial' );
-    if ( hasChanges ) {
-      winston.info( 'Changes to data files detected, will push' );
-      await gitCommit( 'perennial', 'Automated update of perennial data files' );
-      await gitPush( 'perennial', 'main' );
-
-      const perennialAliasClean = await gitIsClean( 'perennial-alias' );
-      if ( perennialAliasClean ) {
-        await gitPull( 'perennial-alias', 'main' );
-      }
-      else {
-        winston.info( 'perennial-alias has changes, skipping pull' );
-      }
-
-    }
-    else {
-      winston.info( 'No changes detected' );
-    }
-  }
 }
 
 ( async () => generateData() )();

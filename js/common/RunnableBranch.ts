@@ -289,4 +289,9 @@ export class RunnableBranch {
     // NOTE: we check on main here
     return ( await this.getMainPackageJSON() ).phet?.published ?? false;
   }
+
+  // Fallback, ReleaseBranch can override
+  public async getDependencies(): Promise<string[]> {
+    return ( await this.checkout.getDependenciesMap( [ this.repo ] ) )[ this.repo ];
+  }
 }

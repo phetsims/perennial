@@ -66,6 +66,11 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
     return `${this.repo} ${this.branch} ${this.brands.join( ',' )}${this.isReleased ? '' : ' (unpublished)'}`;
   }
 
+  public override async getDependencies(): Promise<string[]> {
+    // TODO: read from new buildInfo.json file? We can't use the normal method
+    throw new Error( 'unimplemented' );
+  }
+
   /**
    * // TODO: UPDATE THIS so it only checks for the last SHA whether it is an "update" deployed message!
    * Returns a list of status messages of anything out-of-the-ordinary
