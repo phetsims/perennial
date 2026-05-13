@@ -1,6 +1,9 @@
 // Copyright 2021-2026, University of Colorado Boulder
 
 /**
+ * TODO: decide on what we'll want to keep or pull from this.
+ * TODO: likely will have a top-level list of "non-totality" repos, and we might still want to have something like this?
+ *
  * The main logic behind the sync grunt task (js/grunt/tasks/sync.ts).
  *
  * Generally a "one-stop shop" for all things needed to update the PhET Codebase. By default, this will:

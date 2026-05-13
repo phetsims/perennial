@@ -10,7 +10,7 @@
  */
 import assert from 'assert';
 import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
-import dev from '../dev.js';
+import { dev } from '../dev.js';
 import getOption from './util/getOption.js';
 
 ( async () => {
@@ -20,7 +20,10 @@ import getOption from './util/getOption.js';
 
   assertIsValidRepoName( repo );
 
-  await dev( repo, getOption( 'brands' ).split( ',' ), !!getOption( 'noninteractive' ), 'main', getOption( 'message' ) );
+  await dev( repo, {
+    noninteractive: !!getOption( 'noninteractive' ),
+    message: getOption( 'message' )
+  } );
 
   // When running tsx in combination with readline, the process does not exit properly, so we need to force it. See https://github.com/phetsims/perennial/issues/389
   process.exit( 0 );

@@ -12,16 +12,12 @@
 
 import assert from 'assert';
 import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
-import checkoutMain from '../../common/checkoutMain.js';
-import checkoutTarget from '../../common/checkoutTarget.js';
-import getBranch from '../../common/getBranch.js';
-import dev from '../dev.js';
+import { getBranch } from '../../common/getBranch.js';
+import { dev } from '../dev.js';
 import getOption from './util/getOption.js';
+import { gitCheckout } from '../../common/gitCheckout.js';
 
 ( async () => {
-
-  // TODO: (... how will we handle branch naming and stuff?)
-  throw new Error( 'unimplemented' );
 
   const repo = getOption( 'repo' );
   const brands = getOption( 'brands' );
@@ -32,14 +28,18 @@ import getOption from './util/getOption.js';
 
   let branch = getOption( 'branch' );
   if ( !branch ) {
-    branch = await getBranch( repo );
+    branch = await getBranch();
     console.log( `--branch not provided, using ${branch} detected from ${repo}` );
   }
   assert( branch !== 'main', 'One-off deploys for main are unsupported.' );
 
-  await checkoutTarget( repo, branch );
-  await dev( repo, brands.split( ',' ), !!getOption( 'noninteractive' ), branch, getOption( 'message' ) );
-  await checkoutMain( repo );
+  await gitCheckout( branch );
+  await dev( repo, {
+    oneOffBranch: branch,
+    noninteractive: !!getOption( 'noninteractive' ),
+    message: getOption( 'message' )
+  } );
+  await gitCheckout( 'main' );
 
   // When running tsx in combination with readline, the process does not exit properly, so we need to force it. See https://github.com/phetsims/perennial/issues/389
   process.exit( 0 );

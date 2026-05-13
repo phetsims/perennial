@@ -74,6 +74,10 @@ export class Checkout {
     return new Checkout( 'main', '..' );
   }
 
+  public static async getOneOffCheckout( branch: string): Promise<Checkout> {
+    return new Checkout( branch, '..' );
+  }
+
   public static async getReleaseBranchCheckout( repo: string, legacyBranch: string ): Promise<Checkout> {
     const branch = Checkout.getReleaseBranchName( repo, legacyBranch );
 

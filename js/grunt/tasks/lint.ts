@@ -15,7 +15,7 @@ import lint from '../../eslint/lint.js';
 import getOption, { isOptionKeyProvided } from './util/getOption.js';
 import getRepo from './util/getRepo.js';
 
-export const lintPromise = ( async () => {
+( async () => {
 
   let repos = [ getRepo() ];
   if ( isOptionKeyProvided( 'repos' ) ) {

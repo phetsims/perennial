@@ -6,29 +6,37 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-const SimVersion = require( '../browser-and-node/SimVersion' ).default;
-const booleanPrompt = require( '../common/booleanPrompt' );
-const build = require( '../common/build' );
-const buildLocal = require( '../common/buildLocal' );
-const devDirectoryExists = require( '../common/devDirectoryExists' );
-const devScp = require( '../common/devScp' );
-const devSsh = require( '../common/devSsh' );
-const getBranch = require( '../common/getBranch' );
-const getBranchSHAMap = require( '../common/getBranchSHAMap' );
-const { getRunnableVersion } = require( '../common/getRunnableVersion' );
-const gitIsClean = require( '../common/gitIsClean' );
-const getDependencyRepos = require( '../common/getDependencyRepos' );
-const gitPush = require( '../common/gitPush' );
-const gitRevParse = require( '../common/gitRevParse' );
-const lintProject = require( '../common/lintProject' );
-const isTotality = require( '../common/isTotality' );
-const npmUpdate = require( '../common/npmUpdate' );
-const setRunnableVersion = require( '../common/setRunnableVersion' );
-const vpnCheck = require( '../common/vpnCheck' );
-const writePhetioHtaccess = require( '../common/writePhetioHtaccess' ).default;
-const assert = require( 'assert' );
-const grunt = require( 'grunt' );
-const { readFileSync } = require( 'fs' );
+import SimVersion from '../browser-and-node/SimVersion';
+import assert from 'assert';
+import { vpnCheck } from '../common/vpnCheck';
+import { getBranch } from '../common/getBranch.js';
+import { Checkout } from '../common/Checkout';
+import { lintProject } from '../common/lintProject';
+import { buildLocal } from '../common/buildLocal';
+import { devDirectoryExists } from '../common/devDirectoryExists.js';
+import { booleanPrompt } from '../common/booleanPrompt.js';
+import winston from 'winston';
+import writePhetioHtaccess from '../common/writePhetioHtaccess.js';
+import { devSsh } from '../common/devSsh.js';
+import { devScp } from '../common/devScp.js';
+
+class DevDeployError extends Error {
+  public constructor( message: string ) {
+    super( `Cancelling Dev deployment: ${message}` );
+    this.name = 'DevDeployError';
+  }
+}
+
+export type DevDeployOptions = {
+  // If present and non-main, this will trigger a one-off deploy
+  oneOffBranch?: string;
+
+  // Whether to skip user prompts and assume "yes" for all questions. Useful for maintenance/CI/etc.
+  noninteractive?: boolean;
+
+  // Optional message to append to the version-increment commit.
+  message?: string;
+};
 
 /**
  * Deploys a dev version after incrementing the test version number.
@@ -41,7 +49,17 @@ const { readFileSync } = require( 'fs' );
  * @param {string} [message] - Optional message to append to the version-increment commit.
  * @returns {Promise}
  */
-module.exports = async function dev( repo, brands, noninteractive, branch, message ) {
+export const dev = async (
+  repo: string,
+  options?: DevDeployOptions
+): Promise<SimVersion> => {
+  const noninteractive = options?.noninteractive ?? false;
+  const message = options?.message;
+  const branch = options?.oneOffBranch ?? 'main';
+
+  const checkout = branch === 'main' ? await Checkout.getMainCheckout() : await Checkout.getOneOffCheckout( branch );
+  const runnableBranch = await checkout.getRunnableBranch( repo );
+
   const isOneOff = branch !== 'main';
   const testType = isOneOff ? branch : 'dev';
   if ( isOneOff ) {
@@ -52,12 +70,12 @@ module.exports = async function dev( repo, brands, noninteractive, branch, messa
     throw new Error( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
   }
 
-  const currentBranch = await getBranch( repo );
+  const currentBranch = await getBranch();
   if ( currentBranch !== branch ) {
     throw new Error( `${testType} deployment should be on the branch ${branch}, not: ${currentBranch ? currentBranch : '(detached head)'}` );
   }
 
-  const previousVersion = await getRunnableVersion( repo );
+  const previousVersion = await runnableBranch.getSimVersion();
 
   if ( previousVersion.testType !== testType ) {
     if ( isOneOff ) {
@@ -68,34 +86,21 @@ module.exports = async function dev( repo, brands, noninteractive, branch, messa
     }
   }
 
-  const dependencies = await getDependencyRepos( repo );
-  for ( let i = 0; i < dependencies.length; i++ ) {
-    const dependency = dependencies[ i ];
-    const isClean = await gitIsClean( dependency );
-    if ( !isClean ) {
-      throw new Error( `Unclean status in ${dependency}, cannot deploy` );
-    }
+  if ( !await checkout.isClean() ) {
+    throw new DevDeployError( `Unclean status in ${checkout.branch}, cannot deploy` );
   }
 
-  const currentSHA = await gitRevParse( repo, 'HEAD' );
-  const latestSHA = ( await getBranchSHAMap( repo ) )[ branch ];
-  if ( currentSHA !== latestSHA ) {
-    // See https://github.com/phetsims/chipper/issues/699
-    throw new Error( `Out of date with remote, please push or pull repo. Current SHA: ${currentSHA}, latest SHA: ${latestSHA}` );
-  }
-
-  // Ensure we don't try to request an unsupported brand
-  const supportedBrands = JSON.parse( readFileSync( `../${repo}/package.json`, 'utf8' ) ).phet.supportedBrands || [];
-  brands.forEach( brand => assert( supportedBrands.includes( brand ), `Brand ${brand} not included in ${repo}'s supported brands: ${supportedBrands.join( ',' )}` ) );
+  // Ensure we are up-to-date with the remote on this branch
+  await checkout.gitPullRebase();
 
   // Ensure that the repository and its dependencies pass lint before continuing.
   // See https://github.com/phetsims/perennial/issues/76
-  await lintProject( repo );
+  await lintProject( repo ); // NOTE: This does NOT use a checkout-relative path, but a relative path
 
   // Bump the version
   const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, {
     testType: testType,
-    testNumber: previousVersion.testNumber + 1
+    testNumber: previousVersion.testNumber! + 1
   } );
 
   const versionString = version.toString();
@@ -113,19 +118,13 @@ module.exports = async function dev( repo, brands, noninteractive, branch, messa
     throw new Error( `Aborted ${testType} deploy` );
   }
 
-  // Make sure our correct npm dependencies are set. In the monorepo, you can run without node_modules in the sim repo, see https://github.com/phetsims/totality/issues/27
-  if ( !isTotality ) {
-    await npmUpdate( repo );
-  }
-  await npmUpdate( 'chipper' );
-  await npmUpdate( 'perennial-alias' );
+  await checkout.npmUpdateRepo( 'chipper' );
+  await checkout.npmUpdateRepo( 'perennial-alias' );
 
   await runnableBranch.setSimVersion( version, message );
   await runnableBranch.updateHTMLVersion();
-  await gitPush( repo, branch );
 
-  grunt.log.writeln( await build( repo, {
-    brands: brands,
+  winston.info( await runnableBranch.build( {
     allHTML: true,
     debugHTML: true
   } ) );
@@ -133,7 +132,7 @@ module.exports = async function dev( repo, brands, noninteractive, branch, messa
   // If there is a protected directory and we are copying to the dev server, include the .htaccess file
   // This is for PhET-iO simulations, to protected the password protected wrappers, see
   // https://github.com/phetsims/phet-io/issues/641
-  if ( brands.includes( 'phet-io' ) && buildLocal.devDeployServer === 'bayes.colorado.edu' ) {
+  if ( runnableBranch.brands.includes( 'phet-io' ) && buildLocal.devDeployServer === 'bayes.colorado.edu' ) {
     const htaccessLocation = `../${repo}/build/phet-io`;
     await writePhetioHtaccess( repo, htaccessLocation, {
       checkoutDir: '../'
@@ -149,16 +148,18 @@ module.exports = async function dev( repo, brands, noninteractive, branch, messa
   await devSsh( `mkdir -p "${versionPath}"` );
 
   // Copy the build contents into the version-specific directory
-  for ( const brand of brands ) {
+  for ( const brand of runnableBranch.brands ) {
     await devScp( `../${repo}/build/${brand}`, `${versionPath}/` );
   }
 
   const versionURL = `https://phet-dev.colorado.edu/html/${repo}/${versionString}`;
 
-  if ( brands.includes( 'phet' ) ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/phet/${repo}_all_phet.html` );
+  if ( runnableBranch.brands.includes( 'phet' ) ) {
+    winston.info( `Deployed: ${versionURL}/phet/${repo}_all_phet.html` );
   }
-  if ( brands.includes( 'phet-io' ) ) {
-    grunt.log.writeln( `Deployed: ${versionURL}/phet-io/` );
+  if ( runnableBranch.brands.includes( 'phet-io' ) ) {
+    winston.info( `Deployed: ${versionURL}/phet-io/` );
   }
+
+  return version;
 };

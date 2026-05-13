@@ -2,8 +2,9 @@
 
 /**
  * Prints out a list of all release branches that would need maintenance patches
- * --repo : Only show branches for a specific repository
- * --order=<ORDER> : alphabetical|date
+ *   --repo : Only show branches for a specific repository
+ *   --order=<ORDER> : alphabetical|date
+ *
  * @author Jonathan Olson (PhET Interactive Simulations)
  * */
 
@@ -11,9 +12,9 @@ import assert from 'assert';
 import _ from 'lodash';
 import winston from 'winston';
 import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
-import Maintenance from '../../common/Maintenance.js';
 import getOption from './util/getOption.js';
 import { Checkout } from '../../common/Checkout.js';
+import { ReleaseBranch } from '../../common/ReleaseBranch.js';
 
 ( async () => {
 
@@ -29,16 +30,13 @@ import { Checkout } from '../../common/Checkout.js';
 
   assert( order === 'alphabetical' || order === 'date', `unsupported order type: ${order}` );
 
-  // TODO: rewrite (!!!), shouldn't be too bad
-  // TODO: Need to rewrite the maintenance bits first
-  const branches = await Maintenance.getMaintenanceBranches( releaseBranch => !repo || releaseBranch.repo === repo,
-    true, true );
+  const releaseBranches = await Checkout.getMaintainedReleaseBranches();
 
-  let structures = [];
-  for ( const branch of branches ) {
+  let structures: { releaseBranch: ReleaseBranch; timestamp: number }[] = [];
+  for ( const releaseBranch of releaseBranches ) {
     structures.push( {
-      branch: branch,
-      timestamp: await branch.getDivergingTimestamp()
+      releaseBranch: releaseBranch,
+      timestamp: await releaseBranch.checkout.getDivergingTimestamp()
     } );
   }
 
@@ -48,6 +46,6 @@ import { Checkout } from '../../common/Checkout.js';
 
   console.log( '\nRelease branches:\n{repo} {branch} {brand[,brand]+} {date}\n' );
   for ( const struct of structures ) {
-    console.log( `${struct.branch.toString()} ${new Date( struct.timestamp ).toISOString().split( 'T' )[ 0 ]}` );
+    console.log( `${struct.releaseBranch.toString()} ${new Date( struct.timestamp ).toISOString().split( 'T' )[ 0 ]}` );
   }
 } )();
