@@ -1,6 +1,7 @@
 // Copyright 2023, University of Colorado Boulder
 // @author Matt Pennington (PhET Interactive Simulations)
 
+// TODO: potentially patch? Also copyright format issue
 
 const fs = require( 'fs' );
 const execute = require( './execute' ).default;
@@ -13,6 +14,6 @@ module.exports = async function gitCloneOrFetchDirectory( repo, directory ) {
     await gitCloneDirectory( repo, directory );
   }
   else {
-    await execute( 'git', [ 'fetch' ], repoPwd );
+    await gitMutableExecute( [ 'fetch' ], repoPwd );
   }
 };

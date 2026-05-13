@@ -6,7 +6,7 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
+import { gitImmutableExecute } from './gitMutex.js';
 
 /**
  * Executes git commit
@@ -14,7 +14,7 @@ import execute from './execute.js';
  * @param sha - The SHA of the commit
  */
 export const gitDoesCommitExist = async ( sha: string ): Promise<boolean> => {
-  const result = await execute( 'git', [ 'cat-file', '-e', sha ], '..', {
+  const result = await gitImmutableExecute( [ 'cat-file', '-e', sha ], '..', {
     errors: 'resolve'
   } );
 

@@ -6,8 +6,8 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
 import winston from 'winston';
+import { gitMutableExecute } from './gitMutex.js';
 
 /**
  * Executes git checkout -b {{BRANCH}}
@@ -20,5 +20,5 @@ import winston from 'winston';
 export const gitCreateBranch = async ( branch: string ): Promise<string> => {
   winston.info( `git checkout -b ${branch}` );
 
-  return execute( 'git', [ 'checkout', '-b', branch ], '..' );
+  return gitMutableExecute( [ 'checkout', '-b', branch ], '..' );
 };

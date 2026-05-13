@@ -6,7 +6,7 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
+import { gitImmutableExecute } from './gitMutex.js';
 
 /**
  * Provides the timestamp of the latest commit
@@ -14,7 +14,7 @@ import execute from './execute.js';
  * @returns Resolves to the timestamp (getTime() --- i.e. milliseconds)
  */
 export const gitLastCommitTimestamp = async (): Promise<number> => {
-  return execute( 'git', [ 'log', '-1', '--pretty=format:%cd', '--date=iso' ], '..' ).then( stdout => {
+  return gitImmutableExecute( [ 'log', '-1', '--pretty=format:%cd', '--date=iso' ], '..' ).then( stdout => {
     return Promise.resolve( new Date( stdout.trim() ).getTime() );
   } );
 };

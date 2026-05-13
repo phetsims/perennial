@@ -10,6 +10,7 @@
 const cloneRepo = require( './cloneRepo' );
 const getMissingRepos = require( './getMissingRepos' );
 const winston = require( 'winston' );
+const { gitMutableExecute } = require( './gitMutex' );
 const execute = require( './execute' ).default;
 
 /**
@@ -32,7 +33,9 @@ module.exports = async ( omitPrivate, reposToCheck ) => {
       winston.info( `Could not clone ${repo}, did you mean to omit private repos with  -p?` );
       throw e;
     }
-    await execute( 'git', [ 'init', '--template=../phet-info/git-template-dir' ], `../${repo}` );
+
+    // TODO: if we keep this, mutex
+    await gitMutableExecute( [ 'init', '--template=../phet-info/git-template-dir' ], `../${repo}` );
   }
 
   return missingRepos;

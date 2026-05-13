@@ -6,8 +6,8 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
 import winston from 'winston';
+import { gitImmutableExecute } from './gitMutex.js';
 
 /**
  * @returns {Promise.<Object>} - Object map from branch => sha {string}
@@ -18,7 +18,7 @@ export const getBranchSHAMap = async (): Promise<Record<string, string>> => {
 
   const map: Record<string, string> = {};
 
-  ( await execute( 'git', [ 'ls-remote' ], '..' ) ).split( '\n' ).forEach( line => {
+  ( await gitImmutableExecute( [ 'ls-remote' ], '..' ) ).split( '\n' ).forEach( line => {
     const match = line.trim().match( /^(\S+)\s+refs\/heads\/(\S+)$/ );
     if ( match ) {
       map[ match[ 2 ] ] = match[ 1 ];

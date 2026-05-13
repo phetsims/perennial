@@ -3,6 +3,8 @@
 /**
  * Rebases and pushes repos that are ahead of origin, with consolidated status/error output.
  *
+ * TODO: this is now not needed, remove?
+ *
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 

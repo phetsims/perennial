@@ -6,8 +6,8 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
 import winston from 'winston';
+import { gitMutableExecute } from './gitMutex.js';
 
 /**
  * Executes git cherry-pick (but if it fails, it will back out of the cherry-pick)
@@ -19,10 +19,10 @@ import winston from 'winston';
 export const gitCherryPick = async ( target: string ): Promise<boolean> => {
   winston.info( `git cherry-pick ${target} ` );
 
-  return execute( 'git', [ 'cherry-pick', target ], '..' ).then( stdout => Promise.resolve( true ), cherryPickError => {
+  return gitMutableExecute( [ 'cherry-pick', target ], '..' ).then( stdout => Promise.resolve( true ), cherryPickError => {
     winston.info( `git cherry-pick failed (aborting): ${target}` );
 
-    return execute( 'git', [ 'cherry-pick', '--abort' ], '..' ).then( stdout => Promise.resolve( false ), abortError => {
+    return gitMutableExecute( [ 'cherry-pick', '--abort' ], '..' ).then( stdout => Promise.resolve( false ), abortError => {
       winston.error( `git cherry-pick --abort failed: ${target}` );
       return Promise.reject( abortError );
     } );

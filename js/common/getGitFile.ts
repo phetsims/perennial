@@ -6,11 +6,13 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
+import { gitImmutableExecute } from './gitMutex.js';
 
 /**
  * Gets the contents of a file at a specific git branch/SHA/object
  * @public
+ *
+ * TODO: see if we can remove this, we have the branched form which seems better
  *
  * @param gitObject - The branch/SHA/object name
  * @param filename - The filename - relative to the root of the repository
@@ -18,5 +20,5 @@ import execute from './execute.js';
  * @rejects {ExecuteError}
  */
 export const getGitFile = async function( gitObject: string, filename: string ): Promise<string> {
-  return execute( 'git', [ 'show', `${gitObject}:./${filename}` ], '..' );
+  return gitImmutableExecute( [ 'show', `${gitObject}:./${filename}` ], '..' );
 };

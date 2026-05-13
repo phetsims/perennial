@@ -10,7 +10,7 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
+import { gitImmutableExecute } from './gitMutex.js';
 
 /**
  * @param {string} primaryTarget - Branch/SHA
@@ -23,7 +23,7 @@ export const gitFirstDivergingCommit = async (
 ): Promise<string> => {
   // NOTE: This was switched from `git log secondary..primary --reverse --pretty=oneline` due to totality performance
   // being horrible
-  return execute( 'git', [
+  return gitImmutableExecute( [
     'rev-list',
     '--topo-order',
     '--reverse',

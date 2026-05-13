@@ -3,11 +3,13 @@
 /**
  * git fetch
  *
+ * TODO: can we remove this, rely on Checkout?
+ *
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute';
 import winston from 'winston';
+import { gitMutableExecute } from './gitMutex.js';
 
 /**
  * Executes git fetch
@@ -18,5 +20,5 @@ import winston from 'winston';
 export const gitFetch = async (): Promise<string> => {
   winston.info( 'git fetch' );
 
-  return execute( 'git', [ 'fetch' ], '..' );
+  return gitMutableExecute( [ 'fetch' ], '..' );
 };

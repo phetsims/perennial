@@ -3,6 +3,9 @@
 /**
  * For `grunt create-one-off`, see Gruntfile for details
  *
+ * TODO: potentially get rid of this, aren't we hooking into the Checkout methods directly? Or update this:
+ * TODO: update this
+ *
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 

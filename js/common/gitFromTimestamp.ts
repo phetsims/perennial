@@ -6,7 +6,7 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
+import { gitImmutableExecute } from './gitMutex.js';
 
 /**
  * Gets the best SHA from a given branch at the given timestamp
@@ -20,7 +20,7 @@ export const gitFromTimestamp = async(
   branch: string,
   timestamp: string
 ): Promise<string> => {
-  return execute( 'git', [ 'rev-list', '-1', `--before="${timestamp}"`, branch ], '..' ).then( stdout => {
+  return gitImmutableExecute( [ 'rev-list', '-1', `--before="${timestamp}"`, branch ], '..' ).then( stdout => {
     const sha = stdout.trim();
     if ( sha.length === 0 ) {
       return Promise.reject( new Error( 'No matching SHA for timestamp' ) );

@@ -7,7 +7,7 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
+import { gitImmutableExecute } from './gitMutex.js';
 
 /**
  * Gets the contents of the file at a given state in the git tree
@@ -22,5 +22,5 @@ export const gitCatFile = async(
   file: string,
   branchOrSha = 'HEAD'
 ): Promise<string> => {
-  return execute( 'git', [ 'cat-file', 'blob', `${branchOrSha}:${file}` ], '..' );
+  return gitImmutableExecute( [ 'cat-file', 'blob', `${branchOrSha}:${file}` ], '..' );
 };

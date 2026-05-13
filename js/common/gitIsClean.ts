@@ -6,8 +6,8 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
 import winston from 'winston';
+import { gitImmutableExecute } from './gitMutex.js';
 
 /**
  * Checks to see if the git state/status is clean
@@ -26,5 +26,5 @@ export const gitIsClean = async( file?: string ): Promise<boolean> => {
   if ( file ) {
     gitArgs.push( file );
   }
-  return execute( 'git', gitArgs, '..' ).then( stdout => Promise.resolve( stdout.length === 0 ) );
+  return gitImmutableExecute( gitArgs, '..' ).then( stdout => Promise.resolve( stdout.length === 0 ) );
 };

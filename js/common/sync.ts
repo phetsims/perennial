@@ -170,6 +170,7 @@ export const sync = async ( providedOptions?: Partial<SyncOptions> ): Promise<bo
   async function pullAllBranches( repo: string ): Promise<void> {
     const branches = await getBranches(); // TODO: handle syncing here
     for ( const branch of branches ) {
+      // TODO: if updating, use gitImmutableExecute( or gitMutableExecute
       // Only track the remote branch if it hasn't been tracked yet
       if ( ( await execute( 'git', [ 'rev-parse', '--verify', branch ], `../${repo}`, { errors: 'resolve' } ) ).code !== 0 ) {
         await gitFetch( repo );

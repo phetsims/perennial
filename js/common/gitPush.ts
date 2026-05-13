@@ -6,8 +6,8 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
 import winston from 'winston';
+import { gitMutableExecute } from './gitMutex.js';
 
 /**
  * Executes git push
@@ -19,5 +19,5 @@ import winston from 'winston';
 export const gitPush = async ( remoteBranch: string = 'main' ): Promise<string> => {
   winston.info( `git push to ${remoteBranch}` );
 
-  return execute( 'git', [ 'push', '-u', 'origin', remoteBranch ], '..' );
+  return gitMutableExecute( [ 'push', '-u', 'origin', remoteBranch ], '..' );
 };

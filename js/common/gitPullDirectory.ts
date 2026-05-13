@@ -7,8 +7,8 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute';
 import winston from 'winston';
+import { gitMutableExecute } from './gitMutex.js';
 
 /**
  * Executes git pull
@@ -20,5 +20,5 @@ import winston from 'winston';
 export const gitPullDirectory = async ( directory: string ): Promise<string> => {
   winston.info( `git pull in ${directory}` );
 
-  return execute( 'git', [ 'pull' ], directory );
+  return gitMutableExecute( [ 'pull' ], directory );
 };

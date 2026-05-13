@@ -6,8 +6,8 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
 import winston from 'winston';
+import { gitMutableExecute } from './gitMutex.js';
 
 /**
  * Executes git pull
@@ -18,5 +18,5 @@ import winston from 'winston';
 export const gitPullRebase = async (): Promise<string> => {
   winston.info( `git pull --rebase` );
 
-  return execute( 'git', [ 'pull', '--rebase' ], '..' );
+  return gitMutableExecute( [ 'pull', '--rebase' ], '..' );
 };

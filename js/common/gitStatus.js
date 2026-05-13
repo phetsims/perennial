@@ -29,6 +29,8 @@ module.exports = async function( repo ) {
   // This is needed to get the below `git rev-list` with ${u} to actually compare with the remote state.
   await execute( 'git', [ 'remote', 'update' ], `../${repo}` );
 
+  // TODO: update executes to gitImmutableExecute( or the mutable form
+
   result.symbolicRef = await execute( 'git', [ 'symbolic-ref', '-q', 'HEAD' ], `../${repo}` );
   result.branch = await getBranch( repo ); // might be empty string
   result.sha = await gitRevParse( repo, 'HEAD' );

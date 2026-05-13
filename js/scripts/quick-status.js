@@ -4,6 +4,8 @@
  * A fast-running status check. NOTE: Only checks the local status, does NOT check the server. Use the full status for
  * that if needed.
  *
+ * TODO: likely not needed, remove?
+ *
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 

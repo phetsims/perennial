@@ -6,8 +6,8 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
 import winston from 'winston';
+import { gitMutableExecute } from './gitMutex.js';
 
 /**
  * Executes git add
@@ -19,5 +19,5 @@ import winston from 'winston';
 export const gitAdd = async( file: string ): Promise<string> => {
   winston.info( `git add ${file}` );
 
-  return execute( 'git', [ 'add', file ], '..' );
+  return gitMutableExecute( [ 'add', file ], '..' );
 };

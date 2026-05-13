@@ -6,17 +6,17 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
 import { IntentionalPerennialAny } from '../browser-and-node/PerennialTypes.js';
 import { ensureLocalBranchFromRemote } from './ensureLocalBranchFromRemote.js';
 import { gitCatFile } from './gitCatFile.js';
+import { gitImmutableExecute } from './gitMutex.js';
 
 export const getFileAtBranch = async (
   branch: string,
   file: string
 ): Promise<string> => {
   try {
-    return execute( 'git', [ 'cat-file', 'blob', `${branch}:${file}` ], '..' );
+    return gitImmutableExecute( [ 'cat-file', 'blob', `${branch}:${file}` ], '..' );
   }
   catch( e ) {
     if ( ( e as IntentionalPerennialAny ).message.includes( 'invalid object name' ) && ( e as IntentionalPerennialAny ).message.includes( branch ) ) {

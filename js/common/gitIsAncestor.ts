@@ -6,8 +6,8 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
 import winston from 'winston';
+import { gitImmutableExecute } from './gitMutex.js';
 
 export const gitIsAncestor = async (
   possibleAncestor: string,
@@ -15,7 +15,7 @@ export const gitIsAncestor = async (
 ): Promise<boolean> => {
   winston.info( `git check for whether ${possibleAncestor} is an ancestor of ${possibleDescendant}` );
 
-  return execute( 'git', [ 'merge-base', '--is-ancestor', possibleAncestor, possibleDescendant ], '..' ).then( stdout => Promise.resolve( true ), mergeError => {
+  return gitImmutableExecute( [ 'merge-base', '--is-ancestor', possibleAncestor, possibleDescendant ], '..' ).then( stdout => Promise.resolve( true ), mergeError => {
     if ( mergeError.code === 1 ) {
       return Promise.resolve( false );
     }

@@ -3,11 +3,14 @@
 /**
  * git checkout
  *
+ * TODO: try to minimize usage of this?
+ *
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 import execute from './execute.js';
 import winston from 'winston';
+import { gitMutableExecute } from './gitMutex.js';
 
 /**
  * Executes git checkout
@@ -20,5 +23,5 @@ import winston from 'winston';
 export const gitCheckoutDirectory = async ( target: string, directory: string ): Promise<string> => {
   winston.info( `git checkout ${target} in ${directory}` );
 
-  return execute( 'git', [ 'checkout', target ], directory );
+  return gitMutableExecute( [ 'checkout', target ], directory );
 };

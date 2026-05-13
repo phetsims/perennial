@@ -6,8 +6,8 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
 import winston from 'winston';
+import { gitImmutableExecute } from './gitMutex.js';
 
 /**
  * Whether there is a remote branch for a given repo.
@@ -18,7 +18,7 @@ import winston from 'winston';
 export const hasRemoteBranch = async ( branch: string ): Promise<boolean> => {
   winston.debug( `checking for remote branch ${branch}` );
 
-  const stdout = await execute( 'git', [ 'ls-remote', '--heads', `https://github.com/phetsims/totality.git`, branch ], '..' );
+  const stdout = await gitImmutableExecute( [ 'ls-remote', '--heads', `https://github.com/phetsims/totality.git`, branch ], '..' );
 
   if ( stdout.trim().length === 0 ) {
     return false;

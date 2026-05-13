@@ -8,20 +8,20 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
 import winston from 'winston';
+import { gitImmutableExecute, gitMutableExecute } from './gitMutex.js';
 
 export const ensureLocalBranchFromRemote = async ( branch: string ): Promise<void> => {
   winston.info( `ensuring local branch from remote: ${branch}` );
 
-  await execute( 'git', [
+  await gitMutableExecute( [
     'fetch',
     'origin',
     branch
   ], '..' );
 
   const exists = (
-    await execute( 'git', [
+    await gitImmutableExecute( [
       'show-ref',
       '--verify',
       '--quiet',
@@ -30,7 +30,7 @@ export const ensureLocalBranchFromRemote = async ( branch: string ): Promise<voi
   ).code === 0;
 
   if ( !exists ) {
-    await execute( 'git', [
+    await gitMutableExecute( [
       'branch',
       '--track',
       branch,
@@ -38,7 +38,7 @@ export const ensureLocalBranchFromRemote = async ( branch: string ): Promise<voi
     ], '..' );
   }
   else {
-    await execute( 'git', [
+    await gitMutableExecute( [
       'branch',
       '--set-upstream-to',
       `origin/${branch}`,

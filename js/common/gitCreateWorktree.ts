@@ -1,5 +1,7 @@
 // Copyright 2026, University of Colorado Boulder
 
+import { gitMutableExecute } from './gitMutex.js';
+
 /**
  * Creates a worktree for the given branch (or SHA, if detach:true is provided)
  *
@@ -20,7 +22,7 @@ export const gitCreateWorktree = async (
 ): Promise<void> => {
   const detach = options?.detach ?? false;
 
-  return execute( 'git', [
+  return gitMutableExecute( [
     'worktree',
     'add',
     ...( detach ? [ '--detach' ] : [] ),

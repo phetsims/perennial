@@ -6,7 +6,7 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
+import { gitImmutableExecute } from './gitMutex.js';
 
 /**
  * Provides the timestamp of any git target (branch/SHA)
@@ -15,7 +15,7 @@ import execute from './execute.js';
  * @returns - Resolves to the timestamp (epoch milliseconds)
  */
 export const gitTimestamp = async ( target: string ): Promise<number> => {
-  return execute( 'git', [ 'show', '-s', '--format=%cd', '--date=iso', target ], '..' ).then( stdout => {
+  return gitImmutableExecute( [ 'show', '-s', '--format=%cd', '--date=iso', target ], '..' ).then( stdout => {
     return Promise.resolve( new Date( stdout.trim() ).getTime() );
   } );
 };

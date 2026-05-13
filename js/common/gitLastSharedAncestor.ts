@@ -6,7 +6,7 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute';
+import { gitImmutableExecute } from './gitMutex.js';
 
 /**
  * Provides the SHA of the last shared ancestor commit between two targets (branches/SHAs)
@@ -16,7 +16,7 @@ import execute from './execute';
  * @returns Resolves to the SHA
  */
 export const gitLastSharedAncestor = async ( targetA: string, targetB: string ): Promise<string> => {
-  return execute( 'git', [ 'merge-base', targetA, targetB ], '..' ).then( stdout => {
+  return gitImmutableExecute( [ 'merge-base', targetA, targetB ], '..' ).then( stdout => {
     return Promise.resolve( stdout.trim() );
   } );
 };

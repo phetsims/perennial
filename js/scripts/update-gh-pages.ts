@@ -2,6 +2,9 @@
 
 /**
  * Updates the gh-pages branches for various repos, including building of dot/kite/scenery
+ *
+ * TODO: update this file
+ *
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 

@@ -6,14 +6,14 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
+import { gitImmutableExecute } from './gitMutex.js';
 
 /**
  * Gets a single commit for a given query
  * @returns {Promise.<string>} - Resolves to the SHA.
  */
 export const gitRevParse = async ( query: string ): Promise<string> => {
-  return execute( 'git', [ 'rev-parse', query ], '..' ).then( stdout => {
+  return gitImmutableExecute( [ 'rev-parse', query ], '..' ).then( stdout => {
     const sha = stdout.trim();
     if ( sha.length === 0 ) {
       return Promise.reject( new Error( 'No matching SHA' ) );

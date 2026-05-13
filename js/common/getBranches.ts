@@ -6,13 +6,13 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
 import winston from 'winston';
+import { gitImmutableExecute } from './gitMutex.js';
 
 export const getBranches = async (): Promise<string[]> => {
   winston.debug( 'retrieving branches' );
 
-  return ( await execute( 'git', [ 'ls-remote' ], '..' ) ).split( '\n' ).filter( line => line.includes( 'refs/heads/' ) ).map( line => {
+  return ( await gitImmutableExecute( [ 'ls-remote' ], '..' ) ).split( '\n' ).filter( line => line.includes( 'refs/heads/' ) ).map( line => {
     return line.match( /refs\/heads\/(.*)/ )![ 1 ].trim();
   } );
 };

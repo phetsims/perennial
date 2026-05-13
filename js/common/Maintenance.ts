@@ -729,7 +729,8 @@ class Maintenance {
           for ( const sha of patch.shas ) {
 
             // If the sha doesn't exist in the repo, then give a specific error for that.
-            const hasSha = ( await execute( 'git', [ 'cat-file', '-e', sha ], `../${patchRepo}`, { errors: 'resolve' } ) ).code === 0;
+            // TODO: do the checkout functions that are easier
+            const hasSha = ( await gitImmutableExecute( [ 'cat-file', '-e', sha ], `../${patchRepo}`, { errors: 'resolve' } ) ).code === 0;
             if ( !hasSha ) {
               throw new Error( `SHA not found in ${patchRepo}: ${sha}` );
             }
@@ -823,7 +824,7 @@ class Maintenance {
 
             if ( sha !== currentSHA ) {
               console.log( `Attempting to (hopefully fast-forward) merge ${sha}` );
-              await execute( 'git', [ 'merge', sha ], `../${dependency}` );
+              await gitMutableExecute( [ 'merge', sha ], `../${dependency}` );
               await gitPush( dependency, dependencyBranch );
             }
           }

@@ -6,8 +6,8 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
 import winston from 'winston';
+import { gitMutableExecute } from './gitMutex.js';
 
 /**
  * Executes git commit
@@ -19,5 +19,5 @@ import winston from 'winston';
 export const gitCommit = ( message: string ): Promise<string> => {
   winston.info( `git commit with message:\n${message}` );
 
-  return execute( 'git', [ 'commit', '--no-verify', '-m', message ], '..' );
+  return gitMutableExecute( [ 'commit', '--no-verify', '-m', message ], '..' );
 };

@@ -76,7 +76,7 @@ export class Checkout {
   }
 
   public static async hasWorktree( branch: string ): Promise<boolean> {
-    const worktreeData = await execute( 'git', [
+    const worktreeData = await gitImmutableExecute( [
       'worktree',
       'list',
       '--porcelain'
@@ -237,9 +237,9 @@ export class Checkout {
     winston.info( `Creating branch ${branch}` );
 
     // Create the branch in git, and push it directly (not using the other helpers, since we are doing this from the MAIN directory)
-    await execute( 'git', [ 'checkout', '-b', branch ], '..' );
-    await execute( 'git', [ 'push', '-u', 'origin', branch ], '..' ); // not using this.gitPush, since this is our first
-    await execute( 'git', [ 'checkout', 'main' ], '..' );
+    await gitMutableExecute( [ 'checkout', '-b', branch ], '..' );
+    await gitMutableExecute( [ 'push', '-u', 'origin', branch ], '..' ); // not using this.gitPush, since this is our first
+    await gitMutableExecute( [ 'checkout', 'main' ], '..' );
 
     // Ensure that we are remotely tracked now (sanity check)
     await ensureLocalBranchFromRemote( branch );
@@ -396,37 +396,37 @@ export class Checkout {
   public async gitAdd( file: string ): Promise<string> {
     winston.info( `git add ${file}` );
 
-    return execute( 'git', [ 'add', file ], this.workingDirectory );
+    return gitMutableExecute( [ 'add', file ], this.workingDirectory );
   }
 
   public async gitAddAll(): Promise<string> {
     winston.info( `git add -A` );
 
-    return execute( 'git', [ 'add', '-A' ], this.workingDirectory );
+    return gitMutableExecute( [ 'add', '-A' ], this.workingDirectory );
   }
 
   public async gitCommit( message: string ): Promise<string> {
     winston.info( `git commit with message:\n${message}` );
 
-    return execute( 'git', [ 'commit', '--no-verify', '-m', message ], this.workingDirectory );
+    return gitMutableExecute( [ 'commit', '--no-verify', '-m', message ], this.workingDirectory );
   }
 
   public async gitPush(): Promise<string> {
     winston.info( `git push to ${this.branch}` );
 
-    return execute( 'git', [ 'push', '-u', 'origin', this.branch ], this.workingDirectory );
+    return gitMutableExecute( [ 'push', '-u', 'origin', this.branch ], this.workingDirectory );
   }
 
   public async gitPull(): Promise<string> {
     winston.info( `git pull in ${this.workingDirectory}` );
 
-    return execute( 'git', [ 'pull' ], this.workingDirectory );
+    return gitMutableExecute( [ 'pull' ], this.workingDirectory );
   }
 
   public async gitPullRebase(): Promise<string> {
     winston.info( `git pull --rebase in ${this.workingDirectory}` );
 
-    return execute( 'git', [ 'pull', '--rebase' ], this.workingDirectory );
+    return gitMutableExecute( [ 'pull', '--rebase' ], this.workingDirectory );
   }
 
   public async getSHA(): Promise<string> {
@@ -442,7 +442,7 @@ export class Checkout {
       gitArgs.push( file );
     }
 
-    return execute( 'git', gitArgs, this.workingDirectory ).then( stdout => Promise.resolve( stdout.length === 0 ) );
+    return gitImmutableExecute( gitArgs, this.workingDirectory ).then( stdout => Promise.resolve( stdout.length === 0 ) );
   }
 
   public async npmUpdateRepo( repo: string, options?: NPMUpdateOptions ): Promise<void> {
@@ -474,11 +474,15 @@ export class Checkout {
 
       if ( fs.existsSync( `${this.workingDirectory}/babel` ) ) {
         winston.info( 'pulling babel in worktree' );
-        await execute( 'git', [ 'pull' ], `${this.workingDirectory}/babel` );
+
+        // NOTE: marked as "immutable" because we are the only ones who are doing this (and it isn't our main tree)
+        await gitImmutableExecute( [ 'pull' ], `${this.workingDirectory}/babel` );
       }
       else {
         winston.info( 'cloning babel into worktree' );
-        await execute( 'git', [ 'clone', 'https://github.com/phetsims/babel.git' ], this.workingDirectory );
+
+        // NOTE: marked as "immutable" because we are the only ones who are doing this (and it isn't our main tree)
+        await gitImmutableExecute( [ 'clone', 'https://github.com/phetsims/babel.git' ], this.workingDirectory );
       }
 
       for ( const npmRepo of [ 'chipper', 'perennial-alias', this.releaseBranch.repo ] ) {
@@ -515,7 +519,7 @@ export class Checkout {
       winston.info( `removing worktree at ${this.workingDirectory}` );
 
       // double-force for babel
-      await execute( 'git', [ 'worktree', 'remove', this.workingDirectory, '--force', '--force' ], '.' );
+      await gitMutableExecute( [ 'worktree', 'remove', this.workingDirectory, '--force', '--force' ], '.' );
     }
   }
 
@@ -676,7 +680,7 @@ export class Checkout {
       await this.fetchOrigin();
 
       // Create the local branch, and have it track properly
-      await execute( 'git', [
+      await gitMutableExecute( [
         'branch',
         '--track',
         branch,
@@ -685,7 +689,7 @@ export class Checkout {
     }
     else if ( !await this.hasUpstreamBranch( branch ) ) {
       // Track the already-existing branch
-      await execute( 'git', [
+      await gitMutableExecute( [
         'branch',
         '--set-upstream-to',
         `origin/${branch}`,
@@ -704,7 +708,7 @@ export class Checkout {
   public async ensureUpdatedBranchWithFetch( branch: string ): Promise<void> {
     await this.ensureUpstreamBranch( branch );
 
-    await execute( 'git', [ 'fetch', 'origin', `${branch}:${branch}` ], this.workingDirectory );
+    await gitMutableExecute( [ 'fetch', 'origin', `${branch}:${branch}` ], this.workingDirectory );
   }
 
   /**
@@ -718,7 +722,7 @@ export class Checkout {
     await this.ensureUpstreamBranch( branch );
 
     const canFastForward = (
-      await execute( 'git', [
+      await gitMutableExecute( [
         'merge-base',
         '--is-ancestor',
         branch,
@@ -727,7 +731,7 @@ export class Checkout {
     ).code === 0;
 
     if ( canFastForward ) {
-      await execute( 'git', [
+      await gitMutableExecute( [
         'branch',
         '-f',
         branch,
