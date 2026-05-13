@@ -11,6 +11,8 @@ const assert = require( 'assert' );
 const axios = require( 'axios' );
 const winston = require( 'winston' );
 
+// TODO: TS-this and update
+
 /**
  * Sends a request to the build server.
  * @public
@@ -22,11 +24,12 @@ const winston = require( 'winston' );
  * @param {Object} [options]
  * @returns {Promise} - No resolved value
  */
-module.exports = async function( repo, version, branch, dependencies, options ) {
+module.exports = async function( repo, version, branch, totalitySHA, options ) {
+
+  // TODO: handle brands removal
 
   const {
     locales = '*',
-    brands = [ 'phet', 'phet-io' ],
     servers = [ 'dev' ] // {Array.<string>}, currently 'dev' and 'production' are supported
   } = options || {};
 

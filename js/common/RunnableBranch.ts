@@ -7,11 +7,10 @@ import { puppeteerLoad } from './puppeteerLoad.js';
 import { BuildOptions, getBuildArguments } from './getBuildArguments.js';
 import _ from 'lodash';
 import SimVersion from '../browser-and-node/SimVersion.js';
-import { getBranchVersion } from './getBranchVersion.js';
-import { IntentionalPerennialAny, PackageJSON } from '../browser-and-node/PerennialTypes.js';
+import { PackageJSON } from '../browser-and-node/PerennialTypes.js';
 import { getBranchPackageJSON } from './getBranchPackageJSON.js';
-import { writeJSON } from './writeJSON.js';
 import fs from 'fs';
+import { getBranchSimVersion } from './getBranchSimVersion.js';
 
 export class RunnableBranch {
 
@@ -74,7 +73,7 @@ export class RunnableBranch {
     }
   }
 
-  public async build( options?: Partial<BuildOptions>, executeOptions?: ExecuteOptions & { errors?: 'reject' } ): Promise<void> {
+  public async build( options?: Partial<BuildOptions>, executeOptions?: ExecuteOptions & { errors?: 'reject' } ): Promise<string> {
     const args = getBuildArguments( await this.checkout.getChipperVersion(), _.merge( {
       brands: this.brands,
       allHTML: true,
@@ -96,6 +95,7 @@ export class RunnableBranch {
       throw new Error( 'phet-io dependencies missing' );
     }
 
+    return result;
   }
 
   public async updateHTMLVersion(): Promise<void> {
@@ -215,7 +215,7 @@ export class RunnableBranch {
    * Returns the SimVersion for this release branch
    */
   public async getSimVersion(): Promise<SimVersion> {
-    return getBranchVersion( this.repo, this.checkout.branch );
+    return getBranchSimVersion( this.repo, this.checkout.branch );
   }
 
   /**

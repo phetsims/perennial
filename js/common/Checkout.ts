@@ -18,7 +18,6 @@ import { gitPullDirectory } from './gitPullDirectory.js';
 import execute from './execute.js';
 import { npmUpdateDirectory, NPMUpdateOptions } from './npmUpdateDirectory.js';
 import { ReleaseBranch } from './ReleaseBranch.js';
-import { getBranchVersion } from './getBranchVersion.js';
 import { getBranchBrands } from './getBranchBrands.js';
 import { ChipperVersion } from './ChipperVersion.js';
 import { getFileAtBranch } from './getFileAtBranch.js';
@@ -31,7 +30,6 @@ import simMetadata, { SimMetadata } from './simMetadata';
 import simPhetioMetadata, { SimPhetioMetadata } from './simPhetioMetadata.js';
 import { getActiveSims } from './getActiveSims';
 import { getBranches } from './getBranches.js';
-import _ from 'lodash';
 import os from 'os';
 import { IntentionalPerennialAny } from '../browser-and-node/PerennialTypes.js';
 import assert from 'assert';
@@ -40,6 +38,7 @@ import { hasRemoteBranch } from './hasRemoteBranch.js';
 import SimVersion from '../browser-and-node/SimVersion.js';
 import { gitIsClean } from './gitIsClean';
 import { RunnableBranch } from './RunnableBranch.js';
+import { getBranchSimVersion } from './getBranchSimVersion.js';
 
 export const WORKTREE_DIRECTORY = buildLocal.releaseBranchesDirectory;
 
@@ -80,7 +79,7 @@ export class Checkout {
 
     const checkout = new Checkout( branch, Checkout.getWorktreeDirectory( branch ) );
 
-    const simVersion = await getBranchVersion( repo, branch );
+    const simVersion = await getBranchSimVersion( repo, branch );
 
     const supportedBrands = await getBranchBrands( repo, branch );
 
@@ -368,6 +367,10 @@ export class Checkout {
     winston.info( `git pull --rebase in ${this.workingDirectory}` );
 
     return execute( 'git', [ 'pull', '--rebase' ], this.workingDirectory );
+  }
+
+  public async getSHA(): Promise<string> {
+    return gitRevParse( this.branch );
   }
 
   public async isClean( file?: string ): Promise<boolean> {

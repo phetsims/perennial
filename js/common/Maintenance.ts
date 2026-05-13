@@ -910,7 +910,10 @@ class Maintenance {
         await Maintenance.cleanChipperDist();
         await Maintenance.cleanBuildDirectory( modifiedBranch.repo );
 
-        const version = await rc( modifiedBranch.repo, modifiedBranch.branch, modifiedBranch.brands, true, modifiedBranch.pushedMessages.join( ', ' ) );
+        const version = await rc( modifiedBranch.repo, modifiedBranch.branch, {
+          noninteractive: true,
+          message: modifiedBranch.pushedMessages.join( ', ' )
+        } );
         modifiedBranch.deployedVersion = version;
         maintenance.save(); // save here in case a future failure would "revert" things
       }
@@ -1076,8 +1079,15 @@ class Maintenance {
       }
 
       console.log( releaseBranch.toString() );
-      await rc( releaseBranch.repo, releaseBranch.branch, releaseBranch.brands, true, message );
-      await production( releaseBranch.repo, releaseBranch.branch, releaseBranch.brands, true, false, message );
+      await rc( releaseBranch.repo, releaseBranch.branch, {
+        noninteractive: true,
+        message: message
+        // TODO: skip build?
+      } );
+      await production( releaseBranch.repo, releaseBranch.branch, releaseBranch.brands, true, false, {
+        message: message
+        // TODO: skip build?
+      } );
     }
 
     console.log( 'Finished redeploying' );

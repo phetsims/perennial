@@ -10,7 +10,7 @@ import SimVersion from '../browser-and-node/SimVersion.js';
 import winston from 'winston';
 import { getBranchPackageJSON } from './getBranchPackageJSON.js';
 
-export const getBranchRunnableVersion = async ( runnable: string, totalityBranch: string ): Promise<SimVersion> => {
+export const getBranchSimVersion = async ( runnable: string, totalityBranch: string ): Promise<SimVersion> => {
   winston.debug( `Reading version from package.json for ${runnable} from ${totalityBranch}` );
 
   return SimVersion.parse( ( await getBranchPackageJSON( runnable, totalityBranch ) ).version );
