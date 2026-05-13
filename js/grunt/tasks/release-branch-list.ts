@@ -15,6 +15,7 @@ import getOption from './util/getOption.js';
 import { Checkout } from '../../common/Checkout.js';
 import { ReleaseBranch } from '../../common/ReleaseBranch.js';
 import pLimit from 'p-limit';
+import { gitFetch } from '../../common/gitFetch.js';
 
 ( async () => {
 
@@ -28,6 +29,10 @@ import pLimit from 'p-limit';
   }
 
   assert( order === 'alphabetical' || order === 'date', `unsupported order type: ${order}` );
+
+  // Fetch, so we get up-to-date timestamps below
+  // TODO: how many other operations need this at the start?
+  await gitFetch();
 
   const releaseBranches = await Checkout.getMaintainedReleaseBranches();
 

@@ -670,12 +670,10 @@ export class Checkout {
   }
 
   /**
-   * NOTE: DO NOT run concurrently
-   *
-   * TODO: when calling this, check whether we should PULL. Many times we should pull
+   * Returns whether the origin was fetched as part of this (so we can skip it elsewhere)
    */
-  public async ensureUpstreamBranch( branch: string ): Promise<void> {
-    if ( !await this.hasLocalBranch( branch ) ) {
+  public async ensureUpstreamBranch(): Promise<boolean> {
+    if ( !await this.hasLocalBranch( this.branch ) ) {
       // If we are missing the branch, then kick off a full fetch so that the next things don't error
       await this.fetchOrigin();
 
@@ -683,63 +681,83 @@ export class Checkout {
       await gitMutableExecute( [
         'branch',
         '--track',
-        branch,
-        `origin/${branch}`
+        this.branch,
+        `origin/${this.branch}`
       ], this.workingDirectory );
+
+      return true;
     }
-    else if ( !await this.hasUpstreamBranch( branch ) ) {
+    else if ( !await this.hasUpstreamBranch( this.branch ) ) {
       // Track the already-existing branch
       await gitMutableExecute( [
         'branch',
         '--set-upstream-to',
-        `origin/${branch}`,
-        branch
+        `origin/${this.branch}`,
+        this.branch
       ], this.workingDirectory );
     }
+
+    return false;
   }
 
   /**
-   * This will run its own fetch to update the branch.
+   * Updates the branch (like git pull, without forcing a checkout) with a fetch, and then a fast-forward merge if it
+   * is checked out, or a fetch with refspec if it is not checked out.
    *
-   * NOTE: DO NOT run concurrently
-   *
-   * TODO: enforce concurrency limit, where is the git mutex?
+   * NOTE: This is needed because one method only works when the branch is checked out, and the other only works
+   * when the branch is NOT checked out. Major pain, yes.
    */
-  public async ensureUpdatedBranchWithFetch( branch: string ): Promise<void> {
-    await this.ensureUpstreamBranch( branch );
+  public async gitUpdateWithFetch(): Promise<void> {
+    const fetched = await this.ensureUpstreamBranch();
 
-    await gitMutableExecute( [ 'fetch', 'origin', `${branch}:${branch}` ], this.workingDirectory );
-  }
+    if ( this.isCheckedOut ) {
+      if ( !fetched ) {
+        await this.fetchOrigin();
+      }
 
-  /**
-   * This will run its own update branch with no fetch (assuming `fetchOrigin()` or equivalent has been run)
-   *
-   * NOTE: DO NOT run concurrently
-   *
-   * TODO: enforce concurrency limit, where is the git mutex?
-   */
-  public async ensureUpdatedBranchWithoutFetch( branch: string ): Promise<void> {
-    await this.ensureUpstreamBranch( branch );
-
-    const canFastForward = (
+      // After fetching, this should do a fast-forward as needed
       await gitMutableExecute( [
-        'merge-base',
-        '--is-ancestor',
-        branch,
-        `origin/${branch}`
-      ], this.workingDirectory, { errors: 'resolve' } )
-    ).code === 0;
-
-    if ( canFastForward ) {
-      await gitMutableExecute( [
-        'branch',
-        '-f',
-        branch,
-        `origin/${branch}`
+        'merge',
+        '--ff-only',
+        `origin/${this.branch}`
       ], this.workingDirectory );
     }
     else {
-      throw new Error( `${branch} cannot be fast-forwarded to origin/${branch}` );
+      // If this branch is NOT checked out (anywhere!), we can do a fast-forward like this so we can still git cat-file out things, etc.
+      await gitMutableExecute( [
+        'fetch',
+        'origin',
+        `${this.branch}:${this.branch}`
+      ], this.workingDirectory );
+    }
+  }
+
+  /**
+   * Updates the branch (like git pull, without forcing a checkout) without  a fetch, and then a fast-forward merge if it
+   * is checked out, or a fetch with refspec if it is not checked out.
+   *
+   * Assumes that a fetch was done recently (and we don't want to hit the backend again)
+   *
+   * NOTE: This is needed because one method only works when the branch is checked out, and the other only works
+   * when the branch is NOT checked out. Major pain, yes.
+   */
+  public async gitUpdateWithoutFetch(): Promise<void> {
+    await this.ensureUpstreamBranch()
+
+    if ( this.isCheckedOut ) {
+      await gitMutableExecute( [
+        'merge',
+        '--ff-only',
+        `origin/${this.branch}`
+      ], this.workingDirectory );
+    }
+    else {
+      await gitMutableExecute( [
+        'branch',
+        '-f',
+        this.branch,
+        `origin/${this.branch}`
+      ], this.workingDirectory );
     }
   }
 
@@ -749,8 +767,7 @@ export class Checkout {
    * NOTE: fetches are needed before this, so things are up-to-date (!)
    */
   public async getDivergingSHA(): Promise<string> {
-    // TODO: figure out better-performance ways than doing this here. This takes a while for totality, affects release-branch-list
-    await ensureLocalBranchFromRemote( this.branch );
+    await this.gitUpdateWithoutFetch();
 
     winston.info( 'getting first diverging commit' );
     return gitFirstDivergingCommit( this.branch, 'main' );
