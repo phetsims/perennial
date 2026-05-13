@@ -363,7 +363,7 @@ export class Checkout {
       }
     }
 
-    const limit = pLimit( 1 ); // limit to 5 concurrent requests
+    const limit = pLimit( 10 ); // limit to 5 concurrent requests
 
     return Promise.all( stubs.map( stub => limit( () => Checkout.getReleaseBranch( stub.repo, stub.branch ) ) ) );
   }
@@ -617,10 +617,113 @@ export class Checkout {
     return new Date( timestamp ).toISOString().split( 'T' )[ 0 ];
   }
 
+  public async fetchOrigin(): Promise<void> {
+    winston.info( `fetching origin for ${this.branch}` );
+
+    await execute( 'git', [ 'fetch', 'origin' ], this.workingDirectory );
+  }
+
+  public async hasUpstreamBranch( branch: string ): Promise<boolean> {
+    return ( await execute( 'git', [
+      'rev-parse',
+      '--abbrev-ref',
+      '--symbolic-full-name',
+      `${branch}@{upstream}`
+    ], this.workingDirectory, { errors: 'resolve' } ) ).code === 0;
+  }
+
+  public async hasLocalBranch( branch: string ): Promise<boolean> {
+    return (
+      await execute( 'git', [
+        'show-ref',
+        '--verify',
+        '--quiet',
+        `refs/heads/${branch}`
+      ], this.workingDirectory, { errors: 'resolve' } )
+    ).code === 0;
+  }
+
+  /**
+   * NOTE: DO NOT run concurrently
+   *
+   * TODO: when calling this, check whether we should PULL. Many times we should pull
+   */
+  public async ensureUpstreamBranch( branch: string ): Promise<void> {
+    if ( !await this.hasLocalBranch( branch ) ) {
+      // If we are missing the branch, then kick off a full fetch so that the next things don't error
+      await this.fetchOrigin();
+
+      // Create the local branch, and have it track properly
+      await execute( 'git', [
+        'branch',
+        '--track',
+        branch,
+        `origin/${branch}`
+      ], this.workingDirectory );
+    }
+    else if ( !await this.hasUpstreamBranch( branch ) ) {
+      // Track the already-existing branch
+      await execute( 'git', [
+        'branch',
+        '--set-upstream-to',
+        `origin/${branch}`,
+        branch
+      ], this.workingDirectory );
+    }
+  }
+
+  /**
+   * This will run its own fetch to update the branch.
+   *
+   * NOTE: DO NOT run concurrently
+   *
+   * TODO: enforce concurrency limit, where is the git mutex?
+   */
+  public async ensureUpdatedBranchWithFetch( branch: string ): Promise<void> {
+    await this.ensureUpstreamBranch( branch );
+
+    await execute( 'git', [ 'fetch', 'origin', `${branch}:${branch}` ], this.workingDirectory );
+  }
+
+  /**
+   * This will run its own update branch with no fetch (assuming `fetchOrigin()` or equivalent has been run)
+   *
+   * NOTE: DO NOT run concurrently
+   *
+   * TODO: enforce concurrency limit, where is the git mutex?
+   */
+  public async ensureUpdatedBranchWithoutFetch( branch: string ): Promise<void> {
+    await this.ensureUpstreamBranch( branch );
+
+    const canFastForward = (
+      await execute( 'git', [
+        'merge-base',
+        '--is-ancestor',
+        branch,
+        `origin/${branch}`
+      ], this.workingDirectory, { errors: 'resolve' } )
+    ).code === 0;
+
+    if ( canFastForward ) {
+      await execute( 'git', [
+        'branch',
+        '-f',
+        branch,
+        `origin/${branch}`
+      ], this.workingDirectory );
+    }
+    else {
+      throw new Error( `${branch} cannot be fast-forwarded to origin/${branch}` );
+    }
+  }
+
   /**
    * The SHA at which this release branch's main repository diverged from main.
+   *
+   * NOTE: fetches are needed before this, so things are up-to-date (!)
    */
   public async getDivergingSHA(): Promise<string> {
+    // TODO: figure out better-performance ways than doing this here. This takes a while for totality, affects release-branch-list
     await ensureLocalBranchFromRemote( this.branch );
 
     winston.info( 'getting first diverging commit' );

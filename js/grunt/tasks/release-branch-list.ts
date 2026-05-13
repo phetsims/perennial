@@ -10,11 +10,11 @@
 
 import assert from 'assert';
 import _ from 'lodash';
-import winston from 'winston';
 import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
 import getOption from './util/getOption.js';
 import { Checkout } from '../../common/Checkout.js';
 import { ReleaseBranch } from '../../common/ReleaseBranch.js';
+import pLimit from 'p-limit';
 
 ( async () => {
 
@@ -33,16 +33,22 @@ import { ReleaseBranch } from '../../common/ReleaseBranch.js';
 
   console.log( `Found ${releaseBranches.length} release branches, inspecting for divergence dates` );
 
+  const limit = pLimit( 10 ); // concurrent git operations
+
   let structures: { releaseBranch: ReleaseBranch; timestamp: number }[] = [];
-  for ( const releaseBranch of releaseBranches ) {
+
+  await Promise.all( releaseBranches.map( releaseBranch => limit( async () => {
     structures.push( {
       releaseBranch: releaseBranch,
       timestamp: await releaseBranch.checkout.getDivergingTimestamp()
     } );
-  }
+  } ) ) );
 
   if ( order === 'date' ) {
     structures = _.sortBy( structures, struct => struct.timestamp );
+  }
+  else {
+    structures = _.sortBy( structures, struct => struct.releaseBranch.toString() );
   }
 
   console.log( '\nRelease branches:\n{repo} {branch} {brand[,brand]+} {date}\n' );
