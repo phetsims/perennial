@@ -231,6 +231,10 @@ export class Checkout {
 
       await fsPromises.rm( `${checkout.workingDirectory}/${file}`, { recursive: true, force: true } );
     }
+
+    // Add in a minimal .gitignore
+    await fsPromises.writeFile( `${checkout.workingDirectory}/.gitignore`, `/babel/${os.EOL}.DS_Store${os.EOL}` );
+
     await checkout.gitAddAll();
     await checkout.gitCommit( `Initial commit for release branch ${branch}${message ? `: ${message}` : ''}` );
     await checkout.gitPush();
@@ -367,7 +371,7 @@ export class Checkout {
   }
 
   public async gitAddAll(): Promise<string> {
-    winston.info( `git add ${file}` );
+    winston.info( `git add -A` );
 
     return execute( 'git', [ 'add', '-A' ], this.workingDirectory );
   }

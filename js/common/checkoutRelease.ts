@@ -6,20 +6,14 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-const checkoutTarget = require( './checkoutTarget' );
-const simMetadata = require( './simMetadata' ).default;
-const assert = require( 'assert' );
-const winston = require( 'winston' );
+import winston from 'winston';
+import simMetadata from './simMetadata';
+import { Checkout } from './Checkout.js';
 
 /**
  * Checks out the latest release branch (and dependencies) for a repository.
- * @public
- *
- * @param {string} repo - The repository name
- * @param {boolean} includeNpmUpdate
- * @returns {Promise.<Array.<string>>} - Resolves with checkedOutRepos
  */
-module.exports = async function( repo, includeNpmUpdate ) {
+export const checkoutRelease = async ( repo: string ) => {
   winston.info( `checking out release for ${repo}` );
 
   const data = await simMetadata( {
@@ -30,5 +24,5 @@ module.exports = async function( repo, includeNpmUpdate ) {
 
   const branch = `${data.projects[ 0 ].version.major}.${data.projects[ 0 ].version.minor}`;
 
-  return checkoutTarget( repo, branch, includeNpmUpdate );
+  await ( await Checkout.getReleaseBranchCheckout( repo, branch ) ).update();
 };

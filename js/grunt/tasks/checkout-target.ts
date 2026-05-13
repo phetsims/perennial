@@ -10,8 +10,8 @@
  */
 import assert from 'assert';
 import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
-import checkoutTarget from '../../common/checkoutTarget.js';
 import getOption from './util/getOption.js';
+import { Checkout } from '../../common/Checkout.js';
 
 ( async () => {
   const repo = getOption( 'repo' );
@@ -23,6 +23,5 @@ import getOption from './util/getOption.js';
 
   assertIsValidRepoName( repo );
 
-
-  await checkoutTarget( repo, target, !getOption( 'skipNpmUpdate' ) );
+  await ( await Checkout.getReleaseBranchCheckout( repo, target ) ).update();
 } )();

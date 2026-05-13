@@ -9,10 +9,10 @@
 import execute from './execute.js';
 import { npmCommand } from './npmCommand.js';
 import winston from 'winston';
-import asyncMutex from 'async-mutex';
+import { Mutex } from 'async-mutex';
 import fs from 'fs';
 
-const mutex = new asyncMutex.Mutex();
+const mutex = new Mutex();
 
 export type NPMUpdateOptions = {
   minimal?: boolean;

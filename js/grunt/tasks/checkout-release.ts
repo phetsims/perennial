@@ -7,8 +7,8 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';
-import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
-import checkoutRelease from '../../common/checkoutRelease.js';
+import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
+import { checkoutRelease } from '../../common/checkoutRelease.js';
 import getOption from './util/getOption.js';
 
 ( async () => {
@@ -17,7 +17,5 @@ import getOption from './util/getOption.js';
   assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
   assertIsValidRepoName( repo );
 
-  await checkoutRelease( repo, !getOption( 'skipNpmUpdate' ) );
-
-  // TODO: get Checkout/ReleaseBranch and update()
+  await checkoutRelease( repo );
 } )();
