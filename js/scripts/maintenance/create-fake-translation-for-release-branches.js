@@ -6,7 +6,7 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-const Maintenance = require( '../../common/Maintenance' ).default;
+const Maintenance = require( '../../common/maintenance/Maintenance' ).default;
 const winston = require( 'winston' );
 const fs = require( 'fs' );
 

@@ -6,14 +6,14 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-type PatchSerialized = {
+export type PatchSerialized = {
   repo: string;
   name: string;
   message: string;
   shas: string[];
 };
 
-class Patch implements PatchSerialized {
+export class Patch implements PatchSerialized {
   public constructor( public readonly repo: string, public readonly name: string, public readonly message: string, public readonly shas: string[] = [] ) {}
 
   /**
@@ -35,5 +35,3 @@ class Patch implements PatchSerialized {
     return new Patch( repo, name, message, shas );
   }
 }
-
-export default Patch;

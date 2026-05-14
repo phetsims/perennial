@@ -32,7 +32,7 @@ import winston from 'winston';
 export const githubCreateIssue = async (
   repo: string,
   title: string,
-  options: Octokit.RequestOptions & Octokit.IssuesCreateParams
+  options: Partial<Octokit.RequestOptions & Octokit.IssuesCreateParams>
 ): Promise<void> => {
   winston.info( `Creating issue for ${repo}` );
 

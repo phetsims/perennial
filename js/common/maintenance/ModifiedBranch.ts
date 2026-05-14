@@ -9,15 +9,11 @@
 
 import assert from 'assert';
 import _ from 'lodash';
-import SimVersion from '../browser-and-node/SimVersion.js';
-import checkoutDependencies from './checkoutDependencies.js';
-import getDependencies from './getDependencies.js';
-import gitCheckout from './gitCheckout.js';
-import githubCreateIssue from './githubCreateIssue.js';
-import gitPull from './gitPull.js';
-import Patch from './Patch.js';
-import ReleaseBranch from './ReleaseBranch.js';
-import { Checkout } from './Checkout.js';
+import SimVersion from '../../browser-and-node/SimVersion.js';
+import { ReleaseBranch } from '../ReleaseBranch.js';
+import { Patch } from './Patch.js';
+import { Checkout } from '../Checkout.js';
+import { githubCreateIssue } from '../githubCreateIssue.js';
 
 // Keys are repo names, values are SHAs
 type Dependencies = Record<string, string>;
@@ -46,7 +42,7 @@ export type DeployedLinkOptions = {
   migration?: boolean;
 };
 
-class ModifiedBranch {
+export class ModifiedBranch {
   public readonly repo: string;
   public readonly branch: string;
   public readonly brands: string[];
@@ -91,8 +87,17 @@ class ModifiedBranch {
    * For "patches" param, we only want to store patches in one location, so don't fully save the info.
    *
    */
-  public static async deserialize( { releaseBranch, changedDependencies, neededPatches = [], pendingMessages, pushedMessages, deployedVersion }: ModifiedBranchSerialized, patches: Patch[] ): Promise<ModifiedBranch> {
-    // TODO: handle await everywhere for this
+  public static async deserialize(
+    {
+      releaseBranch,
+      changedDependencies,
+      neededPatches = [],
+      pendingMessages,
+      pushedMessages,
+      deployedVersion
+    }: ModifiedBranchSerialized,
+    patches: Patch[]
+  ): Promise<ModifiedBranch> {
     return new ModifiedBranch(
       await Checkout.getReleaseBranch( releaseBranch.repo, releaseBranch.branch ),
       changedDependencies,
@@ -198,14 +203,9 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
     const colorProfilesString = nonDefaultColorProfiles.length ? ` colorProfiles: ${nonDefaultColorProfiles.join( ',' )}` : '';
 
     const supportedRegionsAndCultures = simFeatures.supportedRegionsAndCultures ?? [];
-    const regionsAndCulturesString = supportedRegionsAndCultures.length ? ` supportedRegionsAndCultures: ${simFeatures.supportedRegionsAndCultures.join( ',' )}` : '';
+    const regionsAndCulturesString = supportedRegionsAndCultures.length ? ` supportedRegionsAndCultures: ${supportedRegionsAndCultures.join( ',' )}` : '';
 
     const features = Object.keys( simFeatures ).filter( feature => feature !== 'colorProfiles' && feature !== 'supportedRegionsAndCultures' );
-
-    // console.log( 'features', features );
-    // console.log( 'nonDefaultColorProfiles', nonDefaultColorProfiles );
-    // console.log( 'simFeatures', simFeatures );
-    // console.log( 'packageJSON', packageJSON );
 
     const mainString = features.join( ', ' ) + colorProfilesString + regionsAndCulturesString;
 
@@ -228,20 +228,22 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
     const linkSuffixes = [];
     const versionString = this.deployedVersion.toString();
 
-    const standaloneParams = await this.releaseBranch.getPhetioStandaloneQueryParameter();
-    const proxiesParams = ( await this.releaseBranch.usesRelativeSimPath() ) ? 'relativeSimPath' : 'launchLocalVersion';
-    const studioName = ( this.brands.includes( 'phet-io' ) && await this.releaseBranch.usesPhetioStudio() ) ? 'studio' : 'instance-proxies';
+    // TODO: move some of this logic into RunnableBranch (!)
+
+    const standaloneParams = await this.releaseBranch.checkout.getPhetioStandaloneQueryParameter();
+    const proxiesParams = ( await this.releaseBranch.checkout.usesRelativeSimPath() ) ? 'relativeSimPath' : 'launchLocalVersion';
+    const studioName = ( this.brands.includes( 'phet-io' ) && await this.releaseBranch.checkout.usesPhetioStudio() ) ? 'studio' : 'instance-proxies';
     const studioNameBeautified = studioName === 'studio' ? 'Studio' : 'Instance Proxies';
-    const usesChipper2 = await this.releaseBranch.usesChipper2();
-    const hasXHTML = await this.releaseBranch.hasXHTML();
+    const usesChipper2 = await this.releaseBranch.checkout.usesChipper2();
+    const hasXHTML = await this.releaseBranch.checkout.hasXHTML();
     const phetFolder = usesChipper2 ? '/phet' : '';
     const phetioFolder = usesChipper2 ? '/phet-io' : '';
     const phetSuffix = usesChipper2 ? '_phet' : '';
     const phetioSuffix = usesChipper2 ? '_all_phet-io' : '_en-phetio';
     const phetioBrandSuffix = usesChipper2 ? '' : '-phetio';
-    const studioPathSuffix = ( await this.releaseBranch.usesPhetioStudioIndex() ) ? '' : `/${studioName}.html?sim=${this.repo}&${proxiesParams}`;
+    const studioPathSuffix = ( await this.releaseBranch.checkout.usesPhetioStudioIndex() ) ? '' : `/${studioName}.html?sim=${this.repo}&${proxiesParams}`;
     const phetioDevVersion = usesChipper2 ? versionString : versionString.split( '-' ).join( '-phetio' );
-    const hasMigrationWrapper = await this.releaseBranch.hasMigrationWrapper();
+    const hasMigrationWrapper = await this.releaseBranch.checkout.hasMigrationWrapper();
     const supportsInteractiveDescription = options.a11yView ? await this.releaseBranch.supportsInteractiveDescription() : false;
 
     if ( this.deployedVersion.testType === 'rc' ) {
@@ -284,26 +286,8 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
       if ( featuresLine.length ) {
         results.unshift( featuresLine );
       }
-      results.unshift( `\n**${this.repo} ${this.branch}** ${await this.releaseBranch.getDivergingTimestampString()} (${this.pushedMessages.join( ', ' )})\n` );
+      results.unshift( `\n**${this.repo} ${this.branch}** ${await this.releaseBranch.checkout.getDivergingTimestampString()} (${this.pushedMessages.join( ', ' )})\n` );
     }
     return results;
   }
-
-  /**
-   * Checks out the modified branch.
-   *
-   * @returns - Names of checked out repositories
-   */
-  public async checkout( includeNpmUpdate = true ): Promise<string[]> {
-    await gitCheckout( this.repo, this.branch );
-    await gitPull( this.repo );
-    const dependencies = await getDependencies( this.repo );
-    for ( const key of Object.keys( this.changedDependencies ) ) {
-      // This should exist hopefully
-      dependencies[ key ].sha = this.changedDependencies[ key ];
-    }
-    return checkoutDependencies( this.repo, dependencies, includeNpmUpdate );
-  }
 }
-
-export default ModifiedBranch;

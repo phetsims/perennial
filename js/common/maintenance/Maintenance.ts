@@ -14,66 +14,18 @@ import _ from 'lodash';
 import path from 'path';
 import repl from 'repl';
 import winston from 'winston';
-import { production } from '../grunt/production.js';
-import { rc } from '../grunt/rc.js';
-import build from './build.js';
-import checkoutMain from './checkoutMain.js';
-import checkoutTarget from './checkoutTarget.js';
-import chipperSupportsOutputJSGruntTasks from './chipperSupportsOutputJSGruntTasks.js';
-import ChipperVersion from './ChipperVersion.js';
-import execute from './execute.js';
-import getActiveRepos from './getActiveRepos.js';
-import { getBranches } from './getBranches.js';
-import getBranchSHAMap from './getBranchSHAMap.js';
-import type { BuildOptions } from './getBuildArguments.js';
-import getDependencies from './getDependencies.js';
-import gitAdd from './gitAdd.js';
-import gitCheckout from './gitCheckout.js';
-import gitCherryPick from './gitCherryPick.js';
-import gitCommit from './gitCommit.js';
-import gitCreateBranch from './gitCreateBranch.js';
-import gitPull from './gitPull.js';
-import gitPush from './gitPush.js';
-import gitRevParse from './gitRevParse.js';
-import gruntCommand from './gruntCommand.js';
-import ModifiedBranch, { type DeployedLinkOptions } from './ModifiedBranch.js';
-import Patch from './Patch.js';
-import { PERENNIAL_ROOT } from './perennialRepoUtils.js';
-import ReleaseBranch from './ReleaseBranch.js';
-import { Checkout } from './Checkout.js';
+import { production } from '../../grunt/production.js';
+import { rc } from '../../grunt/rc.js';
+import { ModifiedBranch } from './ModifiedBranch.js';
+import { ReleaseBranch } from '../ReleaseBranch.js';
+import { Patch } from './Patch.js';
+import { Checkout } from '../Checkout.js';
+import { BuildOptions } from '../getBuildArguments.js';
+import { getActiveRepos } from '../getActiveRepos.js';
+import { getBranchSHAMap } from '../getBranchSHAMap.js';
 
 // constants
 const MAINTENANCE_FILE = '.maintenance.json';
-
-// const PUBLIC_FUNCTIONS = [
-//   'addAllNeededPatches',
-//   'addNeededPatch',
-//   'addNeededPatches',
-//   'addNeededPatchesAfter',
-//   'addNeededPatchesBefore',
-//   'addNeededPatchesBuildFilter',
-//   'addNeededPatchReleaseBranch',
-//   'addPatchSHA',
-//   'applyPatches',
-//   'buildAll',
-//   'checkBranchStatus',
-//   'checkoutBranch',
-//   'checkoutAndBuild',
-//   'createPatch',
-//   'deployProduction',
-//   'deployReleaseCandidates',
-//   'list',
-//   'listLinks',
-//   'removeNeededPatch',
-//   'removeNeededPatches',
-//   'removeNeededPatchesAfter',
-//   'removeNeededPatchesBefore',
-//   'removePatch',
-//   'removePatchSHA',
-//   'reset',
-//   'updateDependencies'
-//   'getAllMaintenanceBranches'
-// ];
 
 type MaintenanceSerialized = {
   patches: ReturnType<Patch['serialize']>[];
@@ -144,7 +96,7 @@ class Maintenance {
     const getBranchSHAMapAsyncCallback = async ( repo: string ) => {
       if ( !branchMaps[ repo ] ) {
         // eslint-disable-next-line require-atomic-updates
-        branchMaps[ repo ] = await getBranchSHAMap( repo );
+        branchMaps[ repo ] = await getBranchSHAMap( repo ); // TODO
       }
       return branchMaps[ repo ];
     };
@@ -249,7 +201,7 @@ class Maintenance {
           return ( async () => {
             if ( !modifiedBranch.releaseBranch.cachedTimestampString ) {
               // eslint-disable-next-line require-atomic-updates
-              modifiedBranch.releaseBranch.cachedTimestampString = await modifiedBranch.releaseBranch.getDivergingTimestampString();
+              modifiedBranch.releaseBranch.cachedTimestampString = await modifiedBranch.releaseBranch.checkout.getDivergingTimestampString();
             }
           } )();
         } ) );
@@ -645,6 +597,8 @@ class Maintenance {
     const maintenance = await Maintenance.load();
 
     const modifiedBranch = await maintenance.ensureModifiedBranch( repo, branch, true );
+
+    // TODO: nope don't need to do this style of checkout!
     await modifiedBranch.checkout( npmUpdate );
 
     await modifiedBranch.releaseBranch.transpile();
