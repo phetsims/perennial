@@ -3,6 +3,8 @@
 /**
  * Returns an inverse string map (stringMap[ stringKey ][ locale ]) for all strings in a given repo.
  *
+ * TODO: port this over https://github.com/phetsims/totality/issues/140
+ *
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
@@ -27,7 +29,7 @@ module.exports = async function getRepoStringMap( repo, checkoutDir ) {
     return {};
   }
 
-  // TODO: replace with getWorktreePackageJSON
+  // TODO: replace with getWorktreePackageJSON https://github.com/phetsims/totality/issues/140
   const packageJSON = await loadJSON( `${checkoutDir}/${repo}/package.json` );
   const requirejsNamespace = packageJSON.phet.requirejsNamespace;
 

@@ -36,7 +36,7 @@
  * @author Chris Klusendorf (PhET Interactive Simulations)
  */
 
-import booleanPrompt from '../common/booleanPrompt.js';
+import { booleanPrompt } from '../common/booleanPrompt.js';
 import execute from '../common/execute.js';
 
 ( async () => {

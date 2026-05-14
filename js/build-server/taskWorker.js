@@ -167,7 +167,7 @@ async function runTask( options ) {
 
     if ( chipperVersion.major !== 1 ) {
       const checkoutDirectory = ReleaseBranch.getCheckoutDirectory( simName, branch );
-      // TODO: replace with getWorktreePackageJSON
+      // TODO: replace with getWorktreePackageJSON https://github.com/phetsims/totality/issues/140
       const packageJSON = JSON.parse( fs.readFileSync( `${checkoutDirectory}/${simName}/package.json`, 'utf8' ) );
       const packageVersion = packageJSON.version;
 
@@ -325,7 +325,7 @@ async function runTask( options ) {
             const suffix = originalVersion.split( '-' ).length >= 2 ? originalVersion.split( '-' )[ 1 ] :
                            ( chipperVersion.major < 2 ? 'phetio' : '' );
             const parsedVersion = SimVersion.parse( version, '' );
-            // TODO: replace with getWorktreePackageJSON
+            // TODO: replace with getWorktreePackageJSON https://github.com/phetsims/totality/issues/140
             const simPackage = await loadJSON( `${simRepoDir}/package.json` );
             const ignoreForAutomatedMaintenanceReleases = !!( simPackage && simPackage.phet && simPackage.phet.ignoreForAutomatedMaintenanceReleases );
 

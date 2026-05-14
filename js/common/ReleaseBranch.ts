@@ -9,10 +9,8 @@
 
 import assert from 'assert';
 import winston from 'winston';
-import { getBranchSHAMap } from './getBranchSHAMap.js';
 import { Checkout } from './Checkout.js';
 import { RunnableBranch } from './RunnableBranch.js';
-import pLimit from 'p-limit';
 import { asyncFilter } from './asyncFilter.js';
 import { limitedMap } from './limitedMap.js';
 import { BuildOptions } from './getBuildArguments.js';
@@ -28,7 +26,7 @@ export type ReleaseBranchSuccessList = {
   errorMap: Map<ReleaseBranch, unknown>;
 };
 
-export const RELEASE_BRANCH_DEFAULT_CONCURRENT_LIMIT = 5; // TODO: have a setting in buildLocal (!)
+export const RELEASE_BRANCH_DEFAULT_CONCURRENT_LIMIT = 5; // TODO: have a setting in buildLocal (!) https://github.com/phetsims/totality/issues/140
 
 export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerialized {
 
@@ -40,7 +38,7 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
     checkout: Checkout,
     repo: string,
 
-    public readonly branch: string, // TODO: note: rename to legacyBranch?
+    public readonly branch: string, // TODO: note: rename to legacyBranch? https://github.com/phetsims/totality/issues/140
     brands: string[],
     public readonly isReleased: boolean
   ) {
@@ -76,8 +74,8 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
     return successList;
   }
 
-  // TODO: a catch-all function that will update/transpile/build all release branches? (filter of course)
-  // TODO: consider some functions like this over in Maintenance (or keep here, and allow passing in a release branch list?)
+  // TODO: a catch-all function that will update/transpile/build all release branches? (filter of course) https://github.com/phetsims/totality/issues/140
+  // TODO: consider some functions like this over in Maintenance (or keep here, and allow passing in a release branch list?) https://github.com/phetsims/totality/issues/140
 
   public static async updateReleaseBranches(
     filter: ( releaseBranch: ReleaseBranch ) => Promise<boolean> = async () => true
@@ -158,7 +156,7 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
   }
 
   public override async getDependencies(): Promise<string[]> {
-    // TODO: read from new buildInfo.json file? We can't use the normal method
+    // TODO: read from new buildInfo.json file? We can't use the normal method https://github.com/phetsims/totality/issues/140
     throw new Error( 'unimplemented' );
   }
 
@@ -167,7 +165,7 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
    */
   public async redeployBranchTipToProduction( locales = '*' ): Promise<void> {
     if ( this.isReleased ) {
-      // TODO: needs recoding
+      // TODO: needs recoding https://github.com/phetsims/totality/issues/140
       throw new Error( 'unimplemented' );
       // await checkoutTarget( this.repo, this.branch, false );
       //
@@ -191,7 +189,7 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
    * Re-runs a production deploy for a specific branch (based on the SHAs that were most recently production deployed)
    */
   public async redeployLastDeployedSHAsToProduction( locales = '*' ): Promise<void> {
-    // TODO: needs recoding
+    // TODO: needs recoding https://github.com/phetsims/totality/issues/140
     throw new Error( 'unimplemented' );
     // if ( !this.isReleased ) {
     //   throw new Error( 'Should not redeploy a non-released branch' );

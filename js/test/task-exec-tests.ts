@@ -11,9 +11,9 @@ import { spawnSync } from 'child_process';
 import fs from 'fs';
 import _ from 'lodash';
 import qunit from 'qunit';
-import gruntCommand from '../common/gruntCommand.js';
+import { gruntCommand } from '../common/gruntCommand.js';
 import { PERENNIAL_REPO_NAME } from '../common/perennialRepoUtils.js';
-import tsxCommand from '../common/tsxCommand.js';
+import { tsxCommand } from '../common/tsxCommand.js';
 
 const SIM = 'acid-base-solutions';
 

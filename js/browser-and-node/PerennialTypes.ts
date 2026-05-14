@@ -4,7 +4,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-// TODO: move launchpad to these types
+// TODO: move launchpad to these types https://github.com/phetsims/totality/issues/140
 export type Repo = string;
 export type SHA = string;
 
@@ -55,7 +55,7 @@ export type PackageJSON = {
   };
 };
 
-// TODO: output and consume this
+// TODO: output and consume this https://github.com/phetsims/totality/issues/140
 export type BuildInfoJSON = {
   name: string; // name of the "repo"/sim
   version: string; // SimVersion-compatible string

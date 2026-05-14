@@ -23,16 +23,9 @@ export class ChipperVersion {
     public maintenance: number,
     public chipperSupportsOutputJSGruntTasks: boolean
   ) {
-
     assert( typeof major === 'number' && major >= 0 && major % 1 === 0, 'major version should be a non-negative integer' );
     assert( typeof minor === 'number' && minor >= 0 && minor % 1 === 0, 'minor version should be a non-negative integer' );
     assert( typeof maintenance === 'number' && maintenance >= 0 && maintenance % 1 === 0, 'maintenance version should be a non-negative integer' );
-
-    // @public {number}
-    this.major = major;
-    this.minor = minor;
-    this.maintenance = maintenance;
-    this.chipperSupportsOutputJSGruntTasks = chipperSupportsOutputJSGruntTasks;
   }
 
   public toString(): string {

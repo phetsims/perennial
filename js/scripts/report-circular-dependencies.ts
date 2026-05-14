@@ -13,7 +13,7 @@
 import fs from 'fs';
 import _ from 'lodash';
 import execute from '../common/execute.js';
-import getRepoList from '../common/getRepoList.js';
+import { getRepoList } from '../common/getRepoList.js';
 import { isOptionKeyProvided } from '../grunt/tasks/util/getOption.js';
 
 ( async () => {

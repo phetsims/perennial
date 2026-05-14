@@ -12,6 +12,7 @@ import { createDirectory } from './createDirectory.js';
 import path from 'path';
 import { ensureLocalBranchFromRemote } from './ensureLocalBranchFromRemote.js';
 import fs from 'fs';
+// eslint-disable-next-line phet/default-import-match-filename
 import fsPromises from 'fs/promises';
 import { gitCreateWorktree } from './gitCreateWorktree.js';
 import { gitPullDirectory } from './gitPullDirectory.js';
@@ -177,7 +178,7 @@ export class Checkout {
     const checkout = await Checkout.getReleaseBranchCheckout( repo, legacyBranch );
 
     if ( !checkout.releaseBranch ) {
-      throw new Error( `Expected release branch to be set for ${checkout.toString()}` );
+      throw new Error( `Expected release branch to be set for ${checkout.branch}` );
     }
 
     return checkout.releaseBranch;
@@ -192,7 +193,7 @@ export class Checkout {
   }
 
   public static getWorktreeDirectory( branch: string ): string {
-    // TODO: do we need escaping at all, if one branch is a substring of another? (e.g. feature/foo, feature/foo/bar)
+    // TODO: do we need escaping at all, if one branch is a substring of another? (e.g. feature/foo, feature/foo/bar) https://github.com/phetsims/totality/issues/140
     return `${WORKTREE_DIRECTORY}/${branch}`;
   }
 
@@ -548,11 +549,11 @@ export class Checkout {
     //     throw new Error( `Expected to be on a clean branch, but there are uncommitted changes` );
     //   }
     //
-    //   // TODO: enable this: (disabled for my work in a feature branch)
+    //   // TODO: enable this: (disabled for my work in a feature branch) https://github.com/phetsims/totality/issues/140
     //   // if ( branch !== 'main' ) {
     //   //   await gitCheckout( 'main' );
     //   //
-    //   //   // TODO: what to do here? We should update babel, yes?
+    //   //   // TODO: what to do here? We should update babel, yes? https://github.com/phetsims/totality/issues/140
     //   // }
     // }
   }
@@ -621,7 +622,7 @@ export class Checkout {
    */
   public async usesRelativeSimPath(): Promise<boolean> {
     // phet-io polyrepo e3fc26079358d86074358a6db3ebaf1af9725632
-    return await gitIsAncestor( '7f1f7a9470d9ced8edcb26837ff431cd61afa517', this.branch );
+    return gitIsAncestor( '7f1f7a9470d9ced8edcb26837ff431cd61afa517', this.branch );
   }
 
   /**
@@ -639,7 +640,7 @@ export class Checkout {
    */
   public async usesPhetioStudioIndex(): Promise<boolean> {
     // phet-io-wrappers polyrepo 7ec1a04a70fb9707b381b8bcab3ad070815ef7fe
-    return await gitIsAncestor( '46fdcc098ba3b84e6f39d8506828c4ad629ef206', this.branch );
+    return gitIsAncestor( '46fdcc098ba3b84e6f39d8506828c4ad629ef206', this.branch );
   }
 
   /**
@@ -647,7 +648,7 @@ export class Checkout {
    */
   public async isPhetioHydrogen(): Promise<boolean> {
     // phet-io-wrappers polyrepo 7e8d97020c6451f68e898ae83aa43593b555137f
-    return await gitIsAncestor( '8c175d14c0d467d0e457f47a5f496455d2370b31', this.branch );
+    return gitIsAncestor( '8c175d14c0d467d0e457f47a5f496455d2370b31', this.branch );
   }
 
   /**
@@ -670,7 +671,7 @@ export class Checkout {
 
   public async hasMigrationWrapper(): Promise<boolean> {
     // phet-io-wrappers polyrepo d8ad7267614d1b7cf3fc2d0d9cc11e3c592ac1ce
-    return await gitIsAncestor( '2328bdd8bacff4bf3858c8eef1bcc3c1dc648cad', this.branch );
+    return gitIsAncestor( '2328bdd8bacff4bf3858c8eef1bcc3c1dc648cad', this.branch );
   }
 
   /**
@@ -951,7 +952,7 @@ export class Checkout {
     return fsPromises.writeFile( `${this.workingDirectory}/${relativeFile}`, contents, 'utf-8' );
   }
 
-  public async writeRelativeJSON( relativeFile: string, json: Object ): Promise<void> {
+  public async writeRelativeJSON( relativeFile: string, json: object ): Promise<void> {
     return this.writeRelativeFile( relativeFile, JSON.stringify( json, null, 2 ) + os.EOL );
   }
 
@@ -960,7 +961,7 @@ export class Checkout {
     await this.gitAdd( relativeFile );
   }
 
-  public async writeAddRelativeJSON( relativeFile: string, json: Object ): Promise<void> {
+  public async writeAddRelativeJSON( relativeFile: string, json: object ): Promise<void> {
     await this.writeRelativeJSON( relativeFile, json );
     await this.gitAdd( relativeFile );
   }
@@ -969,7 +970,7 @@ export class Checkout {
     return getFileAtBranch( this.branch, relativeFile );
   }
 
-  public async getRelativeJSON<T extends Object = IntentionalPerennialAny>( relativeFile: string ): Promise<T> {
+  public async getRelativeJSON<T extends object = IntentionalPerennialAny>( relativeFile: string ): Promise<T> {
     return JSON.parse( await getFileAtBranch( this.branch, relativeFile ) );
   }
 
