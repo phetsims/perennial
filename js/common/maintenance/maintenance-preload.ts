@@ -22,4 +22,4 @@ global.Maintenance = Maintenance;
 // @ts-expect-error
 global.ReleaseBranch = ReleaseBranch;
 
-// TODO: expose Maintenance once that is running
+// TODO: expose Maintenance once that is running https://github.com/phetsims/totality/issues/140
