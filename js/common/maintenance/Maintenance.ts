@@ -90,36 +90,6 @@ class Maintenance {
   }
 
   /**
-   * Builds all release branches (so that the state of things can be checked). Puts in in perennial/build.
-   */
-  public static async buildAll(): Promise<void> {
-    const releaseBranches = await Maintenance.getMaintenanceBranches();
-
-    const failed = [];
-
-    for ( const releaseBranch of releaseBranches ) {
-      console.log( `building ${releaseBranch.repo} ${releaseBranch.branch}` );
-      try {
-        await checkoutTarget( releaseBranch.repo, releaseBranch.branch, true ); // include npm update
-        await build( releaseBranch.repo, {
-          brands: releaseBranch.brands
-        } );
-        throw new Error( 'UNIMPLEMENTED, copy over' );
-      }
-      catch( e ) {
-        failed.push( `${releaseBranch.repo} ${releaseBranch.brands}` );
-      }
-    }
-
-    if ( failed.length ) {
-      console.log( `Failed builds:\n${failed.join( '\n' )}` );
-    }
-    else {
-      console.log( 'Builds complete' );
-    }
-  }
-
-  /**
    * Displays a listing of the current maintenance status.
    *
    * If timestamp:true is provided, it will include timestamps for when the branches diverged from main, and sort by those timestamps.

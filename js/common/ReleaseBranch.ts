@@ -15,6 +15,7 @@ import { RunnableBranch } from './RunnableBranch.js';
 import pLimit from 'p-limit';
 import { asyncFilter } from './asyncFilter.js';
 import { limitedMap } from './limitedMap.js';
+import { BuildOptions } from './getBuildArguments.js';
 
 export type ReleaseBranchSerialized = {
   repo: string;
@@ -48,7 +49,8 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
     assert( Array.isArray( brands ) );
   }
 
-  public static async updateReleaseBranches(
+  public static async successListOperation(
+    f: ( releaseBranch: ReleaseBranch ) => Promise<void>,
     filter: ( releaseBranch: ReleaseBranch ) => Promise<boolean> = async () => true
   ): Promise<ReleaseBranchSuccessList> {
     const successList: ReleaseBranchSuccessList = {
@@ -61,7 +63,7 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
 
     await limitedMap( filteredReleaseBranches, async releaseBranch => {
       try {
-        await releaseBranch.checkout.update();
+        await f( releaseBranch );
         successList.succeeded.push( releaseBranch );
       }
       catch ( e ) {
@@ -72,6 +74,55 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
     }, RELEASE_BRANCH_DEFAULT_CONCURRENT_LIMIT );
 
     return successList;
+  }
+
+  public static async updateReleaseBranches(
+    filter: ( releaseBranch: ReleaseBranch ) => Promise<boolean> = async () => true
+  ): Promise<ReleaseBranchSuccessList> {
+    return ReleaseBranch.successListOperation( async releaseBranch => {
+      await releaseBranch.checkout.update();
+    }, filter );
+  }
+
+  public static async transpileReleaseBranches(
+    filter: ( releaseBranch: ReleaseBranch ) => Promise<boolean> = async () => true
+  ): Promise<ReleaseBranchSuccessList> {
+    return ReleaseBranch.successListOperation( async releaseBranch => {
+      await releaseBranch.transpile();
+    }, filter );
+  }
+
+  public static async buildReleaseBranches(
+    buildOptions?: Partial<BuildOptions>,
+    filter: ( releaseBranch: ReleaseBranch ) => Promise<boolean> = async () => true
+  ): Promise<ReleaseBranchSuccessList> {
+    return ReleaseBranch.successListOperation( async releaseBranch => {
+      await releaseBranch.build( buildOptions );
+    }, filter );
+  }
+
+  public static async checkUnbuiltReleaseBranches(
+    filter: ( releaseBranch: ReleaseBranch ) => Promise<boolean> = async () => true
+  ): Promise<ReleaseBranchSuccessList> {
+    return ReleaseBranch.successListOperation( async releaseBranch => {
+      const result = await releaseBranch.checkUnbuilt();
+
+      if ( result !== null ) {
+        throw new Error( result );
+      }
+    }, filter );
+  }
+
+  public static async checkBuiltReleaseBranches(
+    filter: ( releaseBranch: ReleaseBranch ) => Promise<boolean> = async () => true
+  ): Promise<ReleaseBranchSuccessList> {
+    return ReleaseBranch.successListOperation( async releaseBranch => {
+      const result = await releaseBranch.checkBuilt();
+
+      if ( result !== null ) {
+        throw new Error( result );
+      }
+    }, filter );
   }
 
   /**
