@@ -13,13 +13,13 @@ import { Maintenance } from './Maintenance.js';
 import { ReleaseBranch } from '../ReleaseBranch.js';
 import winston from 'winston';
 
-winston.default.transports.console.level === 'info'
+winston.default.transports.console.level === 'info';
 
-// @ts-ignore
+// @ts-expect-error
 global.Checkout = Checkout;
-// @ts-ignore
+// @ts-expect-error
 global.Maintenance = Maintenance;
-// @ts-ignore
+// @ts-expect-error
 global.ReleaseBranch = ReleaseBranch;
 
 // TODO: expose Maintenance once that is running

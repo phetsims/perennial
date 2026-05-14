@@ -66,7 +66,7 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
         await f( releaseBranch );
         successList.succeeded.push( releaseBranch );
       }
-      catch ( e ) {
+      catch( e ) {
         winston.error( `Failed to update ${releaseBranch.toString()}: ${e instanceof Error ? e.stack : e}` );
         successList.failed.push( releaseBranch );
         successList.errorMap.set( releaseBranch, e );

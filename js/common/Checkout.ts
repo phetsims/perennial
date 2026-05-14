@@ -440,15 +440,15 @@ export class Checkout {
 
       return true;
     }
-    catch ( e ) {
+    catch( e ) {
       winston.info( `git cherry-pick failed (aborting): ${target}` );
 
       try {
-        await gitMutableExecute( [ 'cherry-pick', '--abort' ], this.workingDirectory )
+        await gitMutableExecute( [ 'cherry-pick', '--abort' ], this.workingDirectory );
 
         return false;
       }
-      catch ( e ) {
+      catch( e ) {
         winston.error( `git cherry-pick --abort failed: ${target}` );
 
         throw e;
