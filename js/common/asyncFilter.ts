@@ -8,7 +8,7 @@
 
 export const asyncFilter = async <T>(
   list: T[],
-  f: ( t: T ) => Promise<T>
+  f: ( t: T ) => Promise<boolean>
 ) => {
   const items = [];
   for ( const item of list ) {

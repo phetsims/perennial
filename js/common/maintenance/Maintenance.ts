@@ -54,13 +54,13 @@ class Maintenance {
   /**
    * Resets ALL the maintenance state to a default "blank" state.
    *
-   * @param keepCachedReleaseBranches {boolean} - allReleaseBranches take a while to populate, and have little to do
-   *                                              with the current MR, so optionally keep them in storage.
+   * @param keepCachedReleaseBranches - allReleaseBranches take a while to populate, and have little to do
+   *                                    with the current MR, so optionally keep them in storage.
    *
    * CAUTION: This will remove any information about any ongoing/complete maintenance release from your
    * .maintenance.json. Generally this should be done before any new maintenance release.
    */
-  public static reset( keepCachedReleaseBranches = false ): void {
+  public static async reset( keepCachedReleaseBranches = false ): Promise<void> {
     console.log(
       'PhET-iO simulations require maintaining older release branches. ' +
       'If you are patching specific simulations, use `grunt release-branch-list` ' +
@@ -78,41 +78,15 @@ class Maintenance {
   /**
    * Runs a number of checks through every release branch.
    *
-   *
    * @param filter - Optional filter, release branches will be skipped if this resolves to false
    */
   public static async checkBranchStatus( filter?: FilterSyncRB ): Promise<void> {
-    for ( const repo of getActiveRepos() ) {
-      if ( repo !== 'perennial' && !( await runnableBranch.isClean() ) ) {
-        console.log( `Unclean repository: ${repo}, please resolve this and then run checkBranchStatus again` );
-        return;
-      }
-    }
+    // TODO: add checks to see if release branches have a last commit that is a "post-deploy" commit (!)
+    // TODO: This will likely be done AFTER we do everything else
 
-    const releaseBranches = await Maintenance.getMaintenanceBranches( filter );
+    // TODO: .... nothing else to do, right?
 
-    // Set up a cache of branchMaps so that we don't make multiple requests
-    const branchMaps: Record<string, Record<string, string>> = {};
-    const getBranchSHAMapAsyncCallback = async ( repo: string ) => {
-      if ( !branchMaps[ repo ] ) {
-        // eslint-disable-next-line require-atomic-updates
-        branchMaps[ repo ] = await getBranchSHAMap( repo ); // TODO
-      }
-      return branchMaps[ repo ];
-    };
-
-    for ( const releaseBranch of releaseBranches ) {
-      if ( !filter || filter( releaseBranch ) ) {
-        console.log( `${releaseBranch.repo} ${releaseBranch.branch}` );
-        for ( const line of await releaseBranch.getStatus( getBranchSHAMapAsyncCallback ) ) {
-          console.log( `  ${line}` );
-        }
-      }
-      else {
-        console.log( `${releaseBranch.repo} ${releaseBranch.branch} (skipping due to filter)` );
-      }
-    }
-    console.log( 'Checks completed' );
+    console.log( 'no checks done, TODO' );
   }
 
   /**
@@ -1075,10 +1049,17 @@ class Maintenance {
    * @param maintenance - by default load from saved file the current maintenance instance.
    * @rejects {ExecuteError}
    */
-  public static async getMaintenanceBranches( filter: FilterSyncRB = () => true,
-                                              checkUnreleasedBranches = true,
-                                              forceCacheBreak = false,
-                                              maintenance = await Maintenance.load() ): Promise<ReleaseBranch[]> {
+  public static async getMaintenanceBranches(
+    filter: FilterSyncRB = () => true,
+    checkUnreleasedBranches = true,
+    forceCacheBreak = false,
+    maintenance?: Maintenance
+  ): Promise<ReleaseBranch[]> {
+
+    if ( !maintenance ) {
+      maintenance = await Maintenance.load();
+    }
+
     const releaseBranches = await Maintenance.loadAllMaintenanceBranches( forceCacheBreak, maintenance );
 
     return releaseBranches.filter( releaseBranch => {
@@ -1093,14 +1074,20 @@ class Maintenance {
    * Loads every potential ReleaseBranch (published phet and phet-io brands, as well as unreleased branches), and
    * saves it to the maintenance state.
    *
-   *
    * Call this with true to break the cache and force a recalculation of all ReleaseBranches
    * @param forceCacheBreak - true if you want to force a recalculation of all ReleaseBranches
    * @param maintenance - by default load from saved file the current maintenance instance.
    */
-  public static async loadAllMaintenanceBranches( forceCacheBreak = false, maintenance = await Maintenance.load() ): Promise<ReleaseBranch[]> {
+  public static async loadAllMaintenanceBranches(
+    forceCacheBreak = false,
+    maintenance?: Maintenance
+  ): Promise<ReleaseBranch[]> {
 
-    let releaseBranches = null;
+    if ( !maintenance ) {
+      maintenance = await Maintenance.load();
+    }
+
+    let releaseBranches: ReleaseBranch[];
     if ( maintenance.allReleaseBranches.length > 0 && !forceCacheBreak ) {
       assert( maintenance.allReleaseBranches[ 0 ] instanceof ReleaseBranch, 'deserialization check' );
       releaseBranches = maintenance.allReleaseBranches;
@@ -1108,7 +1095,7 @@ class Maintenance {
     else {
 
       // cache miss
-      releaseBranches = await ReleaseBranch.getAllMaintenanceBranches();
+      releaseBranches = await Checkout.getMaintainedReleaseBranches();
       // eslint-disable-next-line require-atomic-updates
       maintenance.allReleaseBranches = releaseBranches;
       maintenance.save();
@@ -1126,7 +1113,7 @@ class Maintenance {
    * happen. Fun fact, you can't remove needed patches if this happens. RIP the 2026 CC BY-NC release, you will be missed.
    * Never forget "deduplicated from 933 to 151".
    */
-  public static fixDuplicatedModifiedBranches(): void {
+  public static async fixDuplicatedModifiedBranches(): Promise<void> {
     const maintenance = await Maintenance.load();
 
     const modifiedBranchMap: Record<string, ModifiedBranch> = {};
@@ -1210,6 +1197,8 @@ class Maintenance {
 
   /**
    * Starts a command-line REPL with features loaded.
+   *
+   * TODO: expose Checkout, ReleaseBranch, Maintenance, others (!)
    */
   public static startREPL(): Promise<void> {
     return new Promise( ( resolve, reject ) => {

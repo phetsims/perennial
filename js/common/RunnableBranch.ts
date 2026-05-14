@@ -74,6 +74,10 @@ export class RunnableBranch {
   }
 
   public async build( options?: Partial<BuildOptions>, executeOptions?: ExecuteOptions & { errors?: 'reject' } ): Promise<string> {
+    if ( !this.checkout.isCheckedOut ) {
+      throw new Error( `Cannot build ${this.repo} because it is not checked out` );
+    }
+
     const args = getBuildArguments( await this.checkout.getChipperVersion(), _.merge( {
       brands: this.brands,
       allHTML: true,

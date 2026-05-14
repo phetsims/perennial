@@ -12,11 +12,22 @@ import winston from 'winston';
 import { getBranchSHAMap } from './getBranchSHAMap.js';
 import { Checkout } from './Checkout.js';
 import { RunnableBranch } from './RunnableBranch.js';
+import pLimit from 'p-limit';
+import { asyncFilter } from './asyncFilter.js';
+import { limitedMap } from './limitedMap.js';
 
-type ReleaseBranchSerialized = {
+export type ReleaseBranchSerialized = {
   repo: string;
   branch: string;
 };
+
+export type ReleaseBranchSuccessList = {
+  succeeded: ReleaseBranch[];
+  failed: ReleaseBranch[];
+  errorMap: Map<ReleaseBranch, unknown>;
+};
+
+export const RELEASE_BRANCH_DEFAULT_CONCURRENT_LIMIT = 5; // TODO: have a setting in buildLocal (!)
 
 export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerialized {
 
@@ -35,6 +46,32 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
     super( checkout, repo, brands );
 
     assert( Array.isArray( brands ) );
+  }
+
+  public static async updateReleaseBranches(
+    filter: ( releaseBranch: ReleaseBranch ) => Promise<boolean> = async () => true
+  ): Promise<ReleaseBranchSuccessList> {
+    const successList: ReleaseBranchSuccessList = {
+      succeeded: [],
+      failed: [],
+      errorMap: new Map()
+    };
+
+    const filteredReleaseBranches = await asyncFilter( await Checkout.getMaintainedReleaseBranches(), filter );
+
+    await limitedMap( filteredReleaseBranches, async releaseBranch => {
+      try {
+        await releaseBranch.checkout.update();
+        successList.succeeded.push( releaseBranch );
+      }
+      catch ( e ) {
+        winston.error( `Failed to update ${releaseBranch.toString()}: ${e instanceof Error ? e.stack : e}` );
+        successList.failed.push( releaseBranch );
+        successList.errorMap.set( releaseBranch, e );
+      }
+    }, RELEASE_BRANCH_DEFAULT_CONCURRENT_LIMIT );
+
+    return successList;
   }
 
   /**
@@ -69,18 +106,6 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
   public override async getDependencies(): Promise<string[]> {
     // TODO: read from new buildInfo.json file? We can't use the normal method
     throw new Error( 'unimplemented' );
-  }
-
-  /**
-   * // TODO: UPDATE THIS so it only checks for the last SHA whether it is an "update" deployed message!
-   * Returns a list of status messages of anything out-of-the-ordinary
-   */
-  public async getStatus( getBranchSHAMapAsyncCallback = getBranchSHAMap ): Promise<string[]> {
-    const results = [];
-
-    throw new Error( 'unimplemented' );
-
-    return results;
   }
 
   /**
