@@ -3,6 +3,8 @@
 /**
  * Deploys a decaf simulation after incrementing the test version number.  This file ported from dev.js
  *
+ * TODO: How would this be in totality? unported https://github.com/phetsims/totality/issues/140
+ *
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
@@ -61,7 +63,7 @@ module.exports = async function( project, dev, production ) {
     throw new Error( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
   }
 
-  const currentBranch = await getBranch( 'decaf' );
+  const currentBranch = await getBranch();
   if ( currentBranch !== 'main' ) {
     throw new Error( `deployment should be on the branch main, not: ${currentBranch ? currentBranch : '(detached head)'}` );
   }
