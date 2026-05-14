@@ -3,8 +3,8 @@
 /**
  * For `grunt create-one-off`, see Gruntfile for details
  *
- * TODO: potentially get rid of this, aren't we hooking into the Checkout methods directly? Or update this:
- * TODO: update this
+ * TODO: potentially get rid of this, aren't we hooking into the Checkout methods directly? Or update this: https://github.com/phetsims/totality/issues/140
+ * TODO: update this https://github.com/phetsims/totality/issues/140
  *
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
@@ -20,7 +20,6 @@ const gitIsClean = require( '../common/gitIsClean' );
 const gitPush = require( '../common/gitPush' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
-const setRunnableVersion = require( '../common/setRunnableVersion' );
 
 /**
  * For `grunt create-one-off`, see Gruntfile for details
@@ -46,6 +45,7 @@ module.exports = async function( repo, branch, message ) {
     testNumber: 0
   } );
 
+  // TODO isClean api changed https://github.com/phetsims/totality/issues/140
   const isClean = await gitIsClean( repo );
   if ( !isClean ) {
     throw new Error( `Unclean status in ${repo}, cannot create release branch` );
@@ -75,8 +75,11 @@ module.exports = async function( repo, branch, message ) {
     typeCheck: false
   } );
   await copyFile( `../${repo}/build/${brand}/dependencies.json`, `../${repo}/dependencies.json` );
+  // TODO: gitIsClean API changed https://github.com/phetsims/totality/issues/140
   if ( !await gitIsClean( repo ) ) {
+    // TODO: API change https://github.com/phetsims/totality/issues/140
     await gitAdd( repo, 'dependencies.json' );
+    // TODO: API change https://github.com/phetsims/totality/issues/140
     await gitCommit( repo, `updated dependencies.json for version ${newVersion.toString()}` );
   }
   await gitPush( repo, branch );
