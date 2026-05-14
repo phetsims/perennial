@@ -11,8 +11,11 @@
 
 import { Mutex } from 'async-mutex';
 import execute, { ExecuteOptions, ExecuteResult } from './execute.js';
+import fs from 'fs';
 
 export const gitMutex = new Mutex();
+
+const DEBUG_CWD = true;
 
 export const gitExclusive = async <T>(
   callback: () => Promise<T>
@@ -38,6 +41,10 @@ export async function gitMutableExecute(
   cwd: string,
   providedOptions?: ExecuteOptions
 ): Promise<string | ExecuteResult> {
+  if ( DEBUG_CWD && !fs.existsSync( cwd ) ) {
+    throw new Error( `gitMutableExecute: directory ${cwd} does not exist` );
+  }
+
   // @ts-ignore
   return gitExclusive( () => execute( 'git', args, cwd, providedOptions ) );
 }
@@ -61,6 +68,10 @@ export async function gitImmutableExecute(
   cwd: string,
   providedOptions?: ExecuteOptions
 ): Promise<string | ExecuteResult> {
+  if ( DEBUG_CWD && !fs.existsSync( cwd ) ) {
+    throw new Error( `gitImmutableExecute: directory ${cwd} does not exist` );
+  }
+
   // @ts-ignore
   return execute( 'git', args, cwd, providedOptions );
 }

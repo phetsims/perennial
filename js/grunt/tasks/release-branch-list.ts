@@ -16,10 +16,11 @@ import { Checkout } from '../../common/Checkout.js';
 import { ReleaseBranch } from '../../common/ReleaseBranch.js';
 import pLimit from 'p-limit';
 import { gitFetch } from '../../common/gitFetch.js';
+import winston from 'winston';
 
 ( async () => {
 
-  // winston.default.transports.console.level = 'error';
+  winston.default.transports.console.level = 'error';
 
   const repo = getOption( 'repo' )?.startsWith( 'perennial' ) ? null : getOption( 'repo' );
   const order = getOption( 'order' ) || 'alphabetical';
@@ -58,6 +59,6 @@ import { gitFetch } from '../../common/gitFetch.js';
 
   console.log( '\nRelease branches:\n{repo} {branch} {brand[,brand]+} {date}\n' );
   for ( const struct of structures ) {
-    console.log( `${struct.releaseBranch.toString()} ${new Date( struct.timestamp ).toISOString().split( 'T' )[ 0 ]}` );
+    console.log( `${new Date( struct.timestamp ).toISOString().split( 'T' )[ 0 ]} ${struct.releaseBranch.toString()}` );
   }
 } )();

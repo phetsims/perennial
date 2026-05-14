@@ -643,13 +643,23 @@ export class Checkout {
     return new Date( timestamp ).toISOString().split( 'T' )[ 0 ];
   }
 
+  /**
+   * Use this when you just need read-only (or read-write, but it doesn't matter where) access to a working directory.
+   *
+   * NOTABLY this should NOT be used for things that e.g. check the current state of a specific checkout, OR things that
+   * mutate the checkout.
+   */
+  public getAnyWorkingDirectory(): string {
+    return this.isCheckedOut ? this.workingDirectory : '..';
+  }
+
   public async hasUpstreamBranch( branch: string ): Promise<boolean> {
     return ( await gitImmutableExecute( [
       'rev-parse',
       '--abbrev-ref',
       '--symbolic-full-name',
       `${branch}@{upstream}`
-    ], this.workingDirectory, { errors: 'resolve' } ) ).code === 0;
+    ], this.getAnyWorkingDirectory(), { errors: 'resolve' } ) ).code === 0;
   }
 
   public async hasLocalBranch( branch: string ): Promise<boolean> {
@@ -659,14 +669,14 @@ export class Checkout {
         '--verify',
         '--quiet',
         `refs/heads/${branch}`
-      ], this.workingDirectory, { errors: 'resolve' } )
+      ], this.getAnyWorkingDirectory(), { errors: 'resolve' } )
     ).code === 0;
   }
 
   public async fetchOrigin(): Promise<void> {
     winston.info( `fetching origin for ${this.branch}` );
 
-    await gitMutableExecute( [ 'fetch', 'origin' ], this.workingDirectory );
+    await gitMutableExecute( [ 'fetch', 'origin' ], this.getAnyWorkingDirectory() );
   }
 
   /**
@@ -683,7 +693,7 @@ export class Checkout {
         '--track',
         this.branch,
         `origin/${this.branch}`
-      ], this.workingDirectory );
+      ], this.getAnyWorkingDirectory() );
 
       return true;
     }
@@ -694,7 +704,7 @@ export class Checkout {
         '--set-upstream-to',
         `origin/${this.branch}`,
         this.branch
-      ], this.workingDirectory );
+      ], this.getAnyWorkingDirectory() );
     }
 
     return false;
@@ -728,7 +738,7 @@ export class Checkout {
         'fetch',
         'origin',
         `${this.branch}:${this.branch}`
-      ], this.workingDirectory );
+      ], this.getAnyWorkingDirectory() );
     }
   }
 
@@ -757,7 +767,7 @@ export class Checkout {
         '-f',
         this.branch,
         `origin/${this.branch}`
-      ], this.workingDirectory );
+      ], this.getAnyWorkingDirectory() );
     }
   }
 
@@ -769,7 +779,7 @@ export class Checkout {
   public async getDivergingSHA(): Promise<string> {
     await this.gitUpdateWithoutFetch();
 
-    winston.info( 'getting first diverging commit' );
+    winston.info( `getting first diverging commit for ${this.branch}` );
     return gitFirstDivergingCommit( this.branch, 'main' );
   }
 

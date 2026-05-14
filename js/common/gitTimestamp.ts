@@ -15,7 +15,7 @@ import { gitImmutableExecute } from './gitMutex.js';
  * @returns - Resolves to the timestamp (epoch milliseconds)
  */
 export const gitTimestamp = async ( target: string ): Promise<number> => {
-  return gitImmutableExecute( [ 'show', '-s', '--format=%cd', '--date=iso', target ], '..' ).then( stdout => {
+  return gitImmutableExecute( [ 'show', '-s', '--format=%ad', '--date=iso', target ], '..' ).then( stdout => {
     return Promise.resolve( new Date( stdout.trim() ).getTime() );
   } );
 };
