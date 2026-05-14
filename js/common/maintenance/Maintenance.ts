@@ -16,7 +16,6 @@ import { DeployedLinkOptions, ModifiedBranch } from './ModifiedBranch.js';
 import { ReleaseBranch } from '../ReleaseBranch.js';
 import { Patch } from './Patch.js';
 import { Checkout } from '../Checkout.js';
-import { BuildOptions } from '../getBuildArguments.js';
 
 // constants
 const MAINTENANCE_FILE = '.maintenance.json';
@@ -25,13 +24,6 @@ type MaintenanceSerialized = {
   patches: ReturnType<Patch['serialize']>[];
   modifiedBranches: ReturnType<ModifiedBranch['serialize']>[];
   allReleaseBranches: ReturnType<ReleaseBranch['serialize']>[];
-};
-
-type UpdateCheckoutsOptions = {
-  concurrent: number;
-  build: boolean;
-  transpile: boolean;
-  buildOptions: Partial<BuildOptions>;
 };
 
 type FilterSyncRB = ( releaseBranch: ReleaseBranch ) => boolean;

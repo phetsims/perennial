@@ -9,7 +9,7 @@
  */
 
 import { Checkout } from '../Checkout.js';
-// import { Maintenance } from '../Maintenance.js';
+import { Maintenance } from './Maintenance.js';
 import { ReleaseBranch } from '../ReleaseBranch.js';
 import winston from 'winston';
 
@@ -17,8 +17,8 @@ winston.default.transports.console.level === 'info'
 
 // @ts-ignore
 global.Checkout = Checkout;
-// // @ts-ignore
-// global.Maintenance = Maintenance;
+// @ts-ignore
+global.Maintenance = Maintenance;
 // @ts-ignore
 global.ReleaseBranch = ReleaseBranch;
 
