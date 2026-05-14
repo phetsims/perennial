@@ -5,6 +5,9 @@
  *   --repo : Only show branches for a specific repository
  *   --order=<ORDER> : alphabetical|date
  *
+ * TODO: currently need this for TTY: npx tsx ./js/grunt/tasks/release-branch-list.ts
+ * TODO: see console.log( {stdoutTTY: process.stdout.isTTY,stderrTTY: process.stderr.isTTY} );
+ *
  * @author Jonathan Olson (PhET Interactive Simulations)
  * */
 
@@ -17,10 +20,13 @@ import { ReleaseBranch } from '../../common/ReleaseBranch.js';
 import pLimit from 'p-limit';
 import { gitFetch } from '../../common/gitFetch.js';
 import winston from 'winston';
+import cliProgress from 'cli-progress';
 
 ( async () => {
 
   winston.default.transports.console.level = 'error';
+
+  const progressBar = new cliProgress.SingleBar( {}, cliProgress.Presets.shades_classic );
 
   const repo = getOption( 'repo' )?.startsWith( 'perennial' ) ? null : getOption( 'repo' );
   const order = getOption( 'order' ) || 'alphabetical';
@@ -43,12 +49,19 @@ import winston from 'winston';
 
   let structures: { releaseBranch: ReleaseBranch; timestamp: number }[] = [];
 
+  progressBar.start( releaseBranches.length, 0 );
+
+  let countDone = 0;
+
   await Promise.all( releaseBranches.map( releaseBranch => limit( async () => {
     structures.push( {
       releaseBranch: releaseBranch,
       timestamp: await releaseBranch.checkout.getDivergingTimestamp()
     } );
+    progressBar.update( ++countDone );
   } ) ) );
+
+  progressBar.stop();
 
   if ( order === 'date' ) {
     structures = _.sortBy( structures, struct => struct.timestamp );
