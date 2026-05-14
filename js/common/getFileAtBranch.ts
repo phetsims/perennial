@@ -16,13 +16,13 @@ export const getFileAtBranch = async (
   file: string
 ): Promise<string> => {
   try {
-    return gitImmutableExecute( [ 'cat-file', 'blob', `${branch}:${file}` ], '..' );
+    return await gitImmutableExecute( [ 'cat-file', 'blob', `${branch}:${file}` ], '..' );
   }
   catch( e ) {
     if ( ( e as IntentionalPerennialAny ).message.includes( 'invalid object name' ) && ( e as IntentionalPerennialAny ).message.includes( branch ) ) {
 
       await ensureLocalBranchFromRemote( branch );
-      return gitCatFile( branch, file );
+      return gitCatFile( file, branch );
     }
     else {
       throw e;

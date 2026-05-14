@@ -169,7 +169,7 @@ export class Checkout {
       throw new Error( `Expected supported brands ${supportedBrands.join( ', ' )} on branch ${repo} ${legacyBranch} to include all of the published brands ${brands.join( ', ' )}` );
     }
 
-    checkout.releaseBranch = new ReleaseBranch( checkout, repo, branch, brands, isReleased );
+    checkout.releaseBranch = new ReleaseBranch( checkout, repo, legacyBranch, brands, isReleased );
 
     return checkout;
   }
@@ -189,6 +189,10 @@ export class Checkout {
   }
 
   public static getReleaseBranchName( repo: string, legacyBranch: string ): string {
+    if ( legacyBranch.startsWith( 'releases/' ) ) {
+      throw new Error( `Expected legacy branch to not start with releases/, got: ${legacyBranch}` );
+    }
+
     return `releases/${repo}/${legacyBranch}`;
   }
 

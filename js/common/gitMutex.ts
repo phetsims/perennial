@@ -35,7 +35,7 @@ export function gitMutableExecute(
   options?: { errors?: 'reject' } & Partial<ExecuteOptions>
 ): Promise<string>;
 
-// TODO: use this everywhere it is needed ---- find execute( 'git'
+// TODO: use this everywhere it is needed ---- find execute( 'git' https://github.com/phetsims/totality/issues/140
 export async function gitMutableExecute(
   args: string[],
   cwd: string,
@@ -62,7 +62,7 @@ export function gitImmutableExecute(
   options?: { errors?: 'reject' } & Partial<ExecuteOptions>
 ): Promise<string>;
 
-// TODO: use this everywhere it is needed
+// TODO: use this everywhere it is needed https://github.com/phetsims/totality/issues/140
 export async function gitImmutableExecute(
   args: string[],
   cwd: string,
