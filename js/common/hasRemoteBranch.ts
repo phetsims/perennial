@@ -8,6 +8,7 @@
 
 import winston from 'winston';
 import { gitImmutableExecute } from './gitMutex.js';
+import { Branch } from '../browser-and-node/PerennialTypes.js';
 
 /**
  * Whether there is a remote branch for a given repo.
@@ -15,7 +16,7 @@ import { gitImmutableExecute } from './gitMutex.js';
  * @param branch - The potential branch
  * @returns - Whether there was the branch on the remote server
  */
-export const hasRemoteBranch = async ( branch: string ): Promise<boolean> => {
+export const hasRemoteBranch = async ( branch: Branch ): Promise<boolean> => {
   winston.debug( `checking for remote branch ${branch}` );
 
   const stdout = await gitImmutableExecute( [ 'ls-remote', '--heads', 'https://github.com/phetsims/totality.git', branch ], '..' );

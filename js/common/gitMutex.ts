@@ -20,7 +20,7 @@ const DEBUG_CWD = true;
 export const gitExclusive = async <T>(
   callback: () => Promise<T>
 ): Promise<T> => {
-  return await gitMutex.runExclusive( callback );
+  return gitMutex.runExclusive( callback );
 };
 
 // TypeScript fun to get this to type-check, similar to execute

@@ -7,13 +7,14 @@
  */
 
 import { gitImmutableExecute } from './gitMutex.js';
+import { SHA } from '../browser-and-node/PerennialTypes.js';
 
 /**
  * Executes git commit
  *
  * @param sha - The SHA of the commit
  */
-export const gitDoesCommitExist = async ( sha: string ): Promise<boolean> => {
+export const gitDoesCommitExist = async ( sha: SHA ): Promise<boolean> => {
   const result = await gitImmutableExecute( [ 'cat-file', '-e', sha ], '..', {
     errors: 'resolve'
   } );
@@ -25,6 +26,7 @@ export const gitDoesCommitExist = async ( sha: string ): Promise<boolean> => {
     return false;
   }
   else {
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
     throw new Error( `Non-zero and non-one exit code from git cat-file: ${result}` );
   }
 };

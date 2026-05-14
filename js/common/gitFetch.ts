@@ -3,7 +3,7 @@
 /**
  * git fetch
  *
- * TODO: can we remove this, rely on Checkout?
+ * TODO: can we remove this, rely on Checkout? https://github.com/phetsims/totality/issues/140
  *
  * @author Jonathan Olson (PhET Interactive Simulations)
  */

@@ -10,8 +10,9 @@ import fs from 'fs';
 import { gitAdd } from './gitAdd.js';
 import { gitCommit } from './gitCommit.js';
 import { gitPush } from './gitPush.js';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
 
-export const markRunnableAsPublished = async ( runnable: string ): Promise<void> => {
+export const markRunnableAsPublished = async ( runnable: Repo ): Promise<void> => {
   const packageObject = JSON.parse( fs.readFileSync( `../${runnable}/package.json`, 'utf8' ) );
 
   if ( !packageObject.phet.published ) {

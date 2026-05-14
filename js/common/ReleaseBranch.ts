@@ -14,10 +14,11 @@ import { RunnableBranch } from './RunnableBranch.js';
 import { asyncFilter } from './asyncFilter.js';
 import { limitedMap } from './limitedMap.js';
 import { BuildOptions } from './getBuildArguments.js';
+import { LegacyBranch, Repo } from '../browser-and-node/PerennialTypes.js';
 
 export type ReleaseBranchSerialized = {
-  repo: string;
-  branch: string;
+  repo: Repo;
+  branch: LegacyBranch;
 };
 
 export type ReleaseBranchSuccessList = {
@@ -36,9 +37,9 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
   public constructor(
     // passed to RunnableBranch
     checkout: Checkout,
-    repo: string,
+    repo: Repo,
 
-    public readonly branch: string, // TODO: note: rename to legacyBranch? https://github.com/phetsims/totality/issues/140
+    public readonly branch: LegacyBranch, // TODO: note: rename to legacyBranch? https://github.com/phetsims/totality/issues/140
     brands: string[],
     public readonly isReleased: boolean
   ) {
@@ -155,7 +156,7 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
     return `${this.repo} ${this.branch} ${this.brands.join( ',' )}${this.isReleased ? '' : ' (unpublished)'}`;
   }
 
-  public override async getDependencies(): Promise<string[]> {
+  public override async getDependencies(): Promise<Repo[]> {
     // TODO: read from new buildInfo.json file? We can't use the normal method https://github.com/phetsims/totality/issues/140
     throw new Error( 'unimplemented' );
   }

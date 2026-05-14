@@ -10,11 +10,12 @@ import assert from 'assert';
 import winston from 'winston';
 import simMetadata from './simMetadata.js';
 import { Checkout } from './Checkout.js';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
 
 /**
  * Checks out the latest release branch (and dependencies) for a repository.
  */
-export const checkoutRelease = async ( repo: string ) => {
+export const checkoutRelease = async ( repo: Repo ): Promise<void> => {
   winston.info( `checking out release for ${repo}` );
 
   const data = await simMetadata( {

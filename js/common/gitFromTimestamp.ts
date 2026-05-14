@@ -7,17 +7,17 @@
  */
 
 import { gitImmutableExecute } from './gitMutex.js';
+import { Branch } from '../browser-and-node/PerennialTypes.js';
 
 /**
  * Gets the best SHA from a given branch at the given timestamp
  *
- * @param repo - The repository name
  * @param branch - The SHA/branch/whatnot to check out
  * @param timestamp
  * @returns - Resolves to the SHA
  */
 export const gitFromTimestamp = async (
-  branch: string,
+  branch: Branch,
   timestamp: string
 ): Promise<string> => {
   return gitImmutableExecute( [ 'rev-list', '-1', `--before="${timestamp}"`, branch ], '..' ).then( stdout => {

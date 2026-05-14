@@ -10,8 +10,9 @@
 
 import winston from 'winston';
 import { gitImmutableExecute, gitMutableExecute } from './gitMutex.js';
+import { Branch } from '../browser-and-node/PerennialTypes.js';
 
-export const ensureLocalBranchFromRemote = async ( branch: string ): Promise<void> => {
+export const ensureLocalBranchFromRemote = async ( branch: Branch ): Promise<void> => {
   winston.info( `ensuring local branch from remote: ${branch}` );
 
   await gitMutableExecute( [

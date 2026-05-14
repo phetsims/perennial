@@ -1,3 +1,12 @@
+// Copyright 2026, University of Colorado Boulder
+
+/**
+ * Represents a checkout for either the main checkout of totality (main, or sometimes one-offs), or for release
+ * branches (from worktrees). Provides common functionality for both.
+ *
+ * @author Jonathan Olson (PhET Interactive Simulations)
+ */
+
 import type { Checkout } from './Checkout.js';
 import winston from 'winston';
 import execute, { ExecuteOptions } from './execute.js';
@@ -7,9 +16,10 @@ import { puppeteerLoad } from './puppeteerLoad.js';
 import { BuildOptions, getBuildArguments } from './getBuildArguments.js';
 import _ from 'lodash';
 import SimVersion from '../browser-and-node/SimVersion.js';
-import { PackageJSON } from '../browser-and-node/PerennialTypes.js';
+import { PackageJSON, Repo } from '../browser-and-node/PerennialTypes.js';
 import { getBranchPackageJSON } from './getBranchPackageJSON.js';
 import fs from 'fs';
+// eslint-disable-next-line phet/default-import-match-filename
 import fsPromises from 'fs/promises';
 import { getBranchSimVersion } from './getBranchSimVersion.js';
 
@@ -17,7 +27,7 @@ export class RunnableBranch {
 
   public constructor(
     public readonly checkout: Checkout,
-    public readonly repo: string,
+    public readonly repo: Repo,
     public readonly brands: string[]
   ) {
   }
@@ -105,9 +115,9 @@ export class RunnableBranch {
     winston.info( `building ${this.checkout.workingDirectory} with grunt ${args.join( ' ' )}` );
     const result = await execute( gruntCommand, args, `${this.checkout.workingDirectory}/${this.repo}`, executeOptions );
 
-    // TODO: note we should --repo=${repo} potentially with newer chipper versions (!)
-    // TODO: MR patch to older sims to support this, THEN get rid of "npm ci"-ing the sim repo itself(!)
-    // TODO: (or... detected chipper version and run in different places, potentially do that first)
+    // TODO: note we should --repo=${repo} potentially with newer chipper versions (!) https://github.com/phetsims/totality/issues/140
+    // TODO: MR patch to older sims to support this, THEN get rid of "npm ci"-ing the sim repo itself(!) https://github.com/phetsims/totality/issues/140
+    // TODO: (or... detected chipper version and run in different places, potentially do that first) https://github.com/phetsims/totality/issues/140
 
     // Examine output to see if getDependencies (in chipper) notices any missing phet-io things.
     // Fail out if so. Detects that specific error message.
@@ -311,7 +321,7 @@ export class RunnableBranch {
   }
 
   // Fallback, ReleaseBranch can override
-  public async getDependencies(): Promise<string[]> {
+  public async getDependencies(): Promise<Repo[]> {
     return ( await this.checkout.getDependenciesMap( [ this.repo ] ) )[ this.repo ];
   }
 }

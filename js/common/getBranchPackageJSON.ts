@@ -7,11 +7,11 @@
  */
 
 import { getFileAtBranch } from './getFileAtBranch.js';
-import { PackageJSON } from '../browser-and-node/PerennialTypes.js';
+import { Branch, PackageJSON, Repo } from '../browser-and-node/PerennialTypes.js';
 
 export const getBranchPackageJSON = async (
-  repo: string, // e.g. 'scenery', or 'acid-base-solutions'
-  totalityBranch: string
+  repo: Repo, // e.g. 'scenery', or 'acid-base-solutions'
+  branch: Branch
 ): Promise<PackageJSON> => {
-  return JSON.parse( await getFileAtBranch( totalityBranch, `${repo}/package.json` ) );
+  return JSON.parse( await getFileAtBranch( branch, `${repo}/package.json` ) );
 };

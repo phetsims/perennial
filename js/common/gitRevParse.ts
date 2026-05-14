@@ -7,12 +7,12 @@
  */
 
 import { gitImmutableExecute } from './gitMutex.js';
+import { SHA } from '../browser-and-node/PerennialTypes.js';
 
 /**
  * Gets a single commit for a given query
- * @returns {Promise.<string>} - Resolves to the SHA.
  */
-export const gitRevParse = async ( query: string ): Promise<string> => {
+export const gitRevParse = async ( query: string ): Promise<SHA> => {
   return gitImmutableExecute( [ 'rev-parse', query ], '..' ).then( stdout => {
     const sha = stdout.trim();
     if ( sha.length === 0 ) {

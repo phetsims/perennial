@@ -9,9 +9,10 @@
 import SimVersion from '../browser-and-node/SimVersion.js';
 import winston from 'winston';
 import { getPackageJSON } from './getPackageJSON.js';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
 
 // TODO: see where SimVersion.parse is used, use this instead
-export const getRunnableVersion = async ( runnable: string ): Promise<SimVersion> => {
+export const getRunnableVersion = async ( runnable: Repo ): Promise<SimVersion> => {
   winston.debug( `Reading version from package.json for ${runnable}` );
 
   return SimVersion.parse( ( await getPackageJSON( runnable ) ).version );

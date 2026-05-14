@@ -1,7 +1,8 @@
 // Copyright 2023, University of Colorado Boulder
 // @author Matt Pennington (PhET Interactive Simulations)
 
-// TODO: potentially patch? Also copyright format issue
+// TODO: potentially patch? Also copyright format issue https://github.com/phetsims/totality/issues/140
+// TODO: Is this needed? https://github.com/phetsims/totality/issues/140
 
 const fs = require( 'fs' );
 const execute = require( './execute' ).default;

@@ -21,15 +21,15 @@ catch( e ) {
 }
 
 export const buildLocal = {
-  get devUsername() {
+  get devUsername(): string {
     assert( buildLocalObject.devUsername );
     return buildLocalObject.devUsername;
   },
-  get buildServerAuthorizationCode() {
+  get buildServerAuthorizationCode(): string {
     assert( buildLocalObject.buildServerAuthorizationCode );
     return buildLocalObject.buildServerAuthorizationCode;
   },
-  get phetDevGitHubAccessToken() {
+  get phetDevGitHubAccessToken(): string {
     assert( buildLocalObject.phetDevGitHubAccessToken,
       'The phetDevGitHubAccessToken field of build-local.json is required, and can be retrieved from the PhET ' +
       'credentials document for the "Github Machine User" row with the node "phetDevGitHubAccessToken" (it is ' +
@@ -37,25 +37,25 @@ export const buildLocal = {
     return buildLocalObject.phetDevGitHubAccessToken;
   },
 
-  get developerGithubAccessToken() {
+  get developerGithubAccessToken(): string {
     assert( buildLocalObject.developerGithubAccessToken,
       'The developerGithubAccessToken field of build-local.json is required for the use of the scripts in' +
       'phet-info/github-labels.  For information on how to create one, see' +
       'https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line#creating-a-token' );
     return buildLocalObject.developerGithubAccessToken;
   },
-  get developerGithubUsername() {
+  get developerGithubUsername(): string {
     assert( buildLocalObject.developerGithubUsername,
       'The developerGithubUsername field of build-local.json is required for the use of the scripts in' +
       'phet-info/github-labels.' );
     return buildLocalObject.developerGithubUsername;
   },
-  get slackBotToken() {
+  get slackBotToken(): string {
     assert( buildLocalObject.slackBotToken,
       'The slackBotToken field of build-local.json is required for CT Slack integration' );
     return buildLocalObject.slackBotToken;
   },
-  get slackSigningSecret() {
+  get slackSigningSecret(): string {
     assert( buildLocalObject.slackSigningSecret,
       'The slackSigningSecret field of build-local.json is required for CT Slack integration' );
     return buildLocalObject.slackSigningSecret;

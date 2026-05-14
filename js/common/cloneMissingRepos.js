@@ -11,7 +11,6 @@ const cloneRepo = require( './cloneRepo' );
 const getMissingRepos = require( './getMissingRepos' );
 const winston = require( 'winston' );
 const { gitMutableExecute } = require( './gitMutex' );
-const execute = require( './execute' ).default;
 
 /**
  * Clones missing repositories
@@ -34,7 +33,6 @@ module.exports = async ( omitPrivate, reposToCheck ) => {
       throw e;
     }
 
-    // TODO: if we keep this, mutex
     await gitMutableExecute( [ 'init', '--template=../phet-info/git-template-dir' ], `../${repo}` );
   }
 

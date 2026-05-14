@@ -12,7 +12,7 @@ import { gitImmutableExecute } from './gitMutex.js';
 /**
  * Checks to see if the git state/status is clean
  *
- * TODO: replace with checkout.isClean() unless we are specifying the file
+ * TODO: replace with checkout.isClean() unless we are specifying the file https://github.com/phetsims/totality/issues/140
  *
  * @param [file] - Optional file or path if you only want to check state of a single file or subdirectory
  * @returns - Whether it is clean or not

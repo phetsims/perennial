@@ -6,10 +6,10 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-
 import { loadJSON } from './loadJSON.js';
-import { PackageJSON } from '../browser-and-node/PerennialTypes.js';
+import { PackageJSON, Repo } from '../browser-and-node/PerennialTypes.js';
 
-export const getPackageJSON = async ( runnable: string ): Promise<PackageJSON> => {
+// TODO: Perhaps get main checkout and call methods on it, rather than this? https://github.com/phetsims/totality/issues/140
+export const getPackageJSON = async ( runnable: Repo ): Promise<PackageJSON> => {
   return loadJSON( `../${runnable}/package.json` );
 };

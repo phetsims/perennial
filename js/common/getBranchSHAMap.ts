@@ -8,12 +8,9 @@
 
 import winston from 'winston';
 import { gitImmutableExecute } from './gitMutex.js';
+import { Branch, SHA } from '../browser-and-node/PerennialTypes.js';
 
-/**
- * @returns {Promise.<Object>} - Object map from branch => sha {string}
- * @rejects {ExecuteError}
- */
-export const getBranchSHAMap = async (): Promise<Record<string, string>> => {
+export const getBranchSHAMap = async (): Promise<Record<Branch, SHA>> => {
   winston.debug( 'retrieving branches' );
 
   const map: Record<string, string> = {};

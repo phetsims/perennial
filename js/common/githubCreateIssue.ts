@@ -10,6 +10,7 @@ import { buildLocal } from './buildLocal.js';
 import Octokit from '@octokit/rest';
 import _ from 'lodash';
 import winston from 'winston';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
 
 /**
  * Creates an issue in a phetsims github repository
@@ -30,7 +31,7 @@ import winston from 'winston';
  *                     https://octokit.github.io/rest.js/#octokit-routes-issues-create
  */
 export const githubCreateIssue = async (
-  repo: string,
+  repo: Repo,
   title: string,
   options: Partial<Octokit.RequestOptions & Octokit.IssuesCreateParams>
 ): Promise<void> => {

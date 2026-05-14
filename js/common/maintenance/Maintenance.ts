@@ -16,6 +16,7 @@ import { DeployedLinkOptions, ModifiedBranch } from './ModifiedBranch.js';
 import { ReleaseBranch } from '../ReleaseBranch.js';
 import { Patch } from './Patch.js';
 import { Checkout } from '../Checkout.js';
+import { LegacyBranch, Repo, SHA } from '../../browser-and-node/PerennialTypes.js';
 
 // constants
 const MAINTENANCE_FILE = '.maintenance.json';
@@ -67,10 +68,10 @@ export class Maintenance {
    * @param filter - Optional filter, release branches will be skipped if this resolves to false
    */
   public static async checkBranchStatus( filter?: FilterSyncRB ): Promise<void> {
-    // TODO: add checks to see if release branches have a last commit that is a "post-deploy" commit (!)
-    // TODO: This will likely be done AFTER we do everything else
+    // TODO: add checks to see if release branches have a last commit that is a "post-deploy" commit (!) https://github.com/phetsims/totality/issues/140
+    // TODO: This will likely be done AFTER we do everything else https://github.com/phetsims/totality/issues/140
 
-    // TODO: .... nothing else to do, right?
+    // TODO: .... nothing else to do, right? https://github.com/phetsims/totality/issues/140
 
     console.log( 'no checks done, TODO' );
   }
@@ -249,7 +250,7 @@ export class Maintenance {
   /**
    * Adds a particular SHA (to cherry-pick) to a patch.
    */
-  public static async addPatchSHA( patchName: string, sha: string ): Promise<void> {
+  public static async addPatchSHA( patchName: string, sha: SHA ): Promise<void> {
     const maintenance = await Maintenance.load();
 
     const patch = maintenance.findPatch( patchName );
@@ -264,7 +265,7 @@ export class Maintenance {
   /**
    * Removes a particular SHA (to cherry-pick) from a patch.
    */
-  public static async removePatchSHA( patchName: string, sha: string ): Promise<void> {
+  public static async removePatchSHA( patchName: string, sha: SHA ): Promise<void> {
     const maintenance = await Maintenance.load();
 
     const patch = maintenance.findPatch( patchName );
@@ -299,7 +300,7 @@ export class Maintenance {
   /**
    * Adds a needed patch to a given modified branch.
    */
-  public static async addNeededPatch( repo: string, branch: string, patchName: string ): Promise<void> {
+  public static async addNeededPatch( repo: Repo, branch: LegacyBranch, patchName: string ): Promise<void> {
     const maintenance = await Maintenance.load();
     assert( repo !== patchName, 'Cannot patch a release branch repo, yet.' ); // TODO: remove in https://github.com/phetsims/perennial/issues/312
 
@@ -379,7 +380,7 @@ export class Maintenance {
   /**
    * Adds a needed patch to all release branches that do NOT include the given commit on the repo
    */
-  public static async addNeededPatchesBefore( patchName: string, sha: string ): Promise<void> {
+  public static async addNeededPatchesBefore( patchName: string, sha: SHA ): Promise<void> {
     await Maintenance.addNeededPatches( patchName, async releaseBranch => {
       return releaseBranch.checkout.isMissingSHA( sha );
     } );
@@ -388,7 +389,7 @@ export class Maintenance {
   /**
    * Adds a needed patch to all release branches that DO include the given commit on the repo
    */
-  public static async addNeededPatchesAfter( patchName: string, sha: string ): Promise<void> {
+  public static async addNeededPatchesAfter( patchName: string, sha: SHA ): Promise<void> {
     await Maintenance.addNeededPatches( patchName, async releaseBranch => {
       return releaseBranch.checkout.includesSHA( sha );
     } );
@@ -397,7 +398,7 @@ export class Maintenance {
   /**
    * Removes a needed patch from a given modified branch.
    */
-  public static async removeNeededPatch( repo: string, branch: string, patchName: string ): Promise<void> {
+  public static async removeNeededPatch( repo: Repo, branch: LegacyBranch, patchName: string ): Promise<void> {
     const maintenance = await Maintenance.load();
 
     const patch = maintenance.findPatch( patchName );
@@ -451,7 +452,7 @@ export class Maintenance {
   /**
    * Removes a needed patch from all release branches that do NOT include the given commit on the repo
    */
-  public static async removeNeededPatchesBefore( patchName: string, sha: string ): Promise<void> {
+  public static async removeNeededPatchesBefore( patchName: string, sha: SHA ): Promise<void> {
     await Maintenance.removeNeededPatches( patchName, async releaseBranch => {
       return releaseBranch.checkout.isMissingSHA( sha );
     } );
@@ -460,7 +461,7 @@ export class Maintenance {
   /**
    * Removes a needed patch from all release branches that DO include the given commit on the repo
    */
-  public static async removeNeededPatchesAfter( patchName: string, sha: string ): Promise<void> {
+  public static async removeNeededPatchesAfter( patchName: string, sha: SHA ): Promise<void> {
     await Maintenance.removeNeededPatches( patchName, async releaseBranch => {
       return releaseBranch.checkout.includesSHA( sha );
     } );
@@ -835,7 +836,7 @@ export class Maintenance {
    * @param [errorIfMissing]
    * @param [releaseBranches] - If provided, it will speed up the process
    */
-  public async ensureModifiedBranch( repo: string, branch: string, errorIfMissing = false, releaseBranches: ReleaseBranch[] | null = null ): Promise<ModifiedBranch> {
+  public async ensureModifiedBranch( repo: Repo, branch: LegacyBranch, errorIfMissing = false, releaseBranches: ReleaseBranch[] | null = null ): Promise<ModifiedBranch> {
     let modifiedBranch = this.modifiedBranches.find( modifiedBranch => modifiedBranch.repo === repo && modifiedBranch.branch === branch );
 
     if ( !modifiedBranch ) {

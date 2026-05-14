@@ -11,7 +11,6 @@ import { scp } from './scp.js';
 
 /**
  * Transfers a file (or directory recursively) to the dev server
- * @public
  *
  * @param localFile - A file, directory or glob pattern. Basically the first part of the SCP command
  * @param remoteFile - A file or directory. Basically the second part of the SCP command (minus the host/username)

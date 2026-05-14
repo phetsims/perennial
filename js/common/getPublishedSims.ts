@@ -9,8 +9,9 @@
 import simMetadata from './simMetadata.js';
 import simPhetioMetadata from './simPhetioMetadata.js';
 import _ from 'lodash';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
 
-export const getPublishedSims = async (): Promise<string[]> => {
+export const getPublishedSims = async (): Promise<Repo[]> => {
   const publishedRepos: string[] = [];
 
   const metadata = await simMetadata( {

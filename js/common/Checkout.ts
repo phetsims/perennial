@@ -32,7 +32,7 @@ import simPhetioMetadata, { SimPhetioMetadata } from './simPhetioMetadata.js';
 import { getActiveSims } from './getActiveSims.js';
 import { getBranches } from './getBranches.js';
 import os from 'os';
-import { IntentionalPerennialAny } from '../browser-and-node/PerennialTypes.js';
+import { Branch, IntentionalPerennialAny, LegacyBranch, Repo, SHA } from '../browser-and-node/PerennialTypes.js';
 import assert from 'assert';
 import { getBranch } from './getBranch.js';
 import { hasRemoteBranch } from './hasRemoteBranch.js';
@@ -68,18 +68,18 @@ export class Checkout {
   public releaseBranch: ReleaseBranch | null = null;
 
   // This is used a lot, and expensive to calculate, so we will cache it here.
-  private cachedDivergingSHA: string | null = null;
+  private cachedDivergingSHA: SHA | null = null;
 
   // Protected so we can do async initialization in static methods
   protected constructor(
-    public readonly branch: string,
+    public readonly branch: Branch,
     public readonly workingDirectory: string,
     public isCheckedOut: boolean // will be mutated to true on a checkout. We need to track that for various operations
   ) {
 
   }
 
-  public static async hasWorktree( branch: string ): Promise<boolean> {
+  public static async hasWorktree( branch: Branch ): Promise<boolean> {
     const worktreeData = await gitImmutableExecute( [
       'worktree',
       'list',
@@ -97,11 +97,11 @@ export class Checkout {
    * NOTE: BE CAREFUL, this is set as isCheckedOut: true. Code using this should keep it on the branch
    * while it is in scope
    */
-  public static async getOneOffCheckout( branch: string ): Promise<Checkout> {
+  public static async getOneOffCheckout( branch: Branch ): Promise<Checkout> {
     return new Checkout( branch, '..', true );
   }
 
-  public static async getReleaseBranchCheckout( repo: string, legacyBranch: string ): Promise<Checkout> {
+  public static async getReleaseBranchCheckout( repo: Repo, legacyBranch: LegacyBranch ): Promise<Checkout> {
     winston.info( `getting release branch checkout for ${repo} ${legacyBranch}` );
 
     const branch = Checkout.getReleaseBranchName( repo, legacyBranch );
@@ -174,7 +174,7 @@ export class Checkout {
     return checkout;
   }
 
-  public static async getReleaseBranch( repo: string, legacyBranch: string ): Promise<ReleaseBranch> {
+  public static async getReleaseBranch( repo: Repo, legacyBranch: LegacyBranch ): Promise<ReleaseBranch> {
     const checkout = await Checkout.getReleaseBranchCheckout( repo, legacyBranch );
 
     if ( !checkout.releaseBranch ) {
@@ -184,11 +184,11 @@ export class Checkout {
     return checkout.releaseBranch;
   }
 
-  public static async getMainRunnableBranch( repo: string ): Promise<RunnableBranch> {
+  public static async getMainRunnableBranch( repo: Repo ): Promise<RunnableBranch> {
     return ( await Checkout.getMainCheckout() ).getRunnableBranch( repo );
   }
 
-  public static getReleaseBranchName( repo: string, legacyBranch: string ): string {
+  public static getReleaseBranchName( repo: Repo, legacyBranch: LegacyBranch ): Branch {
     if ( legacyBranch.startsWith( 'releases/' ) ) {
       throw new Error( `Expected legacy branch to not start with releases/, got: ${legacyBranch}` );
     }
@@ -196,14 +196,14 @@ export class Checkout {
     return `releases/${repo}/${legacyBranch}`;
   }
 
-  public static getWorktreeDirectory( branch: string ): string {
+  public static getWorktreeDirectory( branch: Branch ): string {
     // TODO: do we need escaping at all, if one branch is a substring of another? (e.g. feature/foo, feature/foo/bar) https://github.com/phetsims/totality/issues/140
     return `${WORKTREE_DIRECTORY}/${branch}`;
   }
 
   public static async createReleaseBranchCheckout(
-    repo: string,
-    legacyBranch: string,
+    repo: Repo,
+    legacyBranch: LegacyBranch,
     brands: string[],
     message?: string // appended to the commit message for the initial release branch commit, if provided
   ): Promise<Checkout> {
@@ -303,13 +303,13 @@ export class Checkout {
   public static async getMaintainedReleaseBranches( unreleased = true ): Promise<ReleaseBranch[]> {
     winston.info( `Getting maintained release branches (unreleased: ${unreleased})` );
 
-    type Stub = { repo: string; branch: string };
+    type Stub = { repo: Repo; branch: LegacyBranch };
 
     const stubs: Stub[] = [];
-    const hasStub = ( repo: string, branch: string ): boolean => {
+    const hasStub = ( repo: Repo, branch: LegacyBranch ): boolean => {
       return stubs.some( stub => stub.repo === repo && stub.branch === branch );
     };
-    const addStub = ( repo: string, branch: string ): void => {
+    const addStub = ( repo: Repo, branch: LegacyBranch ): void => {
       // FAMB 2.3-phetio keeps ending up in the MR list when we don't want it to, see https://github.com/phetsims/phet-io/issues/1957.
       if ( repo === 'forces-and-motion-basics' && branch === '2.3-phetio' ) {
         return;
@@ -397,7 +397,7 @@ export class Checkout {
     return Promise.all( stubs.map( stub => limit( () => Checkout.getReleaseBranch( stub.repo, stub.branch ) ) ) );
   }
 
-  public async getRunnableBranch( repo: string ): Promise<RunnableBranch> {
+  public async getRunnableBranch( repo: Repo ): Promise<RunnableBranch> {
     const brands = await getBranchBrands( repo, this.branch );
 
     return new RunnableBranch( this, repo, brands );
@@ -439,7 +439,7 @@ export class Checkout {
     return gitMutableExecute( [ 'pull', '--rebase' ], this.workingDirectory );
   }
 
-  public async gitCherryPick( target: string ): Promise<boolean> {
+  public async gitCherryPick( target: SHA ): Promise<boolean> {
     winston.info( `git cherry-pick ${target}` );
 
     try {
@@ -463,15 +463,15 @@ export class Checkout {
     }
   }
 
-  public async getSHA(): Promise<string> {
+  public async getSHA(): Promise<SHA> {
     return gitRevParse( this.branch );
   }
 
-  public async getSymbolicRef(): Promise<string> {
+  public async getSymbolicRef(): Promise<SHA | Branch> {
     return ( await gitImmutableExecute( [ 'symbolic-ref', '-q', 'HEAD' ], this.workingDirectory ) ).trim();
   }
 
-  public async getTrackingBranch(): Promise<string> {
+  public async getTrackingBranch(): Promise<Branch> {
     return ( await gitImmutableExecute( [ 'for-each-ref', '--format=\'%(upstream:short)\'', await this.getSymbolicRef() ], this.workingDirectory ) ).trim();
   }
 
@@ -497,7 +497,7 @@ export class Checkout {
     return gitImmutableExecute( gitArgs, this.workingDirectory ).then( stdout => Promise.resolve( stdout.length === 0 ) );
   }
 
-  public async npmUpdateRepo( repo: string, options?: NPMUpdateOptions ): Promise<void> {
+  public async npmUpdateRepo( repo: Repo, options?: NPMUpdateOptions ): Promise<void> {
     return npmUpdateDirectory( `${this.workingDirectory}/${repo}`, options );
   }
 
@@ -705,7 +705,7 @@ export class Checkout {
     return this.isCheckedOut ? this.workingDirectory : '..';
   }
 
-  public async hasUpstreamBranch( branch: string ): Promise<boolean> {
+  public async hasUpstreamBranch( branch: Branch ): Promise<boolean> {
     return ( await gitImmutableExecute( [
       'rev-parse',
       '--abbrev-ref',
@@ -714,7 +714,7 @@ export class Checkout {
     ], this.getAnyWorkingDirectory(), { errors: 'resolve' } ) ).code === 0;
   }
 
-  public async hasLocalBranch( branch: string ): Promise<boolean> {
+  public async hasLocalBranch( branch: Branch ): Promise<boolean> {
     return (
       await gitImmutableExecute( [
         'show-ref',
@@ -828,7 +828,7 @@ export class Checkout {
    *
    * NOTE: fetches are needed before this, so things are up-to-date (!)
    */
-  public async getDivergingSHA(): Promise<string> {
+  public async getDivergingSHA(): Promise<SHA> {
     if ( this.cachedDivergingSHA ) {
       return this.cachedDivergingSHA;
     }
@@ -862,7 +862,7 @@ export class Checkout {
    * NOTE: octopus merges were done for legacy release branches, so ideally finding the totality SHA of an older polyrepo
    * commit will allow this to work.
    */
-  public async includesSHA( sha: string ): Promise<boolean> {
+  public async includesSHA( sha: SHA ): Promise<boolean> {
     return gitIsAncestor( sha, this.branch );
   }
 
@@ -871,7 +871,7 @@ export class Checkout {
    * NOTE: octopus merges were done for legacy release branches, so ideally finding the totality SHA of an older polyrepo
    * commit will allow this to work.
    */
-  public async isMissingSHA( sha: string ): Promise<boolean> {
+  public async isMissingSHA( sha: SHA ): Promise<boolean> {
     const currentSHA = await gitRevParse( this.branch );
 
     return sha !== currentSHA && !( await this.includesSHA( sha ) );
@@ -927,7 +927,7 @@ export class Checkout {
    *
    * NOTE: This does not include babel
    */
-  public async getDependenciesMap( runnables: string[] = getActiveRunnables() ): Promise<Record<string, string[]>> {
+  public async getDependenciesMap( runnables: Repo[] = getActiveRunnables() ): Promise<Record<Repo, Repo[]>> {
     return JSON.parse( await execute(
       tsxCommand,
       [

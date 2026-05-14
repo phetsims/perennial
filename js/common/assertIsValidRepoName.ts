@@ -7,9 +7,10 @@
  */
 
 import assert from 'assert';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
 
 export const assertIsValidRepoName = (
-  repo: string
+  repo: Repo
 ): void => {
   assert( typeof repo === 'string' && /^[a-z]+(-[a-z]+)*$/u.test( repo ), 'repo name should be composed of lowercase a-z characters, optionally with dashes used as separators' );
 };

@@ -8,6 +8,9 @@
  * @author Sam Reid (PhET Interactive Simulations)
  */
 
+// TODO: Decide long-term if we are removing this, see https://github.com/phetsims/totality/issues/140
+// eslint-disable
+// @ts-nocheck
 
 const assert = require( 'assert' );
 const SimVersion = require( '../../browser-and-node/SimVersion' ).default;

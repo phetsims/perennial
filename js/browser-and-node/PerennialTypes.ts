@@ -7,6 +7,9 @@
 // TODO: move launchpad to these types https://github.com/phetsims/totality/issues/140
 export type Repo = string;
 export type SHA = string;
+// TODO: use these types where possible https://github.com/phetsims/totality/issues/140
+export type Branch = string; // for release branches or otherwise, should always be a fully-qualified branch name, e.g. 'releases/acid-base-solutions/1.3'
+export type LegacyBranch = string; // for release branches, e.g. '1.2'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type IntentionalPerennialAny = any;

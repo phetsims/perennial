@@ -7,8 +7,9 @@
  */
 
 import { getPackageJSON } from './getPackageJSON.js';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
 
-export const isPublished = async ( runnable: string ): Promise<boolean> => {
+export const isPublished = async ( runnable: Repo ): Promise<boolean> => {
   const packageObject = await getPackageJSON( runnable );
 
   return !!packageObject?.phet?.published;

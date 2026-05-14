@@ -14,6 +14,7 @@ import { ReleaseBranch } from '../ReleaseBranch.js';
 import { Patch } from './Patch.js';
 import { Checkout } from '../Checkout.js';
 import { githubCreateIssue } from '../githubCreateIssue.js';
+import { LegacyBranch, Repo } from '../../browser-and-node/PerennialTypes.js';
 
 type ModifiedBranchSerialized = {
   releaseBranch: ReturnType<ReleaseBranch['serialize']>;
@@ -38,8 +39,8 @@ export type DeployedLinkOptions = {
 };
 
 export class ModifiedBranch {
-  public readonly repo: string;
-  public readonly branch: string;
+  public readonly repo: Repo;
+  public readonly branch: LegacyBranch;
   public readonly brands: string[];
 
   /**
@@ -147,7 +148,7 @@ export class ModifiedBranch {
   /**
    * Returns the branch name that should be used in dependency repositories.
    */
-  public get dependencyBranch(): string {
+  public get dependencyBranch(): LegacyBranch {
     return `${this.repo}-${this.branch}`;
   }
 

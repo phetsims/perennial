@@ -8,4 +8,4 @@
 
 import { gitPullDirectory } from './gitPullDirectory.js';
 
-export const gitPull = async () => gitPullDirectory( '..' );
+export const gitPull = async (): Promise<string> => gitPullDirectory( '..' );

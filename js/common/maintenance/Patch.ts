@@ -6,17 +6,19 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
+import { SHA } from '../../browser-and-node/PerennialTypes.js';
+
 export type PatchSerialized = {
   name: string;
   message: string;
-  shas: string[];
+  shas: SHA[];
 };
 
 export class Patch implements PatchSerialized {
   public constructor(
     public readonly name: string,
     public readonly message: string,
-    public readonly shas: string[] = []
+    public readonly shas: SHA[] = []
   ) {}
 
   /**
