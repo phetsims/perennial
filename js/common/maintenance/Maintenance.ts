@@ -206,6 +206,10 @@ export class Maintenance {
    * Creates a patch
    */
   public static async createPatch( patchName: string, message: string ): Promise<void> {
+    if ( !message.includes( 'http' ) ) {
+      throw new Error( 'createPatch( patchName, message ), changed API' );
+    }
+
     const maintenance = await Maintenance.load();
 
     for ( const patch of maintenance.patches ) {
