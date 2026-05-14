@@ -7,9 +7,9 @@
  *  @author Matt Pennington
  **/
 
-import getFileAtBranch from '../common/getFileAtBranch.js';
-import ReleaseBranch from '../common/ReleaseBranch.js';
+import { getFileAtBranch } from '../common/getFileAtBranch.js';
 import winston from '../npm-dependencies/winston.js';
+import { Checkout } from '../common/Checkout.js';
 
 // Set to true if you want to ignore release branches that only support phet-io brand.
 const PHET_IO_BRAND_TOO = false;
@@ -19,12 +19,11 @@ console.log( '' );
 
 ( async () => {
 
-  const phetBrandSims = await ReleaseBranch.getAllMaintenanceBranches( false );
+  const releaseBranches = await Checkout.getMaintainedReleaseBranches();
 
-  for ( const releaseBranch of phetBrandSims ) {
+  for ( const releaseBranch of releaseBranches ) {
 
-    const dependencies = JSON.parse( await getFileAtBranch( releaseBranch.repo, releaseBranch.branch, 'dependencies.json' ) );
-    const chipperPackage = JSON.parse( await getFileAtBranch( 'chipper', dependencies.chipper.sha, 'package.json' ) );
+    const chipperPackage = JSON.parse( await getFileAtBranch( releaseBranch.branch, 'chipper/package.json' ) );
 
     const shouldLog = !chipperPackage.version.startsWith( '2' ) &&
                       ( PHET_IO_BRAND_TOO || releaseBranch.brands.includes( 'phet' ) );

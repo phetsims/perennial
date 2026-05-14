@@ -12,7 +12,6 @@ import { vpnCheck } from '../common/vpnCheck.js';
 import { gitIsClean } from '../common/gitIsClean.js';
 import { hasRemoteBranch } from '../common/hasRemoteBranch.js';
 import { booleanPrompt } from '../common/booleanPrompt.js';
-import createRelease from './createRelease.js';
 import { buildLocal } from '../common/buildLocal.js';
 import { devDirectoryExists } from '../common/devDirectoryExists.js';
 import { Checkout } from '../common/Checkout.js';

@@ -92,8 +92,12 @@ export class Checkout {
     return new Checkout( 'main', '..', true );
   }
 
+  /**
+   * NOTE: BE CAREFUL, this is set as isCheckedOut: true. Code using this should keep it on the branch
+   * while it is in scope
+   */
   public static async getOneOffCheckout( branch: string ): Promise<Checkout> {
-    return new Checkout( branch, '..', true ); // TODO: is isCheckedOut:true safe here?
+    return new Checkout( branch, '..', true );
   }
 
   public static async getReleaseBranchCheckout( repo: string, legacyBranch: string ): Promise<Checkout> {
@@ -270,8 +274,6 @@ export class Checkout {
     // Update the version info (will push)
     await releaseBranch.setSupportedBrands( brands );
     await releaseBranch.setSimVersion( newVersion, message );
-
-    // TODO: WE NEED TO SUBSET THINGS, so we remove unneeded repos. We'll need to get dependencies.
 
     // Update the version info in main
     const mainRunnableBranch = await Checkout.getMainRunnableBranch( repo );
@@ -458,6 +460,24 @@ export class Checkout {
 
   public async getSHA(): Promise<string> {
     return gitRevParse( this.branch );
+  }
+
+  public async getSymbolicRef(): Promise<string> {
+    return ( await gitImmutableExecute( [ 'symbolic-ref', '-q', 'HEAD' ], this.workingDirectory ) ).trim();
+  }
+
+  public async getTrackingBranch(): Promise<string> {
+    return ( await gitImmutableExecute( [ 'for-each-ref', '--format=\'%(upstream:short)\'', await this.getSymbolicRef() ], this.workingDirectory ) ).trim();
+  }
+
+  public async getAheadBehind(): Promise<{ ahead: number; behind: number }> {
+    // e.g. behind-count + '\t' + ahead-count
+    const counts = await execute( 'git', [ 'rev-list', '--left-right', '--count', `${await this.getTrackingBranch()}@{u}...HEAD` ], this.workingDirectory );
+
+    return {
+      ahead: Number( counts.split( '\t' )[ 1 ] ),
+      behind: Number( counts.split( '\t' )[ 0 ] )
+    };
   }
 
   public async isClean( file?: string ): Promise<boolean> {

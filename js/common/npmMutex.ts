@@ -10,7 +10,6 @@ import { Mutex } from 'async-mutex';
 
 export const npmMutex = new Mutex();
 
-// TODO: use this everywhere it is needed
 export const npmExclusive = async <T>(
   callback: () => Promise<T>
 ): Promise<T> => {

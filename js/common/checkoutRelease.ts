@@ -6,6 +6,7 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
+import assert from 'assert';
 import winston from 'winston';
 import simMetadata from './simMetadata.js';
 import { Checkout } from './Checkout.js';

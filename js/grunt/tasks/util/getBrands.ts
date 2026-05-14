@@ -5,7 +5,7 @@
  */
 import assert from 'assert';
 import fs from 'fs';
-import buildLocal from '../../../common/buildLocal.js';
+import { buildLocal } from '../../../common/buildLocal.js';
 import getOption from './getOption.js';
 
 type Brand = string;

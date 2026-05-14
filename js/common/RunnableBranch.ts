@@ -20,7 +20,6 @@ export class RunnableBranch {
     public readonly repo: string,
     public readonly brands: string[]
   ) {
-    // TODO: do we want to specify workingDirectory as a helper?
   }
 
   /**
@@ -83,7 +82,6 @@ export class RunnableBranch {
       brands: this.brands,
       allHTML: true,
       debugHTML: true,
-      // lint: false, TODO: when replacing usages, remember to turn off linting when not needed
       locales: '*'
     }, options ) );
 
