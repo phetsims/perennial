@@ -12,7 +12,7 @@ import winston from 'winston';
 /**
  * Executes a command on a remote server.
  *
- * @returns {Promise.<string>} - Stdout
+ * @returns - Stdout
  * @rejects {ExecuteError}
  */
 export const ssh = async (

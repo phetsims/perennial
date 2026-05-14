@@ -34,7 +34,7 @@ const { readFileSync } = require( 'fs' );
  */
 module.exports = async function( repo, author, options ) {
 
-  // TODO: update for totality
+  // TODO: update for totality https://github.com/phetsims/totality/issues/140
 
   const {
     title = toTitle( repo ),

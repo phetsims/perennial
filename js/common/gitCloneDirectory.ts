@@ -6,19 +6,12 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-const winston = require( 'winston' );
-const execute = require( './execute' ).default;
-const getActiveSceneryStackRepos = require( './getActiveSceneryStackRepos' );
-const { gitImmutableExecute } = require( './gitMutex' );
+import winston from 'winston';
+import { getActiveSceneryStackRepos } from './getActiveSceneryStackRepos.js';
+import { gitImmutableExecute } from './gitMutex.js';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
 
-/**
- * @public
- *
- * @param {string} repo
- * @param {string} directory
- * @returns {Promise}
- */
-module.exports = async function gitCloneDirectory( repo, directory ) {
+export const gitCloneDirectory = async ( repo: Repo, directory: string ): Promise<void> => {
   winston.info( `cloning repo ${repo} in ${directory}` );
   if ( getActiveSceneryStackRepos().includes( repo ) ) {
     await gitImmutableExecute( [ 'clone', `https://github.com/scenerystack/${repo}.git` ], directory );

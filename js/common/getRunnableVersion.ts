@@ -11,7 +11,7 @@ import winston from 'winston';
 import { getPackageJSON } from './getPackageJSON.js';
 import { Repo } from '../browser-and-node/PerennialTypes.js';
 
-// TODO: see where SimVersion.parse is used, use this instead
+// TODO: see where SimVersion.parse is used, use this instead https://github.com/phetsims/totality/issues/140
 export const getRunnableVersion = async ( runnable: Repo ): Promise<SimVersion> => {
   winston.debug( `Reading version from package.json for ${runnable}` );
 

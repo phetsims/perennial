@@ -10,9 +10,8 @@ import { gitImmutableExecute } from './gitMutex.js';
 
 /**
  * Gets the contents of a file at a specific git branch/SHA/object
- * @public
  *
- * TODO: see if we can remove this, we have the branched form which seems better
+ * TODO: see if we can remove this, we have the branched form which seems better https://github.com/phetsims/totality/issues/140
  *
  * @param gitObject - The branch/SHA/object name
  * @param filename - The filename - relative to the root of the repository

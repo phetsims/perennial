@@ -11,16 +11,17 @@
  */
 
 import { gitImmutableExecute } from './gitMutex.js';
+import { SHA } from '../browser-and-node/PerennialTypes.js';
 
 /**
- * @param {string} primaryTarget - Branch/SHA
- * @param {string} secondaryTarget - Branch/SHA
- * @returns {Promise.<string>} - Resolves to the SHA
+ * @param primaryTarget - Branch/SHA
+ * @param secondaryTarget - Branch/SHA
+ * @returns Resolves to the SHA
  */
 export const gitFirstDivergingCommit = async (
   primaryTarget: string,
   secondaryTarget: string
-): Promise<string> => {
+): Promise<SHA> => {
   // NOTE: This was switched from `git log secondary..primary --reverse --pretty=oneline` due to totality performance
   // being horrible
   return gitImmutableExecute( [

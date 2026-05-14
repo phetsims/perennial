@@ -11,7 +11,6 @@ import { gitMutableExecute } from './gitMutex.js';
 
 /**
  * Executes git cherry-pick (but if it fails, it will back out of the cherry-pick)
- * @public
  *
  * @param target - The SHA/branch/whatnot to check out
  * @returns - Resolves to whether the cherry-pick worked or not. If aborting fails, will reject.

@@ -5,8 +5,8 @@
  *   --repo : Only show branches for a specific repository
  *   --order=<ORDER> : alphabetical|date
  *
- * TODO: currently need this for TTY: npx tsx ./js/grunt/tasks/release-branch-list.ts
- * TODO: see console.log( {stdoutTTY: process.stdout.isTTY,stderrTTY: process.stderr.isTTY} );
+ * TODO: currently need this for TTY: npx tsx ./js/grunt/tasks/release-branch-list.ts https://github.com/phetsims/totality/issues/140
+ * TODO: see console.log( {stdoutTTY: process.stdout.isTTY,stderrTTY: process.stderr.isTTY} ); https://github.com/phetsims/totality/issues/140
  *
  * @author Jonathan Olson (PhET Interactive Simulations)
  * */
@@ -38,7 +38,7 @@ import cliProgress from 'cli-progress';
   assert( order === 'alphabetical' || order === 'date', `unsupported order type: ${order}` );
 
   // Fetch, so we get up-to-date timestamps below
-  // TODO: how many other operations need this at the start?
+  // TODO: how many other operations need this at the start? https://github.com/phetsims/totality/issues/140
   await gitFetch();
 
   const releaseBranches = await Checkout.getMaintainedReleaseBranches();

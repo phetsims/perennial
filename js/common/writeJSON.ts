@@ -6,7 +6,8 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import fs from 'fs/promises';
+// eslint-disable-next-line phet/default-import-match-filename
+import fsPromises from 'fs/promises';
 import winston from 'winston';
 
 /**
@@ -15,11 +16,11 @@ import winston from 'winston';
  * @param file
  * @param content
  */
-export const writeJSON = async ( file: string, content: Object ): Promise<void> => {
+export const writeJSON = async ( file: string, content: object ): Promise<void> => {
   winston.debug( `Writing JSON to ${file}` );
 
   try {
-    await fs.writeFile( file, JSON.stringify( content, null, 2 ) );
+    await fsPromises.writeFile( file, JSON.stringify( content, null, 2 ) );
   }
   catch( err ) {
     throw new Error( `Could not write to file: ${file} due to: ${err}` );

@@ -122,7 +122,6 @@ export class Maintenance {
         await Promise.all( modifiedBranches.map( modifiedBranch => {
           return ( async () => {
             if ( !modifiedBranch.releaseBranch.cachedTimestampString ) {
-              // TODO: add caching perhaps in the ReleaseBranch objects?
               // eslint-disable-next-line require-atomic-updates
               modifiedBranch.releaseBranch.cachedTimestampString = await modifiedBranch.releaseBranch.checkout.getDivergingTimestampString();
             }
@@ -543,7 +542,7 @@ export class Maintenance {
    *
    * @param filter - Optional filter, modified branches will be skipped if this resolves to false
    */
-  public static async deployReleaseCandidates( filter?: FilterMB ): Promise<void> {
+  public static async deployReleaseCandidates( filter?: FilterMB, skipBuild = false ): Promise<void> {
     const maintenance = await Maintenance.load();
 
     for ( const modifiedBranch of maintenance.modifiedBranches ) {
@@ -563,7 +562,8 @@ export class Maintenance {
 
         const version = await rc( modifiedBranch.repo, modifiedBranch.branch, {
           noninteractive: true,
-          message: modifiedBranch.pushedMessages.join( ', ' )
+          message: modifiedBranch.pushedMessages.join( ', ' ),
+          skipBuild: skipBuild
         } );
         modifiedBranch.deployedVersion = version;
         maintenance.save(); // save here in case a future failure would "revert" things
@@ -584,7 +584,7 @@ export class Maintenance {
    * Deploys production versions of the modified branches that need it.
    * @param filter - Optional filter, modified branches will be skipped if this resolves to false
    */
-  public static async deployProduction( filter: FilterMB ): Promise<void> {
+  public static async deployProduction( filter: FilterMB, skipBuild = true ): Promise<void> {
     const maintenance = await Maintenance.load();
 
     for ( const modifiedBranch of maintenance.modifiedBranches ) {
@@ -602,8 +602,8 @@ export class Maintenance {
 
         const version = await production( modifiedBranch.repo, modifiedBranch.branch, {
           noninteractive: true,
-          message: modifiedBranch.pushedMessages.join( ', ' )
-          // TODO: skipBuild?
+          message: modifiedBranch.pushedMessages.join( ', ' ),
+          skipBuild: skipBuild
         } );
         modifiedBranch.deployedVersion = version;
         modifiedBranch.pushedMessages.length = 0;

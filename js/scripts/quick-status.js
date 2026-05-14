@@ -4,7 +4,7 @@
  * A fast-running status check. NOTE: Only checks the local status, does NOT check the server. Use the full status for
  * that if needed.
  *
- * TODO: likely not needed, remove?
+ * TODO: likely not needed, remove? https://github.com/phetsims/totality/issues/140
  *
  * @author Jonathan Olson (PhET Interactive Simulations)
  */

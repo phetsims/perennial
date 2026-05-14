@@ -204,7 +204,7 @@ ${additionalNotes ? `\n${additionalNotes}` : ''}`
     const linkSuffixes = [];
     const versionString = this.deployedVersion.toString();
 
-    // TODO: move some of this logic into RunnableBranch (!)
+    // TODO: move some of this logic into RunnableBranch (!) https://github.com/phetsims/totality/issues/140
 
     const standaloneParams = await this.releaseBranch.checkout.getPhetioStandaloneQueryParameter();
     const proxiesParams = ( await this.releaseBranch.checkout.usesRelativeSimPath() ) ? 'relativeSimPath' : 'launchLocalVersion';

@@ -14,10 +14,9 @@ const RESET = '\u001B[0m';
 
 /**
  * Prompts the user to confirm a message (or enter a specific string or message).
- * @public
  *
- * @param {string} prompt - The string to be shown to the user
- * @returns {Promise.<string>} - Resolves with the string entered by the user.
+ * @param prompt - The string to be shown to the user
+ * @returns  - Resolves with the string entered by the user.
  */
 export const prompt = ( prompt: string ): Promise<string> => {
   return new Promise( ( resolve, reject ) => {

@@ -40,14 +40,6 @@ export type DevDeployOptions = {
 
 /**
  * Deploys a dev version after incrementing the test version number.
- * @public
- *
- * @param {string} repo
- * @param {Array.<string>} brands
- * @param {boolean} noninteractive
- * @param {string} branch - 'main' for normal dev deploys, otherwise is the name of a one-off branch
- * @param {string} [message] - Optional message to append to the version-increment commit.
- * @returns {Promise}
  */
 export const dev = async (
   repo: string,

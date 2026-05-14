@@ -3,12 +3,11 @@
 /**
  * git checkout
  *
- * TODO: try to minimize usage of this?
+ * TODO: try to minimize usage of this? https://github.com/phetsims/totality/issues/140
  *
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import execute from './execute.js';
 import winston from 'winston';
 import { gitMutableExecute } from './gitMutex.js';
 

@@ -13,5 +13,5 @@ export const npmMutex = new Mutex();
 export const npmExclusive = async <T>(
   callback: () => Promise<T>
 ): Promise<T> => {
-  return await npmMutex.runExclusive( callback );
+  return npmMutex.runExclusive( callback );
 };

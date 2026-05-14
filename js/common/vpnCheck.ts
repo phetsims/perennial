@@ -6,13 +6,13 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
+// eslint-disable-next-line phet/default-import-match-filename
 import dns from 'dns/promises';
 
 /**
  * Checks whether we are somewhere that would have access to phet-server2.int.colorado.edu (implies access to bayes).
- * @public
  *
- * @returns {Promise.<boolean>} - Whether the directory exists
+ * @returns - Whether the directory exists
  */
 export const vpnCheck = async (): Promise<boolean> => {
   try {
