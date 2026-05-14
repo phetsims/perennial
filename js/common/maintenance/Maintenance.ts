@@ -16,13 +16,11 @@ import repl from 'repl';
 import winston from 'winston';
 import { production } from '../../grunt/production.js';
 import { rc } from '../../grunt/rc.js';
-import { ModifiedBranch } from './ModifiedBranch.js';
+import { DeployedLinkOptions, ModifiedBranch } from './ModifiedBranch.js';
 import { ReleaseBranch } from '../ReleaseBranch.js';
 import { Patch } from './Patch.js';
 import { Checkout } from '../Checkout.js';
 import { BuildOptions } from '../getBuildArguments.js';
-import { getActiveRepos } from '../getActiveRepos.js';
-import { getBranchSHAMap } from '../getBranchSHAMap.js';
 
 // constants
 const MAINTENANCE_FILE = '.maintenance.json';
@@ -45,7 +43,7 @@ type FilterSyncMB = ( releaseBranch: ModifiedBranch ) => boolean;
 type FilterRB = ( releaseBranch: ReleaseBranch ) => Promise<boolean>;
 type FilterMB = ( releaseBranch: ModifiedBranch ) => Promise<boolean>;
 
-class Maintenance {
+export class Maintenance {
   public constructor(
     public readonly patches: Patch[] = [],
     public readonly modifiedBranches: ModifiedBranch[] = [],
@@ -144,6 +142,7 @@ class Maintenance {
         await Promise.all( modifiedBranches.map( modifiedBranch => {
           return ( async () => {
             if ( !modifiedBranch.releaseBranch.cachedTimestampString ) {
+              // TODO: add caching perhaps in the ReleaseBranch objects?
               // eslint-disable-next-line require-atomic-updates
               modifiedBranch.releaseBranch.cachedTimestampString = await modifiedBranch.releaseBranch.checkout.getDivergingTimestampString();
             }
@@ -226,6 +225,7 @@ class Maintenance {
 
   /**
    * Creates a patch
+   *
    * @param [patchName] - If no name is provided, the repo string will be used.
    */
   public static async createPatch( repo: string, message: string, patchName?: string ): Promise<void> {
@@ -270,15 +270,10 @@ class Maintenance {
   /**
    * Adds a particular SHA (to cherry-pick) to a patch.
    */
-  public static async addPatchSHA( patchName: string, sha?: string ): Promise<void> {
+  public static async addPatchSHA( patchName: string, sha: string ): Promise<void> {
     const maintenance = await Maintenance.load();
 
     const patch = maintenance.findPatch( patchName );
-
-    if ( !sha ) {
-      sha = await gitRevParse( patch.repo, 'HEAD' );
-      console.log( `SHA not provided, detecting SHA: ${sha}` );
-    }
 
     patch.shas.push( sha );
 
@@ -1293,5 +1288,3 @@ class Maintenance {
     }
   }
 }
-
-export default Maintenance;
