@@ -7,19 +7,18 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import { browserPageLoad, BrowserPageLoadOptions } from './browserPageLoad.js';
-import puppeteer, { Browser } from 'puppeteer';
+import { browserPageLoad, PuppeteerBrowserPageLoadOptions } from './browserPageLoad.js';
+import puppeteer from 'puppeteer';
 
 /**
  * Uses puppeteer to see whether a page loads without an error
  *
  * Rejects if encountering an error loading the page OR (with option provided within the puppeteer page itself).
  *
- * @param {string} url
- * @param {Object} [options] - see browserPageLoad
- * @returns {Promise.<null|*>} - The eval result/null
+ * @param url
+ * @param options - see browserPageLoad
+ * @returns The eval result/null
  */
-export const puppeteerLoad = async ( url: string, options?: BrowserPageLoadOptions ) => {
-  // TODO: look into typing issue
-  return browserPageLoad( puppeteer as unknown as Browser, url, options );
+export const puppeteerLoad = async ( url: string, options?: PuppeteerBrowserPageLoadOptions ): Promise<unknown> => {
+  return browserPageLoad( puppeteer, url, options );
 };
