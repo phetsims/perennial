@@ -45,7 +45,7 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
   public serialize(): ReleaseBranchSerialized {
     return {
       repo: this.repo,
-      branch: this.branch,
+      branch: this.branch
     };
   }
 

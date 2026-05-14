@@ -955,7 +955,7 @@ class Maintenance {
 
         const version = await production( modifiedBranch.repo, modifiedBranch.branch, {
           noninteractive: true,
-          message: modifiedBranch.pushedMessages.join( ', ' ),
+          message: modifiedBranch.pushedMessages.join( ', ' )
           // TODO: skipBuild?
         } );
         modifiedBranch.deployedVersion = version;

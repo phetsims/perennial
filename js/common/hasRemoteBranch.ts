@@ -18,12 +18,12 @@ import { gitImmutableExecute } from './gitMutex.js';
 export const hasRemoteBranch = async ( branch: string ): Promise<boolean> => {
   winston.debug( `checking for remote branch ${branch}` );
 
-  const stdout = await gitImmutableExecute( [ 'ls-remote', '--heads', `https://github.com/phetsims/totality.git`, branch ], '..' );
+  const stdout = await gitImmutableExecute( [ 'ls-remote', '--heads', 'https://github.com/phetsims/totality.git', branch ], '..' );
 
   if ( stdout.trim().length === 0 ) {
     return false;
   }
-  else if ( stdout.indexOf( `refs/heads/${branch}` ) >= 0 ) {
+  else if ( stdout.includes( `refs/heads/${branch}` ) ) {
     return true;
   }
   else {

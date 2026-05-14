@@ -123,7 +123,7 @@ export class RunnableBranch {
       await this.checkout.gitCommit( `Bumping ${this.repo} dev${packageJSON.phet?.generatedUnitTests ? '/test' : ''} HTML with new version` );
       await this.checkout.gitPush();
     }
-  };
+  }
 
   /**
    * Sets the supported brands, and commits/pushes
@@ -133,14 +133,14 @@ export class RunnableBranch {
 
     const isClean = await this.checkout.isClean();
     if ( !isClean ) {
-      throw new Error( `Unclean status, cannot increment version` );
+      throw new Error( 'Unclean status, cannot increment version' );
     }
 
     const packageJSON = await this.getPackageJSON();
     packageJSON.phet = packageJSON.phet || {};
     packageJSON.phet.supportedBrands = brands;
 
-    await this.setPackageJSON( packageJSON, `Updating supported brands to [${brands}]${message ? `, ${message}` : ''}`);
+    await this.setPackageJSON( packageJSON, `Updating supported brands to [${brands}]${message ? `, ${message}` : ''}` );
   }
 
   /**
@@ -182,7 +182,7 @@ export class RunnableBranch {
   public async setPackageJSON( packageJSON: PackageJSON, message: string ): Promise<void> {
     const isClean = await this.checkout.isClean();
     if ( !isClean ) {
-      throw new Error( `Unclean status, set package.json` );
+      throw new Error( 'Unclean status, set package.json' );
     }
 
     await this.checkout.writeAddRelativeJSON( `${this.repo}/package.json`, packageJSON );

@@ -6,13 +6,13 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import SimVersion from '../browser-and-node/SimVersion';
+import SimVersion from '../browser-and-node/SimVersion.js';
 import assert from 'assert';
-import { vpnCheck } from '../common/vpnCheck';
+import { vpnCheck } from '../common/vpnCheck.js';
 import { getBranch } from '../common/getBranch.js';
-import { Checkout } from '../common/Checkout';
-import { lintProject } from '../common/lintProject';
-import { buildLocal } from '../common/buildLocal';
+import { Checkout } from '../common/Checkout.js';
+import { lintProject } from '../common/lintProject.js';
+import { buildLocal } from '../common/buildLocal.js';
 import { devDirectoryExists } from '../common/devDirectoryExists.js';
 import { booleanPrompt } from '../common/booleanPrompt.js';
 import winston from 'winston';

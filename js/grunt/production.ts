@@ -6,17 +6,17 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import SimVersion from '../browser-and-node/SimVersion';
-import { Checkout } from '../common/Checkout';
-import { gitIsClean } from '../common/gitIsClean';
-import { hasRemoteBranch } from '../common/hasRemoteBranch';
-import { vpnCheck } from '../common/vpnCheck';
+import SimVersion from '../browser-and-node/SimVersion.js';
+import { Checkout } from '../common/Checkout.js';
+import { gitIsClean } from '../common/gitIsClean.js';
+import { hasRemoteBranch } from '../common/hasRemoteBranch.js';
+import { vpnCheck } from '../common/vpnCheck.js';
 import { booleanPrompt } from '../common/booleanPrompt.js';
 import simMetadata from '../common/simMetadata.js';
 import assert from 'assert';
 import winston from 'winston';
-import buildServerRequest from '../common/buildServerRequest';
-import { buildLocal } from '../common/buildLocal';
+import buildServerRequest from '../common/buildServerRequest.js';
+import { buildLocal } from '../common/buildLocal.js';
 
 class ProductionDeployError extends Error {
   public constructor( message: string ) {
@@ -59,7 +59,7 @@ export const production = async (
   }
 
   if ( !await gitIsClean() ) {
-    throw new ProductionDeployError( `Unclean status on main checkout, cannot create release branch` );
+    throw new ProductionDeployError( 'Unclean status on main checkout, cannot create release branch' );
   }
 
   if ( !( await hasRemoteBranch( Checkout.getReleaseBranchName( repo, branch ) ) ) ) {

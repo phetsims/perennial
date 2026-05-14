@@ -18,7 +18,7 @@ import { gitImmutableExecute } from './gitMutex.js';
  * @returns Stdout
  * @rejects {ExecuteError}
  */
-export const gitCatFile = async(
+export const gitCatFile = async (
   file: string,
   branchOrSha = 'HEAD'
 ): Promise<string> => {

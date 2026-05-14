@@ -18,7 +18,7 @@ import { gitImmutableExecute } from './gitMutex.js';
  * @returns - Whether it is clean or not
  * @rejects {ExecuteError}
  */
-export const gitIsClean = async( file?: string ): Promise<boolean> => {
+export const gitIsClean = async ( file?: string ): Promise<boolean> => {
   winston.debug( 'git status check' );
 
   const gitArgs = [ 'status', '--porcelain' ];

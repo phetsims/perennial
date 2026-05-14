@@ -11,4 +11,4 @@ import { ssh } from './ssh.js';
 
 export const devSsh = ( cmd: string ): Promise<string> => {
   return ssh( buildLocal.devUsername, buildLocal.devDeployServer, cmd );
-}
+};

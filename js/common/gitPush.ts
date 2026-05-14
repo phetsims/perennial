@@ -16,7 +16,7 @@ import { gitMutableExecute } from './gitMutex.js';
  * @returns - Stdout
  * @rejects {ExecuteError}
  */
-export const gitPush = async ( remoteBranch: string = 'main' ): Promise<string> => {
+export const gitPush = async ( remoteBranch = 'main' ): Promise<string> => {
   winston.info( `git push to ${remoteBranch}` );
 
   return gitMutableExecute( [ 'push', '-u', 'origin', remoteBranch ], '..' );

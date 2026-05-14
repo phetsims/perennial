@@ -15,13 +15,13 @@ import winston from 'winston';
  * @param file
  * @param content
  */
-export const writeJSON = async( file: string, content: Object ): Promise<void> => {
+export const writeJSON = async ( file: string, content: Object ): Promise<void> => {
   winston.debug( `Writing JSON to ${file}` );
 
   try {
     await fs.writeFile( file, JSON.stringify( content, null, 2 ) );
   }
-  catch ( err ) {
+  catch( err ) {
     throw new Error( `Could not write to file: ${file} due to: ${err}` );
   }
 };

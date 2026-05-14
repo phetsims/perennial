@@ -14,12 +14,12 @@ import dns from 'dns/promises';
  *
  * @returns {Promise.<boolean>} - Whether the directory exists
  */
-export const vpnCheck = async(): Promise<boolean> => {
+export const vpnCheck = async (): Promise<boolean> => {
   try {
     await dns.resolve( 'phet-server2.int.colorado.edu' );
     return true;
   }
-  catch ( err ) {
+  catch( err ) {
     return false;
   }
 };

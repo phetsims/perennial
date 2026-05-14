@@ -16,7 +16,7 @@ import { IntentionalPerennialAny } from '../browser-and-node/PerennialTypes.js';
  * @param file
  * @returns - Resolves with {Object} - Result of JSON.parse
  */
-export const loadJSON = async(
+export const loadJSON = async (
   file: string
 ): Promise<IntentionalPerennialAny> => {
   return new Promise( ( resolve, reject ) => {

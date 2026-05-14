@@ -16,7 +16,7 @@ import { gitMutableExecute } from './gitMutex.js';
  * @returns - Stdout
  * @rejects {ExecuteError}
  */
-export const gitAdd = async( file: string ): Promise<string> => {
+export const gitAdd = async ( file: string ): Promise<string> => {
   winston.info( `git add ${file}` );
 
   return gitMutableExecute( [ 'add', file ], '..' );

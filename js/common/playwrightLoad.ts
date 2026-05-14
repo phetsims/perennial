@@ -8,7 +8,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import { browserPageLoad, BrowserPageLoadOptions } from './browserPageLoad';
+import { browserPageLoad, BrowserPageLoadOptions } from './browserPageLoad.js';
 import playwright from 'playwright';
 import _ from 'lodash';
 

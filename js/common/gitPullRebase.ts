@@ -16,7 +16,7 @@ import { gitMutableExecute } from './gitMutex.js';
  * @rejects {ExecuteError}
  */
 export const gitPullRebase = async (): Promise<string> => {
-  winston.info( `git pull --rebase` );
+  winston.info( 'git pull --rebase' );
 
   return gitMutableExecute( [ 'pull', '--rebase' ], '..' );
 };

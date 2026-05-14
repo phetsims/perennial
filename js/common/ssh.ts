@@ -15,7 +15,7 @@ import winston from 'winston';
  * @returns {Promise.<string>} - Stdout
  * @rejects {ExecuteError}
  */
-export const ssh = async(
+export const ssh = async (
   username: string,
   host: string,
   cmd: string

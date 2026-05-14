@@ -11,7 +11,7 @@ import { gitImmutableExecute } from './gitMutex.js';
 
 export const gitIsAncestor = async (
   possibleAncestor: string,
-  possibleDescendant: string,
+  possibleDescendant: string
 ): Promise<boolean> => {
   winston.info( `git check for whether ${possibleAncestor} is an ancestor of ${possibleDescendant}` );
 

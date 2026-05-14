@@ -7,4 +7,4 @@
  */
 
 // needs to be a slightly different command for Windows
-export const gruntCommand = /^win/.test( process.platform ) ? 'grunt.cmd' : 'grunt';
+export const gruntCommand = process.platform.startsWith( 'win' ) ? 'grunt.cmd' : 'grunt';

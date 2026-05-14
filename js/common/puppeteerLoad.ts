@@ -7,7 +7,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import { browserPageLoad, BrowserPageLoadOptions } from './browserPageLoad';
+import { browserPageLoad, BrowserPageLoadOptions } from './browserPageLoad.js';
 import puppeteer, { Browser } from 'puppeteer';
 
 /**

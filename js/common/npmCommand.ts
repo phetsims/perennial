@@ -7,4 +7,4 @@
  */
 
 // needs to be a slightly different command for Windows
-export const npmCommand = /^win/.test( process.platform ) ? 'npm.cmd' : 'npm';
+export const npmCommand = process.platform.startsWith( 'win' ) ? 'npm.cmd' : 'npm';

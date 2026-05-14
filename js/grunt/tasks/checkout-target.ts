@@ -5,11 +5,11 @@
  * --repo : repository name where package.json should be read from
  * --target : the branch/SHA to check out
  * --branch : alias for --target
- * --skipNpmUpdate : If provided, will prevent the usual npm update
+ *
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';
-import assertIsValidRepoName from '../../common/assertIsValidRepoName.js';
+import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
 import getOption from './util/getOption.js';
 import { Checkout } from '../../common/Checkout.js';
 

@@ -16,7 +16,7 @@ import { gitImmutableExecute } from './gitMutex.js';
  * @param timestamp
  * @returns - Resolves to the SHA
  */
-export const gitFromTimestamp = async(
+export const gitFromTimestamp = async (
   branch: string,
   timestamp: string
 ): Promise<string> => {

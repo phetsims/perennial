@@ -7,7 +7,7 @@
  */
 
 import winston from 'winston';
-import simMetadata from './simMetadata';
+import simMetadata from './simMetadata.js';
 import { Checkout } from './Checkout.js';
 
 /**

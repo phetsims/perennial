@@ -45,7 +45,7 @@ export async function gitMutableExecute(
     throw new Error( `gitMutableExecute: directory ${cwd} does not exist` );
   }
 
-  // @ts-ignore
+  // @ts-expect-error
   return gitExclusive( () => execute( 'git', args, cwd, providedOptions ) );
 }
 
@@ -72,6 +72,6 @@ export async function gitImmutableExecute(
     throw new Error( `gitImmutableExecute: directory ${cwd} does not exist` );
   }
 
-  // @ts-ignore
+  // @ts-expect-error
   return execute( 'git', args, cwd, providedOptions );
 }

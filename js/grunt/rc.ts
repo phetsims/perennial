@@ -6,17 +6,17 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import SimVersion from '../browser-and-node/SimVersion';
+import SimVersion from '../browser-and-node/SimVersion.js';
 import { Repo } from '../browser-and-node/PerennialTypes.js';
-import { vpnCheck } from '../common/vpnCheck';
-import { gitIsClean } from '../common/gitIsClean';
+import { vpnCheck } from '../common/vpnCheck.js';
+import { gitIsClean } from '../common/gitIsClean.js';
 import { hasRemoteBranch } from '../common/hasRemoteBranch.js';
-import { booleanPrompt } from '../common/booleanPrompt';
-import createRelease from './createRelease';
+import { booleanPrompt } from '../common/booleanPrompt.js';
+import createRelease from './createRelease.js';
 import { buildLocal } from '../common/buildLocal.js';
-import { devDirectoryExists } from '../common/devDirectoryExists';
-import { Checkout } from '../common/Checkout';
-import buildServerRequest from '../common/buildServerRequest';
+import { devDirectoryExists } from '../common/devDirectoryExists.js';
+import { Checkout } from '../common/Checkout.js';
+import buildServerRequest from '../common/buildServerRequest.js';
 import winston from 'winston';
 
 class RCDeployError extends Error {
@@ -57,7 +57,7 @@ export const rc = async (
   }
 
   if ( !await gitIsClean() ) {
-    throw new RCDeployError( `Unclean status on main checkout, cannot create release branch` );
+    throw new RCDeployError( 'Unclean status on main checkout, cannot create release branch' );
   }
 
   if ( !( await hasRemoteBranch( Checkout.getReleaseBranchName( repo, branch ) ) ) ) {

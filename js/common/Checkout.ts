@@ -7,8 +7,8 @@
  */
 
 import winston from 'winston';
-import { buildLocal } from './buildLocal';
-import { createDirectory } from './createDirectory';
+import { buildLocal } from './buildLocal.js';
+import { createDirectory } from './createDirectory.js';
 import path from 'path';
 import { ensureLocalBranchFromRemote } from './ensureLocalBranchFromRemote.js';
 import fs from 'fs';
@@ -26,9 +26,9 @@ import { getBranchPackageJSON } from './getBranchPackageJSON.js';
 import { gitFirstDivergingCommit } from './gitFirstDivergingCommit.js';
 import { gitTimestamp } from './gitTimestamp.js';
 import { gitRevParse } from './gitRevParse.js';
-import simMetadata, { SimMetadata } from './simMetadata';
+import simMetadata, { SimMetadata } from './simMetadata.js';
 import simPhetioMetadata, { SimPhetioMetadata } from './simPhetioMetadata.js';
-import { getActiveSims } from './getActiveSims';
+import { getActiveSims } from './getActiveSims.js';
 import { getBranches } from './getBranches.js';
 import os from 'os';
 import { IntentionalPerennialAny } from '../browser-and-node/PerennialTypes.js';
@@ -36,12 +36,12 @@ import assert from 'assert';
 import { getBranch } from './getBranch.js';
 import { hasRemoteBranch } from './hasRemoteBranch.js';
 import SimVersion from '../browser-and-node/SimVersion.js';
-import { gitIsClean } from './gitIsClean';
+import { gitIsClean } from './gitIsClean.js';
 import { RunnableBranch } from './RunnableBranch.js';
 import { getBranchSimVersion } from './getBranchSimVersion.js';
 import { getActiveRunnables } from './getActiveRunnables.js';
 import { tsxCommand } from './tsxCommand.js';
-import pLimit from "p-limit";
+import pLimit from 'p-limit';
 import { gitImmutableExecute, gitMutableExecute } from './gitMutex.js';
 
 export const WORKTREE_DIRECTORY = buildLocal.releaseBranchesDirectory;
@@ -123,7 +123,7 @@ export class Checkout {
         return false;
       }
 
-      let releaseRepo = simData.name;
+      const releaseRepo = simData.name;
       let releaseBranch = `${simData.versionMajor}.${simData.versionMinor}`;
       if ( simData.versionSuffix.length ) {
         releaseBranch += `-${simData.versionSuffix}`; // additional dash required
@@ -223,7 +223,7 @@ export class Checkout {
 
     const isClean = await gitIsClean();
     if ( !isClean ) {
-      throw new Error( `Unclean status, cannot create release branch` );
+      throw new Error( 'Unclean status, cannot create release branch' );
     }
 
     const checkout = new Checkout( branch, Checkout.getWorktreeDirectory( branch ), false );
@@ -293,12 +293,12 @@ export class Checkout {
   public static async getMaintainedReleaseBranches( unreleased = true ): Promise<ReleaseBranch[]> {
     winston.info( `Getting maintained release branches (unreleased: ${unreleased})` );
 
-    type Stub = { repo: string; branch: string; };
+    type Stub = { repo: string; branch: string };
 
     const stubs: Stub[] = [];
     const hasStub = ( repo: string, branch: string ): boolean => {
       return stubs.some( stub => stub.repo === repo && stub.branch === branch );
-    }
+    };
     const addStub = ( repo: string, branch: string ): void => {
       // FAMB 2.3-phetio keeps ending up in the MR list when we don't want it to, see https://github.com/phetsims/phet-io/issues/1957.
       if ( repo === 'forces-and-motion-basics' && branch === '2.3-phetio' ) {
@@ -307,9 +307,9 @@ export class Checkout {
 
       // Performance hopefully not a concern
       if ( !hasStub( repo, branch ) ) {
-        stubs.push( { repo, branch } );
+        stubs.push( { repo: repo, branch: branch } );
       }
-    }
+    };
 
     // phet metadata
     for ( const simData of ( await simMetadataPromise ).projects ) {
@@ -400,7 +400,7 @@ export class Checkout {
   }
 
   public async gitAddAll(): Promise<string> {
-    winston.info( `git add -A` );
+    winston.info( 'git add -A' );
 
     return gitMutableExecute( [ 'add', '-A' ], this.workingDirectory );
   }
@@ -451,7 +451,7 @@ export class Checkout {
 
   public async update(): Promise<void> {
     if ( this.releaseBranch ) {
-      winston.info( `updating worktree for ${this.toString()}` );
+      winston.info( `updating worktree for ${this.branch}` );
 
       // Create the container directory
       await this.ensureWorktreeParentDirectory();
@@ -512,7 +512,7 @@ export class Checkout {
 
   public async removeWorktree(): Promise<void> {
     if ( this.branch === 'main' ) {
-      throw new Error( `Cannot remove worktree for main branch` );
+      throw new Error( 'Cannot remove worktree for main branch' );
     }
 
     if ( fs.existsSync( this.workingDirectory ) ) {
@@ -574,7 +574,7 @@ export class Checkout {
    */
   public async usesRelativeSimPath(): Promise<boolean> {
     // phet-io polyrepo e3fc26079358d86074358a6db3ebaf1af9725632
-    return await gitIsAncestor( '7f1f7a9470d9ced8edcb26837ff431cd61afa517', this.branch );;
+    return await gitIsAncestor( '7f1f7a9470d9ced8edcb26837ff431cd61afa517', this.branch );
   }
 
   /**
@@ -592,7 +592,7 @@ export class Checkout {
    */
   public async usesPhetioStudioIndex(): Promise<boolean> {
     // phet-io-wrappers polyrepo 7ec1a04a70fb9707b381b8bcab3ad070815ef7fe
-    return await gitIsAncestor( '46fdcc098ba3b84e6f39d8506828c4ad629ef206', this.branch );;
+    return await gitIsAncestor( '46fdcc098ba3b84e6f39d8506828c4ad629ef206', this.branch );
   }
 
   /**
@@ -600,7 +600,7 @@ export class Checkout {
    */
   public async isPhetioHydrogen(): Promise<boolean> {
     // phet-io-wrappers polyrepo 7e8d97020c6451f68e898ae83aa43593b555137f
-    return await gitIsAncestor( '8c175d14c0d467d0e457f47a5f496455d2370b31', this.branch );;
+    return await gitIsAncestor( '8c175d14c0d467d0e457f47a5f496455d2370b31', this.branch );
   }
 
   /**
@@ -623,7 +623,7 @@ export class Checkout {
 
   public async hasMigrationWrapper(): Promise<boolean> {
     // phet-io-wrappers polyrepo d8ad7267614d1b7cf3fc2d0d9cc11e3c592ac1ce
-    return await gitIsAncestor( '2328bdd8bacff4bf3858c8eef1bcc3c1dc648cad', this.branch );;
+    return await gitIsAncestor( '2328bdd8bacff4bf3858c8eef1bcc3c1dc648cad', this.branch );
   }
 
   /**
@@ -752,7 +752,7 @@ export class Checkout {
    * when the branch is NOT checked out. Major pain, yes.
    */
   public async gitUpdateWithoutFetch(): Promise<void> {
-    await this.ensureUpstreamBranch()
+    await this.ensureUpstreamBranch();
 
     if ( this.isCheckedOut ) {
       await gitMutableExecute( [
