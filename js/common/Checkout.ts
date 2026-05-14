@@ -432,6 +432,30 @@ export class Checkout {
     return gitMutableExecute( [ 'pull', '--rebase' ], this.workingDirectory );
   }
 
+  public async gitCherryPick( target: string ): Promise<boolean> {
+    winston.info( `git cherry-pick ${target}` );
+
+    try {
+      await gitMutableExecute( [ 'cherry-pick', target ], this.workingDirectory );
+
+      return true;
+    }
+    catch ( e ) {
+      winston.info( `git cherry-pick failed (aborting): ${target}` );
+
+      try {
+        await gitMutableExecute( [ 'cherry-pick', '--abort' ], this.workingDirectory )
+
+        return false;
+      }
+      catch ( e ) {
+        winston.error( `git cherry-pick --abort failed: ${target}` );
+
+        throw e;
+      }
+    }
+  }
+
   public async getSHA(): Promise<string> {
     return gitRevParse( this.branch );
   }

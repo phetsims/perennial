@@ -90,9 +90,19 @@ export class RunnableBranch {
     // Deletes the build/ directory for a repo to avoid legacy grunt clean issues that
     // attempt to delete outside the current working directory.
     // See https://github.com/phetsims/perennial/issues/480
-    winston.info( `Cleaning build directory for ${this.repo} at ${this.checkout.workingDirectory}` );
-    const buildDirectory = `${this.checkout.workingDirectory}/${this.repo}/build`;
-    await fsPromises.rm( buildDirectory, { recursive: true, force: true } );
+    {
+      const buildDirectory = `${this.checkout.workingDirectory}/${this.repo}/build`;
+      await fsPromises.rm( buildDirectory, { recursive: true, force: true } );
+    }
+
+    // Cleans chipper/dist, see https://github.com/phetsims/perennial/issues/461#issuecomment-3837518242
+    // Our TypeScript setup is now unreliable, and we need to clear out temporary files to prevent it from bugging out
+    // (having stale TS data from OTHER release branches being used in DIFFERENT release branches --- can trigger or hide
+    // errors).
+    {
+      const chipperDistDirectory = `${this.checkout.workingDirectory}/chipper/dist`;
+      await fsPromises.rm( chipperDistDirectory, { recursive: true, force: true } );
+    }
 
     winston.info( `building ${this.checkout.workingDirectory} with grunt ${args.join( ' ' )}` );
     const result = await execute( gruntCommand, args, `${this.checkout.workingDirectory}/${this.repo}`, executeOptions );

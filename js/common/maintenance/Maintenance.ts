@@ -7,12 +7,8 @@
  */
 
 import assert from 'assert';
-// @ts-expect-error - no @types for this project
-import asyncQ from 'async-q';
 import fs from 'fs';
 import _ from 'lodash';
-import path from 'path';
-import repl from 'repl';
 import winston from 'winston';
 import { production } from '../../grunt/production.js';
 import { rc } from '../../grunt/rc.js';
@@ -500,53 +496,25 @@ export class Maintenance {
           continue;
         }
 
-        const patchRepo = patch.repo;
-
         try {
-          let patchRepoCurrentSHA;
-
-          // Checkout whatever the latest patched SHA is (if we've patched it)
-          if ( modifiedBranch.changedDependencies[ patchRepo ] ) {
-            patchRepoCurrentSHA = modifiedBranch.changedDependencies[ patchRepo ];
-          }
-          else {
-            // Look up the SHA to check out at the tip of the release branch dependencies.json
-            await gitCheckout( repo, branch );
-            await gitPull( repo );
-            const dependencies = await getDependencies( repo );
-            patchRepoCurrentSHA = dependencies[ patchRepo ].sha;
-            await gitCheckout( repo, 'main' ); // TODO: this assumes we were on main when we started running this. https://github.com/phetsims/perennial/issues/368
-            // TODO: see if the patchRepo has a branch for this release branch, and if so, pull it to make sure we have the above SHA https://github.com/phetsims/perennial/issues/368
-          }
-
-          // Then check it out
-          await gitCheckout( patchRepo, patchRepoCurrentSHA );
-          console.log( `Checked out ${patchRepo} for ${repo} ${branch}, SHA: ${patchRepoCurrentSHA}` );
-
           for ( const sha of patch.shas ) {
-
-            // If the sha doesn't exist in the repo, then give a specific error for that.
-            // TODO: do the checkout functions that are easier
-            const hasSha = ( await gitImmutableExecute( [ 'cat-file', '-e', sha ], `../${patchRepo}`, { errors: 'resolve' } ) ).code === 0;
-            if ( !hasSha ) {
-              throw new Error( `SHA not found in ${patchRepo}: ${sha}` );
-            }
-
-            const cherryPickSuccess = await gitCherryPick( patchRepo, sha );
+            const cherryPickSuccess = await modifiedBranch.releaseBranch.checkout.gitCherryPick( sha );
 
             if ( cherryPickSuccess ) {
-              const currentSHA = await gitRevParse( patchRepo, 'HEAD' );
+              const currentSHA = await modifiedBranch.releaseBranch.checkout.getSHA();
               console.log( `Cherry-pick success for ${sha}, result is ${currentSHA}` );
               simSuccess = true;
 
-              modifiedBranch.changedDependencies[ patchRepo ] = currentSHA;
               modifiedBranch.neededPatches.splice( modifiedBranch.neededPatches.indexOf( patch ), 1 );
               numApplied++;
 
               // Don't include duplicate messages, since multiple patches might be for a single issue
-              if ( !modifiedBranch.pendingMessages.includes( patch.message ) ) {
-                modifiedBranch.pendingMessages.push( patch.message );
+              if ( !modifiedBranch.pushedMessages.includes( patch.message ) ) {
+                modifiedBranch.pushedMessages.push( patch.message );
               }
+
+              console.log( 'pushing' );
+              await modifiedBranch.releaseBranch.checkout.gitPush();
 
               break;
             }
@@ -558,11 +526,10 @@ export class Maintenance {
         catch( e ) {
           maintenance.save();
 
-          throw new Error( `Failure applying patch ${patchRepo} to ${repo} ${branch}: ${e}` );
+          throw new Error( `Failure applying patch ${patch.name} to ${repo} ${branch}: ${e}` );
         }
       }
 
-      await gitCheckout( modifiedBranch.repo, 'main' );
       success = success && simSuccess;
     }
 
@@ -571,114 +538,6 @@ export class Maintenance {
     console.log( `${numApplied} patches applied` );
 
     return success;
-  }
-
-  /**
-   * Pushes local changes up to GitHub.
-   *
-   *
-   * @param filter - Optional filter, modified branches will be skipped if this resolves to false
-   */
-  public static async updateDependencies( filter?: FilterMB ): Promise<void> {
-    winston.info( 'update dependencies' );
-
-    const maintenance = await Maintenance.load();
-
-    for ( const modifiedBranch of maintenance.modifiedBranches ) {
-      const changedRepos = Object.keys( modifiedBranch.changedDependencies );
-      if ( changedRepos.length === 0 ) {
-        continue;
-      }
-
-      if ( filter && !( await filter( modifiedBranch ) ) ) {
-        console.log( `Skipping dependency update for ${modifiedBranch.repo} ${modifiedBranch.branch}` );
-        continue;
-      }
-
-      try {
-        // No NPM needed
-        await checkoutTarget( modifiedBranch.repo, modifiedBranch.branch, false );
-        console.log( `Checked out ${modifiedBranch.repo} ${modifiedBranch.branch}` );
-
-        const dependenciesJSONFile = `../${modifiedBranch.repo}/dependencies.json`;
-        const dependenciesJSON = JSON.parse( fs.readFileSync( dependenciesJSONFile, 'utf-8' ) );
-
-        // Modify the "self" in the dependencies.json as expected
-        dependenciesJSON[ modifiedBranch.repo ].sha = await gitRevParse( modifiedBranch.repo, modifiedBranch.branch );
-
-        for ( const dependency of changedRepos ) {
-          const dependencyBranch = modifiedBranch.dependencyBranch;
-          const branches = await getBranches(); // TODO
-          const sha = modifiedBranch.changedDependencies[ dependency ];
-
-          dependenciesJSON[ dependency ].sha = sha;
-
-          if ( branches.includes( dependencyBranch ) ) {
-            console.log( `Branch ${dependencyBranch} already exists in ${dependency}` );
-            await gitCheckout( dependency, dependencyBranch );
-            await gitPull( dependency );
-            const currentSHA = await gitRevParse( dependency, 'HEAD' );
-
-            if ( sha !== currentSHA ) {
-              console.log( `Attempting to (hopefully fast-forward) merge ${sha}` );
-              await gitMutableExecute( [ 'merge', sha ], `../${dependency}` );
-              await gitPush( dependency, dependencyBranch );
-            }
-          }
-          else {
-            console.log( `Branch ${dependencyBranch} does not exist in ${dependency}, creating.` );
-            await gitCheckout( dependency, sha );
-            await gitCreateBranch( dependency, dependencyBranch );
-            await gitPush( dependency, dependencyBranch );
-          }
-
-          delete modifiedBranch.changedDependencies[ dependency ];
-          modifiedBranch.deployedVersion = null;
-          maintenance.save(); // save here in case a future failure would "revert" things
-        }
-
-        const message = modifiedBranch.pendingMessages.join( ' and ' );
-        fs.writeFileSync( dependenciesJSONFile, JSON.stringify( dependenciesJSON, null, 2 ) );
-        await gitAdd( modifiedBranch.repo, 'dependencies.json' );
-        await gitCommit( modifiedBranch.repo, `updated dependencies.json for ${message}` );
-        await gitPush( modifiedBranch.repo, modifiedBranch.branch );
-
-        // Move messages from pending to pushed
-        for ( const message of modifiedBranch.pendingMessages ) {
-          if ( !modifiedBranch.pushedMessages.includes( message ) ) {
-            modifiedBranch.pushedMessages.push( message );
-          }
-        }
-        modifiedBranch.pendingMessages.length = 0;
-        maintenance.save(); // save here in case a future failure would "revert" things
-
-        await checkoutMain( modifiedBranch.repo, false );
-      }
-      catch( e ) {
-        maintenance.save();
-
-        throw new Error( `Failure updating dependencies for ${modifiedBranch.repo} to ${modifiedBranch.branch}: ${e}` );
-      }
-    }
-
-    maintenance.save();
-
-    console.log( 'Dependencies updated' );
-  }
-
-  /**
-   * Cleans chipper/dist, see https://github.com/phetsims/perennial/issues/461#issuecomment-3837518242
-   *
-   * Our TypeScript setup is now unreliable, and we need to clear out temporary files to prevent it from bugging out
-   * (having stale TS data from OTHER release branches being used in DIFFERENT release branches --- can trigger or hide
-   * errors).
-   */
-  public static async cleanChipperDist(): Promise<void> {
-    const distPath = path.resolve( PERENNIAL_ROOT, '..', 'chipper', 'dist' );
-
-    console.log( 'cleaning chipper/dist' );
-
-    await fs.promises.rm( distPath, { recursive: true, force: true } );
   }
 
   /**
@@ -704,9 +563,6 @@ export class Maintenance {
 
       try {
         console.log( `Running RC deploy for ${modifiedBranch.repo} ${modifiedBranch.branch}` );
-
-        await Maintenance.cleanChipperDist();
-        await Maintenance.cleanBuildDirectory( modifiedBranch.repo );
 
         const version = await rc( modifiedBranch.repo, modifiedBranch.branch, {
           noninteractive: true,
@@ -747,9 +603,6 @@ export class Maintenance {
       try {
         console.log( `Running production deploy for ${modifiedBranch.repo} ${modifiedBranch.branch}` );
 
-        await Maintenance.cleanChipperDist();
-        await Maintenance.cleanBuildDirectory( modifiedBranch.repo );
-
         const version = await production( modifiedBranch.repo, modifiedBranch.branch, {
           noninteractive: true,
           message: modifiedBranch.pushedMessages.join( ', ' )
@@ -772,98 +625,6 @@ export class Maintenance {
   }
 
   /**
-   * Create a separate directory for each release branch. This does not interface with the saved maintenance state at
-   * all, and instead just looks at the committed dependencies.json when updating.
-   *
-   *
-   * @param filter - Optional filter, release branches will be skipped if this resolves to false
-   * @param providedOptions
-   */
-  public static async updateCheckouts( filter?: FilterRB, providedOptions?: Partial<UpdateCheckoutsOptions> ): Promise<void> {
-    const options = _.merge( {
-      concurrent: 5,
-      build: true,
-      transpile: true,
-      buildOptions: { lint: true }
-    }, providedOptions );
-
-    console.log( `Updating checkouts (running in parallel with ${options.concurrent} threads)` );
-
-    const releaseBranches = await Maintenance.getMaintenanceBranches();
-
-    const filteredBranches = [];
-
-    // Run all filtering in a step before the parallel step. This way the filter has full access to repos and git commands without race conditions, https://github.com/phetsims/perennial/issues/341
-    for ( const releaseBranch of releaseBranches ) {
-      if ( !filter || await filter( releaseBranch ) ) {
-        filteredBranches.push( releaseBranch );
-      }
-    }
-
-    console.log( `Filter applied. Updating ${filteredBranches.length}:`, filteredBranches.map( x => x.toString() ) );
-
-    const asyncFunctions = filteredBranches.map( releaseBranch => ( async () => {
-      console.log( 'Beginning: ', releaseBranch.toString() );
-      try {
-
-        await releaseBranch.updateCheckout();
-
-        options.transpile && await releaseBranch.transpile();
-        try {
-          options.build && await releaseBranch.build( options.buildOptions );
-          console.log( 'Finished: ', releaseBranch.toString() );
-        }
-        catch( e ) {
-          console.log( `failed to build ${releaseBranch.toString()}: ${e}` );
-        }
-      }
-      catch( e ) {
-        console.log( `failed to update releaseBranch ${releaseBranch.toString()}: ${e}` );
-      }
-    } ) );
-
-    await asyncQ.parallelLimit( asyncFunctions, options.concurrent );
-
-    console.log( 'Done' );
-  }
-
-  /**
-   * @param filter - Optional filter, release branches will be skipped if this resolves to false
-   */
-  public static async checkUnbuiltCheckouts( filter: FilterRB ): Promise<void> {
-    console.log( 'Checking unbuilt checkouts' );
-
-    const releaseBranches = await Maintenance.getMaintenanceBranches();
-    for ( const releaseBranch of releaseBranches ) {
-      if ( !filter || await filter( releaseBranch ) ) {
-        console.log( releaseBranch.toString() );
-        const unbuiltResult = await releaseBranch.checkUnbuilt();
-        if ( unbuiltResult ) {
-          console.log( unbuiltResult );
-        }
-      }
-    }
-  }
-
-  /**
-   * @param filter - Optional filter, release branches will be skipped if this resolves to false
-   */
-  public static async checkBuiltCheckouts( filter?: FilterRB ): Promise<void> {
-    console.log( 'Checking built checkouts' );
-
-    const releaseBranches = await Maintenance.getMaintenanceBranches();
-    for ( const releaseBranch of releaseBranches ) {
-      if ( !filter || await filter( releaseBranch ) ) {
-        console.log( releaseBranch.toString() );
-        const builtResult = await releaseBranch.checkBuilt();
-        if ( builtResult ) {
-          console.log( builtResult );
-        }
-      }
-    }
-  }
-
-  /**
    * Redeploys production versions of all release branches (or those matching a specific filter
    *
    *
@@ -883,13 +644,13 @@ export class Maintenance {
       console.log( releaseBranch.toString() );
       await rc( releaseBranch.repo, releaseBranch.branch, {
         noninteractive: true,
-        message: message
-        // TODO: skip build?
+        message: message,
+        skipBuild: true
       } );
       await production( releaseBranch.repo, releaseBranch.branch, {
         noninteractive: true,
-        message: message
-        // TODO: skip build?
+        message: message,
+        skipBuild: true
       } );
     }
 
@@ -1022,8 +783,6 @@ export class Maintenance {
 
   /**
    * Takes a serialized form of the Maintenance and returns an actual instance.
-   *
-   * TODO: ensure this is awaited everywhere
    */
   public static async deserialize( { patches = [], modifiedBranches = [], allReleaseBranches = [] }: MaintenanceSerialized ): Promise<Maintenance> {
     // Pass in patch references to branch deserialization
@@ -1052,8 +811,6 @@ export class Maintenance {
 
   /**
    * Loads a new Maintenance object (if possible) from the maintenance file.
-   *
-   * TODO: await everything that uses this
    */
   public static async load(): Promise<Maintenance> {
     if ( fs.existsSync( MAINTENANCE_FILE ) ) {
@@ -1062,82 +819,6 @@ export class Maintenance {
     else {
       return new Maintenance();
     }
-  }
-
-  /**
-   * Starts a command-line REPL with features loaded.
-   *
-   * TODO: expose Checkout, ReleaseBranch, Maintenance, others (!)
-   */
-  public static startREPL(): Promise<void> {
-    return new Promise( ( resolve, reject ) => {
-      winston.default.transports.console.level = 'error';
-
-      const session = repl.start( {
-        prompt: 'maintenance> ',
-        useColors: true,
-        replMode: repl.REPL_MODE_STRICT,
-        ignoreUndefined: true
-      } );
-
-      // Wait for promises before being ready for input
-      const nodeEval = session.eval;
-      // @ts-expect-error - docs say readonly, but MK isn't going to change this working code
-      session[ 'eval' ] = // eslint-disable-line @typescript-eslint/dot-notation
-        ( async ( cmd, context, filename, callback ) => {
-          nodeEval.call( session, cmd, context, filename, ( _, result ) => {
-            if ( result instanceof Promise ) {
-              result.then( val => callback( _, val ) ).catch( e => {
-                if ( e.stack ) {
-                  console.error( `Maintenance task failed:\n${e.stack}\nFull Error details:\n${JSON.stringify( e, null, 2 )}` );
-                }
-                else if ( typeof e === 'string' ) {
-                  console.error( `Maintenance task failed: ${e}` );
-                }
-                else {
-                  console.error( `Maintenance task failed with unknown error: ${JSON.stringify( e, null, 2 )}` );
-                }
-              } );
-            }
-            else {
-              callback( _, result );
-            }
-          } );
-        } ) as typeof session.eval;
-
-      // Only autocomplete "public" API functions for Maintenance.
-      // const nodeCompleter = session.completer;
-      // session.completer = function( text, cb ) {
-      //   nodeCompleter( text, ( _, [ completions, completed ] ) => {
-      //     const match = completed.match( /^Maintenance\.(\w*)+/ );
-      //     if ( match ) {
-      //       const funcStart = match[ 1 ];
-      //       cb( null, [ PUBLIC_FUNCTIONS.filter( f => f.startsWith( funcStart ) ).map( f => `Maintenance.${f}` ), completed ] );
-      //     }
-      //     else {
-      //       cb( null, [ completions, completed ] );
-      //     }
-      //   } );
-      // };
-
-      // Allow controlling verbosity
-      Object.defineProperty( global, 'verbose', {
-        get() {
-          return winston.default.transports.console.level === 'info';
-        },
-        set( value ) {
-          winston.default.transports.console.level = value ? 'info' : 'error';
-        }
-      } );
-
-      session.context.Maintenance = Maintenance;
-      session.context.m = Maintenance;
-      session.context.M = Maintenance;
-      session.context.ReleaseBranch = ReleaseBranch;
-      session.context.rb = ReleaseBranch;
-
-      session.on( 'exit', resolve );
-    } );
   }
 
   /**
