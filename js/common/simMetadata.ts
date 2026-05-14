@@ -62,7 +62,7 @@ async function simMetadata( providedOptions?: Partial<SimMetadataOptions> ): Pro
     metadataURL += `&simulation=${options.simulation}`;
   }
 
-  winston.info( `getting metadata request with ${metadataURL}` );
+  winston.debug( `getting metadata request with ${metadataURL}` );
 
   let response;
   try {

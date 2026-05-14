@@ -114,15 +114,6 @@ export class Maintenance {
       if ( modifiedBranch.pushedMessages.length ) {
         console.log( `    pushedMessages: \n      ${modifiedBranch.pushedMessages.join( '\n      ' )}` );
       }
-      if ( modifiedBranch.pendingMessages.length ) {
-        console.log( `    pendingMessages: \n      ${modifiedBranch.pendingMessages.join( '\n      ' )}` );
-      }
-      if ( Object.keys( modifiedBranch.changedDependencies ).length > 0 ) {
-        console.log( '    deps:' );
-        for ( const key of Object.keys( modifiedBranch.changedDependencies ) ) {
-          console.log( `      ${key}: ${modifiedBranch.changedDependencies[ key ]}` );
-        }
-      }
     }
 
     console.log( '\nMaintenance Patches in MR:', maintenance.patches.length === 0 ? 'None' : '' );
@@ -131,7 +122,7 @@ export class Maintenance {
       const count = maintenance.patches.indexOf( patch ) + 1;
       const indexAndSpacing = `${count}. ` + ( count > 9 ? '' : ' ' );
 
-      console.log( `${indexAndSpacing}[${patch.name}]${patch.name !== patch.repo ? ` (${patch.repo})` : ''} ${patch.message}` );
+      console.log( `${indexAndSpacing}[${patch.name}]${patch.name} ${patch.message}` );
       for ( const sha of patch.shas ) {
         console.log( `      ${sha}` );
       }
@@ -225,13 +216,9 @@ export class Maintenance {
 
   /**
    * Creates a patch
-   *
-   * @param [patchName] - If no name is provided, the repo string will be used.
    */
-  public static async createPatch( repo: string, message: string, patchName?: string ): Promise<void> {
+  public static async createPatch( patchName: string, message: string ): Promise<void> {
     const maintenance = await Maintenance.load();
-
-    patchName = patchName || repo;
 
     for ( const patch of maintenance.patches ) {
       if ( patch.name === patchName ) {
@@ -239,11 +226,11 @@ export class Maintenance {
       }
     }
 
-    maintenance.patches.push( new Patch( repo, patchName, message ) );
+    maintenance.patches.push( new Patch( patchName, message ) );
 
     maintenance.save();
 
-    console.log( `Created patch for ${repo} with message: ${message}` );
+    console.log( `Created patch ${patchName} with message: ${message}` );
   }
 
   /**
@@ -402,7 +389,7 @@ export class Maintenance {
    */
   public static async addNeededPatchesBefore( patchName: string, sha: string ): Promise<void> {
     await Maintenance.addNeededPatches( patchName, async releaseBranch => {
-      return releaseBranch.isMissingSHA( sha );
+      return releaseBranch.checkout.isMissingSHA( sha );
     } );
   }
 
@@ -411,28 +398,7 @@ export class Maintenance {
    */
   public static async addNeededPatchesAfter( patchName: string, sha: string ): Promise<void> {
     await Maintenance.addNeededPatches( patchName, async releaseBranch => {
-      return releaseBranch.includesSHA( sha );
-    } );
-  }
-
-  /**
-   * Adds a needed patch to all release branches that satisfy the given filter( releaseBranch, builtFileString )
-   * where it builds the simulation with the defaults (brand=phet) and provides it as a string.
-   */
-  public static async addNeededPatchesBuildFilter( patchName: string, filter: ( releaseBranch: ReleaseBranch, fileContents: string ) => Promise<boolean> ): Promise<void> {
-    await Maintenance.addNeededPatches( patchName, async releaseBranch => {
-      await checkoutTarget( releaseBranch.repo, releaseBranch.branch, true );
-      await gitPull( releaseBranch.repo );
-      await build( releaseBranch.repo );
-      const chipperVersion = await ChipperVersion.getFromRepository();
-      let filename;
-      if ( chipperVersion.major !== 0 ) {
-        filename = `../${releaseBranch.repo}/build/phet/${releaseBranch.repo}_en_phet.html`;
-      }
-      else {
-        filename = `../${releaseBranch.repo}/build/${releaseBranch.repo}_en.html`;
-      }
-      return filter( releaseBranch, fs.readFileSync( filename, 'utf8' ) );
+      return releaseBranch.checkout.includesSHA( sha );
     } );
   }
 
@@ -495,7 +461,7 @@ export class Maintenance {
    */
   public static async removeNeededPatchesBefore( patchName: string, sha: string ): Promise<void> {
     await Maintenance.removeNeededPatches( patchName, async releaseBranch => {
-      return releaseBranch.isMissingSHA( sha );
+      return releaseBranch.checkout.isMissingSHA( sha );
     } );
   }
 
@@ -504,70 +470,8 @@ export class Maintenance {
    */
   public static async removeNeededPatchesAfter( patchName: string, sha: string ): Promise<void> {
     await Maintenance.removeNeededPatches( patchName, async releaseBranch => {
-      return releaseBranch.includesSHA( sha );
+      return releaseBranch.checkout.includesSHA( sha );
     } );
-  }
-
-  /**
-   * Helper for adding patches based on specific patterns, e.g.:
-   * Maintenance.addNeededPatches( 'phetmarks', Maintenance.singleFileReleaseBranchFilter( '../phetmarks/js/phetmarks.ts' ), content => content.includes( 'data/wrappers' ) );
-   */
-  public static singleFileReleaseBranchFilter( fileName: string, predicate: ( fileContents: string ) => boolean ): FilterRB {
-    return async releaseBranch => {
-      await releaseBranch.checkout( false );
-
-      if ( fs.existsSync( fileName ) ) {
-        const contents = fs.readFileSync( fileName, 'utf-8' );
-        return predicate( contents );
-      }
-
-      return false;
-    };
-  }
-
-  /**
-   * Checks out a specific Release Branch (using local commit data as necessary).
-   * @param repo
-   * @param branch
-   * @param outputJS - if true, once checked out this will also run `grunt output-js-project`
-   * @param npmUpdate - do a npm update after checking out shas
-   */
-  public static async checkoutBranch( repo: string, branch: string, outputJS = false, npmUpdate = true ): Promise<void> {
-    const maintenance = await Maintenance.load();
-
-    const modifiedBranch = await maintenance.ensureModifiedBranch( repo, branch, true );
-
-    // TODO: nope don't need to do this style of checkout!
-    await modifiedBranch.checkout( npmUpdate );
-
-    await modifiedBranch.releaseBranch.transpile();
-
-    // No need to save, shouldn't be changing things
-    console.log( `Checked out ${repo} ${branch}` );
-  }
-
-  /**
-   * Checks out a single branch for a repo, then builds it.
-   * @param repo
-   * @param branch
-   * @param buildOptions - Optional build options forwarded to build()
-   */
-  public static async checkoutAndBuild( repo: string, branch: string, buildOptions?: Partial<BuildOptions> ): Promise<void> {
-    await Maintenance.checkoutBranch( repo, branch );
-    await Maintenance.cleanBuildDirectory( repo );
-    await build( repo, buildOptions );
-    console.log( `Built ${repo} ${branch}` );
-  }
-
-  /**
-   * Deletes the build/ directory for a repo to avoid legacy grunt clean issues that
-   * attempt to delete outside the current working directory.
-   * See https://github.com/phetsims/perennial/issues/480
-   */
-  private static async cleanBuildDirectory( repo: string ): Promise<void> {
-    console.log( 'Cleaning repo build directory' );
-    const buildDirectory = path.resolve( PERENNIAL_ROOT, '..', repo, 'build' );
-    await fs.promises.rm( buildDirectory, { recursive: true, force: true } );
   }
 
   /**

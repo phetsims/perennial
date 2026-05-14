@@ -50,11 +50,11 @@ export const WORKTREE_DIRECTORY = buildLocal.releaseBranchesDirectory;
 let simMetadataPromise!: Promise<SimMetadata>;
 let simPhetioMetadataPromise!: Promise<SimPhetioMetadata[]>;
 export const invalidateMetadataCache = (): void => {
-  winston.info( 'loading phet brand ReleaseBranches' );
+  winston.debug( 'loading phet brand ReleaseBranches' );
   simMetadataPromise = simMetadata( {
     type: 'html'
   } );
-  winston.info( 'loading phet-io brand ReleaseBranches' );
+  winston.debug( 'loading phet-io brand ReleaseBranches' );
   simPhetioMetadataPromise = simPhetioMetadata( {
     active: true,
     latest: true
@@ -65,6 +65,9 @@ invalidateMetadataCache();
 export class Checkout {
 
   public releaseBranch: ReleaseBranch | null = null;
+
+  // This is used a lot, and expensive to calculate, so we will cache it here.
+  private cachedDivergingSHA: string | null = null;
 
   // Protected so we can do async initialization in static methods
   protected constructor(
@@ -777,10 +780,19 @@ export class Checkout {
    * NOTE: fetches are needed before this, so things are up-to-date (!)
    */
   public async getDivergingSHA(): Promise<string> {
+    if ( this.cachedDivergingSHA ) {
+      return this.cachedDivergingSHA;
+    }
+
     await this.gitUpdateWithoutFetch();
 
     winston.info( `getting first diverging commit for ${this.branch}` );
-    return gitFirstDivergingCommit( this.branch, 'main' );
+
+    const sha = await gitFirstDivergingCommit( this.branch, 'main' );
+
+    this.cachedDivergingSHA = sha;
+
+    return sha;
   }
 
   /**

@@ -10,6 +10,7 @@ import SimVersion from '../browser-and-node/SimVersion.js';
 import { PackageJSON } from '../browser-and-node/PerennialTypes.js';
 import { getBranchPackageJSON } from './getBranchPackageJSON.js';
 import fs from 'fs';
+import fsPromises from 'fs/promises';
 import { getBranchSimVersion } from './getBranchSimVersion.js';
 
 export class RunnableBranch {
@@ -85,6 +86,13 @@ export class RunnableBranch {
       // lint: false, TODO: when replacing usages, remember to turn off linting when not needed
       locales: '*'
     }, options ) );
+
+    // Deletes the build/ directory for a repo to avoid legacy grunt clean issues that
+    // attempt to delete outside the current working directory.
+    // See https://github.com/phetsims/perennial/issues/480
+    winston.info( `Cleaning build directory for ${this.repo} at ${this.checkout.workingDirectory}` );
+    const buildDirectory = `${this.checkout.workingDirectory}/${this.repo}/build`;
+    await fsPromises.rm( buildDirectory, { recursive: true, force: true } );
 
     winston.info( `building ${this.checkout.workingDirectory} with grunt ${args.join( ' ' )}` );
     const result = await execute( gruntCommand, args, `${this.checkout.workingDirectory}/${this.repo}`, executeOptions );

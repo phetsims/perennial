@@ -15,14 +15,9 @@ import { Patch } from './Patch.js';
 import { Checkout } from '../Checkout.js';
 import { githubCreateIssue } from '../githubCreateIssue.js';
 
-// Keys are repo names, values are SHAs
-type Dependencies = Record<string, string>;
-
 type ModifiedBranchSerialized = {
   releaseBranch: ReturnType<ReleaseBranch['serialize']>;
-  changedDependencies: Dependencies;
   neededPatches: string[];
-  pendingMessages: string[];
   pushedMessages: string[];
   deployedVersion: ReturnType<SimVersion['serialize']> | null;
 };
@@ -49,20 +44,16 @@ export class ModifiedBranch {
 
   /**
    * @param releaseBranch
-   * @param changedDependencies -
    * @param neededPatches
-   * @param pendingMessages - Messages from already-applied patches or other changes NOT included in dependencies.json yet
    * @param pushedMessages - Messages from already-applied patches or other changes that have been included in dependencies.json
    * @param deployedVersion - The deployed version for the latest patches applied. Will be reset to null when updates are made.
    */
   public constructor(
     public readonly releaseBranch: ReleaseBranch,
-    public readonly changedDependencies: Dependencies = {},
     public readonly neededPatches: Patch[] = [],
-    public readonly pendingMessages: string[] = [],
     public readonly pushedMessages: string[] = [],
-    public deployedVersion: SimVersion | null = null ) {
-
+    public deployedVersion: SimVersion | null = null
+  ) {
     this.repo = releaseBranch.repo;
     this.branch = releaseBranch.branch;
     this.brands = releaseBranch.brands;
@@ -74,9 +65,7 @@ export class ModifiedBranch {
   public serialize(): ModifiedBranchSerialized {
     return {
       releaseBranch: this.releaseBranch.serialize(),
-      changedDependencies: this.changedDependencies,
       neededPatches: this.neededPatches.map( patch => patch.name ),
-      pendingMessages: this.pendingMessages,
       pushedMessages: this.pushedMessages,
       deployedVersion: this.deployedVersion ? this.deployedVersion.serialize() : null
     };
@@ -90,9 +79,7 @@ export class ModifiedBranch {
   public static async deserialize(
     {
       releaseBranch,
-      changedDependencies,
       neededPatches = [],
-      pendingMessages,
       pushedMessages,
       deployedVersion
     }: ModifiedBranchSerialized,
@@ -100,9 +87,7 @@ export class ModifiedBranch {
   ): Promise<ModifiedBranch> {
     return new ModifiedBranch(
       await Checkout.getReleaseBranch( releaseBranch.repo, releaseBranch.branch ),
-      changedDependencies,
       neededPatches.map( name => patches.find( patch => patch.name === name )! ),
-      pendingMessages,
       pushedMessages,
       deployedVersion ? SimVersion.deserialize( deployedVersion ) : null
     );
@@ -120,17 +105,9 @@ export class ModifiedBranch {
 
     return new ModifiedBranch(
       this.releaseBranch,
-      {
-        ...this.changedDependencies, // eslint-disable-line phet/no-object-spread-on-non-literals
-        ...other.changedDependencies // eslint-disable-line phet/no-object-spread-on-non-literals
-      },
       _.uniq( [
         ...this.neededPatches,
         ...other.neededPatches
-      ] ),
-      _.uniq( [
-        ...this.pendingMessages,
-        ...other.pendingMessages
       ] ),
       _.uniq( [
         ...this.pushedMessages,
@@ -145,9 +122,7 @@ export class ModifiedBranch {
    */
   public get isUnused(): boolean {
     return this.neededPatches.length === 0 &&
-           Object.keys( this.changedDependencies ).length === 0 &&
-           this.pushedMessages.length === 0 &&
-           this.pendingMessages.length === 0;
+           this.pushedMessages.length === 0;
   }
 
   /**

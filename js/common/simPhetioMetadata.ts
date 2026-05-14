@@ -40,7 +40,7 @@ async function simPhetioMetadata( providedOptions?: Partial<SimPhetioMetadataOpt
     metadataURL += `&latest=${options.latest}`;
   }
 
-  winston.info( `getting phet-io metadata request with ${metadataURL}` );
+  winston.debug( `getting phet-io metadata request with ${metadataURL}` );
   let response;
   try {
     response = await axios( metadataURL );
