@@ -156,11 +156,6 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
     return `${this.repo} ${this.branch} ${this.brands.join( ',' )}${this.isReleased ? '' : ' (unpublished)'}`;
   }
 
-  public override async getDependencies(): Promise<Repo[]> {
-    // TODO: read from new buildInfo.json file? We can't use the normal method https://github.com/phetsims/totality/issues/140
-    throw new Error( 'unimplemented' );
-  }
-
   /**
    * Re-runs a production deploy for a specific branch (based on the SHAs at the tip of the release branch)
    */

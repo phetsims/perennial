@@ -16,7 +16,7 @@ import { puppeteerLoad } from './puppeteerLoad.js';
 import { BuildOptions, getBuildArguments } from './getBuildArguments.js';
 import _ from 'lodash';
 import SimVersion from '../browser-and-node/SimVersion.js';
-import { PackageJSON, Repo } from '../browser-and-node/PerennialTypes.js';
+import { BuildInfoJSON, PackageJSON, Repo } from '../browser-and-node/PerennialTypes.js';
 import { getBranchPackageJSON } from './getBranchPackageJSON.js';
 import fs from 'fs';
 // eslint-disable-next-line phet/default-import-match-filename
