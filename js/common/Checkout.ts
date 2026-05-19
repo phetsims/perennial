@@ -765,7 +765,8 @@ export class Checkout {
 
       if ( sha !== this.branch ) {
         winston.info( `switching worktree at ${this.workingDirectory}` );
-        await gitImmutableExecute( [ 'switch', '--detach', this.branch ], this.workingDirectory );
+        await gitMutableExecute( [ 'switch', '--detach', this.branch ], this.workingDirectory );
+        await gitMutableExecute( [ 'clean', '-fd' ], this.workingDirectory );
       }
       else {
         updated = false;
