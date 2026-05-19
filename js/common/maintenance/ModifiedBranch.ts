@@ -13,14 +13,39 @@ import SimVersion from '../../browser-and-node/SimVersion.js';
 import { ReleaseBranch } from '../ReleaseBranch.js';
 import { Patch } from './Patch.js';
 import { githubCreateIssue } from '../githubCreateIssue.js';
-import { LegacyBranch, Repo } from '../../browser-and-node/PerennialTypes.js';
+import { LegacyBranch, Repo, SHA } from '../../browser-and-node/PerennialTypes.js';
 
 type ModifiedBranchSerialized = {
   releaseBranch: ReturnType<ReleaseBranch['serialize']>;
   neededPatches: string[];
   pushedMessages: string[];
   deployedVersion: ReturnType<SimVersion['serialize']> | null;
+
+  lastUpdate?: LastRun;
+  lastTranspile?: LastRun;
+  lastBuild?: LastRun;
+  lastUnbuiltCheck?: LastRun;
+  lastBuiltCheck?: LastRun;
 };
+
+export type UpdateTestingOptions = {
+  update?: boolean;
+  transpile?: boolean;
+  build?: boolean;
+  unbuiltCheck?: boolean;
+  builtCheck?: boolean;
+};
+
+export type LastRun = null | ( {
+  sha: SHA;
+} & (
+  {
+    success: true;
+  } | {
+    success: false;
+    error: string;
+  }
+) );
 
 export type DeployedLinkOptions = {
 
@@ -52,11 +77,91 @@ export class ModifiedBranch {
     public readonly releaseBranch: ReleaseBranch,
     public readonly neededPatches: Patch[] = [],
     public readonly pushedMessages: string[] = [],
-    public deployedVersion: SimVersion | null = null
+    public deployedVersion: SimVersion | null = null,
+
+    public lastUpdate: LastRun = null,
+    public lastTranspile: LastRun = null,
+    public lastBuild: LastRun = null,
+    public lastUnbuiltCheck: LastRun = null,
+    public lastBuiltCheck: LastRun = null
   ) {
     this.repo = releaseBranch.repo;
     this.branch = releaseBranch.branch;
     this.brands = releaseBranch.brands;
+  }
+
+  public async updateTesting( options?: UpdateTestingOptions ): Promise<void> {
+    const runUpdate = options?.update ?? true;
+    const runTranspile = options?.transpile ?? true;
+    const runBuild = options?.build ?? true;
+    const runUnbuiltCheck = options?.unbuiltCheck ?? runTranspile;
+    const runBuiltCheck = options?.builtCheck ?? runBuild;
+
+    const currentSHA = await this.releaseBranch.checkout.getSHA();
+
+    const isSuccess = ( runResult: LastRun ): boolean => {
+      return !!runResult && runResult.sha === currentSHA && runResult.success;
+    };
+
+    const run = async ( oldLastRun: LastRun, shouldRun: boolean, runFunction: () => Promise<void> ): Promise<LastRun> => {
+      const isUpToDate = !!oldLastRun && oldLastRun.sha === currentSHA;
+
+      if ( isUpToDate ) {
+        return oldLastRun;
+      }
+
+      if ( shouldRun ) {
+        try {
+          await runFunction();
+
+          return {
+            sha: currentSHA,
+            success: true
+          };
+        }
+        catch( e ) {
+          return {
+            sha: currentSHA,
+            success: false,
+            error: e instanceof Error ? ( e + '\n' + e.stack ) : String( e )
+          };
+        }
+      }
+      else {
+        return null;
+      }
+    };
+
+    // Conditions where testing should be reset (if any of these are true, we want to reset all testing results):
+    const isClean = await this.releaseBranch.checkout.isClean();
+    if ( !isClean || this.neededPatches.length > 0 ) {
+      this.lastUpdate = null;
+      this.lastTranspile = null;
+      this.lastBuild = null;
+      this.lastUnbuiltCheck = null;
+      this.lastBuiltCheck = null;
+      return;
+    }
+
+    this.lastUpdate = await run( this.lastUpdate, runUpdate, async () => {
+      await this.releaseBranch.checkout.updateWorktree();
+    } );
+
+    this.lastTranspile = await run( this.lastTranspile, runTranspile && isSuccess( this.lastUpdate ), async () => {
+      await this.releaseBranch.transpile();
+    } );
+
+    this.lastBuild = await run( this.lastBuild, runBuild && isSuccess( this.lastUpdate ), async () => {
+      await this.releaseBranch.build();
+    } );
+
+    this.lastUnbuiltCheck = await run( this.lastUnbuiltCheck, runUnbuiltCheck && isSuccess( this.lastTranspile ), async () => {
+      await this.releaseBranch.checkUnbuilt();
+    } );
+
+    this.lastBuiltCheck = await run( this.lastBuiltCheck, runBuiltCheck && isSuccess( this.lastBuild ), async () => {
+      await this.releaseBranch.checkBuilt();
+    } );
   }
 
   /**
@@ -67,7 +172,12 @@ export class ModifiedBranch {
       releaseBranch: this.releaseBranch.serialize(),
       neededPatches: this.neededPatches.map( patch => patch.name ),
       pushedMessages: this.pushedMessages,
-      deployedVersion: this.deployedVersion ? this.deployedVersion.serialize() : null
+      deployedVersion: this.deployedVersion ? this.deployedVersion.serialize() : null,
+      lastUpdate: this.lastUpdate,
+      lastTranspile: this.lastTranspile,
+      lastBuild: this.lastBuild,
+      lastUnbuiltCheck: this.lastUnbuiltCheck,
+      lastBuiltCheck: this.lastBuiltCheck
     };
   }
 
@@ -81,7 +191,12 @@ export class ModifiedBranch {
       releaseBranch: releaseBranchSerialized,
       neededPatches = [],
       pushedMessages,
-      deployedVersion
+      deployedVersion,
+      lastUpdate = null,
+      lastTranspile = null,
+      lastBuild = null,
+      lastUnbuiltCheck = null,
+      lastBuiltCheck = null
     }: ModifiedBranchSerialized,
     patches: Patch[],
     releaseBranches: ReleaseBranch[]
@@ -95,7 +210,12 @@ export class ModifiedBranch {
       releaseBranch,
       neededPatches.map( name => patches.find( patch => patch.name === name )! ),
       pushedMessages,
-      deployedVersion ? SimVersion.deserialize( deployedVersion ) : null
+      deployedVersion ? SimVersion.deserialize( deployedVersion ) : null,
+      lastUpdate,
+      lastTranspile,
+      lastBuild,
+      lastUnbuiltCheck,
+      lastBuiltCheck
     );
   }
 

@@ -45,6 +45,7 @@ import { tsxCommand } from './tsxCommand.js';
 import pLimit from 'p-limit';
 import { gitImmutableExecute, gitMutableExecute } from './gitMutex.js';
 import { escapeRegExp } from './escapeRegExp.js';
+import _ from 'lodash';
 
 export const WORKTREE_DIRECTORY = buildLocal.worktreesDirectory;
 export const MAINTENANCE_WORKTREE_DIRECTORY = buildLocal.maintenanceWorktreeDirectory;
@@ -480,7 +481,7 @@ export class Checkout {
 
     const limit = pLimit( 10 ); // limit to 5 concurrent requests
 
-    return Promise.all( stubs.map( stub => limit( () => Checkout.getReleaseBranch( stub.repo, stub.branch ) ) ) );
+    return Promise.all( _.sortBy( stubs, [ 'repo', 'branch' ] ).map( stub => limit( () => Checkout.getReleaseBranch( stub.repo, stub.branch ) ) ) );
   }
 
   public async getRunnableBranch( repo: Repo ): Promise<RunnableBranch> {

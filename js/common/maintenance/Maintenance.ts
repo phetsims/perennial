@@ -12,13 +12,14 @@ import _ from 'lodash';
 import winston from 'winston';
 import { production } from '../../grunt/production.js';
 import { rc } from '../../grunt/rc.js';
-import { DeployedLinkOptions, ModifiedBranch } from './ModifiedBranch.js';
-import { ReleaseBranch } from '../ReleaseBranch.js';
+import { DeployedLinkOptions, ModifiedBranch, UpdateTestingOptions } from './ModifiedBranch.js';
+import { RELEASE_BRANCH_DEFAULT_CONCURRENT_LIMIT, ReleaseBranch } from '../ReleaseBranch.js';
 import { Patch } from './Patch.js';
 import { Checkout } from '../Checkout.js';
 import { LegacyBranch, Repo, SHA } from '../../browser-and-node/PerennialTypes.js';
 import { gitImmutableExecute } from '../gitMutex.js';
 import { buildLocal } from '../buildLocal.js';
+import { limitedMap } from '../limitedMap.js';
 
 // constants
 const MAINTENANCE_FILE = '.maintenance.json';
@@ -868,5 +869,13 @@ export class Maintenance {
     await maintenanceCheckout.updateMaintenanceWorktree();
 
     console.log( `checked out ${sha} for ${repo} ${branch}` );
+  }
+
+  public static async updateTesting( options?: UpdateTestingOptions ): Promise<void> {
+    const maintenance = await Maintenance.load();
+
+    await limitedMap( maintenance.modifiedBranches, async modifiedBranch => {
+      await modifiedBranch.updateTesting( options );
+    }, RELEASE_BRANCH_DEFAULT_CONCURRENT_LIMIT );
   }
 }
