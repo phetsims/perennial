@@ -32,7 +32,7 @@ export const RELEASE_BRANCH_DEFAULT_CONCURRENT_LIMIT = 5; // TODO: have a settin
 export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerialized {
 
   // Cache for the timestamp string of the diverging commit, since it can be expensive to calculate and is used in multiple places.
-  public cachedTimestampString: string | null = null;
+  private cachedTimestampString: string | null = null;
 
   public constructor(
     // passed to RunnableBranch
@@ -125,6 +125,13 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
         throw new Error( result );
       }
     }, filter );
+  }
+
+  public async getDivergingTimestampString(): Promise<string> {
+    if ( !this.cachedTimestampString ) {
+      this.cachedTimestampString = await this.checkout.getDivergingTimestampString();
+    }
+    return this.cachedTimestampString;
   }
 
   /**

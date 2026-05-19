@@ -12,7 +12,7 @@ import _ from 'lodash';
 import winston from 'winston';
 import { production } from '../../grunt/production.js';
 import { rc } from '../../grunt/rc.js';
-import { DeployedLinkOptions, ModifiedBranch, UpdateTestingOptions } from './ModifiedBranch.js';
+import { DeployedLinkOptions, LastRun, ModifiedBranch, UpdateTestingOptions } from './ModifiedBranch.js';
 import { RELEASE_BRANCH_DEFAULT_CONCURRENT_LIMIT, ReleaseBranch } from '../ReleaseBranch.js';
 import { Patch } from './Patch.js';
 import { Checkout } from '../Checkout.js';
@@ -20,6 +20,7 @@ import { LegacyBranch, Repo, SHA } from '../../browser-and-node/PerennialTypes.j
 import { gitImmutableExecute } from '../gitMutex.js';
 import { buildLocal } from '../buildLocal.js';
 import { limitedMap } from '../limitedMap.js';
+import { ANSI_GREEN, ANSI_RED, ANSI_RESET, ANSI_YELLOW } from '../ANSI.js';
 
 // constants
 const MAINTENANCE_FILE = '.maintenance.json';
@@ -129,24 +130,13 @@ export class Maintenance {
 
       let modifiedBranches = maintenance.modifiedBranches;
       if ( options?.timestamp ) {
-        // Do a parallel update of cached timestamps on the modified branches, so that we can sort by them.
-        await Promise.all( modifiedBranches.map( modifiedBranch => {
-          return ( async () => {
-            if ( !modifiedBranch.releaseBranch.cachedTimestampString ) {
-              // eslint-disable-next-line require-atomic-updates
-              modifiedBranch.releaseBranch.cachedTimestampString = await modifiedBranch.releaseBranch.checkout.getDivergingTimestampString();
-            }
-          } )();
-        } ) );
-
-        modifiedBranches = _.sortBy( modifiedBranches, modifiedBranch => {
-          return modifiedBranch.releaseBranch.cachedTimestampString;
-        } );
+        modifiedBranches = await ModifiedBranch.sortedByTimestamp( modifiedBranches );
       }
 
       for ( const modifiedBranch of modifiedBranches ) {
         if ( modifiedBranch.neededPatches.includes( patch ) ) {
-          const timestampPrefix = options?.timestamp ? `${modifiedBranch.releaseBranch.cachedTimestampString} ` : '';
+          // NOTE: The sort above should have calculated these in parallel
+          const timestampPrefix = options?.timestamp ? `${await modifiedBranch.releaseBranch.getDivergingTimestampString()} ` : '';
           console.log( `        ${timestampPrefix}${modifiedBranch.repo} ${modifiedBranch.branch} ${modifiedBranch.brands.join( ',' )}` );
         }
       }
@@ -759,7 +749,7 @@ export class Maintenance {
   public serialize(): MaintenanceSerialized {
     return {
       patches: this.patches.map( patch => patch.serialize() ),
-      modifiedBranches: this.modifiedBranches.map( modifiedBranch => modifiedBranch.serialize() ),
+      modifiedBranches: this.modifiedBranches.map( modifiedBranch => modifiedBranch.serialize() )
     };
   }
 
@@ -889,6 +879,33 @@ export class Maintenance {
       // Save after each one is complete
       maintenance.save();
     }, RELEASE_BRANCH_DEFAULT_CONCURRENT_LIMIT );
+  }
+
+  public static async testingList(): Promise<void> {
+    const maintenance = await Maintenance.load();
+
+    console.log( 'update transpile build unbuiltCheck builtCheck' );
+
+    for ( const modifiedBranch of await ModifiedBranch.sortedByTimestamp( maintenance.modifiedBranches ) ) {
+      const currentSHA = await modifiedBranch.releaseBranch.checkout.getSHA();
+
+      const getStatusString = ( lastRun: LastRun ) => {
+        const isUpToDate = !!lastRun && lastRun.sha === currentSHA;
+
+        if ( lastRun === null ) {
+          return ' -- ';
+        }
+        else if ( lastRun.success ) {
+          return `${isUpToDate ? ANSI_GREEN : ANSI_YELLOW} OK ${ANSI_RESET}`;
+        }
+        else {
+          return `${isUpToDate ? ANSI_RED : ANSI_YELLOW}FAIL${ANSI_RESET}`;
+        }
+      };
+
+      // TODO: lines https://github.com/phetsims/totality/issues/140
+      console.log( `${getStatusString( modifiedBranch.lastUpdate )} ${getStatusString( modifiedBranch.lastTranspile )} ${getStatusString( modifiedBranch.lastBuild )} ${getStatusString( modifiedBranch.lastUnbuiltCheck )} ${getStatusString( modifiedBranch.lastBuiltCheck )} ${await modifiedBranch.releaseBranch.getDivergingTimestampString()} ${modifiedBranch.repo} ${modifiedBranch.branch} ${modifiedBranch.brands.join( ',' )}` );
+    }
   }
 
   public static async getInitPromise(): Promise<void> {

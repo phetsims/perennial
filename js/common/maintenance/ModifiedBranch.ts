@@ -177,6 +177,22 @@ export class ModifiedBranch {
     } );
   }
 
+  public static async sortedByTimestamp( modifiedBranches: ModifiedBranch[] ): Promise<ModifiedBranch[]> {
+    const timestampMap = new Map<ModifiedBranch, string>();
+
+    // TODO: separate this out for caching, https://github.com/phetsims/totality/issues/140
+    // Do a parallel update of cached timestamps on the modified branches, so that we can sort by them.
+    await Promise.all( modifiedBranches.map( modifiedBranch => {
+      return ( async () => {
+        timestampMap.set( modifiedBranch, await modifiedBranch.releaseBranch.getDivergingTimestampString() );
+      } )();
+    } ) );
+
+    return _.sortBy( modifiedBranches, modifiedBranch => {
+      return timestampMap.get( modifiedBranch )!;
+    } );
+  }
+
   /**
    * Convert into a plain JS object meant for JSON serialization.
    */
