@@ -79,9 +79,11 @@ export class Checkout {
   protected constructor(
     // The fully-qualified branch name of this checkout (e.g. "releases/acid-base-solutions/1.0", "main"), OR
     // a full SHA if it is a detached head checkout (e.g. "8bf98524a904c9ad10aaad7441f77e88d0ec199d")
+    // TODO: support pull requests, `git ls-remote` mentions things like refs/pull/87/head, see https://github.com/phetsims/totality/issues/140
+    // TODO: actually, don't allow this due to security? https://github.com/phetsims/totality/issues/140
     public readonly branch: BranchOrSHA,
 
-    // Whether it is our primary "checkout" (where we are being run from), or a worktree checkout
+    // Whether it is our primary "checkout" (where we are being run from, i.e. '..'). If false, this is a worktree checkout
     public readonly isPrimary: boolean,
 
     // The working directory for the base of this checkout
@@ -108,6 +110,10 @@ export class Checkout {
   }
 
   public static async hasWorktree( branch: BranchOrSHA ): Promise<boolean> {
+    if ( branch === 'main' ) {
+      throw new Error( 'Should not be checking for a worktree for main branch' );
+    }
+
     const worktreeData = await gitImmutableExecute( [
       'worktree',
       'list',
@@ -118,6 +124,16 @@ export class Checkout {
       `^(?:branch refs/heads/${escapeRegExp( branch )}|HEAD ${escapeRegExp( branch )})$`,
       'm'
     ).test( worktreeData );
+  }
+
+  public static async getCurrentPrimaryCheckout(): Promise<Checkout> {
+    let branchOrSHA = await getBranch();
+
+    if ( !branchOrSHA ) {
+      branchOrSHA = await gitRevParse( 'HEAD' );
+    }
+
+    return Checkout.getGenericBranchCheckout( branchOrSHA, true );
   }
 
   public static async getMainCheckout(): Promise<Checkout> {
@@ -230,6 +246,10 @@ export class Checkout {
     return ( await Checkout.getMainCheckout() ).getRunnableBranch( repo );
   }
 
+  public static async getCurrentPrimaryRunnableBranch( repo: Repo ): Promise<RunnableBranch> {
+    return ( await Checkout.getCurrentPrimaryCheckout() ).getRunnableBranch( repo );
+  }
+
   public static getReleaseBranchName( repo: Repo, legacyBranch: LegacyBranch ): Branch {
     if ( legacyBranch.startsWith( 'releases/' ) ) {
       throw new Error( `Expected legacy branch to not start with releases/, got: ${legacyBranch}` );
@@ -239,6 +259,10 @@ export class Checkout {
   }
 
   public static getWorktreeDirectory( branch: BranchOrSHA ): string {
+    if ( branch === 'main' ) {
+      throw new Error( 'Should not be getting a worktree directory for main branch' );
+    }
+
     // TODO: do we need escaping at all, if one branch is a substring of another? (e.g. feature/foo, feature/foo/bar) https://github.com/phetsims/totality/issues/140
     return `${WORKTREE_DIRECTORY}/${branch}`;
   }
@@ -562,10 +586,19 @@ export class Checkout {
   }
 
   public async getSHA(): Promise<SHA> {
-    return gitRevParse( this.branch );
+    if ( this.isSHA ) {
+      return this.branch;
+    }
+    else {
+      return gitRevParse( this.branch );
+    }
   }
 
   public async getSymbolicRef(): Promise<BranchOrSHA> {
+    if ( this.isSHA ) {
+      return this.branch;
+    }
+
     return ( await gitImmutableExecute( [ 'symbolic-ref', '-q', 'HEAD' ], this.workingDirectory ) ).trim();
   }
 
@@ -630,6 +663,12 @@ export class Checkout {
   }
 
   public async updateBabel(): Promise<void> {
+    if ( !this.isCheckedOut ) {
+      throw new Error( 'Cannot get tracking branch if not checked out' );
+    }
+
+    // TODO: consider using symbolic links? https://github.com/phetsims/totality/issues/140
+
     if ( fs.existsSync( `${this.workingDirectory}/babel` ) ) {
       winston.info( `pulling babel in ${this.workingDirectory}` );
 
@@ -644,19 +683,45 @@ export class Checkout {
     }
   }
 
+  public async ensurePrimaryCheckoutMatches(): Promise<void> {
+    if ( this.isPrimary ) {
+      const currentBranch = await getBranch();
+
+      if ( currentBranch !== this.branch ) {
+        throw new Error( `Expected current branch (${currentBranch}) to match checkout branch (${this.branch}) for primary checkout` );
+      }
+    }
+  }
+
+  public async update(): Promise<void> {
+    if ( this.isPrimary ) {
+      await this.updatePrimaryCheckout();
+    }
+    else {
+      await this.updateWorktree();
+    }
+  }
+
   public async updatePrimaryCheckout(): Promise<void> {
+    if ( !this.isPrimary ) {
+      throw new Error( 'Expected updatePrimaryCheckout to be called on a primary checkout' );
+    }
+
+    await this.ensurePrimaryCheckoutMatches();
+
     winston.info( `pulling primary checkout at ${this.workingDirectory}` );
     await gitPullDirectory( this.workingDirectory );
 
     await this.updateBabel();
     await this.npmUpdate();
-
-    // TODO: see if it is the correct branch checked out (!) see https://github.com/phetsims/totality/issues/140
   }
 
   public async updateWorktree(): Promise<void> {
     if ( this.branch === 'main' ) {
       throw new Error( 'We do not have a separate worktree for main' );
+    }
+    if ( this.isPrimary ) {
+      throw new Error( 'Expected updateWorktree to be called on a non-primary checkout' );
     }
 
     winston.info( `updating worktree for ${this.branch}` );
