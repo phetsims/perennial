@@ -70,7 +70,7 @@ export const buildLocal = {
   babelBranch: buildLocalObject.babelBranch || 'main',
 
   // This is relative to perennial/perennial-alias
-  releaseBranchesDirectory: buildLocalObject.releaseBranchesDirectory || '../release-branches',
+  worktreesDirectory: buildLocalObject.worktreesDirectory || '../worktrees',
 
   brands: buildLocalObject.brands || [ 'adapted-from-phet' ],
 

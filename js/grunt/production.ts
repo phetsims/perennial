@@ -96,7 +96,7 @@ export const production = async (
 
   const published = await releaseBranch.isPublished();
 
-  await checkout.update();
+  await checkout.updateWorktree();
 
   if ( !await checkout.isClean() ) {
     throw new ProductionDeployError( `Unclean status in ${checkout.branch}, cannot deploy` );

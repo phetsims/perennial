@@ -8,6 +8,7 @@
  */
 
 import { gitImmutableExecute } from './gitMutex.js';
+import { BranchOrSHA } from '../browser-and-node/PerennialTypes.js';
 
 /**
  * Gets the contents of the file at a given state in the git tree
@@ -20,7 +21,7 @@ import { gitImmutableExecute } from './gitMutex.js';
  */
 export const gitCatFile = async (
   file: string,
-  branchOrSha = 'HEAD'
+  branchOrSha: BranchOrSHA = 'HEAD'
 ): Promise<string> => {
   return gitImmutableExecute( [ 'cat-file', 'blob', `${branchOrSha}:${file}` ], '..' );
 };

@@ -6,13 +6,13 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import { Branch, IntentionalPerennialAny } from '../browser-and-node/PerennialTypes.js';
+import { BranchOrSHA, IntentionalPerennialAny } from '../browser-and-node/PerennialTypes.js';
 import { ensureLocalBranchFromRemote } from './ensureLocalBranchFromRemote.js';
 import { gitCatFile } from './gitCatFile.js';
 import { gitImmutableExecute } from './gitMutex.js';
 
 export const getFileAtBranch = async (
-  branch: Branch,
+  branch: BranchOrSHA,
   file: string
 ): Promise<string> => {
   try {

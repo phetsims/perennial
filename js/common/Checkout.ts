@@ -32,7 +32,7 @@ import simPhetioMetadata, { SimPhetioMetadata } from './simPhetioMetadata.js';
 import { getActiveSims } from './getActiveSims.js';
 import { getBranches } from './getBranches.js';
 import os from 'os';
-import { Branch, IntentionalPerennialAny, LegacyBranch, Repo, SHA } from '../browser-and-node/PerennialTypes.js';
+import { Branch, BranchOrSHA, IntentionalPerennialAny, LegacyBranch, Repo, SHA } from '../browser-and-node/PerennialTypes.js';
 import assert from 'assert';
 import { getBranch } from './getBranch.js';
 import { hasRemoteBranch } from './hasRemoteBranch.js';
@@ -44,8 +44,9 @@ import { getActiveRunnables } from './getActiveRunnables.js';
 import { tsxCommand } from './tsxCommand.js';
 import pLimit from 'p-limit';
 import { gitImmutableExecute, gitMutableExecute } from './gitMutex.js';
+import { escapeRegExp } from './escapeRegExp.js';
 
-export const WORKTREE_DIRECTORY = buildLocal.releaseBranchesDirectory;
+export const WORKTREE_DIRECTORY = buildLocal.worktreesDirectory;
 
 // Let this data be cached so we don't need to re-request all the time (and share the requests when many things are made at once)
 let simMetadataPromise!: Promise<SimMetadata>;
@@ -66,31 +67,54 @@ invalidateMetadataCache();
 export class Checkout {
 
   public releaseBranch: ReleaseBranch | null = null;
+  public readonly isSHA: boolean;
 
   // This is used a lot, and expensive to calculate, so we will cache it here.
   private cachedDivergingSHA: SHA | null = null;
 
   // Protected so we can do async initialization in static methods
   protected constructor(
-    public readonly branch: Branch,
-    public readonly workingDirectory: string,
-    public isCheckedOut: boolean // will be mutated to true on a checkout. We need to track that for various operations
-  ) {
+    // The fully-qualified branch name of this checkout (e.g. "releases/acid-base-solutions/1.0", "main"), OR
+    // a full SHA if it is a detached head checkout (e.g. "8bf98524a904c9ad10aaad7441f77e88d0ec199d")
+    public readonly branch: BranchOrSHA,
 
+    // Whether it is our primary "checkout" (where we are being run from), or a worktree checkout
+    public readonly isPrimary: boolean,
+
+    // The working directory for the base of this checkout
+    public readonly workingDirectory: string,
+
+    // Whether we are actually checked out. We can still get information from non-checked-out shas/branches, but certain
+    // operations will be unavailable.
+    // Will be mutated to true on a checkout. We need to track that for various operations.
+    public isCheckedOut: boolean
+  ) {
+    this.isSHA = /^[0-9a-fA-F]{40}$/.test( branch );
+
+    if ( isPrimary !== ( workingDirectory === '..' ) ) {
+      throw new Error( `Expected isPrimary (${isPrimary}) to match workingDirectory (${workingDirectory}) for branch ${branch}` );
+    }
+
+    if ( isPrimary && !isCheckedOut ) {
+      throw new Error( `Expected primary checkout to be checked out, but it is not for branch ${branch}` );
+    }
   }
 
-  public static async hasWorktree( branch: Branch ): Promise<boolean> {
+  public static async hasWorktree( branch: BranchOrSHA ): Promise<boolean> {
     const worktreeData = await gitImmutableExecute( [
       'worktree',
       'list',
       '--porcelain'
     ], '..' );
 
-    return !!worktreeData.match( new RegExp( `^branch refs/heads/${branch}$`, 'm' ) );
+    return new RegExp(
+      `^(?:branch refs/heads/${escapeRegExp( branch )}|HEAD ${escapeRegExp( branch )})$`,
+      'm'
+    ).test( worktreeData );
   }
 
   public static async getMainCheckout(): Promise<Checkout> {
-    return new Checkout( 'main', '..', true );
+    return new Checkout( 'main', true, '..', true );
   }
 
   /**
@@ -98,7 +122,18 @@ export class Checkout {
    * while it is in scope
    */
   public static async getOneOffCheckout( branch: Branch ): Promise<Checkout> {
-    return new Checkout( branch, '..', true );
+    return new Checkout( branch, true, '..', true );
+  }
+
+  public static async getGenericBranchCheckout( branch: BranchOrSHA, isPrimary = false ): Promise<Checkout> {
+    const directoryExists = isPrimary ? true : fs.existsSync( Checkout.getWorktreeDirectory( branch ) );
+    const worktreeExists = isPrimary ? true : await Checkout.hasWorktree( branch );
+
+    if ( directoryExists !== worktreeExists ) {
+      throw new Error( `Expected worktree existence (${worktreeExists}) to match directory existence (${directoryExists}) for ${branch}` );
+    }
+
+    return new Checkout( branch, isPrimary, isPrimary ? '..' : Checkout.getWorktreeDirectory( branch ), worktreeExists );
   }
 
   public static async getReleaseBranchCheckout( repo: Repo, legacyBranch: LegacyBranch ): Promise<Checkout> {
@@ -113,7 +148,7 @@ export class Checkout {
       throw new Error( `Expected worktree existence (${worktreeExists}) to match directory existence (${directoryExists}) for ${branch}` );
     }
 
-    const checkout = new Checkout( branch, Checkout.getWorktreeDirectory( branch ), worktreeExists );
+    const checkout = new Checkout( branch, false, Checkout.getWorktreeDirectory( branch ), worktreeExists );
 
     const simVersion = await getBranchSimVersion( repo, branch );
 
@@ -196,7 +231,7 @@ export class Checkout {
     return `releases/${repo}/${legacyBranch}`;
   }
 
-  public static getWorktreeDirectory( branch: Branch ): string {
+  public static getWorktreeDirectory( branch: BranchOrSHA ): string {
     // TODO: do we need escaping at all, if one branch is a substring of another? (e.g. feature/foo, feature/foo/bar) https://github.com/phetsims/totality/issues/140
     return `${WORKTREE_DIRECTORY}/${branch}`;
   }
@@ -238,7 +273,7 @@ export class Checkout {
       throw new Error( 'Unclean status, cannot create release branch' );
     }
 
-    const checkout = new Checkout( branch, Checkout.getWorktreeDirectory( branch ), false );
+    const checkout = new Checkout( branch, false, Checkout.getWorktreeDirectory( branch ), false );
 
     // get dependencies from main
     const dependencies = await ( await checkout.getRunnableBranch( repo ) ).getDependencies();
@@ -257,7 +292,7 @@ export class Checkout {
     await ensureLocalBranchFromRemote( branch );
 
     // Ensure we have a checkout (so we can modify and push from that region).
-    await checkout.update();
+    await checkout.updateWorktree();
 
     // Remove everything except for dependencies, '.git' (so our worktree works), and babel (since we just directly checked it out)
     const topLevelFilesToRemove = ( await fsPromises.readdir( checkout.workingDirectory ) ).filter( file => {
@@ -404,42 +439,98 @@ export class Checkout {
   }
 
   public async gitAdd( file: string ): Promise<string> {
+    if ( this.isSHA ) {
+      throw new Error( 'Cannot write to a detached head SHA' );
+    }
+
+    if ( !this.isCheckedOut ) {
+      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+    }
+
     winston.info( `git add ${file}` );
 
     return gitMutableExecute( [ 'add', file ], this.workingDirectory );
   }
 
   public async gitAddAll(): Promise<string> {
+    if ( this.isSHA ) {
+      throw new Error( 'Cannot write to a detached head SHA' );
+    }
+
+    if ( !this.isCheckedOut ) {
+      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+    }
+
     winston.info( 'git add -A' );
 
     return gitMutableExecute( [ 'add', '-A' ], this.workingDirectory );
   }
 
   public async gitCommit( message: string ): Promise<string> {
+    if ( this.isSHA ) {
+      throw new Error( 'Cannot write to a detached head SHA' );
+    }
+
+    if ( !this.isCheckedOut ) {
+      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+    }
+
     winston.info( `git commit with message:\n${message}` );
 
     return gitMutableExecute( [ 'commit', '--no-verify', '-m', message ], this.workingDirectory );
   }
 
   public async gitPush(): Promise<string> {
+    if ( this.isSHA ) {
+      throw new Error( 'Cannot write to a detached head SHA' );
+    }
+
+    if ( !this.isCheckedOut ) {
+      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+    }
+
     winston.info( `git push to ${this.branch}` );
 
     return gitMutableExecute( [ 'push', '-u', 'origin', this.branch ], this.workingDirectory );
   }
 
   public async gitPull(): Promise<string> {
+    if ( this.isSHA ) {
+      throw new Error( 'Cannot write to a detached head SHA' );
+    }
+
+    if ( !this.isCheckedOut ) {
+      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+    }
+
     winston.info( `git pull in ${this.workingDirectory}` );
 
     return gitMutableExecute( [ 'pull' ], this.workingDirectory );
   }
 
   public async gitPullRebase(): Promise<string> {
+    if ( this.isSHA ) {
+      throw new Error( 'Cannot write to a detached head SHA' );
+    }
+
+    if ( !this.isCheckedOut ) {
+      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+    }
+
     winston.info( `git pull --rebase in ${this.workingDirectory}` );
 
     return gitMutableExecute( [ 'pull', '--rebase' ], this.workingDirectory );
   }
 
   public async gitCherryPick( target: SHA ): Promise<boolean> {
+    if ( this.isSHA ) {
+      throw new Error( 'Cannot write to a detached head SHA' );
+    }
+
+    if ( !this.isCheckedOut ) {
+      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+    }
+
     winston.info( `git cherry-pick ${target}` );
 
     try {
@@ -467,11 +558,19 @@ export class Checkout {
     return gitRevParse( this.branch );
   }
 
-  public async getSymbolicRef(): Promise<SHA | Branch> {
+  public async getSymbolicRef(): Promise<BranchOrSHA> {
     return ( await gitImmutableExecute( [ 'symbolic-ref', '-q', 'HEAD' ], this.workingDirectory ) ).trim();
   }
 
   public async getTrackingBranch(): Promise<Branch> {
+    if ( this.isSHA ) {
+      throw new Error( 'Cannot get tracking branch for a SHA' );
+    }
+
+    if ( !this.isCheckedOut ) {
+      throw new Error( 'Cannot get tracking branch if not checked out' );
+    }
+
     return ( await gitImmutableExecute( [ 'for-each-ref', '--format=\'%(upstream:short)\'', await this.getSymbolicRef() ], this.workingDirectory ) ).trim();
   }
 
@@ -486,6 +585,10 @@ export class Checkout {
   }
 
   public async isClean( file?: string ): Promise<boolean> {
+    if ( !this.isCheckedOut ) {
+      throw new Error( 'Cannot get tracking branch if not checked out' );
+    }
+
     winston.debug( 'git status check' );
 
     const gitArgs = [ 'status', '--porcelain' ];
@@ -498,10 +601,40 @@ export class Checkout {
   }
 
   public async npmUpdateRepo( repo: Repo, options?: NPMUpdateOptions ): Promise<void> {
+    if ( !this.isCheckedOut ) {
+      throw new Error( 'Cannot get tracking branch if not checked out' );
+    }
+
     return npmUpdateDirectory( `${this.workingDirectory}/${repo}`, options );
   }
 
-  public async update(): Promise<void> {
+  public async updateBabel(): Promise<void> {
+    if ( fs.existsSync( `${this.workingDirectory}/babel` ) ) {
+      winston.info( `pulling babel in ${this.workingDirectory}` );
+
+      // NOTE: marked as "immutable" because we are the only ones who are doing this (and it isn't our main tree)
+      await gitImmutableExecute( [ 'pull' ], `${this.workingDirectory}/babel` );
+    }
+    else {
+      winston.info( `cloning babel into ${this.workingDirectory}` );
+
+      // NOTE: marked as "immutable" because we are the only ones who are doing this (and it isn't our main tree)
+      await gitImmutableExecute( [ 'clone', 'https://github.com/phetsims/babel.git' ], this.workingDirectory );
+    }
+  }
+
+  public async updatePrimaryCheckout(): Promise<void> {
+    winston.info( `pulling primary checkout at ${this.workingDirectory}` );
+    await gitPullDirectory( this.workingDirectory );
+
+    await this.updateBabel();
+  }
+
+  public async updateWorktree(): Promise<void> {
+    if ( this.branch === 'main' ) {
+      throw new Error( 'We do not have a separate worktree for main' );
+    }
+
     if ( this.releaseBranch ) {
       winston.info( `updating worktree for ${this.branch}` );
 
@@ -524,18 +657,7 @@ export class Checkout {
         await gitPullDirectory( this.workingDirectory );
       }
 
-      if ( fs.existsSync( `${this.workingDirectory}/babel` ) ) {
-        winston.info( 'pulling babel in worktree' );
-
-        // NOTE: marked as "immutable" because we are the only ones who are doing this (and it isn't our main tree)
-        await gitImmutableExecute( [ 'pull' ], `${this.workingDirectory}/babel` );
-      }
-      else {
-        winston.info( 'cloning babel into worktree' );
-
-        // NOTE: marked as "immutable" because we are the only ones who are doing this (and it isn't our main tree)
-        await gitImmutableExecute( [ 'clone', 'https://github.com/phetsims/babel.git' ], this.workingDirectory );
-      }
+      await this.updateBabel();
 
       for ( const npmRepo of [ 'chipper', 'perennial-alias', this.releaseBranch.repo ] ) {
         if ( fs.existsSync( `${this.workingDirectory}/${npmRepo}` ) ) {
@@ -735,6 +857,10 @@ export class Checkout {
    * Returns whether the origin was fetched as part of this (so we can skip it elsewhere)
    */
   public async ensureUpstreamBranch(): Promise<boolean> {
+    if ( this.isSHA ) {
+      return false;
+    }
+
     if ( !await this.hasLocalBranch( this.branch ) ) {
       // If we are missing the branch, then kick off a full fetch so that the next things don't error
       await this.fetchOrigin();
@@ -928,6 +1054,10 @@ export class Checkout {
    * NOTE: This does not include babel
    */
   public async getDependenciesMap( runnables: Repo[] = getActiveRunnables() ): Promise<Record<Repo, Repo[]>> {
+    if ( !this.isCheckedOut ) {
+      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+    }
+
     return JSON.parse( await execute(
       tsxCommand,
       [
@@ -951,6 +1081,14 @@ export class Checkout {
   }
 
   public async writeRelativeFile( relativeFile: string, contents: string ): Promise<void> {
+    if ( this.isSHA ) {
+      throw new Error( 'Cannot write to a detached head SHA' );
+    }
+
+    if ( !this.isCheckedOut ) {
+      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+    }
+
     winston.info( `writing file ${this.workingDirectory}/${relativeFile}` );
 
     return fsPromises.writeFile( `${this.workingDirectory}/${relativeFile}`, contents, 'utf-8' );

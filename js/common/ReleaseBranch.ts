@@ -82,7 +82,7 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
     filter: ( releaseBranch: ReleaseBranch ) => Promise<boolean> = async () => true
   ): Promise<ReleaseBranchSuccessList> {
     return ReleaseBranch.successListOperation( async releaseBranch => {
-      await releaseBranch.checkout.update();
+      await releaseBranch.checkout.updateWorktree();
     }, filter );
   }
 

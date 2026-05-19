@@ -82,7 +82,7 @@ export const rc = async (
     }
   }
 
-  await checkout.update();
+  await checkout.updateWorktree();
 
   if ( !await checkout.isClean() ) {
     throw new RCDeployError( `Unclean status in ${checkout.branch}, cannot deploy` );
