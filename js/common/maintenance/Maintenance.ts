@@ -505,11 +505,16 @@ export class Maintenance {
 
         try {
           for ( const sha of patch.shas ) {
+            if ( modifiedBranch.failedCherryPicks.includes( sha ) ) {
+              // console.log( `[${modifiedBranch.releaseBranch}] Skipping ${sha} for ${repo} ${branch} since it previously failed to cherry-pick` );
+              continue;
+            }
+
             const cherryPickSuccess = await modifiedBranch.releaseBranch.checkout.gitCherryPick( sha );
 
             if ( cherryPickSuccess ) {
               const currentSHA = await modifiedBranch.releaseBranch.checkout.getSHA();
-              console.log( `Cherry-pick success for ${sha}, result is ${currentSHA}` );
+              console.log( `[${modifiedBranch.releaseBranch}] Cherry-pick success for ${sha}, result is ${currentSHA}` );
               simSuccess = true;
 
               modifiedBranch.neededPatches.splice( modifiedBranch.neededPatches.indexOf( patch ), 1 );
@@ -520,13 +525,17 @@ export class Maintenance {
                 modifiedBranch.pushedMessages.push( patch.message );
               }
 
-              console.log( 'pushing' );
+              console.log( `[${modifiedBranch.releaseBranch}] pushing` );
               await modifiedBranch.releaseBranch.checkout.gitPush();
+
+              // NOTE: we clear the failed cherry picks, since we changed where we are at (things could cherry pick now)
+              modifiedBranch.failedCherryPicks.length = 0;
 
               break;
             }
             else {
-              console.log( `Could not cherry-pick ${sha}` );
+              console.log( `[${modifiedBranch.releaseBranch}] Could not cherry-pick ${sha}` );
+              modifiedBranch.failedCherryPicks.push( sha );
             }
           }
         }
@@ -884,5 +893,17 @@ export class Maintenance {
 
   public static async getInitPromise(): Promise<void> {
     await allReleaseBranchesPromise;
+  }
+
+  public static async buildLastCheckout(): Promise<void> {
+    const releaseBranch = Maintenance.maintenanceCheckout?.releaseBranch;
+
+    if ( !releaseBranch ) {
+      throw new Error( 'No checkout to build' );
+    }
+
+    console.log( `Building ${releaseBranch.repo} ${releaseBranch.branch}` );
+
+    console.log( await releaseBranch.build() );
   }
 }

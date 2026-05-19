@@ -21,6 +21,8 @@ type ModifiedBranchSerialized = {
   pushedMessages: string[];
   deployedVersion: ReturnType<SimVersion['serialize']> | null;
 
+  failedCherryPicks?: SHA[];
+
   lastUpdate?: LastRun;
   lastTranspile?: LastRun;
   lastBuild?: LastRun;
@@ -78,6 +80,8 @@ export class ModifiedBranch {
     public readonly neededPatches: Patch[] = [],
     public readonly pushedMessages: string[] = [],
     public deployedVersion: SimVersion | null = null,
+
+    public failedCherryPicks: SHA[] = [],
 
     public lastUpdate: LastRun = null,
     public lastTranspile: LastRun = null,
@@ -182,6 +186,7 @@ export class ModifiedBranch {
       neededPatches: this.neededPatches.map( patch => patch.name ),
       pushedMessages: this.pushedMessages,
       deployedVersion: this.deployedVersion ? this.deployedVersion.serialize() : null,
+      failedCherryPicks: this.failedCherryPicks,
       lastUpdate: this.lastUpdate,
       lastTranspile: this.lastTranspile,
       lastBuild: this.lastBuild,
@@ -201,6 +206,7 @@ export class ModifiedBranch {
       neededPatches = [],
       pushedMessages,
       deployedVersion,
+      failedCherryPicks,
       lastUpdate = null,
       lastTranspile = null,
       lastBuild = null,
@@ -220,6 +226,7 @@ export class ModifiedBranch {
       neededPatches.map( name => patches.find( patch => patch.name === name )! ),
       pushedMessages,
       deployedVersion ? SimVersion.deserialize( deployedVersion ) : null,
+      failedCherryPicks,
       lastUpdate,
       lastTranspile,
       lastBuild,
