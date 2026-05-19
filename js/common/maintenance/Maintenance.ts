@@ -378,6 +378,30 @@ export class Maintenance {
   }
 
   /**
+   * Adds a needed patch to release branches that are marked as failing at least one last test
+   */
+  public static async addFailingNeededPatches( patchName: string ): Promise<void> {
+    const maintenance = await Maintenance.load();
+
+    await Maintenance.addNeededPatches( patchName, async releaseBranch => {
+      return maintenance.modifiedBranches.some( modifiedBranch => {
+        const modifiedBranchFailed =
+          modifiedBranch.lastUpdate?.success === false ||
+          modifiedBranch.lastTranspile?.success === false ||
+          modifiedBranch.lastBuild?.success === false ||
+          modifiedBranch.lastUnbuiltCheck?.success === false ||
+          modifiedBranch.lastBuiltCheck?.success === false;
+
+        if ( !modifiedBranchFailed ) {
+          return false;
+        }
+
+        return modifiedBranch.releaseBranch.equals( releaseBranch );
+      } );
+    } );
+  }
+
+  /**
    * Adds a needed patch to all release branches that do NOT include the given commit on the repo
    */
   public static async addNeededPatchesBefore( patchName: string, sha: SHA ): Promise<void> {
