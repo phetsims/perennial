@@ -876,6 +876,9 @@ export class Maintenance {
 
     await limitedMap( maintenance.modifiedBranches, async modifiedBranch => {
       await modifiedBranch.updateTesting( options );
+
+      // Save after each one is complete
+      maintenance.save();
     }, RELEASE_BRANCH_DEFAULT_CONCURRENT_LIMIT );
   }
 

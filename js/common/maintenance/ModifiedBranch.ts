@@ -103,7 +103,12 @@ export class ModifiedBranch {
       return !!runResult && runResult.sha === currentSHA && runResult.success;
     };
 
-    const run = async ( oldLastRun: LastRun, shouldRun: boolean, runFunction: () => Promise<void> ): Promise<LastRun> => {
+    const run = async (
+      name: string,
+      oldLastRun: LastRun,
+      shouldRun: boolean,
+      runFunction: () => Promise<void>
+    ): Promise<LastRun> => {
       const isUpToDate = !!oldLastRun && oldLastRun.sha === currentSHA;
 
       if ( isUpToDate ) {
@@ -112,6 +117,8 @@ export class ModifiedBranch {
 
       if ( shouldRun ) {
         try {
+          console.log( 'running ' + name + ' for ' + this.repo + ' ' + this.branch );
+
           await runFunction();
 
           return {
@@ -120,6 +127,8 @@ export class ModifiedBranch {
           };
         }
         catch( e ) {
+          console.log( `Error during ${name} for ${this.repo} ${this.branch}: ${e instanceof Error ? e + '\n' + e.stack : e}` );
+
           return {
             sha: currentSHA,
             success: false,
@@ -143,23 +152,23 @@ export class ModifiedBranch {
       return;
     }
 
-    this.lastUpdate = await run( this.lastUpdate, runUpdate, async () => {
+    this.lastUpdate = await run( 'Update', this.lastUpdate, runUpdate, async () => {
       await this.releaseBranch.checkout.updateWorktree();
     } );
 
-    this.lastTranspile = await run( this.lastTranspile, runTranspile && isSuccess( this.lastUpdate ), async () => {
+    this.lastTranspile = await run( 'Transpile', this.lastTranspile, runTranspile && isSuccess( this.lastUpdate ), async () => {
       await this.releaseBranch.transpile();
     } );
 
-    this.lastBuild = await run( this.lastBuild, runBuild && isSuccess( this.lastUpdate ), async () => {
+    this.lastBuild = await run( 'Build', this.lastBuild, runBuild && isSuccess( this.lastUpdate ), async () => {
       await this.releaseBranch.build();
     } );
 
-    this.lastUnbuiltCheck = await run( this.lastUnbuiltCheck, runUnbuiltCheck && isSuccess( this.lastTranspile ), async () => {
+    this.lastUnbuiltCheck = await run( 'UnbuiltCheck', this.lastUnbuiltCheck, runUnbuiltCheck && isSuccess( this.lastTranspile ), async () => {
       await this.releaseBranch.checkUnbuilt();
     } );
 
-    this.lastBuiltCheck = await run( this.lastBuiltCheck, runBuiltCheck && isSuccess( this.lastBuild ), async () => {
+    this.lastBuiltCheck = await run( 'BuiltCheck', this.lastBuiltCheck, runBuiltCheck && isSuccess( this.lastBuild ), async () => {
       await this.releaseBranch.checkBuilt();
     } );
   }
