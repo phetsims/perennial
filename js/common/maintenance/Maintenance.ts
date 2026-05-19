@@ -850,6 +850,8 @@ export class Maintenance {
     return ( await gitImmutableExecute( [ 'rev-parse', 'HEAD' ], buildLocal.maintenanceWorktreeDirectory ) ).trim();
   }
 
+  public static maintenanceCheckout: Checkout | null = null;
+
   public static async checkoutBranch( repo: Repo, branch: LegacyBranch ): Promise<void> {
     const releaseBranch = ( await allReleaseBranchesPromise ).find( releaseBranch => releaseBranch.repo === repo && releaseBranch.branch === branch );
 
@@ -860,6 +862,8 @@ export class Maintenance {
     const sha = ( await gitImmutableExecute( [ 'rev-parse', Checkout.getReleaseBranchName( repo, branch ) ], '..' ) ).trim();
 
     const maintenanceCheckout = await Checkout.getMaintenanceCheckout( sha );
+
+    Maintenance.maintenanceCheckout = maintenanceCheckout;
 
     await maintenanceCheckout.updateMaintenanceWorktree();
 
