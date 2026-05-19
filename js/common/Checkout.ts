@@ -66,7 +66,10 @@ invalidateMetadataCache();
 
 export class Checkout {
 
+  // If this is for a ReleaseBranch, this will store a reference to the ReleaseBranch.
   public releaseBranch: ReleaseBranch | null = null;
+
+  // Whether the "branch" is a SHA (modeled as a detached HEAD)
   public readonly isSHA: boolean;
 
   // This is used a lot, and expensive to calculate, so we will cache it here.
@@ -97,6 +100,10 @@ export class Checkout {
 
     if ( isPrimary && !isCheckedOut ) {
       throw new Error( `Expected primary checkout to be checked out, but it is not for branch ${branch}` );
+    }
+
+    if ( !isPrimary && branch === 'main' ) {
+      throw new Error( 'Should not be creating a non-primary checkout for main branch' );
     }
   }
 
@@ -608,6 +615,20 @@ export class Checkout {
     return npmUpdateDirectory( `${this.workingDirectory}/${repo}`, options );
   }
 
+  public async npmUpdate( options?: NPMUpdateOptions ): Promise<void> {
+    for ( const npmRepo of [
+      'chipper',
+      'perennial-alias',
+      ...( this.releaseBranch ? [ this.releaseBranch.repo ] : [] )
+    ] ) {
+      if ( fs.existsSync( `${this.workingDirectory}/${npmRepo}` ) ) {
+        winston.info( `npm update ${npmRepo} in worktree` );
+
+        await this.npmUpdateRepo( npmRepo );
+      }
+    }
+  }
+
   public async updateBabel(): Promise<void> {
     if ( fs.existsSync( `${this.workingDirectory}/babel` ) ) {
       winston.info( `pulling babel in ${this.workingDirectory}` );
@@ -628,6 +649,9 @@ export class Checkout {
     await gitPullDirectory( this.workingDirectory );
 
     await this.updateBabel();
+    await this.npmUpdate();
+
+    // TODO: see if it is the correct branch checked out (!) see https://github.com/phetsims/totality/issues/140
   }
 
   public async updateWorktree(): Promise<void> {
@@ -635,53 +659,29 @@ export class Checkout {
       throw new Error( 'We do not have a separate worktree for main' );
     }
 
-    if ( this.releaseBranch ) {
-      winston.info( `updating worktree for ${this.branch}` );
+    winston.info( `updating worktree for ${this.branch}` );
 
-      // Create the container directory
-      await this.ensureWorktreeParentDirectory();
+    // Create the container directory
+    await this.ensureWorktreeParentDirectory();
 
-      // Ensure our remote tracking is set up properly
-      await ensureLocalBranchFromRemote( this.branch );
+    // Ensure our remote tracking is set up properly
+    await ensureLocalBranchFromRemote( this.branch );
 
-      // Create the worktree itself if needed
-      if ( !fs.existsSync( this.workingDirectory ) ) {
-        winston.info( `creating worktree at ${this.workingDirectory}` );
+    // Create the worktree itself if needed
+    if ( !fs.existsSync( this.workingDirectory ) ) {
+      winston.info( `creating worktree at ${this.workingDirectory}` );
 
-        this.isCheckedOut = true;
+      this.isCheckedOut = true;
 
-        await gitCreateWorktree( this.workingDirectory, this.branch );
-      }
-      else {
-        winston.info( `pulling worktree at ${this.workingDirectory}` );
-        await gitPullDirectory( this.workingDirectory );
-      }
-
-      await this.updateBabel();
-
-      for ( const npmRepo of [ 'chipper', 'perennial-alias', this.releaseBranch.repo ] ) {
-        if ( fs.existsSync( `${this.workingDirectory}/${npmRepo}` ) ) {
-          winston.info( `npm update ${npmRepo} in worktree` );
-
-          await this.npmUpdateRepo( npmRepo );
-        }
-      }
+      await gitCreateWorktree( this.workingDirectory, this.branch );
     }
-    // else {
-    //   // Ensure we are on main!
-    //   const branch = await getBranch();
-    //
-    //   if ( !( await gitIsClean() ) ) {
-    //     throw new Error( `Expected to be on a clean branch, but there are uncommitted changes` );
-    //   }
-    //
-    //   // TODO: enable this: (disabled for my work in a feature branch) https://github.com/phetsims/totality/issues/140
-    //   // if ( branch !== 'main' ) {
-    //   //   await gitCheckout( 'main' );
-    //   //
-    //   //   // TODO: what to do here? We should update babel, yes? https://github.com/phetsims/totality/issues/140
-    //   // }
-    // }
+    else {
+      winston.info( `pulling worktree at ${this.workingDirectory}` );
+      await gitPullDirectory( this.workingDirectory );
+    }
+
+    await this.updateBabel();
+    await this.npmUpdate();
   }
 
   public async removeWorktree(): Promise<void> {
@@ -822,6 +822,8 @@ export class Checkout {
    *
    * NOTABLY this should NOT be used for things that e.g. check the current state of a specific checkout, OR things that
    * mutate the checkout.
+   *
+   * TODO: where am I not using this where I should be? https://github.com/phetsims/totality/issues/140
    */
   public getAnyWorkingDirectory(): string {
     return this.isCheckedOut ? this.workingDirectory : '..';
