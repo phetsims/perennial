@@ -112,7 +112,7 @@ export class RunnableBranch {
       await fsPromises.rm( chipperDistDirectory, { recursive: true, force: true } );
     }
 
-    winston.info( `building ${this.checkout.workingDirectory} with grunt ${args.join( ' ' )}` );
+    winston.info( `building ${this.repo} in ${this.checkout.workingDirectory} with grunt ${args.join( ' ' )}` );
     const result = await execute( gruntCommand, args, `${this.checkout.workingDirectory}/${this.repo}`, executeOptions );
 
     // TODO: note we should --repo=${repo} potentially with newer chipper versions (!) https://github.com/phetsims/totality/issues/140

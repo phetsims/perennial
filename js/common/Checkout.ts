@@ -163,10 +163,19 @@ export class Checkout {
     return new Checkout( branch, isPrimary, false, isPrimary ? '..' : Checkout.getWorktreeDirectory( branch ), worktreeExists );
   }
 
-  public static async getMaintenanceCheckout( branchOrSHA: BranchOrSHA ): Promise<Checkout> {
+  public static async getMaintenanceCheckout(
+    branchOrSHA: BranchOrSHA,
+    referenceReleaseBranch?: ReleaseBranch
+  ): Promise<Checkout> {
     // TODO: Must be manually created right now, fix that (!) https://github.com/phetsims/totality/issues/140
 
-    return new Checkout( branchOrSHA, false, true, MAINTENANCE_WORKTREE_DIRECTORY, true );
+    const checkout = new Checkout( branchOrSHA, false, true, MAINTENANCE_WORKTREE_DIRECTORY, true );
+
+    if ( referenceReleaseBranch ) {
+      checkout.releaseBranch = new ReleaseBranch( checkout, referenceReleaseBranch.repo, referenceReleaseBranch.branch, referenceReleaseBranch.brands, referenceReleaseBranch.isReleased );
+    }
+
+    return checkout;
   }
 
   public static async getReleaseBranchCheckout( repo: Repo, legacyBranch: LegacyBranch ): Promise<Checkout> {

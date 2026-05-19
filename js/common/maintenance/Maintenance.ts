@@ -861,7 +861,7 @@ export class Maintenance {
 
     const sha = ( await gitImmutableExecute( [ 'rev-parse', Checkout.getReleaseBranchName( repo, branch ) ], '..' ) ).trim();
 
-    const maintenanceCheckout = await Checkout.getMaintenanceCheckout( sha );
+    const maintenanceCheckout = await Checkout.getMaintenanceCheckout( sha, releaseBranch );
 
     Maintenance.maintenanceCheckout = maintenanceCheckout;
 
