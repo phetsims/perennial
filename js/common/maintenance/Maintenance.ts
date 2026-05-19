@@ -878,4 +878,8 @@ export class Maintenance {
       await modifiedBranch.updateTesting( options );
     }, RELEASE_BRANCH_DEFAULT_CONCURRENT_LIMIT );
   }
+
+  public static async getInitPromise(): Promise<void> {
+    await allReleaseBranchesPromise;
+  }
 }

@@ -22,14 +22,24 @@ export const gitFirstDivergingCommit = async (
   primaryTarget: string,
   secondaryTarget: string
 ): Promise<SHA> => {
-  // NOTE: This was switched from `git log secondary..primary --reverse --pretty=oneline` due to totality performance
-  // being horrible
-  return gitImmutableExecute( [
+  const mergeBase = ( await gitImmutableExecute( [
+    'merge-base',
+    secondaryTarget,
+    primaryTarget
+  ], '..' ) ).trim();
+
+  const stdout = await gitImmutableExecute( [
     'rev-list',
+    '--ancestry-path',
     '--topo-order',
     '--reverse',
-    `${secondaryTarget}...${primaryTarget}`
-  ], '..' ).then( stdout => {
-    return Promise.resolve( stdout.trim().split( '\n' )[ 0 ].trim().split( ' ' )[ 0 ] );
-  } );
+    `${mergeBase}..${primaryTarget}`
+  ], '..' );
+
+  const sha = stdout.trim().split( '\n' )[ 0 ]?.trim();
+  if ( !sha ) {
+    throw new Error( `No diverging commit found for ${primaryTarget} from ${secondaryTarget}` );
+  }
+
+  return sha;
 };
