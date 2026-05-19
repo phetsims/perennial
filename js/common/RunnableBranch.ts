@@ -118,6 +118,7 @@ export class RunnableBranch {
     // TODO: note we should --repo=${repo} potentially with newer chipper versions (!) https://github.com/phetsims/totality/issues/140
     // TODO: MR patch to older sims to support this, THEN get rid of "npm ci"-ing the sim repo itself(!) https://github.com/phetsims/totality/issues/140
     // TODO: (or... detected chipper version and run in different places, potentially do that first) https://github.com/phetsims/totality/issues/140
+    // TODO: use await checkout.hasGruntRepoFlag(); https://github.com/phetsims/totality/issues/140
 
     // Examine output to see if getDependencies (in chipper) notices any missing phet-io things.
     // Fail out if so. Detects that specific error message.
@@ -142,10 +143,12 @@ export class RunnableBranch {
     const packageJSON = await this.getPackageJSON();
 
     // We'll want to update development/test HTML as necessary, since they'll include the version
+    // TODO: use await checkout.hasGruntRepoFlag(); https://github.com/phetsims/totality/issues/140
     await execute( gruntCommand, [ 'generate-development-html', `--repo=${this.repo}` ], `${this.checkout.workingDirectory}/chipper` );
     await this.checkout.gitAdd( `${this.repo}/${this.repo}_en.html` );
 
     if ( packageJSON.phet?.generatedUnitTests ) {
+      // TODO: use await checkout.hasGruntRepoFlag(); https://github.com/phetsims/totality/issues/140
       await execute( gruntCommand, [ 'generate-test-html', `--repo=${this.repo}` ], '../chipper' );
       await this.checkout.gitAdd( `${this.repo}/${this.repo}-tests.html` );
     }
@@ -228,11 +231,13 @@ export class RunnableBranch {
     winston.info( 'Updating branch README' );
 
     try {
+      // TODO: use await checkout.hasGruntRepoFlag(); https://github.com/phetsims/totality/issues/140
       await execute( gruntCommand, [ 'published-readme', `--repo=${this.repo}` ], this.checkout.workingDirectory );
     }
     catch( e ) {
       winston.info( 'published-readme error, may not exist, will try generate-published-README' );
       try {
+        // TODO: use await checkout.hasGruntRepoFlag(); https://github.com/phetsims/totality/issues/140
         await execute( gruntCommand, [ 'generate-published-README', `--repo=${this.repo}` ], this.checkout.workingDirectory );
       }
       catch( e ) {

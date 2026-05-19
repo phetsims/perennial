@@ -673,6 +673,9 @@ export class Checkout {
     for ( const npmRepo of [
       'chipper',
       'perennial-alias',
+
+      // TODO: use await checkout.hasGruntRepoFlag(); https://github.com/phetsims/totality/issues/140
+      // TODO: We can likely skip this when that flag exists https://github.com/phetsims/totality/issues/140
       ...( this.releaseBranch ? [ this.releaseBranch.repo ] : [] )
     ] ) {
       if ( fs.existsSync( `${this.workingDirectory}/${npmRepo}` ) ) {
@@ -916,6 +919,13 @@ export class Checkout {
   public async hasXHTML(): Promise<boolean> {
     // chipper polyrepo 70c2d4b0cb0cb0cb457190e3ca889c406b663686
     return gitIsAncestor( '8a26d07ea32b04ec3fbe7efa60c180ec45c99273', this.branch );
+  }
+
+  /**
+   * Returns whether we can `grunt --repo` from chipper for this sim
+   */
+  public async hasGruntRepoFlag(): Promise<boolean> {
+    return gitIsAncestor( '8d8fd4b95310e5b8d41da91cf79d169f86a56244', this.branch );
   }
 
 

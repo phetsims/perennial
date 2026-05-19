@@ -905,5 +905,7 @@ export class Maintenance {
     console.log( `Building ${releaseBranch.repo} ${releaseBranch.branch}` );
 
     console.log( await releaseBranch.build() );
+
+    console.log( `Finished building ${releaseBranch.repo} ${releaseBranch.branch}` );
   }
 }
