@@ -846,7 +846,7 @@ export class Maintenance {
     }
   }
 
-  public async getCheckoutSHA(): Promise<SHA> {
+  public static async getCheckoutSHA(): Promise<SHA> {
     return ( await gitImmutableExecute( [ 'rev-parse', 'HEAD' ], buildLocal.maintenanceWorktreeDirectory ) ).trim();
   }
 
