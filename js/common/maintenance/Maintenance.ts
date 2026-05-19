@@ -17,6 +17,8 @@ import { ReleaseBranch } from '../ReleaseBranch.js';
 import { Patch } from './Patch.js';
 import { Checkout } from '../Checkout.js';
 import { LegacyBranch, Repo, SHA } from '../../browser-and-node/PerennialTypes.js';
+import { gitImmutableExecute } from '../gitMutex.js';
+import { buildLocal } from '../buildLocal.js';
 
 // constants
 const MAINTENANCE_FILE = '.maintenance.json';
@@ -24,7 +26,6 @@ const MAINTENANCE_FILE = '.maintenance.json';
 type MaintenanceSerialized = {
   patches: ReturnType<Patch['serialize']>[];
   modifiedBranches: ReturnType<ModifiedBranch['serialize']>[];
-  allReleaseBranches: ReturnType<ReleaseBranch['serialize']>[];
 };
 
 type FilterSyncRB = ( releaseBranch: ReleaseBranch ) => boolean;
@@ -32,11 +33,20 @@ type FilterSyncMB = ( releaseBranch: ModifiedBranch ) => boolean;
 type FilterRB = ( releaseBranch: ReleaseBranch ) => Promise<boolean>;
 type FilterMB = ( releaseBranch: ModifiedBranch ) => Promise<boolean>;
 
+// We will cache release branches in memory (Maintenance tooling can be restarted to get another set)
+const allReleaseBranchesPromise = Checkout.getMaintainedReleaseBranches();
+allReleaseBranchesPromise.then( releaseBranches => {
+  console.log( `loaded ${releaseBranches.length} release branches` );
+} ).catch( e => {
+  console.error( `Error loading release branches: ${e}` );
+} );
+
 export class Maintenance {
   public constructor(
     public readonly patches: Patch[] = [],
     public readonly modifiedBranches: ModifiedBranch[] = [],
-    public allReleaseBranches: ReleaseBranch[] = [] ) {}
+    public allReleaseBranches: ReleaseBranch[] = []
+  ) {}
 
   /**
    * Resets ALL the maintenance state to a default "blank" state.
@@ -687,7 +697,7 @@ export class Maintenance {
       maintenance = await Maintenance.load();
     }
 
-    const releaseBranches = await Maintenance.loadAllMaintenanceBranches( forceCacheBreak, maintenance );
+    const releaseBranches = await allReleaseBranchesPromise;
 
     return releaseBranches.filter( releaseBranch => {
       if ( !checkUnreleasedBranches && !releaseBranch.isReleased ) {
@@ -695,40 +705,6 @@ export class Maintenance {
       }
       return filter( releaseBranch );
     } );
-  }
-
-  /**
-   * Loads every potential ReleaseBranch (published phet and phet-io brands, as well as unreleased branches), and
-   * saves it to the maintenance state.
-   *
-   * Call this with true to break the cache and force a recalculation of all ReleaseBranches
-   * @param forceCacheBreak - true if you want to force a recalculation of all ReleaseBranches
-   * @param maintenance - by default load from saved file the current maintenance instance.
-   */
-  public static async loadAllMaintenanceBranches(
-    forceCacheBreak = false,
-    maintenance?: Maintenance
-  ): Promise<ReleaseBranch[]> {
-
-    if ( !maintenance ) {
-      maintenance = await Maintenance.load();
-    }
-
-    let releaseBranches: ReleaseBranch[];
-    if ( maintenance.allReleaseBranches.length > 0 && !forceCacheBreak ) {
-      assert( maintenance.allReleaseBranches[ 0 ] instanceof ReleaseBranch, 'deserialization check' );
-      releaseBranches = maintenance.allReleaseBranches;
-    }
-    else {
-
-      // cache miss
-      releaseBranches = await Checkout.getMaintainedReleaseBranches();
-      // eslint-disable-next-line require-atomic-updates
-      maintenance.allReleaseBranches = releaseBranches;
-      maintenance.save();
-    }
-
-    return releaseBranches;
   }
 
   /**
@@ -774,17 +750,18 @@ export class Maintenance {
     return {
       patches: this.patches.map( patch => patch.serialize() ),
       modifiedBranches: this.modifiedBranches.map( modifiedBranch => modifiedBranch.serialize() ),
-      allReleaseBranches: this.allReleaseBranches.map( releaseBranch => releaseBranch.serialize() )
     };
   }
 
   /**
    * Takes a serialized form of the Maintenance and returns an actual instance.
    */
-  public static async deserialize( { patches = [], modifiedBranches = [], allReleaseBranches = [] }: MaintenanceSerialized ): Promise<Maintenance> {
+  public static async deserialize( { patches = [], modifiedBranches = [] }: MaintenanceSerialized ): Promise<Maintenance> {
+    const releaseBranches = ( await allReleaseBranchesPromise ).slice(); // sliced for extra protection
+
     // Pass in patch references to branch deserialization
     const deserializedPatches = patches.map( Patch.deserialize );
-    const modifiedBranchesDeserialized = await Promise.all( modifiedBranches.map( modifiedBranch => ModifiedBranch.deserialize( modifiedBranch, deserializedPatches ) ) );
+    const modifiedBranchesDeserialized = await Promise.all( modifiedBranches.map( modifiedBranch => ModifiedBranch.deserialize( modifiedBranch, deserializedPatches, releaseBranches ) ) );
     modifiedBranchesDeserialized.sort( ( a, b ) => {
       if ( a.repo !== b.repo ) {
         return a.repo < b.repo ? -1 : 1;
@@ -794,9 +771,8 @@ export class Maintenance {
       }
       return 0;
     } );
-    const deserializedReleaseBranches = await Promise.all( allReleaseBranches.map( releaseBranch => Checkout.getReleaseBranch( releaseBranch.repo, releaseBranch.branch ) ) );
 
-    return new Maintenance( deserializedPatches, modifiedBranchesDeserialized, deserializedReleaseBranches );
+    return new Maintenance( deserializedPatches, modifiedBranchesDeserialized, releaseBranches );
   }
 
   /**
@@ -868,5 +844,25 @@ export class Maintenance {
 
       this.modifiedBranches.splice( index, 1 );
     }
+  }
+
+  public async getCheckoutSHA(): Promise<SHA> {
+    return ( await gitImmutableExecute( [ 'rev-parse', 'HEAD' ], buildLocal.maintenanceWorktreeDirectory ) ).trim();
+  }
+
+  public static async checkoutBranch( repo: Repo, branch: LegacyBranch ): Promise<void> {
+    const releaseBranch = ( await allReleaseBranchesPromise ).find( releaseBranch => releaseBranch.repo === repo && releaseBranch.branch === branch );
+
+    if ( !releaseBranch ) {
+      throw new Error( `Could not find a release branch for repo=${repo} branch=${branch}` );
+    }
+
+    const sha = ( await gitImmutableExecute( [ 'rev-parse', Checkout.getReleaseBranchName( repo, branch ) ], '..' ) ).trim();
+
+    const maintenanceCheckout = await Checkout.getMaintenanceCheckout( sha );
+
+    await maintenanceCheckout.updateMaintenanceWorktree();
+
+    console.log( `checked out ${sha} for ${repo} ${branch}` );
   }
 }

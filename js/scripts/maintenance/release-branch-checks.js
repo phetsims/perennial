@@ -62,8 +62,8 @@ const logResult = ( success, message, url ) => {
   // Use withServer for cross-dev environment execution.
   await withServer( async port => {
     const server = `http://localhost:${port}`;
-    // await Maintenance.loadAllMaintenanceBranches();
-    const releaseBranches = TEST_FROM_MAIN ? [ null ] : await Maintenance.loadAllMaintenanceBranches();
+    // TODO: update for https://github.com/phetsims/totality/issues/140
+    const releaseBranches = TEST_FROM_MAIN ? [ null ] : await Checkout.getMaintainedReleaseBranches();
     // const releaseBranches = [];
     // const getBuiltURLs = async releaseBranch => {
     //   const urls = [];

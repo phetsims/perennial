@@ -79,15 +79,21 @@ export class ModifiedBranch {
    */
   public static async deserialize(
     {
-      releaseBranch,
+      releaseBranch: releaseBranchSerialized,
       neededPatches = [],
       pushedMessages,
       deployedVersion
     }: ModifiedBranchSerialized,
-    patches: Patch[]
+    patches: Patch[],
+    releaseBranches: ReleaseBranch[]
   ): Promise<ModifiedBranch> {
+    const releaseBranch = releaseBranches.find( branch => branch.repo === releaseBranchSerialized.repo && branch.branch === releaseBranchSerialized.branch );
+    if ( !releaseBranch ) {
+      throw new Error( `Could not find release branch for ${releaseBranchSerialized.repo} ${releaseBranchSerialized.branch}` );
+    }
+
     return new ModifiedBranch(
-      await Checkout.getReleaseBranch( releaseBranch.repo, releaseBranch.branch ),
+      releaseBranch,
       neededPatches.map( name => patches.find( patch => patch.name === name )! ),
       pushedMessages,
       deployedVersion ? SimVersion.deserialize( deployedVersion ) : null

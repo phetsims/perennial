@@ -71,6 +71,7 @@ export const buildLocal = {
 
   // This is relative to perennial/perennial-alias
   worktreesDirectory: buildLocalObject.worktreesDirectory || '../worktrees',
+  maintenanceWorktreeDirectory: buildLocalObject.maintenanceWorktreeDirectory || '../worktrees/maintenance',
 
   brands: buildLocalObject.brands || [ 'adapted-from-phet' ],
 

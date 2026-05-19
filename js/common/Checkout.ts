@@ -47,6 +47,7 @@ import { gitImmutableExecute, gitMutableExecute } from './gitMutex.js';
 import { escapeRegExp } from './escapeRegExp.js';
 
 export const WORKTREE_DIRECTORY = buildLocal.worktreesDirectory;
+export const MAINTENANCE_WORKTREE_DIRECTORY = buildLocal.maintenanceWorktreeDirectory;
 
 // Let this data be cached so we don't need to re-request all the time (and share the requests when many things are made at once)
 let simMetadataPromise!: Promise<SimMetadata>;
@@ -85,6 +86,9 @@ export class Checkout {
 
     // Whether it is our primary "checkout" (where we are being run from, i.e. '..'). If false, this is a worktree checkout
     public readonly isPrimary: boolean,
+
+    // Whether this is our secondary "maintenance" worktree, to use for editing release branches and such.
+    public readonly isMaintenance: boolean,
 
     // The working directory for the base of this checkout
     public readonly workingDirectory: string,
@@ -137,7 +141,7 @@ export class Checkout {
   }
 
   public static async getMainCheckout(): Promise<Checkout> {
-    return new Checkout( 'main', true, '..', true );
+    return new Checkout( 'main', true, false, '..', true );
   }
 
   /**
@@ -145,7 +149,7 @@ export class Checkout {
    * while it is in scope
    */
   public static async getOneOffCheckout( branch: Branch ): Promise<Checkout> {
-    return new Checkout( branch, true, '..', true );
+    return new Checkout( branch, true, false, '..', true );
   }
 
   public static async getGenericBranchCheckout( branch: BranchOrSHA, isPrimary = false ): Promise<Checkout> {
@@ -156,22 +160,29 @@ export class Checkout {
       throw new Error( `Expected worktree existence (${worktreeExists}) to match directory existence (${directoryExists}) for ${branch}` );
     }
 
-    return new Checkout( branch, isPrimary, isPrimary ? '..' : Checkout.getWorktreeDirectory( branch ), worktreeExists );
+    return new Checkout( branch, isPrimary, false, isPrimary ? '..' : Checkout.getWorktreeDirectory( branch ), worktreeExists );
+  }
+
+  public static async getMaintenanceCheckout( branchOrSHA: BranchOrSHA ): Promise<Checkout> {
+    // TODO: Must be manually created right now, fix that (!) https://github.com/phetsims/totality/issues/140
+
+    return new Checkout( branchOrSHA, false, true, MAINTENANCE_WORKTREE_DIRECTORY, true );
   }
 
   public static async getReleaseBranchCheckout( repo: Repo, legacyBranch: LegacyBranch ): Promise<Checkout> {
-    winston.info( `getting release branch checkout for ${repo} ${legacyBranch}` );
+    winston.debug( `getting release branch checkout for ${repo} ${legacyBranch}` );
 
     const branch = Checkout.getReleaseBranchName( repo, legacyBranch );
+    const workingDirectory = Checkout.getWorktreeDirectory( branch );
 
-    const directoryExists = fs.existsSync( Checkout.getWorktreeDirectory( branch ) );
+    const directoryExists = fs.existsSync( workingDirectory );
     const worktreeExists = await Checkout.hasWorktree( branch );
 
     if ( directoryExists !== worktreeExists ) {
       throw new Error( `Expected worktree existence (${worktreeExists}) to match directory existence (${directoryExists}) for ${branch}` );
     }
 
-    const checkout = new Checkout( branch, false, Checkout.getWorktreeDirectory( branch ), worktreeExists );
+    const checkout = new Checkout( branch, false, false, workingDirectory, worktreeExists );
 
     const simVersion = await getBranchSimVersion( repo, branch );
 
@@ -304,7 +315,7 @@ export class Checkout {
       throw new Error( 'Unclean status, cannot create release branch' );
     }
 
-    const checkout = new Checkout( branch, false, Checkout.getWorktreeDirectory( branch ), false );
+    const checkout = new Checkout( branch, false, false, Checkout.getWorktreeDirectory( branch ), false );
 
     // get dependencies from main
     const dependencies = await ( await checkout.getRunnableBranch( repo ) ).getDependencies();
@@ -697,6 +708,9 @@ export class Checkout {
     if ( this.isPrimary ) {
       await this.updatePrimaryCheckout();
     }
+    else if ( this.isMaintenance ) {
+      await this.updateMaintenanceWorktree();
+    }
     else {
       await this.updateWorktree();
     }
@@ -716,12 +730,55 @@ export class Checkout {
     await this.npmUpdate();
   }
 
+  public async updateMaintenanceWorktree(): Promise<void> {
+    if ( !this.isMaintenance ) {
+      throw new Error( 'Expected updateMaintenanceWorktree to be called on a maintenance checkout' );
+    }
+
+    winston.info( `updating maintenance worktree for ${this.branch}` );
+
+    // Create the container directory
+    await this.ensureWorktreeParentDirectory();
+
+    let updated = true;
+
+    // Create the worktree itself if needed
+    if ( !fs.existsSync( this.workingDirectory ) ) {
+      winston.info( `creating worktree at ${this.workingDirectory}` );
+
+      await gitCreateWorktree( this.workingDirectory, this.branch, {
+        detach: true
+      } );
+    }
+    else {
+      const sha = ( await gitImmutableExecute( [ 'rev-parse', 'HEAD' ], this.workingDirectory ) ).trim();
+
+      if ( sha !== this.branch ) {
+        winston.info( `switching worktree at ${this.workingDirectory}` );
+        await gitImmutableExecute( [ 'switch', '--detach', this.branch ], this.workingDirectory );
+      }
+      else {
+        updated = false;
+      }
+    }
+
+    await this.updateBabel();
+
+    // If the SHA didn't change, we don't have to npm update things
+    if ( updated ) {
+      await this.npmUpdate();
+    }
+  }
+
   public async updateWorktree(): Promise<void> {
     if ( this.branch === 'main' ) {
       throw new Error( 'We do not have a separate worktree for main' );
     }
     if ( this.isPrimary ) {
       throw new Error( 'Expected updateWorktree to be called on a non-primary checkout' );
+    }
+    if ( this.isMaintenance ) {
+      throw new Error( 'Expected updateWorktree to be called on a non-maintenance checkout' );
     }
 
     winston.info( `updating worktree for ${this.branch}` );

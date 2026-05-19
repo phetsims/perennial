@@ -10,16 +10,18 @@ import fs from 'fs';
 import winston from 'winston';
 
 export const createDirectory = async ( path: string ): Promise<void> => {
-  winston.info( `Creating directory ${path}` );
+  if ( !fs.existsSync( path ) ) {
+    winston.info( `Creating directory ${path}` );
 
-  return new Promise( ( resolve, reject ) => {
-    fs.mkdir( path, { recursive: true }, err => {
-      if ( err ) {
-        reject( new Error( `createDirectory: ${err}` ) );
-      }
-      else {
-        resolve();
-      }
+    return new Promise( ( resolve, reject ) => {
+      fs.mkdir( path, { recursive: true }, err => {
+        if ( err ) {
+          reject( new Error( `createDirectory: ${err}` ) );
+        }
+        else {
+          resolve();
+        }
+      } );
     } );
-  } );
+  }
 };
