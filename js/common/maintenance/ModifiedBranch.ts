@@ -12,7 +12,6 @@ import _ from 'lodash';
 import SimVersion from '../../browser-and-node/SimVersion.js';
 import { ReleaseBranch } from '../ReleaseBranch.js';
 import { Patch } from './Patch.js';
-import { Checkout } from '../Checkout.js';
 import { githubCreateIssue } from '../githubCreateIssue.js';
 import { LegacyBranch, Repo } from '../../browser-and-node/PerennialTypes.js';
 
