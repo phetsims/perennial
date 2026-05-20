@@ -636,7 +636,7 @@ export class Checkout {
 
   public async getAheadBehind(): Promise<{ ahead: number; behind: number }> {
     // e.g. behind-count + '\t' + ahead-count
-    const counts = await execute( 'git', [ 'rev-list', '--left-right', '--count', `${await this.getTrackingBranch()}@{u}...HEAD` ], this.workingDirectory );
+    const counts = await gitImmutableExecute( [ 'rev-list', '--left-right', '--count', `${await this.getTrackingBranch()}@{u}...HEAD` ], this.workingDirectory );
 
     return {
       ahead: Number( counts.split( '\t' )[ 1 ] ),

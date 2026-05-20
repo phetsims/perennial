@@ -22,6 +22,7 @@ import { npxCommand } from '../common/npxCommand.js';
 import puppeteerEvaluate from '../common/puppeteerEvaluate.js';
 import { puppeteerLoad } from '../common/puppeteerLoad.js';
 import withServer from '../common/withServer.js';
+import { gitMutableExecute } from '../common/git/gitMutex.js';
 
 winston.default.transports.console.level = 'error';
 
@@ -53,7 +54,7 @@ const SKIP_REFRESH = false;
       if ( !fs.existsSync( `./.scenerystack/${repo}` ) ) {
         console.log( `cloning ${repo}` );
 
-        await execute( 'git', [ 'clone', `https://github.com/scenerystack/${repo}.git` ], './.scenerystack' );
+        await gitMutableExecute( [ 'clone', `https://github.com/scenerystack/${repo}.git` ], './.scenerystack' );
       }
 
       // Patch it so that it refers to the local version of scenerystack
