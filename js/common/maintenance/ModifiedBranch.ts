@@ -150,7 +150,7 @@ export class ModifiedBranch {
     };
 
     // Conditions where testing should be reset (if any of these are true, we want to reset all testing results):
-    const isClean = await this.releaseBranch.checkout.isClean();
+    const isClean = !this.releaseBranch.checkout.isCheckedOut || await this.releaseBranch.checkout.isClean();
     if ( !isClean || ( this.neededPatches.length > 0 && !retest ) ) {
       this.lastUpdate = null;
       this.lastTranspile = null;
