@@ -1,16 +1,18 @@
-// Copyright 2017, University of Colorado Boulder
-// @author Matt Pennington (PhET Interactive Simulations)
+// Copyright 2017-2026, University of Colorado Boulder
 
+/**
+ * @author Matt Pennington (PhET Interactive Simulations)
+ */
 
-const constants = require( './constants' );
-const fs = require( 'graceful-fs' ); // eslint-disable-line phet/require-statement-match
-const getSortedVersionDirectories = require( './getSortedVersionDirectories' );
-const parseString = require( 'xml2js' ).parseString; // eslint-disable-line phet/no-property-in-require-statement
-const winston = require( 'winston' );
+import constants from './constants.js';
+import fs from 'graceful-fs';
+import getSortedVersionDirectories from './getSortedVersionDirectories.js';
+import { parseString } from 'xml2js';
+import winston from 'winston';
 
-async function getJsonFromXML( xmlString ) {
+async function getJsonFromXML( xmlString: string | Buffer ): Promise<any> {
   return new Promise( ( resolve, reject ) => {
-    parseString( xmlString, ( error, json ) => {
+    parseString( xmlString, ( error: Error | null, json: any ) => {
       if ( error ) {
         reject( error );
       }
@@ -27,8 +29,8 @@ async function getJsonFromXML( xmlString ) {
  * @param {String} locales - comma separated list of locale codes
  * @param {String} simName - name of the sim, should match GitHub repo name, e.g. "energy-skate-park-basics"
  */
-async function getLocales( locales, simName ) {
-  let callbackLocales;
+export const getLocales = async ( locales: string | null, simName: string ): Promise<string> => {
+  let callbackLocales = '';
 
   if ( locales && locales !== '*' ) {
 
@@ -56,7 +58,7 @@ async function getLocales( locales, simName ) {
       winston.log( 'info', 'data extracted from translations XML file:' );
       winston.log( 'info', JSON.stringify( json, null, 2 ) );
       const simsArray = json.project.simulations[ 0 ].simulation;
-      const localesArray = [];
+      const localesArray: string[] = [];
       for ( let i = 0; i < simsArray.length; i++ ) {
         localesArray.push( simsArray[ i ].$.locale );
       }
@@ -71,6 +73,4 @@ async function getLocales( locales, simName ) {
   winston.log( 'info', `building locales=${callbackLocales}` );
 
   return callbackLocales;
-}
-
-module.exports = getLocales;
+};

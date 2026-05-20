@@ -12,7 +12,7 @@ import axios from 'axios';
 import winston from 'winston';
 import SimVersion from '../browser-and-node/SimVersion.js';
 import { LegacyBranch, Repo, SHA } from '../browser-and-node/PerennialTypes.js';
-import { BuildServerRequest } from '../build-server/BuildServerRequest.js';
+import { BuildServerRequest } from '../build-server/BuildServerTypes.js';
 
 export type BuildServerRequestOptions = {
   locales?: string[] | '*'; // TODO: figure out the type we need to send in.

@@ -1,13 +1,15 @@
-// Copyright 2017, University of Colorado Boulder
-// @author Matt Pennington (PhET Interactive Simulations)
+// Copyright 2017-2026, University of Colorado Boulder
 
+/**
+ * @author Matt Pennington (PhET Interactive Simulations)
+ */
 
-const constants = require( './constants' );
-const winston = require( 'winston' );
-const nodemailer = require( 'nodemailer' );
+import constants from './constants.js';
+import winston from 'winston';
+import nodemailer from 'nodemailer';
 
 // configure email server
-let transporter;
+let transporter: nodemailer.Transporter | null = null;
 if ( constants.BUILD_SERVER_CONFIG.emailUsername && constants.BUILD_SERVER_CONFIG.emailPassword && constants.BUILD_SERVER_CONFIG.emailTo ) {
   transporter = nodemailer.createTransport( {
     auth: {
@@ -33,7 +35,12 @@ else {
  * @param emailParameter - recipient defined per request
  * @param emailParameterOnly - if true send the email only to the passed in email, not to the default list as well
  */
-module.exports = async function sendEmail( subject, text, emailParameter, emailParameterOnly ) {
+export const sendEmail = async (
+  subject: string,
+  text: string,
+  emailParameter?: string | null,
+  emailParameterOnly = false
+): Promise<void> => {
   if ( transporter ) {
     let emailTo = constants.BUILD_SERVER_CONFIG.emailTo;
 
@@ -63,7 +70,7 @@ module.exports = async function sendEmail( subject, text, emailParameter, emailP
     }
     catch( err ) {
       let errorString = typeof err === 'string' ? err : JSON.stringify( err );
-      errorString = errorString.replace( constants.BUILD_SERVER_CONFIG.emailPassword, '***PASSWORD REDACTED***' );
+      errorString = errorString.replace( constants.BUILD_SERVER_CONFIG.emailPassword!, '***PASSWORD REDACTED***' );
       winston.error( `error when attempted to send email, err = ${errorString}` );
     }
   }

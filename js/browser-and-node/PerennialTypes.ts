@@ -11,6 +11,7 @@ export type SHA = string;
 export type Branch = string; // for release branches or otherwise, should always be a fully-qualified branch name, e.g. 'releases/acid-base-solutions/1.3'
 export type LegacyBranch = string; // for release branches, e.g. '1.2'
 export type BranchOrSHA = Branch | SHA; // for cases where we can allow either
+export type BuildServerTarget = 'dev' | 'production';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type IntentionalPerennialAny = any;

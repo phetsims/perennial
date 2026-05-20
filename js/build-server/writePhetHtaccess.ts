@@ -1,33 +1,35 @@
-// Copyright 2017-2018, University of Colorado Boulder
-// @author Matt Pennington (PhET Interactive Simulations)
-
-
-const constants = require( './constants' );
-const SimVersion = require( '../browser-and-node/SimVersion' ).default;
-const writeFile = require( '../common/writeFile' );
-const axios = require( 'axios' );
+// Copyright 2017-2026, University of Colorado Boulder
 
 /**
  * Write the .htaccess file to make "latest" point to the version being deployed and allow "download" links to work on Safari
- * @param simName
- * @param version
+ *
+ * @author Matt Pennington (PhET Interactive Simulations)
  */
-module.exports = async function writePhetHtaccess( simName, version ) {
+
+import constants from './constants.js';
+import SimVersion from '../browser-and-node/SimVersion.js';
+import axios from 'axios';
+import fs from 'fs';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
+
+export const writePhetHtaccess = async (
+  simName: Repo,
+  version: string
+): Promise<void> => {
   const metadataURL = `${constants.BUILD_SERVER_CONFIG.productionServerURL}/services/metadata/1.2/simulations?format=json&type=html&summary&include-unpublished=true&simulation=${simName}`;
   const pass = constants.BUILD_SERVER_CONFIG.serverToken;
-  let response;
-  try {
-    response = await axios( {
-      url: metadataURL,
-      auth: {
-        username: 'token',
-        password: pass
-      }
-    } );
+
+  if ( !pass ) {
+    throw new Error( 'No server token provided, cannot check for existing simulation version or update .htaccess' );
   }
-  catch( e ) {
-    throw new Error( e );
-  }
+
+  const response = await axios( {
+    url: metadataURL,
+    auth: {
+      username: 'token',
+      password: pass
+    }
+  } );
   const body = response.data;
 
 
@@ -54,5 +56,5 @@ module.exports = async function writePhetHtaccess( simName, version ) {
                    'RewriteCond %{QUERY_STRING} =download\n' +
                    'RewriteRule ([^/]*)$ - [L,E=download:$1]\n' +
                    'Header onsuccess set Content-disposition "attachment; filename=%{download}e" env=download\n';
-  await writeFile( `${constants.HTML_SIMS_DIRECTORY + simName}/.htaccess`, contents );
+  await fs.promises.writeFile( `${constants.HTML_SIMS_DIRECTORY + simName}/.htaccess`, contents );
 };

@@ -1,8 +1,10 @@
-// Copyright 2017, University of Colorado Boulder
-// @author Matt Pennington (PhET Interactive Simulations)
+// Copyright 2017-2026, University of Colorado Boulder
 
+/**
+ * @author Matt Pennington (PhET Interactive Simulations)
+ */
 
-const fs = require( 'graceful-fs' ); // eslint-disable-line phet/require-statement-match
+import fs from 'graceful-fs';
 
 /**
  * Define a helper function that will get a list of the PhET-style version directories at the given path.  The
@@ -15,7 +17,7 @@ const fs = require( 'graceful-fs' ); // eslint-disable-line phet/require-stateme
  * @returns {Array} - returns a sorted array of version directories.  Returns an empty array if none exist or if the
  * path does not exist.
  */
-module.exports = async function getSortedVersionDirectories( path ) {
+export default async function getSortedVersionDirectories( path: string ): Promise<string[]> {
 
   let versions;
 
@@ -58,4 +60,4 @@ module.exports = async function getSortedVersionDirectories( path ) {
     return result;
   } );
   return versions;
-};
+}

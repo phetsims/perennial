@@ -1,4 +1,4 @@
-// Copyright 2002-2017, University of Colorado Boulder
+// Copyright 2002-2026, University of Colorado Boulder
 
 /**
  * PhET build and deploy server. The server is designed to run on the same host as the production site (phet-server.int.colorado.edu).
@@ -8,20 +8,22 @@
  * @author Matt Pennington
  */
 
+import constants from './constants.js';
+import childProcess from 'child_process';
+// eslint-disable-next-line phet/default-import-match-filename
+import winston from './log.js';
+import { logRequest } from './logRequest.js';
+import { sendEmail } from './sendEmail.js';
+import { taskWorker } from './taskWorker.js';
+import async from 'async';
+import bodyParser from 'body-parser';
+import express, { Request, Response } from 'express';
+import _ from 'lodash';
+import parseArgs from 'minimist';
+import * as persistentQueue from './persistentQueue.js';
+import getStatus from './getStatus.js';
 
-const constants = require( './constants' );
-const childProcess = require( 'child_process' );
-const winston = require( './log' ); // eslint-disable-line phet/require-statement-match
-const logRequest = require( './logRequest' );
-const sendEmail = require( './sendEmail' );
-const taskWorker = require( './taskWorker' );
-const async = require( 'async' );
-const bodyParser = require( 'body-parser' );
-const express = require( 'express' );
-const _ = require( 'lodash' );
-const parseArgs = require( 'minimist' ); // eslint-disable-line phet/require-statement-match
-const persistentQueue = require( './persistentQueue' );
-const getStatus = require( './getStatus' );
+type BuildServerTask = any; // TODO: model legacy build-server task shape.
 
 // set this process up with the appropriate permissions, value is in octal
 process.umask( 0o0002 );
@@ -53,7 +55,7 @@ for ( const key in parsedCommandLineOptions ) {
 // If help flag, print help and usage info
 if ( parsedCommandLineOptions.hasOwnProperty( 'help' ) || parsedCommandLineOptions.hasOwnProperty( 'h' ) ) {
   console.log( 'Usage:' );
-  console.log( '  node build-server.js [options]' );
+  console.log( '  node --import tsx build-server.ts [options]' );
   console.log( '' );
   console.log( 'Options:' );
   console.log(
@@ -69,16 +71,16 @@ if ( parsedCommandLineOptions.hasOwnProperty( 'help' ) || parsedCommandLineOptio
 const options = _.assignIn( defaultOptions, parsedCommandLineOptions );
 const verbose = options.verbose;
 
-const taskQueue = async.queue( taskWorker, 1 ); // 1 is the max number of tasks that can run concurrently
+const taskQueue = async.queue<BuildServerTask>( taskWorker, 1 ); // 1 is the max number of tasks that can run concurrently
 
 /**
  * Handle chipper 1.0 requests
- *
- * @param {express.Request} req
- * @param {express.Response} res
- * @param {String} key - one of 'query' or 'body', used to differentiate query parameters or POST data.
  */
-const queueDeployApiVersion1 = ( req, res, key ) => {
+const queueDeployApiVersion1 = (
+  req: Request,
+  res: Response,
+  key: 'query' | 'body'
+): void => {
   const repos = JSON.parse( decodeURIComponent( req[ key ][ constants.REPOS_KEY ] ) );
   const simName = decodeURIComponent( req[ key ][ constants.SIM_NAME_KEY ] );
   const version = decodeURIComponent( req[ key ][ constants.VERSION_KEY ] );
@@ -98,13 +100,13 @@ const queueDeployApiVersion1 = ( req, res, key ) => {
   queueDeploy( '1.0', repos, simName, version, locales, brands, servers, email, translatorId, branch, authorizationKey, req, res );
 };
 
-const getQueueDeploy = ( req, res ) => {
-  logRequest( req, 'query', winston );
+const getQueueDeploy = ( req: Request, res: Response ): void => {
+  logRequest( req, 'query' );
   queueDeployApiVersion1( req, res, 'query' );
 };
 
-const postQueueDeploy = ( req, res ) => {
-  logRequest( req, 'body', winston );
+const postQueueDeploy = ( req: Request, res: Response ): void => {
+  logRequest( req, 'body' );
 
   const api = decodeURIComponent( req.body[ constants.API_KEY ] );
 
@@ -144,7 +146,21 @@ const postQueueDeploy = ( req, res ) => {
  * @param {express.Request} req
  * @param {express.Response} res
  */
-const queueDeploy = ( api, repos, simName, version, locales, brands, servers, email, userId, branch, authorizationKey, req, res ) => {
+const queueDeploy = (
+  api: string,
+  repos: any,
+  simName: string,
+  version: string,
+  locales: string[] | string | null,
+  brands: string[],
+  servers: string[],
+  email: string | null,
+  userId: string | null,
+  branch: string | null,
+  authorizationKey: string,
+  req: Request,
+  res: Response
+): void => {
 
   if ( repos && simName && version && authorizationKey ) {
     const productionBrands = [ constants.PHET_BRAND, constants.PHET_IO_BRAND ];
@@ -155,7 +171,7 @@ const queueDeploy = ( api, repos, simName, version, locales, brands, servers, em
       res.status( 401 );
       res.send( err );
     }
-    else if ( servers.indexOf( constants.PRODUCTION_SERVER ) >= 0 && brands.some( brand => !productionBrands.includes( brand ) ) ) {
+    else if ( servers.includes( constants.PRODUCTION_SERVER ) && brands.some( brand => !productionBrands.includes( brand ) ) ) {
       const err = 'Cannot complete production deploys for brands outside of phet and phet-io';
       winston.log( 'error', err );
       res.status( 400 );
@@ -190,8 +206,8 @@ const queueDeploy = ( api, repos, simName, version, locales, brands, servers, em
   }
 };
 
-const buildCallback = task => {
-  return err => {
+const buildCallback = ( task: BuildServerTask ) => {
+  return async ( err?: Error | string | null ): Promise<void> => {
     const simInfoString = `Sim = ${task.simName
     } Version = ${task.version
     } Brands = ${task.brands
@@ -209,18 +225,18 @@ const buildCallback = task => {
       }
       const errorMessage = `Build failure: ${err}. ${simInfoString} Shas = ${JSON.stringify( shas )}`;
       winston.log( 'error', errorMessage );
-      sendEmail( 'BUILD ERROR', errorMessage, task.email );
+      await sendEmail( 'BUILD ERROR', errorMessage, task.email );
     }
     else {
       winston.log( 'info', `build for ${task.simName} finished successfully` );
       persistentQueue.finishTask();
-      sendEmail( 'Build Succeeded', simInfoString, task.email, true );
+      await sendEmail( 'Build Succeeded', simInfoString, task.email, true );
     }
   };
 };
 
-const postQueueImageDeploy = ( req, res ) => {
-  logRequest( req, 'body', winston );
+const postQueueImageDeploy = ( req: Request, res: Response ): void => {
+  logRequest( req, 'body' );
 
   const authorizationKey = req.body[ constants.AUTHORIZATION_KEY ];
   if ( authorizationKey !== constants.BUILD_SERVER_CONFIG.buildServerAuthorizationCode ) {
@@ -246,15 +262,15 @@ const postQueueImageDeploy = ( req, res ) => {
       simulation: simulation,
       version: version
     },
-    err => {
+    async ( err?: Error | string | null ) => {
       if ( err ) {
         const errorMessage = `Image deploy failure: ${err}`;
         winston.log( 'error', errorMessage );
-        sendEmail( 'IMAGE DEPLOY ERROR', errorMessage, email );
+        await sendEmail( 'IMAGE DEPLOY ERROR', errorMessage, email );
       }
       else {
         winston.log( 'info', 'Image deploy finished successfully' );
-        sendEmail( 'Image deploy succeeded', emailBodyText, email, true );
+        await sendEmail( 'Image deploy succeeded', emailBodyText, email, true );
       }
     } );
 

@@ -1,10 +1,13 @@
-// Copyright 2021, University of Colorado Boulder
-// @author Matt Pennington (PhET Interactive Simulations)
+// Copyright 2021-2026, University of Colorado Boulder
 
-const axios = require( 'axios' );
-const getFullStringMap = require( './getFullStringMap' );
-const loadJSON = require( '../common/loadJSON' );
-const gitCheckout = require( '../common/git/gitCheckout' );
+/**
+ * @author Matt Pennington (PhET Interactive Simulations)
+ */
+
+import axios from 'axios';
+import getFullStringMap from './getFullStringMap.js';
+import { loadJSON } from '../common/loadJSON.js';
+import { gitCheckout } from '../common/git/gitCheckout.js';
 
 /**
  * NOTE: release branch NEEDS to be checked out for this to be called, since we'll need the dependencies.json file
@@ -14,7 +17,11 @@ const gitCheckout = require( '../common/git/gitCheckout' );
  * @param {string} checkoutDir
  * @returns {Promise.<{}>}
  */
-const parseScreenNamesFromSimulation = async ( simName, locales, checkoutDir ) => {
+export const parseScreenNames = async (
+  simName: string,
+  locales: string[],
+  checkoutDir: string
+): Promise<Record<string, string[]>> => {
 
   const stringMap = await getFullStringMap( simName, checkoutDir );
   const packageObject = await loadJSON( `${checkoutDir}/${simName}/package.json` );
@@ -22,7 +29,7 @@ const parseScreenNamesFromSimulation = async ( simName, locales, checkoutDir ) =
 
   const localeData = await loadJSON( `${checkoutDir}/babel/localeData.json` );
 
-  const result = {};
+  const result: Record<string, string[]> = {};
   for ( const locale of locales ) {
     const fallbackLocales = [
       locale,
@@ -43,11 +50,11 @@ const parseScreenNamesFromSimulation = async ( simName, locales, checkoutDir ) =
   return result;
 };
 
-const parseScreenNamesAllSimulations = async () => {
+export const parseScreenNamesAllSimulations = async (): Promise<Record<string, Record<string, string[]>>> => {
   const url = 'https://phet.colorado.edu/services/metadata/1.3/simulations?format=json&type=html&summary';
   const projects = ( await axios.get( url ) ).data.projects;
 
-  const screenNameObject = {};
+  const screenNameObject: Record<string, Record<string, string[]>> = {};
 
   for ( let projectIndex = 0; projectIndex < projects.length; projectIndex++ ) {
     const project = projects[ projectIndex ];
@@ -55,14 +62,9 @@ const parseScreenNamesAllSimulations = async () => {
     const simName = simulation.name;
     const locales = Object.keys( simulation.localizedSimulations );
     await gitCheckout( simName, `${project.version.major}.${project.version.minor}` );
-    screenNameObject[ simName ] = await parseScreenNamesFromSimulation( simName, locales, '..' );
+    screenNameObject[ simName ] = await parseScreenNames( simName, locales, '..' );
     await gitCheckout( simName, 'main' );
   }
 
   return screenNameObject;
-};
-
-module.exports = {
-  parseScreenNames: parseScreenNamesFromSimulation,
-  parseScreenNamesAllSimulations: parseScreenNamesAllSimulations
 };

@@ -1,32 +1,37 @@
-// Copyright 2017-2019, University of Colorado Boulder
-// @author Matt Pennington (PhET Interactive Simulations)
-
-
-const constants = require( './constants' );
-const createTranslationsXML = require( './createTranslationsXML' );
-const devDeploy = require( './devDeploy' );
-const execute = require( '../common/execute' ).default;
-const fs = require( 'fs' );
-const getLocales = require( './getLocales' );
-const notifyServer = require( './notifyServer' );
-const rsync = require( 'rsync' );
-const SimVersion = require( '../browser-and-node/SimVersion' ).default;
-const winston = require( 'winston' );
-const writePhetHtaccess = require( './writePhetHtaccess' );
-const writePhetioHtaccess = require( '../common/writePhetioHtaccess' ).default;
-const deployImages = require( './deployImages' );
-const persistentQueue = require( './persistentQueue' );
-const ReleaseBranch = require( '../common/ReleaseBranch' ).default;
-const loadJSON = require( '../common/loadJSON' );
-const sendEmail = require( './sendEmail' );
+// Copyright 2017-2026, University of Colorado Boulder
 
 /**
- * Abort build with err
- * @param {String|Error} err - error logged and sent via email
+ * @author Matt Pennington (PhET Interactive Simulations)
  */
-const abortBuild = async err => {
+
+import constants from './constants.js';
+import { createTranslationsXML } from './createTranslationsXML.js';
+import { devDeploy } from './devDeploy.js';
+import execute from '../common/execute.js';
+import fs from 'fs';
+import { getLocales } from './getLocales.js';
+import notifyServer from './notifyServer.js';
+import rsync from 'rsync';
+import SimVersion from '../browser-and-node/SimVersion.js';
+import winston from 'winston';
+import { writePhetHtaccess } from './writePhetHtaccess.js';
+import writePhetioHtaccess from '../common/writePhetioHtaccess.js';
+import { deployImages } from './deployImages.js';
+import * as persistentQueue from './persistentQueue.js';
+import { ReleaseBranch } from '../common/ReleaseBranch.js';
+import { loadJSON } from '../common/loadJSON.js';
+import { sendEmail } from './sendEmail.js';
+import { BuildServerTask } from './BuildServerTypes.js';
+
+/**
+ * Abort build with err - error logged and sent via email
+ */
+const abortBuild = async ( err: Error | string ): Promise<never> => {
   winston.log( 'error', `BUILD ABORTED! ${err}` );
-  err.stack && winston.log( 'error', err.stack );
+
+  if ( err instanceof Error ) {
+    err.stack && winston.log( 'error', err.stack );
+  }
 
   throw new Error( `Build aborted, ${err}` );
 };
@@ -34,51 +39,38 @@ const abortBuild = async err => {
 /**
  * Clean up after deploy. Remove tmp dir.
  */
-const afterDeploy = async buildDir => {
+const afterDeploy = async ( buildDir: string ): Promise<void> => {
   try {
     await execute( 'rm', [ '-rf', buildDir ], '.' );
   }
   catch( err ) {
-    await abortBuild( err );
+    await abortBuild( err instanceof Error ? err : new Error( `Error during afterDeploy: ${err}` ) );
   }
 };
 
 /**
  * taskQueue ensures that only one build/deploy process will be happening at the same time.  The main build/deploy logic is here.
- *
- * @property {JSON} repos
- * @property {String} api
- * @property {String} locales - comma separated list of locale codes
- * @property {String} simName - lower case simulation name used for creating files/directories
- * @property {String} version - sim version identifier string
- * @property {String} servers - deployment targets, subset of [ 'dev', 'production' ]
- * @property {string[]} brands - deployment brands
- * @property {String} email - used for sending notifications about success/failure
- * @property {String} translatorId - rosetta user id for adding translators to the website
- * @property {winston} winston - logger
- * @param options
  */
-async function runTask( options ) {
+async function runTask( options: BuildServerTask ): Promise<void> {
   persistentQueue.startTask( options );
+
   if ( options.deployImages ) {
     try {
       await deployImages( options );
       return;
     }
     catch( e ) {
-      winston.error( e );
+      winston.error( `${e}` );
       winston.error( 'Deploy images failed. See previous logs for details.' );
       throw e;
     }
   }
-
 
   try {
     //-------------------------------------------------------------------------------------
     // Parse and validate parameters
     //-------------------------------------------------------------------------------------
     const api = options.api;
-    const dependencies = options.repos;
     let locales = options.locales;
     const simName = options.simName;
     let version = options.version;
@@ -86,13 +78,13 @@ async function runTask( options ) {
     const brands = options.brands;
     const servers = options.servers;
     const userId = options.userId;
-    const branch = options.branch || version.match( /^(\d+\.\d+)/ )[ 0 ];
+    const branch = options.branch || version.match( /^(\d+\.\d+)/ )![ 0 ];
 
     if ( userId ) {
       winston.log( 'info', `setting userId = ${userId}` );
     }
 
-    if ( branch === null ) {
+    if ( branch === null || branch === undefined ) {
       await abortBuild( 'Branch must be provided.' );
     }
 
@@ -211,8 +203,8 @@ async function runTask( options ) {
 
     if ( servers.indexOf( constants.PRODUCTION_SERVER ) >= 0 ) {
       winston.info( 'deploying to production' );
-      let targetVersionDir;
-      let targetSimDir;
+      let targetVersionDir!: string;
+      let targetSimDir!: string;
 
       // Loop over all brands
       for ( const i in brands ) {
@@ -275,9 +267,9 @@ async function runTask( options ) {
               .set( 'exclude', '.rsync-filter' )
               .source( `${sourceDir}/` )
               .destination( targetVersionDir )
-              .output( stdout => { winston.debug( stdout.toString() ); },
-                stderr => { winston.error( stderr.toString() ); } )
-              .execute( ( err, code, cmd ) => {
+              .output( ( stdout: Buffer ) => { winston.debug( stdout.toString() ); },
+                ( stderr: Buffer ) => { winston.error( stderr.toString() ); } )
+              .execute( ( err: Error | null, code: number, cmd: string ) => {
                 if ( err && code !== 23 ) {
                   winston.debug( code );
                   winston.debug( cmd );
@@ -317,7 +309,7 @@ async function runTask( options ) {
             // Production deploy to PhET Brand is most likely buggy if deploying a previous major.minor version. Let's
             // tell someone.
             if ( SimVersion.parse( version ).compareNumber( latestFileSystemVersion ) < 0 ) {
-              sendEmail( 'PhET Production Deploy of older release',
+              await sendEmail( 'PhET Production Deploy of older release',
                 `Build server deployed ${simName} version: ${version} to phet brand production site but the latest version is ${latestFileSystemVersion}` );
             }
           }
@@ -362,14 +354,16 @@ async function runTask( options ) {
 }
 
 // Look at the file system for the directory that has the latest version as its name.
-function getLatestFileSystemProductionVersion( dirPath ) {
+function getLatestFileSystemProductionVersion( dirPath: string ): SimVersion | undefined {
   const versionDirRegex = /^\d+\.\d+\.\d+$/; // start and end markers because we only care about production deploys
   const versionStrings = fs.readdirSync( dirPath ).filter( f => versionDirRegex.test( f ) );
   return versionStrings.map( f => SimVersion.parse( f ) ).sort( SimVersion.comparator ).pop();
 }
 
-
-module.exports = function taskWorker( task, taskCallback ) {
+export const taskWorker = (
+  task: BuildServerTask,
+  taskCallback: ( err?: Error | null ) => void
+): void => {
   runTask( task )
     .then( () => {
         taskCallback();

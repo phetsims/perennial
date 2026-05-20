@@ -1,34 +1,36 @@
-// Copyright 2017-2018, University of Colorado Boulder
-// @author Matt Pennington (PhET Interactive Simulations)
-
-
-const constants = require( './constants' );
-const devSsh = require( '../common/devSsh' );
-const rsync = require( 'rsync' );
-const winston = require( 'winston' );
-const writeFile = require( '../common/writeFile' );
-const fs = require( 'fs' );
-
-const user = constants.BUILD_SERVER_CONFIG.devUsername;
-const host = constants.BUILD_SERVER_CONFIG.devDeployServer;
+// Copyright 2017-2026, University of Colorado Boulder
 
 /**
  * Copy files to dev server, typically bayes.colorado.edu.
  *
- * @param {string} simDir
- * @param {string} simName
- * @param {string} version
- * @param {ChipperVersion} chipperVersion
- * @param {string[]} brands
- * @param {string} buildDir
+ * @author Matt Pennington (PhET Interactive Simulations)
  */
-module.exports = async function devDeploy( simDir, simName, version, chipperVersion, brands, buildDir ) {
+
+import constants from './constants.js';
+import { devSsh } from '../common/devSsh.js';
+import rsync from 'rsync';
+import winston from 'winston';
+import fs from 'fs';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
+import { ChipperVersion } from '../common/ChipperVersion.js';
+
+const user = constants.BUILD_SERVER_CONFIG.devUsername;
+const host = constants.BUILD_SERVER_CONFIG.devDeployServer;
+
+export const devDeploy = async (
+  simDir: string,
+  simName: Repo,
+  versionString: string,
+  chipperVersion: ChipperVersion,
+  brands: string[],
+  buildDir: string
+): Promise<void> => {
   const simDirectory = constants.BUILD_SERVER_CONFIG.devDeployPath + simName;
-  let versionDirectory = version;
+  let versionDirectory = versionString;
 
   // Chipper 1.0 has -phetio in the version schema for PhET-iO branded sims
-  if ( brands.length === 1 && brands[ 0 ] === constants.PHET_IO_BRAND && chipperVersion.major === 0 && !version.match( '-phetio' ) ) {
-    versionDirectory = version.split( '-' ).join( '-phetio' );
+  if ( brands.length === 1 && brands[ 0 ] === constants.PHET_IO_BRAND && chipperVersion.major === 0 && !versionString.match( '-phetio' ) ) {
+    versionDirectory = versionString.split( '-' ).join( '-phetio' );
   }
   const simVersionDirectory = `${simDirectory}/${versionDirectory}`;
 
@@ -44,18 +46,18 @@ module.exports = async function devDeploy( simDir, simName, version, chipperVers
 
   if ( brands.includes( constants.PHET_BRAND ) ) {
     const rsyncFilterContents = '- *_CA*\n+ *_en*\n+ *_all*\n+ *_a11y*\n- *.html';
-    await writeFile( rsyncFilterFile, rsyncFilterContents );
+    await fs.promises.writeFile( rsyncFilterFile, rsyncFilterContents );
   }
 
-  await new Promise( ( resolve, reject ) => {
+  await new Promise<void>( ( resolve, reject ) => {
     new rsync()
       .flags( 'razpFFO' )
       .set( 'no-perms' )
       .source( `${buildDir}/` )
       .destination( `${user}@${host}:${simVersionDirectory}` )
-      .execute( ( err, code, cmd ) => {
+      .execute( ( err: Error | null, code: number, cmd: string ) => {
         if ( err ) {
-          winston.debug( code );
+          winston.debug( `${code}` );
           winston.debug( cmd );
           reject( err );
         }

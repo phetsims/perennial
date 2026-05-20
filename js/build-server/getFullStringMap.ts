@@ -6,22 +6,24 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-const getDependencyRepos = require( '../common/getDependencyRepos' );
-const getRepoStringMap = require( './getRepoStringMap' );
+import getDependencyRepos from '../common/getDependencyRepos.js';
+import getRepoStringMap from './getRepoStringMap.js';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
 
 /**
  * Returns an inverse string map (stringMap[ stringKey ][ locale ]) for all strings in all dependencies for a given repo
- * @public
  *
- * @param {string} repo - The repository name
- * @param {string} checkoutDir
- * @returns {Promise.<stringMap[ stringKey ][ locale ]>}
+ * @returns - {Promise.<stringMap[ stringKey ][ locale ]>}
  */
-module.exports = async function getFullStringMap( repo, checkoutDir ) {
+export const getFullStringMap = async (
+  repo: Repo,
+  checkoutDir: string
+): Promise<Record<string, Record<string, string>>> => {
 
-  let result = {};
+  let result: Record<string, Record<string, string>> = {};
 
   for ( const dependencyRepo of await getDependencyRepos( repo, { cwd: checkoutDir } ) ) {
+    // eslint-disable-next-line phet/no-object-spread-on-non-literals
     result = { ...result, ...await getRepoStringMap( dependencyRepo, checkoutDir ) };
   }
 

@@ -8,8 +8,8 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-const loadJSON = require( '../common/loadJSON' );
-const fs = require( 'fs' );
+import { loadJSON } from '../common/loadJSON.js';
+import fs from 'fs';
 
 /**
  * Returns an inverse string map (stringMap[ stringKey ][ locale ]) for all strings in a given repo.
@@ -19,10 +19,10 @@ const fs = require( 'fs' );
  * @param {string} checkoutDir
  * @returns {Promise.<stringMap[ stringKey ][ locale ]>}
  */
-module.exports = async function getRepoStringMap( repo, checkoutDir ) {
+export default async function getRepoStringMap( repo: string, checkoutDir: string ): Promise<Record<string, Record<string, string>>> {
 
   // partialKeyMap[ partialStringKey ][ locale ] = stringValue
-  const partialKeyMap = {};
+  const partialKeyMap: Record<string, Record<string, string>> = {};
 
   // If we're not a repo with strings
   if ( !fs.existsSync( `${checkoutDir}/${repo}/${repo}-strings_en.json` ) ) {
@@ -37,7 +37,7 @@ module.exports = async function getRepoStringMap( repo, checkoutDir ) {
 
   // Support recursive structure of English string files. Tests for `value: <<string type>>` to determine if it's a string.
   // Fills partialKeyMap
-  ( function recur( stringStructure, stringKeyParts ) {
+  ( function recur( stringStructure: any, stringKeyParts: string[] ) {
     if ( typeof stringStructure.value === 'string' ) {
       partialKeyMap[ stringKeyParts.join( '.' ) ] = {
         en: stringStructure.value
@@ -69,7 +69,7 @@ module.exports = async function getRepoStringMap( repo, checkoutDir ) {
   }
 
   // result[ stringKey ][ locale ] = stringValue
-  const result = {};
+  const result: Record<string, Record<string, string>> = {};
 
   // Prepend the requirejsNamespace to the string keys
   Object.keys( partialKeyMap ).forEach( partialKey => {
@@ -77,4 +77,4 @@ module.exports = async function getRepoStringMap( repo, checkoutDir ) {
   } );
 
   return result;
-};
+}

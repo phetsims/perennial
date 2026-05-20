@@ -1,0 +1,111 @@
+// Copyright 2017-2026, University of Colorado Boulder
+
+/**
+ * Constants required for the build-server
+ *
+ * @author Matt Pennington
+ */
+
+import fs from 'graceful-fs';
+import assert from 'assert';
+
+type BuildServerConfig = {
+  babelBranch: string;
+  buildServerAuthorizationCode: string;
+  databaseAuthorizationCode: string | undefined;
+  devDeployPath: string;
+  devDeployServer: string;
+  devUsername: string;
+  emailPassword: string | undefined;
+  emailServer: string;
+  emailTo: string | undefined;
+  emailUsername: string | undefined;
+  htmlSimsDirectory: string;
+  phetioSimsDirectory: string;
+  pgConnectionString: string | undefined;
+  productionServerURL: string;
+  serverToken: string | undefined;
+  verbose: boolean;
+};
+
+//------------------------------------------------------------------------------------
+// read configuration file
+const BUILD_LOCAL_FILENAME = `${process.env.HOME}/.phet/build-local.json`;
+const buildLocalJSON = JSON.parse( fs.readFileSync( BUILD_LOCAL_FILENAME, { encoding: 'utf-8' } ) );
+assert( buildLocalJSON.buildServerAuthorizationCode, `buildServerAuthorizationCode missing from ${BUILD_LOCAL_FILENAME}` );
+assert( buildLocalJSON.devUsername, `devUsername missing from ${BUILD_LOCAL_FILENAME}` );
+
+/**
+ * Configuration information that is related to deploying sims.
+ *
+ * TODO: better separate out and doc https://github.com/phetsims/totality/issues/140
+ *
+ * All fields are public (read-only).
+ * Fields include:
+ *
+ * Required:
+ * {string} buildServerAuthorizationCode - password that verifies if build request comes from phet team members
+ * {string} devUsername - username on our dev server
+ *
+ * Optional:
+ * {string} devDeployServer - name of the dev server, defaults to 'bayes.colorado.edu'
+ * {string} devDeployPath - path on dev server to deploy to, defaults to '/data/web/htdocs/dev/html/'
+ * {string} productionServerURL - production server url, defaults to 'https://phet.colorado.edu', can be over-ridden to 'https://phet-dev.colorado.edu'
+ *
+ * Include these fields in build-local.json to enable sending emails from build-server on build failure.
+ * They are only needed on the production server, not locally. A valid emailUsername and emailPassword are needed to authenticate
+ * sending mail from the smtp server, though the actual emails will be sent from 'PhET Build Server <phethelp@colorado.edu>',
+ * not from the address you put here.
+ * {string} emailUsername - e.g. "[identikey]@colorado.edu"
+ * {string} emailPassword
+ * {string} emailServer - (optional: defaults to "smtp.colorado.edu")
+ * {string} emailTo - e.g. "Me <[identikey]@colorado.edu>, Another Person <person@example.com>"
+ *
+ * @author Chris Malley (PixelZoom, Inc.)
+ * @author Aaron Davis
+ */
+const BUILD_SERVER_CONFIG: BuildServerConfig = {
+  babelBranch: buildLocalJSON.babelBranch || 'main',
+  buildServerAuthorizationCode: buildLocalJSON.buildServerAuthorizationCode,
+  databaseAuthorizationCode: buildLocalJSON.databaseAuthorizationCode,
+  devDeployPath: buildLocalJSON.devDeployPath || '/data/web/htdocs/dev/html/',
+  devDeployServer: buildLocalJSON.devDeployServer || 'bayes.colorado.edu',
+  devUsername: buildLocalJSON.devUsername,
+  emailPassword: buildLocalJSON.emailPassword,
+  emailServer: buildLocalJSON.emailServer || 'smtp.office365.com',
+  emailTo: buildLocalJSON.emailTo,
+  emailUsername: buildLocalJSON.emailUsername,
+  htmlSimsDirectory: buildLocalJSON.htmlSimsDirectory,
+  phetioSimsDirectory: buildLocalJSON.phetioSimsDirectory,
+  pgConnectionString: buildLocalJSON.pgConnectionString,
+  productionServerURL: buildLocalJSON.productionServerURL || 'https://phet.colorado.edu',
+  serverToken: buildLocalJSON.serverToken,
+  verbose: buildLocalJSON.verbose || buildLocalJSON.verbose === 'true'
+};
+
+export default {
+  BUILD_SERVER_CONFIG: BUILD_SERVER_CONFIG,
+  LISTEN_PORT: 16371,
+  HTML_SIMS_DIRECTORY: BUILD_SERVER_CONFIG.htmlSimsDirectory,
+  PHET_IO_SIMS_DIRECTORY: BUILD_SERVER_CONFIG.phetioSimsDirectory,
+  REPOS_KEY: 'repos',
+  DEPENDENCIES_KEY: 'dependencies',
+  LOCALES_KEY: 'locales',
+  API_KEY: 'api',
+  SIM_NAME_KEY: 'simName',
+  VERSION_KEY: 'version',
+  OPTION_KEY: 'option',
+  EMAIL_KEY: 'email',
+  BRANCH_KEY: 'branch',
+  USER_ID_KEY: 'userId',
+  TRANSLATOR_ID_KEY: 'translatorId',
+  AUTHORIZATION_KEY: 'authorizationCode',
+  SERVERS_KEY: 'servers',
+  BRANDS_KEY: 'brands',
+  PRODUCTION_SERVER: 'production',
+  DEV_SERVER: 'dev',
+  PHET_BRAND: 'phet',
+  PHET_IO_BRAND: 'phet-io',
+  ENGLISH_LOCALE: 'en',
+  PERENNIAL: '.'
+};

@@ -1,4 +1,4 @@
-# build-server.js
+# build-server.ts
 
 PhET build and deploy server.
 

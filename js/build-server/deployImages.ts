@@ -1,32 +1,52 @@
-// Copyright 2020, University of Colorado Boulder
-// @author Matt Pennington (PhET Interactive Simulations)
+// Copyright 2020-2026, University of Colorado Boulder
 
-const execute = require( '../common/execute' ).default;
-const gitCheckoutDirectory = require( '../common/git/gitCheckoutDirectory' );
-const gitCloneOrFetchDirectory = require( '../common/gitCloneOrFetchDirectory' );
-const gitPullDirectory = require( '../common/git/gitPullDirectory' );
-const npmUpdateDirectory = require( '../common/npmUpdateDirectory' );
-const constants = require( './constants' );
-const fs = require( 'fs' );
-const axios = require( 'axios' );
+/**
+ * @author Matt Pennington (PhET Interactive Simulations)
+ */
+
+import execute from '../common/execute.js';
+import { gitCheckoutDirectory } from '../common/git/gitCheckoutDirectory.js';
+import { gitCloneDirectory } from '../common/git/gitCloneDirectory.js';
+import { gitPullDirectory } from '../common/git/gitPullDirectory.js';
+import { npmUpdateDirectory } from '../common/npmUpdateDirectory.js';
+import constants from './constants.js';
+import fs from 'fs';
+import axios from 'axios';
 
 const imagesReposDir = '../images-repos';
 const chipperDir = `${imagesReposDir}/chipper`;
 const perennialAliasDir = `${imagesReposDir}/perennial-alias`;
 
-const processSim = async ( simulation, brands, version ) => {
+type DeployImagesOptions = {
+  simulation?: string;
+  brands?: string[] | string;
+  version?: string;
+};
+
+const cloneOrFetchDirectory = async ( repo: string, directory: string ): Promise<void> => {
+  const repoDir = `${directory}/${repo}`;
+  if ( fs.existsSync( repoDir ) ) {
+    await gitPullDirectory( repoDir );
+  }
+  else {
+    await gitCloneDirectory( repo as any, directory );
+  }
+};
+
+const processSim = async ( simulation: string, brands: string[] | string | undefined, version: string ): Promise<void> => {
 
   const repoDir = `${imagesReposDir}/${simulation}`;
 
   // Get main
-  await gitCloneOrFetchDirectory( simulation, imagesReposDir );
+  // TODO: This replaced the removed legacy gitCloneOrFetchDirectory helper with a minimal equivalent.
+  await cloneOrFetchDirectory( simulation, imagesReposDir );
   await gitCheckoutDirectory( 'main', repoDir );
   await gitPullDirectory( repoDir );
 
-  let brandsArray;
-  let brandsString;
+  let brandsArray: string[];
+  let brandsString: string;
   if ( brands ) {
-    if ( brands.split ) {
+    if ( typeof brands === 'string' ) {
       brandsArray = brands.split( ',' );
       brandsString = brands;
     }
@@ -64,8 +84,9 @@ const processSim = async ( simulation, brands, version ) => {
   }
 };
 
-const updateRepoDir = async ( repo, dir ) => {
-  await gitCloneOrFetchDirectory( repo, imagesReposDir );
+const updateRepoDir = async ( repo: string, dir: string ): Promise<void> => {
+  // TODO: This replaced the removed legacy gitCloneOrFetchDirectory helper with a minimal equivalent.
+  await cloneOrFetchDirectory( repo, imagesReposDir );
   await gitCheckoutDirectory( 'main', dir );
   await gitPullDirectory( dir );
   await npmUpdateDirectory( dir );
@@ -75,7 +96,7 @@ const updateRepoDir = async ( repo, dir ) => {
  * This task deploys all image assets from the main branch to the latest version of all published sims. If specific
  * simulation/version options are provided, it will deploy only that specific one.
  */
-const deployImages = async options => {
+export const deployImages = async ( options: DeployImagesOptions ): Promise<void> => {
   console.log( `deploying images with brands ${options.brands}` );
   if ( !fs.existsSync( imagesReposDir ) ) {
     await execute( 'mkdir', [ imagesReposDir ], '.' );
@@ -118,5 +139,3 @@ const deployImages = async options => {
     }
   }
 };
-
-module.exports = deployImages;

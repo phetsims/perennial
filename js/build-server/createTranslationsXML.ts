@@ -1,12 +1,13 @@
-// Copyright 2017-2018, University of Colorado Boulder
-// @author Matt Pennington (PhET Interactive Simulations)
+// Copyright 2017-2026, University of Colorado Boulder
 
+/**
+ * @author Matt Pennington (PhET Interactive Simulations)
+ */
 
-const constants = require( './constants' );
-const fs = require( 'graceful-fs' ); // eslint-disable-line phet/require-statement-match
-const winston = require( 'winston' );
-const writeFile = require( '../common/writeFile' );
-const parseScreenNames = require( './parseScreenNames' );
+import constants from './constants.js';
+import fs from 'graceful-fs';
+import winston from 'winston';
+import { parseScreenNames } from './parseScreenNames.js';
 
 /**
  * Create a [sim name].xml file in the live sim directory in htdocs. This file tells the website which
@@ -15,10 +16,12 @@ const parseScreenNames = require( './parseScreenNames' );
  * @param version
  * @param checkoutDir
  */
-module.exports = async function( simName, version, checkoutDir ) {
+type StringFile = { name: string; locale: string };
+
+export const createTranslationsXML = async ( simName: string, version: string, checkoutDir: string ): Promise<void> => {
   const translatedStringFilesDir = `${checkoutDir}/babel/${simName}`;
   const englishStringsFile = `${simName}-strings_en.json`;
-  const stringFiles = [ { name: englishStringsFile, locale: constants.ENGLISH_LOCALE } ];
+  const stringFiles: StringFile[] = [ { name: englishStringsFile, locale: constants.ENGLISH_LOCALE } ];
 
   // pull all the string filenames and locales from babel and store in stringFiles array
   try {
@@ -39,7 +42,7 @@ module.exports = async function( simName, version, checkoutDir ) {
   }
 
   // try opening the english strings file so we can read the english strings
-  let englishStrings;
+  let englishStrings: any;
   try {
     englishStrings = JSON.parse( fs.readFileSync( `${checkoutDir}/${simName}/${englishStringsFile}`, { encoding: 'utf-8' } ) );
   }
@@ -55,7 +58,7 @@ module.exports = async function( simName, version, checkoutDir ) {
   // create xml, making a simulation tag for each language
   let finalXML = `<?xml version="1.0" encoding="utf-8" ?>\n<project name="${simName}">\n<simulations>`;
 
-  const screenNames = await parseScreenNames.parseScreenNames( simName, stringFiles.map( f => f.locale ), checkoutDir );
+  const screenNames = await parseScreenNames( simName, stringFiles.map( f => f.locale ), checkoutDir );
 
   for ( let j = 0; j < stringFiles.length; j++ ) {
     const stringFile = stringFiles[ j ];
@@ -70,7 +73,7 @@ module.exports = async function( simName, version, checkoutDir ) {
                                   `<title><![CDATA[${localizedSimTitle}]]></title>\n` );
       if ( screenNames && screenNames[ stringFile.locale ] ) {
         finalXML = finalXML.concat( '<screens>\n' );
-        screenNames[ stringFile.locale ].forEach( ( screenName, index ) => {
+        screenNames[ stringFile.locale ].forEach( ( screenName: string, index: number ) => {
           finalXML = finalXML.concat( `<screenName position="${index + 1}"><![CDATA[${screenName}]]></screenName>\n` );
         } );
         finalXML = finalXML.concat( '</screens>\n' );
@@ -83,7 +86,7 @@ module.exports = async function( simName, version, checkoutDir ) {
 
   const xmlFilepath = `${constants.HTML_SIMS_DIRECTORY + simName}/${version}/${simName}.xml`;
   try {
-    await writeFile( xmlFilepath, finalXML );
+    await fs.promises.writeFile( xmlFilepath, finalXML );
   }
   catch( err ) {
     console.error( 'Error writing xml file', err );
