@@ -572,8 +572,8 @@ export class Maintenance {
   /**
    * Deploys RC versions of the modified branches that need it.
    *
-   *
    * @param filter - Optional filter, modified branches will be skipped if this resolves to false
+   * @param skipBuild - Whether to skip the build step (should only be done for large batches of sims that are guaranteed to build fine)
    */
   public static async deployReleaseCandidates( filter?: FilterMB, skipBuild = false ): Promise<void> {
     const maintenance = await Maintenance.load();
@@ -616,6 +616,7 @@ export class Maintenance {
   /**
    * Deploys production versions of the modified branches that need it.
    * @param filter - Optional filter, modified branches will be skipped if this resolves to false
+   * @param skipBuild - Whether to skip the build step (should only be done for large batches of sims that are guaranteed to build fine)
    */
   public static async deployProduction( filter: FilterMB, skipBuild = true ): Promise<void> {
     const maintenance = await Maintenance.load();
@@ -694,31 +695,22 @@ export class Maintenance {
    *
    * @param filter - return false if the ReleaseBranch should be excluded.
    * @param checkUnreleasedBranches - If false, will skip checking for unreleased branches. This checking needs all repos checked out
-   * @param forceCacheBreak - true if you want to force a recalculation of all ReleaseBranches
    * @rejects {ExecuteError}
    */
-  public async getMaintenanceBranches( filter: FilterSyncRB = () => true, checkUnreleasedBranches = true, forceCacheBreak = false ): Promise<ReleaseBranch[]> {
-    return Maintenance.getMaintenanceBranches( filter, checkUnreleasedBranches, forceCacheBreak, this );
+  public async getMaintenanceBranches( filter: FilterSyncRB = () => true, checkUnreleasedBranches = true ): Promise<ReleaseBranch[]> {
+    return Maintenance.getMaintenanceBranches( filter, checkUnreleasedBranches );
   }
 
   /**
    *
    * @param filter - return false if the ReleaseBranch should be excluded.
    * @param checkUnreleasedBranches - If false, will skip checking for unreleased branches. This checking needs all repos checked out
-   * @param forceCacheBreak - true if you want to force a recalculation of all ReleaseBranches
-   * @param maintenance - by default load from saved file the current maintenance instance.
    * @rejects {ExecuteError}
    */
   public static async getMaintenanceBranches(
     filter: FilterSyncRB = () => true,
-    checkUnreleasedBranches = true,
-    forceCacheBreak = false,
-    maintenance?: Maintenance
+    checkUnreleasedBranches = true
   ): Promise<ReleaseBranch[]> {
-
-    if ( !maintenance ) {
-      maintenance = await Maintenance.load();
-    }
 
     const releaseBranches = await allReleaseBranchesPromise;
 
