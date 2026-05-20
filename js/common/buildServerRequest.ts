@@ -6,46 +6,43 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-const buildLocal = require( './buildLocal' );
-const assert = require( 'assert' );
-const axios = require( 'axios' );
-const winston = require( 'winston' );
+import { buildLocal } from './buildLocal.js';
+import assert from 'assert';
+import axios from 'axios';
+import winston from 'winston';
+import SimVersion from '../browser-and-node/SimVersion.js';
+import { LegacyBranch, Repo, SHA } from '../browser-and-node/PerennialTypes.js';
+import { BuildServerRequest } from '../build-server/BuildServerRequest.js';
 
-// TODO: TS-this and update
+export type BuildServerRequestOptions = {
+  locales?: string[] | '*'; // TODO: figure out the type we need to send in.
+  servers?: string[];
+};
 
-/**
- * Sends a request to the build server.
- * @public
- *
- * @param {string} repo
- * @param {SimVersion} version
- * @param {string} branch
- * @param {Object} dependencies - Dependencies object, use getDependencies?
- * @param {Object} [options]
- * @returns {Promise} - No resolved value
- */
-module.exports = async function( repo, version, branch, totalitySHA, options ) {
+export const buildServerRequest = async (
+  repo: Repo,
+  version: SimVersion,
+  legacyBranch: LegacyBranch,
+  brands: string[],
+  totalitySHA: SHA,
+  options?: BuildServerRequestOptions
+): Promise<void> => {
+  const locales = options?.locales ?? '*';
+  const servers = options?.servers ?? [ 'dev' ];
 
-  // TODO: handle brands removal
-
-  const {
-    locales = '*',
-    servers = [ 'dev' ] // {Array.<string>}, currently 'dev' and 'production' are supported
-  } = options || {};
-
-  winston.info( `sending build request for ${repo} ${version.toString()} with dependencies: ${JSON.stringify( dependencies )}` );
+  winston.info( `sending build request for ${repo} ${version.toString()} with totality SHA: ${totalitySHA}` );
 
   servers.forEach( server => assert( [ 'dev', 'production' ].includes( server ), `Unknown server: ${server}` ) );
 
-  const requestObject = {
-    api: '2.0',
-    dependencies: JSON.stringify( dependencies ),
+  const requestObject: BuildServerRequest = {
+    api: '3.0',
     simName: repo,
     version: version.toString(),
     locales: locales,
     servers: servers,
     brands: brands,
-    branch: branch,
+    branch: legacyBranch,
+    totalitySHA: totalitySHA,
     authorizationCode: buildLocal.buildServerAuthorizationCode
   };
   if ( buildLocal.buildServerNotifyEmail ) {

@@ -15,7 +15,7 @@ import { booleanPrompt } from '../booleanPrompt.js';
 import { buildLocal } from '../buildLocal.js';
 import { devDirectoryExists } from '../devDirectoryExists.js';
 import { Checkout } from '../Checkout.js';
-import buildServerRequest from '../buildServerRequest.js';
+import { buildServerRequest } from '../buildServerRequest.js';
 import winston from 'winston';
 
 class RCDeployError extends Error {
@@ -41,7 +41,7 @@ export type RCDeployOptions = {
  */
 export const rc = async (
   repo: Repo,
-  branch: string,
+  legacyBranch: string,
   options?: RCDeployOptions
 ): Promise<SimVersion> => {
   const noninteractive = options?.noninteractive ?? false;
@@ -49,7 +49,7 @@ export const rc = async (
   const skipBuild = options?.skipBuild ?? false;
 
   // Assertions for the version.
-  SimVersion.ensureReleaseBranch( branch );
+  SimVersion.ensureReleaseBranch( legacyBranch );
 
   if ( !( await vpnCheck() ) ) {
     throw new RCDeployError( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
@@ -59,18 +59,18 @@ export const rc = async (
     throw new RCDeployError( 'Unclean status on main checkout, cannot create release branch' );
   }
 
-  if ( !( await hasRemoteBranch( Checkout.getReleaseBranchName( repo, branch ) ) ) ) {
-    if ( noninteractive || !await booleanPrompt( `Release branch ${branch} does not exist. Create it?`, false ) ) {
+  if ( !( await hasRemoteBranch( Checkout.getReleaseBranchName( repo, legacyBranch ) ) ) ) {
+    if ( noninteractive || !await booleanPrompt( `Release branch ${legacyBranch} does not exist. Create it?`, false ) ) {
       throw new RCDeployError( 'Release branch does not exist' );
     }
 
     const includePhetIO = await booleanPrompt( 'Include phet-io brand in release branch?', noninteractive );
     const brands = includePhetIO ? [ 'phet', 'phet-io' ] : [ 'phet' ];
 
-    await Checkout.createReleaseBranchCheckout( repo, branch, brands );
+    await Checkout.createReleaseBranchCheckout( repo, legacyBranch, brands );
   }
 
-  const releaseBranch = await Checkout.getReleaseBranch( repo, branch );
+  const releaseBranch = await Checkout.getReleaseBranch( repo, legacyBranch );
   const checkout = releaseBranch.checkout;
 
   // PhET-iO simulations require validation for RCs. Error out if "phet.phet-io.validation=false" is in package.json.
@@ -130,7 +130,7 @@ export const rc = async (
   }
 
   // Send the build request
-  await buildServerRequest( repo, version, branch, await checkout.getSHA(), {
+  await buildServerRequest( repo, version, legacyBranch, releaseBranch.brands, await checkout.getSHA(), {
     locales: [ '*' ],
     servers: [ 'dev' ]
   } );

@@ -15,7 +15,7 @@ import { booleanPrompt } from '../booleanPrompt.js';
 import simMetadata from '../simMetadata.js';
 import assert from 'assert';
 import winston from 'winston';
-import buildServerRequest from '../buildServerRequest.js';
+import { buildServerRequest } from '../buildServerRequest.js';
 import { buildLocal } from '../buildLocal.js';
 
 class ProductionDeployError extends Error {
@@ -44,7 +44,7 @@ export type ProductionDeployOptions = {
  */
 export const production = async (
   repo: string,
-  branch: string,
+  legacyBranch: string,
   options?: ProductionDeployOptions
 ): Promise<SimVersion> => {
   const noninteractive = options?.noninteractive ?? false;
@@ -52,7 +52,7 @@ export const production = async (
   const skipBuild = options?.skipBuild ?? false;
   const redeploy = options?.redeploy ?? false;
 
-  SimVersion.ensureReleaseBranch( branch );
+  SimVersion.ensureReleaseBranch( legacyBranch );
 
   if ( !( await vpnCheck() ) ) {
     throw new ProductionDeployError( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
@@ -62,11 +62,11 @@ export const production = async (
     throw new ProductionDeployError( 'Unclean status on main checkout, cannot create release branch' );
   }
 
-  if ( !( await hasRemoteBranch( Checkout.getReleaseBranchName( repo, branch ) ) ) ) {
-    throw new ProductionDeployError( `Cannot find release branch ${Checkout.getReleaseBranchName( repo, branch )} for ${repo}` );
+  if ( !( await hasRemoteBranch( Checkout.getReleaseBranchName( repo, legacyBranch ) ) ) ) {
+    throw new ProductionDeployError( `Cannot find release branch ${Checkout.getReleaseBranchName( repo, legacyBranch )} for ${repo}` );
   }
 
-  const releaseBranch = await Checkout.getReleaseBranch( repo, branch );
+  const releaseBranch = await Checkout.getReleaseBranch( repo, legacyBranch );
   const checkout = releaseBranch.checkout;
 
   if ( !checkout.existsRelative( `${repo}/assets/${repo}-screenshot.png` ) && releaseBranch.brands.includes( 'phet' ) ) {
@@ -156,7 +156,7 @@ export const production = async (
   }
 
   // Send the build request
-  await buildServerRequest( repo, version, branch, await checkout.getSHA(), {
+  await buildServerRequest( repo, version, legacyBranch, releaseBranch.brands, await checkout.getSHA(), {
     locales: '*',
     servers: [ 'dev', 'production' ]
   } );
