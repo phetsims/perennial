@@ -37,7 +37,8 @@ export type UpdateTestingOptions = {
   unbuiltCheck?: boolean;
   builtCheck?: boolean;
 
-  retest?: boolean; // If true, it will re-run tests even if the SHA is the same.
+  // If true, it will re-run tests even if the SHA is the same (OR if the release branch has needed patches)
+  retest?: boolean;
 };
 
 export type LastRun = null | ( {
@@ -150,7 +151,7 @@ export class ModifiedBranch {
 
     // Conditions where testing should be reset (if any of these are true, we want to reset all testing results):
     const isClean = await this.releaseBranch.checkout.isClean();
-    if ( !isClean || this.neededPatches.length > 0 ) {
+    if ( !isClean || ( this.neededPatches.length > 0 && !retest ) ) {
       this.lastUpdate = null;
       this.lastTranspile = null;
       this.lastBuild = null;
