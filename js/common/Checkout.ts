@@ -674,9 +674,8 @@ export class Checkout {
       'chipper',
       'perennial-alias',
 
-      // TODO: use await checkout.hasGruntRepoFlag(); https://github.com/phetsims/totality/issues/140
-      // TODO: We can likely skip this when that flag exists https://github.com/phetsims/totality/issues/140
-      ...( this.releaseBranch ? [ this.releaseBranch.repo ] : [] )
+      // We skip the repo itself, unless it is an older release branch where this is needed.
+      ...( this.releaseBranch && !( await this.hasGruntRepoFlag() ) ? [ this.releaseBranch.repo ] : [] )
     ] ) {
       if ( fs.existsSync( `${this.workingDirectory}/${npmRepo}` ) ) {
         winston.info( `npm update ${npmRepo} in worktree` );

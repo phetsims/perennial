@@ -9,14 +9,14 @@
 
 import type { Checkout } from './Checkout.js';
 import winston from 'winston';
-import execute, { ExecuteOptions } from './execute.js';
+import execute, { ExecuteOptions, ExecuteResult } from './execute.js';
 import { gruntCommand } from './gruntCommand.js';
 import withServer from './withServer.js';
 import { puppeteerLoad } from './puppeteerLoad.js';
 import { BuildOptions, getBuildArguments } from './getBuildArguments.js';
 import _ from 'lodash';
 import SimVersion from '../browser-and-node/SimVersion.js';
-import { BuildInfoJSON, PackageJSON, Repo } from '../browser-and-node/PerennialTypes.js';
+import { PackageJSON, Repo } from '../browser-and-node/PerennialTypes.js';
 import { getBranchPackageJSON } from './getBranchPackageJSON.js';
 import fs from 'fs';
 // eslint-disable-next-line phet/default-import-match-filename
@@ -67,9 +67,11 @@ export class RunnableBranch {
     return !!( accessibilityInFeatures || accessibilityInPhet );
   }
 
+  /**
+   * Transpiles the sim (if available) so that the unbuilt HTML can be loaded (and chipper/dist will contain the transpiled files)
+   */
   public async transpile(): Promise<void> {
     const worktreeDirectory = this.checkout.workingDirectory;
-    const repoDirectory = `${worktreeDirectory}/${this.repo}`;
 
     const supportsOutputJSGruntTask = ( await this.checkout.getChipperVersion() ).chipperSupportsOutputJSGruntTasks;
 
@@ -77,12 +79,33 @@ export class RunnableBranch {
       winston.info( `transpiling ${worktreeDirectory}` );
 
       // We might not be able to run this command!
-      await execute( gruntCommand, [ 'output-js-project', '--silent' ], repoDirectory, {
+      await this.grunt( [ 'output-js-project', '--silent' ], {
         errors: 'resolve'
       } );
     }
   }
 
+  /**
+   * Grunt commands before 8d8fd4b95310e5b8d41da91cf79d169f86a56244 required running in the sim repo (and were typically
+   * done so until Mar 2026), but we can improve the npm situation slightly by running in chipper with the --repo flag
+   * for the versions that support it.
+   */
+  public async grunt( args: string[], executeOptions?: ExecuteOptions & { errors: 'resolve' } ): Promise<ExecuteResult>;
+  public async grunt( args: string[], executeOptions?: ExecuteOptions & { errors?: 'reject' } ): Promise<string>;
+  public async grunt( args: string[], executeOptions?: ExecuteOptions ): Promise<string | ExecuteResult> {
+    if ( await this.checkout.hasGruntRepoFlag() ) {
+      // @ts-expect-error - the overloads are a bit hard to express here, but the types of execute() should line up with the return type of this function based on the options
+      return execute( gruntCommand, [ ...args, `--repo=${this.repo}` ], `${this.checkout.workingDirectory}/chipper`, executeOptions );
+    }
+    else {
+      // @ts-expect-error - the overloads are a bit hard to express here, but the types of execute() should line up with the return type of this function based on the options
+      return execute( gruntCommand, args, `${this.checkout.workingDirectory}/${this.repo}`, executeOptions );
+    }
+  }
+
+  /**
+   * Builds the simulation
+   */
   public async build( options?: Partial<BuildOptions>, executeOptions?: ExecuteOptions & { errors?: 'reject' } ): Promise<string> {
     if ( !this.checkout.isCheckedOut ) {
       throw new Error( `Cannot build ${this.repo} because it is not checked out` );
@@ -113,12 +136,7 @@ export class RunnableBranch {
     }
 
     winston.info( `building ${this.repo} in ${this.checkout.workingDirectory} with grunt ${args.join( ' ' )}` );
-    const result = await execute( gruntCommand, args, `${this.checkout.workingDirectory}/${this.repo}`, executeOptions );
-
-    // TODO: note we should --repo=${repo} potentially with newer chipper versions (!) https://github.com/phetsims/totality/issues/140
-    // TODO: MR patch to older sims to support this, THEN get rid of "npm ci"-ing the sim repo itself(!) https://github.com/phetsims/totality/issues/140
-    // TODO: (or... detected chipper version and run in different places, potentially do that first) https://github.com/phetsims/totality/issues/140
-    // TODO: use await checkout.hasGruntRepoFlag(); https://github.com/phetsims/totality/issues/140
+    const result = await this.grunt( args, executeOptions );
 
     // Examine output to see if getDependencies (in chipper) notices any missing phet-io things.
     // Fail out if so. Detects that specific error message.
@@ -143,13 +161,11 @@ export class RunnableBranch {
     const packageJSON = await this.getPackageJSON();
 
     // We'll want to update development/test HTML as necessary, since they'll include the version
-    // TODO: use await checkout.hasGruntRepoFlag(); https://github.com/phetsims/totality/issues/140
-    await execute( gruntCommand, [ 'generate-development-html', `--repo=${this.repo}` ], `${this.checkout.workingDirectory}/chipper` );
+    await this.grunt( [ 'generate-development-html' ] );
     await this.checkout.gitAdd( `${this.repo}/${this.repo}_en.html` );
 
     if ( packageJSON.phet?.generatedUnitTests ) {
-      // TODO: use await checkout.hasGruntRepoFlag(); https://github.com/phetsims/totality/issues/140
-      await execute( gruntCommand, [ 'generate-test-html', `--repo=${this.repo}` ], '../chipper' );
+      await this.grunt( [ 'generate-test-html' ] );
       await this.checkout.gitAdd( `${this.repo}/${this.repo}-tests.html` );
     }
     if ( !( await this.checkout.isClean() ) ) {
@@ -231,14 +247,12 @@ export class RunnableBranch {
     winston.info( 'Updating branch README' );
 
     try {
-      // TODO: use await checkout.hasGruntRepoFlag(); https://github.com/phetsims/totality/issues/140
-      await execute( gruntCommand, [ 'published-readme', `--repo=${this.repo}` ], this.checkout.workingDirectory );
+      await this.grunt( [ 'published-readme' ] );
     }
     catch( e ) {
       winston.info( 'published-readme error, may not exist, will try generate-published-README' );
       try {
-        // TODO: use await checkout.hasGruntRepoFlag(); https://github.com/phetsims/totality/issues/140
-        await execute( gruntCommand, [ 'generate-published-README', `--repo=${this.repo}` ], this.checkout.workingDirectory );
+        await this.grunt( [ 'generate-published-README' ] );
       }
       catch( e ) {
         winston.info( 'No published README generation found' );
