@@ -8,7 +8,6 @@
 
 import assert from 'assert';
 import fs from 'fs';
-import _ from 'lodash';
 import winston from 'winston';
 import { production } from '../../grunt/production.js';
 import { rc } from '../../grunt/rc.js';
@@ -83,7 +82,7 @@ export class Maintenance {
     // TODO: add checks to see if release branches have a last commit that is a "post-deploy" commit (!) https://github.com/phetsims/totality/issues/140
     // TODO: This will likely be done AFTER we do everything else https://github.com/phetsims/totality/issues/140
 
-    // TODO: .... nothing else to do, right? https://github.com/phetsims/totality/issues/140
+    // TODO: Have a definitive commit message type after version is incremented https://github.com/phetsims/totality/issues/140
 
     console.log( 'no checks done, TODO' );
   }
@@ -822,7 +821,10 @@ export class Maintenance {
    * Looks up a patch by its name.
    */
   public findPatch( patchName: string ): Patch {
-    // TODO: assert if two patches have the same name, https://github.com/phetsims/perennial/issues/369
+    if ( this.patches.filter( patch => patch.name === patchName ).length > 1 ) {
+      throw new Error( `Multiple patches with the same name are not concurrently supported: ${patchName}` );
+    }
+
     const patch = this.patches.find( p => p.name === patchName );
     assert( patch, `Patch not found for ${patchName}` );
 
@@ -927,8 +929,25 @@ export class Maintenance {
         }
       };
 
-      // TODO: lines https://github.com/phetsims/totality/issues/140
-      console.log( `${getStatusString( modifiedBranch.lastUpdate )} ${getStatusString( modifiedBranch.lastTranspile )} ${getStatusString( modifiedBranch.lastBuild )} ${getStatusString( modifiedBranch.lastUnbuiltCheck )} ${getStatusString( modifiedBranch.lastBuiltCheck )} ${await modifiedBranch.releaseBranch.getDivergingTimestampString()} ${modifiedBranch.repo} ${modifiedBranch.branch} ${modifiedBranch.brands.join( ',' )}` );
+      console.log( `${
+        getStatusString( modifiedBranch.lastUpdate )
+      } ${
+        getStatusString( modifiedBranch.lastTranspile )
+      } ${
+        getStatusString( modifiedBranch.lastBuild )
+      } ${
+        getStatusString( modifiedBranch.lastUnbuiltCheck )
+      } ${
+        getStatusString( modifiedBranch.lastBuiltCheck )
+      } ${
+        await modifiedBranch.releaseBranch.getDivergingTimestampString()
+      } ${
+        modifiedBranch.repo
+      } ${
+        modifiedBranch.branch
+      } ${
+        modifiedBranch.brands.join( ',' )
+      }` );
     }
   }
 

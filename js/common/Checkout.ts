@@ -168,8 +168,6 @@ export class Checkout {
     branchOrSHA: BranchOrSHA,
     referenceReleaseBranch?: ReleaseBranch
   ): Promise<Checkout> {
-    // TODO: Must be manually created right now, fix that (!) https://github.com/phetsims/totality/issues/140
-
     const checkout = new Checkout( branchOrSHA, false, true, MAINTENANCE_WORKTREE_DIRECTORY, true );
 
     if ( referenceReleaseBranch ) {
@@ -284,7 +282,8 @@ export class Checkout {
       throw new Error( 'Should not be getting a worktree directory for main branch' );
     }
 
-    // TODO: do we need escaping at all, if one branch is a substring of another? (e.g. feature/foo, feature/foo/bar) https://github.com/phetsims/totality/issues/140
+    // NOTE: Assuming, based on the spec of branch names, that we do not need to do any escaping here, since there
+    // will be no overlap
     return `${WORKTREE_DIRECTORY}/${branch}`;
   }
 
@@ -964,8 +963,6 @@ export class Checkout {
    *
    * NOTABLY this should NOT be used for things that e.g. check the current state of a specific checkout, OR things that
    * mutate the checkout.
-   *
-   * TODO: where am I not using this where I should be? https://github.com/phetsims/totality/issues/140
    */
   public getAnyWorkingDirectory(): string {
     return this.isCheckedOut ? this.workingDirectory : '..';

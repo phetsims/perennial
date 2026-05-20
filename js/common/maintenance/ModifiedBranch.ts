@@ -36,6 +36,8 @@ export type UpdateTestingOptions = {
   build?: boolean;
   unbuiltCheck?: boolean;
   builtCheck?: boolean;
+
+  retest?: boolean; // If true, it will re-run tests even if the SHA is the same.
 };
 
 export type LastRun = null | ( {
@@ -100,6 +102,7 @@ export class ModifiedBranch {
     const runBuild = options?.build ?? true;
     const runUnbuiltCheck = options?.unbuiltCheck ?? runTranspile;
     const runBuiltCheck = options?.builtCheck ?? runBuild;
+    const retest = options?.retest ?? false;
 
     const currentSHA = await this.releaseBranch.checkout.getSHA();
 
@@ -113,7 +116,7 @@ export class ModifiedBranch {
       shouldRun: boolean,
       runFunction: () => Promise<void>
     ): Promise<LastRun> => {
-      const isUpToDate = !!oldLastRun && oldLastRun.sha === currentSHA;
+      const isUpToDate = !retest && !!oldLastRun && oldLastRun.sha === currentSHA;
 
       if ( isUpToDate ) {
         return oldLastRun;
