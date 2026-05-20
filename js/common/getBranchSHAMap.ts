@@ -7,7 +7,7 @@
  */
 
 import winston from 'winston';
-import { gitImmutableExecute } from './gitMutex.js';
+import { gitImmutableExecute } from './git/gitMutex.js';
 import { Branch, SHA } from '../browser-and-node/PerennialTypes.js';
 
 export const getBranchSHAMap = async (): Promise<Record<Branch, SHA>> => {

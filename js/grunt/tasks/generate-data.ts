@@ -19,7 +19,7 @@
 
 import winston from 'winston';
 import { IntentionalPerennialAny } from '../../browser-and-node/PerennialTypes.js';
-import { getActiveRepos } from '../../common/getActiveRepos.js';
+import { getActiveRepos } from '../../common/repos/getActiveRepos.js';
 import fs from 'fs';
 import os from 'os';
 

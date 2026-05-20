@@ -6,19 +6,19 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import SimVersion from '../browser-and-node/SimVersion.js';
+import SimVersion from '../../browser-and-node/SimVersion.js';
 import assert from 'assert';
-import { vpnCheck } from '../common/vpnCheck.js';
-import { getBranch } from '../common/getBranch.js';
-import { Checkout } from '../common/Checkout.js';
-import { lintProject } from '../common/lintProject.js';
-import { buildLocal } from '../common/buildLocal.js';
-import { devDirectoryExists } from '../common/devDirectoryExists.js';
-import { booleanPrompt } from '../common/booleanPrompt.js';
+import { vpnCheck } from '../vpnCheck.js';
+import { getBranch } from '../git/getBranch.js';
+import { Checkout } from '../Checkout.js';
+import { lintProject } from '../lintProject.js';
+import { buildLocal } from '../buildLocal.js';
+import { devDirectoryExists } from '../devDirectoryExists.js';
+import { booleanPrompt } from '../booleanPrompt.js';
 import winston from 'winston';
-import writePhetioHtaccess from '../common/writePhetioHtaccess.js';
-import { devSsh } from '../common/devSsh.js';
-import { devScp } from '../common/devScp.js';
+import writePhetioHtaccess from '../writePhetioHtaccess.js';
+import { devSsh } from '../devSsh.js';
+import { devScp } from '../devScp.js';
 
 class DevDeployError extends Error {
   public constructor( message: string ) {

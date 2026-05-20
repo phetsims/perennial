@@ -6,7 +6,7 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-const gitFetchCheckout = require( './gitFetchCheckout' );
+const gitFetchCheckout = require( './git/gitFetchCheckout' );
 const npmUpdate = require( './npmUpdate' );
 const winston = require( 'winston' );
 

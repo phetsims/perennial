@@ -12,10 +12,10 @@
 
 import assert from 'assert';
 import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
-import { getBranch } from '../../common/getBranch.js';
-import { dev } from '../dev.js';
+import { getBranch } from '../../common/git/getBranch.js';
+import { dev } from '../../common/deployment/dev.js';
 import getOption from './util/getOption.js';
-import { gitCheckout } from '../../common/gitCheckout.js';
+import { gitCheckout } from '../../common/git/gitCheckout.js';
 
 ( async () => {
 

@@ -12,7 +12,7 @@
 
 import assert from 'assert';
 import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
-import { rc } from '../rc.js';
+import { rc } from '../../common/deployment/rc.js';
 import getOption from './util/getOption.js';
 
 ( async () => {

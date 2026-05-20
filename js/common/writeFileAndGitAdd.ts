@@ -9,8 +9,8 @@
 import fs from 'fs';
 import grunt from '../npm-dependencies/grunt.js';
 import fixEOL from './fixEOL.js';
-import { gitIsClean } from './gitIsClean.js';
-import { gitAdd } from './gitAdd.js';
+import { gitIsClean } from './git/gitIsClean.js';
+import { gitAdd } from './git/gitAdd.js';
 
 export const writeFileAndGitAdd = async ( relativeFile: string, content: string ): Promise<void> => {
 

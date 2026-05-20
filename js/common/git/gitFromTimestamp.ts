@@ -7,7 +7,7 @@
  */
 
 import { gitImmutableExecute } from './gitMutex.js';
-import { Branch } from '../browser-and-node/PerennialTypes.js';
+import { Branch } from '../../browser-and-node/PerennialTypes.js';
 
 /**
  * Gets the best SHA from a given branch at the given timestamp

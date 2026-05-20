@@ -6,17 +6,17 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import SimVersion from '../browser-and-node/SimVersion.js';
-import { Checkout } from '../common/Checkout.js';
-import { gitIsClean } from '../common/gitIsClean.js';
-import { hasRemoteBranch } from '../common/hasRemoteBranch.js';
-import { vpnCheck } from '../common/vpnCheck.js';
-import { booleanPrompt } from '../common/booleanPrompt.js';
-import simMetadata from '../common/simMetadata.js';
+import SimVersion from '../../browser-and-node/SimVersion.js';
+import { Checkout } from '../Checkout.js';
+import { gitIsClean } from '../git/gitIsClean.js';
+import { hasRemoteBranch } from '../hasRemoteBranch.js';
+import { vpnCheck } from '../vpnCheck.js';
+import { booleanPrompt } from '../booleanPrompt.js';
+import simMetadata from '../simMetadata.js';
 import assert from 'assert';
 import winston from 'winston';
-import buildServerRequest from '../common/buildServerRequest.js';
-import { buildLocal } from '../common/buildLocal.js';
+import buildServerRequest from '../buildServerRequest.js';
+import { buildLocal } from '../buildLocal.js';
 
 class ProductionDeployError extends Error {
   public constructor( message: string ) {

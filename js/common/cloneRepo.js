@@ -6,7 +6,7 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-const gitCloneDirectory = require( './gitCloneDirectory' );
+const gitCloneDirectory = require( './git/gitCloneDirectory' );
 
 /**
  * Clones the given repo name into the working copy

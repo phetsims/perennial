@@ -10,7 +10,7 @@
 
 
 const execute = require( '../common/execute' ).default;
-const getBranches = require( '../common/getBranches' );
+const getBranches = require( '../common/git/getBranches' );
 const gruntCommand = require( '../common/gruntCommand' );
 const qunit = require( 'qunit' );
 

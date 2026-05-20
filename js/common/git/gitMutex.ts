@@ -10,7 +10,7 @@
  */
 
 import { Mutex } from 'async-mutex';
-import execute, { ExecuteOptions, ExecuteResult } from './execute.js';
+import execute, { ExecuteOptions, ExecuteResult } from '../execute.js';
 import fs from 'fs';
 
 export const gitMutex = new Mutex();

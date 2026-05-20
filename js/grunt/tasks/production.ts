@@ -13,7 +13,7 @@
 import assert from 'assert';
 import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
 import { markRunnableAsPublished } from '../../common/markRunnableAsPublished.js';
-import { production } from '../production.js';
+import { production } from '../../common/deployment/production.js';
 import getOption from './util/getOption.js';
 
 ( async () => {

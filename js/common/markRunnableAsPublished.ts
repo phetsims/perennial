@@ -7,9 +7,9 @@
  */
 
 import fs from 'fs';
-import { gitAdd } from './gitAdd.js';
-import { gitCommit } from './gitCommit.js';
-import { gitPush } from './gitPush.js';
+import { gitAdd } from './git/gitAdd.js';
+import { gitCommit } from './git/gitCommit.js';
+import { gitPush } from './git/gitPush.js';
 import { Repo } from '../browser-and-node/PerennialTypes.js';
 
 export const markRunnableAsPublished = async ( runnable: Repo ): Promise<void> => {

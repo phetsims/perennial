@@ -8,7 +8,7 @@
  */
 
 import { gitImmutableExecute } from './gitMutex.js';
-import { BranchOrSHA } from '../browser-and-node/PerennialTypes.js';
+import { BranchOrSHA } from '../../browser-and-node/PerennialTypes.js';
 
 /**
  * Gets the contents of the file at a given state in the git tree

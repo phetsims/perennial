@@ -19,7 +19,7 @@
  */
 
 import _ from 'lodash';
-import typeCheck, { CheckOptions } from '../typeCheck.js';
+import typeCheck, { CheckOptions } from '../../common/typeCheck.js';
 import getOption, { isOptionKeyProvided } from './util/getOption.js';
 import getRepo from './util/getRepo.js';
 

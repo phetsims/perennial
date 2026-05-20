@@ -14,10 +14,10 @@ const build = require( '../common/build' );
 const copyFile = require( '../common/copyFile' );
 const execute = require( '../common/execute' ).default;
 const { getRunnableVersion } = require( '../common/getRunnableVersion' );
-const gitAdd = require( '../common/gitAdd' );
-const gitCommit = require( '../common/gitCommit' );
-const gitIsClean = require( '../common/gitIsClean' );
-const gitPush = require( '../common/gitPush' );
+const gitAdd = require( '../common/git/gitAdd' );
+const gitCommit = require( '../common/git/gitCommit' );
+const gitIsClean = require( '../common/git/gitIsClean' );
+const gitPush = require( '../common/git/gitPush' );
 const hasRemoteBranch = require( '../common/hasRemoteBranch' );
 const npmUpdate = require( '../common/npmUpdate' );
 

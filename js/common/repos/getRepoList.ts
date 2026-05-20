@@ -7,7 +7,7 @@
  */
 
 import fs from 'fs';
-import { Repo } from '../browser-and-node/PerennialTypes.js';
+import { Repo } from '../../browser-and-node/PerennialTypes.js';
 
 /**
  * Returns a list of repositories based on data in perennial/data.

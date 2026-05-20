@@ -18,7 +18,7 @@ import getOption from './util/getOption.js';
 import { Checkout } from '../../common/Checkout.js';
 import { ReleaseBranch } from '../../common/ReleaseBranch.js';
 import pLimit from 'p-limit';
-import { gitFetch } from '../../common/gitFetch.js';
+import { gitFetch } from '../../common/git/gitFetch.js';
 import winston from 'winston';
 import cliProgress from 'cli-progress';
 

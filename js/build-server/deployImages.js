@@ -2,9 +2,9 @@
 // @author Matt Pennington (PhET Interactive Simulations)
 
 const execute = require( '../common/execute' ).default;
-const gitCheckoutDirectory = require( '../common/gitCheckoutDirectory' );
+const gitCheckoutDirectory = require( '../common/git/gitCheckoutDirectory' );
 const gitCloneOrFetchDirectory = require( '../common/gitCloneOrFetchDirectory' );
-const gitPullDirectory = require( '../common/gitPullDirectory' );
+const gitPullDirectory = require( '../common/git/gitPullDirectory' );
 const npmUpdateDirectory = require( '../common/npmUpdateDirectory' );
 const constants = require( './constants' );
 const fs = require( 'fs' );

@@ -22,7 +22,7 @@ import _ from 'lodash';
 import process from 'process';
 import { buildLocal } from '../common/buildLocal.js';
 import { createDirectory } from '../common/createDirectory.js';
-import { getRepoList } from '../common/getRepoList.js';
+import { getRepoList } from '../common/repos/getRepoList.js';
 import lint from '../eslint/lint.js';
 import { getOption } from '../grunt/tasks/util/getOption.js';
 

@@ -7,7 +7,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import { getRepoList } from '../common/getRepoList.js';
+import { getRepoList } from '../common/repos/getRepoList.js';
 import { Repo } from '../browser-and-node/PerennialTypes.js';
 import getOption, { isOptionKeyProvided } from '../grunt/tasks/util/getOption.js';
 

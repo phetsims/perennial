@@ -4,7 +4,7 @@
 const axios = require( 'axios' );
 const getFullStringMap = require( './getFullStringMap' );
 const loadJSON = require( '../common/loadJSON' );
-const gitCheckout = require( '../common/gitCheckout' );
+const gitCheckout = require( '../common/git/gitCheckout' );
 
 /**
  * NOTE: release branch NEEDS to be checked out for this to be called, since we'll need the dependencies.json file

@@ -6,7 +6,7 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-const getRepoList = require( './getRepoList' );
+const getRepoList = require( './repos/getRepoList' );
 const fs = require( 'fs' );
 
 /**

@@ -8,8 +8,8 @@
 
 import { BranchOrSHA, IntentionalPerennialAny } from '../browser-and-node/PerennialTypes.js';
 import { ensureLocalBranchFromRemote } from './ensureLocalBranchFromRemote.js';
-import { gitCatFile } from './gitCatFile.js';
-import { gitImmutableExecute } from './gitMutex.js';
+import { gitCatFile } from './git/gitCatFile.js';
+import { gitImmutableExecute } from './git/gitMutex.js';
 
 export const getFileAtBranch = async (
   branch: BranchOrSHA,

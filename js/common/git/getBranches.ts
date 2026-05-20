@@ -8,7 +8,7 @@
 
 import winston from 'winston';
 import { gitImmutableExecute } from './gitMutex.js';
-import { Branch } from '../browser-and-node/PerennialTypes.js';
+import { Branch } from '../../browser-and-node/PerennialTypes.js';
 
 export const getBranches = async (): Promise<Branch[]> => {
   winston.debug( 'retrieving branches' );

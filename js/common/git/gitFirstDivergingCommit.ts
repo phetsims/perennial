@@ -11,7 +11,7 @@
  */
 
 import { gitImmutableExecute } from './gitMutex.js';
-import { SHA } from '../browser-and-node/PerennialTypes.js';
+import { SHA } from '../../browser-and-node/PerennialTypes.js';
 
 /**
  * @param primaryTarget - Branch/SHA

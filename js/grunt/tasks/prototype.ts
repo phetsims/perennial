@@ -11,7 +11,7 @@
  */
 import assert from 'assert';
 import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
-import { production } from '../production.js';
+import { production } from '../../common/deployment/production.js';
 import getOption from './util/getOption.js';
 
 ( async () => {

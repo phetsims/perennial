@@ -10,7 +10,7 @@
 const cloneRepo = require( './cloneRepo' );
 const getMissingRepos = require( './getMissingRepos' );
 const winston = require( 'winston' );
-const { gitMutableExecute } = require( './gitMutex' );
+const { gitMutableExecute } = require( './git/gitMutex' );
 
 /**
  * Clones missing repositories

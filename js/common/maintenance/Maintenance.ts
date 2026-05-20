@@ -9,16 +9,16 @@
 import assert from 'assert';
 import fs from 'fs';
 import winston from 'winston';
-import { production } from '../../grunt/production.js';
-import { rc } from '../../grunt/rc.js';
+import { production } from '../deployment/production.js';
+import { rc } from '../deployment/rc.js';
 import { DeployedLinkOptions, LastRun, ModifiedBranch, UpdateTestingOptions } from './ModifiedBranch.js';
 import { RELEASE_BRANCH_DEFAULT_CONCURRENT_LIMIT, ReleaseBranch } from '../ReleaseBranch.js';
 import { Patch } from './Patch.js';
 import { Checkout } from '../Checkout.js';
 import { LegacyBranch, Repo, SHA } from '../../browser-and-node/PerennialTypes.js';
-import { gitImmutableExecute } from '../gitMutex.js';
+import { gitImmutableExecute } from '../git/gitMutex.js';
 import { buildLocal } from '../buildLocal.js';
-import { limitedMap } from '../limitedMap.js';
+import { limitedMap } from '../async/limitedMap.js';
 import { ANSI_GREEN, ANSI_RED, ANSI_RESET, ANSI_YELLOW } from '../ANSI.js';
 
 // constants

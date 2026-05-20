@@ -28,8 +28,8 @@ import path from 'path';
 import process from 'process';
 import { Repo } from '../browser-and-node/PerennialTypes.js';
 import callbackOnWorkers from '../common/callbackOnWorkers.js';
-import { getActiveSceneryStackRepos } from '../common/getActiveSceneryStackRepos.js';
-import { tscCleanRepo } from '../grunt/typeCheck.js';
+import { getActiveSceneryStackRepos } from '../common/repos/getActiveSceneryStackRepos.js';
+import { tscCleanRepo } from '../common/typeCheck.js';
 import { DEBUG_PHET_LINT } from './lint.js';
 
 // It is problematic for every repo to have a eslint.config.mjs, so it is preferable to opt-out some repos here, see https://github.com/phetsims/chipper/issues/1484

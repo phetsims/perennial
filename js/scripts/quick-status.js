@@ -10,8 +10,8 @@
  */
 
 const execute = require( '../common/execute' ).default;
-const getActiveRepos = require( '../common/getActiveRepos' );
-const gitRevParse = require( '../common/gitRevParse' );
+const getActiveRepos = require( '../common/repos/getActiveRepos' );
+const gitRevParse = require( '../common/git/gitRevParse' );
 const winston = require( 'winston' );
 
 winston.default.transports.console.level = 'error';

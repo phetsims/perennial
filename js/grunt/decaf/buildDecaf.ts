@@ -18,7 +18,7 @@ import getPreloads from './getPreloads.js';
 
 const assert = require( 'assert' );
 const copyFile = require( '../../common/copyFile.js' );
-const gitRevParse = require( '../../common/gitRevParse.js' );
+const gitRevParse = require( '../../common/git/gitRevParse.js' );
 const loadJSON = require( '../../common/loadJSON.js' );
 const writeJSON = require( '../../common/writeJSON.js' );
 const path = require( 'path' );

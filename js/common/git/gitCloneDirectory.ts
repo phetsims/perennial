@@ -7,9 +7,9 @@
  */
 
 import winston from 'winston';
-import { getActiveSceneryStackRepos } from './getActiveSceneryStackRepos.js';
+import { getActiveSceneryStackRepos } from '../repos/getActiveSceneryStackRepos.js';
 import { gitImmutableExecute } from './gitMutex.js';
-import { Repo } from '../browser-and-node/PerennialTypes.js';
+import { Repo } from '../../browser-and-node/PerennialTypes.js';
 
 export const gitCloneDirectory = async ( repo: Repo, directory: string ): Promise<void> => {
   winston.info( `cloning repo ${repo} in ${directory}` );

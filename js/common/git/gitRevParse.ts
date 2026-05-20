@@ -7,7 +7,7 @@
  */
 
 import { gitImmutableExecute } from './gitMutex.js';
-import { SHA } from '../browser-and-node/PerennialTypes.js';
+import { SHA } from '../../browser-and-node/PerennialTypes.js';
 
 /**
  * Gets a single commit for a given query

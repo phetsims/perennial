@@ -14,8 +14,8 @@ import { Repo } from '../browser-and-node/PerennialTypes.js';
 import winston from '../npm-dependencies/winston.js';
 import dirname from './dirname.js';
 import { ExecuteResult } from './execute.js';
-import { getActiveRepos } from './getActiveRepos.js';
-import { gitMutableExecute } from './gitMutex.js';
+import { getActiveRepos } from './repos/getActiveRepos.js';
+import { gitMutableExecute } from './git/gitMutex.js';
 
 // @ts-expect-error ok to use import meta here
 const __dirname = dirname( import.meta.url );

@@ -9,7 +9,7 @@
  */
 
 const _ = require( 'lodash' );
-const gitIsAncestor = require( './gitIsAncestor' );
+const gitIsAncestor = require( './git/gitIsAncestor' );
 const getFileAtBranch = require( './getFileAtBranch' );
 const simPhetioMetadata = require( './simPhetioMetadata' ).default;
 

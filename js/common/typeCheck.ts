@@ -12,9 +12,9 @@ import _ from 'lodash';
 import os from 'os';
 import path from 'path';
 import { Repo } from '../browser-and-node/PerennialTypes.js';
-import execute from '../common/execute.js';
-import fixEOL from '../common/fixEOL.js';
-import { PERENNIAL_ROOT } from '../common/perennialRepoUtils.js';
+import execute from './execute.js';
+import fixEOL from './fixEOL.js';
+import { PERENNIAL_ROOT } from './perennialRepoUtils.js';
 
 const ALL_CONFIG_PATH = `${PERENNIAL_ROOT}/../chipper/dist/tsconfig/all/`;
 const TSC_COMMAND = `${PERENNIAL_ROOT}/node_modules/typescript/bin/tsc`;

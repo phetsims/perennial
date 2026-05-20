@@ -6,16 +6,16 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import SimVersion from '../browser-and-node/SimVersion.js';
-import { Repo } from '../browser-and-node/PerennialTypes.js';
-import { vpnCheck } from '../common/vpnCheck.js';
-import { gitIsClean } from '../common/gitIsClean.js';
-import { hasRemoteBranch } from '../common/hasRemoteBranch.js';
-import { booleanPrompt } from '../common/booleanPrompt.js';
-import { buildLocal } from '../common/buildLocal.js';
-import { devDirectoryExists } from '../common/devDirectoryExists.js';
-import { Checkout } from '../common/Checkout.js';
-import buildServerRequest from '../common/buildServerRequest.js';
+import SimVersion from '../../browser-and-node/SimVersion.js';
+import { Repo } from '../../browser-and-node/PerennialTypes.js';
+import { vpnCheck } from '../vpnCheck.js';
+import { gitIsClean } from '../git/gitIsClean.js';
+import { hasRemoteBranch } from '../hasRemoteBranch.js';
+import { booleanPrompt } from '../booleanPrompt.js';
+import { buildLocal } from '../buildLocal.js';
+import { devDirectoryExists } from '../devDirectoryExists.js';
+import { Checkout } from '../Checkout.js';
+import buildServerRequest from '../buildServerRequest.js';
 import winston from 'winston';
 
 class RCDeployError extends Error {

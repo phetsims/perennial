@@ -10,7 +10,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import { getRepoList } from './common/getRepoList.js';
+import { getRepoList } from './common/repos/getRepoList.js';
 import fs from 'fs';
 
 // --importedRepos=repo1,repo2,... restricts all repo lists to this set (for totality monorepo).

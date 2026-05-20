@@ -14,7 +14,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import { sleep } from './sleep.js';
+import { sleep } from './async/sleep.js';
 import _ from 'lodash';
 import winston from 'winston';
 import puppeteer from 'puppeteer';

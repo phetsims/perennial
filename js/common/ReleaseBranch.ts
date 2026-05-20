@@ -11,8 +11,8 @@ import assert from 'assert';
 import winston from 'winston';
 import { Checkout } from './Checkout.js';
 import { RunnableBranch } from './RunnableBranch.js';
-import { asyncFilter } from './asyncFilter.js';
-import { limitedMap } from './limitedMap.js';
+import { asyncFilter } from './async/asyncFilter.js';
+import { limitedMap } from './async/limitedMap.js';
 import { BuildOptions } from './getBuildArguments.js';
 import { LegacyBranch, Repo } from '../browser-and-node/PerennialTypes.js';
 
