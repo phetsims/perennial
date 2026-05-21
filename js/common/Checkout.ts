@@ -379,6 +379,7 @@ export class Checkout {
     await releaseBranch.setSimVersion( newVersion, message );
 
     // Update the version info in main
+    winston.info( 'Updating main sim version and HTML' );
     // TODO: remove this testing branch for the future https://github.com/phetsims/totality/issues/140 (only support main)
     const mainRunnableBranch = currentBranch === 'main' ? await Checkout.getMainRunnableBranch( repo ) : await ( await Checkout.getCurrentPrimaryCheckout() ).getRunnableBranch( repo );
     await mainRunnableBranch.checkout.gitPullRebase();
