@@ -51,14 +51,17 @@ export const rc = async (
   // Assertions for the version.
   SimVersion.ensureReleaseBranch( legacyBranch );
 
+  winston.info( 'checking vpn' );
   if ( !( await vpnCheck() ) ) {
     throw new RCDeployError( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
   }
 
+  winston.info( 'checking clean main checkout' );
   if ( !await gitIsClean() ) {
     throw new RCDeployError( 'Unclean status on main checkout, cannot create release branch' );
   }
 
+  winston.info( 'checking for remote branch' );
   if ( !( await hasRemoteBranch( Checkout.getReleaseBranchName( repo, legacyBranch ) ) ) ) {
     if ( noninteractive || !await booleanPrompt( `Release branch ${legacyBranch} does not exist. Create it?`, false ) ) {
       throw new RCDeployError( 'Release branch does not exist' );
@@ -70,6 +73,7 @@ export const rc = async (
     await Checkout.createReleaseBranchCheckout( repo, legacyBranch, brands );
   }
 
+  winston.info( 'loading checkout' );
   const releaseBranch = await Checkout.getReleaseBranch( repo, legacyBranch );
   const checkout = releaseBranch.checkout;
 
@@ -82,8 +86,10 @@ export const rc = async (
     }
   }
 
+  winston.info( 'updating worktree' );
   await checkout.updateWorktree();
 
+  winston.info( 'checking clean release branch checkout' );
   if ( !await checkout.isClean() ) {
     throw new RCDeployError( `Unclean status in ${checkout.branch}, cannot deploy` );
   }
@@ -115,12 +121,14 @@ export const rc = async (
 
   // Now this is just a sanity check to ensure that we don't have errors that we're sending to the build server
   if ( !skipBuild ) {
+    winston.info( 'building... (may take a while)' );
     // No special options required here, as we send the main request to the build server
     winston.info( await releaseBranch.build( {
       minify: !noninteractive
     } ) );
   }
 
+  winston.info( 'setting sim version on release branch' );
   await releaseBranch.setSimVersion( version, message );
 
   if ( !skipBuild && !await booleanPrompt( `Please test the built version of ${repo}.\nIs it ready to deploy`, noninteractive ) ) {
@@ -130,6 +138,7 @@ export const rc = async (
   }
 
   // Send the build request
+  winston.info( 'sending build-server request' );
   await buildServerRequest( repo, version, legacyBranch, releaseBranch.getBuildServerBrands(), await checkout.getSHA(), {
     locales: '*',
     servers: [ 'dev' ]

@@ -54,18 +54,22 @@ export const production = async (
 
   SimVersion.ensureReleaseBranch( legacyBranch );
 
+  winston.info( 'checking vpn' );
   if ( !( await vpnCheck() ) ) {
     throw new ProductionDeployError( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
   }
 
+  winston.info( 'checking clean main checkout' );
   if ( !await gitIsClean() ) {
     throw new ProductionDeployError( 'Unclean status on main checkout, cannot create release branch' );
   }
 
+  winston.info( 'checking for remote branch' );
   if ( !( await hasRemoteBranch( Checkout.getReleaseBranchName( repo, legacyBranch ) ) ) ) {
     throw new ProductionDeployError( `Cannot find release branch ${Checkout.getReleaseBranchName( repo, legacyBranch )} for ${repo}` );
   }
 
+  winston.info( 'loading checkout' );
   const releaseBranch = await Checkout.getReleaseBranch( repo, legacyBranch );
   const checkout = releaseBranch.checkout;
 
@@ -81,6 +85,7 @@ export const production = async (
     throw new ProductionDeployError( 'Maintenance patches are not tested' );
   }
 
+  winston.info( 'querying sim metadata' );
   const isFirstVersion = !( await simMetadata( {
     simulation: repo
   } ) ).projects;
@@ -96,8 +101,10 @@ export const production = async (
 
   const published = await releaseBranch.isPublished();
 
+  winston.info( 'updating worktree' );
   await checkout.updateWorktree();
 
+  winston.info( 'checking clean release branch checkout' );
   if ( !await checkout.isClean() ) {
     throw new ProductionDeployError( `Unclean status in ${checkout.branch}, cannot deploy` );
   }
@@ -133,16 +140,19 @@ export const production = async (
   }
 
   if ( versionChanged ) {
+    winston.info( 'setting sim version on release branch' );
     await releaseBranch.setSimVersion( version, message );
   }
 
   // Update the README on the branch
   if ( published ) {
+    winston.info( 'updating production README on release branch' );
     await releaseBranch.updateProductionREADME();
   }
 
   // Now this is just a sanity check to ensure that we don't have errors that we're sending to the build server
   if ( !skipBuild ) {
+    winston.info( 'building... (may take a while)' );
     // No special options required here, as we send the main request to the build server
     winston.info( await releaseBranch.build( {
       minify: !noninteractive
@@ -156,6 +166,7 @@ export const production = async (
   }
 
   // Send the build request
+  winston.info( 'sending build-server request' );
   await buildServerRequest( repo, version, legacyBranch, releaseBranch.getBuildServerBrands(), await checkout.getSHA(), {
     locales: '*',
     servers: [ 'dev', 'production' ]

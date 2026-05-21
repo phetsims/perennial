@@ -13,7 +13,7 @@ export const gitIsAncestor = async (
   possibleAncestor: string,
   possibleDescendant: string
 ): Promise<boolean> => {
-  winston.info( `git check for whether ${possibleAncestor} is an ancestor of ${possibleDescendant}` );
+  winston.debug( `git check for whether ${possibleAncestor} is an ancestor of ${possibleDescendant}` );
 
   return gitImmutableExecute( [ 'merge-base', '--is-ancestor', possibleAncestor, possibleDescendant ], '..' ).then( stdout => Promise.resolve( true ), mergeError => {
     if ( mergeError.code === 1 ) {
