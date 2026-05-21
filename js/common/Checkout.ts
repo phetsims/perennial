@@ -303,11 +303,15 @@ export class Checkout {
     assert( Array.isArray( brands ), 'supported brands required' );
     assert( brands.length >= 1, 'must have a supported brand' );
 
+
     const currentBranch = await getBranch();
     // TODO: remove this testing branch for the future https://github.com/phetsims/totality/issues/140
     if ( currentBranch !== 'main' && currentBranch !== 'features/totality/issues/140' ) {
       throw new Error( `Should be on main to create a release branch, not: ${currentBranch ? currentBranch : '(detached head)'}` );
     }
+
+    // TODO: remove this testing branch for the future https://github.com/phetsims/totality/issues/140 --- only have getMainCheckout() and TEST
+    const primaryCheckout = currentBranch === 'main' ? await Checkout.getMainCheckout() : await Checkout.getCurrentPrimaryCheckout();
 
     const hasBranchAlready = await hasRemoteBranch( branch );
     if ( hasBranchAlready ) {
@@ -329,7 +333,7 @@ export class Checkout {
 
     // get dependencies from main
     winston.info( 'Getting dependency repos' );
-    const dependencies = await ( await checkout.getRunnableBranch( repo ) ).getDependencies();
+    const dependencies = await ( await primaryCheckout.getRunnableBranch( repo ) ).getDependencies();
 
     const releaseBranch = new ReleaseBranch( checkout, repo, legacyBranch, brands, false );
     checkout.releaseBranch = releaseBranch;
