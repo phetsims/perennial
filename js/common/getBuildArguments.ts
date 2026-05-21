@@ -92,8 +92,8 @@ export const getBuildArguments = ( chipperVersion: ChipperVersion, options?: Get
       args.push( '--debugHTML' );
     }
   }
-  // Chipper 2.0
-  else if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
+  // Chipper 2.0/3.0
+  else if ( ( chipperVersion.major === 2 || chipperVersion.major === 3 ) && chipperVersion.minor === 0 ) {
     args.push( `--brands=${brands.join( ',' )}` );
     args.push( `--locales=${locales}` );
     if ( !uglify ) {

@@ -119,12 +119,16 @@ export class RunnableBranch {
       throw new Error( `Cannot build ${this.repo} because it is not checked out` );
     }
 
-    const args = getBuildArguments( await this.checkout.getChipperVersion(), _.merge( {
+    const args = getBuildArguments( await this.checkout.getChipperVersion(), {
       brands: this.brands,
       allHTML: true,
       debugHTML: true,
-      locales: '*'
-    }, options ) );
+      locales: '*',
+
+      // Not using _.merge, since it would combine brands (or arrays) badly)
+      // eslint-disable-next-line phet/no-object-spread-on-non-literals
+      ...options
+    } );
 
     // Deletes the build/ directory for a repo to avoid legacy grunt clean issues that
     // attempt to delete outside the current working directory.
@@ -223,7 +227,11 @@ export class RunnableBranch {
     if ( fs.existsSync( `${this.checkout.workingDirectory}/${packageLockFile}` ) ) {
       const packageLockObject = await this.checkout.getRelativeJSON( packageLockFile );
       packageLockObject.version = versionString;
-      packageLockObject.packages[ '' ].version = versionString;
+
+      // Just double-check, for v1 lockfiles.
+      if ( packageLockObject.packages?.[ '' ] ) {
+        packageLockObject.packages[ '' ].version = versionString;
+      }
       await this.checkout.writeAddRelativeJSON( packageLockFile, packageLockObject );
     }
 

@@ -13,6 +13,7 @@ import { Branch, Repo } from '../browser-and-node/PerennialTypes.js';
 export const getBranchBrands = async ( repo: Repo, branch: Branch ): Promise<string[]> => {
   winston.debug( `Reading version from package.json for ${repo}` );
 
+  // Should only be called on repos with phet defined in package.json, so a hard failure on nonexistence is great.
   const brands = ( await getBranchPackageJSON( repo, branch ) ).phet!.supportedBrands;
 
   if ( !brands || !Array.isArray( brands ) ) {
