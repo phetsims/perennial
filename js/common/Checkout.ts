@@ -314,7 +314,7 @@ export class Checkout {
       throw new Error( 'Branch already exists, aborting' );
     }
 
-    winston.info( 'Setting the release branch version to rc.0 so it will auto-increment to rc.1 for the first RC deployment' );
+    winston.info( 'Will set the release branch version to rc.0 so it will auto-increment to rc.1 for the first RC deployment' );
     const newVersion = new SimVersion( major, minor, 0, {
       testType: 'rc',
       testNumber: 0
@@ -328,6 +328,7 @@ export class Checkout {
     const checkout = new Checkout( branch, false, false, Checkout.getWorktreeDirectory( branch ), false );
 
     // get dependencies from main
+    winston.info( 'Getting dependency repos' );
     const dependencies = await ( await checkout.getRunnableBranch( repo ) ).getDependencies();
 
     const releaseBranch = new ReleaseBranch( checkout, repo, legacyBranch, brands, false );
@@ -341,9 +342,11 @@ export class Checkout {
     await gitMutableExecute( [ 'checkout', currentBranch ], '..' );
 
     // Ensure that we are remotely tracked now (sanity check)
+    winston.info( `Setting up tracking remote branch ${branch}` );
     await ensureLocalBranchFromRemote( branch );
 
     // Ensure we have a checkout (so we can modify and push from that region).
+    winston.info( 'Creating worktree' );
     await checkout.updateWorktree();
 
     // Remove everything except for dependencies, '.git' (so our worktree works), and babel (since we just directly checked it out)
@@ -357,18 +360,23 @@ export class Checkout {
     }
 
     // Add in a minimal .gitignore
+    winston.info( 'Adding .gitignore' );
     await fsPromises.writeFile( `${checkout.workingDirectory}/.gitignore`, `/babel/${os.EOL}.DS_Store${os.EOL}` );
 
+    winston.info( 'Worktree changes add/commit/push' );
     await checkout.gitAddAll();
     await checkout.gitCommit( `Initial commit for release branch ${branch}${message ? `: ${message}` : ''}` );
     await checkout.gitPush();
 
-    // Update the version info (will push)
+    winston.info( 'Worktree setting/pushing supported brands' );
     await releaseBranch.setSupportedBrands( brands );
+
+    winston.info( 'Worktree setting/pushing sim version' );
     await releaseBranch.setSimVersion( newVersion, message );
 
     // Update the version info in main
-    const mainRunnableBranch = await Checkout.getMainRunnableBranch( repo );
+    // TODO: remove this testing branch for the future https://github.com/phetsims/totality/issues/140 (only support main)
+    const mainRunnableBranch = currentBranch === 'main' ? await Checkout.getMainRunnableBranch( repo ) : await ( await Checkout.getCurrentPrimaryCheckout() ).getRunnableBranch( repo );
     await mainRunnableBranch.checkout.gitPullRebase();
     await mainRunnableBranch.setSimVersion( new SimVersion( major, minor + 1, 0, {
       testType: 'dev',
