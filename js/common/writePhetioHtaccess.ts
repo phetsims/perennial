@@ -162,7 +162,7 @@ ${publicAccessDirective}
       throw new Error( 'latestOption is missing one of the required parameters (simName, version, directory, or checkoutDir)' );
     }
   }
-}
+};
 
 function getPublicAccessDirective( commentSymbol: string, packageKey: string ): string {
   return `
@@ -171,4 +171,4 @@ function getPublicAccessDirective( commentSymbol: string, packageKey: string ): 
 ${commentSymbol} Satisfy Any
 ${commentSymbol} Allow from all
 `;
-};
+}

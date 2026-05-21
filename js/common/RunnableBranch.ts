@@ -14,7 +14,6 @@ import { gruntCommand } from './gruntCommand.js';
 import withServer from './withServer.js';
 import { puppeteerLoad } from './puppeteerLoad.js';
 import { BuildOptions, getBuildArguments } from './getBuildArguments.js';
-import _ from 'lodash';
 import SimVersion from '../browser-and-node/SimVersion.js';
 import { PackageJSON, Repo, SupportedBuildServerBrand } from '../browser-and-node/PerennialTypes.js';
 import { getBranchPackageJSON } from './getBranchPackageJSON.js';

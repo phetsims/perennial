@@ -18,6 +18,11 @@
  * @author Chris Malley (PixelZoom, Inc.)
  */
 
+// TODO: update this https://github.com/phetsims/totality/issues/140
+
+// eslint-disable
+// @ts-nocheck
+
 const _ = require( 'lodash' );
 const assert = require( 'assert' );
 const execute = require( '../common/execute' ).default;

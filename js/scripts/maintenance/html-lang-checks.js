@@ -12,8 +12,11 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
+// TODO: this should be adapted for the new API https://github.com/phetsims/totality/issues/140
+// eslint-disable
+// @ts-nocheck
+
 const puppeteerLoad = require( '../../common/puppeteerLoad' );
-const Maintenance = require( '../../common/maintenance/Maintenance' ).default;
 const withServer = require( '../../common/withServer' ).default;
 const winston = require( 'winston' );
 const puppeteer = require( 'puppeteer' );
@@ -45,6 +48,7 @@ const logResult = ( success, message, url ) => {
   await withServer( async port => {
     const server = `http://localhost:${port}`;
     // TODO: update for https://github.com/phetsims/totality/issues/140
+    // eslint-disable-next-line no-undef
     const releaseBranches = await Checkout.getMaintainedReleaseBranches();
 
     const getBuiltURLs = async releaseBranch => {

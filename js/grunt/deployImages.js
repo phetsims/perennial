@@ -6,7 +6,9 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-// TODO: this should be adapted for the new API
+// TODO: this should be adapted for the new API https://github.com/phetsims/totality/issues/140
+// eslint-disable
+// @ts-nocheck
 
 // modules
 const buildLocal = require( '../common/buildLocal' );

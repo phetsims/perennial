@@ -9,6 +9,11 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
+// Disable eslint on whole file correctly
+
+// eslint-disable
+// @ts-nocheck
+
 const SimVersion = require( '../browser-and-node/SimVersion' ).default;
 const build = require( '../common/build' );
 const copyFile = require( '../common/copyFile' );
@@ -57,6 +62,7 @@ module.exports = async function( repo, branch, message ) {
 
   // Create the branch, update the version info
   await execute( 'git', checkoutArgs, `../${repo}` );
+  // eslint-disable-next-line no-undef
   await runnableBranch.setSimVersion( newVersion, message );
   await gitPush( repo, branch );
 
