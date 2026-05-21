@@ -18,7 +18,6 @@ const user = constants.BUILD_SERVER_CONFIG.devUsername;
 const host = constants.BUILD_SERVER_CONFIG.devDeployServer;
 
 export const devDeploy = async (
-  simDir: string,
   simName: Repo,
   versionString: string,
   chipperVersion: ChipperVersion,

@@ -313,6 +313,10 @@ export class RunnableBranch {
     }
   }
 
+  public getBuildDirectory(): string {
+    return `${this.checkout.workingDirectory}/${this.repo}/build`;
+  }
+
   /**
    * Returns the SimVersion for this release branch
    */

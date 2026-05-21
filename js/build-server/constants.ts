@@ -102,10 +102,10 @@ export default {
   AUTHORIZATION_KEY: 'authorizationCode',
   SERVERS_KEY: 'servers',
   BRANDS_KEY: 'brands',
-  PRODUCTION_SERVER: 'production',
-  DEV_SERVER: 'dev',
-  PHET_BRAND: 'phet',
-  PHET_IO_BRAND: 'phet-io',
+  PRODUCTION_SERVER: 'production' as const,
+  DEV_SERVER: 'dev' as const,
+  PHET_BRAND: 'phet' as const,
+  PHET_IO_BRAND: 'phet-io' as const,
   ENGLISH_LOCALE: 'en',
   PERENNIAL: '.'
 };

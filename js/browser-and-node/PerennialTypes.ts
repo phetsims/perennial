@@ -13,6 +13,8 @@ export type LegacyBranch = string; // for release branches, e.g. '1.2'
 export type BranchOrSHA = Branch | SHA; // for cases where we can allow either
 export type BuildServerTarget = 'dev' | 'production';
 
+export type LocalesStringSpecifier = '*' | string; // either '*', or a comma-separated list of locale codes, e.g. 'en,es,fr'
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type IntentionalPerennialAny = any;
 

@@ -10,7 +10,7 @@ import winston from 'winston';
 import axios from 'axios';
 import SimVersion from '../browser-and-node/SimVersion.js';
 import { LegacyBranch, Repo } from '../browser-and-node/PerennialTypes.js';
-import { BuildServerTask } from './taskWorker.js';
+import { BuildServerTask } from './BuildServerTypes.js';
 
 export type NotifyServerOptions = {
   simName: Repo;
@@ -20,7 +20,7 @@ export type NotifyServerOptions = {
   translatorId?: BuildServerTask[ 'userId' ];
   phetioOptions?: {
     version: SimVersion;
-    branch: LegacyBranch;
+    legacyBranch: LegacyBranch;
     suffix: string;
     ignoreForAutomatedMaintenanceReleases: boolean;
   };
@@ -75,7 +75,7 @@ export default async function notifyServer( options: NotifyServerOptions ): Prom
                 }&versionMinor=${options.phetioOptions!.version.minor
                 }&versionMaintenance=${options.phetioOptions!.version.maintenance
                 }&versionSuffix=${options.phetioOptions!.suffix
-                }&branch=${options.phetioOptions!.branch
+                }&branch=${options.phetioOptions!.legacyBranch
                 }&active=${!options.phetioOptions!.ignoreForAutomatedMaintenanceReleases}`;
     const response = await axios( {
       url: url,

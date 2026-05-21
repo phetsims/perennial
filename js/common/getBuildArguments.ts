@@ -9,10 +9,11 @@
 
 import assert from 'assert';
 import type { ChipperVersion } from './ChipperVersion.js';
+import { LocalesStringSpecifier } from '../browser-and-node/PerennialTypes.js';
 
 export type BuildOptions = {
   brands: string[];
-  locales: string;
+  locales: LocalesStringSpecifier;
   allHTML: boolean;
   debugHTML: boolean;
   uglify: boolean;
