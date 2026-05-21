@@ -9,11 +9,11 @@ import fs from 'graceful-fs';
 import { getSortedVersionDirectories } from './getSortedVersionDirectories.js';
 import { parseString } from 'xml2js';
 import winston from 'winston';
-import { LocalesStringSpecifier, Repo } from '../browser-and-node/PerennialTypes.js';
+import { IntentionalPerennialAny, LocalesStringSpecifier, Repo } from '../browser-and-node/PerennialTypes.js';
 
-async function getJsonFromXML( xmlString: string | Buffer ): Promise<any> {
+async function getJsonFromXML( xmlString: string | Buffer ): Promise<IntentionalPerennialAny> {
   return new Promise( ( resolve, reject ) => {
-    parseString( xmlString, ( error: Error | null, json: any ) => {
+    parseString( xmlString, ( error: Error | null, json: IntentionalPerennialAny ) => {
       if ( error ) {
         reject( error );
       }
