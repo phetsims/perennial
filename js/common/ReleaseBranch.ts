@@ -45,6 +45,10 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
   ) {
     super( checkout, repo, brands );
 
+    if ( brands.length === 0 ) {
+      throw new Error( 'A release branch must have at least one brand.' );
+    }
+
     assert( Array.isArray( brands ) );
   }
 

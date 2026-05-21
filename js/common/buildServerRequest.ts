@@ -26,6 +26,10 @@ export const buildServerRequest = async (
   totalitySHA: SHA,
   options?: BuildServerRequestOptions
 ): Promise<void> => {
+  if ( brands.length === 0 ) {
+    throw new Error( 'At least one brand must be specified for a build server request.' );
+  }
+
   const locales = options?.locales ?? '*';
   const servers = options?.servers ?? [ 'dev' ] as const;
 
@@ -51,7 +55,11 @@ export const buildServerRequest = async (
   const url = `${buildLocal.productionServerURL}/deploy-html-simulation`;
 
   winston.info( url );
-  winston.info( JSON.stringify( requestObject ) );
+  winston.info( JSON.stringify( {
+    // eslint-disable-next-line phet/no-object-spread-on-non-literals
+    ...requestObject,
+    authorizationCode: 'REDACTED_FOR_LOGGING'
+  } ) );
 
   let response;
   try {
