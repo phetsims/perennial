@@ -8,7 +8,7 @@
 
 import fs from 'fs';
 import grunt from '../npm-dependencies/grunt.js';
-import fixEOL from './fixEOL.js';
+import { fixEOL } from './fixEOL.js';
 import { gitIsClean } from './git/gitIsClean.js';
 import { gitAdd } from './git/gitAdd.js';
 

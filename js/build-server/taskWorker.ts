@@ -14,7 +14,7 @@ import rsync from 'rsync';
 import SimVersion from '../browser-and-node/SimVersion.js';
 import winston from 'winston';
 import { writePhetHtaccess } from './writePhetHtaccess.js';
-import writePhetioHtaccess from '../common/writePhetioHtaccess.js';
+import { writePhetioHtaccess } from '../common/writePhetioHtaccess.js';
 import { deployImages } from './deployImages.js';
 import * as persistentQueue from './persistentQueue.js';
 import { sendEmail } from './sendEmail.js';

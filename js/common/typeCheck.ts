@@ -13,7 +13,7 @@ import os from 'os';
 import path from 'path';
 import { Repo } from '../browser-and-node/PerennialTypes.js';
 import execute from './execute.js';
-import fixEOL from './fixEOL.js';
+import { fixEOL } from './fixEOL.js';
 import { PERENNIAL_ROOT } from './perennialRepoUtils.js';
 
 const ALL_CONFIG_PATH = `${PERENNIAL_ROOT}/../chipper/dist/tsconfig/all/`;

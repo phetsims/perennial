@@ -16,7 +16,7 @@ import { buildLocal } from '../buildLocal.js';
 import { devDirectoryExists } from '../devDirectoryExists.js';
 import { booleanPrompt } from '../booleanPrompt.js';
 import winston from 'winston';
-import writePhetioHtaccess from '../writePhetioHtaccess.js';
+import { writePhetioHtaccess } from '../writePhetioHtaccess.js';
 import { devSsh } from '../devSsh.js';
 import { devScp } from '../devScp.js';
 

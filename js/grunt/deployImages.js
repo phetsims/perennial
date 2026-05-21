@@ -6,6 +6,8 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
+// TODO: this should be adapted for the new API
+
 // modules
 const buildLocal = require( '../common/buildLocal' );
 const winston = require( 'winston' );

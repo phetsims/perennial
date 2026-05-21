@@ -1,11 +1,14 @@
 // Copyright 2017-2026, University of Colorado Boulder
-// @author Matt Pennington (PhET Interactive Simulations)
 
-const buildLocal = require( './buildLocal' );
-const writeFile = require( './writeFile' );
-const axios = require( 'axios' );
-const fs = require( 'graceful-fs' ); // eslint-disable-line phet/require-statement-match
-const winston = require( 'winston' );
+/**
+ * @author Matt Pennington (PhET Interactive Simulations)
+ */
+
+import { buildLocal } from './buildLocal.js';
+import axios from 'axios';
+import fs from 'graceful-fs';
+import winston from 'winston';
+import { Repo } from '../browser-and-node/PerennialTypes.js';
 
 // A list of directories directly nested under the phet-io build output folder that should be password protected. Slashes
 // added later.
@@ -29,13 +32,17 @@ const htaccessFilename = '.htaccess';
 /**
  * Writes the htaccess file to password protect the exclusive content for phet-io sims
  */
-export default async function writePhetioHtaccess( simName: string, passwordProtectPath: string, latestOption: LatestOption ): Promise<void> {
+export const writePhetioHtaccess = async (
+  simName: Repo,
+  passwordProtectPath: string,
+  latestOption: LatestOption
+): Promise<void> => {
   const authFilepath = '/etc/httpd/conf/phet-io_pw';
 
   const isProductionDeploy = latestOption.isProductionDeploy;
 
-  const simPackage = JSON.parse( fs.readFileSync( `${latestOption.checkoutDir}/${simName}/package.json` ) );
-  const phetioPackage = JSON.parse( fs.readFileSync( `${latestOption.checkoutDir}/phet-io/package.json` ) );
+  const simPackage = JSON.parse( fs.readFileSync( `${latestOption.checkoutDir}/${simName}/package.json`, 'utf-8' ) );
+  const phetioPackage = JSON.parse( fs.readFileSync( `${latestOption.checkoutDir}/phet-io/package.json`, 'utf-8' ) );
 
   // Only allow public accessibility with htaccess mutation if in production deploy when the "allowPublicAccess" flag
   // is present. Commented out lines keep password protection, but comment them in with `allowPublicAccess`.
@@ -98,26 +105,26 @@ ${publicAccessDirective}
         const fullSubdirPath = `${passwordProtectPath}/${subdir}`;
 
         // if the directory exists
-        fs.existsSync( fullSubdirPath ) && await writeFile( `${fullSubdirPath}/${htaccessFilename}`, passwordProtectWrapperContents );
+        fs.existsSync( fullSubdirPath ) && await fs.promises.writeFile( `${fullSubdirPath}/${htaccessFilename}`, passwordProtectWrapperContents );
 
         // Add an additional .htaccess to individual wrappers that are marked as public
         if ( subdir === 'wrappers' && phetioPackageBlock?.publicWrappers ) {
           const publicWrapperContents = getPublicAccessDirective( '', 'publicWrappers' );
           for ( const publicWrapper of phetioPackageBlock.publicWrappers ) {
             const publicWrapperPath = `${fullSubdirPath}/${publicWrapper}`;
-            fs.existsSync( publicWrapperPath ) && await writeFile( `${publicWrapperPath}/${htaccessFilename}`, publicWrapperContents );
+            fs.existsSync( publicWrapperPath ) && await fs.promises.writeFile( `${publicWrapperPath}/${htaccessFilename}`, publicWrapperContents );
           }
 
           const commonWrapperPaths = [ `${fullSubdirPath}/common/css`, `${fullSubdirPath}/common/js/codap` ];
           for ( let i = 0; i < commonWrapperPaths.length; i++ ) {
             const commonWrapperPath = commonWrapperPaths[ i ];
-            fs.existsSync( commonWrapperPath ) && await writeFile( `${commonWrapperPath}/${htaccessFilename}`, publicWrapperContents );
+            fs.existsSync( commonWrapperPath ) && await fs.promises.writeFile( `${commonWrapperPath}/${htaccessFilename}`, publicWrapperContents );
           }
         }
       }
 
       // Root path
-      await writeFile( `${passwordProtectPath}/${htaccessFilename}`, rootHtaccessContent );
+      await fs.promises.writeFile( `${passwordProtectPath}/${htaccessFilename}`, rootHtaccessContent );
     }
     winston.debug( 'phetio authentication htaccess written' );
   }
@@ -145,7 +152,7 @@ ${publicAccessDirective}
       latestRedirectContents += 'RewriteCond %{QUERY_STRING} =download\n' +
                                 'RewriteRule ([^/]*)$ - [L,E=download:$1]\n' +
                                 'Header onsuccess set Content-disposition "attachment; filename=%{download}e" env=download\n';
-      await writeFile( redirectFilepath, latestRedirectContents );
+      await fs.promises.writeFile( redirectFilepath, latestRedirectContents );
     }
     else {
       winston.error( `simName: ${simName}` );
@@ -164,4 +171,4 @@ function getPublicAccessDirective( commentSymbol: string, packageKey: string ): 
 ${commentSymbol} Satisfy Any
 ${commentSymbol} Allow from all
 `;
-}
+};

@@ -7,10 +7,9 @@
  */
 
 import { Locale, Repo } from '../browser-and-node/PerennialTypes.js';
-
-const _ = require( 'lodash' );
-const winston = require( 'winston' );
-const axios = require( 'axios' );
+import _ from 'lodash';
+import winston from 'winston';
+import axios from 'axios';
 
 type SimMetadataOptions = {
   summary: boolean;
@@ -66,15 +65,9 @@ async function simMetadata( providedOptions?: Partial<SimMetadataOptions> ): Pro
 
   winston.debug( `getting metadata request with ${metadataURL}` );
 
-  let response;
-  try {
-    response = await axios( metadataURL );
-  }
-  catch( e ) {
-    throw new Error( `metadata request failed with ${e}` );
-  }
+  const response = await axios( metadataURL );
   if ( response.status !== 200 ) {
-    throw new Error( `metadata request failed with status ${response.status} ${response}` );
+    throw new Error( `metadata request failed with status ${response.status}` );
   }
   else {
     return response.data;
