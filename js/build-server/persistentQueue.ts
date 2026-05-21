@@ -17,7 +17,7 @@ const createNewQueue = (): BuildServerQueue => ( { queue: [], currentTask: null 
 
 export const getQueue = (): BuildServerQueue => {
   try {
-    const buildStatus = JSON.parse( fs.readFileSync( '.build-server-queue' ).toString() );
+    const buildStatus = fs.existsSync( '.build-server-queue' ) ? JSON.parse( fs.readFileSync( '.build-server-queue' ).toString() ) : [];
 
     if ( !Array.isArray( buildStatus.queue ) ) {
       console.error( 'Queue is not an array, found this instead', JSON.stringify( buildStatus.queue ) );
