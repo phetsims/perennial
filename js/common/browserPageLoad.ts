@@ -272,7 +272,7 @@ export async function browserPageLoad( browserCreator: BrowserCreator, url: stri
       }
 
       if ( options.resolveFromLoad ) {
-        let result = null;
+        let result: unknown = null;
         if ( options.evaluate && !page.isClosed() ) {
           result = isPuppeteerPage( page ) ?
                    await page.evaluate( options.evaluate ) :
