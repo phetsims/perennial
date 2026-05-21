@@ -6,9 +6,10 @@
 
 import constants from './constants.js';
 import fs from 'graceful-fs';
-import getSortedVersionDirectories from './getSortedVersionDirectories.js';
+import { getSortedVersionDirectories } from './getSortedVersionDirectories.js';
 import { parseString } from 'xml2js';
 import winston from 'winston';
+import { LocalesStringSpecifier, Repo } from '../browser-and-node/PerennialTypes.js';
 
 async function getJsonFromXML( xmlString: string | Buffer ): Promise<any> {
   return new Promise( ( resolve, reject ) => {
@@ -26,10 +27,10 @@ async function getJsonFromXML( xmlString: string | Buffer ): Promise<any> {
 /**
  * Get all of the deployed locales for the latest deployed version of the specified simulation.  This is generally done
  * before publishing a new version so that we can know which locales to rebuild.
- * @param {String} locales - comma separated list of locale codes
- * @param {String} simName - name of the sim, should match GitHub repo name, e.g. "energy-skate-park-basics"
+ * @param locales - comma separated list of locale codes
+ * @param simName - name of the sim, should match GitHub repo name, e.g. "energy-skate-park-basics"
  */
-export const getLocales = async ( locales: string | null, simName: string ): Promise<string> => {
+export const getLocales = async ( locales: LocalesStringSpecifier, simName: Repo ): Promise<LocalesStringSpecifier> => {
   let callbackLocales = '';
 
   if ( locales && locales !== '*' ) {

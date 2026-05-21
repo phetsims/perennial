@@ -12,7 +12,9 @@ import { BuildServerTarget, LegacyBranch, LocalesStringSpecifier, Repo, SHA, Ver
 export type SupportedBuildServerVersion = '3.0';
 export type SupportedBuildServerBrand = 'phet' | 'phet-io';
 
-export type BuildServerTask = {
+export type BuildServerSimTask = {
+  type: 'sim';
+
   api: SupportedBuildServerVersion;
 
   // lower case simulation name used for creating files/directories
@@ -42,16 +44,25 @@ export type BuildServerTask = {
 
   // If true, this will presumably(?) just deploy images and do nothing else.
   deployImages?: boolean;
+};
 
+export type BuildServerDeployImagesTask = {
+  type: 'deployImages';
+
+  simName?: Repo;
+  versionString?: VersionString;
+};
+
+export type BuildServerTask = {
   ////// Internally-set options during tracking (persistentQueue)
   enqueueTime?: string;
   startTime?: string;
-};
+} & ( BuildServerSimTask | BuildServerDeployImagesTask );
 
 export type BuildServerRequest3_0 = {
   api: '3.0';
   authorizationCode: string;
-} & Pick<BuildServerTask, 'simName' | 'totalitySHA' | 'versionString' | 'locales' | 'servers' | 'brands' | 'legacyBranch' | 'email'>;
+} & Pick<BuildServerSimTask, 'simName' | 'totalitySHA' | 'versionString' | 'locales' | 'servers' | 'brands' | 'legacyBranch' | 'email' | 'userId' | 'deployImages'>;
 
 // Will be able to or (|) in future versions
 export type BuildServerRequest = BuildServerRequest3_0;

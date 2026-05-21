@@ -14,12 +14,12 @@ import fs from 'graceful-fs';
  * necessary, see https://github.com/phetsims/perennial/issues/28.
  *
  * @param path - Filename of the directory.  It's ok if the path does not exist.
- * @returns {Array} - returns a sorted array of version directories.  Returns an empty array if none exist or if the
+ * @returns - returns a sorted array of version directories.  Returns an empty array if none exist or if the
  * path does not exist.
  */
-export default async function getSortedVersionDirectories( path: string ): Promise<string[]> {
+export const getSortedVersionDirectories = async ( path: string ): Promise<string[]> => {
 
-  let versions;
+  let versions: string[];
 
   if ( fs.existsSync( path ) ) {
     versions = fs.readdirSync( path );
@@ -35,7 +35,7 @@ export default async function getSortedVersionDirectories( path: string ): Promi
       return false;
     }
     for ( let i = 0; i < 3; i++ ) {
-      if ( isNaN( splitPath[ i ] ) ) {
+      if ( isNaN( parseInt( splitPath[ i ], 10 ) ) ) {
         return false;
       }
     }
@@ -59,5 +59,6 @@ export default async function getSortedVersionDirectories( path: string ): Promi
     }
     return result;
   } );
+
   return versions;
-}
+};

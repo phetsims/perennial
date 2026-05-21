@@ -38,7 +38,13 @@ const saveQueue = ( queue: BuildServerQueue ): void => {
   fs.writeFileSync( '.build-server-queue', JSON.stringify( queue ) );
 };
 
-const formatTask = ( task: BuildServerTask ): BuildServerTask => ( {
+const formatTask = ( task: BuildServerTask ): BuildServerTask => ( task.type === 'deployImages' ? {
+  type: task.type,
+  simName: task.simName,
+  versionString: task.versionString,
+  enqueueTime: task.enqueueTime
+} : {
+  type: task.type,
   api: task.api,
   simName: task.simName,
   versionString: task.versionString,
@@ -51,7 +57,7 @@ const formatTask = ( task: BuildServerTask ): BuildServerTask => ( {
   userId: task.userId,
   deployImages: task.deployImages,
   enqueueTime: task.enqueueTime
-} );
+} ) as BuildServerTask; // NOTE: these aren't actually build server tasks!!! Keeping the same typing as before.
 
 export const addTask = ( task: BuildServerTask ): void => {
   const buildStatus = getQueue();

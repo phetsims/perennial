@@ -10,14 +10,14 @@ import winston from 'winston';
 import axios from 'axios';
 import SimVersion from '../browser-and-node/SimVersion.js';
 import { LegacyBranch, Repo } from '../browser-and-node/PerennialTypes.js';
-import { BuildServerTask } from './BuildServerTypes.js';
+import { BuildServerSimTask } from './BuildServerTypes.js';
 
 export type NotifyServerOptions = {
   simName: Repo;
-  email?: BuildServerTask[ 'email' ];
+  email?: BuildServerSimTask[ 'email' ];
   brand: string;
-  locales?: BuildServerTask[ 'locales' ];
-  translatorId?: BuildServerTask[ 'userId' ];
+  locales?: BuildServerSimTask[ 'locales' ];
+  translatorId?: BuildServerSimTask[ 'userId' ];
   phetioOptions?: {
     version: SimVersion;
     legacyBranch: LegacyBranch;

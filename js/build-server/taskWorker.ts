@@ -18,7 +18,7 @@ import writePhetioHtaccess from '../common/writePhetioHtaccess.js';
 import { deployImages } from './deployImages.js';
 import * as persistentQueue from './persistentQueue.js';
 import { sendEmail } from './sendEmail.js';
-import { BuildServerTask } from './BuildServerTypes.js';
+import { BuildServerSimTask, BuildServerTask } from './BuildServerTypes.js';
 import { Checkout } from '../common/Checkout.js';
 
 /**
@@ -52,9 +52,12 @@ const afterDeploy = async ( buildDir: string ): Promise<void> => {
 async function runTask( task: BuildServerTask ): Promise<void> {
   persistentQueue.startTask( task );
 
-  if ( task.deployImages ) {
+  if ( task.type === 'deployImages' ) {
     try {
-      await deployImages( task );
+      await deployImages( {
+        simulation: task.simName,
+        version: task.versionString
+      } );
       return;
     }
     catch( e ) {
@@ -66,7 +69,7 @@ async function runTask( task: BuildServerTask ): Promise<void> {
 
   try {
     try {
-      validateBuildServerTask( task );
+      validateBuildServerSimTask( task );
     }
     catch( e ) {
       await abortBuild( e instanceof Error ? e : new Error( `Error validating task: ${e}` ) );
@@ -226,7 +229,6 @@ async function runTask( task: BuildServerTask ): Promise<void> {
           if ( !isTranslationRequest ) {
             await deployImages( {
               simulation: task.simName,
-              brands: task.brands,
               version: task.versionString
             } );
           }
@@ -312,7 +314,7 @@ export const taskWorker = (
   } );
 };
 
-export const validateBuildServerTask = ( task: BuildServerTask ): void => {
+export const validateBuildServerSimTask = ( task: BuildServerSimTask ): void => {
   if ( task.api !== '3.0' ) {
     throw new Error( `Unsupported API version: ${task.api}` );
   }

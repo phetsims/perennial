@@ -5,8 +5,9 @@
  */
 
 import * as persistentQueue from './persistentQueue.js';
+import { Request, Response } from 'express';
 
-export default function getStatus( req: any, res: any ): void {
+export default function getStatus( req: Request, res: Response ): void {
   const buildStatus = persistentQueue.getQueue();
   res.render( 'getStatus', {
     builds: buildStatus.queue,

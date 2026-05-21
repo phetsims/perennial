@@ -22,8 +22,7 @@ import _ from 'lodash';
 import parseArgs from 'minimist';
 import * as persistentQueue from './persistentQueue.js';
 import getStatus from './getStatus.js';
-
-type BuildServerTask = any; // TODO: model legacy build-server task shape.
+import { BuildServerRequest, BuildServerSimTask, BuildServerTask } from './BuildServerTypes.js';
 
 // set this process up with the appropriate permissions, value is in octal
 process.umask( 0o0002 );
@@ -73,96 +72,49 @@ const verbose = options.verbose;
 
 const taskQueue = async.queue<BuildServerTask>( taskWorker, 1 ); // 1 is the max number of tasks that can run concurrently
 
-/**
- * Handle chipper 1.0 requests
- */
-const queueDeployApiVersion1 = (
-  req: Request,
-  res: Response,
-  key: 'query' | 'body'
-): void => {
-  const repos = JSON.parse( decodeURIComponent( req[ key ][ constants.REPOS_KEY ] ) );
-  const simName = decodeURIComponent( req[ key ][ constants.SIM_NAME_KEY ] );
-  const version = decodeURIComponent( req[ key ][ constants.VERSION_KEY ] );
-  const locales = decodeURIComponent( req[ key ][ constants.LOCALES_KEY ] ) || null;
-  const option = decodeURIComponent( req[ key ][ constants.OPTION_KEY ] ) || 'default';
-  const email = decodeURIComponent( req[ key ][ constants.EMAIL_KEY ] ) || null;
-  const translatorId = decodeURIComponent( req[ key ][ constants.USER_ID_KEY ] ) || null;
-  const authorizationKey = decodeURIComponent( req[ key ][ constants.AUTHORIZATION_KEY ] );
-  const branch = decodeURIComponent( req[ key ][ constants.BRANCH_KEY ] ) || repos[ simName ].branch;
-
-  // TODO https://github.com/phetsims/perennial/issues/167 determine if this comment needs updating for chipper 1.0 deploys
-  // For RC deploys, only send to the dev server.  For production deploys, the local build will send to the dev server so the build-server
-  // only sends to the production server (phet-server2).
-  const servers = ( option === 'rc' ) ? [ constants.DEV_SERVER ] : [ constants.PRODUCTION_SERVER ];
-  const brands = version.indexOf( 'phetio' ) < 0 ? [ constants.PHET_BRAND ] : [ constants.PHET_IO_BRAND ];
-
-  queueDeploy( '1.0', repos, simName, version, locales, brands, servers, email, translatorId, branch, authorizationKey, req, res );
-};
-
-const getQueueDeploy = ( req: Request, res: Response ): void => {
-  logRequest( req, 'query' );
-  queueDeployApiVersion1( req, res, 'query' );
-};
-
 const postQueueDeploy = ( req: Request, res: Response ): void => {
   logRequest( req, 'body' );
 
-  const api = decodeURIComponent( req.body[ constants.API_KEY ] );
+  const body: BuildServerRequest = req.body;
 
-  if ( api && api.startsWith( '2.' ) ) {
-    const repos = JSON.parse( req.body[ constants.DEPENDENCIES_KEY ] );
-    const simName = req.body[ constants.SIM_NAME_KEY ];
-    const version = req.body[ constants.VERSION_KEY ];
-    const locales = req.body[ constants.LOCALES_KEY ] || null;
-    const servers = req.body[ constants.SERVERS_KEY ];
-    const brands = req.body[ constants.BRANDS_KEY ];
-    const authorizationKey = req.body[ constants.AUTHORIZATION_KEY ];
-    const translatorId = req.body[ constants.TRANSLATOR_ID_KEY ] || null;
-    const email = req.body[ constants.EMAIL_KEY ] || null;
-    const branch = req.body[ constants.BRANCH_KEY ] || null;
+  const simTask: BuildServerSimTask = {
+    type: 'sim',
+    api: body[ constants.API_KEY ],
+    simName: body[ constants.SIM_NAME_KEY ],
+    versionString: body[ constants.VERSION_STRING_KEY ],
+    legacyBranch: body[ constants.LEGACY_BRANCH_KEY ],
+    locales: body[ constants.LOCALES_KEY ],
+    totalitySHA: body[ constants.TOTALITY_SHA_KEY ],
+    servers: body[ constants.SERVERS_KEY ],
+    brands: body[ constants.BRANDS_KEY ]
+  };
 
-    queueDeploy( api, repos, simName, version, locales, brands, servers, email, translatorId, branch, authorizationKey, req, res );
+  if ( body[ constants.EMAIL_KEY ] ) {
+    simTask.email = body[ constants.EMAIL_KEY ];
   }
-  else {
-    queueDeployApiVersion1( req, res, 'body' );
+  if ( body[ constants.USER_ID_KEY ] ) {
+    simTask.userId = body[ constants.USER_ID_KEY ];
   }
+  if ( body[ constants.DEPLOY_IMAGES_KEY ] ) {
+    simTask.deployImages = body[ constants.DEPLOY_IMAGES_KEY ];
+  }
+
+  const authorizationKey = body[ constants.AUTHORIZATION_KEY ];
+
+  queueDeploy( simTask, authorizationKey, req, res );
 };
 
 /**
  * Adds the request to the processing queue and handles email notifications about success or failures
- *
- * @param {String} api
- * @param {Object} repos
- * @param {String} simName
- * @param {String} version
- * @param {Array.<String>} locales
- * @param {Array.<String>} brands
- * @param {Array.<String>} servers
- * @param {String} email
- * @param {String} userId
- * @param {String} branch
- * @param {String} authorizationKey
- * @param {express.Request} req
- * @param {express.Response} res
  */
 const queueDeploy = (
-  api: string,
-  repos: any,
-  simName: string,
-  version: string,
-  locales: string[] | string | null,
-  brands: string[],
-  servers: string[],
-  email: string | null,
-  userId: string | null,
-  branch: string | null,
+  simTask: BuildServerSimTask,
   authorizationKey: string,
   req: Request,
   res: Response
 ): void => {
-
-  if ( repos && simName && version && authorizationKey ) {
+  // Not doing full validation here, because other failures we'll want to propagate by email
+  if ( authorizationKey && simTask.simName && simTask.versionString ) {
     const productionBrands = [ constants.PHET_BRAND, constants.PHET_IO_BRAND ];
 
     if ( authorizationKey !== constants.BUILD_SERVER_CONFIG.buildServerAuthorizationCode ) {
@@ -171,30 +123,18 @@ const queueDeploy = (
       res.status( 401 );
       res.send( err );
     }
-    else if ( servers.includes( constants.PRODUCTION_SERVER ) && brands.some( brand => !productionBrands.includes( brand ) ) ) {
+    else if ( simTask.servers.includes( constants.PRODUCTION_SERVER ) && simTask.brands.some( brand => !productionBrands.includes( brand ) ) ) {
       const err = 'Cannot complete production deploys for brands outside of phet and phet-io';
       winston.log( 'error', err );
       res.status( 400 );
       res.send( err );
     }
     else {
-      winston.log( 'info', `queuing build for ${simName} ${version}` );
-      const task = {
-        api: api,
-        repos: repos,
-        simName: simName,
-        version: version,
-        locales: locales,
-        servers: servers,
-        brands: brands,
-        email: email,
-        userId: userId,
-        branch: branch
-      };
-      persistentQueue.addTask( task );
-      taskQueue.push( task, buildCallback( task ) );
+      winston.log( 'info', `queuing build for ${simTask.simName} ${simTask.versionString}` );
+      persistentQueue.addTask( simTask );
+      taskQueue.push( simTask, buildCallback( simTask ) );
 
-      res.status( api === '1.0' ? 200 : 202 );
+      res.status( 202 );
       res.send( 'build process initiated, check logs for details' );
     }
   }
@@ -208,29 +148,22 @@ const queueDeploy = (
 
 const buildCallback = ( task: BuildServerTask ) => {
   return async ( err?: Error | string | null ): Promise<void> => {
-    const simInfoString = `Sim = ${task.simName
-    } Version = ${task.version
-    } Brands = ${task.brands
-    } Locales = ${task.locales}`;
+    if ( task.type !== 'deployImages' ) {
+      const simInfoString = `Sim = ${task.simName
+      } Version = ${task.versionString
+      } Brands = ${task.brands
+      } Locales = ${task.locales}`;
 
-    if ( err ) {
-      let shas = task.repos;
-
-      // try to format the JSON nicely for the email, but don't worry if it is invalid JSON
-      try {
-        shas = JSON.stringify( JSON.parse( shas ), null, 2 );
+      if ( err ) {
+        const errorMessage = `Build failure: ${err}. ${simInfoString} totality sha = ${JSON.stringify( task.totalitySHA )}`;
+        winston.log( 'error', errorMessage );
+        await sendEmail( 'BUILD ERROR', errorMessage, task.email );
       }
-      catch( e ) {
-        // invalid JSON
+      else {
+        winston.log( 'info', `build for ${task.simName} finished successfully` );
+        persistentQueue.finishTask();
+        await sendEmail( 'Build Succeeded', simInfoString, task.email, true );
       }
-      const errorMessage = `Build failure: ${err}. ${simInfoString} Shas = ${JSON.stringify( shas )}`;
-      winston.log( 'error', errorMessage );
-      await sendEmail( 'BUILD ERROR', errorMessage, task.email );
-    }
-    else {
-      winston.log( 'info', `build for ${task.simName} finished successfully` );
-      persistentQueue.finishTask();
-      await sendEmail( 'Build Succeeded', simInfoString, task.email, true );
     }
   };
 };
@@ -247,8 +180,6 @@ const postQueueImageDeploy = ( req: Request, res: Response ): void => {
     return;
   }
 
-  const branch = req.body[ constants.BRANCH_KEY ] || 'main';
-  const brands = req.body[ constants.BRANDS_KEY ] || 'phet';
   const email = req.body[ constants.EMAIL_KEY ] || null;
   const simulation = req.body[ constants.SIM_NAME_KEY ] || null;
   const version = req.body[ constants.VERSION_KEY ] || null;
@@ -256,11 +187,9 @@ const postQueueImageDeploy = ( req: Request, res: Response ): void => {
 
   taskQueue.push(
     {
-      deployImages: true,
-      branch: branch,
-      brands: brands,
-      simulation: simulation,
-      version: version
+      type: 'deployImages',
+      simName: simulation,
+      versionString: version
     },
     async ( err?: Error | string | null ) => {
       if ( err ) {
@@ -285,7 +214,6 @@ const app = express();
 app.use( bodyParser.json() );
 
 // add the route to build and deploy
-app.get( '/deploy-html-simulation', getQueueDeploy );
 app.post( '/deploy-html-simulation', postQueueDeploy );
 app.post( '/deploy-images', postQueueImageDeploy );
 
