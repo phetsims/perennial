@@ -172,8 +172,15 @@ function writeAllTSConfigFile(): void {
            repo !== 'phet-vite-demo'; // TODO: include this repo, see https://github.com/phetsims/phet-vite-demo/issues/2
   } );
 
+  const references = filteredRepos.map( repo => ( { path: `../../../../${repo}` } ) );
+
+  // launchpad has a separate server tsconfig, since its root tsconfig is used to build the client code.
+  if ( fs.existsSync( `${PERENNIAL_ROOT}/../launchpad/js/server/tsconfig.json` ) ) {
+    references.push( { path: '../../../../launchpad/js/server/tsconfig.json' } );
+  }
+
   const json = {
-    references: filteredRepos.map( repo => ( { path: `../../../../${repo}` } ) )
+    references: references
   };
 
   const fileOutput = `/**
