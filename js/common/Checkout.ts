@@ -304,7 +304,8 @@ export class Checkout {
     assert( brands.length >= 1, 'must have a supported brand' );
 
     const currentBranch = await getBranch();
-    if ( currentBranch !== 'main' ) {
+    // TODO: remove this testing branch for the future https://github.com/phetsims/totality/issues/140
+    if ( currentBranch !== 'main' && currentBranch !== 'features/totality/issues/140' ) {
       throw new Error( `Should be on main to create a release branch, not: ${currentBranch ? currentBranch : '(detached head)'}` );
     }
 
@@ -337,7 +338,7 @@ export class Checkout {
     // Create the branch in git, and push it directly (not using the other helpers, since we are doing this from the MAIN directory)
     await gitMutableExecute( [ 'checkout', '-b', branch ], '..' );
     await gitMutableExecute( [ 'push', '-u', 'origin', branch ], '..' ); // not using this.gitPush, since this is our first
-    await gitMutableExecute( [ 'checkout', 'main' ], '..' );
+    await gitMutableExecute( [ 'checkout', currentBranch ], '..' );
 
     // Ensure that we are remotely tracked now (sanity check)
     await ensureLocalBranchFromRemote( branch );
