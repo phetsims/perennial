@@ -6,7 +6,7 @@
 
 import fs from 'fs';
 import _ from 'lodash';
-import { BuildServerTask } from './taskWorker.js';
+import { BuildServerTask } from './BuildServerTypes.js';
 
 type BuildServerQueue = {
   queue: BuildServerTask[];
@@ -40,15 +40,16 @@ const saveQueue = ( queue: BuildServerQueue ): void => {
 
 const formatTask = ( task: BuildServerTask ): BuildServerTask => ( {
   api: task.api,
-  repos: task.repos,
   simName: task.simName,
-  version: task.version,
+  versionString: task.versionString,
+  legacyBranch: task.legacyBranch,
   locales: task.locales,
+  totalitySHA: task.totalitySHA,
   servers: task.servers,
   brands: task.brands,
   email: task.email,
   userId: task.userId,
-  branch: task.branch,
+  deployImages: task.deployImages,
   enqueueTime: task.enqueueTime
 } );
 

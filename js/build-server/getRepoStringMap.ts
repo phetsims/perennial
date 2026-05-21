@@ -3,41 +3,43 @@
 /**
  * Returns an inverse string map (stringMap[ stringKey ][ locale ]) for all strings in a given repo.
  *
- * TODO: port this over https://github.com/phetsims/totality/issues/140
- *
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 import { loadJSON } from '../common/loadJSON.js';
 import fs from 'fs';
+import { EnglishStringsJSON, InversedStringMap, PackageJSON, PartialStringKey, Repo } from '../browser-and-node/PerennialTypes.js';
+import winston from 'winston';
 
 /**
  * Returns an inverse string map (stringMap[ stringKey ][ locale ]) for all strings in a given repo.
- * @public
- *
- * @param {string} repo - The repository name
- * @param {string} checkoutDir
- * @returns {Promise.<stringMap[ stringKey ][ locale ]>}
  */
-export default async function getRepoStringMap( repo: string, checkoutDir: string ): Promise<Record<string, Record<string, string>>> {
+export const getRepoStringMap = async (
+  repo: Repo,
+  checkoutDir: string
+): Promise<InversedStringMap> => {
 
   // partialKeyMap[ partialStringKey ][ locale ] = stringValue
-  const partialKeyMap: Record<string, Record<string, string>> = {};
+  const partialKeyMap: InversedStringMap = {};
 
   // If we're not a repo with strings
   if ( !fs.existsSync( `${checkoutDir}/${repo}/${repo}-strings_en.json` ) ) {
     return {};
   }
 
-  // TODO: replace with getWorktreePackageJSON https://github.com/phetsims/totality/issues/140
-  const packageJSON = await loadJSON( `${checkoutDir}/${repo}/package.json` );
-  const requirejsNamespace = packageJSON.phet.requirejsNamespace;
+  const packageJSON: PackageJSON = await loadJSON( `${checkoutDir}/${repo}/package.json` );
+  const requirejsNamespace = packageJSON.phet!.requirejsNamespace!;
 
-  const englishStrings = await loadJSON( `${checkoutDir}/${repo}/${repo}-strings_en.json` );
+  if ( !requirejsNamespace ) {
+    winston.warn( `Repo ${repo} does not have a requirejsNamespace in its package.json, but has a strings file` );
+    return {};
+  }
+
+  const englishStrings: EnglishStringsJSON = await loadJSON( `${checkoutDir}/${repo}/${repo}-strings_en.json` );
 
   // Support recursive structure of English string files. Tests for `value: <<string type>>` to determine if it's a string.
   // Fills partialKeyMap
-  ( function recur( stringStructure: any, stringKeyParts: string[] ) {
+  ( function recur( stringStructure: EnglishStringsJSON, stringKeyParts: PartialStringKey[] ) {
     if ( typeof stringStructure.value === 'string' ) {
       partialKeyMap[ stringKeyParts.join( '.' ) ] = {
         en: stringStructure.value
@@ -45,6 +47,7 @@ export default async function getRepoStringMap( repo: string, checkoutDir: strin
     }
     Object.keys( stringStructure ).forEach( partialKey => {
       if ( typeof stringStructure[ partialKey ] === 'object' ) {
+        // @ts-expect-error - we know this is an EnglishStringsJSON, but the type system doesn't
         recur( stringStructure[ partialKey ], [ ...stringKeyParts, partialKey ] );
       }
     } );
@@ -69,7 +72,7 @@ export default async function getRepoStringMap( repo: string, checkoutDir: strin
   }
 
   // result[ stringKey ][ locale ] = stringValue
-  const result: Record<string, Record<string, string>> = {};
+  const result: InversedStringMap = {};
 
   // Prepend the requirejsNamespace to the string keys
   Object.keys( partialKeyMap ).forEach( partialKey => {
@@ -77,4 +80,4 @@ export default async function getRepoStringMap( repo: string, checkoutDir: strin
   } );
 
   return result;
-}
+};

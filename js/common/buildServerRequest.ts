@@ -11,24 +11,24 @@ import assert from 'assert';
 import axios from 'axios';
 import winston from 'winston';
 import SimVersion from '../browser-and-node/SimVersion.js';
-import { LegacyBranch, Repo, SHA } from '../browser-and-node/PerennialTypes.js';
-import { BuildServerRequest } from '../build-server/BuildServerTypes.js';
+import { BuildServerTarget, LegacyBranch, LocalesStringSpecifier, Repo, SHA } from '../browser-and-node/PerennialTypes.js';
+import { BuildServerRequest, SupportedBuildServerBrand } from '../build-server/BuildServerTypes.js';
 
 export type BuildServerRequestOptions = {
-  locales?: string[] | '*'; // TODO: figure out the type we need to send in.
-  servers?: string[];
+  locales?: LocalesStringSpecifier;
+  servers?: BuildServerTarget[];
 };
 
 export const buildServerRequest = async (
   repo: Repo,
   version: SimVersion,
   legacyBranch: LegacyBranch,
-  brands: string[],
+  brands: SupportedBuildServerBrand[],
   totalitySHA: SHA,
   options?: BuildServerRequestOptions
 ): Promise<void> => {
   const locales = options?.locales ?? '*';
-  const servers = options?.servers ?? [ 'dev' ];
+  const servers = options?.servers ?? [ 'dev' ] as const;
 
   winston.info( `sending build request for ${repo} ${version.toString()} with totality SHA: ${totalitySHA}` );
 
@@ -37,11 +37,11 @@ export const buildServerRequest = async (
   const requestObject: BuildServerRequest = {
     api: '3.0',
     simName: repo,
-    version: version.toString(),
+    versionString: version.toString(),
     locales: locales,
     servers: servers,
     brands: brands,
-    branch: legacyBranch,
+    legacyBranch: legacyBranch,
     totalitySHA: totalitySHA,
     authorizationCode: buildLocal.buildServerAuthorizationCode
   };

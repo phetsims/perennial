@@ -8,6 +8,8 @@ import constants from './constants.js';
 import fs from 'graceful-fs';
 import winston from 'winston';
 import { parseScreenNames } from './parseScreenNames.js';
+import { EnglishStringsJSON, Locale } from '../browser-and-node/PerennialTypes.js';
+import { ReleaseBranch } from '../common/ReleaseBranch.js';
 
 /**
  * Create a [sim name].xml file in the live sim directory in htdocs. This file tells the website which
@@ -16,10 +18,15 @@ import { parseScreenNames } from './parseScreenNames.js';
  * @param version
  * @param checkoutDir
  */
-type StringFile = { name: string; locale: string };
+type StringFile = { name: string; locale: Locale };
 
-export const createTranslationsXML = async ( simName: string, version: string, checkoutDir: string ): Promise<void> => {
-  const translatedStringFilesDir = `${checkoutDir}/babel/${simName}`;
+export const createTranslationsXML = async (
+  releaseBranch: ReleaseBranch,
+  version: string
+): Promise<void> => {
+  const simName = releaseBranch.repo;
+
+  const translatedStringFilesDir = `${releaseBranch.checkout.workingDirectory}/babel/${simName}`;
   const englishStringsFile = `${simName}-strings_en.json`;
   const stringFiles: StringFile[] = [ { name: englishStringsFile, locale: constants.ENGLISH_LOCALE } ];
 
@@ -42,9 +49,9 @@ export const createTranslationsXML = async ( simName: string, version: string, c
   }
 
   // try opening the english strings file so we can read the english strings
-  let englishStrings: any;
+  let englishStrings: EnglishStringsJSON;
   try {
-    englishStrings = JSON.parse( fs.readFileSync( `${checkoutDir}/${simName}/${englishStringsFile}`, { encoding: 'utf-8' } ) );
+    englishStrings = JSON.parse( fs.readFileSync( `${releaseBranch.checkout.workingDirectory}/${simName}/${englishStringsFile}`, { encoding: 'utf-8' } ) );
   }
   catch( e ) {
     throw new Error( 'English strings file not found' );
@@ -58,7 +65,7 @@ export const createTranslationsXML = async ( simName: string, version: string, c
   // create xml, making a simulation tag for each language
   let finalXML = `<?xml version="1.0" encoding="utf-8" ?>\n<project name="${simName}">\n<simulations>`;
 
-  const screenNames = await parseScreenNames( simName, stringFiles.map( f => f.locale ), checkoutDir );
+  const screenNames = await parseScreenNames( releaseBranch, stringFiles.map( f => f.locale ) );
 
   for ( let j = 0; j < stringFiles.length; j++ ) {
     const stringFile = stringFiles[ j ];
@@ -73,6 +80,7 @@ export const createTranslationsXML = async ( simName: string, version: string, c
                                   `<title><![CDATA[${localizedSimTitle}]]></title>\n` );
       if ( screenNames && screenNames[ stringFile.locale ] ) {
         finalXML = finalXML.concat( '<screens>\n' );
+        // eslint-disable-next-line @typescript-eslint/no-loop-func
         screenNames[ stringFile.locale ].forEach( ( screenName: string, index: number ) => {
           finalXML = finalXML.concat( `<screenName position="${index + 1}"><![CDATA[${screenName}]]></screenName>\n` );
         } );

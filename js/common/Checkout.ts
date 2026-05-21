@@ -32,7 +32,7 @@ import simPhetioMetadata, { SimPhetioMetadata } from './simPhetioMetadata.js';
 import { getActiveSims } from './repos/getActiveSims.js';
 import { getBranches } from './git/getBranches.js';
 import os from 'os';
-import { Branch, BranchOrSHA, IntentionalPerennialAny, LegacyBranch, Repo, SHA } from '../browser-and-node/PerennialTypes.js';
+import { Branch, BranchOrSHA, IntentionalPerennialAny, LegacyBranch, LocaleData, Repo, SHA } from '../browser-and-node/PerennialTypes.js';
 import assert from 'assert';
 import { getBranch } from './git/getBranch.js';
 import { hasRemoteBranch } from './hasRemoteBranch.js';
@@ -1259,5 +1259,9 @@ export class Checkout {
 
   public existsRelative( relativeFile: string ): boolean {
     return fs.existsSync( `${this.workingDirectory}/${relativeFile}` );
+  }
+
+  public async getLocaleData(): Promise<LocaleData> {
+    return JSON.parse( await getFileAtBranch( this.branch, 'babel/localeData.json' ) );
   }
 }

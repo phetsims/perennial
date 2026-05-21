@@ -73,7 +73,7 @@ async function runTask( task: BuildServerTask ): Promise<void> {
     }
 
     const simName = task.simName;
-    const version = task.version;
+    const versionString = task.versionString;
     const brands = task.brands;
     const legacyBranch = task.legacyBranch;
 
@@ -108,8 +108,8 @@ async function runTask( task: BuildServerTask ): Promise<void> {
     // sim package.json version vs. build request version check
     if ( chipperVersion.major !== 1 ) {
       const packageVersionString = ( await releaseBranch.getSimVersion() ).toString();
-      if ( packageVersionString !== version ) {
-        await abortBuild( `Version mismatch between package.json and build request: ${packageVersionString} vs ${version}` );
+      if ( packageVersionString !== versionString ) {
+        await abortBuild( `Version mismatch between package.json and build request: ${packageVersionString} vs ${versionString}` );
       }
     }
 
@@ -142,7 +142,7 @@ async function runTask( task: BuildServerTask ): Promise<void> {
           isProductionDeploy: false
         } );
       }
-      await devDeploy( simName, version, chipperVersion, brands, buildDir );
+      await devDeploy( simName, versionString, chipperVersion, brands, buildDir );
     }
 
     if ( task.servers.includes( constants.PRODUCTION_SERVER ) ) {
@@ -156,7 +156,7 @@ async function runTask( task: BuildServerTask ): Promise<void> {
         // Pre-copy steps
         if ( brand === constants.PHET_BRAND ) {
           targetSimDir = constants.HTML_SIMS_DIRECTORY + simName;
-          targetVersionDir = `${targetSimDir}/${version}/`;
+          targetVersionDir = `${targetSimDir}/${versionString}/`;
 
           if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
             // Remove _phet from all filenames in the phet directory
@@ -172,10 +172,10 @@ async function runTask( task: BuildServerTask ): Promise<void> {
         }
         else if ( brand === constants.PHET_IO_BRAND ) {
           targetSimDir = constants.PHET_IO_SIMS_DIRECTORY + simName;
-          targetVersionDir = `${targetSimDir}/${version}`;
+          targetVersionDir = `${targetSimDir}/${versionString}`;
 
           // Chipper 1.0 has -phetio in the version schema for PhET-iO branded sims
-          if ( chipperVersion.major === 0 && !version.match( '-phetio' ) ) {
+          if ( chipperVersion.major === 0 && !versionString.match( '-phetio' ) ) {
             targetVersionDir += '-phetio';
           }
           targetVersionDir += '/';
@@ -227,11 +227,11 @@ async function runTask( task: BuildServerTask ): Promise<void> {
             await deployImages( {
               simulation: task.simName,
               brands: task.brands,
-              version: task.version
+              version: task.versionString
             } );
           }
-          await writePhetHtaccess( simName, version );
-          await createTranslationsXML( simName, version, releaseBranch.checkout.workingDirectory );
+          await writePhetHtaccess( simName, versionString );
+          await createTranslationsXML( releaseBranch, versionString );
 
           // This should be the last function called for the phet brand.
           // This triggers an asyncronous task on the tomcat/wicket application and only waits for a response that the request was received.
@@ -248,15 +248,15 @@ async function runTask( task: BuildServerTask ): Promise<void> {
 
           // Production deploy to PhET Brand is most likely buggy if deploying a previous major.minor version. Let's
           // tell someone.
-          if ( SimVersion.parse( version ).compareNumber( latestFileSystemVersion ) < 0 ) {
+          if ( SimVersion.parse( versionString ).compareNumber( latestFileSystemVersion ) < 0 ) {
             await sendEmail( 'PhET Production Deploy of older release',
-              `Build server deployed ${simName} version: ${version} to phet brand production site but the latest version is ${latestFileSystemVersion}` );
+              `Build server deployed ${simName} version: ${versionString} to phet brand production site but the latest version is ${latestFileSystemVersion}` );
           }
         }
         else if ( brand === constants.PHET_IO_BRAND ) {
-          const suffix = version.split( '-' ).length >= 2 ? version.split( '-' )[ 1 ] :
+          const suffix = versionString.split( '-' ).length >= 2 ? versionString.split( '-' )[ 1 ] :
                          ( chipperVersion.major < 2 ? 'phetio' : '' );
-          const parsedVersion = SimVersion.parse( version, '' );
+          const parsedVersion = SimVersion.parse( versionString, '' );
           // TODO: replace with getWorktreePackageJSON https://github.com/phetsims/totality/issues/140
           const simPackage = await releaseBranch.getPackageJSON();
           const ignoreForAutomatedMaintenanceReleases = !!( simPackage && simPackage.phet && simPackage.phet.ignoreForAutomatedMaintenanceReleases );
@@ -277,7 +277,7 @@ async function runTask( task: BuildServerTask ): Promise<void> {
 
           winston.debug( 'server notified' );
           await writePhetioHtaccess( simName, targetVersionDir, {
-            version: version,
+            version: versionString,
             directory: constants.PHET_IO_SIMS_DIRECTORY,
             checkoutDir: releaseBranch.checkout.workingDirectory,
             isProductionDeploy: true
@@ -332,8 +332,8 @@ export const validateBuildServerTask = ( task: BuildServerTask ): void => {
     throw new Error( `totalitySHA should be a 40 character string, got ${task.totalitySHA}` );
   }
 
-  if ( typeof task.version !== 'string' ) {
-    throw new Error( `version must be a string, got ${typeof task.version}` );
+  if ( typeof task.versionString !== 'string' ) {
+    throw new Error( `versionString must be a string, got ${typeof task.versionString}` );
   }
 
   if ( !Array.isArray( task.servers ) || task.servers.some( server => ![ 'dev', 'production' ].includes( server ) ) ) {

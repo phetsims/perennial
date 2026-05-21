@@ -6,6 +6,8 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
+import { Locale, Repo } from '../browser-and-node/PerennialTypes.js';
+
 const _ = require( 'lodash' );
 const winston = require( 'winston' );
 const axios = require( 'axios' );
@@ -13,13 +15,13 @@ const axios = require( 'axios' );
 type SimMetadataOptions = {
   summary: boolean;
   type: string | null;
-  locale: string | null;
-  simulation: string | null;
+  locale: Locale | null;
+  simulation: Repo | null;
   includePrototypes: boolean;
 };
 
 type ProjectType = {
-  name: string;
+  name: Repo;
   id: number;
   version: {
     string: string;

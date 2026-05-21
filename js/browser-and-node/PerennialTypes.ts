@@ -12,11 +12,40 @@ export type Branch = string; // for release branches or otherwise, should always
 export type LegacyBranch = string; // for release branches, e.g. '1.2'
 export type BranchOrSHA = Branch | SHA; // for cases where we can allow either
 export type BuildServerTarget = 'dev' | 'production';
+export type VersionString = string; // SimVersion-compatible string
+export type FullStringKey = string; // including the require.js namespace, e.g. 'JOIST/foo.bar'
+export type PartialStringKey = string; // not including the require.js namespace, e.g. 'foo.bar'
+export type Locale = string;
 
 export type LocalesStringSpecifier = '*' | string; // either '*', or a comma-separated list of locale codes, e.g. 'en,es,fr'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type IntentionalPerennialAny = any;
+
+export type StringMap = Record<Locale, Record<FullStringKey, string>>;
+export type InversedStringMap = Record<FullStringKey, Record<Locale, string>>;
+
+export type EnglishStringsJSONLeaf = {
+  value: string;
+  _comment?: string;
+  deprecated?: true;
+  simMetadata?: {
+    phetioReadOnly?: boolean;
+  };
+};
+
+export type EnglishStringsJSON = {
+  [key: PartialStringKey]: EnglishStringsJSONLeaf | EnglishStringsJSON;
+};
+
+export type LocaleData = Record<Locale, {
+  englishName: string;
+  localizedName: string;
+  direction: 'rtl' | 'ltr';
+  bcp47: string;
+  locale3?: string;
+  fallbackLocales?: Locale[];
+}>;
 
 export type PackageJSON = {
   name: string;
@@ -34,6 +63,13 @@ export type PackageJSON = {
     };
     supportedBrands?: string[];
     ignoreForAutomatedMaintenanceReleases?: boolean;
+
+    // fully-qualified string keys for each screen name, so that the build-server/website can parse it out and use it
+    screenNameKeys?: FullStringKey[];
+
+    // the start of a fully-qualified string key for this repo, e.g. 'JOIST'.
+    requirejsNamespace?: string;
+
     simFeatures?: {
       supportsGestureControl?: boolean;
       supportsInteractiveDescription?: boolean;
