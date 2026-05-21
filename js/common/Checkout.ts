@@ -644,9 +644,13 @@ export class Checkout {
       throw new Error( 'Cannot get tracking branch if not checked out' );
     }
 
-    return ( await gitImmutableExecute( [ 'for-each-ref', '--format=\'%(upstream:short)\'', await this.getSymbolicRef() ], this.workingDirectory ) ).trim();
+    return ( await gitImmutableExecute( [ 'for-each-ref', '--format=%(upstream:short)', await this.getSymbolicRef() ], this.workingDirectory ) ).trim();
   }
 
+  // TODO: this is likely wrong: to quote: https://github.com/phetsims/totality/issues/140
+  // TODO: it calls getTrackingBranch() and then appends @{u} to the upstream https://github.com/phetsims/totality/issues/140
+  // TODO: branch, producing something like origin/main@{u}...HEAD. Remote-tracking branches usually do not have upstreams. It probably wants either https://github.com/phetsims/totality/issues/140
+  // TODO: @{u}...HEAD from the checked-out branch, or origin/main...HEAD without @{u}. https://github.com/phetsims/totality/issues/140
   public async getAheadBehind(): Promise<{ ahead: number; behind: number }> {
     // e.g. behind-count + '\t' + ahead-count
     const counts = await gitImmutableExecute( [ 'rev-list', '--left-right', '--count', `${await this.getTrackingBranch()}@{u}...HEAD` ], this.workingDirectory );
@@ -692,7 +696,7 @@ export class Checkout {
       if ( fs.existsSync( `${this.workingDirectory}/${npmRepo}` ) ) {
         winston.info( `npm update ${npmRepo} in worktree` );
 
-        await this.npmUpdateRepo( npmRepo );
+        await this.npmUpdateRepo( npmRepo, options );
       }
     }
   }
@@ -708,12 +712,14 @@ export class Checkout {
       winston.info( `pulling babel in ${this.workingDirectory}` );
 
       // NOTE: marked as "immutable" because we are the only ones who are doing this (and it isn't our main tree)
+      // So we don't have to use gitMutableExecute (since we won't have conflicts on this specific git repository)
       await gitImmutableExecute( [ 'pull' ], `${this.workingDirectory}/babel` );
     }
     else {
       winston.info( `cloning babel into ${this.workingDirectory}` );
 
       // NOTE: marked as "immutable" because we are the only ones who are doing this (and it isn't our main tree)
+      // So we don't have to use gitMutableExecute (since we won't have conflicts on this specific git repository)
       await gitImmutableExecute( [ 'clone', 'https://github.com/phetsims/babel.git' ], this.workingDirectory );
     }
   }
@@ -963,15 +969,6 @@ export class Checkout {
   }
 
   /**
-   * Returns the timestamp string with the date of when this release branch diverged from main.
-   */
-  public async getDivergingTimestampString(): Promise<string> {
-    const divergingCommit = await gitFirstDivergingCommit( this.branch, 'main' );
-    const timestamp = await gitTimestamp( divergingCommit );
-    return new Date( timestamp ).toISOString().split( 'T' )[ 0 ];
-  }
-
-  /**
    * Use this when you just need read-only (or read-write, but it doesn't matter where) access to a working directory.
    *
    * NOTABLY this should NOT be used for things that e.g. check the current state of a specific checkout, OR things that
@@ -1131,6 +1128,13 @@ export class Checkout {
     return gitTimestamp( await this.getDivergingSHA() );
   }
 
+  /**
+   * Returns the timestamp string with the date of when this release branch diverged from main.
+   */
+  public async getDivergingTimestampString(): Promise<string> {
+    return new Date( await this.getDivergingTimestamp() ).toISOString().split( 'T' )[ 0 ];
+  }
+
   public async getChipperVersion(): Promise<ChipperVersion> {
     const packageJSON = await getBranchPackageJSON( 'chipper', this.branch );
 
@@ -1166,7 +1170,7 @@ export class Checkout {
    */
   public async getFileOptionalContents( relativeFile: string ): Promise<string> {
     try {
-      return getFileAtBranch( this.branch, relativeFile );
+      return await getFileAtBranch( this.branch, relativeFile );
     }
     catch( e ) {
       return '';
