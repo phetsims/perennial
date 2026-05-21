@@ -183,6 +183,9 @@ export class Checkout {
     const branch = Checkout.getReleaseBranchName( repo, legacyBranch );
     const workingDirectory = Checkout.getWorktreeDirectory( branch );
 
+    winston.debug( `  branch: ${branch}` );
+    winston.debug( `  workingDirectory: ${workingDirectory}` );
+
     const directoryExists = fs.existsSync( workingDirectory );
     const worktreeExists = await Checkout.hasWorktree( branch );
 
@@ -193,8 +196,10 @@ export class Checkout {
     const checkout = new Checkout( branch, false, false, workingDirectory, worktreeExists );
 
     const simVersion = await getBranchSimVersion( repo, branch );
+    winston.debug( `  simVersion: ${simVersion.toString()}` );
 
     const supportedBrands = await getBranchBrands( repo, branch );
+    winston.debug( `  supportedBrands: ${supportedBrands.join( ',' )}` );
 
     const includePublishedPhetBrand = ( await simMetadataPromise ).projects.some( simData => {
       const releaseRepo = simData.name.slice( simData.name.indexOf( '/' ) + 1 );
@@ -202,6 +207,7 @@ export class Checkout {
 
       return releaseRepo === repo && releaseBranch === legacyBranch;
     } );
+    winston.debug( `  includePublishedPhetBrand: ${includePublishedPhetBrand}` );
 
     const includePublishedPhetioBrand = ( await simPhetioMetadataPromise ).some( simData => {
       if ( !simData.active || !simData.latest ) {
@@ -216,8 +222,10 @@ export class Checkout {
 
       return releaseRepo === repo && releaseBranch === legacyBranch;
     } );
+    winston.debug( `  includePublishedPhetioBrand: ${includePublishedPhetioBrand}` );
 
     let isReleased = simVersion.isSimPublished;
+    winston.debug( `  isReleased: ${isReleased}` );
 
     if ( simVersion.isSimPublished && !includePublishedPhetBrand && !includePublishedPhetioBrand ) {
       // Marking an unreleased sim
@@ -233,6 +241,7 @@ export class Checkout {
         ...( includePublishedPhetBrand ? [ 'phet' ] : [] ),
         ...( includePublishedPhetioBrand ? [ 'phet-io' ] : [] )
       ];
+      winston.debug( `  published, overriding brands with: ${brands.join( ',' )}` );
     }
     else {
       brands = [
@@ -240,10 +249,15 @@ export class Checkout {
         'phet',
         ...( supportedBrands.includes( 'phet-io' ) ? [ 'phet-io' ] : [] )
       ];
+      winston.debug( `  unpublished, overriding brands with: ${brands.join( ',' )}` );
     }
 
     if ( brands.some( brand => !supportedBrands.includes( brand ) ) ) {
       throw new Error( `Expected supported brands ${supportedBrands.join( ', ' )} on branch ${repo} ${legacyBranch} to include all of the published brands ${brands.join( ', ' )}` );
+    }
+
+    if ( brands.length === 0 ) {
+      throw new Error( `Expected at least one supported brand for ${repo} ${legacyBranch}, got none` );
     }
 
     checkout.releaseBranch = new ReleaseBranch( checkout, repo, legacyBranch, brands, isReleased );

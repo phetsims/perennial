@@ -14,6 +14,10 @@ import assert from 'assert';
 import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
 import { rc } from '../../common/deployment/rc.js';
 import getOption from './util/getOption.js';
+import winston from 'winston';
+
+// TODO revert to normal logging levels, see https://github.com/phetsims/totality/issues/140
+winston.default.transports.console.level = 'debug';
 
 ( async () => {
   const repo = getOption( 'repo' );

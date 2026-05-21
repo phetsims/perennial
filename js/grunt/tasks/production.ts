@@ -15,6 +15,10 @@ import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
 import { markRunnableAsPublished } from '../../common/markRunnableAsPublished.js';
 import { production } from '../../common/deployment/production.js';
 import getOption from './util/getOption.js';
+import winston from 'winston';
+
+// TODO revert to normal logging levels, see https://github.com/phetsims/totality/issues/140
+winston.default.transports.console.level = 'info';
 
 ( async () => {
 
