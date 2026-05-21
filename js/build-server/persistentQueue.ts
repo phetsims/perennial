@@ -6,7 +6,7 @@
 
 import fs from 'fs';
 import _ from 'lodash';
-import { BuildServerTask } from './BuildServerTypes.js';
+import { BuildServerTask } from '../browser-and-node/PerennialTypes.js';
 
 type BuildServerQueue = {
   queue: BuildServerTask[];

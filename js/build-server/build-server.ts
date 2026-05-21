@@ -22,7 +22,7 @@ import _ from 'lodash';
 import parseArgs from 'minimist';
 import * as persistentQueue from './persistentQueue.js';
 import getStatus from './getStatus.js';
-import { BuildServerRequest, BuildServerSimTask, BuildServerTask } from './BuildServerTypes.js';
+import { BuildServerRequest, BuildServerSimTask, BuildServerTask } from '../browser-and-node/PerennialTypes.js';
 
 // set this process up with the appropriate permissions, value is in octal
 process.umask( 0o0002 );

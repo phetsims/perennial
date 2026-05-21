@@ -9,8 +9,7 @@ import { sendEmail } from './sendEmail.js';
 import winston from 'winston';
 import axios from 'axios';
 import SimVersion from '../browser-and-node/SimVersion.js';
-import { LegacyBranch, Repo } from '../browser-and-node/PerennialTypes.js';
-import { BuildServerSimTask } from './BuildServerTypes.js';
+import { LegacyBranch, Repo, BuildServerSimTask } from '../browser-and-node/PerennialTypes.js';
 
 export type NotifyServerOptions = {
   simName: Repo;

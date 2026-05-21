@@ -18,7 +18,7 @@ import writePhetioHtaccess from '../common/writePhetioHtaccess.js';
 import { deployImages } from './deployImages.js';
 import * as persistentQueue from './persistentQueue.js';
 import { sendEmail } from './sendEmail.js';
-import { BuildServerSimTask, BuildServerTask } from './BuildServerTypes.js';
+import { BuildServerSimTask, BuildServerTask } from '../browser-and-node/PerennialTypes.js';
 import { Checkout } from '../common/Checkout.js';
 
 /**

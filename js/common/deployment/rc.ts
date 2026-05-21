@@ -130,8 +130,8 @@ export const rc = async (
   }
 
   // Send the build request
-  await buildServerRequest( repo, version, legacyBranch, releaseBranch.brands, await checkout.getSHA(), {
-    locales: [ '*' ],
+  await buildServerRequest( repo, version, legacyBranch, releaseBranch.getBuildServerBrands(), await checkout.getSHA(), {
+    locales: '*',
     servers: [ 'dev' ]
   } );
 

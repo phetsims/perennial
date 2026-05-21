@@ -16,7 +16,7 @@ import { puppeteerLoad } from './puppeteerLoad.js';
 import { BuildOptions, getBuildArguments } from './getBuildArguments.js';
 import _ from 'lodash';
 import SimVersion from '../browser-and-node/SimVersion.js';
-import { PackageJSON, Repo } from '../browser-and-node/PerennialTypes.js';
+import { PackageJSON, Repo, SupportedBuildServerBrand } from '../browser-and-node/PerennialTypes.js';
 import { getBranchPackageJSON } from './getBranchPackageJSON.js';
 import fs from 'fs';
 // eslint-disable-next-line phet/default-import-match-filename
@@ -30,6 +30,14 @@ export class RunnableBranch {
     public readonly repo: Repo,
     public readonly brands: string[]
   ) {
+  }
+
+  public getBuildServerBrands(): SupportedBuildServerBrand[] {
+    if ( this.brands.some( brand => brand !== 'phet' && brand !== 'phet-io' ) ) {
+      throw new Error( `Unsupported brand found in ${this.brands}` );
+    }
+
+    return this.brands as SupportedBuildServerBrand[];
   }
 
   /**

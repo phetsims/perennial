@@ -156,7 +156,7 @@ export const production = async (
   }
 
   // Send the build request
-  await buildServerRequest( repo, version, legacyBranch, releaseBranch.brands, await checkout.getSHA(), {
+  await buildServerRequest( repo, version, legacyBranch, releaseBranch.getBuildServerBrands(), await checkout.getSHA(), {
     locales: '*',
     servers: [ 'dev', 'production' ]
   } );

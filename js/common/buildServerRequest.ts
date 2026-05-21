@@ -11,8 +11,7 @@ import assert from 'assert';
 import axios from 'axios';
 import winston from 'winston';
 import SimVersion from '../browser-and-node/SimVersion.js';
-import { BuildServerTarget, LegacyBranch, LocalesStringSpecifier, Repo, SHA } from '../browser-and-node/PerennialTypes.js';
-import { BuildServerRequest, SupportedBuildServerBrand } from '../build-server/BuildServerTypes.js';
+import { BuildServerTarget, LegacyBranch, LocalesStringSpecifier, Repo, SHA, BuildServerRequest, SupportedBuildServerBrand } from '../browser-and-node/PerennialTypes.js';
 
 export type BuildServerRequestOptions = {
   locales?: LocalesStringSpecifier;
