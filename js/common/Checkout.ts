@@ -355,7 +355,7 @@ export class Checkout {
 
     // Remove everything except for dependencies, '.git' (so our worktree works), and babel (since we just directly checked it out)
     const topLevelFilesToRemove = ( await fsPromises.readdir( checkout.workingDirectory ) ).filter( file => {
-      return !dependencies.includes( file ) && file !== 'git' && file !== 'babel';
+      return !dependencies.includes( file ) && file !== '.git' && file !== 'babel';
     } );
     for ( const file of topLevelFilesToRemove ) {
       winston.info( `Removing ${file} from release branch worktree` );
