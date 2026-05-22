@@ -15,6 +15,7 @@ import { asyncFilter } from './async/asyncFilter.js';
 import { limitedMap } from './async/limitedMap.js';
 import { BuildOptions } from './getBuildArguments.js';
 import { LegacyBranch, Repo } from '../browser-and-node/PerennialTypes.js';
+import { ANSI_BLUE, ANSI_GREEN, ANSI_MAGENTA, ANSI_RED, ANSI_RESET } from './ANSI.js';
 
 export type ReleaseBranchSerialized = {
   repo: Repo;
@@ -164,7 +165,12 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
    * Converts it to a (debuggable) string form.
    */
   public override toString(): string {
-    return `${this.repo} ${this.branch} ${this.brands.join( ',' )}${this.isReleased ? '' : ' (unpublished)'}`;
+    const brandColor = this.brands.includes( 'phet' ) ? (
+      this.brands.includes( 'phet-io' ) ? ANSI_GREEN : ANSI_BLUE
+    ) : (
+      this.brands.includes( 'phet-io' ) ? ANSI_RED : ANSI_MAGENTA
+    );
+    return `${this.repo} ${this.branch} ${brandColor + this.brands.join( ',' ) + ANSI_RESET}${this.isReleased ? '' : ' (unpublished)'}`;
   }
 
   /**

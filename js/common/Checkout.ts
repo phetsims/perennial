@@ -53,6 +53,7 @@ export const MAINTENANCE_WORKTREE_DIRECTORY = buildLocal.maintenanceWorktreeDire
 // Let this data be cached so we don't need to re-request all the time (and share the requests when many things are made at once)
 let simMetadataPromise!: Promise<SimMetadata>;
 let simPhetioMetadataPromise!: Promise<SimPhetioMetadata[]>;
+// TODO: do this in launchpad, see https://github.com/phetsims/totality/issues/140
 export const invalidateMetadataCache = (): void => {
   winston.debug( 'loading phet brand ReleaseBranches' );
   simMetadataPromise = simMetadata( {
@@ -177,6 +178,40 @@ export class Checkout {
     return checkout;
   }
 
+  public static async getPhetPublishedBranch( repo: Repo ): Promise<LegacyBranch | null> {
+    for ( const simData of ( await simMetadataPromise ).projects ) {
+      const releaseRepo = simData.name.slice( simData.name.indexOf( '/' ) + 1 );
+
+      if ( releaseRepo !== repo ) {
+        continue;
+      }
+
+      return `${simData.version.major}.${simData.version.minor}`;
+    }
+
+    return null;
+  }
+
+  public static async getPhetioPublishedBranches( repo: Repo ): Promise<LegacyBranch[]> {
+    const branches: LegacyBranch[] = [];
+
+    for ( const simData of ( await simPhetioMetadataPromise ) ) {
+      if ( !simData.active || !simData.latest ) {
+        continue;
+      }
+
+      const releaseRepo = simData.name.slice( simData.name.indexOf( '/' ) + 1 );
+
+      if ( releaseRepo !== repo ) {
+        continue;
+      }
+
+      branches.push( `${simData.versionMajor}.${simData.versionMinor}${simData.versionSuffix.length ? `-${simData.versionSuffix}` : ''}` );
+    }
+
+    return branches;
+  }
+
   public static async getReleaseBranchCheckout( repo: Repo, legacyBranch: LegacyBranch ): Promise<Checkout> {
     winston.debug( `getting release branch checkout for ${repo} ${legacyBranch}` );
 
@@ -201,59 +236,64 @@ export class Checkout {
     const supportedBrands = await getBranchBrands( repo, branch );
     winston.debug( `  supportedBrands: ${supportedBrands.join( ',' )}` );
 
-    const includePublishedPhetBrand = ( await simMetadataPromise ).projects.some( simData => {
-      const releaseRepo = simData.name.slice( simData.name.indexOf( '/' ) + 1 );
-      const releaseBranch = `${simData.version.major}.${simData.version.minor}`;
+    const publishedPhetBranch = await Checkout.getPhetPublishedBranch( repo );
+    winston.debug( `  publishedPhetBranch: ${publishedPhetBranch}` );
+    const publishedPhetioBranches = await Checkout.getPhetioPublishedBranches( repo );
+    winston.debug( `  publishedPhetioBranches: ${publishedPhetioBranches.join( ', ' )}` );
 
-      return releaseRepo === repo && releaseBranch === legacyBranch;
-    } );
-    winston.debug( `  includePublishedPhetBrand: ${includePublishedPhetBrand}` );
-
-    const includePublishedPhetioBrand = ( await simPhetioMetadataPromise ).some( simData => {
-      if ( !simData.active || !simData.latest ) {
-        return false;
+    type VersionComparison = 'olderThanPublished' | 'sameAsPublished' | 'newerThanPublished' | 'nothingPublished';
+    const versionComparison = ( publishedBranch: LegacyBranch | null ): VersionComparison => {
+      if ( !publishedBranch ) {
+        return 'nothingPublished';
       }
 
-      const releaseRepo = simData.name;
-      let releaseBranch = `${simData.versionMajor}.${simData.versionMinor}`;
-      if ( simData.versionSuffix.length ) {
-        releaseBranch += `-${simData.versionSuffix}`; // additional dash required
+      const majorMinorFromBranch = ( b: LegacyBranch ) => {
+        const majorMinor = b.split( '-' )[ 0 ];
+
+        return {
+          major: Number( majorMinor.split( '.' )[ 0 ] ),
+          minor: Number( majorMinor.split( '.' )[ 1 ] )
+        };
+      };
+
+      const publishedMajorMinor = majorMinorFromBranch( publishedBranch );
+      const ourMajorMinor = majorMinorFromBranch( legacyBranch );
+
+      if ( ourMajorMinor.major === publishedMajorMinor.major && ourMajorMinor.minor === publishedMajorMinor.minor ) {
+        return 'sameAsPublished';
       }
+      else if ( ourMajorMinor.major < publishedMajorMinor.major || ( ourMajorMinor.major === publishedMajorMinor.major && ourMajorMinor.minor < publishedMajorMinor.minor ) ) {
+        return 'olderThanPublished';
+      }
+      else {
+        return 'newerThanPublished';
+      }
+    };
 
-      return releaseRepo === repo && releaseBranch === legacyBranch;
-    } );
-    winston.debug( `  includePublishedPhetioBrand: ${includePublishedPhetioBrand}` );
+    const phetComparison = versionComparison( publishedPhetBranch );
+    winston.debug( `  phetComparison: ${phetComparison}` );
+    const phetioComparisons = publishedPhetioBranches.map( versionComparison );
+    const hasPhetioBranchMatch = phetioComparisons.some( comparison => comparison === 'sameAsPublished' );
+    winston.debug( `  hasPhetioBranchMatch: ${hasPhetioBranchMatch}` );
 
-    let isReleased = simVersion.isSimPublished;
+    if ( phetComparison === 'olderThanPublished' && !hasPhetioBranchMatch ) {
+      winston.info( `Branch ${repo} ${legacyBranch} is not maintained, not creating a ReleaseBranch object` );
+      return checkout;
+    }
+
+    const isReleased = phetComparison === 'sameAsPublished' || hasPhetioBranchMatch;
     winston.debug( `  isReleased: ${isReleased}` );
 
-    if ( simVersion.isSimPublished && !includePublishedPhetBrand && !includePublishedPhetioBrand ) {
-      // Marking an unreleased sim
-      isReleased = false;
-    }
-    if ( !simVersion.isSimPublished && ( includePublishedPhetBrand || includePublishedPhetioBrand ) ) {
-      throw new Error( `Expected unpublished sim ${repo} ${legacyBranch} to not be included in metadata, but it was` );
-    }
+    const desirePhetBrand = phetComparison !== 'olderThanPublished';
+    const desirePhetioBrand = hasPhetioBranchMatch || !isReleased;
 
-    let brands: string[];
-    if ( simVersion.isSimPublished ) {
-      brands = [
-        ...( includePublishedPhetBrand ? [ 'phet' ] : [] ),
-        ...( includePublishedPhetioBrand ? [ 'phet-io' ] : [] )
-      ];
-      winston.debug( `  published, overriding brands with: ${brands.join( ',' )}` );
-    }
-    else {
-      brands = [
-        // phet-brand always include for presumed unreleased branch
-        'phet',
-        ...( supportedBrands.includes( 'phet-io' ) ? [ 'phet-io' ] : [] )
-      ];
-      winston.debug( `  unpublished, overriding brands with: ${brands.join( ',' )}` );
-    }
+    const brands: string[] = [];
 
-    if ( brands.some( brand => !supportedBrands.includes( brand ) ) ) {
-      throw new Error( `Expected supported brands ${supportedBrands.join( ', ' )} on branch ${repo} ${legacyBranch} to include all of the published brands ${brands.join( ', ' )}` );
+    if ( desirePhetBrand && supportedBrands.includes( 'phet' ) ) {
+      brands.push( 'phet' );
+    }
+    if ( desirePhetioBrand && supportedBrands.includes( 'phet-io' ) ) {
+      brands.push( 'phet-io' );
     }
 
     if ( brands.length === 0 ) {
@@ -269,7 +309,7 @@ export class Checkout {
     const checkout = await Checkout.getReleaseBranchCheckout( repo, legacyBranch );
 
     if ( !checkout.releaseBranch ) {
-      throw new Error( `Expected release branch to be set for ${checkout.branch}` );
+      throw new Error( `Expected release branch to be set for ${checkout.branch}, perhaps this is an old release branch that is not maintained?` );
     }
 
     return checkout.releaseBranch;
