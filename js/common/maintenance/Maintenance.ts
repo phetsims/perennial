@@ -34,6 +34,12 @@ type FilterSyncMB = ( releaseBranch: ModifiedBranch ) => boolean;
 type FilterRB = ( releaseBranch: ReleaseBranch ) => Promise<boolean>;
 type FilterMB = ( releaseBranch: ModifiedBranch ) => Promise<boolean>;
 
+// TODO: re-add cache in maintenance.json? https://github.com/phetsims/totality/issues/140
+// TODO: track release branches in maintenance.json (to at least check if things change) (potentially add SHAs for each release branch): https://github.com/phetsims/totality/issues/140
+// TODO: could check for external changes or mismatches before important steps (production deploy) https://github.com/phetsims/totality/issues/140
+
+// TODO: Testing columns for separate lint / TSC (for where available) https://github.com/phetsims/totality/issues/140
+
 // We will cache release branches in memory (Maintenance tooling can be restarted to get another set)
 const allReleaseBranchesPromise = Checkout.getMaintainedReleaseBranches();
 allReleaseBranchesPromise.then( releaseBranches => {

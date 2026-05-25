@@ -4,11 +4,28 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
+export type Sim = string; // "acid-base-solutions" -- a simulation name
+export type Runnable = string; // "joist" -- a runnable package (has a <runnable>_en.html and can by built/deployed)
+export type Package = string; // "scenery" -- has code and a package.json
+export type Directory = string; // e.g. "qa" -- a top-level directory in totality
+
+export type NonTotalityRepo = string;
+// TODO: new perennial data lists, https://github.com/phetsims/totality/issues/140
+
+// @deprecated TODO: remove usages of this and rename things https://github.com/phetsims/totality/issues/140
 export type Repo = string;
+
 export type SHA = string;
-export type Branch = string; // for release branches or otherwise, should always be a fully-qualified branch name, e.g. 'releases/acid-base-solutions/1.3'
-export type LegacyBranch = string; // for release branches, e.g. '1.2'
+
+export type Branch = string; // for release branches or otherwise, should always be a fully-qualified totality branch name, e.g. 'releases/acid-base-solutions/1.3'
+
+export type BranchVersion = string; // for release branches, e.g. '1.3' or '1.3-phetio'
+
+// @deprecated TODO: replace with BranchVersion https://github.com/phetsims/totality/issues/140
+export type LegacyBranch = string; // for release branches, e.g. '1.3' or '1.3-phetio'
+
 export type BranchOrSHA = Branch | SHA; // for cases where we can allow either
+
 export type BuildServerTarget = 'dev' | 'production';
 export type VersionString = string; // SimVersion-compatible string
 export type FullStringKey = string; // including the require.js namespace, e.g. 'JOIST/foo.bar'
@@ -110,6 +127,7 @@ export type BuildInfoJSON = {
 export type SupportedBuildServerVersion = '3.0';
 export type SupportedBuildServerBrand = 'phet' | 'phet-io';
 
+// TODO: create BuildServerAPIData that requests and tasks can pick out, move SimTask to build-server https://github.com/phetsims/totality/issues/140
 export type BuildServerSimTask = {
   type: 'sim';
 

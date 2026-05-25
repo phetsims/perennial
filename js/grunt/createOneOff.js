@@ -4,7 +4,7 @@
  * For `grunt create-one-off`, see Gruntfile for details
  *
  * TODO: potentially get rid of this, aren't we hooking into the Checkout methods directly? Or update this: https://github.com/phetsims/totality/issues/140
- * TODO: update this https://github.com/phetsims/totality/issues/140
+ * TODO: update this:   branches like one-off/${sim}/${one-off-name} https://github.com/phetsims/totality/issues/140
  *
  * @author Jonathan Olson (PhET Interactive Simulations)
  */

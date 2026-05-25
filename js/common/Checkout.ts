@@ -1,7 +1,11 @@
 // Copyright 2026, University of Colorado Boulder
 
 /**
- * Represents a checked out (either main copy or worktree)
+ * Represents a checked out copy of totality (either main copy or worktree).
+ *
+ * Checkouts can either be:
+ *  - a "full" checkout (contains all totality code, i.e. main branch)
+ *  - a "release branch" checkout (top-level directories are pruned so only packages needed for the specific sim are present)
  *
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
@@ -62,7 +66,7 @@ export const invalidateMetadataCache = (): void => {
   winston.debug( 'loading phet-io brand ReleaseBranches' );
   simPhetioMetadataPromise = simPhetioMetadata( {
     active: true,
-    latest: true
+    latest: true // TODO: oh dear, check everywhere 'latest' exists, because once ph-scale 1.5 is fixed, we should ABSOLUTELY not use it https://github.com/phetsims/totality/issues/140
   } );
 };
 invalidateMetadataCache();

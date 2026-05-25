@@ -4,6 +4,8 @@
  * PhET build and deploy server. The server is designed to run on the same host as the production site (phet-server.int.colorado.edu).
  * This file initializes the app and the main process queue.
  *
+ * TODO: move to top-level build-server directory https://github.com/phetsims/totality/issues/140
+ *
  * @author Aaron Davis
  * @author Matt Pennington
  */
