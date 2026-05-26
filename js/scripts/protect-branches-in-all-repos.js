@@ -9,6 +9,10 @@
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 
+// TODO: not ported to totality, see https://github.com/phetsims/totality/issues/140
+// eslint-disable
+// @ts-nocheck
+
 const protectGithubBranches = require( '../common/protectGithubBranches' );
 const fs = require( 'fs' );
 

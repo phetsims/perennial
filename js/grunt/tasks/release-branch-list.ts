@@ -13,7 +13,7 @@
 
 import assert from 'assert';
 import _ from 'lodash';
-import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
+import { assertIsValidDependencyName } from '../../common/assertIsValidDependencyName.js';
 import getOption from './util/getOption.js';
 import { Checkout } from '../../common/Checkout.js';
 import { ReleaseBranch } from '../../common/ReleaseBranch.js';
@@ -32,7 +32,7 @@ import cliProgress from 'cli-progress';
   const order = getOption( 'order' ) || 'alphabetical';
 
   if ( repo ) {
-    assertIsValidRepoName( repo );
+    assertIsValidDependencyName( repo );
   }
 
   assert( order === 'alphabetical' || order === 'date', `unsupported order type: ${order}` );

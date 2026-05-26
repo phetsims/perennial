@@ -11,14 +11,14 @@ import { devSsh } from '../common/devSsh.js';
 import rsync from 'rsync';
 import winston from 'winston';
 import fs from 'fs';
-import { Repo } from '../browser-and-node/PerennialTypes.js';
 import { ChipperVersion } from '../common/ChipperVersion.js';
+import { Sim } from '../browser-and-node/PerennialTypes.js';
 
 const user = constants.BUILD_SERVER_CONFIG.devUsername;
 const host = constants.BUILD_SERVER_CONFIG.devDeployServer;
 
 export const devDeploy = async (
-  simName: Repo,
+  simName: Sim,
   versionString: string,
   chipperVersion: ChipperVersion,
   brands: string[],

@@ -7,7 +7,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';
-import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
+import { assertIsValidDependencyName } from '../../common/assertIsValidDependencyName.js';
 import { checkoutRelease } from '../../common/checkoutRelease.js';
 import getOption from './util/getOption.js';
 
@@ -15,7 +15,7 @@ import getOption from './util/getOption.js';
   const repo = getOption( 'repo' );
 
   assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
-  assertIsValidRepoName( repo );
+  assertIsValidDependencyName( repo );
 
   await checkoutRelease( repo );
 } )();

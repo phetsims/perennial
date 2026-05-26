@@ -9,7 +9,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';
-import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
+import { assertIsValidDependencyName } from '../../common/assertIsValidDependencyName.js';
 import getOption from './util/getOption.js';
 import { Checkout } from '../../common/Checkout.js';
 
@@ -21,7 +21,7 @@ import { Checkout } from '../../common/Checkout.js';
   const target = getOption( 'target' ) || getOption( 'branch' );
   assert( target, 'Requires specifying a branch/SHA with --target={{BRANCH}}' );
 
-  assertIsValidRepoName( repo );
+  assertIsValidDependencyName( repo );
 
   await ( await Checkout.getReleaseBranchCheckout( repo, target ) ).update();
 } )();

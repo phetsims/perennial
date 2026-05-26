@@ -10,7 +10,7 @@
  */
 
 import assert from 'assert';
-import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
+import { assertIsValidDependencyName } from '../../common/assertIsValidDependencyName.js';
 import getOption from './util/getOption.js';
 import { Checkout } from '../../common/Checkout.js';
 
@@ -27,6 +27,6 @@ import { Checkout } from '../../common/Checkout.js';
   assert( branch, 'Requires specifying a branch with --branch={{BRANCH}}' );
   assert( branch.split( '.' ).length === 2, 'Branch should be {{MAJOR}}.{{MINOR}}' );
 
-  assertIsValidRepoName( repo );
+  assertIsValidDependencyName( repo );
   await Checkout.createReleaseBranchCheckout( repo, branch, brands.split( ',' ), message );
 } )();

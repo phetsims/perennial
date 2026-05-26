@@ -8,7 +8,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';
-import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
+import { assertIsValidDependencyName } from '../../common/assertIsValidDependencyName.js';
 import createOneOff from '../createOneOff.js';
 import getOption from './util/getOption.js';
 
@@ -21,7 +21,7 @@ import getOption from './util/getOption.js';
   assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
   assert( branch, 'Requires specifying a branch with --branch={{BRANCH}}' );
   assert( !branch.includes( '-' ) && !branch.includes( '.' ), 'Branch should not contain dashes or periods' );
-  assertIsValidRepoName( repo );
+  assertIsValidDependencyName( repo );
 
   await createOneOff( repo, branch, message );
 } )();

@@ -9,17 +9,17 @@
 import simMetadata from './simMetadata.js';
 import simPhetioMetadata from './simPhetioMetadata.js';
 import _ from 'lodash';
-import { Repo } from '../browser-and-node/PerennialTypes.js';
+import { Sim } from '../browser-and-node/PerennialTypes.js';
 
-export const getPublishedSims = async (): Promise<Repo[]> => {
-  const publishedRepos: string[] = [];
+export const getPublishedSims = async (): Promise<Sim[]> => {
+  const publishedSims: string[] = [];
 
   const metadata = await simMetadata( {
     includePrototypes: false
   } );
   metadata.projects.forEach( projectData => {
     if ( projectData.name.startsWith( 'html/' ) ) {
-      publishedRepos.push( projectData.name.substring( 'html/'.length ) );
+      publishedSims.push( projectData.name.substring( 'html/'.length ) );
     }
   } );
 
@@ -27,8 +27,8 @@ export const getPublishedSims = async (): Promise<Repo[]> => {
     active: true,
     latest: true
   } ) ).filter( simData => simData.active && simData.latest ).forEach( simData => {
-    publishedRepos.push( simData.name );
+    publishedSims.push( simData.name );
   } );
 
-  return _.uniq( publishedRepos ).sort();
+  return _.uniq( publishedSims ).sort();
 };

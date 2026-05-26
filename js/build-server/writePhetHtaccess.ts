@@ -10,10 +10,10 @@ import constants from './constants.js';
 import SimVersion from '../browser-and-node/SimVersion.js';
 import axios from 'axios';
 import fs from 'fs';
-import { Repo } from '../browser-and-node/PerennialTypes.js';
+import { Sim } from '../browser-and-node/PerennialTypes.js';
 
 export const writePhetHtaccess = async (
-  simName: Repo,
+  simName: Sim,
   version: string
 ): Promise<void> => {
   const metadataURL = `${constants.BUILD_SERVER_CONFIG.productionServerURL}/services/metadata/1.2/simulations?format=json&type=html&summary&include-unpublished=true&simulation=${simName}`;

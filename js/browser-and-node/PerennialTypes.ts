@@ -6,7 +6,7 @@
 
 export type Sim = string; // "acid-base-solutions" -- a simulation name
 export type Runnable = string; // "joist" -- a runnable package (has a <runnable>_en.html and can by built/deployed)
-export type Package = string; // "scenery" -- has code and a package.json
+export type Dependency = string; // "scenery" -- has code and a package.json
 export type Directory = string; // e.g. "qa" -- a top-level directory in totality
 
 export type NonTotalityRepo = string;

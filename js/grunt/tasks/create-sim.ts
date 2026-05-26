@@ -9,7 +9,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';
-import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
+import { assertIsValidDependencyName } from '../../common/assertIsValidDependencyName.js';
 import createSim from '../createSim.js';
 import getOption from './util/getOption.js';
 
@@ -24,6 +24,6 @@ import getOption from './util/getOption.js';
     assert( repo, 'Requires specifying a repository name with --repo={{REPO}}' );
     assert( getOption( 'author' ), 'Requires specifying a author with --author={{AUTHOR}}' );
 
-    assertIsValidRepoName( repo );
+    assertIsValidDependencyName( repo );
     await createSim( repo, author, { title: title, clean: clean } );
 } )();

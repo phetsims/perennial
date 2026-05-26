@@ -14,6 +14,9 @@ const protectGithubBranches = require( '../common/protectGithubBranches' );
  * @author Jesse Greenberg (PhET Interactive Simulations)
  */
 
+// TODO: not ported to totality, see https://github.com/phetsims/totality/issues/140
+// eslint-disable
+// @ts-nocheck
 
 const args = process.argv.slice( 2 );
 const repo = args[ 0 ];

@@ -11,7 +11,7 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';
-import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
+import { assertIsValidDependencyName } from '../../common/assertIsValidDependencyName.js';
 import { markRunnableAsPublished } from '../../common/markRunnableAsPublished.js';
 import { production } from '../../common/deployment/production.js';
 import getOption from './util/getOption.js';
@@ -25,7 +25,7 @@ winston.default.transports.console.level = 'info';
   const repo = getOption( 'repo' );
   assert( getOption( 'repo' ), 'Requires specifying a repository with --repo={{REPOSITORY}}' );
   assert( getOption( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
-  assertIsValidRepoName( repo );
+  assertIsValidDependencyName( repo );
 
   await markRunnableAsPublished( repo );
 

@@ -11,7 +11,7 @@
  */
 
 import assert from 'assert';
-import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
+import { assertIsValidDependencyName } from '../../common/assertIsValidDependencyName.js';
 import { getBranch } from '../../common/git/getBranch.js';
 import { dev } from '../../common/deployment/dev.js';
 import getOption from './util/getOption.js';
@@ -24,7 +24,7 @@ import { gitCheckout } from '../../common/git/gitCheckout.js';
 
   assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
   assert( brands, 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
-  assertIsValidRepoName( repo );
+  assertIsValidDependencyName( repo );
 
   let branch = getOption( 'branch' );
   if ( !branch ) {

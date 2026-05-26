@@ -11,7 +11,7 @@
  */
 
 import assert from 'assert';
-import { assertIsValidRepoName } from '../../common/assertIsValidRepoName.js';
+import { assertIsValidDependencyName } from '../../common/assertIsValidDependencyName.js';
 import { rc } from '../../common/deployment/rc.js';
 import getOption from './util/getOption.js';
 import winston from 'winston';
@@ -23,7 +23,7 @@ winston.default.transports.console.level = 'debug';
   const repo = getOption( 'repo' );
   assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
   assert( getOption( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
-  assertIsValidRepoName( repo );
+  assertIsValidDependencyName( repo );
 
   await rc( repo, getOption( 'branch' ), {
     noninteractive: !!getOption( 'noninteractive' ),

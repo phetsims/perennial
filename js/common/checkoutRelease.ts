@@ -10,21 +10,21 @@ import assert from 'assert';
 import winston from 'winston';
 import simMetadata from './simMetadata.js';
 import { Checkout } from './Checkout.js';
-import { Repo } from '../browser-and-node/PerennialTypes.js';
+import { Sim } from '../browser-and-node/PerennialTypes.js';
 
 /**
  * Checks out the latest release branch (and dependencies) for a repository.
  */
-export const checkoutRelease = async ( repo: Repo ): Promise<void> => {
-  winston.info( `checking out release for ${repo}` );
+export const checkoutRelease = async ( sim: Sim ): Promise<void> => {
+  winston.info( `checking out release for ${sim}` );
 
   const data = await simMetadata( {
-    simulation: repo
+    simulation: sim
   } );
 
   assert( data.projects.length === 1, 'Metadata request should only return 1 simulation result' );
 
   const branch = `${data.projects[ 0 ].version.major}.${data.projects[ 0 ].version.minor}`;
 
-  await ( await Checkout.getReleaseBranchCheckout( repo, branch ) ).update();
+  await ( await Checkout.getReleaseBranchCheckout( sim, branch ) ).update();
 };

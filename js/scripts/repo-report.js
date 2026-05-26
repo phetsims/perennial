@@ -11,6 +11,10 @@
  * TODO https://github.com/phetsims/tasks/issues/942 This is a "quick" version which could benefit from documentation, better command line hygiene, more options, etc.
  */
 
+// TODO: not ported to totality, see https://github.com/phetsims/totality/issues/140
+// eslint-disable
+// @ts-nocheck
+
 const { exec } = require( 'child_process' );
 
 exec( 'git rev-list main', ( error, stdout, stderr ) => {
