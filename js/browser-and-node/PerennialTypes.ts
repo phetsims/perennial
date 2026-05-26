@@ -85,6 +85,8 @@ export type PackageJSON = {
     // the start of a fully-qualified string key for this repo, e.g. 'JOIST'.
     requirejsNamespace?: string;
 
+    readmeCreatedManually?: boolean;
+
     simFeatures?: {
       supportsGestureControl?: boolean;
       supportsInteractiveDescription?: boolean;

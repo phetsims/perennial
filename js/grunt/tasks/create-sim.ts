@@ -2,28 +2,28 @@
 
 /**
  * Creates a sim based on the simula-rasa template.
- * --repo="string" : the repository name
+ * --sim="string" : the sim name
  * --author="string" : the author name
  * --title="string" : (optional) the simulation title
- * --clean=true : (optional) deletes the repository directory if it exists
+ * --clean=true : (optional) deletes the sim directory if it exists
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';
 import { assertIsValidDependencyName } from '../../common/assertIsValidDependencyName.js';
-import createSim from '../createSim.js';
+import { createSim } from '../../common/createSim.js';
 import getOption from './util/getOption.js';
 
 ( async () => {
 
-    const repo = getOption( 'repo' );
+    const sim = getOption( 'sim' );
 
     const author = getOption( 'author' );
     const title = getOption( 'title' );
     const clean = getOption( 'clean' );
 
-    assert( repo, 'Requires specifying a repository name with --repo={{REPO}}' );
+    assert( sim, 'Requires specifying a sim name with --sim={{REPO}}' );
     assert( getOption( 'author' ), 'Requires specifying a author with --author={{AUTHOR}}' );
 
-    assertIsValidDependencyName( repo );
-    await createSim( repo, author, { title: title, clean: clean } );
+    assertIsValidDependencyName( sim );
+    await createSim( sim, author, { title: title, clean: clean } );
 } )();
