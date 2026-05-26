@@ -7,6 +7,10 @@
  *  - a "full" checkout (contains all totality code, i.e. main branch)
  *  - a "release branch" checkout (top-level directories are pruned so only packages needed for the specific sim are present)
  *
+ * TODO: doc https://github.com/phetsims/totality/issues/140
+ *
+ * TODO: separate out static functions into separate files where appropriate https://github.com/phetsims/totality/issues/140
+ *
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
@@ -36,10 +40,10 @@ import simPhetioMetadata, { SimPhetioMetadata } from './simPhetioMetadata.js';
 import { getActiveSims } from './repos/getActiveSims.js';
 import { getBranches } from './git/getBranches.js';
 import os from 'os';
-import { Branch, BranchOrSHA, IntentionalPerennialAny, LegacyBranch, LocaleData, Repo, SHA } from '../browser-and-node/PerennialTypes.js';
+import { Branch, BranchOrSHA, BranchVersion, IntentionalPerennialAny, LegacyBranch, LocaleData, Repo, SHA, Sim } from '../browser-and-node/PerennialTypes.js';
 import assert from 'assert';
 import { getBranch } from './git/getBranch.js';
-import { hasRemoteBranch } from './hasRemoteBranch.js';
+import { hasRemoteBranch } from './git/hasRemoteBranch.js';
 import SimVersion from '../browser-and-node/SimVersion.js';
 import { gitIsClean } from './git/gitIsClean.js';
 import { RunnableBranch } from './RunnableBranch.js';
@@ -327,12 +331,26 @@ export class Checkout {
     return ( await Checkout.getCurrentPrimaryCheckout() ).getRunnableBranch( repo );
   }
 
-  public static getReleaseBranchName( repo: Repo, legacyBranch: LegacyBranch ): Branch {
-    if ( legacyBranch.startsWith( 'releases/' ) ) {
-      throw new Error( `Expected legacy branch to not start with releases/, got: ${legacyBranch}` );
+  /**
+   * Returns the branch name for the given sim and branchVersion. Only release branches should start with releases/
+   */
+  public static getReleaseBranchName( sim: Sim, branchVersion: BranchVersion ): Branch {
+    if ( branchVersion.startsWith( 'releases/' ) ) {
+      throw new Error( `Expected branch version to not start with releases/, got: ${branchVersion}` );
     }
 
-    return `releases/${repo}/${legacyBranch}`;
+    return `releases/${sim}/${branchVersion}`;
+  }
+
+  /**
+   * Returns the branch name for the given sim and one-off name. Only one-off branches should start with one-off/
+   */
+  public static getOneOffBranchName( sim: Sim, oneOffName: string ): Branch {
+    if ( oneOffName.startsWith( 'one-off/' ) ) {
+      throw new Error( `Expected one-off name to not start with releases/, got: ${oneOffName}` );
+    }
+
+    return `one-off/${sim}/${oneOffName}`;
   }
 
   public static getWorktreeDirectory( branch: BranchOrSHA ): string {
@@ -446,6 +464,60 @@ export class Checkout {
       testNumber: 0
     } ), message );
     await mainRunnableBranch.updateHTMLVersion();
+
+    return checkout;
+  }
+
+  public static async createOneOffCheckout(
+    sim: Sim,
+    oneOffName: string,
+    message?: string // appended to the commit message for the initial release branch commit, if provided
+  ): Promise<Checkout> {
+    const branch = Checkout.getOneOffBranchName( sim, oneOffName );
+
+    const hasBranchAlready = await hasRemoteBranch( branch );
+    if ( hasBranchAlready ) {
+
+      // Comment this line out if you know, because you just created the branch on accident.
+      throw new Error( 'Branch already exists, aborting' );
+    }
+
+    const primaryCheckout = await Checkout.getCurrentPrimaryCheckout();
+    const mainRunnableBranch = await primaryCheckout.getRunnableBranch( sim );
+
+    const branchedVersion = await mainRunnableBranch.getSimVersion();
+
+    const newVersion = new SimVersion( branchedVersion.major, branchedVersion.minor, 0, {
+      testType: branch,
+      testNumber: 0
+    } );
+
+    const isClean = await primaryCheckout.isClean();
+    if ( !isClean ) {
+      throw new Error( 'Unclean status, cannot create one-off branch' );
+    }
+
+    const checkout = new Checkout( branch, false, false, Checkout.getWorktreeDirectory( branch ), false );
+
+    winston.info( `Creating branch ${branch}` );
+
+    // Create the branch in git, and push it directly (not using the other helpers, since we are doing this from the MAIN directory)
+    await gitMutableExecute( [ 'checkout', '-b', branch ], '..' );
+    await gitMutableExecute( [ 'push', '-u', 'origin', branch ], '..' ); // not using this.gitPush, since this is our first
+    await gitMutableExecute( [ 'checkout', primaryCheckout.branch ], '..' );
+
+    // Ensure that we are remotely tracked now (sanity check)
+    winston.info( `Setting up tracking remote branch ${branch}` );
+    await ensureLocalBranchFromRemote( branch );
+
+    // Ensure we have a checkout (so we can modify and push from that region).
+    winston.info( 'Creating worktree' );
+    await checkout.updateWorktree();
+
+    const runnableBranch = await checkout.getRunnableBranch( sim );
+
+    winston.info( 'Worktree setting/pushing sim version' );
+    await runnableBranch.setSimVersion( newVersion, message );
 
     return checkout;
   }

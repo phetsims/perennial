@@ -9,7 +9,7 @@
 import SimVersion from '../../browser-and-node/SimVersion.js';
 import { Checkout } from '../Checkout.js';
 import { gitIsClean } from '../git/gitIsClean.js';
-import { hasRemoteBranch } from '../hasRemoteBranch.js';
+import { hasRemoteBranch } from '../git/hasRemoteBranch.js';
 import { vpnCheck } from '../vpnCheck.js';
 import { booleanPrompt } from '../booleanPrompt.js';
 import simMetadata from '../simMetadata.js';

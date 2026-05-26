@@ -7,8 +7,8 @@
  */
 
 import winston from 'winston';
-import { gitImmutableExecute } from './git/gitMutex.js';
-import { Branch } from '../browser-and-node/PerennialTypes.js';
+import { gitImmutableExecute } from './gitMutex.js';
+import { Branch } from '../../browser-and-node/PerennialTypes.js';
 
 /**
  * Whether there is a remote branch for a given repo.

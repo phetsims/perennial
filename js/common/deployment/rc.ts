@@ -10,7 +10,7 @@ import SimVersion from '../../browser-and-node/SimVersion.js';
 import { Repo } from '../../browser-and-node/PerennialTypes.js';
 import { vpnCheck } from '../vpnCheck.js';
 import { gitIsClean } from '../git/gitIsClean.js';
-import { hasRemoteBranch } from '../hasRemoteBranch.js';
+import { hasRemoteBranch } from '../git/hasRemoteBranch.js';
 import { booleanPrompt } from '../booleanPrompt.js';
 import { buildLocal } from '../buildLocal.js';
 import { devDirectoryExists } from '../devDirectoryExists.js';
