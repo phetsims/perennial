@@ -40,7 +40,7 @@ import simPhetioMetadata, { SimPhetioMetadata } from './simPhetioMetadata.js';
 import { getActiveSims } from './repos/getActiveSims.js';
 import { getBranches } from './git/getBranches.js';
 import os from 'os';
-import { Branch, BranchOrSHA, BranchVersion, IntentionalPerennialAny, LegacyBranch, LocaleData, Repo, SHA, Sim } from '../browser-and-node/PerennialTypes.js';
+import { Branch, BranchOrSHA, BranchVersion, IntentionalPerennialAny, LegacyBranch, LocaleData, Repo, Runnable, SHA, Sim } from '../browser-and-node/PerennialTypes.js';
 import assert from 'assert';
 import { getBranch } from './git/getBranch.js';
 import { hasRemoteBranch } from './git/hasRemoteBranch.js';
@@ -118,13 +118,13 @@ export class Checkout {
       throw new Error( `Expected primary checkout to be checked out, but it is not for branch ${branch}` );
     }
 
-    if ( !isPrimary && branch === 'main' ) {
+    if ( !isPrimary && Checkout.isBranchNameMainlike( branch ) ) {
       throw new Error( 'Should not be creating a non-primary checkout for main branch' );
     }
   }
 
   public static async hasWorktree( branch: BranchOrSHA ): Promise<boolean> {
-    if ( branch === 'main' ) {
+    if ( Checkout.isBranchNameMainlike( branch ) ) {
       throw new Error( 'Should not be checking for a worktree for main branch' );
     }
 
@@ -154,12 +154,8 @@ export class Checkout {
     return new Checkout( 'main', true, false, '..', true );
   }
 
-  /**
-   * NOTE: BE CAREFUL, this is set as isCheckedOut: true. Code using this should keep it on the branch
-   * while it is in scope
-   */
   public static async getOneOffCheckout( branch: Branch ): Promise<Checkout> {
-    return new Checkout( branch, true, false, '..', true );
+    return Checkout.getGenericBranchCheckout( branch, false );
   }
 
   public static async getGenericBranchCheckout( branch: BranchOrSHA, isPrimary = false ): Promise<Checkout> {
@@ -350,11 +346,22 @@ export class Checkout {
       throw new Error( `Expected one-off name to not start with releases/, got: ${oneOffName}` );
     }
 
+    if ( oneOffName.includes( '/' ) ) {
+      throw new Error( `Expected one-off name to not include slashes, got: ${oneOffName}` );
+    }
+
     return `one-off/${sim}/${oneOffName}`;
   }
 
+  /**
+   * Used during development to be able to treat non-main branches as if they were main
+   */
+  public static isBranchNameMainlike( branch: Branch ): boolean {
+    return branch === 'main' || branch === 'features/totality/issues/140';
+  }
+
   public static getWorktreeDirectory( branch: BranchOrSHA ): string {
-    if ( branch === 'main' ) {
+    if ( Checkout.isBranchNameMainlike( branch ) ) {
       throw new Error( 'Should not be getting a worktree directory for main branch' );
     }
 
@@ -382,12 +389,11 @@ export class Checkout {
 
     const currentBranch = await getBranch();
     // TODO: remove this testing branch for the future https://github.com/phetsims/totality/issues/140
-    if ( currentBranch !== 'main' && currentBranch !== 'features/totality/issues/140' ) {
+    if ( !Checkout.isBranchNameMainlike( currentBranch ) ) {
       throw new Error( `Should be on main to create a release branch, not: ${currentBranch ? currentBranch : '(detached head)'}` );
     }
 
-    // TODO: remove this testing branch for the future https://github.com/phetsims/totality/issues/140 --- only have getMainCheckout() and TEST
-    const primaryCheckout = currentBranch === 'main' ? await Checkout.getMainCheckout() : await Checkout.getCurrentPrimaryCheckout();
+    const primaryCheckout = await Checkout.getCurrentPrimaryCheckout();
 
     const hasBranchAlready = await hasRemoteBranch( branch );
     if ( hasBranchAlready ) {
@@ -457,13 +463,13 @@ export class Checkout {
     // Update the version info in main
     winston.info( 'Updating main sim version and HTML' );
     // TODO: remove this testing branch for the future https://github.com/phetsims/totality/issues/140 (only support main)
-    const mainRunnableBranch = currentBranch === 'main' ? await Checkout.getMainRunnableBranch( repo ) : await ( await Checkout.getCurrentPrimaryCheckout() ).getRunnableBranch( repo );
-    await mainRunnableBranch.checkout.gitPullRebase();
-    await mainRunnableBranch.setSimVersion( new SimVersion( major, minor + 1, 0, {
+    const primaryRunnableBranch = await ( await Checkout.getCurrentPrimaryCheckout() ).getRunnableBranch( repo );
+    await primaryRunnableBranch.checkout.gitPullRebase();
+    await primaryRunnableBranch.setSimVersion( new SimVersion( major, minor + 1, 0, {
       testType: 'dev',
       testNumber: 0
     } ), message );
-    await mainRunnableBranch.updateHTMLVersion();
+    await primaryRunnableBranch.updateHTMLVersion();
 
     return checkout;
   }
@@ -627,10 +633,10 @@ export class Checkout {
     return Promise.all( _.sortBy( stubs, [ 'repo', 'branch' ] ).map( stub => limit( () => Checkout.getReleaseBranch( stub.repo, stub.branch ) ) ) );
   }
 
-  public async getRunnableBranch( repo: Repo ): Promise<RunnableBranch> {
-    const brands = await getBranchBrands( repo, this.branch );
+  public async getRunnableBranch( runnable: Runnable ): Promise<RunnableBranch> {
+    const brands = await getBranchBrands( runnable, this.branch );
 
-    return new RunnableBranch( this, repo, brands );
+    return new RunnableBranch( this, runnable, brands );
   }
 
   public async gitAdd( file: string ): Promise<string> {
@@ -933,7 +939,7 @@ export class Checkout {
   }
 
   public async updateWorktree(): Promise<void> {
-    if ( this.branch === 'main' ) {
+    if ( Checkout.isBranchNameMainlike( this.branch ) ) {
       throw new Error( 'We do not have a separate worktree for main' );
     }
     if ( this.isPrimary ) {
@@ -969,7 +975,7 @@ export class Checkout {
   }
 
   public async removeWorktree(): Promise<void> {
-    if ( this.branch === 'main' ) {
+    if ( Checkout.isBranchNameMainlike( this.branch ) ) {
       throw new Error( 'Cannot remove worktree for main branch' );
     }
 

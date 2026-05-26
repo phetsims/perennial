@@ -19,6 +19,7 @@ import winston from 'winston';
 import { writePhetioHtaccess } from '../writePhetioHtaccess.js';
 import { devSsh } from '../devSsh.js';
 import { devScp } from '../devScp.js';
+import { Runnable } from '../../browser-and-node/PerennialTypes.js';
 
 class DevDeployError extends Error {
   public constructor( message: string ) {
@@ -42,17 +43,18 @@ export type DevDeployOptions = {
  * Deploys a dev version after incrementing the test version number.
  */
 export const dev = async (
-  repo: string,
+  runnable: Runnable,
   options?: DevDeployOptions
 ): Promise<SimVersion> => {
   const noninteractive = options?.noninteractive ?? false;
   const message = options?.message;
   const branch = options?.oneOffBranch ?? 'main';
 
-  const checkout = branch === 'main' ? await Checkout.getMainCheckout() : await Checkout.getOneOffCheckout( branch );
-  const runnableBranch = await checkout.getRunnableBranch( repo );
+  const isOneOff = !Checkout.isBranchNameMainlike( branch );
 
-  const isOneOff = branch !== 'main';
+  const checkout = isOneOff ? await Checkout.getOneOffCheckout( branch ) : await Checkout.getMainCheckout();
+  const runnableBranch = await checkout.getRunnableBranch( runnable );
+
   const testType = isOneOff ? branch : 'dev';
   if ( isOneOff ) {
     assert( !branch.includes( '-' ), 'One-off versions should be from branches that do not include hyphens' );
@@ -78,6 +80,10 @@ export const dev = async (
     }
   }
 
+  if ( !checkout.isCheckedOut ) {
+    await checkout.update();
+  }
+
   if ( !await checkout.isClean() ) {
     throw new DevDeployError( `Unclean status in ${checkout.branch}, cannot deploy` );
   }
@@ -87,7 +93,7 @@ export const dev = async (
 
   // Ensure that the repository and its dependencies pass lint before continuing.
   // See https://github.com/phetsims/perennial/issues/76
-  await lintProject( repo ); // NOTE: This does NOT use a checkout-relative path, but a relative path
+  await runnableBranch.lint();
 
   // Bump the version
   const version = new SimVersion( previousVersion.major, previousVersion.minor, previousVersion.maintenance, {
@@ -96,7 +102,7 @@ export const dev = async (
   } );
 
   const versionString = version.toString();
-  const simPath = buildLocal.devDeployPath + repo;
+  const simPath = buildLocal.devDeployPath + runnable;
   const versionPath = `${simPath}/${versionString}`;
 
   const simPathExists = await devDirectoryExists( simPath );
@@ -110,8 +116,7 @@ export const dev = async (
     throw new Error( `Aborted ${testType} deploy` );
   }
 
-  await checkout.npmUpdateRepo( 'chipper' );
-  await checkout.npmUpdateRepo( 'perennial-alias' );
+  await checkout.npmUpdate();
 
   await runnableBranch.setSimVersion( version, message );
   await runnableBranch.updateHTMLVersion();
@@ -125,8 +130,8 @@ export const dev = async (
   // This is for PhET-iO simulations, to protected the password protected wrappers, see
   // https://github.com/phetsims/phet-io/issues/641
   if ( runnableBranch.brands.includes( 'phet-io' ) && buildLocal.devDeployServer === 'bayes.colorado.edu' ) {
-    const htaccessLocation = `../${repo}/build/phet-io`;
-    await writePhetioHtaccess( repo, htaccessLocation, {
+    const htaccessLocation = `../${runnable}/build/phet-io`;
+    await writePhetioHtaccess( runnable, htaccessLocation, {
       checkoutDir: '../'
     } );
   }
@@ -141,13 +146,13 @@ export const dev = async (
 
   // Copy the build contents into the version-specific directory
   for ( const brand of runnableBranch.brands ) {
-    await devScp( `../${repo}/build/${brand}`, `${versionPath}/` );
+    await devScp( `../${runnable}/build/${brand}`, `${versionPath}/` );
   }
 
-  const versionURL = `https://phet-dev.colorado.edu/html/${repo}/${versionString}`;
+  const versionURL = `https://phet-dev.colorado.edu/html/${runnable}/${versionString}`;
 
   if ( runnableBranch.brands.includes( 'phet' ) ) {
-    winston.info( `Deployed: ${versionURL}/phet/${repo}_all_phet.html` );
+    winston.info( `Deployed: ${versionURL}/phet/${runnable}_all_phet.html` );
   }
   if ( runnableBranch.brands.includes( 'phet-io' ) ) {
     winston.info( `Deployed: ${versionURL}/phet-io/` );

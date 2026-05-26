@@ -111,7 +111,21 @@ export class RunnableBranch {
   }
 
   /**
-   * Builds the simulation
+   * Lints the runnable.
+   *
+   * Returns stdout of the process
+   */
+  public async lint( executeOptions?: ExecuteOptions & { errors?: 'reject' } ): Promise<string> {
+    winston.info( `linting ${this.repo}` );
+
+    // Lint from chipper in case sim runnable doesn't have node_modules, see https://github.com/phetsims/totality/issues/27
+    return execute( gruntCommand, [ 'lint-project', `--repo=${this.repo}` ], '../chipper', executeOptions );
+  }
+
+  /**
+   * Builds the runnable.
+   *
+   * Returns stdout of the process
    */
   public async build( options?: Partial<BuildOptions>, executeOptions?: ExecuteOptions & { errors?: 'reject' } ): Promise<string> {
     if ( !this.checkout.isCheckedOut ) {

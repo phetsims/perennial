@@ -8,13 +8,13 @@
 
 import winston from 'winston';
 import { getBranchPackageJSON } from './getBranchPackageJSON.js';
-import { Branch, Repo } from '../browser-and-node/PerennialTypes.js';
+import { Branch, Runnable } from '../browser-and-node/PerennialTypes.js';
 
-export const getBranchBrands = async ( repo: Repo, branch: Branch ): Promise<string[]> => {
-  winston.debug( `Reading version from package.json for ${repo}` );
+export const getBranchBrands = async ( runnable: Runnable, branch: Branch ): Promise<string[]> => {
+  winston.debug( `Reading version from package.json for ${runnable}` );
 
-  // Should only be called on repos with phet defined in package.json, so a hard failure on nonexistence is great.
-  const brands = ( await getBranchPackageJSON( repo, branch ) ).phet!.supportedBrands;
+  // Should only be called on runnables with phet defined in package.json, so a hard failure on nonexistence is great.
+  const brands = ( await getBranchPackageJSON( runnable, branch ) ).phet!.supportedBrands;
 
   if ( !brands || !Array.isArray( brands ) ) {
     // This is likely chipper 1.0, so we'll manually specify the brands based on the branch name. This is not ideal, but it is better than failing.
