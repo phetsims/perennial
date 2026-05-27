@@ -10,10 +10,10 @@ import winston from 'winston';
 import { gitImmutableExecute } from './gitMutex.js';
 import { Branch } from '../../browser-and-node/PerennialTypes.js';
 
-export const getBranches = async (): Promise<Branch[]> => {
+export const getBranches = async ( directory = '..' ): Promise<Branch[]> => {
   winston.debug( 'retrieving branches' );
 
-  return ( await gitImmutableExecute( [ 'ls-remote' ], '..' ) ).split( '\n' ).filter( line => line.includes( 'refs/heads/' ) ).map( line => {
+  return ( await gitImmutableExecute( [ 'ls-remote' ], directory ) ).split( '\n' ).filter( line => line.includes( 'refs/heads/' ) ).map( line => {
     return line.match( /refs\/heads\/(.*)/ )![ 1 ].trim();
   } );
 };

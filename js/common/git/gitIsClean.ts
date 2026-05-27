@@ -15,10 +15,11 @@ import { gitImmutableExecute } from './gitMutex.js';
  * TODO: replace with checkout.isClean() unless we are specifying the file https://github.com/phetsims/totality/issues/140
  *
  * @param [file] - Optional file or path if you only want to check state of a single file or subdirectory
+ * @param [directory]
  * @returns - Whether it is clean or not
  * @rejects {ExecuteError}
  */
-export const gitIsClean = async ( file?: string ): Promise<boolean> => {
+export const gitIsClean = async ( file?: string, directory = '..' ): Promise<boolean> => {
   winston.debug( 'git status check' );
 
   const gitArgs = [ 'status', '--porcelain' ];
@@ -26,5 +27,5 @@ export const gitIsClean = async ( file?: string ): Promise<boolean> => {
   if ( file ) {
     gitArgs.push( file );
   }
-  return gitImmutableExecute( gitArgs, '..' ).then( stdout => Promise.resolve( stdout.length === 0 ) );
+  return gitImmutableExecute( gitArgs, directory ).then( stdout => Promise.resolve( stdout.length === 0 ) );
 };

@@ -9,6 +9,6 @@
 import { gitImmutableExecute } from './gitMutex.js';
 import { Branch } from '../../browser-and-node/PerennialTypes.js';
 
-export const getBranch = async (): Promise<Branch> => {
-  return gitImmutableExecute( [ 'symbolic-ref', '-q', 'HEAD' ], '..' ).then( stdout => stdout.trim().replace( 'refs/heads/', '' ) );
+export const getBranch = async ( directory = '..' ): Promise<Branch> => {
+  return gitImmutableExecute( [ 'symbolic-ref', '-q', 'HEAD' ], directory ).then( stdout => stdout.trim().replace( 'refs/heads/', '' ) );
 };

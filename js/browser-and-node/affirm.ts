@@ -4,11 +4,11 @@
  * Like assert.js, with the following differences:
  *
  * 1. Can be used in browser/node/both code
- * 2. Call are stripped out during the babel step, without another guard
+ * 2. Calls are stripped out during the babel step, without another guard
  * 3. Adds an `asserts` type to the predicate, which is a TypeScript feature that allows the type checker to
  *    understand that the predicate is true after the call to affirm.
  *
- * We choose the term affirm since it has a positive connotation, and has a similar letter pattern as assert, and since
+ * We choose the term affirm since it has a positive connotation and has a similar letter pattern as assert, and since
  * the term `affirm` is not otherwise used in our codebase.
  *
  * @author Sam Reid (PhET Interactive Simulations)
