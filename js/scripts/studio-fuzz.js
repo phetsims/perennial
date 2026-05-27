@@ -9,7 +9,6 @@
 
 // TODO: not ported to totality, see https://github.com/phetsims/totality/issues/140
 // eslint-disable
-// eslint-disable-next-line phet/bad-typescript-text
 // @ts-nocheck
 
 const puppeteerLoad = require( '../common/puppeteerLoad' );

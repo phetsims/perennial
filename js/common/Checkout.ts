@@ -11,6 +11,8 @@
  *
  * TODO: separate out static functions into separate files where appropriate https://github.com/phetsims/totality/issues/140
  *
+ * TODO: require deployment with primary checkout as main-like, see https://github.com/phetsims/totality/issues/140
+ *
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 

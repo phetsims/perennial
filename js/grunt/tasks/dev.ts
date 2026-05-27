@@ -6,6 +6,9 @@
  * --brands : A comma-separated list of brand names to deploy
  * --noninteractive : If specified, prompts will be skipped. Some prompts that should not be automated will fail out
  * --message : An optional message that will be appended on version-change commits.
+ *
+ * TODO: require deployment with primary checkout as main-like, see https://github.com/phetsims/totality/issues/140
+ *
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 import assert from 'assert';

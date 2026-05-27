@@ -11,7 +11,6 @@ import assert from 'assert';
 import { vpnCheck } from '../vpnCheck.js';
 import { getBranch } from '../git/getBranch.js';
 import { Checkout } from '../Checkout.js';
-import { lintProject } from '../lintProject.js';
 import { buildLocal } from '../buildLocal.js';
 import { devDirectoryExists } from '../devDirectoryExists.js';
 import { booleanPrompt } from '../booleanPrompt.js';
