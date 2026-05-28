@@ -137,7 +137,7 @@ async function runTask( task: BuildServerTask ): Promise<void> {
     if ( task.servers.includes( constants.DEV_SERVER ) ) {
       winston.info( 'deploying to dev' );
       if ( brands.includes( constants.PHET_IO_BRAND ) ) {
-        const htaccessLocation = ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) ?
+        const htaccessLocation = chipperVersion.hasBrandBuildDirectories() ?
                                  `${buildDir}/phet-io` :
                                  buildDir;
         await writePhetioHtaccess( simName, htaccessLocation, {
@@ -161,7 +161,7 @@ async function runTask( task: BuildServerTask ): Promise<void> {
           targetSimDir = constants.HTML_SIMS_DIRECTORY + simName;
           targetVersionDir = `${targetSimDir}/${versionString}/`;
 
-          if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
+          if ( chipperVersion.hasBrandBuildDirectories() ) {
             // Remove _phet from all filenames in the phet directory
             const phetBuildDir = `${buildDir}/phet`;
             const files = fs.readdirSync( phetBuildDir );
@@ -198,7 +198,7 @@ async function runTask( task: BuildServerTask ): Promise<void> {
           }
         }
         let sourceDir = buildDir;
-        if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
+        if ( chipperVersion.hasBrandBuildDirectories() ) {
           sourceDir += `/${brand}`;
         }
         // eslint-disable-next-line @typescript-eslint/no-loop-func

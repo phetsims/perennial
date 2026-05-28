@@ -38,7 +38,7 @@ export const devDeploy = async (
 
   // copy the files
   let rsyncFilterFile = buildDir;
-  if ( chipperVersion.major === 2 && chipperVersion.minor === 0 ) {
+  if ( chipperVersion.hasBrandBuildDirectories() ) {
     rsyncFilterFile += '/phet';
   }
   rsyncFilterFile += '/.rsync-filter';

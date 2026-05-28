@@ -32,6 +32,10 @@ export class ChipperVersion {
     return `${this.major}.${this.minor}.${this.maintenance}`;
   }
 
+  public hasBrandBuildDirectories(): boolean {
+    return this.major >= 2;
+  }
+
   public static getFromPackageJSON( packageJSON: PackageJSON ): ChipperVersion {
     const versionString = packageJSON.version;
 
