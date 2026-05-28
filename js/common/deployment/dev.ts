@@ -59,6 +59,10 @@ export const dev = async (
     assert( !branch.includes( '-' ), 'One-off versions should be from branches that do not include hyphens' );
   }
 
+  if ( !Checkout.isBranchNameMainlike( await getBranch() ) ) {
+    throw new DevDeployError( 'Primary checkout must be on main in order to deploy' );
+  }
+
   if ( !( await vpnCheck() ) ) {
     throw new Error( 'VPN or being on campus is required for this build. Ensure VPN is enabled, or that you have access to phet-server2.int.colorado.edu' );
   }

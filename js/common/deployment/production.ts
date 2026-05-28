@@ -17,6 +17,7 @@ import assert from 'assert';
 import winston from 'winston';
 import { buildServerRequest } from '../buildServerRequest.js';
 import { buildLocal } from '../buildLocal.js';
+import { getBranch } from '../git/getBranch.js';
 
 class ProductionDeployError extends Error {
   public constructor( message: string ) {
@@ -53,6 +54,10 @@ export const production = async (
   const redeploy = options?.redeploy ?? false;
 
   SimVersion.ensureReleaseBranch( legacyBranch );
+
+  if ( !Checkout.isBranchNameMainlike( await getBranch() ) ) {
+    throw new ProductionDeployError( 'Primary checkout must be on main in order to deploy' );
+  }
 
   winston.info( 'checking vpn' );
   if ( !( await vpnCheck() ) ) {

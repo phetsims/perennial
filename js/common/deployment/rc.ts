@@ -17,6 +17,7 @@ import { devDirectoryExists } from '../devDirectoryExists.js';
 import { Checkout } from '../Checkout.js';
 import { buildServerRequest } from '../buildServerRequest.js';
 import winston from 'winston';
+import { getBranch } from '../git/getBranch.js';
 
 class RCDeployError extends Error {
   public constructor( message: string ) {
@@ -50,6 +51,10 @@ export const rc = async (
 
   // Assertions for the version.
   SimVersion.ensureReleaseBranch( legacyBranch );
+
+  if ( !Checkout.isBranchNameMainlike( await getBranch() ) ) {
+    throw new RCDeployError( 'Primary checkout must be on main in order to deploy' );
+  }
 
   winston.info( 'checking vpn' );
   if ( !( await vpnCheck() ) ) {

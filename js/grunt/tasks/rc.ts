@@ -8,8 +8,6 @@
  * --skipBuild: Skips the build step during the deploy
  * --message : An optional message that will be appended on version-change commits.
  *
- * TODO: require deployment with primary checkout as main-like, see https://github.com/phetsims/totality/issues/140
- *
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
@@ -20,7 +18,7 @@ import getOption from './util/getOption.js';
 import winston from 'winston';
 
 // TODO revert to normal logging levels, see https://github.com/phetsims/totality/issues/140
-winston.default.transports.console.level = 'debug';
+winston.default.transports.console.level = 'info';
 
 ( async () => {
   const repo = getOption( 'repo' );
