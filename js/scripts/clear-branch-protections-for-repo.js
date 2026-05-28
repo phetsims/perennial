@@ -1,4 +1,4 @@
-// Copyright 2023-2024, University of Colorado Boulder
+// Copyright 2023-2026, University of Colorado Boulder
 
 /**
  * Wait. Stop. Why do you want to remove the protection rules? Bad things often happen when you want to remove '

@@ -1,4 +1,4 @@
-// Copyright 2024, University of Colorado Boulder
+// Copyright 2024-2026, University of Colorado Boulder
 
 /**
  * This entry point for lint divides the list of repos into batches and spawns lint-main processes to do the work.

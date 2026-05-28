@@ -1,4 +1,4 @@
-// Copyright 2025, University of Colorado Boulder
+// Copyright 2025-2026, University of Colorado Boulder
 
 /**
  * Instead of mapping an entire list to an async task all in one sync step, split it up into chunk sizes, with a sleep

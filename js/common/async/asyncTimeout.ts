@@ -1,4 +1,4 @@
-// Copyright 2025, University of Colorado Boulder
+// Copyright 2025-2026, University of Colorado Boulder
 
 /**
  * Returns a Promise that resolves either from the provided Promise, or from a timeout Promise that rejects after the
