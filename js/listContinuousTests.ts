@@ -10,8 +10,8 @@
  * @author Michael Kauzmann (PhET Interactive Simulations)
  */
 
-import { getRepoList } from './common/repos/getRepoList.js';
 import fs from 'fs';
+import { getRepoList } from './common/repos/getRepoList.js';
 
 // --repos=repo1,repo2,... restricts all repo lists to this set (for totality monorepo).
 // Default behavior (no flag) uses the full active-repos list as before.
@@ -374,7 +374,7 @@ phetioRepos.forEach( repo => {
     } );
   } );
 
-  const wrappersToIgnore = [ 'migration', 'playback', 'login' ];
+  const wrappersToIgnore = [ 'migration', 'playback', 'login', 'studio-b' ];
 
   phetioWrapperSuiteWrappers.forEach( wrapperPath => {
 
