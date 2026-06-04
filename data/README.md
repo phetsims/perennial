@@ -26,6 +26,9 @@ You will also need `perennial`, though it isn't in this list.
 needed so that phetmarks works on release branches. DO NOT UPDATE.
 See https://github.com/phetsims/scenery-phet/issues/515#issuecomment-885921345
 
+**dirs-without-polyrepos (manually maintained)** - a list of top-level directories in totality that do not have
+corresponding GitHub polyrepos.
+
 **interactive-description (auto-generated)** - is a list of all repositories that have been outfitted with interactive
 description like keyboard navigation. Sims in progress are also included in this list.
 
