@@ -26,7 +26,7 @@ import fs from 'fs';
 import _ from 'lodash';
 import path from 'path';
 import process from 'process';
-import { Repo } from '../browser-and-node/PerennialTypes.js';
+import { Dependency } from '../browser-and-node/PerennialTypes.js';
 import callbackOnWorkers from '../common/callbackOnWorkers.js';
 import { getActiveSceneryStackRepos } from '../common/repos/getActiveSceneryStackRepos.js';
 import { tscCleanRepo } from '../common/typeCheck.js';
@@ -43,17 +43,17 @@ const DO_NOT_LINT = [
   ...getActiveSceneryStackRepos()
 ];
 
-const getCacheLocation = ( repo: Repo ) => path.resolve( `../chipper/dist/eslint/cache/${repo}.eslintcache` );
+const getCacheLocation = ( dependency: Dependency ) => path.resolve( `../chipper/dist/eslint/cache/${dependency}.eslintcache` );
 const OLD_CACHE = '../chipper/eslint/cache/';
 
 /**
  * Lints repositories using a worker pool approach.
  */
-async function lintWithWorkers( repos: Repo[], fix: boolean ): Promise<boolean> {
-  const reposQueue: Repo[] = [ ...repos.filter( repo => !DO_NOT_LINT.includes( repo ) ) ];
+async function lintWithWorkers( dependencies: Dependency[], fix: boolean ): Promise<boolean> {
+  const dependenciesQueue: Dependency[] = [ ...dependencies.filter( repo => !DO_NOT_LINT.includes( repo ) ) ];
   const exitCodes: number[] = [];
 
-  const results = await callbackOnWorkers( reposQueue, async repo => {
+  const results = await callbackOnWorkers( dependenciesQueue, async repo => {
     const lintResult = await lintWithNodeAPI( repo, fix );
     exitCodes.push( lintResult );
   } );
@@ -68,22 +68,22 @@ async function lintWithWorkers( repos: Repo[], fix: boolean ): Promise<boolean> 
 /**
  * Runs ESLint on a single repository using the ESLint Node API.
  */
-async function lintWithNodeAPI( repo: Repo, fix: boolean ): Promise<number> {
+async function lintWithNodeAPI( dependency: Dependency, fix: boolean ): Promise<number> {
 
   // Prepare options for ESLint instance
   const eslintOptions = {
-    cwd: path.resolve( `../${repo}` ),
+    cwd: path.resolve( `../${dependency}` ),
 
     // The --clean wipes the directory at the beginning, so we always want to cache the results of a run.
     cache: true,
-    cacheLocation: path.resolve( getCacheLocation( repo ) ),
+    cacheLocation: path.resolve( getCacheLocation( dependency ) ),
     fix: fix,
     flags: [ 'unstable_config_lookup_from_file' ],
     errorOnUnmatchedPattern: false
   };
 
   if ( DEBUG_PHET_LINT ) {
-    console.error( 'lint-main: repo', repo );
+    console.error( 'lint-main: dependency', dependency );
     console.error( 'lint-main: fix: ', eslintOptions.fix );
   }
 
@@ -98,7 +98,7 @@ async function lintWithNodeAPI( repo: Repo, fix: boolean ): Promise<number> {
     results = await eslint.lintFiles( patterns );
   }
   catch( error ) {
-    console.error( `Error linting files in repo ${repo}:`, error );
+    console.error( `Error linting files in repo ${dependency}:`, error );
     return 1; // Non-zero exit code to indicate failure
   }
 
@@ -116,7 +116,7 @@ async function lintWithNodeAPI( repo: Repo, fix: boolean ): Promise<number> {
 
     if ( resultText.trim().length > 0 ) {
       if ( !loggedRepo ) {
-        console.log( `\n${repo}:` );
+        console.log( `\n${dependency}:` );
         loggedRepo = true;
       }
 
@@ -129,9 +129,9 @@ async function lintWithNodeAPI( repo: Repo, fix: boolean ): Promise<number> {
   return errorCount === 0 ? 0 : 1; // Return 0 if no errors, 1 if there are errors
 }
 
-const cleanCaches = ( originalRepos: Repo[] ) => {
-  DEBUG_PHET_LINT && console.error( 'lint-main clearing: ', originalRepos );
-  originalRepos.forEach( async repo => {
+const cleanCaches = ( originalDependencies: Dependency[] ) => {
+  DEBUG_PHET_LINT && console.error( 'lint-main clearing: ', originalDependencies );
+  originalDependencies.forEach( async repo => {
     const cacheFile = getCacheLocation( repo );
 
     try {
@@ -155,17 +155,17 @@ const cleanCaches = ( originalRepos: Repo[] ) => {
 /**
  * Lints the specified repositories.
  */
-const lintMain = async ( repos: Repo[], clean: boolean, fix: boolean ): Promise<boolean> => {
+const lintMain = async ( dependencies: Dependency[], clean: boolean, fix: boolean ): Promise<boolean> => {
 
-  assert( repos.length > 0, 'no repos provided to lint' );
+  assert( dependencies.length > 0, 'no repos provided to lint' );
 
   // Clean in advance if requested. During linting the cache will be repopulated.
-  clean && cleanCaches( repos );
+  clean && cleanCaches( dependencies );
   handleOldCacheLocation();
 
   // Top level try-catch just in case.
   try {
-    return await lintWithWorkers( repos, fix );
+    return await lintWithWorkers( dependencies, fix );
   }
   catch( error ) {
     if ( error instanceof Error ) {
@@ -194,6 +194,7 @@ function handleOldCacheLocation(): void {
 void ( async () => {
 
   // search argv for --repos=a,b,c
+  // TODO: --dependencies, see https://github.com/phetsims/totality/issues/140
   const reposArg = process.argv.find( arg => arg.startsWith( '--repos=' ) );
   const cleanArg = process.argv.find( arg => arg.startsWith( '--clean=' ) );
   const fixArg = process.argv.find( arg => arg.startsWith( '--fix=' ) );
@@ -202,16 +203,16 @@ void ( async () => {
   assert( cleanArg, 'missing --clean argument' );
   assert( fixArg, 'missing --fix argument' );
 
-  const repos: Repo[] = reposArg ? reposArg.split( '=' )[ 1 ].split( ',' ) : [];
+  const dependencies: Dependency[] = reposArg ? reposArg.split( '=' )[ 1 ].split( ',' ) : [];
   const clean = cleanArg ? cleanArg.split( '=' )[ 1 ] === 'true' : false;
   const fix = fixArg ? fixArg.split( '=' )[ 1 ] === 'true' : false;
 
   if ( DEBUG_PHET_LINT ) {
-    console.error( 'lint-main.ts repos', repos );
+    console.error( 'lint-main.ts dependencies', dependencies );
     console.error( 'lint-main.ts clean', clean );
     console.error( 'lint-main.ts fix', fix );
   }
 
-  const success = await lintMain( _.uniq( repos ), clean, fix );
+  const success = await lintMain( _.uniq( dependencies ), clean, fix );
   process.exit( success ? 0 : 1 );
 } )();

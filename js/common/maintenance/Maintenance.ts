@@ -15,7 +15,7 @@ import { DeployedLinkOptions, LastRun, ModifiedBranch, UpdateTestingOptions } fr
 import { RELEASE_BRANCH_DEFAULT_CONCURRENT_LIMIT, ReleaseBranch } from '../ReleaseBranch.js';
 import { Patch } from './Patch.js';
 import { Checkout } from '../Checkout.js';
-import { BranchVersion, Repo, SHA } from '../../browser-and-node/PerennialTypes.js';
+import { BranchVersion, SHA, Sim } from '../../browser-and-node/PerennialTypes.js';
 import { gitImmutableExecute } from '../git/gitMutex.js';
 import { buildLocal } from '../buildLocal.js';
 import { limitedMap } from '../async/limitedMap.js';
@@ -305,18 +305,18 @@ export class Maintenance {
   /**
    * Adds a needed patch to a given modified branch.
    */
-  public static async addNeededPatch( repo: Repo, branchVersion: BranchVersion, patchName: string ): Promise<void> {
+  public static async addNeededPatch( sim: Sim, branchVersion: BranchVersion, patchName: string ): Promise<void> {
     const maintenance = await Maintenance.load();
-    assert( repo !== patchName, 'Cannot patch a release branch repo, yet.' ); // TODO: remove in https://github.com/phetsims/perennial/issues/312
+    assert( sim !== patchName, 'Cannot patch a release branch itself, yet.' ); // TODO: remove in https://github.com/phetsims/perennial/issues/312
 
     const patch = maintenance.findPatch( patchName );
 
-    const modifiedBranch = await maintenance.ensureModifiedBranch( repo, branchVersion );
+    const modifiedBranch = await maintenance.ensureModifiedBranch( sim, branchVersion );
     modifiedBranch.neededPatches.push( patch );
 
     maintenance.save();
 
-    console.log( `Added patch ${patchName} as needed for ${repo} ${branchVersion}` );
+    console.log( `Added patch ${patchName} as needed for ${sim} ${branchVersion}` );
   }
 
   /**
@@ -427,12 +427,12 @@ export class Maintenance {
   /**
    * Removes a needed patch from a given modified branch.
    */
-  public static async removeNeededPatch( repo: Repo, branchVersion: BranchVersion, patchName: string ): Promise<void> {
+  public static async removeNeededPatch( sim: Sim, branchVersion: BranchVersion, patchName: string ): Promise<void> {
     const maintenance = await Maintenance.load();
 
     const patch = maintenance.findPatch( patchName );
 
-    const modifiedBranch = await maintenance.ensureModifiedBranch( repo, branchVersion );
+    const modifiedBranch = await maintenance.ensureModifiedBranch( sim, branchVersion );
     const index = modifiedBranch.neededPatches.indexOf( patch );
     assert( index >= 0, 'Could not find needed patch on the modified branch' );
 
@@ -441,7 +441,7 @@ export class Maintenance {
 
     maintenance.save();
 
-    console.log( `Removed patch ${patchName} from ${repo} ${branchVersion}` );
+    console.log( `Removed patch ${patchName} from ${sim} ${branchVersion}` );
   }
 
   /**
@@ -831,23 +831,23 @@ export class Maintenance {
 
   /**
    * Looks up (or adds) a ModifiedBranch by its identifying information.
-   * @param repo
+   * @param sim
    * @param branchVersion
    * @param [errorIfMissing]
    * @param [releaseBranches] - If provided, it will speed up the process
    */
-  public async ensureModifiedBranch( repo: Repo, branchVersion: BranchVersion, errorIfMissing = false, releaseBranches: ReleaseBranch[] | null = null ): Promise<ModifiedBranch> {
-    let modifiedBranch = this.modifiedBranches.find( modifiedBranch => modifiedBranch.repo === repo && modifiedBranch.branch === branchVersion );
+  public async ensureModifiedBranch( sim: Sim, branchVersion: BranchVersion, errorIfMissing = false, releaseBranches: ReleaseBranch[] | null = null ): Promise<ModifiedBranch> {
+    let modifiedBranch = this.modifiedBranches.find( modifiedBranch => modifiedBranch.repo === sim && modifiedBranch.branch === branchVersion );
 
     if ( !modifiedBranch ) {
       if ( errorIfMissing ) {
-        throw new Error( `Could not find a tracked modified branch for ${repo} ${branchVersion}` );
+        throw new Error( `Could not find a tracked modified branch for ${sim} ${branchVersion}` );
       }
 
       // Use the instance version of getMaintenanceBranches to make sure that this Maintenance instance is updated with new ReleaseBranches.
-      releaseBranches = releaseBranches || await this.getMaintenanceBranches( releaseBranch => releaseBranch.repo === repo );
-      const releaseBranch = releaseBranches.find( release => release.repo === repo && release.branch === branchVersion );
-      assert( releaseBranch, `Could not find a release branch for repo=${repo} branch=${branchVersion}` );
+      releaseBranches = releaseBranches || await this.getMaintenanceBranches( releaseBranch => releaseBranch.repo === sim );
+      const releaseBranch = releaseBranches.find( release => release.repo === sim && release.branch === branchVersion );
+      assert( releaseBranch, `Could not find a release branch for repo=${sim} branch=${branchVersion}` );
 
       modifiedBranch = new ModifiedBranch( releaseBranch );
 
@@ -876,14 +876,14 @@ export class Maintenance {
 
   public static maintenanceCheckout: Checkout | null = null;
 
-  public static async checkoutBranch( repo: Repo, branchVersion: BranchVersion ): Promise<void> {
-    const releaseBranch = ( await allReleaseBranchesPromise ).find( releaseBranch => releaseBranch.repo === repo && releaseBranch.branch === branchVersion );
+  public static async checkoutBranch( sim: Sim, branchVersion: BranchVersion ): Promise<void> {
+    const releaseBranch = ( await allReleaseBranchesPromise ).find( releaseBranch => releaseBranch.repo === sim && releaseBranch.branch === branchVersion );
 
     if ( !releaseBranch ) {
-      throw new Error( `Could not find a release branch for repo=${repo} branch=${branchVersion}` );
+      throw new Error( `Could not find a release branch for repo=${sim} branch=${branchVersion}` );
     }
 
-    const sha = ( await gitImmutableExecute( [ 'rev-parse', Checkout.getReleaseBranchName( repo, branchVersion ) ], '..' ) ).trim();
+    const sha = ( await gitImmutableExecute( [ 'rev-parse', Checkout.getReleaseBranchName( sim, branchVersion ) ], '..' ) ).trim();
 
     const maintenanceCheckout = await Checkout.getMaintenanceCheckout( sha, releaseBranch );
 
@@ -891,7 +891,7 @@ export class Maintenance {
 
     await maintenanceCheckout.updateMaintenanceWorktree();
 
-    console.log( `checked out ${sha} for ${repo} ${branchVersion}` );
+    console.log( `checked out ${sha} for ${sim} ${branchVersion}` );
   }
 
   public static async updateTesting( options?: UpdateTestingOptions ): Promise<void> {

@@ -9,7 +9,7 @@
 import path from 'path';
 import process from 'process';
 import affirm from '../../../browser-and-node/affirm.js';
-import { Repo } from '../../../browser-and-node/PerennialTypes.js';
+import { Dependency } from '../../../browser-and-node/PerennialTypes.js';
 import dirname from '../../../common/dirname.js';
 import getOption from './getOption.js';
 
@@ -18,7 +18,8 @@ const __dirname = dirname( import.meta.url );
 
 const gitRoot = path.resolve( `${__dirname}/../../../../../` );
 
-export default function getRepo(): Repo {
+// TODO: rename getDependency(), see https://github.com/phetsims/totality/issues/140
+export default function getRepo(): Dependency {
 
   const repoOption = getOption( 'repo' );
   if ( repoOption ) {

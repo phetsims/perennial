@@ -12,9 +12,7 @@ export type Directory = string; // e.g. "qa" -- a top-level directory in totalit
 export type NonTotalityRepo = string;
 // TODO: new perennial data lists, https://github.com/phetsims/totality/issues/140
 
-// @deprecated TODO: remove usages of this and rename things https://github.com/phetsims/totality/issues/140
-export type Repo = string;
-
+export type Repo = string; // NOTE: ONLY use this for actual repos (not directories in totality, etc.)
 export type SHA = string;
 export type Branch = string; // for release branches or otherwise, should always be a fully-qualified totality branch name, e.g. 'releases/acid-base-solutions/1.3'
 export type BranchVersion = string; // for release branches, e.g. '1.3' or '1.3-phetio'
@@ -130,7 +128,7 @@ export type BuildServerSimTask = {
   api: SupportedBuildServerVersion;
 
   // lower case simulation name used for creating files/directories
-  simName: Repo;
+  simName: Sim;
 
   // sim version identifier string
   versionString: VersionString;
@@ -161,7 +159,7 @@ export type BuildServerSimTask = {
 export type BuildServerDeployImagesTask = {
   type: 'deployImages';
 
-  simName?: Repo;
+  simName?: Sim;
   versionString?: VersionString;
 };
 

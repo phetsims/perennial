@@ -9,7 +9,7 @@ import fs from 'graceful-fs';
 import { getSortedVersionDirectories } from './getSortedVersionDirectories.js';
 import { parseString } from 'xml2js';
 import winston from 'winston';
-import { IntentionalPerennialAny, LocalesStringSpecifier, Repo } from '../browser-and-node/PerennialTypes.js';
+import { IntentionalPerennialAny, LocalesStringSpecifier, Sim } from '../browser-and-node/PerennialTypes.js';
 
 async function getJsonFromXML( xmlString: string | Buffer ): Promise<IntentionalPerennialAny> {
   return new Promise( ( resolve, reject ) => {
@@ -30,7 +30,7 @@ async function getJsonFromXML( xmlString: string | Buffer ): Promise<Intentional
  * @param locales - comma separated list of locale codes
  * @param simName - name of the sim, should match GitHub repo name, e.g. "energy-skate-park-basics"
  */
-export const getLocales = async ( locales: LocalesStringSpecifier, simName: Repo ): Promise<LocalesStringSpecifier> => {
+export const getLocales = async ( locales: LocalesStringSpecifier, simName: Sim ): Promise<LocalesStringSpecifier> => {
   let callbackLocales = '';
 
   if ( locales && locales !== '*' ) {

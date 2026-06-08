@@ -12,19 +12,19 @@
  */
 
 import os from 'os';
-import { Repo } from '../browser-and-node/PerennialTypes.js';
+import { Dependency } from '../browser-and-node/PerennialTypes.js';
 
 const MAX_BATCH_SIZE = 50;
 
-export default function divideIntoBatches( originalRepos: Repo[], maxProcesses: number ): Repo[][] {
+export default function divideIntoBatches( originalDependencies: Dependency[], maxProcesses: number ): Dependency[][] {
 
-  const N = originalRepos.length;
+  const N = originalDependencies.length;
 
   // Use most of the processors. for instance, on Macbook air m1, we have 8 cores and we use 6, which has good performance
   const numCPUs = os.cpus().length; // as of 11/2024 -- MK: 20, SR: 16, sparky: 128
   const processCount = Math.min( Math.round( numCPUs / 4 ), maxProcesses );
 
-  const batches: Repo[][] = [];
+  const batches: Dependency[][] = [];
 
   if ( N === 0 ) {
     return batches; // Return empty array if no repositories
@@ -33,7 +33,7 @@ export default function divideIntoBatches( originalRepos: Repo[], maxProcesses: 
   if ( N <= processCount ) {
 
     // Create N batches, each with 1 repository
-    for ( const repo of originalRepos ) {
+    for ( const repo of originalDependencies ) {
       batches.push( [ repo ] );
     }
   }
@@ -49,7 +49,7 @@ export default function divideIntoBatches( originalRepos: Repo[], maxProcesses: 
       // Distribute the extra repositories one by one to the first 'extra' batches
       const batchSize = baseSize + ( i < extra ? 1 : 0 );
       const end = start + batchSize;
-      batches.push( originalRepos.slice( start, end ) );
+      batches.push( originalDependencies.slice( start, end ) );
       start = end;
     }
   }
@@ -57,7 +57,7 @@ export default function divideIntoBatches( originalRepos: Repo[], maxProcesses: 
 
     // Create as many batches of 50 as needed
     for ( let i = 0; i < N; i += MAX_BATCH_SIZE ) {
-      batches.push( originalRepos.slice( i, i + MAX_BATCH_SIZE ) );
+      batches.push( originalDependencies.slice( i, i + MAX_BATCH_SIZE ) );
     }
   }
 

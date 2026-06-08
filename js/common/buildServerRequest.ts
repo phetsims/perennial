@@ -11,7 +11,7 @@ import assert from 'assert';
 import axios from 'axios';
 import winston from 'winston';
 import SimVersion from '../browser-and-node/SimVersion.js';
-import { BuildServerTarget, LocalesStringSpecifier, Repo, SHA, BuildServerRequest, SupportedBuildServerBrand, BranchVersion } from '../browser-and-node/PerennialTypes.js';
+import { BranchVersion, BuildServerRequest, BuildServerTarget, LocalesStringSpecifier, SHA, Sim, SupportedBuildServerBrand } from '../browser-and-node/PerennialTypes.js';
 
 export type BuildServerRequestOptions = {
   locales?: LocalesStringSpecifier;
@@ -19,7 +19,7 @@ export type BuildServerRequestOptions = {
 };
 
 export const buildServerRequest = async (
-  repo: Repo,
+  sim: Sim,
   version: SimVersion,
   branchVersion: BranchVersion,
   brands: SupportedBuildServerBrand[],
@@ -33,13 +33,13 @@ export const buildServerRequest = async (
   const locales = options?.locales ?? '*';
   const servers = options?.servers ?? [ 'dev' ] as const;
 
-  winston.info( `sending build request for ${repo} ${version.toString()} with totality SHA: ${totalitySHA}` );
+  winston.info( `sending build request for ${sim} ${version.toString()} with totality SHA: ${totalitySHA}` );
 
   servers.forEach( server => assert( [ 'dev', 'production' ].includes( server ), `Unknown server: ${server}` ) );
 
   const requestObject: BuildServerRequest = {
     api: '3.0',
-    simName: repo,
+    simName: sim,
     versionString: version.toString(),
     locales: locales,
     servers: servers,

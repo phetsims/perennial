@@ -9,9 +9,9 @@
  */
 
 import { npmUpdateDirectory, NPMUpdateOptions } from './npmUpdateDirectory.js';
-import { Repo } from '../browser-and-node/PerennialTypes.js';
+import { Dependency } from '../browser-and-node/PerennialTypes.js';
 
 // TODO: Can we remove this and use checkout methods directly? https://github.com/phetsims/totality/issues/140
-export const npmUpdate = async ( repo: Repo, options?: NPMUpdateOptions ): Promise<void> => {
-  return npmUpdateDirectory( `../${repo}`, options );
+export const npmUpdate = async ( dependency: Dependency, options?: NPMUpdateOptions ): Promise<void> => {
+  return npmUpdateDirectory( `../${dependency}`, options );
 };

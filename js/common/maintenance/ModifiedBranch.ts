@@ -13,7 +13,7 @@ import SimVersion from '../../browser-and-node/SimVersion.js';
 import { ReleaseBranch } from '../ReleaseBranch.js';
 import { Patch } from './Patch.js';
 import { githubCreateIssue } from '../githubCreateIssue.js';
-import { BranchVersion, Repo, SHA } from '../../browser-and-node/PerennialTypes.js';
+import { BranchVersion, SHA, Sim } from '../../browser-and-node/PerennialTypes.js';
 
 type ModifiedBranchSerialized = {
   releaseBranch: ReturnType<ReleaseBranch['serialize']>;
@@ -68,7 +68,7 @@ export type DeployedLinkOptions = {
 };
 
 export class ModifiedBranch {
-  public readonly repo: Repo;
+  public readonly repo: Sim; // TODO: rename https://github.com/phetsims/totality/issues/140
   public readonly branch: BranchVersion; // TODO: rename to branchVersion, see https://github.com/phetsims/totality/issues/140
   public readonly brands: string[];
 

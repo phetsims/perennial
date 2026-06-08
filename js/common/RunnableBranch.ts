@@ -15,7 +15,7 @@ import withServer from './withServer.js';
 import { puppeteerLoad } from './puppeteerLoad.js';
 import { BuildOptions, getBuildArguments } from './getBuildArguments.js';
 import SimVersion from '../browser-and-node/SimVersion.js';
-import { PackageJSON, Repo, SupportedBuildServerBrand } from '../browser-and-node/PerennialTypes.js';
+import { PackageJSON, Repo, Runnable, SupportedBuildServerBrand } from '../browser-and-node/PerennialTypes.js';
 import { getBranchPackageJSON } from './getBranchPackageJSON.js';
 import fs from 'fs';
 // eslint-disable-next-line phet/default-import-match-filename
@@ -26,7 +26,7 @@ export class RunnableBranch {
 
   public constructor(
     public readonly checkout: Checkout,
-    public readonly repo: Repo,
+    public readonly repo: Runnable, // TODO: rename? https://github.com/phetsims/totality/issues/140
     public readonly brands: string[]
   ) {
   }

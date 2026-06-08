@@ -10,17 +10,17 @@ import fs from 'fs';
 import { gitAdd } from './git/gitAdd.js';
 import { gitCommit } from './git/gitCommit.js';
 import { gitPush } from './git/gitPush.js';
-import { Repo } from '../browser-and-node/PerennialTypes.js';
+import { Sim } from '../browser-and-node/PerennialTypes.js';
 
-export const markRunnableAsPublished = async ( runnable: Repo ): Promise<void> => {
-  const packageObject = JSON.parse( fs.readFileSync( `../${runnable}/package.json`, 'utf8' ) );
+export const markSimAsPublished = async ( sim: Sim ): Promise<void> => {
+  const packageObject = JSON.parse( fs.readFileSync( `../${sim}/package.json`, 'utf8' ) );
 
   if ( !packageObject.phet.published ) {
     packageObject.phet.published = true;
-    fs.writeFileSync( `../${runnable}/package.json`, JSON.stringify( packageObject, null, 2 ) );
+    fs.writeFileSync( `../${sim}/package.json`, JSON.stringify( packageObject, null, 2 ) );
 
-    await gitAdd( `${runnable}/package.json` );
-    await gitCommit( 'Marking repository as published' );
+    await gitAdd( `${sim}/package.json` );
+    await gitCommit( 'Marking simulation as published' );
     await gitPush( 'main' );
   }
 };

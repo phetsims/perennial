@@ -8,7 +8,7 @@ import { buildLocal } from './buildLocal.js';
 import axios from 'axios';
 import fs from 'graceful-fs';
 import winston from 'winston';
-import { Repo } from '../browser-and-node/PerennialTypes.js';
+import { Sim } from '../browser-and-node/PerennialTypes.js';
 
 // A list of directories directly nested under the phet-io build output folder that should be password protected. Slashes
 // added later.
@@ -33,7 +33,7 @@ const htaccessFilename = '.htaccess';
  * Writes the htaccess file to password protect the exclusive content for phet-io sims
  */
 export const writePhetioHtaccess = async (
-  simName: Repo,
+  simName: Sim,
   passwordProtectPath: string,
   latestOption: LatestOption
 ): Promise<void> => {

@@ -14,7 +14,7 @@ import assert from 'assert';
 import { spawn } from 'child_process';
 import _ from 'lodash';
 import path from 'path';
-import { Repo } from '../browser-and-node/PerennialTypes.js';
+import { Dependency } from '../browser-and-node/PerennialTypes.js';
 import dirname from '../common/dirname.js';
 import { tsxCommand } from '../common/tsxCommand.js';
 import getOption from '../grunt/tasks/util/getOption.js';
@@ -29,9 +29,9 @@ const lintMainPath = path.join( __dirname, 'lint-main.ts' );
 // For debugging the options and making sure they pass through correctly
 export const DEBUG_PHET_LINT = getOption( 'debug' );
 
-export default async function lint( repos: Repo[], providedOptions?: LintOptions ): Promise<boolean> {
-  repos = _.uniq( repos ); // Don't double lint repos
-  assert( repos.length > 0, 'no repos provided to lint' );
+export default async function lint( dependencies: Dependency[], providedOptions?: LintOptions ): Promise<boolean> {
+  dependencies = _.uniq( dependencies ); // Don't double lint repos
+  assert( dependencies.length > 0, 'no repos provided to lint' );
 
   const options = _.assignIn( {
 
@@ -45,18 +45,18 @@ export default async function lint( repos: Repo[], providedOptions?: LintOptions
   }, providedOptions );
 
 
-  const repoBatches = divideIntoBatches( repos, options.processes );
+  const dependencyBatches = divideIntoBatches( dependencies, options.processes );
 
   if ( DEBUG_PHET_LINT ) {
-    console.error( 'lint.js repos', repos );
+    console.error( 'lint.js dependencies', dependencies );
     console.error( 'lint.js clean', options.clean );
     console.error( 'lint.js fix', options.fix );
     console.error( 'lint.js processes', options.processes );
-    console.error( 'lint.js repoBatches', repoBatches );
+    console.error( 'lint.js dependencyBatches', dependencyBatches );
   }
 
   // spawn node lint-main.js for each batch and wait for all to complete using child process
-  const promises = repoBatches.map( batch => {
+  const promises = dependencyBatches.map( batch => {
     return new Promise<void>( ( resolve, reject ) => {
 
       const child = spawn( tsxCommand, [

@@ -8,7 +8,7 @@
  */
 
 import { getRepoList } from '../common/repos/getRepoList.js';
-import { Repo } from '../browser-and-node/PerennialTypes.js';
+import { Dependency } from '../browser-and-node/PerennialTypes.js';
 import getOption, { isOptionKeyProvided } from '../grunt/tasks/util/getOption.js';
 
 export type LintOptions = {
@@ -24,7 +24,8 @@ export const DEFAULT_MAX_PROCESSES = 6;
  * Get the list of repos to lint when doing lint-everything or lint --all
  * Linting runs in perennial-alias by default in all repos except perennial/ see https://github.com/phetsims/chipper/issues/1520
  */
-export function getLintEverythingRepos(): Repo[] {
+export function getLintEverythingRepos(): Dependency[] {
+  // TODO: use getActiveRepos() or equivalent, see https://github.com/phetsims/totality/issues/140
   return getRepoList( 'active-repos' );
 }
 

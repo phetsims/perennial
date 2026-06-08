@@ -1,41 +1,38 @@
 // Copyright 2023-2026, University of Colorado Boulder
 
 /**
- * Returns an inverse string map (stringMap[ stringKey ][ locale ]) for all strings in a given repo.
+ * Returns an inverse string map (stringMap[ stringKey ][ locale ]) for all strings in a given dependency.
  *
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 import { loadJSON } from '../common/loadJSON.js';
 import fs from 'fs';
-import { EnglishStringsJSON, InversedStringMap, PackageJSON, PartialStringKey, Repo } from '../browser-and-node/PerennialTypes.js';
+import { Dependency, EnglishStringsJSON, InversedStringMap, PackageJSON, PartialStringKey } from '../browser-and-node/PerennialTypes.js';
 import winston from 'winston';
 
-/**
- * Returns an inverse string map (stringMap[ stringKey ][ locale ]) for all strings in a given repo.
- */
 export const getRepoStringMap = async (
-  repo: Repo,
+  dependency: Dependency,
   checkoutDir: string
 ): Promise<InversedStringMap> => {
 
   // partialKeyMap[ partialStringKey ][ locale ] = stringValue
   const partialKeyMap: InversedStringMap = {};
 
-  // If we're not a repo with strings
-  if ( !fs.existsSync( `${checkoutDir}/${repo}/${repo}-strings_en.json` ) ) {
+  // If we're not a dependency with strings
+  if ( !fs.existsSync( `${checkoutDir}/${dependency}/${dependency}-strings_en.json` ) ) {
     return {};
   }
 
-  const packageJSON: PackageJSON = await loadJSON( `${checkoutDir}/${repo}/package.json` );
+  const packageJSON: PackageJSON = await loadJSON( `${checkoutDir}/${dependency}/package.json` );
   const requirejsNamespace = packageJSON.phet!.requirejsNamespace!;
 
   if ( !requirejsNamespace ) {
-    winston.warn( `Repo ${repo} does not have a requirejsNamespace in its package.json, but has a strings file` );
+    winston.warn( `Repo ${dependency} does not have a requirejsNamespace in its package.json, but has a strings file` );
     return {};
   }
 
-  const englishStrings: EnglishStringsJSON = await loadJSON( `${checkoutDir}/${repo}/${repo}-strings_en.json` );
+  const englishStrings: EnglishStringsJSON = await loadJSON( `${checkoutDir}/${dependency}/${dependency}-strings_en.json` );
 
   // Support recursive structure of English string files. Tests for `value: <<string type>>` to determine if it's a string.
   // Fills partialKeyMap
@@ -54,9 +51,9 @@ export const getRepoStringMap = async (
   } )( englishStrings, [] );
 
   // Fill partialKeyMap with other locales (if the directory in babel exists)
-  if ( fs.existsSync( `${checkoutDir}/babel/${repo}` ) ) {
-    for ( const stringFilename of fs.readdirSync( `${checkoutDir}/babel/${repo}` ) ) {
-      const localeStrings = await loadJSON( `${checkoutDir}/babel/${repo}/${stringFilename}` );
+  if ( fs.existsSync( `${checkoutDir}/babel/${dependency}` ) ) {
+    for ( const stringFilename of fs.readdirSync( `${checkoutDir}/babel/${dependency}` ) ) {
+      const localeStrings = await loadJSON( `${checkoutDir}/babel/${dependency}/${stringFilename}` );
 
       // Extract locale from filename
       const firstUnderscoreIndex = stringFilename.indexOf( '_' );

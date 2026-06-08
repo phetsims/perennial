@@ -14,11 +14,12 @@ import { RunnableBranch } from './RunnableBranch.js';
 import { asyncFilter } from './async/asyncFilter.js';
 import { limitedMap } from './async/limitedMap.js';
 import { BuildOptions } from './getBuildArguments.js';
-import { BranchVersion, Repo } from '../browser-and-node/PerennialTypes.js';
+import { BranchVersion, Sim } from '../browser-and-node/PerennialTypes.js';
 import { ANSI_BLUE, ANSI_GREEN, ANSI_MAGENTA, ANSI_RED, ANSI_RESET } from './ANSI.js';
 
 export type ReleaseBranchSerialized = {
-  repo: Repo;
+  // TODO: rename? See https://github.com/phetsims/totality/issues/140
+  repo: Sim;
   branch: BranchVersion;
 };
 
@@ -38,7 +39,9 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
   public constructor(
     // passed to RunnableBranch
     checkout: Checkout,
-    repo: Repo,
+
+    // TODO: rename? https://github.com/phetsims/totality/issues/140
+    repo: Sim,
 
     public readonly branch: BranchVersion, // TODO: note: rename to branchVersion? https://github.com/phetsims/totality/issues/140
     brands: string[],

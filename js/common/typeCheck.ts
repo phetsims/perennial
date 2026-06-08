@@ -11,7 +11,7 @@ import fs from 'fs';
 import _ from 'lodash';
 import os from 'os';
 import path from 'path';
-import { Repo } from '../browser-and-node/PerennialTypes.js';
+import { Dependency } from '../browser-and-node/PerennialTypes.js';
 import execute from './execute.js';
 import { fixEOL } from './fixEOL.js';
 import { PERENNIAL_ROOT } from './perennialRepoUtils.js';
@@ -26,7 +26,7 @@ export type CheckOptions = {
   native: boolean;
 
   // The repo to use as the entrypoint for type checking. The repo provided MUST have a tsconfig.json at the top level.
-  repo: Repo;
+  repo: Dependency; // TODO: rename? https://github.com/phetsims/totality/issues/140
 
   // Type check all supported repos in active-repos. Using this option ignore the "repo" option.
   all: boolean;

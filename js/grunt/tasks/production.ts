@@ -12,7 +12,7 @@
  */
 import assert from 'assert';
 import { assertIsValidDependencyName } from '../../common/assertIsValidDependencyName.js';
-import { markRunnableAsPublished } from '../../common/markRunnableAsPublished.js';
+import { markSimAsPublished } from '../../common/markSimAsPublished.js';
 import { production } from '../../common/deployment/production.js';
 import getOption from './util/getOption.js';
 import winston from 'winston';
@@ -27,7 +27,7 @@ winston.default.transports.console.level = 'info';
   assert( getOption( 'branch' ), 'Requires specifying a branch with --branch={{BRANCH}}' );
   assertIsValidDependencyName( repo );
 
-  await markRunnableAsPublished( repo );
+  await markSimAsPublished( repo );
 
   await production( repo, getOption( 'branch' ), {
     noninteractive: !!getOption( 'noninteractive' ),

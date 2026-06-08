@@ -42,7 +42,7 @@ import simPhetioMetadata, { SimPhetioMetadata } from './simPhetioMetadata.js';
 import { getActiveSims } from './repos/getActiveSims.js';
 import { getBranches } from './git/getBranches.js';
 import os from 'os';
-import { Branch, BranchOrSHA, BranchVersion, IntentionalPerennialAny, LocaleData, Repo, Runnable, SHA, Sim } from '../browser-and-node/PerennialTypes.js';
+import { Branch, BranchOrSHA, BranchVersion, Dependency, IntentionalPerennialAny, LocaleData, Runnable, SHA, Sim } from '../browser-and-node/PerennialTypes.js';
 import assert from 'assert';
 import { getBranch } from './git/getBranch.js';
 import { hasRemoteBranch } from './git/hasRemoteBranch.js';
@@ -184,11 +184,11 @@ export class Checkout {
     return checkout;
   }
 
-  public static async getPhetPublishedBranch( repo: Repo ): Promise<BranchVersion | null> {
+  public static async getPhetPublishedBranch( sim: Sim ): Promise<BranchVersion | null> {
     for ( const simData of ( await simMetadataPromise ).projects ) {
       const releaseRepo = simData.name.slice( simData.name.indexOf( '/' ) + 1 );
 
-      if ( releaseRepo !== repo ) {
+      if ( releaseRepo !== sim ) {
         continue;
       }
 
@@ -198,7 +198,7 @@ export class Checkout {
     return null;
   }
 
-  public static async getPhetioPublishedBranches( repo: Repo ): Promise<BranchVersion[]> {
+  public static async getPhetioPublishedBranches( sim: Sim ): Promise<BranchVersion[]> {
     const branchVersions: BranchVersion[] = [];
 
     for ( const simData of ( await simPhetioMetadataPromise ) ) {
@@ -208,7 +208,7 @@ export class Checkout {
 
       const releaseRepo = simData.name.slice( simData.name.indexOf( '/' ) + 1 );
 
-      if ( releaseRepo !== repo ) {
+      if ( releaseRepo !== sim ) {
         continue;
       }
 
@@ -218,10 +218,10 @@ export class Checkout {
     return branchVersions;
   }
 
-  public static async getReleaseBranchCheckout( repo: Repo, branchVersion: BranchVersion ): Promise<Checkout> {
-    winston.debug( `getting release branch checkout for ${repo} ${branchVersion}` );
+  public static async getReleaseBranchCheckout( sim: Sim, branchVersion: BranchVersion ): Promise<Checkout> {
+    winston.debug( `getting release branch checkout for ${sim} ${branchVersion}` );
 
-    const branch = Checkout.getReleaseBranchName( repo, branchVersion );
+    const branch = Checkout.getReleaseBranchName( sim, branchVersion );
     const workingDirectory = Checkout.getWorktreeDirectory( branch );
 
     winston.debug( `  branch: ${branch}` );
@@ -236,15 +236,15 @@ export class Checkout {
 
     const checkout = new Checkout( branch, false, false, workingDirectory, worktreeExists );
 
-    const simVersion = await getBranchSimVersion( repo, branch );
+    const simVersion = await getBranchSimVersion( sim, branch );
     winston.debug( `  simVersion: ${simVersion.toString()}` );
 
-    const supportedBrands = await getBranchBrands( repo, branch );
+    const supportedBrands = await getBranchBrands( sim, branch );
     winston.debug( `  supportedBrands: ${supportedBrands.join( ',' )}` );
 
-    const publishedPhetBranch = await Checkout.getPhetPublishedBranch( repo );
+    const publishedPhetBranch = await Checkout.getPhetPublishedBranch( sim );
     winston.debug( `  publishedPhetBranch: ${publishedPhetBranch}` );
-    const publishedPhetioBranches = await Checkout.getPhetioPublishedBranches( repo );
+    const publishedPhetioBranches = await Checkout.getPhetioPublishedBranches( sim );
     winston.debug( `  publishedPhetioBranches: ${publishedPhetioBranches.join( ', ' )}` );
 
     type VersionComparison = 'olderThanPublished' | 'sameAsPublished' | 'newerThanPublished' | 'nothingPublished';
@@ -283,7 +283,7 @@ export class Checkout {
     winston.debug( `  hasPhetioBranchMatch: ${hasPhetioBranchMatch}` );
 
     if ( phetComparison === 'olderThanPublished' && !hasPhetioBranchMatch ) {
-      winston.info( `Branch ${repo} ${branchVersion} is not maintained, not creating a ReleaseBranch object` );
+      winston.info( `Branch ${sim} ${branchVersion} is not maintained, not creating a ReleaseBranch object` );
       return checkout;
     }
 
@@ -303,16 +303,16 @@ export class Checkout {
     }
 
     if ( brands.length === 0 ) {
-      throw new Error( `Expected at least one supported brand for ${repo} ${branchVersion}, got none` );
+      throw new Error( `Expected at least one supported brand for ${sim} ${branchVersion}, got none` );
     }
 
-    checkout.releaseBranch = new ReleaseBranch( checkout, repo, branchVersion, brands, isReleased );
+    checkout.releaseBranch = new ReleaseBranch( checkout, sim, branchVersion, brands, isReleased );
 
     return checkout;
   }
 
-  public static async getReleaseBranch( repo: Repo, branchVersion: BranchVersion ): Promise<ReleaseBranch> {
-    const checkout = await Checkout.getReleaseBranchCheckout( repo, branchVersion );
+  public static async getReleaseBranch( sim: Sim, branchVersion: BranchVersion ): Promise<ReleaseBranch> {
+    const checkout = await Checkout.getReleaseBranchCheckout( sim, branchVersion );
 
     if ( !checkout.releaseBranch ) {
       throw new Error( `Expected release branch to be set for ${checkout.branch}, perhaps this is an old release branch that is not maintained?` );
@@ -321,12 +321,12 @@ export class Checkout {
     return checkout.releaseBranch;
   }
 
-  public static async getMainRunnableBranch( repo: Repo ): Promise<RunnableBranch> {
-    return ( await Checkout.getMainCheckout() ).getRunnableBranch( repo );
+  public static async getMainRunnableBranch( sim: Sim ): Promise<RunnableBranch> {
+    return ( await Checkout.getMainCheckout() ).getRunnableBranch( sim );
   }
 
-  public static async getCurrentPrimaryRunnableBranch( repo: Repo ): Promise<RunnableBranch> {
-    return ( await Checkout.getCurrentPrimaryCheckout() ).getRunnableBranch( repo );
+  public static async getCurrentPrimaryRunnableBranch( sim: Sim ): Promise<RunnableBranch> {
+    return ( await Checkout.getCurrentPrimaryCheckout() ).getRunnableBranch( sim );
   }
 
   /**
@@ -373,12 +373,12 @@ export class Checkout {
   }
 
   public static async createReleaseBranchCheckout(
-    repo: Repo,
+    sim: Sim,
     branchVersion: BranchVersion,
     brands: string[],
     message?: string // appended to the commit message for the initial release branch commit, if provided
   ): Promise<Checkout> {
-    const branch = Checkout.getReleaseBranchName( repo, branchVersion );
+    const branch = Checkout.getReleaseBranchName( sim, branchVersion );
 
     const major = Number( branchVersion.split( '.' )[ 0 ] );
     const minor = Number( branchVersion.split( '.' )[ 1 ] );
@@ -417,9 +417,9 @@ export class Checkout {
 
     // get dependencies from main
     winston.info( 'Getting dependency repos' );
-    const dependencies = await ( await primaryCheckout.getRunnableBranch( repo ) ).getDependencies();
+    const dependencies = await ( await primaryCheckout.getRunnableBranch( sim ) ).getDependencies();
 
-    const releaseBranch = new ReleaseBranch( checkout, repo, branchVersion, brands, false );
+    const releaseBranch = new ReleaseBranch( checkout, sim, branchVersion, brands, false );
     checkout.releaseBranch = releaseBranch;
 
     winston.info( `Creating branch ${branch}` );
@@ -465,7 +465,7 @@ export class Checkout {
     // Update the version info in main
     winston.info( 'Updating main sim version and HTML' );
     // TODO: remove this testing branch for the future https://github.com/phetsims/totality/issues/140 (only support main)
-    const primaryRunnableBranch = await ( await Checkout.getCurrentPrimaryCheckout() ).getRunnableBranch( repo );
+    const primaryRunnableBranch = await ( await Checkout.getCurrentPrimaryCheckout() ).getRunnableBranch( sim );
     await primaryRunnableBranch.checkout.gitPullRebase();
     await primaryRunnableBranch.setSimVersion( new SimVersion( major, minor + 1, 0, {
       testType: 'dev',
@@ -541,30 +541,30 @@ export class Checkout {
   public static async getMaintainedReleaseBranches( unreleased = true ): Promise<ReleaseBranch[]> {
     winston.info( `Getting maintained release branches (unreleased: ${unreleased})` );
 
-    type Stub = { repo: Repo; branchVersion: BranchVersion };
+    type Stub = { sim: Sim; branchVersion: BranchVersion };
 
     const stubs: Stub[] = [];
-    const hasStub = ( repo: Repo, branchVersion: BranchVersion ): boolean => {
-      return stubs.some( stub => stub.repo === repo && stub.branchVersion === branchVersion );
+    const hasStub = ( sim: Sim, branchVersion: BranchVersion ): boolean => {
+      return stubs.some( stub => stub.sim === sim && stub.branchVersion === branchVersion );
     };
-    const addStub = ( repo: Repo, branchVersion: BranchVersion ): void => {
+    const addStub = ( sim: Sim, branchVersion: BranchVersion ): void => {
       // FAMB 2.3-phetio keeps ending up in the MR list when we don't want it to, see https://github.com/phetsims/phet-io/issues/1957.
-      if ( repo === 'forces-and-motion-basics' && branchVersion === '2.3-phetio' ) {
+      if ( sim === 'forces-and-motion-basics' && branchVersion === '2.3-phetio' ) {
         return;
       }
 
       // Performance hopefully not a concern
-      if ( !hasStub( repo, branchVersion ) ) {
-        stubs.push( { repo: repo, branchVersion: branchVersion } );
+      if ( !hasStub( sim, branchVersion ) ) {
+        stubs.push( { sim: sim, branchVersion: branchVersion } );
       }
     };
 
     // phet metadata
     for ( const simData of ( await simMetadataPromise ).projects ) {
-      const repo = simData.name.slice( simData.name.indexOf( '/' ) + 1 );
+      const sim = simData.name.slice( simData.name.indexOf( '/' ) + 1 );
       const branch = `${simData.version.major}.${simData.version.minor}`;
 
-      addStub( repo, branch );
+      addStub( sim, branch );
     }
 
     // phet-io metadata
@@ -573,13 +573,13 @@ export class Checkout {
         continue;
       }
 
-      const repo = simData.name;
+      const sim = simData.name;
       let branch = `${simData.versionMajor}.${simData.versionMinor}`;
       if ( simData.versionSuffix.length ) {
         branch += `-${simData.versionSuffix}`; // additional dash required
       }
 
-      addStub( repo, branch );
+      addStub( sim, branch );
     }
 
     // unreleased branches (might pick up duplicate stubs, that is fine)
@@ -593,27 +593,27 @@ export class Checkout {
           continue;
         }
 
-        const repo = match[ 1 ];
+        const sim = match[ 1 ];
         const major = Number( match[ 2 ] );
         const minor = Number( match[ 3 ] );
         const branch = `${major}.${minor}`;
 
 
-        if ( repo === 'chains' ) {
+        if ( sim === 'chains' ) {
           continue; // chains was used as a special case, so we need to ignore those for now
         }
 
-        // Only look for active sim repos
-        if ( !activeSims.includes( repo ) ) {
+        // Only look for active sim sims
+        if ( !activeSims.includes( sim ) ) {
           continue;
         }
 
-        if ( hasStub( repo, branch ) ) {
+        if ( hasStub( sim, branch ) ) {
           continue;
         }
 
         // Assumption that there is no phet-io brand sim that isn't also released with phet brand
-        const projectMetadata = ( await simMetadataPromise ).projects.find( project => project.name === `html/${repo}` ) || null;
+        const projectMetadata = ( await simMetadataPromise ).projects.find( project => project.name === `html/${sim}` ) || null;
         const productionVersion = projectMetadata ? projectMetadata.version : null;
 
         if (
@@ -621,10 +621,10 @@ export class Checkout {
           major > productionVersion.major ||
           ( major === productionVersion.major && minor > productionVersion.minor )
         ) {
-          const packageJSON = await getBranchPackageJSON( repo, totalityBranch );
+          const packageJSON = await getBranchPackageJSON( sim, totalityBranch );
 
           if ( !packageJSON.phet!.ignoreForAutomatedMaintenanceReleases ) {
-            addStub( repo, branch );
+            addStub( sim, branch );
           }
         }
       }
@@ -632,7 +632,7 @@ export class Checkout {
 
     const limit = pLimit( 10 ); // limit to 5 concurrent requests
 
-    return Promise.all( _.sortBy( stubs, [ 'repo', 'branch' ] ).map( stub => limit( () => Checkout.getReleaseBranch( stub.repo, stub.branchVersion ) ) ) );
+    return Promise.all( _.sortBy( stubs, [ 'sim', 'branch' ] ).map( stub => limit( () => Checkout.getReleaseBranch( stub.sim, stub.branchVersion ) ) ) );
   }
 
   public async getRunnableBranch( runnable: Runnable ): Promise<RunnableBranch> {
@@ -816,12 +816,12 @@ export class Checkout {
     return gitImmutableExecute( gitArgs, this.workingDirectory ).then( stdout => Promise.resolve( stdout.length === 0 ) );
   }
 
-  public async npmUpdateRepo( repo: Repo, options?: NPMUpdateOptions ): Promise<void> {
+  public async npmUpdateRepo( sim: Sim, options?: NPMUpdateOptions ): Promise<void> {
     if ( !this.isCheckedOut ) {
       throw new Error( 'Cannot get tracking branch if not checked out' );
     }
 
-    return npmUpdateDirectory( `${this.workingDirectory}/${repo}`, options );
+    return npmUpdateDirectory( `${this.workingDirectory}/${sim}`, options );
   }
 
   public async npmUpdate( options?: NPMUpdateOptions ): Promise<void> {
@@ -1350,7 +1350,7 @@ export class Checkout {
    *
    * NOTE: This does not include babel
    */
-  public async getDependenciesMap( runnables: Repo[] = getActiveRunnables() ): Promise<Record<Repo, Repo[]>> {
+  public async getDependenciesMap( runnables: Runnable[] = getActiveRunnables() ): Promise<Record<Runnable, Dependency[]>> {
     if ( !this.isCheckedOut ) {
       throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
     }
