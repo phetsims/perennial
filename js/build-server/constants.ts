@@ -94,7 +94,7 @@ export default {
   AUTHORIZATION_KEY: 'authorizationCode' as const,
   SIM_NAME_KEY: 'simName' as const,
   VERSION_STRING_KEY: 'versionString' as const,
-  LEGACY_BRANCH_KEY: 'legacyBranch' as const,
+  BRANCH_VERSION_KEY: 'branchVersion' as const,
   LOCALES_KEY: 'locales' as const,
   TOTALITY_SHA_KEY: 'totalitySHA' as const,
   SERVERS_KEY: 'servers' as const,

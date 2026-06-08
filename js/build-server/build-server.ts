@@ -84,7 +84,7 @@ const postQueueDeploy = ( req: Request, res: Response ): void => {
     api: body[ constants.API_KEY ],
     simName: body[ constants.SIM_NAME_KEY ],
     versionString: body[ constants.VERSION_STRING_KEY ],
-    legacyBranch: body[ constants.LEGACY_BRANCH_KEY ],
+    branchVersion: body[ constants.BRANCH_VERSION_KEY ],
     locales: body[ constants.LOCALES_KEY ],
     totalitySHA: body[ constants.TOTALITY_SHA_KEY ],
     servers: body[ constants.SERVERS_KEY ],

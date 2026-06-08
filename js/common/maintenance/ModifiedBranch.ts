@@ -13,7 +13,7 @@ import SimVersion from '../../browser-and-node/SimVersion.js';
 import { ReleaseBranch } from '../ReleaseBranch.js';
 import { Patch } from './Patch.js';
 import { githubCreateIssue } from '../githubCreateIssue.js';
-import { LegacyBranch, Repo, SHA } from '../../browser-and-node/PerennialTypes.js';
+import { BranchVersion, Repo, SHA } from '../../browser-and-node/PerennialTypes.js';
 
 type ModifiedBranchSerialized = {
   releaseBranch: ReturnType<ReleaseBranch['serialize']>;
@@ -69,7 +69,7 @@ export type DeployedLinkOptions = {
 
 export class ModifiedBranch {
   public readonly repo: Repo;
-  public readonly branch: LegacyBranch;
+  public readonly branch: BranchVersion; // TODO: rename to branchVersion, see https://github.com/phetsims/totality/issues/140
   public readonly brands: string[];
 
   /**
@@ -304,13 +304,6 @@ export class ModifiedBranch {
            this.pushedMessages.length > 0 &&
            this.deployedVersion !== null &&
            this.deployedVersion.testType === 'rc';
-  }
-
-  /**
-   * Returns the branch name that should be used in dependency repositories.
-   */
-  public get dependencyBranch(): LegacyBranch {
-    return `${this.repo}-${this.branch}`;
   }
 
   /**

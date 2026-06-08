@@ -42,7 +42,7 @@ import simPhetioMetadata, { SimPhetioMetadata } from './simPhetioMetadata.js';
 import { getActiveSims } from './repos/getActiveSims.js';
 import { getBranches } from './git/getBranches.js';
 import os from 'os';
-import { Branch, BranchOrSHA, BranchVersion, IntentionalPerennialAny, LegacyBranch, LocaleData, Repo, Runnable, SHA, Sim } from '../browser-and-node/PerennialTypes.js';
+import { Branch, BranchOrSHA, BranchVersion, IntentionalPerennialAny, LocaleData, Repo, Runnable, SHA, Sim } from '../browser-and-node/PerennialTypes.js';
 import assert from 'assert';
 import { getBranch } from './git/getBranch.js';
 import { hasRemoteBranch } from './git/hasRemoteBranch.js';
@@ -184,7 +184,7 @@ export class Checkout {
     return checkout;
   }
 
-  public static async getPhetPublishedBranch( repo: Repo ): Promise<LegacyBranch | null> {
+  public static async getPhetPublishedBranch( repo: Repo ): Promise<BranchVersion | null> {
     for ( const simData of ( await simMetadataPromise ).projects ) {
       const releaseRepo = simData.name.slice( simData.name.indexOf( '/' ) + 1 );
 
@@ -198,8 +198,8 @@ export class Checkout {
     return null;
   }
 
-  public static async getPhetioPublishedBranches( repo: Repo ): Promise<LegacyBranch[]> {
-    const branches: LegacyBranch[] = [];
+  public static async getPhetioPublishedBranches( repo: Repo ): Promise<BranchVersion[]> {
+    const branchVersions: BranchVersion[] = [];
 
     for ( const simData of ( await simPhetioMetadataPromise ) ) {
       if ( !simData.active || !simData.latest ) {
@@ -212,16 +212,16 @@ export class Checkout {
         continue;
       }
 
-      branches.push( `${simData.versionMajor}.${simData.versionMinor}${simData.versionSuffix.length ? `-${simData.versionSuffix}` : ''}` );
+      branchVersions.push( `${simData.versionMajor}.${simData.versionMinor}${simData.versionSuffix.length ? `-${simData.versionSuffix}` : ''}` );
     }
 
-    return branches;
+    return branchVersions;
   }
 
-  public static async getReleaseBranchCheckout( repo: Repo, legacyBranch: LegacyBranch ): Promise<Checkout> {
-    winston.debug( `getting release branch checkout for ${repo} ${legacyBranch}` );
+  public static async getReleaseBranchCheckout( repo: Repo, branchVersion: BranchVersion ): Promise<Checkout> {
+    winston.debug( `getting release branch checkout for ${repo} ${branchVersion}` );
 
-    const branch = Checkout.getReleaseBranchName( repo, legacyBranch );
+    const branch = Checkout.getReleaseBranchName( repo, branchVersion );
     const workingDirectory = Checkout.getWorktreeDirectory( branch );
 
     winston.debug( `  branch: ${branch}` );
@@ -248,12 +248,12 @@ export class Checkout {
     winston.debug( `  publishedPhetioBranches: ${publishedPhetioBranches.join( ', ' )}` );
 
     type VersionComparison = 'olderThanPublished' | 'sameAsPublished' | 'newerThanPublished' | 'nothingPublished';
-    const versionComparison = ( publishedBranch: LegacyBranch | null ): VersionComparison => {
-      if ( !publishedBranch ) {
+    const versionComparison = ( publishedBranchVersion: BranchVersion | null ): VersionComparison => {
+      if ( !publishedBranchVersion ) {
         return 'nothingPublished';
       }
 
-      const majorMinorFromBranch = ( b: LegacyBranch ) => {
+      const majorMinorFromBranch = ( b: BranchVersion ) => {
         const majorMinor = b.split( '-' )[ 0 ];
 
         return {
@@ -262,8 +262,8 @@ export class Checkout {
         };
       };
 
-      const publishedMajorMinor = majorMinorFromBranch( publishedBranch );
-      const ourMajorMinor = majorMinorFromBranch( legacyBranch );
+      const publishedMajorMinor = majorMinorFromBranch( publishedBranchVersion );
+      const ourMajorMinor = majorMinorFromBranch( branchVersion );
 
       if ( ourMajorMinor.major === publishedMajorMinor.major && ourMajorMinor.minor === publishedMajorMinor.minor ) {
         return 'sameAsPublished';
@@ -283,7 +283,7 @@ export class Checkout {
     winston.debug( `  hasPhetioBranchMatch: ${hasPhetioBranchMatch}` );
 
     if ( phetComparison === 'olderThanPublished' && !hasPhetioBranchMatch ) {
-      winston.info( `Branch ${repo} ${legacyBranch} is not maintained, not creating a ReleaseBranch object` );
+      winston.info( `Branch ${repo} ${branchVersion} is not maintained, not creating a ReleaseBranch object` );
       return checkout;
     }
 
@@ -303,16 +303,16 @@ export class Checkout {
     }
 
     if ( brands.length === 0 ) {
-      throw new Error( `Expected at least one supported brand for ${repo} ${legacyBranch}, got none` );
+      throw new Error( `Expected at least one supported brand for ${repo} ${branchVersion}, got none` );
     }
 
-    checkout.releaseBranch = new ReleaseBranch( checkout, repo, legacyBranch, brands, isReleased );
+    checkout.releaseBranch = new ReleaseBranch( checkout, repo, branchVersion, brands, isReleased );
 
     return checkout;
   }
 
-  public static async getReleaseBranch( repo: Repo, legacyBranch: LegacyBranch ): Promise<ReleaseBranch> {
-    const checkout = await Checkout.getReleaseBranchCheckout( repo, legacyBranch );
+  public static async getReleaseBranch( repo: Repo, branchVersion: BranchVersion ): Promise<ReleaseBranch> {
+    const checkout = await Checkout.getReleaseBranchCheckout( repo, branchVersion );
 
     if ( !checkout.releaseBranch ) {
       throw new Error( `Expected release branch to be set for ${checkout.branch}, perhaps this is an old release branch that is not maintained?` );
@@ -374,14 +374,14 @@ export class Checkout {
 
   public static async createReleaseBranchCheckout(
     repo: Repo,
-    legacyBranch: LegacyBranch,
+    branchVersion: BranchVersion,
     brands: string[],
     message?: string // appended to the commit message for the initial release branch commit, if provided
   ): Promise<Checkout> {
-    const branch = Checkout.getReleaseBranchName( repo, legacyBranch );
+    const branch = Checkout.getReleaseBranchName( repo, branchVersion );
 
-    const major = Number( legacyBranch.split( '.' )[ 0 ] );
-    const minor = Number( legacyBranch.split( '.' )[ 1 ] );
+    const major = Number( branchVersion.split( '.' )[ 0 ] );
+    const minor = Number( branchVersion.split( '.' )[ 1 ] );
     assert( major > 0, 'Major version for a branch should be greater than zero' );
     assert( minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
 
@@ -419,7 +419,7 @@ export class Checkout {
     winston.info( 'Getting dependency repos' );
     const dependencies = await ( await primaryCheckout.getRunnableBranch( repo ) ).getDependencies();
 
-    const releaseBranch = new ReleaseBranch( checkout, repo, legacyBranch, brands, false );
+    const releaseBranch = new ReleaseBranch( checkout, repo, branchVersion, brands, false );
     checkout.releaseBranch = releaseBranch;
 
     winston.info( `Creating branch ${branch}` );
@@ -541,21 +541,21 @@ export class Checkout {
   public static async getMaintainedReleaseBranches( unreleased = true ): Promise<ReleaseBranch[]> {
     winston.info( `Getting maintained release branches (unreleased: ${unreleased})` );
 
-    type Stub = { repo: Repo; branch: LegacyBranch };
+    type Stub = { repo: Repo; branchVersion: BranchVersion };
 
     const stubs: Stub[] = [];
-    const hasStub = ( repo: Repo, branch: LegacyBranch ): boolean => {
-      return stubs.some( stub => stub.repo === repo && stub.branch === branch );
+    const hasStub = ( repo: Repo, branchVersion: BranchVersion ): boolean => {
+      return stubs.some( stub => stub.repo === repo && stub.branchVersion === branchVersion );
     };
-    const addStub = ( repo: Repo, branch: LegacyBranch ): void => {
+    const addStub = ( repo: Repo, branchVersion: BranchVersion ): void => {
       // FAMB 2.3-phetio keeps ending up in the MR list when we don't want it to, see https://github.com/phetsims/phet-io/issues/1957.
-      if ( repo === 'forces-and-motion-basics' && branch === '2.3-phetio' ) {
+      if ( repo === 'forces-and-motion-basics' && branchVersion === '2.3-phetio' ) {
         return;
       }
 
       // Performance hopefully not a concern
-      if ( !hasStub( repo, branch ) ) {
-        stubs.push( { repo: repo, branch: branch } );
+      if ( !hasStub( repo, branchVersion ) ) {
+        stubs.push( { repo: repo, branchVersion: branchVersion } );
       }
     };
 
@@ -632,7 +632,7 @@ export class Checkout {
 
     const limit = pLimit( 10 ); // limit to 5 concurrent requests
 
-    return Promise.all( _.sortBy( stubs, [ 'repo', 'branch' ] ).map( stub => limit( () => Checkout.getReleaseBranch( stub.repo, stub.branch ) ) ) );
+    return Promise.all( _.sortBy( stubs, [ 'repo', 'branch' ] ).map( stub => limit( () => Checkout.getReleaseBranch( stub.repo, stub.branchVersion ) ) ) );
   }
 
   public async getRunnableBranch( runnable: Runnable ): Promise<RunnableBranch> {

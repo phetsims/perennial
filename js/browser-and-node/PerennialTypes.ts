@@ -16,14 +16,8 @@ export type NonTotalityRepo = string;
 export type Repo = string;
 
 export type SHA = string;
-
 export type Branch = string; // for release branches or otherwise, should always be a fully-qualified totality branch name, e.g. 'releases/acid-base-solutions/1.3'
-
 export type BranchVersion = string; // for release branches, e.g. '1.3' or '1.3-phetio'
-
-// @deprecated TODO: replace with BranchVersion https://github.com/phetsims/totality/issues/140
-export type LegacyBranch = string; // for release branches, e.g. '1.3' or '1.3-phetio'
-
 export type BranchOrSHA = Branch | SHA; // for cases where we can allow either
 
 export type BuildServerTarget = 'dev' | 'production';
@@ -141,7 +135,7 @@ export type BuildServerSimTask = {
   // sim version identifier string
   versionString: VersionString;
 
-  legacyBranch: LegacyBranch;
+  branchVersion: BranchVersion;
 
   // '*' or comma separated list of locale codes
   locales: LocalesStringSpecifier;
@@ -180,7 +174,7 @@ export type BuildServerTask = {
 export type BuildServerRequest3_0 = {
   api: '3.0';
   authorizationCode: string;
-} & Pick<BuildServerSimTask, 'simName' | 'totalitySHA' | 'versionString' | 'locales' | 'servers' | 'brands' | 'legacyBranch' | 'email' | 'userId' | 'deployImages'>;
+} & Pick<BuildServerSimTask, 'simName' | 'totalitySHA' | 'versionString' | 'locales' | 'servers' | 'brands' | 'branchVersion' | 'email' | 'userId' | 'deployImages'>;
 
 // Will be able to or (|) in future versions
 export type BuildServerRequest = BuildServerRequest3_0;

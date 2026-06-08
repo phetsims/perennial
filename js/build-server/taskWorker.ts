@@ -78,7 +78,7 @@ async function runTask( task: BuildServerTask ): Promise<void> {
     const simName = task.simName;
     const versionString = task.versionString;
     const brands = task.brands;
-    const legacyBranch = task.legacyBranch;
+    const branchVersion = task.branchVersion;
 
     if ( task.userId ) {
       winston.log( 'info', `setting userId = ${task.userId}` );
@@ -90,7 +90,7 @@ async function runTask( task: BuildServerTask ): Promise<void> {
       await abortBuild( `invalid simName ${simName}` );
     }
 
-    const releaseBranch = await Checkout.getReleaseBranch( simName, legacyBranch );
+    const releaseBranch = await Checkout.getReleaseBranch( simName, branchVersion );
     await releaseBranch.checkout.updateWorktree();
 
     if ( task.totalitySHA !== await releaseBranch.checkout.getSHA() ) {
@@ -270,7 +270,7 @@ async function runTask( task: BuildServerTask ): Promise<void> {
             email: task.email,
             brand: brand,
             phetioOptions: {
-              legacyBranch: legacyBranch,
+              branchVersion: branchVersion,
               suffix: suffix,
               version: parsedVersion,
               ignoreForAutomatedMaintenanceReleases: ignoreForAutomatedMaintenanceReleases
@@ -323,11 +323,11 @@ export const validateBuildServerSimTask = ( task: BuildServerSimTask ): void => 
     throw new Error( `locales must be a string, got ${typeof task.locales}` );
   }
 
-  if ( task.legacyBranch.includes( '/' ) ) {
-    throw new Error( `legacyBranch should not include slashes, got ${task.legacyBranch}` );
+  if ( task.branchVersion.includes( '/' ) ) {
+    throw new Error( `branchVersion should not include slashes, got ${task.branchVersion}` );
   }
-  if ( !task.legacyBranch.includes( '.' ) ) {
-    throw new Error( `legacyBranch should include a dot, got ${task.legacyBranch}` );
+  if ( !task.branchVersion.includes( '.' ) ) {
+    throw new Error( `branchVersion should include a dot, got ${task.branchVersion}` );
   }
 
   if ( !task.totalitySHA || task.totalitySHA.length !== 40 ) {

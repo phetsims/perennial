@@ -41,6 +41,7 @@
 /* eslint-disable phet/bad-typescript-text */
 
 import affirm from './affirm.js';
+import { BranchVersion } from './PerennialTypes.js';
 
 type SimVersionOptions = {
   testType?: string | null;
@@ -268,11 +269,11 @@ export default class SimVersion implements SimVersionSerialized {
   /**
    * Ensures that a branch name is ok to be a release branch.
    *
-   * @param {string} branch - e.g. '1.0'
+   * @param branchVersion - e.g. '1.0'
    * @ignore - not needed by PhET-iO Clients
    */
-  public static ensureReleaseBranch( branch: string ): void {
-    const version = SimVersion.fromBranch( branch.split( '-' )[ 0 ] );
+  public static ensureReleaseBranch( branchVersion: BranchVersion ): void {
+    const version = SimVersion.fromBranch( branchVersion.split( '-' )[ 0 ] );
     affirm( version.major > 0, 'Major version for a branch should be greater than zero' );
     affirm( version.minor >= 0, 'Minor version for a branch should be greater than (or equal) to zero' );
   }

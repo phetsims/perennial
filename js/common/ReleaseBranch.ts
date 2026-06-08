@@ -14,12 +14,12 @@ import { RunnableBranch } from './RunnableBranch.js';
 import { asyncFilter } from './async/asyncFilter.js';
 import { limitedMap } from './async/limitedMap.js';
 import { BuildOptions } from './getBuildArguments.js';
-import { LegacyBranch, Repo } from '../browser-and-node/PerennialTypes.js';
+import { BranchVersion, Repo } from '../browser-and-node/PerennialTypes.js';
 import { ANSI_BLUE, ANSI_GREEN, ANSI_MAGENTA, ANSI_RED, ANSI_RESET } from './ANSI.js';
 
 export type ReleaseBranchSerialized = {
   repo: Repo;
-  branch: LegacyBranch;
+  branch: BranchVersion;
 };
 
 export type ReleaseBranchSuccessList = {
@@ -40,7 +40,7 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
     checkout: Checkout,
     repo: Repo,
 
-    public readonly branch: LegacyBranch, // TODO: note: rename to legacyBranch? https://github.com/phetsims/totality/issues/140
+    public readonly branch: BranchVersion, // TODO: note: rename to branchVersion? https://github.com/phetsims/totality/issues/140
     brands: string[],
     public readonly isReleased: boolean
   ) {

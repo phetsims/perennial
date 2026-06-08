@@ -7,7 +7,7 @@
  */
 
 import SimVersion from '../../browser-and-node/SimVersion.js';
-import { Repo } from '../../browser-and-node/PerennialTypes.js';
+import { Sim } from '../../browser-and-node/PerennialTypes.js';
 import { vpnCheck } from '../vpnCheck.js';
 import { gitIsClean } from '../git/gitIsClean.js';
 import { hasRemoteBranch } from '../git/hasRemoteBranch.js';
@@ -41,8 +41,8 @@ export type RCDeployOptions = {
  * Deploys an rc version after incrementing the test version number.
  */
 export const rc = async (
-  repo: Repo,
-  legacyBranch: string,
+  sim: Sim,
+  branchVersion: string,
   options?: RCDeployOptions
 ): Promise<SimVersion> => {
   const noninteractive = options?.noninteractive ?? false;
@@ -50,7 +50,7 @@ export const rc = async (
   const skipBuild = options?.skipBuild ?? false;
 
   // Assertions for the version.
-  SimVersion.ensureReleaseBranch( legacyBranch );
+  SimVersion.ensureReleaseBranch( branchVersion );
 
   if ( !Checkout.isBranchNameMainlike( await getBranch() ) ) {
     throw new RCDeployError( 'Primary checkout must be on main in order to deploy' );
@@ -67,19 +67,19 @@ export const rc = async (
   }
 
   winston.info( 'checking for remote branch' );
-  if ( !( await hasRemoteBranch( Checkout.getReleaseBranchName( repo, legacyBranch ) ) ) ) {
-    if ( noninteractive || !await booleanPrompt( `Release branch ${legacyBranch} does not exist. Create it?`, false ) ) {
+  if ( !( await hasRemoteBranch( Checkout.getReleaseBranchName( sim, branchVersion ) ) ) ) {
+    if ( noninteractive || !await booleanPrompt( `Release branch ${branchVersion} does not exist. Create it?`, false ) ) {
       throw new RCDeployError( 'Release branch does not exist' );
     }
 
     const includePhetIO = await booleanPrompt( 'Include phet-io brand in release branch?', noninteractive );
     const brands = includePhetIO ? [ 'phet', 'phet-io' ] : [ 'phet' ];
 
-    await Checkout.createReleaseBranchCheckout( repo, legacyBranch, brands );
+    await Checkout.createReleaseBranchCheckout( sim, branchVersion, brands );
   }
 
   winston.info( 'loading checkout' );
-  const releaseBranch = await Checkout.getReleaseBranch( repo, legacyBranch );
+  const releaseBranch = await Checkout.getReleaseBranch( sim, branchVersion );
   const checkout = releaseBranch.checkout;
 
   // PhET-iO simulations require validation for RCs. Error out if "phet.phet-io.validation=false" is in package.json.
@@ -111,7 +111,7 @@ export const rc = async (
   } );
 
   const versionString = version.toString();
-  const simPath = buildLocal.devDeployPath + repo;
+  const simPath = buildLocal.devDeployPath + sim;
   const versionPath = `${simPath}/${versionString}`;
 
   const versionPathExists = await devDirectoryExists( versionPath );
@@ -136,7 +136,7 @@ export const rc = async (
   winston.info( 'setting sim version on release branch' );
   await releaseBranch.setSimVersion( version, message );
 
-  if ( !skipBuild && !await booleanPrompt( `Please test the built version of ${repo}.\nIs it ready to deploy`, noninteractive ) ) {
+  if ( !skipBuild && !await booleanPrompt( `Please test the built version of ${sim}.\nIs it ready to deploy`, noninteractive ) ) {
     await releaseBranch.setSimVersion( previousVersion, `Reverting deploy version for: ${message}` );
 
     throw new RCDeployError( `Built sim test failed, reverted back to ${previousVersion}` );
@@ -144,15 +144,15 @@ export const rc = async (
 
   // Send the build request
   winston.info( 'sending build-server request' );
-  await buildServerRequest( repo, version, legacyBranch, releaseBranch.getBuildServerBrands(), await checkout.getSHA(), {
+  await buildServerRequest( sim, version, branchVersion, releaseBranch.getBuildServerBrands(), await checkout.getSHA(), {
     locales: '*',
     servers: [ 'dev' ]
   } );
 
-  const versionURL = `https://phet-dev.colorado.edu/html/${repo}/${versionString}`;
+  const versionURL = `https://phet-dev.colorado.edu/html/${sim}/${versionString}`;
 
   if ( releaseBranch.brands.includes( 'phet' ) ) {
-    winston.info( `Deployed: ${versionURL}/phet/${repo}_all_phet.html` );
+    winston.info( `Deployed: ${versionURL}/phet/${sim}_all_phet.html` );
   }
   if ( releaseBranch.brands.includes( 'phet-io' ) ) {
     winston.info( `Deployed: ${versionURL}/phet-io/` );

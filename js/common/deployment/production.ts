@@ -18,6 +18,7 @@ import winston from 'winston';
 import { buildServerRequest } from '../buildServerRequest.js';
 import { buildLocal } from '../buildLocal.js';
 import { getBranch } from '../git/getBranch.js';
+import { BranchVersion, Sim } from '../../browser-and-node/PerennialTypes.js';
 
 class ProductionDeployError extends Error {
   public constructor( message: string ) {
@@ -44,8 +45,8 @@ export type ProductionDeployOptions = {
  * Deploys a production version after incrementing the test version number.
  */
 export const production = async (
-  repo: string,
-  legacyBranch: string,
+  sim: Sim,
+  branchVersion: BranchVersion,
   options?: ProductionDeployOptions
 ): Promise<SimVersion> => {
   const noninteractive = options?.noninteractive ?? false;
@@ -53,7 +54,7 @@ export const production = async (
   const skipBuild = options?.skipBuild ?? false;
   const redeploy = options?.redeploy ?? false;
 
-  SimVersion.ensureReleaseBranch( legacyBranch );
+  SimVersion.ensureReleaseBranch( branchVersion );
 
   if ( !Checkout.isBranchNameMainlike( await getBranch() ) ) {
     throw new ProductionDeployError( 'Primary checkout must be on main in order to deploy' );
@@ -70,16 +71,16 @@ export const production = async (
   }
 
   winston.info( 'checking for remote branch' );
-  if ( !( await hasRemoteBranch( Checkout.getReleaseBranchName( repo, legacyBranch ) ) ) ) {
-    throw new ProductionDeployError( `Cannot find release branch ${Checkout.getReleaseBranchName( repo, legacyBranch )} for ${repo}` );
+  if ( !( await hasRemoteBranch( Checkout.getReleaseBranchName( sim, branchVersion ) ) ) ) {
+    throw new ProductionDeployError( `Cannot find release branch ${Checkout.getReleaseBranchName( sim, branchVersion )} for ${sim}` );
   }
 
   winston.info( 'loading checkout' );
-  const releaseBranch = await Checkout.getReleaseBranch( repo, legacyBranch );
+  const releaseBranch = await Checkout.getReleaseBranch( sim, branchVersion );
   const checkout = releaseBranch.checkout;
 
-  if ( !checkout.existsRelative( `${repo}/assets/${repo}-screenshot.png` ) && releaseBranch.brands.includes( 'phet' ) ) {
-    throw new ProductionDeployError( `Missing screenshot file (${repo}/assets/${repo}-screenshot.png)` );
+  if ( !checkout.existsRelative( `${sim}/assets/${sim}-screenshot.png` ) && releaseBranch.brands.includes( 'phet' ) ) {
+    throw new ProductionDeployError( `Missing screenshot file (${sim}/assets/${sim}-screenshot.png)` );
   }
 
   if ( !await booleanPrompt( 'Are QA credits up-to-date?', noninteractive ) ) {
@@ -92,7 +93,7 @@ export const production = async (
 
   winston.info( 'querying sim metadata' );
   const isFirstVersion = !( await simMetadata( {
-    simulation: repo
+    simulation: sim
   } ) ).projects;
 
   // Initial deployment nags
@@ -140,7 +141,7 @@ export const production = async (
 
   // caps-lock should hopefully shout this at people. do we have a text-to-speech synthesizer we can shout out of their speakers?
   // SECOND THOUGHT: this would be horrible during automated maintenance releases.
-  if ( !await booleanPrompt( `DEPLOY ${repo} ${versionString} (brands: ${releaseBranch.brands.join( ',' )}) to PRODUCTION`, noninteractive ) ) {
+  if ( !await booleanPrompt( `DEPLOY ${sim} ${versionString} (brands: ${releaseBranch.brands.join( ',' )}) to PRODUCTION`, noninteractive ) ) {
     throw new ProductionDeployError( '"DEPLOY" user request' );
   }
 
@@ -164,7 +165,7 @@ export const production = async (
     } ) );
   }
 
-  if ( !skipBuild && !await booleanPrompt( `Please test the built version of ${repo}.\nIs it ready to deploy`, noninteractive ) ) {
+  if ( !skipBuild && !await booleanPrompt( `Please test the built version of ${sim}.\nIs it ready to deploy`, noninteractive ) ) {
     await releaseBranch.setSimVersion( previousVersion, `Reverting deploy version for: ${message}` );
 
     throw new ProductionDeployError( `Built sim test failed, reverted back to ${previousVersion}` );
@@ -172,16 +173,16 @@ export const production = async (
 
   // Send the build request
   winston.info( 'sending build-server request' );
-  await buildServerRequest( repo, version, legacyBranch, releaseBranch.getBuildServerBrands(), await checkout.getSHA(), {
+  await buildServerRequest( sim, version, branchVersion, releaseBranch.getBuildServerBrands(), await checkout.getSHA(), {
     locales: '*',
     servers: [ 'dev', 'production' ]
   } );
 
   if ( releaseBranch.brands.includes( 'phet' ) ) {
-    winston.info( `Deployed: https://phet.colorado.edu/sims/html/${repo}/latest/${repo}_all.html` );
+    winston.info( `Deployed: https://phet.colorado.edu/sims/html/${sim}/latest/${sim}_all.html` );
   }
   if ( releaseBranch.brands.includes( 'phet-io' ) ) {
-    winston.info( `Deployed: https://phet-io.colorado.edu/sims/${repo}/${versionString}/` );
+    winston.info( `Deployed: https://phet-io.colorado.edu/sims/${sim}/${versionString}/` );
   }
 
   winston.info( 'Please wait for the build-server to complete the deployment, and then test!' );
@@ -194,7 +195,7 @@ export const production = async (
     if ( published ) {
       winston.info( 'Updating main README' );
 
-      await ( await Checkout.getMainRunnableBranch( repo ) ).updateProductionREADME();
+      await ( await Checkout.getMainRunnableBranch( sim ) ).updateProductionREADME();
     }
   }
 

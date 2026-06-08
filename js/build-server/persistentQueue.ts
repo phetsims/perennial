@@ -48,7 +48,7 @@ const formatTask = ( task: BuildServerTask ): BuildServerTask => ( task.type ===
   api: task.api,
   simName: task.simName,
   versionString: task.versionString,
-  legacyBranch: task.legacyBranch,
+  branchVersion: task.branchVersion,
   locales: task.locales,
   totalitySHA: task.totalitySHA,
   servers: task.servers,
