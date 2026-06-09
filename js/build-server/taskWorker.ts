@@ -259,7 +259,6 @@ async function runTask( task: BuildServerTask ): Promise<void> {
           const suffix = versionString.split( '-' ).length >= 2 ? versionString.split( '-' )[ 1 ] :
                          ( chipperVersion.major < 2 ? 'phetio' : '' );
           const parsedVersion = SimVersion.parse( versionString, '' );
-          // TODO: replace with getWorktreePackageJSON https://github.com/phetsims/totality/issues/140
           const simPackage = await releaseBranch.getPackageJSON();
           const ignoreForAutomatedMaintenanceReleases = !!( simPackage && simPackage.phet && simPackage.phet.ignoreForAutomatedMaintenanceReleases );
 

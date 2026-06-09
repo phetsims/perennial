@@ -8,12 +8,12 @@
  * @author Chris Klusendorf (PhET Interactive Simulations)
  */
 
-const _ = require( 'lodash' );
-const gitIsAncestor = require( './git/gitIsAncestor' );
-const getFileAtBranch = require( './getFileAtBranch' );
-const simPhetioMetadata = require( './simPhetioMetadata' ).default;
+import _ from 'lodash';
+import simPhetioMetadata, { SimPhetioMetadata } from './simPhetioMetadata.js';
+import { BranchVersion, Sim } from '../browser-and-node/PerennialTypes.js';
+import { Checkout } from './Checkout.js';
 
-module.exports = async () => {
+const getPhetioLinks = async (): Promise<string[]> => {
 
   const allSimsData = await simPhetioMetadata( {
     active: true,
@@ -37,26 +37,20 @@ module.exports = async () => {
   return phetioLinks;
 };
 
+export default getPhetioLinks;
+
 /**
  * Returns whether phet-io Studio is being used instead of deprecated instance proxies wrapper.
- *
- * @param {string} repo
- * @param {string} branch
- * @returns {Promise.<boolean>}
  */
-async function usesTopLevelIndex( repo, branch ) {
-  const dependencies = JSON.parse( await getFileAtBranch( repo, branch, 'dependencies.json' ) );
-  const sha = dependencies.chipper.sha;
-
-  // TODO: find sha (totality looks like bdff4df5dbf0d0bbdd7ad1d949bd7acf1dec05b7) https://github.com/phetsims/totality/issues/140
-  return gitIsAncestor( 'chipper', '8db0653ee0cbb6ed716fa3b4d4759bcb75d8118a', sha );
+async function usesTopLevelIndex( sim: Sim, branchVersion: BranchVersion ): Promise<boolean> {
+  return ( await Checkout.getLightweightReleaseBranchCheckout( sim, branchVersion ) ).hasTopLevelStudioIndex();
 }
 
 // {Object} metadata -> version string
-const getVersion = simData => `${simData.versionMajor}.${simData.versionMinor}`;
+const getVersion = ( simData: SimPhetioMetadata ) => `${simData.versionMajor}.${simData.versionMinor}`;
 
 // {Object} metadata -> branch name
-const getBranch = simData => {
+const getBranch = ( simData: SimPhetioMetadata ) => {
   let branch = `${simData.versionMajor}.${simData.versionMinor}`;
   if ( simData.versionSuffix.length ) {
     branch += `-${simData.versionSuffix}`; // additional dash required

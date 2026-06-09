@@ -38,8 +38,6 @@ assert( buildLocalJSON.devUsername, `devUsername missing from ${BUILD_LOCAL_FILE
 /**
  * Configuration information that is related to deploying sims.
  *
- * TODO: better separate out and doc https://github.com/phetsims/totality/issues/140
- *
  * All fields are public (read-only).
  * Fields include:
  *

@@ -6,11 +6,11 @@
  * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
-import { getPackageJSON } from './getPackageJSON.js';
 import { Sim } from '../browser-and-node/PerennialTypes.js';
+import { Checkout } from './Checkout.js';
 
 export const isPublished = async ( sim: Sim ): Promise<boolean> => {
-  const packageObject = await getPackageJSON( sim );
+  const packageObject = await ( await Checkout.getMainCheckout() ).getPackageJSON( sim );
 
   return !!packageObject?.phet?.published;
 };

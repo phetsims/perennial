@@ -7,8 +7,8 @@
  */
 
 import assert from 'assert';
-import { getPackageJSON } from './getPackageJSON.js';
 import { PackageJSON } from '../browser-and-node/PerennialTypes.js';
+import { Checkout } from './Checkout.js';
 
 export class ChipperVersion {
   /**
@@ -57,6 +57,6 @@ export class ChipperVersion {
    * Returns the chipper version of the currently-checked-out chipper repository.
    */
   public static async getFromRepository(): Promise<ChipperVersion> {
-    return ChipperVersion.getFromPackageJSON( await getPackageJSON( 'chipper' ) );
+    return ( await Checkout.getMainCheckout() ).getChipperVersion();
   }
 }

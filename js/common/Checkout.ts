@@ -42,7 +42,7 @@ import simPhetioMetadata, { SimPhetioMetadata } from './simPhetioMetadata.js';
 import { getActiveSims } from './repos/getActiveSims.js';
 import { getBranches } from './git/getBranches.js';
 import os from 'os';
-import { Branch, BranchOrSHA, BranchVersion, Dependency, IntentionalPerennialAny, LocaleData, Runnable, SHA, Sim } from '../browser-and-node/PerennialTypes.js';
+import { Branch, BranchOrSHA, BranchVersion, Dependency, IntentionalPerennialAny, LocaleData, PackageJSON, Runnable, SHA, Sim } from '../browser-and-node/PerennialTypes.js';
 import assert from 'assert';
 import { getBranch } from './git/getBranch.js';
 import { hasRemoteBranch } from './git/hasRemoteBranch.js';
@@ -72,7 +72,7 @@ export const invalidateMetadataCache = (): void => {
   winston.debug( 'loading phet-io brand ReleaseBranches' );
   simPhetioMetadataPromise = simPhetioMetadata( {
     active: true,
-    latest: true // TODO: oh dear, check everywhere 'latest' exists, because once ph-scale 1.5 is fixed, we should ABSOLUTELY not use it https://github.com/phetsims/totality/issues/140
+    latest: true // NOTE: latest means "latest maintenance version with a major.minor"
   } );
 };
 invalidateMetadataCache();
@@ -216,6 +216,20 @@ export class Checkout {
     }
 
     return branchVersions;
+  }
+
+  /**
+   * Returns a checkout that doesn't do checks and assumes that the worktree does NOT exist.
+   *
+   * Additionally, it does NOT create a ReleaseBranch object.
+   *
+   * This should be used for when the performance cost of the normal lookups is not acceptable.
+   */
+  public static async getLightweightReleaseBranchCheckout( sim: Sim, branchVersion: BranchVersion ): Promise<Checkout> {
+    const branch = Checkout.getReleaseBranchName( sim, branchVersion );
+    const workingDirectory = Checkout.getWorktreeDirectory( branch );
+
+    return new Checkout( branch, false, false, workingDirectory, false );
   }
 
   public static async getReleaseBranchCheckout( sim: Sim, branchVersion: BranchVersion ): Promise<Checkout> {
@@ -1099,6 +1113,11 @@ export class Checkout {
     return gitIsAncestor( '2328bdd8bacff4bf3858c8eef1bcc3c1dc648cad', this.branch );
   }
 
+  public async hasTopLevelStudioIndex(): Promise<boolean> {
+    // chipper polyrepo 8db0653ee0cbb6ed716fa3b4d4759bcb75d8118a --- from getPhetioLinks
+    return gitIsAncestor( 'bdff4df5dbf0d0bbdd7ad1d949bd7acf1dec05b7', this.branch );
+  }
+
   /**
    * Returns the query parameter to use for activating phet-io standalone mode
    *
@@ -1411,6 +1430,10 @@ export class Checkout {
 
   public async getRelativeJSON<T extends object = IntentionalPerennialAny>( relativeFile: string ): Promise<T> {
     return JSON.parse( await getFileAtBranch( this.branch, relativeFile ) );
+  }
+
+  public async getPackageJSON( dependency: Dependency ): Promise<PackageJSON> {
+    return this.getRelativeJSON( `${dependency}/package.json` );
   }
 
   public existsRelative( relativeFile: string ): boolean {
