@@ -83,9 +83,6 @@ export class ReleaseBranch extends RunnableBranch implements ReleaseBranchSerial
     return successList;
   }
 
-  // TODO: a catch-all function that will update/transpile/build all release branches? (filter of course) https://github.com/phetsims/totality/issues/140
-  // TODO: consider some functions like this over in Maintenance (or keep here, and allow passing in a release branch list?) https://github.com/phetsims/totality/issues/140
-
   public static async updateReleaseBranches(
     filter: ( releaseBranch: ReleaseBranch ) => Promise<boolean> = async () => true
   ): Promise<ReleaseBranchSuccessList> {
