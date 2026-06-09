@@ -1,7 +1,9 @@
 // Copyright 2024-2026, University of Colorado Boulder
 /**
  * Collection of usable types for build tools
+ *
  * @author Michael Kauzmann (PhET Interactive Simulations)
+ * @author Jonathan Olson (PhET Interactive Simulations)
  */
 
 export type Sim = string; // "acid-base-solutions" -- a simulation name
@@ -107,7 +109,6 @@ export type PackageJSON = {
   };
 };
 
-// TODO: output and consume this https://github.com/phetsims/totality/issues/140
 export type BuildInfoJSON = {
   name: string; // name of the "repo"/sim
   version: string; // SimVersion-compatible string
@@ -121,12 +122,8 @@ export type BuildInfoJSON = {
 export type SupportedBuildServerVersion = '3.0';
 export type SupportedBuildServerBrand = 'phet' | 'phet-io';
 
-// TODO: create BuildServerAPIData that requests and tasks can pick out, move SimTask to build-server https://github.com/phetsims/totality/issues/140
-export type BuildServerSimTask = {
-  type: 'sim';
-
-  api: SupportedBuildServerVersion;
-
+// Items common to both the build request API and internal sim-deployment task objects
+export type BuildServerAPIData = {
   // lower case simulation name used for creating files/directories
   simName: Sim;
 
@@ -149,12 +146,17 @@ export type BuildServerSimTask = {
   // used for sending notifications about success/failure
   email?: string;
 
-  // rosetta user id for adding translators to the websiteg
+  // rosetta user id for adding translators to the website
   userId?: string;
 
   // If true, this will presumably(?) just deploy images and do nothing else.
   deployImages?: boolean;
 };
+
+export type BuildServerSimTask = {
+  type: 'sim';
+  api: SupportedBuildServerVersion;
+} & BuildServerAPIData;
 
 export type BuildServerDeployImagesTask = {
   type: 'deployImages';
@@ -172,7 +174,7 @@ export type BuildServerTask = {
 export type BuildServerRequest3_0 = {
   api: '3.0';
   authorizationCode: string;
-} & Pick<BuildServerSimTask, 'simName' | 'totalitySHA' | 'versionString' | 'locales' | 'servers' | 'brands' | 'branchVersion' | 'email' | 'userId' | 'deployImages'>;
+} & BuildServerAPIData;
 
 // Will be able to or (|) in future versions
 export type BuildServerRequest = BuildServerRequest3_0;
