@@ -32,6 +32,7 @@
  */
 
 import { execSync } from 'child_process';
+import path from 'path';
 import { Project, PropertyDeclaration } from 'ts-morph';
 
 /**
@@ -132,20 +133,15 @@ const repoPath = process.argv[ 2 ];
  */
 function isBuildSuccessful( repoPath: string ): boolean {
   try {
-    // Specify the path to the TypeScript compiler or build command you want to use
-    const gruntCommand = require( '../../../perennial-alias/js/common/gruntCommand.js' );
-
-    // Run the specified TypeScript compiler or build command in the current directory
-    const result = execSync( `${gruntCommand} type-check`, {
-      // set the working directory
-      cwd: repoPath,
-      stdio: 'pipe', // Capture the output
+    // Run type-check via the top-level bin/grunt wrapper, resolved from this source file so the
+    // script is independent of process cwd. bin/grunt exits non-zero on type errors, which makes
+    // execSync throw.
+    const totalityRoot = path.resolve( __dirname, '..', '..', '..' );
+    execSync( `${totalityRoot}/bin/grunt type-check --repo=${repoPath}`, {
+      cwd: totalityRoot,
+      stdio: 'pipe',
       encoding: 'utf-8'
     } );
-
-    if ( result.toLowerCase().includes( 'error' ) ) {
-      return false;
-    }
 
     // If the build command exits without error, the build is successful
     return true;

@@ -34,6 +34,7 @@
  */
 
 import { execSync } from 'child_process';
+import path from 'path';
 import { Project, Scope } from 'ts-morph';
 
 // Function to tighten accessibility annotations
@@ -140,18 +141,15 @@ const repoPath = process.argv[ 2 ];
 function isBuildSuccessful(): boolean {
   try {
 
-    // Specify the path to the TypeScript compiler you want to use
-    const gruntCommand = require( '../../../perennial-alias/js/common/gruntCommand.js' );
-
-    // Run the specified TypeScript compiler in the current directory
-    const result = execSync( `${gruntCommand} type-check`, {
-
-      // set the working directory
-      cwd: repoPath
+    // Run type-check via the top-level bin/grunt wrapper, resolved from this source file so the
+    // script is independent of process cwd. bin/grunt exits non-zero on type errors, which makes
+    // execSync throw.
+    const totalityRoot = path.resolve( __dirname, '..', '..', '..' );
+    execSync( `${totalityRoot}/bin/grunt type-check --repo=${repoPath}`, {
+      cwd: totalityRoot,
+      stdio: 'pipe',
+      encoding: 'utf-8'
     } );
-    if ( result.toString().includes( 'error' ) ) {
-      return false;
-    }
 
     // If type-check exits without error, the build is successful
     return true;

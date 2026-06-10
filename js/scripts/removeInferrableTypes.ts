@@ -27,10 +27,10 @@ import { execSync } from 'child_process';
 import path from 'path';
 import { ArrowFunction, FunctionExpression, Node, ParameterDeclaration, Project } from 'ts-morph';
 
-// Type-checking is invoked the same way `_totality/scripts/grunt.mts` does it: run `grunt`
-// from the chipper directory (which has a local grunt install) and pass `--repo=<repo>`.
-// Resolving CHIPPER from this source file makes the script independent of process cwd.
-const CHIPPER = path.resolve( __dirname, '..', '..', '..', 'chipper' );
+// Type-checking is invoked via the top-level `bin/grunt` wrapper, which handles repo selection and
+// delegation to chipper. Resolving the totality root from this source file makes the script
+// independent of process cwd.
+const TOTALITY_ROOT = path.resolve( __dirname, '..', '..', '..' );
 
 type Candidate =
   | { kind: 'param'; param: ParameterDeclaration; originalText: string }
@@ -167,17 +167,13 @@ const repoPath = process.argv[ 2 ];
  */
 function isBuildSuccessful( repoPath: string ): boolean {
   try {
-
-    // Use gruntCommand.js so this works on Windows (grunt.cmd) as well as macOS/Linux (grunt).
-    const gruntCommand = require( '../../../perennial-alias/js/common/gruntCommand.js' );
-    const result = execSync( `${gruntCommand} type-check --repo=${repoPath}`, {
-      cwd: CHIPPER,
+    execSync( `${TOTALITY_ROOT}/bin/grunt type-check --repo=${repoPath}`, {
+      cwd: TOTALITY_ROOT,
       stdio: 'pipe',
       encoding: 'utf-8'
     } );
-    if ( result.toLowerCase().includes( 'error' ) ) {
-      return false;
-    }
+
+    // bin/grunt exits non-zero on type errors, which makes execSync throw.
     return true;
   }
   catch( error ) {
