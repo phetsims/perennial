@@ -22,5 +22,6 @@ export const getBranchBrands = async ( runnable: Runnable, branch: Branch ): Pro
     return branch.includes( 'phetio' ) ? [ 'phet-io' ] : [ 'phet' ];
   }
 
-  return brands;
+  // We'll ignore adapted-from-phet for internal processes, see https://github.com/phetsims/chipper/issues/1679
+  return brands.filter( brand => brand !== 'adapted-from-phet' );
 };

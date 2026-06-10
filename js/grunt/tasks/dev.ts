@@ -19,7 +19,6 @@ import getOption from './util/getOption.js';
 ( async () => {
   const repo = getOption( 'repo' );
   assert( repo, 'Requires specifying a repository with --repo={{REPOSITORY}}' );
-  assert( getOption( 'brands' ), 'Requires specifying brands (comma-separated) with --brands={{BRANDS}}' );
 
   assertIsValidDependencyName( repo );
 
