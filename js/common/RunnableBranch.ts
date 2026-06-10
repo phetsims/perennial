@@ -195,7 +195,7 @@ export class RunnableBranch {
     }
     if ( !( await this.checkout.isClean() ) ) {
       await this.checkout.gitCommit( `Bumping ${this.repo} dev${packageJSON.phet?.generatedUnitTests ? '/test' : ''} HTML with new version` );
-      await this.checkout.gitPush();
+      await this.checkout.gitRebasePush();
     }
   }
 
@@ -250,7 +250,7 @@ export class RunnableBranch {
 
     if ( !await this.checkout.isClean() ) {
       await this.checkout.gitCommit( `Bumping ${this.repo} version to ${version.toString()}${message ? `, ${message}` : ''}` );
-      await this.checkout.gitPush();
+      await this.checkout.gitRebasePush();
     }
   }
 
@@ -268,7 +268,7 @@ export class RunnableBranch {
     // Only commit if there was actually something changed
     if ( !( await this.checkout.isClean() ) ) {
       await this.checkout.gitCommit( message );
-      await this.checkout.gitPush();
+      await this.checkout.gitRebasePush();
     }
   }
 
@@ -292,7 +292,7 @@ export class RunnableBranch {
 
     if ( !await this.checkout.isClean() ) {
       await this.checkout.gitCommit( `Generated published README.md for ${this.checkout.branch} as part of a production deploy` );
-      await this.checkout.gitPush();
+      await this.checkout.gitRebasePush();
     }
   }
 

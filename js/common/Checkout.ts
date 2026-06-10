@@ -468,7 +468,7 @@ export class Checkout {
     winston.info( 'Worktree changes add/commit/push' );
     await checkout.gitAddAll();
     await checkout.gitCommit( `Initial commit for release branch ${branch}${message ? `: ${message}` : ''}` );
-    await checkout.gitPush();
+    await checkout.gitRebasePush();
 
     winston.info( 'Worktree setting/pushing supported brands' );
     await releaseBranch.setSupportedBrands( brands );
@@ -709,6 +709,21 @@ export class Checkout {
     winston.info( `git push to ${this.branch}` );
 
     return gitMutableExecute( [ 'push', '-u', 'origin', this.branch ], this.workingDirectory );
+  }
+
+  public async gitRebasePush(): Promise<void> {
+    if ( this.isSHA ) {
+      throw new Error( 'Cannot write to a detached head SHA' );
+    }
+
+    if ( !this.isCheckedOut ) {
+      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+    }
+
+    winston.info( `git push to ${this.branch}` );
+
+    await gitMutableExecute( [ 'pull', '--rebase', 'origin', this.branch ], this.workingDirectory );
+    await gitMutableExecute( [ 'push', '-u', 'origin', this.branch ], this.workingDirectory );
   }
 
   public async gitPull(): Promise<string> {
