@@ -6,19 +6,18 @@
  * After each modification, it runs the TypeScript type checker to validate the change. If the type checker fails, it reverts the change.
  * This helps in ensuring that class properties are immutable where possible, enhancing code reliability and maintainability.
  *
- * Usage:
- * cd perennial-alias/
- * sage run js/scripts/enforceReadonlyModifiers.ts [relative-path-to-repo-directory]
+ * Usage (from the totality monorepo root):
+ *   bash perennial-alias/bin/sage run perennial-alias/js/scripts/restrictReadonlyModifiers.ts <repo-directory>
  *
  * Parameters:
- * [relative-path-to-repo-directory] - The path to the repository where TypeScript files are located. This script assumes
- *                            a 'tsconfig.json' file is present at the root of the specified directory.
+ * <repo-directory> - The repo directory name (relative to the totality root) whose TypeScript files
+ *                    should be processed. Must contain a 'tsconfig.json'.
  *
  * Options:
  * --help                   - Displays this help message and exits.
  *
  * Example:
- * sage run js/scripts/enforceReadonlyModifiers.ts ../my-ts-project
+ *   bash perennial-alias/bin/sage run perennial-alias/js/scripts/restrictReadonlyModifiers.ts quantum-wave-interference
  *
  * Note:
  * - Ensure that 'tsconfig.json' is correctly set up in your project root.
@@ -92,19 +91,18 @@ async function enforceReadonlyModifiers( repoPath: string ): Promise<void> {
 // Check if there is a --help command line argument
 if ( process.argv.includes( '--help' ) ) {
   console.log( `
-\x1b[1mUsage:\x1b[0m
-  \x1b[36mcd perennial-alias/\x1b[0m
-  \x1b[36msage run js/scripts/enforceReadonlyModifiers.ts [relative-path-to-repo-directory]\x1b[0m
+\x1b[1mUsage (run from the totality monorepo root):\x1b[0m
+  \x1b[36mbash perennial-alias/bin/sage run perennial-alias/js/scripts/restrictReadonlyModifiers.ts <repo-directory>\x1b[0m
 
 \x1b[1mParameters:\x1b[0m
-  \x1b[33m[relative-path-to-repo-directory]\x1b[0m - The path to the repository where TypeScript files are located. Assumes
-                           a 'tsconfig.json' file is present at the root of the specified directory.
+  \x1b[33m<repo-directory>\x1b[0m - The repo directory name (relative to the totality root) whose
+                       TypeScript files should be processed. Must contain a 'tsconfig.json'.
 
 \x1b[1mOptions:\x1b[0m
   \x1b[32m--help\x1b[0m                  - Displays this help message and exits.
 
 \x1b[1mExample:\x1b[0m
-  \x1b[36msage run js/scripts/enforceReadonlyModifiers.ts ../my-ts-project\x1b[0m
+  \x1b[36mbash perennial-alias/bin/sage run perennial-alias/js/scripts/restrictReadonlyModifiers.ts quantum-wave-interference\x1b[0m
 
 \x1b[1mNote:\x1b[0m
 - Ensure that 'tsconfig.json' is correctly set up in your project root.
