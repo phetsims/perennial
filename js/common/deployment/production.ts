@@ -79,7 +79,8 @@ export const production = async (
   const releaseBranch = await Checkout.getReleaseBranch( sim, branchVersion );
   const checkout = releaseBranch.checkout;
 
-  if ( !checkout.existsRelative( `${sim}/assets/${sim}-screenshot.png` ) && releaseBranch.brands.includes( 'phet' ) ) {
+  // Check main for the screenshot, since they are processed from main.
+  if ( !( await Checkout.getMainCheckout() ).existsRelative( `${sim}/assets/${sim}-screenshot.png` ) && releaseBranch.brands.includes( 'phet' ) ) {
     throw new ProductionDeployError( `Missing screenshot file (${sim}/assets/${sim}-screenshot.png)` );
   }
 
