@@ -1456,6 +1456,6 @@ export class Checkout {
   }
 
   public async getLocaleData(): Promise<LocaleData> {
-    return JSON.parse( await getFileAtBranch( this.branch, 'babel/localeData.json' ) );
+    return JSON.parse( await fsPromises.readFile( `${this.workingDirectory}/babel/localeData.json`, 'utf-8' ) );
   }
 }
