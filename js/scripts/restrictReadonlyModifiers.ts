@@ -1,4 +1,4 @@
-// Copyright 2024, University of Colorado Boulder
+// Copyright 2024-2026, University of Colorado Boulder
 
 /**
  * This script automates the process of enforcing the 'readonly' modifier on class properties within TypeScript files in a specified project.
