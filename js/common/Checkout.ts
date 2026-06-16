@@ -661,7 +661,7 @@ export class Checkout {
     }
 
     if ( !this.isCheckedOut ) {
-      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+      throw new Error( 'Cannot gitAdd for a checkout that is not checked out' );
     }
 
     winston.info( `git add ${file}` );
@@ -675,7 +675,7 @@ export class Checkout {
     }
 
     if ( !this.isCheckedOut ) {
-      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+      throw new Error( 'Cannot gitAddAll for a checkout that is not checked out' );
     }
 
     winston.info( 'git add -A' );
@@ -689,7 +689,7 @@ export class Checkout {
     }
 
     if ( !this.isCheckedOut ) {
-      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+      throw new Error( 'Cannot gitCommit for a checkout that is not checked out' );
     }
 
     winston.info( `git commit with message:\n${message}` );
@@ -703,7 +703,7 @@ export class Checkout {
     }
 
     if ( !this.isCheckedOut ) {
-      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+      throw new Error( 'Cannot gitPush for a checkout that is not checked out' );
     }
 
     winston.info( `git push to ${this.branch}` );
@@ -717,7 +717,7 @@ export class Checkout {
     }
 
     if ( !this.isCheckedOut ) {
-      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+      throw new Error( 'Cannot gitRebasePush for a checkout that is not checked out' );
     }
 
     winston.info( `git push to ${this.branch}` );
@@ -732,7 +732,7 @@ export class Checkout {
     }
 
     if ( !this.isCheckedOut ) {
-      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+      throw new Error( 'Cannot gitPull for a checkout that is not checked out' );
     }
 
     winston.info( `git pull in ${this.workingDirectory}` );
@@ -746,7 +746,7 @@ export class Checkout {
     }
 
     if ( !this.isCheckedOut ) {
-      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+      throw new Error( 'Cannot gitPullRebase for a checkout that is not checked out' );
     }
 
     winston.info( `git pull --rebase in ${this.workingDirectory}` );
@@ -760,7 +760,7 @@ export class Checkout {
     }
 
     if ( !this.isCheckedOut ) {
-      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+      throw new Error( 'Cannot gitCherryPick for a checkout that is not checked out' );
     }
 
     winston.info( `git cherry-pick ${target}` );
@@ -1417,7 +1417,7 @@ export class Checkout {
     }
 
     if ( !this.isCheckedOut ) {
-      throw new Error( 'Cannot get dependencies map for a checkout that is not checked out' );
+      throw new Error( `Cannot write relative file ${relativeFile} for a checkout that is not checked out` );
     }
 
     winston.info( `writing file ${this.workingDirectory}/${relativeFile}` );

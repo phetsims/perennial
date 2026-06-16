@@ -522,6 +522,10 @@ export class Maintenance {
           continue;
         }
 
+        if ( !modifiedBranch.releaseBranch.checkout.isCheckedOut ) {
+          await modifiedBranch.releaseBranch.checkout.update();
+        }
+
         try {
           for ( const sha of patch.shas ) {
             if ( modifiedBranch.failedCherryPicks.includes( sha ) ) {
