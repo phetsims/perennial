@@ -100,7 +100,7 @@ export class RunnableBranch {
   public async grunt( args: string[], executeOptions?: ExecuteOptions & { errors: 'resolve' } ): Promise<ExecuteResult>;
   public async grunt( args: string[], executeOptions?: ExecuteOptions & { errors?: 'reject' } ): Promise<string>;
   public async grunt( args: string[], executeOptions?: ExecuteOptions ): Promise<string | ExecuteResult> {
-    if ( await this.checkout.hasGruntRepoFlag() ) {
+    if ( await this.checkout.supportsGruntRepoFlag() ) {
       // @ts-expect-error - the overloads are a bit hard to express here, but the types of execute() should line up with the return type of this function based on the options
       return execute( gruntCommand, [ ...args, `--repo=${this.repo}` ], `${this.checkout.workingDirectory}/chipper`, executeOptions );
     }

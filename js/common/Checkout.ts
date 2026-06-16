@@ -859,7 +859,7 @@ export class Checkout {
       'perennial-alias',
 
       // We skip the repo itself, unless it is an older release branch where this is needed.
-      ...( this.releaseBranch && !( await this.hasGruntRepoFlag() ) ? [ this.releaseBranch.repo ] : [] )
+      ...( this.releaseBranch && !( await this.supportsGruntRepoFlag() ) ? [ this.releaseBranch.repo ] : [] )
     ] ) {
       if ( fs.existsSync( `${this.workingDirectory}/${npmRepo}` ) ) {
         winston.info( `npm update ${npmRepo} in worktree` );
@@ -1109,8 +1109,13 @@ export class Checkout {
   /**
    * Returns whether we can `grunt --repo` from chipper for this sim
    */
-  public async hasGruntRepoFlag(): Promise<boolean> {
-    return gitIsAncestor( '8d8fd4b95310e5b8d41da91cf79d169f86a56244', this.branch );
+  public async supportsGruntRepoFlag(): Promise<boolean> {
+    const hasGruntRepoFlag = await gitIsAncestor( '8d8fd4b95310e5b8d41da91cf79d169f86a56244', this.branch );
+
+    // NOTE: If run from chipper, the grunt.delete can fail because it refuses to delete files outside of the "working directory"
+    const cleanDoesNotGruntDelete = await gitIsAncestor( '7cbc1f137848c288a0395eb7ae7b9fea1597cd65', this.branch );
+
+    return hasGruntRepoFlag && cleanDoesNotGruntDelete;
   }
 
 
