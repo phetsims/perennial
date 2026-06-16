@@ -1059,7 +1059,7 @@ export class Checkout {
    */
   public async usesOldPhetioStandalone(): Promise<boolean> {
     // chipper polyrepo 4814d6966c54f250b1c0f3909b71f2b9cfcc7665
-    return gitIsAncestor( '6aa2943d55f673921609b7e76b6a808e033e439c', this.branch );
+    return !gitIsAncestor( '6aa2943d55f673921609b7e76b6a808e033e439c', this.branch );
   }
 
   /**
