@@ -996,10 +996,9 @@ export class Checkout {
 
       await gitCreateWorktree( this.workingDirectory, this.branch );
     }
-    else {
-      winston.info( `pulling worktree at ${this.workingDirectory}` );
-      await gitPullDirectory( this.workingDirectory );
-    }
+
+    winston.info( `pulling worktree at ${this.workingDirectory}` );
+    await gitPullDirectory( this.workingDirectory );
 
     await this.updateBabel();
     await this.npmUpdate();
