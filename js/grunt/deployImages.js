@@ -11,7 +11,7 @@
 // @ts-nocheck
 
 // modules
-const buildLocal = require( '../common/buildLocal' );
+const { buildLocal } = require( '../common/buildLocal' );
 const winston = require( 'winston' );
 const axios = require( 'axios' );
 
