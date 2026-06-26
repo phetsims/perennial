@@ -1,4 +1,4 @@
-// Copyright 2018, University of Colorado Boulder
+// Copyright 2018-2026, University of Colorado Boulder
 
 /**
  *  This script searches babel for all translation credits based on history and adds them to the website database

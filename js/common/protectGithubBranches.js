@@ -1,4 +1,4 @@
-// Copyright 2021, University of Colorado Boulder
+// Copyright 2021-2026, University of Colorado Boulder
 
 /**
  * Sets branch protection rules for the provided list of repositories. The default branch protection rules prevent
