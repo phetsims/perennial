@@ -19,7 +19,11 @@ export const getFileAtBranch = async (
     return await gitImmutableExecute( [ 'cat-file', 'blob', `${branch}:${file}` ], '..' );
   }
   catch( e ) {
-    if ( ( e as IntentionalPerennialAny ).message.includes( 'invalid object name' ) && ( e as IntentionalPerennialAny ).message.includes( branch ) ) {
+
+    // Different git versions word a missing ref differently: newer git says "invalid object name '<ref>'", older git
+    // says "Not a valid object name <ref>:<file>".
+    const message = ( e as IntentionalPerennialAny ).message;
+    if ( ( message.includes( 'invalid object name' ) || message.includes( 'Not a valid object name' ) ) && message.includes( branch ) ) {
 
       await ensureLocalBranchFromRemote( branch );
       return gitCatFile( file, branch );
