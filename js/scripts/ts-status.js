@@ -7,7 +7,7 @@
  * Run from sims root directory
  * USAGE:
  * cd ${root containing all repos}
- * sage run ./perennial/js/scripts/ts-status.js
+ * perennial-alias/bin/sage run ./perennial-alias/js/scripts/ts-status.js
  *
  * @author Marla Schulz (PhET Interactive Simulations)
  */
@@ -25,7 +25,7 @@ const repos = [
   'kite',
   'mobius',
   'nitroglycerin',
-  'perennial',
+  'perennial-alias',
   'phet-core',
   'phet-io',
   'phetcommon',
