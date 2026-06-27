@@ -1,4 +1,4 @@
-// Copyright 2022, University of Colorado Boulder
+// Copyright 2022-2026, University of Colorado Boulder
 /**
  *
  * The ts-status script runs through relevant common code repos and counts the lines of code written in javascript
