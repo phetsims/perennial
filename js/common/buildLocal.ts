@@ -9,9 +9,10 @@
 import assert from 'assert';
 import fs from 'fs';
 import winston from 'winston';
+import { BuildLocalJSON, LaunchpadOptions } from '../browser-and-node/PerennialTypes.js';
 
 // Handle the lack of build.json
-let buildLocalObject;
+let buildLocalObject: BuildLocalJSON;
 try {
   buildLocalObject = JSON.parse( fs.readFileSync( `${process.env.HOME}/.phet/build-local.json`, 'utf8' ) );
 }
@@ -59,6 +60,10 @@ export const buildLocal = {
     assert( buildLocalObject.slackSigningSecret,
       'The slackSigningSecret field of build-local.json is required for CT Slack integration' );
     return buildLocalObject.slackSigningSecret;
+  },
+
+  get launchpadOptions(): LaunchpadOptions | undefined {
+    return buildLocalObject.launchpadOptions;
   },
 
   // Wrappers are now deployed to the dev location (for convenience)

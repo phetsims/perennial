@@ -7,8 +7,8 @@
  */
 
 import winston from 'winston';
-import { gitImmutableExecute } from './git/gitMutex.js';
-import { Branch, SHA } from '../browser-and-node/PerennialTypes.js';
+import { gitImmutableExecute } from './gitMutex.js';
+import { Branch, SHA } from '../../browser-and-node/PerennialTypes.js';
 
 export const getBranchSHAMap = async (): Promise<Record<Branch, SHA>> => {
   winston.debug( 'retrieving branches' );
@@ -17,7 +17,9 @@ export const getBranchSHAMap = async (): Promise<Record<Branch, SHA>> => {
 
   ( await gitImmutableExecute( [ 'ls-remote' ], '..' ) ).split( '\n' ).forEach( line => {
     const match = line.trim().match( /^(\S+)\s+refs\/heads\/(\S+)$/ );
-    if ( match ) {
+
+    // Ignore legacy branches, since they are not used in totality
+    if ( match && !match[ 2 ].startsWith( 'legacy/' ) ) {
       map[ match[ 2 ] ] = match[ 1 ];
     }
   } );

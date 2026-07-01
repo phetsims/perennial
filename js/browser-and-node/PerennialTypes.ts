@@ -31,6 +31,15 @@ export type LocalesStringSpecifier = '*' | string; // either '*', or a comma-sep
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type IntentionalPerennialAny = any;
 
+export type LaunchpadOptions = {
+  port?: number;
+  totalityDirectory?: string;
+  autoUpdate?: boolean;
+  cacheModulification?: boolean;
+  logLevel?: string;
+  useGithubAPI?: boolean;
+};
+
 export type StringMap = Record<Locale, Record<FullStringKey, string>>;
 export type InversedStringMap = Record<FullStringKey, Record<Locale, string>>;
 
@@ -116,6 +125,28 @@ export type BuildInfoJSON = {
   totalitySHA: string; // main totality commit
   babelSHA: string; // since we check out babel separately, we'll record the SHA of the babel repo here
   dependencyDirectories: string[]; // e.g. [ <sim-repo>, 'scenery', 'sun', ... ]
+};
+
+export type BuildLocalJSON = {
+  devUsername?: string;
+  buildServerAuthorizationCode?: string;
+  phetDevGitHubAccessToken?: string;
+  developerGithubAccessToken?: string;
+  developerGithubUsername?: string;
+  slackBotToken?: string;
+  slackSigningSecret?: string;
+  launchpadOptions?: LaunchpadOptions;
+  devDeployServer?: string;
+  devDeployPath?: string;
+  decafDeployPath?: string;
+  buildServerNotifyEmail?: string | null;
+  productionServerURL?: string;
+  babelBranch?: string;
+  worktreesDirectory?: string;
+  maintenanceWorktreeDirectory?: string;
+  brands?: string[];
+  hookPreCommit?: Record<string, boolean>;
+  isPhetTeamMember?: boolean;
 };
 
 // Dropping support for 1.0 and 2.0 since we need to work off of totality. Will be able to or (|) to add future versions
