@@ -1,7 +1,9 @@
 /* eslint-disable */
-// Adapted from https://github.com/davidtaylorhq/qunit-puppeteer which is distributed under the MIT License
+// Adapted from https://github.com/davidtaylorhq/qunit-puppeteer which is distributed under the MIT License,
+// and converted from puppeteer to playwright, see https://github.com/phetsims/totality/issues/185
 /* eslint-enable */
 // @author Michael Kauzmann (PhET Interactive Simulations)
+// @author Sam Reid (PhET Interactive Simulations)
 
 /* global window */
 
@@ -18,7 +20,8 @@ module.exports = function( browser, targetURL ) {
       }
     };
 
-    page.on( 'error', msg => end( { ok: false, result: 'error', message: msg } ) );
+    // playwright's counterpart to puppeteer's page 'error' event, fired when the page crashes
+    page.on( 'crash', () => end( { ok: false, result: 'crash', message: 'Page crashed' } ) );
     page.on( 'pageerror', msg => end( { ok: false, result: 'pageerror', message: msg } ) );
 
     const moduleErrors = [];
