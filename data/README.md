@@ -19,9 +19,6 @@ instead of `phetsims`.
 **active-sims (auto-generated)** - a list of all simulation repositories that can be built with chipper. Similar to
 runnables, but doesn't include repos with test code like sun, scenery-phet, etc.
 
-**active-website-repos (manually maintained)** - the list of repos required by the website development team for website.
-You will also need `perennial`, though it isn't in this list.
-
 **color-profiles (manually maintained)** - a vestigial list of outdates color-profile-supporting sims that is only
 needed so that phetmarks works on release branches. DO NOT UPDATE.
 See https://github.com/phetsims/scenery-phet/issues/515#issuecomment-885921345
@@ -56,8 +53,5 @@ shouldn't be tested as such. Any sim in this list will not have its state wrappe
 
 **voicing (auto-generated)** - is the list of all simulations that have the voicing feature. This is noted in package
 json "phetFeatures.supportsVoicing".
-
-**website-deployed-repos (manually maintained)** - List of website repos that require special management for releasing 
-the phet website. These repos are versioned separately to support website deploys. All repos in this list MUST be in active-website-repos.
 
 **wrappers (manually maintained)** - list of PhET-iO "wrapper suite" wrappers that are published with every PhET-iO build.

@@ -82,7 +82,6 @@ function task_data-lists() {
 function task_reopen-todos() {
   logWithStderr "TASK - REOPEN ISSUES LINKED IN TODOS:"
   (cd perennial-alias && bin/sage run js/scripts/reopen-issues-from-todos.ts)
-  (cd perennial-alias && bin/sage run js/scripts/reopen-issues-from-todos.ts --repoList=active-website-repos)
 }
 
 function task_update() {
