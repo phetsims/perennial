@@ -54,7 +54,7 @@
     "lodash": "~4.17.10",
     "madge": "~8.0.0",
     "ncp": "~2.0.0",
-    "nodemailer": "^6.9.1",
+    "nodemailer": "^9.0.1",
     "nopt": "~4.0.1",
     "p-limit": "^7.1.1",
     "playwright": "^1.56.1",
